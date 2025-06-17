@@ -4,6 +4,7 @@ import * as HoldsRepo from "../repositories/Holds/HoldsRepository.js";
 import * as AccessCheckRepo from "../repositories/Equipment/AccessChecksRepository.js";
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
+import * as RestrictionRepo from "../repositories/Restrictions/RestrictionsRepository.js";
 import { Privilege } from "../schemas/usersSchema.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { ApolloContext, CurrentUser } from "../context.js";
@@ -18,8 +19,18 @@ const UsersResolvers = {
     holds: async (
       parent: { id: string },
       _args: any,
-      _context: ApolloContext) => {
+      _context: ApolloContext
+    ) => {
       return HoldsRepo.getHoldsByUser(Number(parent.id));
+    },
+
+    // Map restrictions field to array of Restricitons
+    restrictions: async (
+      parent: { id: string},
+      _args: any,
+      _context: ApolloContext
+    ) => {
+      return RestrictionRepo.getRestrictionsByUserID(Number(parent.id))
     },
 
     //Map passedModules field to array of passed TrainingModules
@@ -34,7 +45,8 @@ const UsersResolvers = {
     accessChecks: async (
       parent: { id: string },
       _args: any,
-      _context: ApolloContext) => {
+      _context: ApolloContext
+    ) => {
       return AccessCheckRepo.getAccessChecksByUserID(Number(parent.id));
     },
 
@@ -42,7 +54,8 @@ const UsersResolvers = {
     trainingHolds: async (
       parent: { id: string },
       _args: any,
-      _context: ApolloContext) => {
+      _context: ApolloContext
+    ) => {
       return getActiveTrainingHoldsByUser(Number(parent.id));
     },
 
