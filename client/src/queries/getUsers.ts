@@ -9,6 +9,7 @@ export interface PartialUser {
   privilege: Privilege;
   setupComplete?: boolean;
   activeHold: boolean;
+  restrictions: any[];
 }
 
 const GET_USERS = gql`
@@ -35,6 +36,9 @@ export const GET_USERS_LIMIT = gql`
       manager
       staff
       trainer
+      restrictions {
+        id
+      }
     }
   }
 `;
