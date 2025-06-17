@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { Link } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface AuditLogEntityProps {
   entityCode: string;
 }
 
-function getEntityUrl(entityType: string, id: string) {
+function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
   switch (entityType) {
     case "user":
-      return "/admin/people/" + id;
+      return `/makerspace/${makerspaceID}/people/${id}`;
     case "room":
-      return "/admin/rooms/" + id;
+      return `/makerspace/${makerspaceID}/edit/room/${id}`;
     case "equipment":
       return "/admin/equipment/" + id;
     case "module":
@@ -19,22 +19,24 @@ function getEntityUrl(entityType: string, id: string) {
     case "conceal":
       return "#";
     case "access_device":
-      return "/admin/readers";
+      return `/makerspace/${makerspaceID}/readers`;
     case "machine":
-      return "/admin/readers";
+      return `/makerspace/${makerspaceID}/readers`;
     case "makerspace":
       return `/makerspace/${id}`;
     default:
-      return "/admin/history";
+      return `/makerspace/${makerspaceID}/history`;
   }
 }
 
 export default function AuditLogEntity({ entityCode }: AuditLogEntityProps) {
   const navigate = useNavigate();
+  // Dangerous!!! Might be undefined. A temporary fix until history/logs can be overhauled
+  const { makerspaceID } = useParams<{makerspaceID: string}>();
 
   const [entityType, id, label] = entityCode.split(":");
 
-  const url = getEntityUrl(entityType, id);
+  const url = getEntityUrl(entityType, id, makerspaceID ?? "0");
 
   const [reveal, setReveal] = useState(entityType != "conceal");
 

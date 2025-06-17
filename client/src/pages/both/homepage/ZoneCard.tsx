@@ -1,5 +1,7 @@
 import { Card, CardActionArea, CardContent, CardMedia, Stack, Typography } from "@mui/material";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 interface ZoneCardProps {
     id: number;
@@ -95,7 +97,7 @@ function getHoursToday(times: {type: string, dayOfTheWeek: number, time: string}
         <Stack justifyContent="space-between" direction="row">
             {currentStatus(rawOpen, rawClose)}
             <Stack direction="row">
-                <Typography color="darkorange">{today}</Typography>
+                <Typography color="darkorange" fontWeight="bold">{today}</Typography>
                 <Typography paddingLeft={"10px"}>{rawOpen !== "" ? rawClose !== "" ? `${reformatTime(rawOpen)} - ${reformatTime(rawClose)}` : "" : ""}</Typography>
             </Stack>
             
@@ -107,8 +109,10 @@ export default function ZoneCard(props: ZoneCardProps) {
 
     const navigate = useNavigate();
 
+    const [isHovered, setIsHovered] = useState(false);
+
     return (
-        <Card sx={{width: props.isMobile ? "350px" : "500px"}}>
+        <Card sx={{width: props.isMobile ? "350px" : "500px"}} elevation={isHovered ? undefined : 8} onMouseEnter={() => {setIsHovered(true)}} onMouseLeave={() => {setIsHovered(false)}}>
             <CardActionArea onClick={() => {navigate(`/makerspace/${props.id}`)}}>
                 <CardMedia
                     component="img"
@@ -116,7 +120,10 @@ export default function ZoneCard(props: ZoneCardProps) {
                     image={props.imageUrl}
                 />
                 <CardContent>
-                    <Typography variant="h4">{props.name}</Typography>
+                    <Stack spacing={0.5} direction="row" alignItems="center">
+                        <Typography variant="h4">{props.name}</Typography>
+                        <ChevronRightIcon color="primary" fontSize="large"/>
+                    </Stack>
                     {getHoursToday(props.hours)}
                 </CardContent>
             </CardActionArea>
