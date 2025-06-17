@@ -14,6 +14,7 @@ import GET_EVENTS, { MakeEvent } from "../../../queries/eventQueries"
 import EventCard from "./EventCard";
 import EditIcon from '@mui/icons-material/Edit';
 import { isAdmin } from "../../../common/PrivilegeUtils";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 const INCREMENT_SITE_VISITS = gql`
     query IncrementSiteVisits {
@@ -25,22 +26,9 @@ export function Dashboard() {
     const currentUser = useCurrentUser();
     const adminMode = isAdmin(currentUser);
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
 
     const incrementSiteVisits = useQuery(INCREMENT_SITE_VISITS);
-
-    const [width, setWidth] = useState<number>(window.innerWidth);
-    function handleWindowSizeChange() {
-        setWidth(window.innerWidth);
-    }
-    useEffect(() => {
-        window.addEventListener('resize', handleWindowSizeChange);
-        return () => {
-            window.removeEventListener('resize', handleWindowSizeChange);
-        }
-    }, []);
-
-    const isMobile = width <= 1100;
-
     const getZonesResult = useQuery(GET_ZONES_WITH_HOURS);
     const getAnnouncementsResult = useQuery(GET_ANNOUNCEMENTS);
     const getEvents = useQuery(GET_EVENTS);
@@ -65,7 +53,7 @@ export function Dashboard() {
                         marginLeft="0px"
                     >
                         {sortedZones.map((zone: ZoneWithHours) => (
-                            <Grid marginTop={isMobile ? "10px" : undefined}>
+                            <Grid gap={2}>
                                 <ZoneCard 
                                     id={zone.id}
                                     name={zone.name}
