@@ -6,11 +6,10 @@ import { EquipmentRow, ReaderRow, UserRow } from "./db/tables.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName } from "./repositories/Users/UserRepository.js";
 import { getEquipmentByID, getMissingTrainingModules, hasAccessByID } from "./repositories/Equipment/EquipmentRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
-import { Privilege, User } from "./schemas/usersSchema.js";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { getRoomByID, hasSwipedToday } from "./repositories/Rooms/RoomRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
-import { getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstancesRepository.js";
+import { getInstanceByReaderID, getReaderByInstanceId } from "./repositories/Equipment/EquipmentInstancesRepository.js";
 import { randomInt } from "crypto";
 import { generateRandomHumanName } from "./data/humanReadableNames.js";
 import { generateShlugKey } from "./resolvers/readersResolver.js";
@@ -38,7 +37,7 @@ function stringSlugPool() {
  */
 async function addOrUpdateConnection(connData: ConnectionData) {
     if (connData.readerId == null) {
-        console.error(`WSACS: Attempting to add invalid connection to active connections\nState: ${connData.currentState}\nID: ${connData.readerId}\nSeqNum: ${connData.toShlugSeqNum}`)
+        console.error(`WSACS: Attempting to add invalid connection to active connections\n\tState: ${connData.currentState}\n\tID: ${connData.readerId}\n\tSeqNum: ${connData.toShlugSeqNum}`)
         return;
     }
     slugPool.set(connData.readerId, connData);
@@ -365,8 +364,12 @@ async function handleRequest(connData: ConnectionData | undefined, requested_val
                 if (connData?.readerId) {
                     const reader: ReaderRow | undefined = await getReaderByID(connData.readerId);
                     if (reader?.state) {
-                        console.log("WSACS: Requested state and giving last", reader?.state);
-                        obj.State = reader.state;
+                        if (["Lockout", "Welcoming"].includes(reader.state)) {
+                            obj.State = reader.state;
+                        } else {
+                            obj.State = "Idle"
+                        }
+
                     } else {
                         wsApiLog(`Couldn't find requested reader information for id ${connData.readerId}. Telling Idle`, "State")
                         obj.State = "Idle";
@@ -667,7 +670,17 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                     return;
                 }
                 let reader: ReaderRow | undefined = await getReaderByID(connData.readerId);
-                wsApiLog(`Websocket to {access_device} closed. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status", { id: connData.readerId ?? 0, label: reader?.name ?? "unknown shlug" });
+                if (reader == null) {
+                    wsApiLog(`Websocket to unknown reader closed. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status");
+                } else {
+                    const instance = await getInstanceByReaderID(reader.id);
+                    const machine = await getReaderByInstanceId(reader.id);
+                    if (instance == null || machine == null) {
+                        wsApiLog(`Websocket to unassociated {access_device} closed. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status", { id: connData.readerId, label: reader.name });
+                    } else {
+                        wsApiLog(`Websocket to {machine} instance ${instance.name}. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status", { id: connData.readerId, label: reader.name }, { id: machine.id, label: machine.name });
+                    }
+                }
                 removeConnection(connData);
             } catch (e) {
                 console.error(`WSACS: Close Exception: ${e}`)
@@ -685,6 +698,8 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
             try {
                 const shlugMessage: ShlugMessage | undefined = validateShlugMessage(ev, req);
                 if (shlugMessage == null) {
+                    wsApiDebugLog(`Invalid Shlug Message: ${JSON.stringify(ev.data)}. Forcing reconnect`, "status")
+                    ws.close(4001);
                     return;
                 }
 
@@ -693,6 +708,8 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                     // Bootup message
                     if (!await handleBootupMessage(connData, shlugMessage, ws, req?.ip ?? "unknown ip")) {
                         // failed to setup  
+                        console.error("Incorrect Boot Message. Forcing Reconnect")
+                        ws.close(4001);
                         return;
                     }
                 }
@@ -701,11 +718,10 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                 // Get reader that was setup by handleBootupMessage
                 var reader = await getReaderByID(connData.readerId ?? 0);
                 if (reader == null) {
-                    if (!connData.alreadyComplainedAboutInvalidReader) {
-                        wsApiDebugLog(`Failed to find entry for device ${connData.readerId}. Error '{error}'`, "status", { id: 400, label: "Reader does not exist" });
-                        console.error(`Failed to find entry for device. ID: ${connData.readerId}, Last State: ${connData.currentState}. IP: ${req.ip}`);
-                        connData.alreadyComplainedAboutInvalidReader = true;
-                    }
+                    wsApiDebugLog(`Failed to find entry for device ${connData.readerId}. Error '{error}' Forcing Reconnect: ${shlugMessage}. IP: ${req.ip}`, "status", { id: 400, label: "Reader does not exist" });
+                    console.error(`Failed to find entry for device. Forcing Reconnect. ID: ${connData.readerId}, Last State: ${connData.currentState}. IP: ${req.ip}: ${shlugMessage}`);
+                    // Closing the websocket will make it reauth and hopefully tell us its id
+                    ws.close(4000);
                     return;
                 }
                 var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [])
