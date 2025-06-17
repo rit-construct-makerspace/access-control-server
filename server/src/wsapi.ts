@@ -28,7 +28,7 @@ var slugPool: Map<number, ConnectionData> = new Map();
 
 function stringSlugPool() {
     var entries = Array.from(slugPool.entries());
-    var entriesNoWs = entries.map(([_, data]) => ({ "id": data?.readerId, "timeLastSent": data?.timeLastSent, "state": data?.currentState }));
+    var entriesNoWs = entries.map(([_, data]) => ({ "id": data?.readerId, "state": data?.currentState }));
     return JSON.stringify(entriesNoWs)
 }
 
@@ -153,17 +153,11 @@ interface ConnectionData {
 
     alreadyComplainedAboutInvalidReader: boolean;
     toShlugSeqNum: number
-    timeLastSent?: Date
 }
 
-// Sends a message to the shlug taking into account the time between messages 
-// The shlug cannot handle messages more often than ~1 a second
+// Sends a message to a shlug 
 function sendToShlugRaw(connData: ConnectionData, data: string) {
-
-    const now = new Date();
-    connData.timeLastSent = now;
     connData.ws.send(data);
-
 }
 
 /**
@@ -189,7 +183,6 @@ function sendToShlugUnprompted(connData: ConnectionData, data: any) {
  * @param replyTo the message number to respond to
  */
 function replyToShlug(connData: ConnectionData, data: any, replyTo: number) {
-    connData.timeLastSent = new Date();
     var toSend = data as ShlugResponse;
     toSend.Seq = replyTo;
 
@@ -361,7 +354,7 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
  * @param requested_values list of keys that the shlug is requesting from us
  * @returns response containing those keys
  */
-function handleRequest(connData: ConnectionData | undefined, requested_values: string[]): ShlugResponse {
+async function handleRequest(connData: ConnectionData | undefined, requested_values: string[]): Promise<ShlugResponse> {
     var obj: ShlugResponse = { Seq: -1 };
     for (let value of requested_values) {
         switch (value) {
@@ -369,7 +362,19 @@ function handleRequest(connData: ConnectionData | undefined, requested_values: s
                 obj.Time = Math.floor(Date.now() / 1000);
                 break;
             case "State":
-                obj.State = "Idle";
+                if (connData?.readerId) {
+                    const reader: ReaderRow | undefined = await getReaderByID(connData.readerId);
+                    if (reader?.state) {
+                        console.log("WSACS: Requested state and giving last", reader?.state);
+                        obj.State = reader.state;
+                    } else {
+                        wsApiLog(`Couldn't find requested reader information for id ${connData.readerId}. Telling Idle`, "State")
+                        obj.State = "Idle";
+                    }
+                } else {
+                    wsApiLog(`Couldn't find requested reader information. Telling Idle`, "State")
+                    obj.State = "Idle";
+                }
                 break;
             default:
                 wsApiDebugLog(`Invalid request from Shlug ${connData?.readerId}`, "ACS Message")
@@ -536,6 +541,13 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
     }
     connData.readerId = reader.id;
 
+    let newState: string = message.State ?? reader.state;
+    if ((message?.Request ?? []).includes("State")) {
+        // If requesting a new state, don't blindly accept a new one
+        // Wait for request handler to do logic about this
+        newState = reader.state;
+    }
+
     // update with new info
     await updateReaderStatus({
         id: reader.id,
@@ -543,7 +555,7 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
         machineType: "",
         zone: "",
         temp: 0,
-        state: message.State ?? "unknown-state",
+        state: newState,
         currentUID: "",
         recentSessionLength: reader.recentSessionLength,
         lastStatusReason: reader.lastStatusReason,
@@ -691,11 +703,12 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                 if (reader == null) {
                     if (!connData.alreadyComplainedAboutInvalidReader) {
                         wsApiDebugLog(`Failed to find entry for device ${connData.readerId}. Error '{error}'`, "status", { id: 400, label: "Reader does not exist" });
+                        console.error(`Failed to find entry for device. ID: ${connData.readerId}, Last State: ${connData.currentState}. IP: ${req.ip}`);
                         connData.alreadyComplainedAboutInvalidReader = true;
                     }
                     return;
                 }
-                var response: ShlugResponse = handleRequest(connData, shlugMessage.Request || [])
+                var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [])
 
 
                 if (shlugMessage.Message) { 
