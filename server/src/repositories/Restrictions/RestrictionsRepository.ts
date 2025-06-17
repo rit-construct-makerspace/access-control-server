@@ -62,7 +62,7 @@ export async function getRestrictionsByUserID(userID: number): Promise<Restricti
  * @param makerspaceID the id of the makerspace to check
  * @returns true if the user has a restriction in the given makerspace, false otherwise
  */
-export async function hasActiveRestriction(userID: number, makerspaceID: number): Promise<Boolean> {
+export async function hasRestriction(userID: number, makerspaceID: number): Promise<Boolean> {
     return (await getRestrictionsByUserID(userID)).some((restriction: RestrictionRow) => {
         return restriction.makerspaceID === makerspaceID;
     })
