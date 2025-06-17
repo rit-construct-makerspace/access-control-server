@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
-import { Avatar, Box, Button, Card, Chip, IconButton, MenuItem, Select, Stack, TextareaAutosize, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Card, Chip, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, TextareaAutosize, Typography } from "@mui/material";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import InfoBlob from "./InfoBlob";
@@ -19,7 +19,12 @@ import { GET_ALL_EQUIPMENTS } from "../../../queries/equipmentQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import CloseIcon from '@mui/icons-material/Close';
 import { stringAvatar } from "../../../common/avatarGenerator";
-import { isManager } from "../../../common/PrivilegeUtils";
+import { isManager, isStaff, isStaffFor } from "../../../common/PrivilegeUtils";
+import RestricitonCard from "./RestrictionCard";
+import RestrictionCard from "./RestrictionCard";
+import { useIsMobile } from "../../../common/IsMobileProvider";
+import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
+import LockIcon from '@mui/icons-material/Lock';
 
 const StyledInfo = styled.div`
   margin-top: 16px;
@@ -41,6 +46,20 @@ export interface Hold {
   };
   createDate: string;
   removeDate?: string;
+}
+
+export interface Restriction {
+  id: number;
+  reason: string;
+  creator: {
+    firstName: string;
+    lastName: string;
+  };
+  makerspace: {
+    id: number;
+    name: string;
+  };
+  createDate: string;
 }
 
 export interface AccessCheck {
@@ -77,6 +96,19 @@ export const GET_USER = gql`
         removeDate
         description
       }
+      restrictions {
+        id
+        creator {
+          firstName
+          lastName
+        }
+        makerspace {
+          id
+          name
+        }
+        reason
+        createDate
+      }
       accessChecks {
         id
         equipmentID
@@ -106,6 +138,14 @@ export const GET_USER = gql`
 export const CREATE_HOLD = gql`
   mutation CreateHold($userID: ID!, $description: String!) {
     createHold(userID: $userID, description: $description) {
+      id
+    }
+  }
+`;
+
+export const CREATE_RESTRICTION = gql`
+  mutation CreateRestriction($userID: ID!, $makerspaceID: ID!, $reason: String!) {
+    createRestriction(targetID: $userID, makerspaceID: $makerspaceID, reason: $reason) {
       id
     }
   }
@@ -154,19 +194,23 @@ interface UserModalProps {
 export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
+  const isMobile = useIsMobile();
 
   const [notes, setNotes] = useState<string>();
   const [openCreateCheckDialouge, setOpenCreateCheckDialouge] = useState<boolean>();
   const [newCheckEquipmentID, setNewCheckEquipmentID] = useState<string>();
+  const [restrictionMakerspace, setRestrictionMakerspace] = useState(-1);
 
   const [getUser, getUserResult] = useLazyQuery(GET_USER);
   const getEquipment = useQuery(GET_ALL_EQUIPMENTS)
   const [createHold] = useMutation(CREATE_HOLD);
+  const [createRestriction] = useMutation(CREATE_RESTRICTION);
   const [deleteUser] = useMutation(ARCHIVE_USER);
   const [setNotesMutation] = useMutation(SET_NOTES);
   const [refreshCheck, refreshCheckResult] = useMutation(REFRESH_CHECKS, { variables: { userID: selectedUserID }, refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const [createCheck] = useMutation(CREATE_CHECK, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const [deleteTrainingHold] = useMutation(DELETE_TRAINING_HOLD, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
+  const getZonesResult = useQuery(GET_FULL_ZONES);
 
   useEffect(() => {
     if (selectedUserID) getUser({ variables: { id: selectedUserID } });
@@ -188,6 +232,26 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
     });
   };
 
+  function handleCreateRestriction() {
+    if (restrictionMakerspace == -1) {
+      window.alert("Makerspace Required");
+      return;
+    }
+
+    const reason = window.prompt("Enter reason for restriction:")
+    if (reason == "") {
+      window.alert("Reason required.");
+      return;
+    } else if (!reason) {
+      return;
+    }
+
+    createRestriction({
+      variables: { userID: getUserResult.data.user.id, makerspaceID: restrictionMakerspace, reason: reason },
+      refetchQueries: [{query: GET_USER, variables: {id: selectedUserID}}]
+    });
+  }
+
   function handleTrainingHoldDeleteClick(id: number) {
     deleteTrainingHold({variables: {id}});
   }
@@ -197,18 +261,6 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
     createCheck({ variables: { userID: selectedUserID, equipmentID: newCheckEquipmentID } });
     setOpenCreateCheckDialouge(false);
   }
-
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
 
   const handleNotesChanged = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setNotes(event.target.value)
@@ -261,12 +313,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
             </Typography>
 
             {user.holds.length === 0 && (
-              <Stack direction="row" spacing={1} sx={{ opacity: 0.8 }}>
-                <CheckCircleIcon color="success" fontSize="small" />
-                <Typography variant="body1" fontStyle="italic">
-                  No holds.
-                </Typography>
-              </Stack>
+              <Alert severity="success">No Holds!</Alert>
             )}
 
             <Stack spacing={2}>
@@ -282,6 +329,52 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
             >
               Place hold
             </Button>
+
+            <Typography variant="h6" component="div" mt={6} mb={1}>
+              Account Restrictions
+            </Typography>
+
+            {user.restrictions.length === 0 && (
+              <Alert severity="success">No Restrictions!</Alert>
+            )}
+
+            <Stack spacing={2}>
+              {user.restrictions.map((restriction: Restriction) => (
+                <RestrictionCard key={restriction.id} restriction={restriction} userID={user.id}/>
+              ))}
+            </Stack>
+
+            {
+              isStaff(currentUser)
+              ? <RequestWrapper2 result={getZonesResult} render={(data) => {
+
+                const fullZones: FullZone[] = data.zones;
+                const potentialRestrictions = fullZones.filter((zone: FullZone) => isStaffFor(currentUser, zone.id))
+
+                return (
+                  <Stack direction="row" spacing={1} mt={2}>
+                    <FormControl fullWidth>
+                      <InputLabel id="restriction-makerspace">Makerspace</InputLabel>
+                      <Select id="restriction-makerspace"
+                        label="Makerspace"
+                        onChange={(e) => setRestrictionMakerspace(Number(e.target.value))}
+                        fullWidth
+                      >
+                        {
+                          potentialRestrictions.map((zone: FullZone) => (
+                            <MenuItem value={zone.id}>{zone.name} ID: {zone.id}</MenuItem>
+                          ))
+                        }
+                      </Select>
+                    </FormControl>
+                    <Button variant="contained" size="small" onClick={handleCreateRestriction} startIcon={<LockIcon/>}>
+                      Place Restriction
+                    </Button>
+                  </Stack>
+                );
+              }} />
+              : null
+            }
 
             <Typography variant="h6" component="div" mt={6} mb={1}>
               Access Checks

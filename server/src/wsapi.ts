@@ -14,6 +14,8 @@ import { getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstanc
 import { randomInt } from "crypto";
 import { generateRandomHumanName } from "./data/humanReadableNames.js";
 import { generateShlugKey } from "./resolvers/readersResolver.js";
+import { hasActiveHolds } from "./repositories/Holds/HoldsRepository.js";
+import { hasRestriction } from "./repositories/Restrictions/RestrictionsRepository.js";
 
 
 const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
@@ -274,6 +276,33 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
 
         // Find Makerspace
         const machineMakerspace = (await getRoomByID(machine.roomID))?.zoneID
+
+        // Hold Check
+        if (await hasActiveHolds(user.id)) {
+            wsApiLog("{user} failed to swipe into {access_device} - {equipment} due to an active hold", "auth",
+                { id: user.id, label: getUsersFullName(user) },
+                { id: reader?.id, label: reader?.name },
+                { id: machine.id, label: machine.name }
+            )
+
+            inResponse.Verified = 0;
+            inResponse.Error = "User has an active hold";
+            inResponse.Reason = "active-hold"
+            return inResponse;
+        }
+
+        // Restriction Check
+        if (await hasRestriction(user.id, machineMakerspace ?? -1)) {
+            wsApiLog("{user} failed to swipe into {access_device} - {equipment} due to an active restriction", "auth",
+                { id: user.id, label: getUsersFullName(user) },
+                { id: reader?.id, label: reader?.name },
+                { id: machine.id, label: machine.name }
+            )
+            inResponse.Verified = 0;
+            inResponse.Error = "User has an active restriction"
+            inResponse.Reason = "active-restriction"
+            return inResponse;
+        }
 
         // Manager bypass. Skip welcome and training check.
         if (typeof(machineMakerspace) === "number") {

@@ -65,13 +65,7 @@ export default function UsersPage() {
         <Button onClick={(e) => setUrlParam("q", searchText)} variant="contained" color="primary">Search</Button>
       </Stack>
       <Stack direction="row" flexWrap="wrap" justifyContent="center">
-        {safeUsers
-          // .filter((m: { id: number; ritUsername: String; firstName: string; lastName: string }) =>
-          //   (m.firstName + " " + m.lastName + " " + m.ritUsername)
-          //     .toLocaleLowerCase()
-          //     .includes(searchText.toLocaleLowerCase())
-          // )
-          ?.map((user: PartialUser) => (
+        {safeUsers?.map((user: PartialUser) => (
           <UserCard
             user={user}
             key={user.id}
@@ -80,7 +74,6 @@ export default function UsersPage() {
         ))}
       </Stack>
       <p>This page is limited to 100 users. Consider narrowing your search.</p>
-
       <UserModal selectedUserID={userID ?? ""} onClose={handleUserModalClosed} />
       </Box>
     </RequestWrapper>

@@ -116,7 +116,7 @@ export default function AppRoutes() {
                 <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />}/>
                 <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage/>}/>
               </Route>
-            </Route>n
+            </Route>
 
             {/* Routes for admins */}
             <Route element={<AdminRoute/>}>
