@@ -53,7 +53,7 @@ function removeConnection(connData: ConnectionData): boolean {
         return false;
     } else if (!slugPool.has(connData.readerId)) {
         console.error(`WSACS: Attempting to remove nonexistent connection to shlug from pool\nData: ${JSON.stringify(connData)}\nPool:${stringSlugPool()}`);
-        return false;    
+        return false;
     }
     return slugPool.delete(connData.readerId);
 }
@@ -73,7 +73,7 @@ export async function identifyReader(executingUser: UserRow, readerId: number, d
     sendToShlugUnprompted(connData, { "Identify": doIdentify });
 
     return true;
-}   
+}
 
 /**
  * Sends a state to a shlug
@@ -268,7 +268,7 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
         const machineMakerspace = (await getRoomByID(machine.roomID))?.zoneID
 
         // Manager bypass. Skip welcome and training check.
-        if (typeof(machineMakerspace) === "number") {
+        if (typeof (machineMakerspace) === "number") {
             const userManagerPerms = await getUserManagerPerms(user.id);
             if (userManagerPerms.includes(machineMakerspace)) {
                 wsApiLog("{user} has activated {access_device} - {equipment} with MANAGER access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
@@ -621,7 +621,7 @@ async function handleStateTransition(reader: ReaderRow, newState: string, active
                     await createLog(`{user} signed out of {access_device} that was not paired with any instance (Unpaired while in use) (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, { id: reader.id, label: reader.name ?? "undefined" });
                 }
             } else {
-            // Update equipment session that was created when we authed
+                // Update equipment session that was created when we authed
                 await setLatestEquipmentSessionLength(equipment.id, reader.recentSessionLength, reader.name);
                 if (user != null) {
                     await createLog(`{user} signed out of {equipment} (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, label);
@@ -674,11 +674,11 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                     wsApiLog(`Websocket to unknown reader closed. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status");
                 } else {
                     const instance = await getInstanceByReaderID(reader.id);
-                    const machine = await getReaderByInstanceId(reader.id);
+                    const machine = await getEquipmentByID(instance?.equipmentID ?? 0);
                     if (instance == null || machine == null) {
                         wsApiLog(`Websocket to unassociated {access_device} closed. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status", { id: connData.readerId, label: reader.name });
                     } else {
-                        wsApiLog(`Websocket to {machine} instance ${instance.name}. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status", { id: connData.readerId, label: reader.name }, { id: machine.id, label: machine.name });
+                        wsApiLog(`Websocket to {access_device} - {machine} instance ${instance.name}. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status", { id: connData.readerId, label: reader.name }, { id: machine.id, label: machine.name });
                     }
                 }
                 removeConnection(connData);
@@ -727,8 +727,17 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                 var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [])
 
 
-                if (shlugMessage.Message) { 
-                    wsApiLog(`{access_device} message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name })
+                if (shlugMessage.Message) {
+                    try {
+                        const instance = await getInstanceByReaderID(reader.id);
+                        const machine = await getEquipmentByID(instance?.equipmentID ?? 0);
+                        if (instance == null || machine == null) {
+                            throw EntityNotFound;
+                        }
+                        wsApiLog(`{access_device} - {machine} instance '${instance.name}' message: ${shlugMessage.Message}`, "message", { id: machine.id, label: machine.name })
+                    } catch (e) {
+                        wsApiLog(`{access_device} (unpaired) message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name })
+                    }
                 }
                 if (shlugMessage.State) {
                     await handleStateTransition(reader, shlugMessage.State, shlugMessage.UID)
