@@ -4,6 +4,12 @@ import { Announcement, GET_ANNOUNCEMENTS } from "../../queries/announcementsQuer
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { Stack } from "@mui/system";
 import { useEffect, useMemo, useReducer, useState } from "react";
+import styled from "styled-components";
+import MakeQRCode from "../../assets/make-qr-code.png";
+
+const StyledQRCode = styled.img`
+    padding: 10px;
+`;
 
 var listLength = 0;
 var index = 0;
@@ -50,7 +56,7 @@ export default function AnnouncementsDisplay() {
             const announcementGraphics = announcements.map((announcement: Announcement, loc) => {
                 return (
                         <Stack width="100%" padding="25px" key={announcement.id} spacing={2} divider={<Divider orientation="horizontal" flexItem/>}>
-                            <Typography variant="h1" textAlign="center" color="primary" fontWeight="bold">{announcement.title}</Typography>
+                            <Typography fontSize={100} textAlign="center" color="primary" fontWeight="bold">{announcement.title}</Typography>
                             <Typography variant="h3" textAlign="center">{announcement.description}</Typography>
                         </Stack>
                 );
@@ -59,14 +65,20 @@ export default function AnnouncementsDisplay() {
             listLength = announcementGraphics.length;
 
             return (
-                <Stack width="100%" height="100vh" spacing={4} justifyContent="space-between">
-                    <Slide direction="up" in={progress < 99 && progress > 1} appear={false}>
-                        <Box>
-                        {
-                            announcementGraphics.slice(index, index + 1)
-                        }
-                        </Box>
-                    </Slide>
+                <Stack width="100%" height="100vh" justifyContent="space-between">
+                    <Stack height={"100%"} justifyContent="space-between" overflow="hidden">
+                        <Slide direction="down" in={progress < 99 && progress > 1} appear={false}>
+                            <Box>
+                            {
+                                announcementGraphics.slice(index, index + 1)
+                            }
+                            </Box>
+                        </Slide>
+                        <Stack direction="row" alignItems="center" justifyContent="center" spacing={4} pb="10px">
+                            <Typography variant="h3">For more information, go to: <Typography textAlign="center" sx={{textDecoration: "underline"}} fontSize={72} fontStyle="none" color="primary">make.rit.edu</Typography></Typography>
+                            <StyledQRCode src={MakeQRCode}/>
+                        </Stack>
+                    </Stack>
                     <LinearProgress variant="determinate" value={progress} sx={{height: "30px"}}/>
                 </Stack>
             );
