@@ -57,6 +57,7 @@ export const StatisticQueryTypeDefs = gql`
         id: ID!
         moduleID: ID!
         moduleName: String!
+        quiz: JSON!
         makerID: ID!
         makerName: String!
         summary: JSON!

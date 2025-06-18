@@ -55,7 +55,7 @@ export interface VerboseEquipmentSession {
 
 function joinEquipmentSession(obj: VerboseEquipmentSession) {
   return (obj.id + ', ' + obj.start + ', ' + obj.equipmentID + ', ' + obj.equipmentName + ', ' + obj.userID + ', ' + obj.userName + ', '
-     + obj.sessionLength + ', ' + obj.readerSlug + ', ' + obj.roomID + ', ' + obj.roomName + ', ' + obj.zoneID + ', ' + obj.zoneName + ', ');
+    + obj.sessionLength + ', ' + obj.readerSlug + ', ' + obj.roomID + ', ' + obj.roomName + ', ' + obj.zoneID + ', ' + obj.zoneName + ', ');
 }
 
 
@@ -116,25 +116,25 @@ export function EquipmentStats() {
   const download = (data: BlobPart, name: string) => {
     // Create a Blob with the CSV data and type
     const blob = new Blob([data], { type: 'text/csv' });
-    
+
     // Create a URL for the Blob
     const url = URL.createObjectURL(blob);
-    
+
     // Create an anchor tag for downloading
     const a = document.createElement('a');
-    
+
     // Set the URL and download attribute of the anchor tag
     a.href = url;
     a.download = name;
-    
+
     // Trigger the download by clicking the anchor tag
     a.click();
-}
+  }
 
   function handleCSVExport() {
-    let csvContent = 
-    Object.keys(getEquipmentSessionsResult.data.getEquipmentSessionsWithAttachedEntities[0] as VerboseEquipmentSession).map((s: string) => s == "__typename" ? '' : `${s},`).join('')
-     + '\n' + getEquipmentSessionsResult.data.getEquipmentSessionsWithAttachedEntities.map((e: VerboseEquipmentSession)  => joinEquipmentSession(e)).join("\n");
+    let csvContent =
+      Object.keys(getEquipmentSessionsResult.data.getEquipmentSessionsWithAttachedEntities[0] as VerboseEquipmentSession).map((s: string) => s == "__typename" ? '' : `${s},`).join('')
+      + '\n' + getEquipmentSessionsResult.data.getEquipmentSessionsWithAttachedEntities.map((e: VerboseEquipmentSession) => joinEquipmentSession(e)).join("\n");
     download(csvContent, "equipmentSessions.csv");
   }
 
@@ -148,7 +148,7 @@ export function EquipmentStats() {
     }, {} as Record<string, VerboseEquipmentSession[]>);
   };
 
-  
+
 
 
 
@@ -183,27 +183,29 @@ export function EquipmentStats() {
         </FormControl>
 
 
-        <RequestWrapper loading={getEquipment.loading} error={getEquipment.error}>
-          <FormControl sx={{ width: '25em' }}>
-            <InputLabel id="es-stat_equipment-select_label">Equipment</InputLabel>
-            <Select
-              labelId="es-stat_equipment-select_label"
-              value={equipmentIDs}
-              label="Equipment"
-              multiple
-              onChange={handleEquipmentIDsChange}
-            >
-              {getEquipment.data?.equipments.map((equipment: Equipment) => (
-                <MenuItem value={equipment.id}>{equipment.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </RequestWrapper>
+        <RequestWrapper2 result={getEquipment} render={function (data: any): ReactElement {
+          return (
+            <FormControl sx={{ width: '25em' }}>
+              <InputLabel id="es-stat_equipment-select_label">Equipment (Default is all)</InputLabel>
+              <Select
+                labelId="es-stat_equipment-select_label"
+                value={equipmentIDs}
+                label="Equipment"
+                multiple
+                onChange={handleEquipmentIDsChange}
+              >
+                {data.equipments.map((equipment: Equipment) => (
+                  <MenuItem value={equipment.id}>{equipment.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )
+        }} />
 
-        <Button onClick={handleSubmit} variant="contained" color="primary" sx={{width: '10em'}}>Fetch</Button>
+        <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ width: '10em' }}>Fetch</Button>
 
         <Tooltip title={getEquipmentSessionsResult.data ? "User, Equipment, Room, and Zone columns will be split into Names and IDs" : "Must Fetch data before exporting"}>
-          <Button onClick={handleCSVExport} startIcon={<DownloadIcon />} variant="outlined" color="secondary" sx={{width: '10em'}} disabled={!getEquipmentSessionsResult.data}>Export as CSV</Button>
+          <Button onClick={handleCSVExport} startIcon={<DownloadIcon />} variant="outlined" color="secondary" sx={{ width: '10em' }} disabled={!getEquipmentSessionsResult.data}>Export as CSV</Button>
         </Tooltip>
 
         {showClearButton && (
@@ -275,22 +277,22 @@ export function EquipmentStats() {
 
             <Box>
               <DataGrid
-              rows={rows}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: {
-                    pageSize: 5,
+                rows={rows}
+                columns={columns}
+                initialState={{
+                  pagination: {
+                    paginationModel: {
+                      pageSize: 5,
+                    },
                   },
-                },
-              }}
-              pageSizeOptions={[5]}
-              //checkboxSelection
-              disableRowSelectionOnClick
+                }}
+                pageSizeOptions={[5]}
+                //checkboxSelection
+                disableRowSelectionOnClick
               />
 
               <Box width={"100%"}>
-                <IconButton sx={{width: "100%", borderRadius: 0}} onClick={() => setCardContainerCollapsed(!cardContainerCollapsed)}>
+                <IconButton sx={{ width: "100%", borderRadius: 0 }} onClick={() => setCardContainerCollapsed(!cardContainerCollapsed)}>
                   {cardContainerCollapsed ? "Show Cards" : "Hide Cards"}
                   {cardContainerCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
                 </IconButton>

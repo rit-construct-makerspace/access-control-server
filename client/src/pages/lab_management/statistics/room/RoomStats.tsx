@@ -170,7 +170,7 @@ export function RoomStats() {
 
         <RequestWrapper loading={getRooms.loading} error={getRooms.error}>
           <FormControl sx={{ width: '25em' }}>
-            <InputLabel id="es-stat_room-select_label">Rooms</InputLabel>
+            <InputLabel id="es-stat_room-select_label">Rooms (Default is all)</InputLabel>
             <Select
               labelId="es-stat_room-select_label"
               value={roomIDs}
