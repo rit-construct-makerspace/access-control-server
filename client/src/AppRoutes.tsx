@@ -43,6 +43,7 @@ import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
 
+// Authed Routes
 function AuthedRoute() {
   const user = useCurrentUser();
   if (user.visitor) {
