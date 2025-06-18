@@ -79,7 +79,6 @@ export function TrainingStatCard({ relevantTrainingSubmissions: relevantTraining
 
   var questionStats: { questionText: string, correct: number, incorrect: number, percent: number }[] = []
 
-  console.log(relevantTrainingSubmissions[0].quiz)
   const currentQuestions = relevantTrainingSubmissions[0].quiz.filter((item) => item.type === "MULTIPLE_CHOICE" || item.type == "CHECKBOX");
 
   relevantTrainingSubmissions.forEach((submission: VerboseTrainingSubmission) => {
