@@ -1,0 +1,75 @@
+import { useQuery } from "@apollo/client";
+import { Box, Divider, LinearProgress, Slide, Typography } from "@mui/material";
+import { Announcement, GET_ANNOUNCEMENTS } from "../../queries/announcementsQueries";
+import RequestWrapper2 from "../../common/RequestWrapper2";
+import { Stack } from "@mui/system";
+import { useEffect, useMemo, useReducer, useState } from "react";
+
+var listLength = 0;
+var index = 0;
+
+export default function AnnouncementsDisplay() {
+
+    const getAnnouncementsResult = useQuery(GET_ANNOUNCEMENTS, {pollInterval: 300000});
+
+    const [progress, setProgress] = useState(0);
+
+    function handleNextAnnouncement() {
+        console.log(listLength);
+        if (index + 1 < listLength) {
+            index = index + 1;
+        } else {
+            index = 0;
+        }
+        console.log(index);
+    }
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setProgress((oldProgress) => {
+                var newProgress = oldProgress === 100 ? 0 : Math.min(oldProgress + 1, 100);
+
+                if (newProgress < oldProgress) {
+                    handleNextAnnouncement();
+                }
+
+                return newProgress;
+            })
+        }, 200);
+
+        return () => {
+            clearInterval(timer);
+        };
+    }, []);
+    
+    return (
+        <RequestWrapper2 result={getAnnouncementsResult} render={(data) => {
+
+            const announcements: Announcement[] = data.getAllAnnouncements;
+
+            const announcementGraphics = announcements.map((announcement: Announcement, loc) => {
+                return (
+                        <Stack width="100%" padding="25px" key={announcement.id} spacing={2} divider={<Divider orientation="horizontal" flexItem/>}>
+                            <Typography variant="h1" textAlign="center" color="primary" fontWeight="bold">{announcement.title}</Typography>
+                            <Typography variant="h3" textAlign="center">{announcement.description}</Typography>
+                        </Stack>
+                );
+            });
+
+            listLength = announcementGraphics.length;
+
+            return (
+                <Stack width="100%" height="100vh" spacing={4} justifyContent="space-between">
+                    <Slide direction="up" in={progress < 99 && progress > 1} appear={false}>
+                        <Box>
+                        {
+                            announcementGraphics.slice(index, index + 1)
+                        }
+                        </Box>
+                    </Slide>
+                    <LinearProgress variant="determinate" value={progress} sx={{height: "30px"}}/>
+                </Stack>
+            );
+        }}/>
+    ) 
+}
