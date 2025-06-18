@@ -23,7 +23,7 @@ export default function Ledger() {
 
 
   const matchingItems = queryResult.data?.Ledgers.filter((i: InventoryLedger) => {
-    var searchString = i.category + " " + i.initiator.firstName + " " + i.initiator.lastName + " " + i.items.toString() + " " + i.purchaser?.firstName + " " + i.purchaser?.lastName + " " + i.totalCost + " ";
+    var searchString = i.category + " " + i.initiator?.firstName + " " + i.initiator?.lastName + " " + i.items.toString() + " " + i.purchaser?.firstName + " " + i.purchaser?.lastName + " " + i.totalCost + " ";
     return searchString.toLowerCase().includes(searchText.toLowerCase())
   });
 
@@ -153,7 +153,12 @@ export default function Ledger() {
             {matchingItems && matchingItems.map((item: InventoryLedger) => (
               <StyledTableRow>
                 <TableCell>{format(new Date(Number(item.timestamp)), "M/d/yy h:mmaaa")}</TableCell>
-                <TableCell><AuditLogEntity entityCode={`user:${item.initiator.id}:${item.initiator.firstName} ${item.initiator.lastName}`} /></TableCell>
+                <TableCell>
+                  {item.initiator 
+                    ? <AuditLogEntity entityCode={`user:${item.initiator.id}:${item.initiator.firstName} ${item.initiator.lastName}`} />
+                    : <i>None</i>
+                  }
+                  </TableCell>
                 <TableCell>{item.category}</TableCell>
                 <TableCell sx={{backgroundColor: incomeColor(item.totalCost)}}>$ {item.totalCost.toFixed(2)}</TableCell>
                 <TableCell>{item.purchaser && <div><b>Purchased By: <AuditLogEntity entityCode={`user:${item.purchaser.id}:${item.purchaser.firstName} ${item.purchaser.lastName}`} /></b></div>}{item.notes}</TableCell>

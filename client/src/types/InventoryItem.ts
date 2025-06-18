@@ -20,7 +20,7 @@ export default interface InventoryItem {
 export interface InventoryLedger {
   id: number;
   timestamp: Date;
-  initiator: {
+  initiator?: {
     id: number;
     firstName: string;
     lastName: string;
