@@ -16,6 +16,7 @@ const categoryChips = {
   server: <Chip label="Server" variant="outlined" color="info" size="small" sx={chipSx} />,
   training: <Chip label="Training" variant="outlined" color="secondary" size="small" sx={chipSx} />,
   admin: <Chip label="Admin" variant="outlined" color="primary" size="small" sx={chipSx} />,
+  inventory: <Chip label="Inventory" variant="outlined" color="warning" size="small" sx={chipSx} />,
   uncategorized: <></>,
 }
 

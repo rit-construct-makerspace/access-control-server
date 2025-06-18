@@ -145,6 +145,30 @@ export async function addItemAmount(
 }
 
 /**
+ * Set the count of an existing InventoryItem
+ * @param itemId ID of item to modify amount to
+ * @param amount amount set
+ * @returns modified Inventory Item
+ */
+export async function setItemAmount(
+  itemId: number,
+  amount: number
+): Promise<InventoryItem | null> {
+  const updateItem = (
+    await knex("InventoryItem")
+      .where({ id: itemId })
+      .update(
+        {
+          count: amount,
+        },
+        "id"
+      )
+  )[0];
+
+  return await getItemById(updateItem.id);
+}
+
+/**
  * Archive an Inventory Item
  * @param itemId ID of Inventory Item to archive
  * @returns updated Inventory Item
