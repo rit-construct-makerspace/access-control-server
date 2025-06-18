@@ -91,7 +91,11 @@ export default function AppRoutes() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/admin/storefront/preview" element={<StorefrontPreviewPage />} />
 
-        <Route path="/visitor" element={<AnnouncementsDisplay/>}/>
+        {/* Routes for the sattic displays around the makerspaces */}
+        <Route path="/display">
+          <Route path="/display/announcements" element={<AnnouncementsDisplay/>}/>
+        </Route>
+        {/* END STATIC DISPLAYS */}
 
         <Route path={"/"} element={<TopNav />}>
 
