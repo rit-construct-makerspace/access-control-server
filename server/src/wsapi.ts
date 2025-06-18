@@ -1,7 +1,7 @@
 import { Request } from "express";
 import * as ws from "ws";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
-import { createReaderFromSN, getReaderByID, getReaderByName, getReaderBySN, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
+import { createReaderFromSN, getReaderByID, getReaderByName, getReaderBySN, submitReaderLog, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
 import { EquipmentRow, ReaderRow, UserRow } from "./db/tables.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName } from "./repositories/Users/UserRepository.js";
 import { getEquipmentByID, getMissingTrainingModules, hasAccessByID } from "./repositories/Equipment/EquipmentRepository.js";
@@ -120,19 +120,6 @@ export async function sendState(executingUser: UserRow, readerId: number, state:
     return "success";
 }
 
-
-// Log helper
-export async function wsApiDebugLog(
-    message: string,
-    category: string | undefined,
-    ...entities: { id: any; label: string }[]
-) {
-    if (!API_DEBUG_LOGGING) {
-        return;
-    }
-    createLog(message, category, ...entities);
-}
-
 // Log helper
 export async function wsApiLog(
     message: string,
@@ -210,7 +197,7 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
     try {
         const reader = await getReaderByID(readerId);
         if (reader == null) {
-            wsApiDebugLog(`Failed to retrieve information about reader ${readerId}. Can't authorize`, "auth");
+            wsApiLog(`Failed to retrieve information about reader ${readerId}. Can't authorize`, "auth");
             inResponse.Auth = uid;
             inResponse.Verified = 0;
             inResponse.Error = "Failed to retrieve info about reader";
@@ -311,7 +298,7 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
         if (machine.needsWelcome && !(process.env.GLOBAL_WELCOME_BYPASS == "TRUE")) {
             const welcomed = await hasSwipedToday(machine.roomID, user.id);
             if (!welcomed) {
-                wsApiDebugLog("{user} failed to swipe into {machine} -{equipment} with error '{error}'", "auth",
+                wsApiLog("{user} failed to swipe into {machine} -{equipment} with error '{error}'", "auth",
                     { id: user.id, label: getUsersFullName(user) },
                     { id: reader.id, label: reader?.name ?? "undefined" },
                     { id: machine.id, label: machine.name },
@@ -332,7 +319,7 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
                 incompleteTrainingsStr += module.name;
                 if (i < incompleteTrainings.length - 1) incompleteTrainingsStr += ", ";
             });
-            wsApiDebugLog(`{user} failed to swipe into {machine} - {equipment} with error '{error}' [${incompleteTrainingsStr}]`, "auth",
+            wsApiLog(`{user} failed to swipe into {machine} - {equipment} with error '{error}' [${incompleteTrainingsStr}]`, "auth",
                 { id: user.id, label: getUsersFullName(user) },
                 { id: machine.id, label: reader.name ?? "undefined" },
                 { id: machine.id, label: machine.name },
@@ -346,7 +333,7 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
 
         //Check that equipment access check is completed
         if (!(process.env.GLOBAL_ACCESS_CHECK_BYPASS == "TRUE") && !(await isApproved(user.id, machine.id))) {
-            wsApiDebugLog("{user} failed to swipe into {machine} - {equipment} with error '{error}'", "auth",
+            wsApiLog("{user} failed to swipe into {machine} - {equipment} with error '{error}'", "auth",
                 { id: user.id, label: getUsersFullName(user) },
                 { id: machine.id, label: reader.name },
                 { id: machine.id, label: machine.name ?? "undefined" },
@@ -367,7 +354,7 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
         inResponse.Verified = 1;
         return inResponse;
     } catch (err) {
-        wsApiDebugLog(`Unhandled error when authorizing on {access_device} - ${err}`, "auth", { id: readerId, label: (await getReaderByID(readerId))?.name ?? "unknown device" })
+        wsApiLog(`Unhandled error when authorizing on {access_device} - ${err}`, "auth", { id: readerId, label: (await getReaderByID(readerId))?.name ?? "unknown device" })
         inResponse.Role = "unknown role";
         inResponse.Verified = 0;
         inResponse.Error = "Unknown Error";
@@ -390,26 +377,21 @@ async function handleRequest(connData: ConnectionData | undefined, requested_val
                 obj.Time = Math.floor(Date.now() / 1000);
                 break;
             case "State":
-                if (connData?.readerId) {
-                    const reader: ReaderRow | undefined = await getReaderByID(connData.readerId);
-                    if (reader?.state) {
-                        if (["Lockout", "Welcoming"].includes(reader.state)) {
-                            obj.State = reader.state;
-                        } else {
-                            obj.State = "Idle"
-                        }
-
+                const reader: ReaderRow | undefined = await getReaderByID(connData?.readerId ?? 0);
+                if (reader?.state) {
+                    if (["Lockout", "Welcoming"].includes(reader.state)) {
+                        obj.State = reader.state;
                     } else {
-                        wsApiLog(`Couldn't find requested reader information for id ${connData.readerId}. Telling Idle`, "State")
-                        obj.State = "Idle";
+                        obj.State = "Idle"
                     }
+
                 } else {
-                    wsApiLog(`Couldn't find requested reader information. Telling Idle`, "State")
+                    wsApiLog(`Couldn't find requested reader information for id ${connData?.readerId}. Telling Idle`, "State")
                     obj.State = "Idle";
                 }
                 break;
             default:
-                wsApiDebugLog(`Invalid request from Shlug ${connData?.readerId}`, "ACS Message")
+                wsApiLog(`Invalid request from Shlug ${connData?.readerId}`, "ACS Message")
         }
     }
     return obj;
@@ -424,7 +406,7 @@ interface ShlugMessage {
     HWType?: string;
     Request?: string[];
     Message?: string;  // Log Message to echo to history
-
+    Log?: string;      // Structured log message to save. Should be JSON 
     State?: string; // Current State
     UID?: string; // Reason for switching to that state
 
@@ -466,7 +448,7 @@ function validateShlugMessage(ev: ws.MessageEvent, req: Request): ShlugMessage |
         return undefined;
     }
     if (jdata.Seq == null) {
-        wsApiLog(`WSACS: Received valid JSON  from ${req.ip} with no Sequence Number. Got ${JSON.stringify(jdata)}`, "status")
+        console.error(`WSACS: Received valid JSON  from ${req.ip} with no Sequence Number. Got ${JSON.stringify(jdata)}`);
         return undefined;
     }
     return jdata;
@@ -509,6 +491,8 @@ export async function authenticateReader(readerSN: string, readerKey: string): P
     return true;
 }
 
+
+
 /**
  * Parses and handles the initial informational message sent by the shlug identifying itself
  * @param connData state of the connection
@@ -520,7 +504,8 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
         if (message.Key) {
             message.Key = "<sanitized>";
         }
-        wsApiDebugLog(`WSACS: Missing fields in boot message from ${srcIp}. Got ${JSON.stringify(message)}`, "status");
+        console.error(`WSACS: Missing fields in boot message from ${srcIp}. Got ${JSON.stringify(message)}`);
+        submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "missing fields", "ReaderIP": srcIp, "message": message });
         ws.close(4000, "Invalid Fields");
         return false;
     }
@@ -528,13 +513,16 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
     if (reader?.pairTime == null || reader?.SN == null) {
         wsApiLog(`WSACS: Request from unpaired shlug ${srcIp}. Denying`, "status");
         console.error(`WSACS: Request from unpaired shlug ${srcIp}. Denying`);
+        submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "unpaired", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
         ws.close(4001, "Unpaired Reader. Rejected");
         return false;
 
     }
     const keyToMatch = await generateShlugKey(reader?.pairTime, reader?.SN, reader?.readerKeyCycle);
     if (message.Key != keyToMatch) {
-        wsApiLog(`WSACS: Invalid key from SN ${reader?.SN} on connect.`, "status");
+        wsApiLog(`WSACS: Invalid key from SN ${reader?.SN} on connect. Was it paired correctly?`, "status");
+        message.Key = "<sanitized>";
+        await submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "wrong key", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
         console.error(`WSACS: Invalid key from SN ${reader?.SN} on connect.`);
         ws.close(4002, "Invalid Key. Rejected")
         return false;
@@ -551,7 +539,7 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
 
 
         if (reader == undefined) {
-            wsApiDebugLog("Failed to create new access device. Error '{error}'", "status", { id: 400, label: "Reader does not exist" });
+            wsApiLog("Failed to create new access device. Error '{error}'", "status", { id: 400, label: "Reader does not exist" });
             return false;
         }
         else {
@@ -561,16 +549,26 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
 
     const instance = await getInstanceByReaderID(reader.id);
     const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
-    const tag = (equipment == null) ? "reader {access_device} (unpaired)" : ("{equipment} instance " + (instance?.name ?? "unknown instance"))
-    const label: { id: number, label: string } = (equipment == null) ? { id: reader.id, label: reader.name } : { id: equipment.id, label: equipment.name ?? "unknown equipment" }
-
+    let offlineForSec = null;
     if (reader?.lastStatusTime) {
         let offlineMs = new Date().getTime() - reader.lastStatusTime.getTime();
-        const timeString = new Date(offlineMs).toISOString().slice(11, 19);
-        wsApiLog(`Opened WS to ${tag}. Offline for ${timeString}`, "status", label)
-    } else {
-        wsApiLog(`Opened WS to ${tag}`, "status", label)
+        offlineForSec = Math.floor(offlineMs / 1000);
+
     }
+    submitReaderLog(reader.id, new Date(), {
+        "WsEvent": "open",
+        "ReaderIP": srcIp,
+        "OfflineFor": offlineForSec,
+        "ReaderID": reader.id,
+        "ReaderName": reader.name,
+        "InstanceID": instance?.id,
+        "InstanceName": instance?.name,
+        "MachineID": equipment?.id,
+        "MachineName": equipment?.name,
+
+    });
+
+
     connData.readerId = reader.id;
 
     let newState: string = message.State ?? reader.state;
@@ -635,6 +633,7 @@ async function handleStateTransition(reader: ReaderRow, newState: string, active
         } else {
             wsApiLog(`{user} changed state of ${tag}: ${oldState} -> ${newState}`, "state", { id: user.id ?? 0, label: user ? getUsersFullName(user) : "NULL" }, label);
         }
+        submitReaderLog(reader.id, new Date(), { "ACSEvent": "StateChange", "From": oldState, "To": newState, "User": user?.id })
         if (newState == "Unlocked") {
             reader.sessionStartTime = new Date();
             reader.recentSessionLength = 0;
@@ -689,25 +688,46 @@ function isReplyWorthSending(resp: ShlugResponse): boolean {
 export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
     var connData: ConnectionData = initConnectionData(ws);
     console.log(`WSACS: Websocket opened to ${req.ip}`);
-
+    submitReaderLog(null, new Date(), { "WsEvent": "initial connect", "IP": req.ip })
     try {
         ws.onclose = async function (ev: ws.CloseEvent) {
             try {
                 if (connData.readerId == null) {
                     // Connection was never associated with a real reader (boot message never sent, probably something fishy)
                     console.error(`WSACS: Websocket from non-reader ${req.ip} closed with code ${ev.code} ${ev.reason}`);
+                    submitReaderLog(null, new Date(), { "WsEvent": "close nonreader", "IP": req.ip, "WsCloseCode": ev.code, "WsCloseReason": ev.reason });
                     return;
                 }
                 let reader: ReaderRow | undefined = await getReaderByID(connData.readerId);
                 if (reader == null) {
-                    wsApiLog(`Websocket to unknown reader closed. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status");
+                    await submitReaderLog(connData.readerId ?? null, new Date(), {
+                        "WsEvent": "closed",
+                        "WsClosedCode": ev.code,
+                        "WsClosedReason": ev.reason,
+                        "IP": req.ip,
+                    });
                 } else {
                     const instance = await getInstanceByReaderID(reader.id);
                     const machine = await getEquipmentByID(instance?.equipmentID ?? 0);
                     if (instance == null || machine == null) {
-                        wsApiLog(`Websocket to unassociated {access_device} closed. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status", { id: connData.readerId, label: reader.name });
+                        await submitReaderLog(connData.readerId ?? null, new Date(), {
+                            "WsEvent": "closed",
+                            "WsClosedCode": ev.code,
+                            "WsClosedReason": ev.reason,
+                            "ReaderID": reader.id,
+                            "ReaderName": reader.name,
+                        });
                     } else {
-                        wsApiLog(`Websocket to {access_device} - {machine} instance ${instance.name}. code:${ev.code}. ${ev.reason.length > 0 ? "Reason: " + ev.reason : ""}`, "status", { id: connData.readerId, label: reader.name }, { id: machine.id, label: machine.name });
+                        await submitReaderLog(connData.readerId ?? null, new Date(), {
+                            "WsClosedCode": ev.code,
+                            "WsClosedReason": ev.reason,
+                            "ReaderID": reader.id,
+                            "ReaderName": reader.name,
+                            "InstanceID": instance.id,
+                            "InstanceName": instance.name,
+                            "MachineID": machine.id,
+                            "MachineName": machine.name,
+                        });
                     }
                 }
                 removeConnection(connData);
@@ -717,8 +737,8 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
 
         };
 
-        ws.onerror = function (ev: ws.ErrorEvent) {
-            wsApiDebugLog(`WSACS: Websocket unrecoverable: ${ev}`, "status")
+        ws.onerror = async function (ev: ws.ErrorEvent) {
+            await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "error", "WsErrorMsg": ev.message });
             console.error(`WSACS: websocket error ${ev.error} - ${ev.type}: ${ev.message}`)
             ws.close(4000, "got unrecoverable error");
         }
@@ -727,18 +747,20 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
             try {
                 const shlugMessage: ShlugMessage | undefined = validateShlugMessage(ev, req);
                 if (shlugMessage == null) {
-                    wsApiDebugLog(`Invalid Shlug Message: ${JSON.stringify(ev.data)}. Forcing reconnect`, "status")
-                    ws.close(4001);
+                    console.error(`Invalid Shlug Message: ${JSON.stringify(ev.data)}. Forcing reconnect`);
+                    await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "invalid message", "Data": ev.data });
+
+                    ws.close(4001, "Invalid Message");
                     return;
                 }
 
                 // First Message is special, identifies the shlug to the server
                 if (shlugMessage.Seq === 0) {
                     // Bootup message
-                    if (!await handleBootupMessage(connData, shlugMessage, ws, req?.ip ?? "unknown ip")) {
+                    if (!await handleBootupMessage(connData, shlugMessage, ws, req.ip ?? "unknown ip")) {
                         // failed to setup  
-                        console.error("Incorrect Boot Message. Forcing Reconnect")
-                        ws.close(4001);
+                        console.error("WSACS: Incorrect Boot Message. Forcing Reconnect")
+                        ws.close(4001, "Invalid Boot Message");
                         return;
                     }
                 }
@@ -747,10 +769,10 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                 // Get reader that was setup by handleBootupMessage
                 var reader = await getReaderByID(connData.readerId ?? 0);
                 if (reader == null) {
-                    wsApiDebugLog(`Failed to find entry for device ${connData.readerId}. Error '{error}' Forcing Reconnect: ${shlugMessage}. IP: ${req.ip}`, "status", { id: 400, label: "Reader does not exist" });
-                    console.error(`Failed to find entry for device. Forcing Reconnect. ID: ${connData.readerId}, Last State: ${connData.currentState}. IP: ${req.ip}: ${shlugMessage}`);
+                    submitReaderLog(null, new Date(), { "WsEvent": "undefined reader", "ReaderIP": req.ip, "ReaderID": connData?.readerId });
+                    console.error(`Failed to find entry for device. Forcing Reconnect. ID: ${connData.readerId}, Last State: ${connData.currentState}. IP: ${req.ip}: ${JSON.stringify(shlugMessage)}`);
                     // Closing the websocket will make it reauth and hopefully tell us its id
-                    ws.close(4000);
+                    ws.close(4000, "No Device Found");
                     return;
                 }
                 var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [])
@@ -763,10 +785,13 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                         if (instance == null || machine == null) {
                             throw EntityNotFound;
                         }
-                        wsApiLog(`{access_device} - {machine} instance '${instance.name}' message: ${shlugMessage.Message}`, "message", { id: machine.id, label: machine.name })
+                        wsApiLog(`{access_device} - {machine} instance '${instance.name}' message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: machine.id, label: machine.name })
                     } catch (e) {
-                        wsApiLog(`{access_device} (unpaired) message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name })
+                        wsApiLog(`{access_device} (unpaired) message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: reader.id, label: reader.name })
                     }
+                }
+                if (shlugMessage.Log) {
+                    await submitReaderLog(connData.readerId ?? null, new Date(), shlugMessage.Log);
                 }
                 if (shlugMessage.State) {
                     await handleStateTransition(reader, shlugMessage.State, shlugMessage.UID)
@@ -779,14 +804,14 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                     replyToShlug(connData, response, shlugMessage.Seq);
                 }
             } catch (e: any) {
-                wsApiDebugLog(`WSACS: Message Exception: ${e}`, "status");
+                wsApiLog(`WSACS: Message Exception: ${e}`, "status");
                 console.error(`WSACS: Message Exception: ${e}: ${e?.stack}`)
             }
 
         }
 
     } catch (e) {
-        wsApiDebugLog(`WSACS: Exception: ${e}`, "status");
+        wsApiLog(`WSACS: Exception: ${e}`, "status");
         console.error(`WSACS: Exception: ${e}`)
     }
 }

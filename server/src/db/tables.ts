@@ -244,6 +244,11 @@ export interface ReaderRow {
   pairTime?: Date
 }
 
+export interface ReaderLogRow {
+  id: number;
+  readerID: number | null;
+  data: object;
+}
 
 export interface AnnouncementRow {
   id: number;
@@ -360,6 +365,7 @@ declare module "knex/types/tables.js" {
     TrainingHolds: TrainingHoldsRow;
     Users: UserRow;
     Readers: ReaderRow;
+    ReaderLogs: ReaderLogRow;
     AccessChecks: AccessCheckRow;
     Zones: ZoneRow;
     RoomsForZones: RoomsForZonesRow

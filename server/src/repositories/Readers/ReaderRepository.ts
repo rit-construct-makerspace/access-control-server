@@ -193,6 +193,15 @@ export async function toggleHelpRequested(id: number): Promise<void> {
     return await knex("Readers").where({ id: id }).update({ helpRequested: !(oldRow?.helpRequested)})
 }
 
+/**
+ * Submit a structured reader log to the db
+ * @param readerID the ID of the reader that this message came from
+ * @param log the json object data to insert
+ * @returns the primary key in the database
+ */
+export async function submitReaderLog(readerID: number | null, dateTime: Date, log: any): Promise<number> {
+    return await knex("ReaderLogs").insert({ readerID, dateTime, log }).returning("id");
+}
 
 const ReaderCertCAId = 34;
 export async function getReaderCertCA(): Promise<TextFieldRow | undefined> {
