@@ -134,10 +134,9 @@ const UsersResolvers = {
     currentUser: async (
       _parent: any,
       _args: any,
-      { user, ifAuthenticated }: ApolloContext) =>
-      ifAuthenticated(async () => {
+      { user }: ApolloContext) => {
         return user;
-      }),
+      },
 
     /**
      * Fetch the number of total users
