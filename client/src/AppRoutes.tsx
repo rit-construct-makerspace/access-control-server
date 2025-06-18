@@ -38,6 +38,7 @@ import { useCurrentUser } from "./common/CurrentUserProvider";
 import StaffBar from "./pages/makerspace_page/StaffBar";
 import { isAdmin, isManagerFor, isStaffFor } from "./common/PrivilegeUtils";
 import NoPrivilegePage from "./pages/NoPrivilegePage";
+import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -90,6 +91,8 @@ export default function AppRoutes() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/admin/storefront/preview" element={<StorefrontPreviewPage />} />
 
+        <Route path="/visitor" element={<AnnouncementsDisplay/>}/>
+
         <Route path={"/"} element={<TopNav />}>
 
           <Route path="/" element={<Dashboard />} />
@@ -116,7 +119,7 @@ export default function AppRoutes() {
                 <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />}/>
                 <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage/>}/>
               </Route>
-            </Route>n
+            </Route>
 
             {/* Routes for admins */}
             <Route element={<AdminRoute/>}>

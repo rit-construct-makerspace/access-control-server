@@ -69,7 +69,7 @@ export const UsersTypeDefs = gql`
     manager: [Int]
     staff: [Int]
     trainer: [Int]
-    restricitons: [Restriction]
+    restrictions: [Restriction]
 
     """
     The number-letter combination that is attached to your RIT email
