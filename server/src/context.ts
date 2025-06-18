@@ -15,6 +15,7 @@ export interface CurrentUser extends UserRow {
   trainer: number[];
 }
 
+//const testuser = undefined;
 const testuser: CurrentUser = {
   id: 16,
   firstName: "Test",
