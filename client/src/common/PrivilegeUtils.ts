@@ -5,6 +5,7 @@ export function isAdmin(user: CurrentUser) {
 }
 
 export function isManagerFor(user: CurrentUser, makerspaceID: number) {
+    makerspaceID = Number(makerspaceID);
     if (isAdmin(user)) {
         return true;
     }
@@ -19,6 +20,7 @@ export function isManager(user: CurrentUser) {
 }
 
 export function isStaffFor(user: CurrentUser, makerspaceID: number) {
+    makerspaceID = Number(makerspaceID);
     if (isManagerFor(user, makerspaceID)) {
         return true;
     }
@@ -35,6 +37,8 @@ export function isStaff(user: CurrentUser) {
 }
 
 export function isTrainerFor(user: CurrentUser, equipmentID: number, makerspaceID: number) {
+    makerspaceID = Number(makerspaceID);
+    equipmentID = Number(equipmentID);
     if (isManagerFor(user, makerspaceID)) {
         return true;
     }

@@ -349,7 +349,8 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
               ? <RequestWrapper2 result={getZonesResult} render={(data) => {
 
                 const fullZones: FullZone[] = data.zones;
-                const potentialRestrictions = fullZones.filter((zone: FullZone) => isStaffFor(currentUser, zone.id))
+                // I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript 
+                const potentialRestrictions = fullZones.filter((zone: FullZone) => isStaffFor(currentUser, Number(zone.id)))
 
                 return (
                   <Stack direction="row" spacing={1} mt={2}>
@@ -384,7 +385,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
               <Stack direction="row" spacing={1} sx={{ opacity: 0.8 }}>
                 <CheckCircleIcon color="success" fontSize="small" />
                 <Typography variant="body1" fontStyle="italic">
-                  No avaiable checks.
+                  No available checks.
                 </Typography>
               </Stack>
             )}
