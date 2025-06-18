@@ -349,7 +349,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
               ? <RequestWrapper2 result={getZonesResult} render={(data) => {
 
                 const fullZones: FullZone[] = data.zones;
-                const potentialRestrictions = fullZones.filter((zone: FullZone) => isStaffFor(currentUser, zone.id))
+                const potentialRestrictions = fullZones.filter((zone: FullZone) => isStaffFor(currentUser, Number(zone.id)))
 
                 return (
                   <Stack direction="row" spacing={1} mt={2}>
