@@ -31,7 +31,7 @@ export const EventsResolver = {
       _args: any,
     ) => {
         const events = (await getEvents()).events;
-        console.log(events);
+        //console.log(events);
         return events;
       },
   }
