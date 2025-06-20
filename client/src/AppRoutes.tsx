@@ -39,6 +39,7 @@ import StaffBar from "./pages/makerspace_page/StaffBar";
 import { isAdmin, isManagerFor, isStaffFor } from "./common/PrivilegeUtils";
 import NoPrivilegePage from "./pages/NoPrivilegePage";
 import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
+import HoursDisplay from "./pages/signage/HoursDisplay";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -95,6 +96,7 @@ export default function AppRoutes() {
         {/* Routes for the sattic displays around the makerspaces */}
         <Route path="/display">
           <Route path="/display/announcements" element={<AnnouncementsDisplay/>}/>
+          <Route path="/display/hours/:makerspaceID" element={<HoursDisplay/>}/>
         </Route>
         {/* END STATIC DISPLAYS */}
 

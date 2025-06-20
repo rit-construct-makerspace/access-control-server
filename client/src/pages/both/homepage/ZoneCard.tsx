@@ -2,6 +2,7 @@ import { Card, CardActionArea, CardContent, CardMedia, Stack, Typography } from 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { currentStatus, dayToStringMake, reformatTime } from "../../../common/TimeUtils";
 
 interface ZoneCardProps {
     id: number;
@@ -9,67 +10,6 @@ interface ZoneCardProps {
     hours: {type: string, dayOfTheWeek: number, time: string}[];
     imageUrl: string;
     isMobile: boolean;
-}
-
-function reformatTime(time: string) {
-    const split = time.split(":");
-    var hours = Number(split[0]);
-
-    var suffix = " AM";
-    //Hours in PM
-    if (hours > 11) {
-        suffix = " PM";
-        hours = hours == 12 ? 12 : hours - 12
-    }
-
-    return "" + hours + ":" + split[1] + suffix;
-}
-
-function dayOfTheWeekConvert(day: number) {
-    switch (Number(day)) {
-        case 1: return "Sunday";
-        case 2: return "Monday";
-        case 3: return "Tuesday";
-        case 4: return "Wednesday";
-        case 5: return "Thursday";
-        case 6: return "Friday";
-        case 7: return "Saturday";
-        default: return "UNKNOWN";
-    }
-}
-
-function addHours(date: Date, hours: number) {
-    const msToAdd = hours * 60 * 60 * 1000;
-    date.setTime(date.getTime() + msToAdd);
-    return date;
-}
-
-function currentStatus(opening: string, closing: string) {
-    if (closing === "") {
-        return <Typography color="red">CLOSED</Typography>;
-    }
-    const date = new Date();
-
-    const formatter = new Intl.DateTimeFormat("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        timeZone: "America/New_York",
-        hour12: false
-    })
-
-    var curTimeDate = new Date(Date.parse('01/01/2011 ' + formatter.format(date)));
-    var closingDate = new Date(Date.parse('01/01/2011 ' + closing));
-    var openingDate = new Date(Date.parse('01/01/2011 ' + opening));
-
-    if (curTimeDate >= openingDate && curTimeDate <= closingDate) {
-        return <Typography color="green" fontWeight="bold">OPEN</Typography>;
-    } else if (curTimeDate > closingDate) {
-        return <Typography color="red" fontWeight="bold">CLOSED</Typography>;
-    } else if (addHours(curTimeDate, 1) > closingDate) {
-        return <Typography color="red" fontWeight="bold">CLOSING SOON</Typography>;
-    } else {
-        return <Typography color="red" fontWeight="bold">CLOSED</Typography>;
-    }
 }
 
 function getHoursToday(times: {type: string, dayOfTheWeek: number, time: string}[]) {
@@ -83,19 +23,21 @@ function getHoursToday(times: {type: string, dayOfTheWeek: number, time: string}
     var rawClose = "";
 
     times.map((time: {type: string, dayOfTheWeek: number, time: string}, index) => {
-        if (dayOfTheWeekConvert(time.dayOfTheWeek) === today && time.type === "OPEN") {
+        if (dayToStringMake(time.dayOfTheWeek) === today && time.type === "OPEN") {
             rawOpen = time.time;
         }
 
-        if (dayOfTheWeekConvert(time.dayOfTheWeek) === today && time.type === "CLOSE") {
+        if (dayToStringMake(time.dayOfTheWeek) === today && time.type === "CLOSE") {
             rawClose = time.time;
         }
         
     })
 
+    const status = currentStatus(rawOpen, rawClose);
+
     return (
         <Stack justifyContent="space-between" direction="row">
-            {currentStatus(rawOpen, rawClose)}
+            <Typography color={status === "OPEN" ? "success" : "error"} fontWeight="bold">{status}</Typography>
             <Stack direction="row">
                 <Typography color="darkorange" fontWeight="bold">{today}</Typography>
                 <Typography paddingLeft={"10px"}>{rawOpen !== "" ? rawClose !== "" ? `${reformatTime(rawOpen)} - ${reformatTime(rawClose)}` : "" : ""}</Typography>
