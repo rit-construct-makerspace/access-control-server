@@ -89,11 +89,6 @@ export function currentStatus(opening: string, closing: string) {
     var closingDate = new Date(Date.parse('01/01/2011 ' + closing));
     var openingDate = new Date(Date.parse('01/01/2011 ' + opening));
 
-    console.log(closingDate);
-
-    console.log(`${curTimeDate.getTime()} >= ${addHours(closingDate, -1).getTime()}`, curTimeDate.getTime() >= addHours(closingDate, -1).getTime());
-    console.log(`${curTimeDate.getTime()} < ${closingDate.getTime()}`, curTimeDate.getTime() < closingDate.getTime());
-
     if (curTimeDate.getTime() >= addHours(closingDate, -1).getTime() && curTimeDate.getTime() < closingDate.getTime()) {
         return "CLOSING SOON";
     } else if (curTimeDate.getTime() >= openingDate.getTime() && curTimeDate.getTime() < closingDate.getTime()) {
