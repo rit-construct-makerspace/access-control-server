@@ -10,8 +10,7 @@ import ReaderCard from "./ReaderCard";
 import AdminPage from "../../AdminPage";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import AddIcon from '@mui/icons-material/Add';
-import { isStaff } from "../../../common/PrivilegeUtils";
-
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 
 export default function ReadersPage() {
   const { makerspaceID } = useParams<{makerspaceID: string}>();
@@ -32,11 +31,9 @@ export default function ReadersPage() {
           onChange={(e) => setSearchText(e.target.value)}
           onClear={() => setSearchText("")}
         />
-        {
-          isStaff(user) ? 
-          <Button color="success" variant="contained" onClick={()=>{navigate("/admin/newreader")}}><AddIcon/>Pair New Reader</Button> 
-          : null
-        }
+        <Button color="success" variant="contained" onClick={() => { navigate("/admin/newreader") }}><AddIcon />Pair New Reader</Button>
+        <Button color="secondary" variant="contained" onClick={() => { navigate(`/makerspace/${makerspaceID}/readerlogs`) }}><AnalyticsIcon />Reader Logs</Button>
+
       </Stack>
 
       <RequestWrapper

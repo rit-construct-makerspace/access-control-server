@@ -4,7 +4,8 @@
  */
 
 import { knex } from "../../db/index.js";
-import { ReaderRow, TextFieldRow } from "../../db/tables.js";
+import { ReaderLogRow, ReaderRow, TextFieldRow } from "../../db/tables.js";
+import { getInstanceByReaderID } from "../Equipment/EquipmentInstancesRepository.js";
 
 /**
  * Fetch a card ready buy it's primary key
@@ -63,6 +64,31 @@ export async function getUnpairedReaders(): Promise<ReaderRow[]> {
         .leftJoin("EquipmentInstances", "Readers.id", "EquipmentInstances.readerID")
         .whereNotNull("SN").andWhere(function () { this.whereNull("EquipmentInstances.readerID") })
         .orderBy("Readers.name", "desc").orderBy("Readers.id", "asc")
+}
+
+export async function getReaderLogs(searchParams: { makerspaceID?: number, from: Date, to: Date, pageOffset?: number, pageLimit: number }): Promise<ReaderLogRow[]> {
+    let query = knex("ReaderLogs as rl");
+    console.log("Makerspace filter", searchParams.makerspaceID);
+    if (searchParams.makerspaceID) {
+        query = query.leftJoin("EquipmentInstances as ei", "rl.readerID", "ei.readerID")
+            .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
+            .leftJoin("Rooms as rs", "e.roomID", "rs.id")
+            .where("rs.zoneID", "=", Number(searchParams.makerspaceID));
+    }
+    if (searchParams.from) {
+        query.andWhere("dateTime", ">", searchParams.from);
+    }
+    if (searchParams.to) {
+        query.andWhere("dateTime", "<", searchParams.to);
+    }
+
+
+    if (searchParams.pageOffset && searchParams.pageLimit) {
+        query = query.offset(searchParams.pageOffset).limit(searchParams.pageLimit)
+    }
+
+    query = query.select("rl.id", "rl.readerID", "rl.currentInstanceID", "rl.dateTime", "rl.log");
+    return query;
 }
 
 /**
@@ -200,8 +226,16 @@ export async function toggleHelpRequested(id: number): Promise<void> {
  * @returns the primary key in the database
  */
 export async function submitReaderLog(readerID: number | null, dateTime: Date, log: any): Promise<number> {
-    return await knex("ReaderLogs").insert({ readerID, dateTime, log }).returning("id");
+    let instance = null;
+    if (readerID) {
+        instance = await getInstanceByReaderID(readerID);
+    }
+    return submitReaderLogWithInstance(readerID, instance?.id ?? null, dateTime, log);
 }
+export async function submitReaderLogWithInstance(readerID: number | null, currentInstanceID: number | null, dateTime: Date, log: any): Promise<number> {
+    return await knex("ReaderLogs").insert({ readerID, currentInstanceID, dateTime, log }).returning("id");
+}
+
 
 const ReaderCertCAId = 34;
 export async function getReaderCertCA(): Promise<TextFieldRow | undefined> {

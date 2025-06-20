@@ -1,7 +1,7 @@
 import { Request } from "express";
 import * as ws from "ws";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
-import { createReaderFromSN, getReaderByID, getReaderByName, getReaderBySN, submitReaderLog, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
+import { createReaderFromSN, getReaderByID, getReaderByName, getReaderBySN, submitReaderLog, submitReaderLogWithInstance, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
 import { EquipmentRow, ReaderRow, UserRow } from "./db/tables.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName } from "./repositories/Users/UserRepository.js";
 import { getEquipmentByID, getMissingTrainingModules, hasAccessByID } from "./repositories/Equipment/EquipmentRepository.js";
@@ -555,17 +555,10 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
         offlineForSec = Math.floor(offlineMs / 1000);
 
     }
-    submitReaderLog(reader.id, new Date(), {
+    submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), {
         "WsEvent": "open",
         "ReaderIP": srcIp,
         "OfflineFor": offlineForSec,
-        "ReaderID": reader.id,
-        "ReaderName": reader.name,
-        "InstanceID": instance?.id,
-        "InstanceName": instance?.name,
-        "MachineID": equipment?.id,
-        "MachineName": equipment?.name,
-
     });
 
 
@@ -633,7 +626,7 @@ async function handleStateTransition(reader: ReaderRow, newState: string, active
         } else {
             wsApiLog(`{user} changed state of ${tag}: ${oldState} -> ${newState}`, "state", { id: user.id ?? 0, label: user ? getUsersFullName(user) : "NULL" }, label);
         }
-        submitReaderLog(reader.id, new Date(), { "ACSEvent": "StateChange", "From": oldState, "To": newState, "User": user?.id })
+        submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), { "ACSEvent": "StateChange", "From": oldState, "To": newState, "User": user?.id })
         if (newState == "Unlocked") {
             reader.sessionStartTime = new Date();
             reader.recentSessionLength = 0;
@@ -700,35 +693,18 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                 }
                 let reader: ReaderRow | undefined = await getReaderByID(connData.readerId);
                 if (reader == null) {
-                    await submitReaderLog(connData.readerId ?? null, new Date(), {
+                    await submitReaderLog(null, new Date(), {
                         "WsEvent": "closed",
                         "WsClosedCode": ev.code,
                         "WsClosedReason": ev.reason,
                         "IP": req.ip,
                     });
                 } else {
-                    const instance = await getInstanceByReaderID(reader.id);
-                    const machine = await getEquipmentByID(instance?.equipmentID ?? 0);
-                    if (instance == null || machine == null) {
-                        await submitReaderLog(connData.readerId ?? null, new Date(), {
-                            "WsEvent": "closed",
-                            "WsClosedCode": ev.code,
-                            "WsClosedReason": ev.reason,
-                            "ReaderID": reader.id,
-                            "ReaderName": reader.name,
-                        });
-                    } else {
-                        await submitReaderLog(connData.readerId ?? null, new Date(), {
-                            "WsClosedCode": ev.code,
-                            "WsClosedReason": ev.reason,
-                            "ReaderID": reader.id,
-                            "ReaderName": reader.name,
-                            "InstanceID": instance.id,
-                            "InstanceName": instance.name,
-                            "MachineID": machine.id,
-                            "MachineName": machine.name,
-                        });
-                    }
+                    await submitReaderLog(reader.id, new Date(), {
+                        "WsEvent": "closed",
+                        "WsClosedCode": ev.code,
+                        "WsClosedReason": ev.reason,
+                    });
                 }
                 removeConnection(connData);
             } catch (e) {
@@ -738,6 +714,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
         };
 
         ws.onerror = async function (ev: ws.ErrorEvent) {
+
             await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "error", "WsErrorMsg": ev.message });
             console.error(`WSACS: websocket error ${ev.error} - ${ev.type}: ${ev.message}`)
             ws.close(4000, "got unrecoverable error");

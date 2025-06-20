@@ -247,7 +247,9 @@ export interface ReaderRow {
 export interface ReaderLogRow {
   id: number;
   readerID: number | null;
-  data: object;
+  currentInstanceID: number | null;
+  dateTime: Date;
+  log: object;
 }
 
 export interface AnnouncementRow {

@@ -9,12 +9,12 @@ import { Privilege } from "../schemas/usersSchema.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUserByCardTagID, getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
-import { ReaderRow } from "../db/tables.js";
+import { ReaderLogRow, ReaderRow } from "../db/tables.js";
 import * as ShlugControl from "../wsapi.js"
 
 import { createCipheriv, randomInt, scryptSync } from "crypto";
 import { generateRandomHumanName } from "../data/humanReadableNames.js";
-import { getInstanceByReaderID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
+import { getInstanceByID, getInstanceByReaderID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import { getEquipmentByID } from "../repositories/Equipment/EquipmentRepository.js";
 const serverApiPass = process.env.SERVER_API_PASSWORD ?? 'unsecure_server_password';
 const serverKey = scryptSync(serverApiPass, 'makerspace-salt¯\_(ツ)_/¯', 24);
@@ -62,6 +62,20 @@ const ReadersResolver = {
       return getUserByCardTagID(parent.currentUID);
     },
   },
+  ReaderLog: {
+    reader: async (
+      parent: ReaderLogRow,
+      _args: any,
+      _context: ApolloContext) => {
+      return parent.readerID ? ReaderRepo.getReaderByID(parent.readerID) : null;
+    },
+    instance: async (
+      parent: ReaderLogRow,
+      _args: any,
+      _context: ApolloContext) => {
+      return parent.currentInstanceID ? getInstanceByID(parent.currentInstanceID) : null;
+    }
+  },
 
   Query: {
     /**
@@ -102,7 +116,23 @@ const ReadersResolver = {
       { isStaff }: ApolloContext) =>
       isStaff(async (user: CurrentUser) => {
         return await ReaderRepo.getReaderByID(Number(args.id));
-      })
+      }),
+    /**
+     * 
+     * @argument makerspaceFilter the id of the current makerspace, or null to not filter by makerspace 
+     * @argument from early side of date range. omit to extend to the beginning of time
+     * @argument from late side of the date range. omit to extend to the end of time
+     * @argument pageOffset offset into result set when paging
+     * @argument pageLimit size of page when paging
+     * @returns list of reader log entries
+     */
+    readerLogs: async (
+      _parent: any,
+      args: { makerspaceID?: number, from: Date, to: Date, pageOffset?: number, pageLimit: number },
+      { isStaff }: ApolloContext) =>
+      isStaff(async () => {
+        return await ReaderRepo.getReaderLogs(args);
+      }),
   },
 
   Mutation: {

@@ -22,6 +22,7 @@ import EditNewModulePage from "./pages/lab_management/edit_module/EditNewModuleP
 import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnouncementPage";
 import EditAnnouncement from "./pages/lab_management/announcements/EditAnnouncement";
 import ReadersPage from "./pages/lab_management/readers/ReadersPage";
+import ReaderLogsPage from "./pages/lab_management/readerlogs_page/ReaderLogsPage";
 import StatisticsPage from "./pages/lab_management/statistics/StatisticsPage";
 import EditTermsPage from "./pages/lab_management/policy/EditTermsPage";
 import TermsPage from "./pages/both/policy/TermsPage";
@@ -118,6 +119,7 @@ export default function AppRoutes() {
                 <Route path="/makerspace/:makerspaceID/people/:userID" element={<UsersPage />}/>
                 <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />}/>
                 <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage/>}/>
+                <Route path="/makerspace/:makerspaceID/readerlogs" element={<ReaderLogsPage />} />
               </Route>
             </Route>
 
@@ -128,6 +130,7 @@ export default function AppRoutes() {
               <Route path="/admin/announcements/new" element={<NewAnnouncementPage />} />
 
               <Route path="/admin/newreader" element={<NewReaderPage />} />
+
             </Route>
 
             <Route path="/maker/training" element={<TrainingPage />} />
