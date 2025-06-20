@@ -40,6 +40,7 @@ import { isAdmin, isManagerFor, isStaffFor } from "./common/PrivilegeUtils";
 import NoPrivilegePage from "./pages/NoPrivilegePage";
 import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
 import HoursDisplay from "./pages/signage/HoursDisplay";
+import EventsDisplay from "./pages/signage/EventsDisplay";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -97,6 +98,7 @@ export default function AppRoutes() {
         <Route path="/display">
           <Route path="/display/announcements" element={<AnnouncementsDisplay/>}/>
           <Route path="/display/hours/:makerspaceID" element={<HoursDisplay/>}/>
+          <Route path="/display/events" element={<EventsDisplay/>}/>
         </Route>
         {/* END STATIC DISPLAYS */}
 

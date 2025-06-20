@@ -21,13 +21,11 @@ export default function AnnouncementsDisplay() {
     const [progress, setProgress] = useState(0);
 
     function handleNextAnnouncement() {
-        console.log(listLength);
         if (index + 1 < listLength) {
             index = index + 1;
         } else {
             index = 0;
         }
-        console.log(index);
     }
 
     useEffect(() => {
