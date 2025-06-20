@@ -10,7 +10,7 @@ async function getEvents() {
   var options = {
     method: "GET"
   }
-  const requestBody = await fetch(((process.env.EVENTBRITE_API_LIST_EVENTS_URL ?? "") + ("?token=" + process.env.EVENTBRITE_API_KEY + "&order_by=start_asc&time_filter=current_future&page_size=15")), options).then(async function (res) {
+  const requestBody = await fetch(((process.env.EVENTBRITE_API_LIST_EVENTS_URL ?? "") + ("?token=" + process.env.EVENTBRITE_API_KEY + "&order_by=start_asc&time_filter=current_future&page_size=15&expand=ticket_availability")), options).then(async function (res) {
     //Currently the compiler will not allow us to parse res.json() since it is typed as 'unknown'
     //To fix this, we will simply lie to the compiler and say it is 'any'
     //console.log(res.json());
@@ -30,7 +30,9 @@ export const EventsResolver = {
       _parent: any,
       _args: any,
     ) => {
-        return (await getEvents()).events;
+        const events = (await getEvents()).events;
+        console.log(events);
+        return events;
       },
   }
 }
