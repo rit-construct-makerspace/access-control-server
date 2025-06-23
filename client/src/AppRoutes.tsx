@@ -126,7 +126,7 @@ export default function AppRoutes() {
                 <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />}/>
                 <Route path="/makerspace/:makerspaceID/people/:userID" element={<UsersPage />}/>
                 <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />}/>
-                <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage/>}/>
+                <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
               </Route>
             </Route>
 
@@ -137,6 +137,7 @@ export default function AppRoutes() {
               <Route path="/admin/announcements/new" element={<NewAnnouncementPage />} />
 
               <Route path="/admin/newreader" element={<NewReaderPage />} />
+
             </Route>
 
             <Route path="/maker/training" element={<TrainingPage />} />

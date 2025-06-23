@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { GET_READERS, Reader } from "../../../queries/readersQueries";
-import { Box, Button, Grid, Stack } from "@mui/material";
+import { Box, Button, Grid, Link, Stack } from "@mui/material";
 import Page from "../../Page";
 import SearchBar from "../../../common/SearchBar";
 import { useNavigate, useParams } from "react-router-dom";
@@ -10,8 +10,7 @@ import ReaderCard from "./ReaderCard";
 import AdminPage from "../../AdminPage";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import AddIcon from '@mui/icons-material/Add';
-import { isStaff } from "../../../common/PrivilegeUtils";
-
+import AnalyticsIcon from '@mui/icons-material/Analytics';
 
 export default function ReadersPage() {
   const { makerspaceID } = useParams<{makerspaceID: string}>();
@@ -32,11 +31,8 @@ export default function ReadersPage() {
           onChange={(e) => setSearchText(e.target.value)}
           onClear={() => setSearchText("")}
         />
-        {
-          isStaff(user) ? 
-          <Button color="success" variant="contained" onClick={()=>{navigate("/admin/newreader")}}><AddIcon/>Pair New Reader</Button> 
-          : null
-        }
+        <Button color="success" variant="contained" onClick={() => { navigate("/admin/newreader") }}><AddIcon />Pair New Reader</Button>
+        <Link href={process.env.REACT_APP_GRAFANA_READER_STATS_URL}>Reader Stats</Link>
       </Stack>
 
       <RequestWrapper

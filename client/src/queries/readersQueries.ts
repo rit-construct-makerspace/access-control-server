@@ -79,6 +79,34 @@ export const GET_READER_BY_ID = gql`
 `;
 
 
+export const GET_READER_LOGS = gql`
+query GetReaderLogs($makerspaceID: ID, $from: DateTime, $to: DateTime, $offset: Int, $limit: Int){
+  readerLogs(makerspaceID: $makerspaceID, from: $from, to: $to, pageOffset: $offset, pageLimit: $limit) {
+    id
+    dateTime
+    reader {
+      id
+      name
+    }
+    instance {
+      id
+      name
+      equipment {
+        id
+        name
+        room {
+          zone {
+            id
+            name
+          }
+        }
+      }
+    }
+    log
+  }
+}`;
+
+
 export const GET_UNPAIRED_READERS = gql`
   query GetUnpairedReaders {
     unpairedReaders {
