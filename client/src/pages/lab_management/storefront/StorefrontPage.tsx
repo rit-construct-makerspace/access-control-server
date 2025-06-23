@@ -12,7 +12,9 @@ import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_INVENTORY_ITEMS } from "../../../queries/inventoryQueries";
 import AdminPage from "../../AdminPage";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { isManager } from "../../../common/PrivilegeUtils";
+import { isAdmin, isManager, isStaff } from "../../../common/PrivilegeUtils";
+import Page from "../../Page";
+import Privilege from "../../../types/Privilege";
 
 const REMOVE_INVENTORY_ITEM_AMOUNT = gql`
   mutation RemoveInventoryItemAmount($itemID: ID!, $amountToRemove: Int!) {
@@ -32,6 +34,7 @@ export interface ShoppingCartEntry {
   id: string;
   item: InventoryItem;
   count: number;
+  makerspace: number;
 }
 
 function updateLocalStorage(cart: ShoppingCartEntry[] | null) {
@@ -41,7 +44,7 @@ function updateLocalStorage(cart: ShoppingCartEntry[] | null) {
 export default function StorefrontPage() {
   const currentUser = useCurrentUser();
 
-  const { loading, error, data } = useQuery(GET_INVENTORY_ITEMS);
+  const { loading, error, data } = useQuery(GET_INVENTORY_ITEMS, {variables: {storefrontVisible: isStaff(currentUser) ? null : true}});
 
   const [checkoutItems] = useMutation(CHECKOUT_ITEMS, {
     refetchQueries: [{ query: GET_INVENTORY_ITEMS }],
@@ -109,7 +112,7 @@ export default function StorefrontPage() {
     });
 
   const handleCheckout = async (checkoutNotes: string, recievingUserID: number | undefined) => {
-    const items: {id: number, count: number}[] = shoppingCart.map((cartItem) => ({id: cartItem.item.id, count: cartItem.count}));
+    const items: { id: number, count: number }[] = shoppingCart.map((cartItem) => ({ id: cartItem.item.id, count: cartItem.count }));
 
     await checkoutItems({
       variables: {
@@ -125,9 +128,7 @@ export default function StorefrontPage() {
 
   return (
     <RequestWrapper loading={loading} error={error}>
-      <AdminPage>
-        <Box margin="25px">
-        <Typography variant="h4">Storefront</Typography>
+      <Page title={"Store"}>
         <ShoppingCart
           entries={shoppingCart}
           removeEntry={removeFromShoppingCart}
@@ -136,19 +137,19 @@ export default function StorefrontPage() {
           internal={showInternalItems || showStaffItems}
         />
 
+        { isAdmin(currentUser) &&
         <Stack direction={"row"} sx={{ mb: 2, mt: 8, justifyContent: "space-between" }}>
-          <Typography variant="h5" component="div">
-            Inventory
-          </Typography>
           <Stack direction={"row"} spacing={2}>
             <Stack direction={"row"} alignItems={"center"}>
               <Switch color="warning" onChange={handleShowInternalChange}></Switch><span> Internal Use Items</span>
             </Stack>
             <Stack direction={"row"} alignItems={"center"}>
-            <Switch color="warning" onChange={handleShowStaffChange} disabled={!isManager(currentUser)}></Switch><span> Staff Only Items</span>
+              <Switch color="warning" onChange={handleShowStaffChange} disabled={!isManager(currentUser)}></Switch><span> Staff Only Items</span>
             </Stack>
           </Stack>
         </Stack>
+        }
+        
 
         <SearchBar
           placeholder="Search inventory"
@@ -158,7 +159,7 @@ export default function StorefrontPage() {
           onClear={() => setSearchText("")}
         />
 
-        <Stack divider={<Divider flexItem />} sx={{width: "100%"}}>
+        <Stack divider={<Divider flexItem />} sx={{ width: "100%" }}>
           {data?.InventoryItems?.filter((item: InventoryItem) =>
             item.name.toLowerCase().includes(searchText.toLowerCase())
             && (!showInternalItems ? item.storefrontVisible : true)
@@ -185,8 +186,7 @@ export default function StorefrontPage() {
             item={activeItem}
           />
         )}
-      </Box>
-      </AdminPage>
+      </Page>
     </RequestWrapper>
   );
 }
