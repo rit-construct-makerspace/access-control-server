@@ -93,6 +93,20 @@ export interface InventoryItemRow {
   tagID1: number | null;
   tagID2: number | null;
   tagID3: number | null;
+  makerspaceID?: number;
+}
+
+export interface InventoryCarts {
+  id: number;
+  userID: number;
+  makerspaceID: number;
+  lastModified: Date;
+}
+
+export interface InventoryItemsForCarts {
+  cartID: number;
+  itemID: number;
+  count: number;
 }
 
 export interface InventoryTagRow {
