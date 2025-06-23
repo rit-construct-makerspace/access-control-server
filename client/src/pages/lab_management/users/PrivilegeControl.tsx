@@ -2,12 +2,13 @@ import { Alert, Button, Card, Checkbox, FormControl, FormControlLabel, FormGroup
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { ChangeEvent, ReactElement, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
-import { MAKE_USER_MANAGER, MAKE_USER_STAFF, REVOKE_USER_MANAGER, REVOKE_USER_STAFF, SET_USER_ADMIN } from "../../../queries/permissionQueries";
+import { MAKE_USER_MANAGER, MAKE_USER_STAFF, MAKE_USER_TRAINER, REVOKE_USER_MANAGER, REVOKE_USER_STAFF, REVOKE_USER_TRAINER, SET_USER_ADMIN } from "../../../queries/permissionQueries";
 import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isManagerFor } from "../../../common/PrivilegeUtils";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { GET_USER } from "./UserModal";
+import TrainerCard from "./TrainerCard";
 
 
 interface PrivilegeControlProps {
@@ -62,6 +63,24 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
 
     async function removeStaffPerms(makerspaceID: number) {
         await revokeUserStaff({variables: {userID: props.user.id, makerspaceID: makerspaceID}});
+    }
+
+    const [makeUserTrainer] = useMutation(MAKE_USER_TRAINER, {refetchQueries: [{query: GET_USER, variables: {id: props.user.id}}]});
+    const [revokeUserTrainer] = useMutation(REVOKE_USER_TRAINER, {refetchQueries: [{query: GET_USER, variables: {id: props.user.id}}]});
+    const [addTrainerPerms, setAddTrainerPerms] = useState(-1);
+
+    async function handleAddTrainerPerms() {
+        if (addTrainerPerms === -1) {
+            alert("Equipment cannot be empty, please select a piece of equipment");
+            return;
+        }
+        await makeUserTrainer({
+            variables: {userID: props.user.id, equipmentID: addTrainerPerms}
+        });
+    }
+
+    async function removeTrainerPerms(equipmentID: number) {
+        await revokeUserTrainer({variables: {userID: props.user.id, equipmentID: equipmentID}});
     }
 
     return (
@@ -177,6 +196,18 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                                 <Button variant="contained" color="success" onClick={handleAddStaffPerms}>
                                     Add
                                 </Button>
+                            </Stack>
+                        </Stack>
+                        <Stack spacing={1}>
+                            <Typography>Trainer</Typography>
+                            <Stack direction="row" spacing={1}>
+                                    {
+                                        props.user.trainer.length === 0
+                                        ? <Alert severity="info">Not a Trainer!</Alert>
+                                        : props.user.trainer.map((equipmentID: number) => (
+                                            <TrainerCard equipmentID={equipmentID} removeTrainerPerms={removeTrainerPerms}/>
+                                        ))
+                                    }
                             </Stack>
                         </Stack>
                     </Stack>
