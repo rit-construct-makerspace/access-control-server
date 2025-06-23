@@ -9,6 +9,7 @@ import { isManagerFor } from "../../../common/PrivilegeUtils";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { GET_USER } from "./UserModal";
 import TrainerCard from "./TrainerCard";
+import TrainerEquipmentSelect from "./TrainerEquipmentSelect";
 
 
 interface PrivilegeControlProps {
@@ -199,7 +200,7 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                             </Stack>
                         </Stack>
                         <Stack spacing={1}>
-                            <Typography>Trainer</Typography>
+                            <Typography variant="subtitle1" fontWeight="bold">Trainer</Typography>
                             <Stack direction="row" spacing={1}>
                                     {
                                         props.user.trainer.length === 0
@@ -208,6 +209,15 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                                             <TrainerCard equipmentID={equipmentID} removeTrainerPerms={removeTrainerPerms}/>
                                         ))
                                     }
+                            </Stack>
+                            <Stack direction="row" spacing={1}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="add-trainer-permissions">Equipment</InputLabel>
+                                    <TrainerEquipmentSelect user={props.user} setAddTrainerPerms={setAddTrainerPerms}/>
+                                </FormControl>
+                                <Button variant="contained" color="success" onClick={handleAddTrainerPerms}>
+                                    Add
+                                </Button>
                             </Stack>
                         </Stack>
                     </Stack>

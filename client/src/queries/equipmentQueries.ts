@@ -15,6 +15,11 @@ export const GET_EQUIPMENTS = gql`
       numAvailable
       numInUse
       byReservationOnly
+      room {
+        zone {
+          id
+        }
+      }
     }
   }
 `;
@@ -40,7 +45,10 @@ export const GET_EQUIPMENT_BY_ID = gql`
       room {
         id
         name
-        zone
+        zone {
+          id
+          name
+        }
       }
       trainingModules {
         id
