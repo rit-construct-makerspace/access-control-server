@@ -768,7 +768,11 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                     }
                 }
                 if (shlugMessage.Log) {
-                    await submitReaderLog(connData.readerId ?? null, new Date(), shlugMessage.Log);
+                    try {
+                        await submitReaderLog(connData.readerId ?? null, new Date(), shlugMessage.Log);
+                    } catch (e: any) {
+                        wsApiLog(`Unable to submit Reader Log '${JSON.stringify(shlugMessage.Log)}': ${e}`, "status");
+                    }
                 }
                 if (shlugMessage.State) {
                     await handleStateTransition(reader, shlugMessage.State, shlugMessage.UID)

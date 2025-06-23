@@ -5,7 +5,6 @@
 
 import { knex } from "../../db/index.js";
 import { ReaderLogRow, ReaderRow, TextFieldRow } from "../../db/tables.js";
-import { wsApiLog } from "../../wsapi.js";
 import { getInstanceByReaderID } from "../Equipment/EquipmentInstancesRepository.js";
 
 /**
@@ -234,12 +233,7 @@ export async function submitReaderLog(readerID: number | null, dateTime: Date, l
     return submitReaderLogWithInstance(readerID, instance?.id ?? null, dateTime, log);
 }
 export async function submitReaderLogWithInstance(readerID: number | null, currentInstanceID: number | null, dateTime: Date, log: any): Promise<number> {
-    try {
-        return await knex("ReaderLogs").insert({ readerID, currentInstanceID, dateTime, log }).returning("id");
-    } catch (e: any) {
-        wsApiLog(`Unable to submit Reader Log '${JSON.stringify(log)}': ${e}`, "status");
-        return 0;
-    }
+    return await knex("ReaderLogs").insert({ readerID, currentInstanceID, dateTime, log }).returning("id");
 }
 
 
