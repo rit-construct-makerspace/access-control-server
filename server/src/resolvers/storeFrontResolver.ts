@@ -26,7 +26,7 @@ const StorefrontResolvers = {
     initiator: (parent: any) => {
       return getUserByID(parent.initiator);
     },
-    
+
     //Map purchaser field to Use
     purchaser: (parent: any) => {
       return getUserByIDOrUndefined(parent.purchaser);
@@ -44,13 +44,18 @@ const StorefrontResolvers = {
       _: any,
       args: { storefrontVisible?: boolean },
       { isStaff }: ApolloContext) => {
-      if (args.storefrontVisible == null || args.storefrontVisible == undefined)
-        return await InventoryRepo.getItems();
-      if (args.storefrontVisible)
+      if (args.storefrontVisible === null || args.storefrontVisible === undefined) {
         isStaff(async () => {
-          return await InventoryRepo.getItemsWhereStorefront(true);
+          return await InventoryRepo.getItems();
         })
-      return await InventoryRepo.getItemsWhereStorefront(false);
+      }
+      else if (args.storefrontVisible == false) {
+        isStaff(async () => {
+          return await InventoryRepo.getItemsWhereStorefront(false);
+        })
+      }
+
+      return await InventoryRepo.getItemsWhereStorefront(true);
     },
 
     /**
