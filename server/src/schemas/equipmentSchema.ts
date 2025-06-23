@@ -14,6 +14,7 @@ export interface EquipmentInput {
   sopUrl: string | null
   byReservationOnly: boolean;
   needsWelcome: boolean;
+  requiresTrainerApproval: boolean;
 }
 
 export const EquipmentTypeDefs = gql`
@@ -32,6 +33,7 @@ export const EquipmentTypeDefs = gql`
     numInUse: Int
     byReservationOnly: Boolean
     needsWelcome: Boolean
+    requiresTrainerApproval: Boolean
   }
 
   input EquipmentInput {
