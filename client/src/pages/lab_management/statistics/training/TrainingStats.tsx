@@ -22,6 +22,7 @@ const GET_VERBOSE_TRAINING_SUBMISSIONS = gql`
       id
       moduleID
       moduleName
+      quiz
       makerID
       makerName
       summary
@@ -35,6 +36,7 @@ const GET_VERBOSE_TRAINING_SUBMISSIONS = gql`
 export interface VerboseTrainingSubmission {
   id: number;
   moduleID: number;
+  quiz: { id: string, type: string, text: string }[];
   makerID: number;
   summary: {questionNum: string, questionText: string, correct: boolean}[];
   submissionDate: Date;
@@ -182,7 +184,7 @@ export function TrainingStats() {
 
         <RequestWrapper loading={getModules.loading} error={getModules.error}>
           <FormControl sx={{ width: '25em' }}>
-            <InputLabel id="es-stat_equipment-select_label">Modules</InputLabel>
+            <InputLabel id="es-stat_equipment-select_label">Modules (Default is all)</InputLabel>
             <Select
               labelId="es-stat_equipment-select_label"
               value={moduleIDs}

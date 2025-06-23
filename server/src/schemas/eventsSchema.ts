@@ -14,11 +14,16 @@ export const EventsTypeDefs = gql`
         end: TimeField
         summary: String
         logo: Logo
+        ticket_availability: TicketAvailability
     }
 
     type TextField {
         text: String
         html: String
+    }
+
+    type TicketAvailability {
+        has_available_tickets: Boolean
     }
 
     type TimeField {

@@ -41,7 +41,7 @@ export async function getTrainingSubmissionsWithAttachedEntities(startDate?: str
 
 
   return await knex.raw(`
-    SELECT ms.*, tm."name" AS "moduleName", concat(substr(u."firstName", 0, 2), '. ', u."lastName") AS "makerName"
+    SELECT ms.*, tm."name" AS "moduleName", tm.quiz, concat(substr(u."firstName", 0, 2), '. ', u."lastName") AS "makerName"
     FROM "ModuleSubmissions" ms 
     INNER JOIN "TrainingModule" tm ON ms."moduleID" = tm.id
     INNER JOIN "Users" u ON ms."makerID" = u.id
