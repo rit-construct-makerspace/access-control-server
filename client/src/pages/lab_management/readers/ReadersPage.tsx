@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { GET_READERS, Reader } from "../../../queries/readersQueries";
-import { Box, Button, Grid, Stack } from "@mui/material";
+import { Box, Button, Grid, Link, Stack } from "@mui/material";
 import Page from "../../Page";
 import SearchBar from "../../../common/SearchBar";
 import { useNavigate, useParams } from "react-router-dom";
@@ -32,8 +32,7 @@ export default function ReadersPage() {
           onClear={() => setSearchText("")}
         />
         <Button color="success" variant="contained" onClick={() => { navigate("/admin/newreader") }}><AddIcon />Pair New Reader</Button>
-        <Button color="secondary" variant="contained" onClick={() => { navigate(`/makerspace/${makerspaceID}/readerlogs`) }}><AnalyticsIcon />Reader Logs</Button>
-
+        <Link href={process.env.REACT_APP_GRAFANA_READER_STATS_URL}>Reader Stats</Link>
       </Stack>
 
       <RequestWrapper
