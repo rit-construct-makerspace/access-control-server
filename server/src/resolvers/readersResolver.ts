@@ -5,7 +5,6 @@
 
 import * as ReaderRepo from "../repositories/Readers/ReaderRepository.js";
 import { ApolloContext, CurrentUser } from "../context.js";
-import { Privilege } from "../schemas/usersSchema.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUserByCardTagID, getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
@@ -14,8 +13,7 @@ import * as ShlugControl from "../wsapi.js"
 
 import { createCipheriv, randomInt, scryptSync } from "crypto";
 import { generateRandomHumanName } from "../data/humanReadableNames.js";
-import { getInstanceByID, getInstanceByReaderID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
-import { getEquipmentByID } from "../repositories/Equipment/EquipmentRepository.js";
+import { getInstanceByID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
 const serverApiPass = process.env.SERVER_API_PASSWORD ?? 'unsecure_server_password';
 const serverKey = scryptSync(serverApiPass, 'makerspace-salt¯\_(ツ)_/¯', 24);
 const algorithm = 'aes-192-cbc';
@@ -154,6 +152,20 @@ const ReadersResolver = {
       }),
 
     /**
+     * Delete a reader
+     * @argument id ID of reader to be deleted
+     * @returns true if reader was found and deleted
+     * @returns false if reader was not found and not deleted
+     */
+    deleteReader: async (
+      _parent: any,
+      args: { id: number },
+      { isManager }: ApolloContext) =>
+      isManager(async (user: CurrentUser) => {
+        return await ReaderRepo.deleteReader(args.id);
+      }),
+
+      /**
      * Pair a new Reader
      * @argument SN serial number of the shlug
      * @returns SerialNumber, ShlugKey, Certs, Domain

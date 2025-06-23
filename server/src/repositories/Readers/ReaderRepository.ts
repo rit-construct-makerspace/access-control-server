@@ -135,6 +135,9 @@ export async function createReader(reader: {
     return await getReaderByID(newID.id);
 }
 
+export async function deleteReader(id: number): Promise<boolean> {
+    return (await knex("Readers").delete().where("id", "=", id)) > 0;
+}
 
 
 /**
