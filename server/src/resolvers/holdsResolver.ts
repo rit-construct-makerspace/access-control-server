@@ -12,9 +12,9 @@ const HoldsResolvers = {
     creator: async (
       parent: HoldRow,
       _args: any,
-      { isStaff }: ApolloContext
+      { isTrainer }: ApolloContext
     ) =>
-      isStaff(async (user: CurrentUser) => {
+      isTrainer(async (user: CurrentUser) => {
         return UsersRepo.getUserByID(parent.creatorID);
       }),
 
@@ -22,9 +22,9 @@ const HoldsResolvers = {
     remover: async (
       parent: HoldRow,
       _args: any,
-      { isStaff }: ApolloContext
+      { isTrainer }: ApolloContext
     ) =>
-      isStaff(
+      isTrainer(
         async (user: CurrentUser) => parent.removerID && UsersRepo.getUserByID(parent.removerID)
       ),
   },
