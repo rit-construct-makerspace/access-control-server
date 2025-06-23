@@ -166,10 +166,11 @@ export const UPDATE_EQUIPMENT = gql`
     $notes: String!
     $byReservationOnly: Boolean
     $needsWelcome: Boolean
+    $requiresTrainerApproval: Boolean
   ) {
     updateEquipment(
       id: $id
-      equipment: { name: $name, roomID: $roomID, moduleIDs: $moduleIDs, imageUrl: $imageUrl, sopUrl: $sopUrl, notes: $notes, byReservationOnly: $byReservationOnly, needsWelcome: $needsWelcome }
+      equipment: { name: $name, roomID: $roomID, moduleIDs: $moduleIDs, imageUrl: $imageUrl, sopUrl: $sopUrl, notes: $notes, byReservationOnly: $byReservationOnly, needsWelcome: $needsWelcome, requiresTrainerApproval: $requiresTrainerApproval }
     ) {
       id
     }
@@ -202,9 +203,10 @@ export const CREATE_EQUIPMENT = gql`
     $notes: String!
     $byReservationOnly: Boolean
     $needsWelcome: Boolean
+    $requiresTrainerApproval: Boolean
     ) {
     addEquipment(
-      equipment: { name: $name, roomID: $roomID, moduleIDs: $moduleIDs, imageUrl: $imageUrl, sopUrl: $sopUrl, notes: $notes, byReservationOnly: $byReservationOnly, needsWelcome: $needsWelcome }
+      equipment: { name: $name, roomID: $roomID, moduleIDs: $moduleIDs, imageUrl: $imageUrl, sopUrl: $sopUrl, notes: $notes, byReservationOnly: $byReservationOnly, needsWelcome: $needsWelcome, requiresTrainerApproval: $requiresTrainerApproval }
     ) {
       id
     }

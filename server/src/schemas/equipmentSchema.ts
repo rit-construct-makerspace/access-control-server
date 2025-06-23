@@ -45,6 +45,7 @@ export const EquipmentTypeDefs = gql`
     notes: String!
     byReservationOnly: Boolean
     needsWelcome: Boolean
+    requiresTrainerApproval: Boolean
   }
 
   extend type Query {

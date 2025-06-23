@@ -117,6 +117,13 @@ export default function EquipmentEditor({
     });
   };
 
+  const handleRequiresTrainerApprovalSwitchChanged = () => {
+    setEquipment({
+      ...equipment,
+      requiresTrainerApproval: !equipment.requiresTrainerApproval
+    })
+  }
+
 
   const [instancesModalOpen, setInstancesModalOpen] = useState<boolean>(false);
 
@@ -262,8 +269,11 @@ export default function EquipmentEditor({
                 onChange={handleNotesChanged}
                 rows={3}
               />
+
               <FormControlLabel control={<Switch checked={equipment.byReservationOnly} onChange={handleByReservationOnlySwitchChanged} />} label={"Available by reservation only"} />
               <FormControlLabel control={<Switch checked={equipment.needsWelcome} onChange={handleNeedsWelcomeSwitchChanged} />} label={"Needs Welcome"} />
+              <FormControlLabel control={<Switch checked={equipment.requiresTrainerApproval} onChange={handleRequiresTrainerApprovalSwitchChanged} />} label={"Requires Trainer to Approve"} />
+              
               <Typography variant="h5">Training Modules</Typography>
               <Stack divider={<Divider flexItem />} spacing={1}>
                 {equipment.trainingModules.map((m) => (
