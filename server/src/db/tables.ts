@@ -25,6 +25,7 @@ export interface EquipmentRow {
   notes: string;
   byReservationOnly: boolean;
   needsWelcome?: boolean;
+  requiresTrainerApproval: boolean;
 }
 
 export interface EquipmentInstancesRow {

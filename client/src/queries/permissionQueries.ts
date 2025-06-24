@@ -54,3 +54,21 @@ export const REVOKE_USER_STAFF = gql`
         revokeUserStaff(userID: $userID, makerspaceID: $makerspaceID)
     }
 `;
+
+/**
+ * 
+ */
+export const MAKE_USER_TRAINER = gql`
+    mutation MakeUserTrainer($userID: ID!, $equipmentID: ID!) {
+        makeUserTrainer(userID: $userID, equipmentID: $equipmentID)
+    }
+`;
+
+/**
+ * 
+ */
+export const REVOKE_USER_TRAINER = gql`
+    mutation revokeUserTrainer($userID: ID!, $equipmentID: ID!) {
+        revokeUserTrainer(userID: $userID, equipmentID: $equipmentID)
+    }
+`;
