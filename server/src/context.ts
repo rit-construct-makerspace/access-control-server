@@ -17,7 +17,7 @@ export interface CurrentUser extends UserRow {
 
 //const testuser = undefined;
 const testuser: CurrentUser = {
-  id: 266,
+  id: 16,
   firstName: "Test",
   lastName: "User",
   pronouns: "They / Them",
@@ -31,12 +31,12 @@ const testuser: CurrentUser = {
   archived: false,
   balance: "0",
   manager: [],
-  staff: [38],
+  staff: [],
   trainer: [],
   cardTagID: "12345",
   notes: "",
   activeHold: false,
-  admin: false,
+  admin: true,
   hasHolds: false,
   hasCardTag: true,
 };
