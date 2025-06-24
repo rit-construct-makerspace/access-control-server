@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardActions, Stack, Typography } from "@mui/material";
-import { AccessCheck, GET_USER, Hold } from "./UserModal";
+import { AccessCheck, AccessCheckExtraInfo, GET_USER, Hold } from "./UserModal";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { LoadingButton } from "@mui/lab";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
@@ -25,7 +25,7 @@ const UNAPPROVE_CHECK = gql`
 `;
 
 interface AccessCheckCardProps {
-  accessCheck: any;
+  accessCheck: AccessCheckExtraInfo;
   userID: string;
 }
 

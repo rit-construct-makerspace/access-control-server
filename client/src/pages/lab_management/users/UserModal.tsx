@@ -68,6 +68,21 @@ export interface AccessCheck {
   approved: boolean;
 }
 
+export interface AccessCheckExtraInfo {
+  id: number;
+  approved: boolean;
+  equipment: {
+    id: number;
+    name: string;
+    requiresTrainerApproval: boolean;
+    room: {
+      zone: {
+        id: number;
+      }
+    }
+  }
+}
+
 export const GET_USER = gql`
   query GetUser($id: ID!) {
     user(id: $id) {
@@ -280,8 +295,8 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
       <RequestWrapper2
         result={getUserResult}
         render={({ user }) => {
-          const filteredACs: AccessCheck[] = user.accessChecks.filter(
-            (ac: any) => (
+          const filteredACs: AccessCheckExtraInfo[] = user.accessChecks.filter(
+            (ac: AccessCheckExtraInfo) => (
               ac.equipment.requiresTrainerApproval
               ? isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id))
               : (isStaffFor(currentUser, Number(ac.equipment.room.zone.id)) || isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id)))
@@ -415,7 +430,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
             </Stack>}
 
             <Stack spacing={2} mt={2}>
-              {filteredACs != null && filteredACs.map((accessCheck: AccessCheck) => (
+              {filteredACs != null && filteredACs.map((accessCheck: AccessCheckExtraInfo) => (
                 <AccessCheckCard key={accessCheck.id} accessCheck={accessCheck} userID={user.id} />
               ))}
             </Stack>
