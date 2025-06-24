@@ -4,7 +4,8 @@
  */
 
 import { knex } from "../../db/index.js";
-import { ReaderRow, TextFieldRow } from "../../db/tables.js";
+import { ReaderLogRow, ReaderRow, TextFieldRow } from "../../db/tables.js";
+import { getInstanceByReaderID } from "../Equipment/EquipmentInstancesRepository.js";
 
 /**
  * Fetch a card ready buy it's primary key
@@ -65,6 +66,31 @@ export async function getUnpairedReaders(): Promise<ReaderRow[]> {
         .orderBy("Readers.name", "desc").orderBy("Readers.id", "asc")
 }
 
+export async function getReaderLogs(searchParams: { makerspaceID?: number, from: Date, to: Date, pageOffset?: number, pageLimit: number }): Promise<ReaderLogRow[]> {
+    let query = knex("ReaderLogs as rl");
+    console.log("Makerspace filter", searchParams.makerspaceID);
+    if (searchParams.makerspaceID) {
+        query = query.leftJoin("EquipmentInstances as ei", "rl.readerID", "ei.readerID")
+            .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
+            .leftJoin("Rooms as rs", "e.roomID", "rs.id")
+            .where("rs.zoneID", "=", Number(searchParams.makerspaceID));
+    }
+    if (searchParams.from) {
+        query.andWhere("dateTime", ">", searchParams.from);
+    }
+    if (searchParams.to) {
+        query.andWhere("dateTime", "<", searchParams.to);
+    }
+
+
+    if (searchParams.pageOffset && searchParams.pageLimit) {
+        query = query.offset(searchParams.pageOffset).limit(searchParams.pageLimit)
+    }
+
+    query = query.select("rl.id", "rl.readerID", "rl.currentInstanceID", "rl.dateTime", "rl.log");
+    return query;
+}
+
 /**
  * Get number of idle ACS readers
  * @param machineID the equipment ID to find readers for
@@ -109,6 +135,9 @@ export async function createReader(reader: {
     return await getReaderByID(newID.id);
 }
 
+export async function deleteReader(id: number): Promise<boolean> {
+    return (await knex("Readers").delete().where("id", "=", id)) > 0;
+}
 
 
 /**
@@ -191,6 +220,23 @@ export async function setReaderName(
 export async function toggleHelpRequested(id: number): Promise<void> {
     const oldRow = await knex("Readers").select("*").where({ id: id }).first()
     return await knex("Readers").where({ id: id }).update({ helpRequested: !(oldRow?.helpRequested)})
+}
+
+/**
+ * Submit a structured reader log to the db
+ * @param readerID the ID of the reader that this message came from
+ * @param log the json object data to insert
+ * @returns the primary key in the database
+ */
+export async function submitReaderLog(readerID: number | null, dateTime: Date, log: any): Promise<number> {
+    let instance = null;
+    if (readerID) {
+        instance = await getInstanceByReaderID(readerID);
+    }
+    return submitReaderLogWithInstance(readerID, instance?.id ?? null, dateTime, log);
+}
+export async function submitReaderLogWithInstance(readerID: number | null, currentInstanceID: number | null, dateTime: Date, log: any): Promise<number> {
+    return await knex("ReaderLogs").insert({ readerID, currentInstanceID, dateTime, log }).returning("id");
 }
 
 

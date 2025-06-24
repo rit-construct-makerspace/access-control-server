@@ -155,6 +155,7 @@ export default function AppRoutes() {
               <Route path="/admin/announcements/new" element={<NewAnnouncementPage />} />
 
               <Route path="/admin/newreader" element={<NewReaderPage />} />
+
             </Route>
 
             <Route path="/maker/training" element={<TrainingPage />} />
