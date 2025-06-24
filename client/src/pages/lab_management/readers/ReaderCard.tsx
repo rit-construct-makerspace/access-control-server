@@ -1,21 +1,24 @@
 import {
   Box,
+  Button,
   Card,
   CardContent,
   CardHeader,
   Checkbox,
+  IconButton,
   Link,
   MenuItem,
   Select,
   Stack,
   Typography,
 } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 import { GET_CORRESPONDING_MACHINE_BY_READER_ID_OR_MACHINE_ID } from "../../../queries/equipmentQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
 import { useQuery, useMutation } from "@apollo/client";
 import TimeAgo from 'react-timeago'
-import { IDENTIFY_READER, Reader, SET_READER_STATE } from "../../../queries/readersQueries";
+import { DELETE_READER, GET_READERS, IDENTIFY_READER, Reader, SET_READER_STATE } from "../../../queries/readersQueries";
 
 interface ReaderCardProps {
     reader: Reader
@@ -72,8 +75,9 @@ export default function ReaderCard({reader, makerspaceID}: ReaderCardProps) {
   const [doIdentify] = useMutation(IDENTIFY_READER)
   function handleIdentifyChecked(checked: boolean) {
     doIdentify({ variables: { "id": reader.id, doIdentify: checked } })
-
   }
+
+  const [deleteReader] = useMutation(DELETE_READER, { refetchQueries: [{ query: GET_READERS }] })
 
   return (
     <RequestWrapper
@@ -84,6 +88,14 @@ export default function ReaderCard({reader, makerspaceID}: ReaderCardProps) {
         <CardHeader
           title={reader.name}
           subheader={`SN: ${reader.SN}`}
+          action={
+            <Button color="error" variant="contained" onClick={() => {
+              if (window.confirm(`Are you sure you want to delete ${reader.name}`)) {
+                deleteReader({ variables: { id: reader.id } });
+              }
+            }}>
+              <DeleteIcon />
+            </Button>}
         >
         </CardHeader>
         <CardContent>

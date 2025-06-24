@@ -160,6 +160,12 @@ export const CREATE_READER = gql`
   }
 `;
 
+export const DELETE_READER = gql`
+  mutation DeleteReader($id: ID!){
+    deleteReader(id: $id)
+  }
+`
+
 export const PAIR_READER = gql`
   mutation PairReader(
     $SN: String!,

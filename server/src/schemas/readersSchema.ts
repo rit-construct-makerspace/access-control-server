@@ -57,6 +57,7 @@ export const ReaderTypeDefs = gql`
       zone: String
     ): Reader
 
+    deleteReader(id: ID!): Boolean
 
     pairReader(
       SN: String!
