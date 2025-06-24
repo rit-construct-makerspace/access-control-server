@@ -19,7 +19,7 @@ import { GET_ALL_EQUIPMENTS } from "../../../queries/equipmentQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import CloseIcon from '@mui/icons-material/Close';
 import { stringAvatar } from "../../../common/avatarGenerator";
-import { isManager, isStaff, isStaffFor } from "../../../common/PrivilegeUtils";
+import { isManager, isStaff, isStaffFor, isTrainerFor } from "../../../common/PrivilegeUtils";
 import RestricitonCard from "./RestrictionCard";
 import RestrictionCard from "./RestrictionCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
@@ -111,7 +111,16 @@ export const GET_USER = gql`
       }
       accessChecks {
         id
-        equipmentID
+        equipment {
+          id
+          name
+          requiresTrainerApproval
+          room {
+            zone {
+              id
+            }
+          }
+        }
         approved
       }
       passedModules {
@@ -270,7 +279,16 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
     <PrettyModal open={!!selectedUserID} onClose={onClose} width={isMobile ? 300 : 800}>
       <RequestWrapper2
         result={getUserResult}
-        render={({ user }) => (
+        render={({ user }) => {
+          console.log(user.accessChecks);
+          const filteredACs: AccessCheck[] = user.accessChecks.filter(
+            (ac: any) => Boolean(ac.equipment.requiresTrainerApproval) 
+            ? isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id))
+            : (isStaffFor(currentUser, Number(ac.equipment.room.zone)) || isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id)))
+
+          );
+
+          return (
           <Stack>
             <Stack direction="row" justifyContent="space-between">
               <Stack direction="row" alignItems="baseline" spacing={2}>
@@ -381,7 +399,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
               Access Checks
             </Typography>
 
-            {user.accessChecks == null || user.accessChecks.length === 0 && (
+            {filteredACs == null || filteredACs.length === 0 && (
               <Stack direction="row" spacing={1} sx={{ opacity: 0.8 }}>
                 <CheckCircleIcon color="success" fontSize="small" />
                 <Typography variant="body1" fontStyle="italic">
@@ -406,7 +424,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
             </Stack>}
 
             <Stack spacing={2} mt={2}>
-              {user.accessChecks != null && user.accessChecks.map((accessCheck: AccessCheck) => (
+              {filteredACs != null && filteredACs.map((accessCheck: AccessCheck) => (
                 <AccessCheckCard key={accessCheck.id} accessCheck={accessCheck} userID={user.id} />
               ))}
             </Stack>
@@ -519,7 +537,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                 </Button>
               </>}
           </Stack>
-        )}
+        );}}
       />
     </PrettyModal>
   );
