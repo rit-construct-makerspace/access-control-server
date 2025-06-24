@@ -91,7 +91,6 @@ export default function ReaderCard({reader, makerspaceID}: ReaderCardProps) {
           action={
             <Button color="error" variant="contained" onClick={() => {
               if (window.confirm(`Are you sure you want to delete ${reader.name}`)) {
-                console.log("Deleting");
                 deleteReader({ variables: { id: reader.id } });
               }
             }}>
