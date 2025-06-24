@@ -28,6 +28,13 @@ export const ReaderTypeDefs = gql`
     readerKeyCycle: Int
     pairTime: DateTime
   }
+  type ReaderLog{
+    id: ID!
+    dateTime: DateTime
+    reader: Reader
+    instance: EquipmentInstance
+    log: JSON
+  }
   type PairInfo {
     readerKey: String
     name: String
@@ -39,6 +46,7 @@ export const ReaderTypeDefs = gql`
     readers: [Reader]
     unpairedReaders: [Reader]
     reader(id: ID!): Reader
+    readerLogs(makerspaceID: ID, from: DateTime, to: DateTime, pageOffset: Int, pageLimit: Int): [ReaderLog]
   }
 
   extend type Mutation {
@@ -49,6 +57,7 @@ export const ReaderTypeDefs = gql`
       zone: String
     ): Reader
 
+    deleteReader(id: ID!): Boolean
 
     pairReader(
       SN: String!
