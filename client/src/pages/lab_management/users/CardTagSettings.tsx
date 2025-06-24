@@ -13,6 +13,7 @@ import { GET_USER } from "./UserModal";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { toast } from "react-toastify";
+import { isStaff } from "../../../common/PrivilegeUtils";
 
 
 const SET_CARD_TAG_ID = gql`
@@ -80,34 +81,29 @@ export default function CardTagSettings({
         Card Tag Settings
       </Typography>
       {!hasCardTag && (
-        <Stack direction="row" spacing={1} sx={{ opacity: 0.8 }}>
-          <CheckCircleIcon color="error" fontSize="small" />
-          <Typography variant="body1" fontStyle="italic">
-            No RIT ID Card Tag!
-          </Typography>
-        </Stack>
+        <Alert severity="error">No Associated Card Tag</Alert>
       )}
 
-      <FormControl disabled={!currentUser.admin || setCardTagIDResult.loading}>
+      <FormControl disabled={!isStaff(currentUser) || setCardTagIDResult.loading}>
         <TextField
           label="Update RIT ID"
           value={updatedCardTagID}
           onChange={(e) => {
             setUpdatedCardTagID(e.target.value.replaceAll(/(?=[^a-z])([^0-9])/g, ''))
           }}
-          sx={{ mt: 4 }}
+          sx={{ mt: 2 }}
         />
         <LoadingButton
           loading={setCardTagIDResult.loading}
           size="large"
           variant="contained"
           onClick={handleSubmit}
-          sx={{ mt: 8, alignSelf: "flex-end" }}
+          sx={{ mt: 1, alignSelf: "flex-end" }}
         >
           Update RIT Card Tag
         </LoadingButton>
       </FormControl>
-      {!currentUser.admin && (
+      {!isStaff(currentUser) && (
         <Alert severity="info" sx={{ width: "max-content", mt: 1 }}>
           You do not have permission to change this.
         </Alert>

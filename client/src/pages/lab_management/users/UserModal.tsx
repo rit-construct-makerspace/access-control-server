@@ -280,12 +280,12 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
       <RequestWrapper2
         result={getUserResult}
         render={({ user }) => {
-          console.log(user.accessChecks);
           const filteredACs: AccessCheck[] = user.accessChecks.filter(
-            (ac: any) => Boolean(ac.equipment.requiresTrainerApproval) 
-            ? isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id))
-            : (isStaffFor(currentUser, Number(ac.equipment.room.zone)) || isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id)))
-
+            (ac: any) => (
+              ac.equipment.requiresTrainerApproval
+              ? isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id))
+              : (isStaffFor(currentUser, Number(ac.equipment.room.zone.id)) || isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id)))
+            )
           );
 
           return (
@@ -399,15 +399,6 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
               Access Checks
             </Typography>
 
-            {filteredACs == null || filteredACs.length === 0 && (
-              <Stack direction="row" spacing={1} sx={{ opacity: 0.8 }}>
-                <CheckCircleIcon color="success" fontSize="small" />
-                <Typography variant="body1" fontStyle="italic">
-                  No available checks.
-                </Typography>
-              </Stack>
-            )}
-
             <Stack direction={"row"} spacing={1}>
               <ActionButton iconSize={5} color="info" appearance={"small"} variant="outlined" handleClick={async () => { refreshCheck() }} loading={refreshCheckResult.loading} buttonText="Refresh Checks" tooltipText="Purge all unapproved checks and repopulate based on currently passed modules." />
               {isManager(currentUser) && <ActionButton iconSize={5} color="primary" appearance={"small"} variant="outlined" handleClick={async () => { setOpenCreateCheckDialouge(!openCreateCheckDialouge) }} loading={false} buttonText="Create Check" />}
@@ -429,18 +420,16 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
               ))}
             </Stack>
 
+            {filteredACs == null || filteredACs.length === 0 && (
+              <Alert severity="info">No Access Checks Available</Alert>
+            )}
 
             <Typography variant="h6" component="div" mt={6} mb={1}>
               Passed Trainings
             </Typography>
 
             {user.passedModules == null || user.passedModules.length === 0 && (
-              <Stack direction="row" spacing={1} sx={{ opacity: 0.8 }}>
-                <CheckCircleIcon color="error" fontSize="small" />
-                <Typography variant="body1" fontStyle="italic">
-                  No trainings.
-                </Typography>
-              </Stack>
+              <Alert severity="info">No Passed Trainings</Alert>
             )}
 
             <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
@@ -462,12 +451,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
             </Typography>
 
             {user.trainingHolds == null || user.trainingHolds.length === 0 && (
-              <Stack direction="row" spacing={1} sx={{ opacity: 0.8 }}>
-                <CheckCircleIcon color="error" fontSize="small" />
-                <Typography variant="body1" fontStyle="italic">
-                  No trainings.
-                </Typography>
-              </Stack>
+              <Alert severity="success">No Locked Trainings</Alert>
             )}
 
             <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
@@ -492,17 +476,6 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
             </Typography>
 
             <Stack direction="row" spacing={2}>
-              {/* currentUser.privilege === Privilege.STAFF &&
-                <Button
-                  variant="outlined"
-                  color="error"
-                  startIcon={<DeleteIcon />}
-                  onClick={() => handleDeleteUserClicked
-                  }
-                >
-                  Delete account
-                </Button>
-              */}
               <Button
                 startIcon={<HistoryIcon />}
                 variant="outlined"
