@@ -26,5 +26,9 @@ export interface EquipmentWithRoom {
   byReservationOnly: boolean;
   archived: boolean;
   notes: string;
-  room: ObjectSummary;
+  room: {
+    name: String;
+    id: number;
+    zone: any;
+  };
 }

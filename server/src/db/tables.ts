@@ -25,6 +25,7 @@ export interface EquipmentRow {
   notes: string;
   byReservationOnly: boolean;
   needsWelcome?: boolean;
+  requiresTrainerApproval: boolean;
 }
 
 export interface EquipmentInstancesRow {
@@ -244,6 +245,13 @@ export interface ReaderRow {
   pairTime?: Date
 }
 
+export interface ReaderLogRow {
+  id: number;
+  readerID: number | null;
+  currentInstanceID: number | null;
+  dateTime: Date;
+  log: object;
+}
 
 export interface AnnouncementRow {
   id: number;
@@ -360,6 +368,7 @@ declare module "knex/types/tables.js" {
     TrainingHolds: TrainingHoldsRow;
     Users: UserRow;
     Readers: ReaderRow;
+    ReaderLogs: ReaderLogRow;
     AccessChecks: AccessCheckRow;
     Zones: ZoneRow;
     RoomsForZones: RoomsForZonesRow

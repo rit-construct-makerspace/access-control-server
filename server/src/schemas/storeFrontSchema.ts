@@ -81,7 +81,7 @@ export const StoreFrontTypeDefs = gql`
   type InventoryLedger {
     id: ID!
     timestamp: String!
-    initiator: User!
+    initiator: User
     category: String!
     totalCost: Float!
     purchaser: User

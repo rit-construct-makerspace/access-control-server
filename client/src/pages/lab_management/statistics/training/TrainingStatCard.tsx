@@ -79,6 +79,8 @@ export function TrainingStatCard({ relevantTrainingSubmissions: relevantTraining
 
   var questionStats: { questionText: string, correct: number, incorrect: number, percent: number }[] = []
 
+  const currentQuestions = relevantTrainingSubmissions[0].quiz.filter((item) => item.type === "MULTIPLE_CHOICE" || item.type == "CHECKBOX");
+
   relevantTrainingSubmissions.forEach((submission: VerboseTrainingSubmission) => {
 
     //Add all unique IDs to array
@@ -91,19 +93,22 @@ export function TrainingStatCard({ relevantTrainingSubmissions: relevantTraining
     var numCorrect = 0;
     var numIncorrect = 0;
     submission.summary.forEach((questionSummary) => {
-      //Fetch or create questionStats entry an count the number of correct and incorrect answers
-      var exisitingQuestionStat = questionStats.find((item) => item.questionText === questionSummary.questionText);
-      if (!exisitingQuestionStat) exisitingQuestionStat = questionStats[questionStats.push({
-        questionText: questionSummary.questionText,
-        correct: 0,
-        incorrect: 0,
-        percent: 0
-      }) - 1];
-      // console.log(exisitingQuestionStat)
-      if (questionSummary.correct) exisitingQuestionStat.correct++;
-      else exisitingQuestionStat.incorrect++;
+      //First ensure that the question is a part of the most up to date version of the quiz
+      if (currentQuestions.find((item) => item.id === questionSummary.questionNum)) {
+        //Fetch or create questionStats entry an count the number of correct and incorrect answers
+        var exisitingQuestionStat = questionStats.find((item) => item.questionText === questionSummary.questionText);
+        if (!exisitingQuestionStat) exisitingQuestionStat = questionStats[questionStats.push({
+          questionText: questionSummary.questionText,
+          correct: 0,
+          incorrect: 0,
+          percent: 0
+        }) - 1];
+        // console.log(exisitingQuestionStat)
+        if (questionSummary.correct) exisitingQuestionStat.correct++;
+        else exisitingQuestionStat.incorrect++;
 
-      questionSummary.correct ? numCorrect++ : numIncorrect++;
+        questionSummary.correct ? numCorrect++ : numIncorrect++;
+      }
     });
     sumScoreAverages += numCorrect / (numCorrect + numIncorrect);
   });

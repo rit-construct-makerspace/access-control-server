@@ -108,8 +108,8 @@ const UsersResolvers = {
     usersLimit: async (
       _parent: any,
       args: { searchText: string },
-      { isStaff }: ApolloContext) =>
-      isStaff(async () => {
+      { isTrainer }: ApolloContext) =>
+      isTrainer(async () => {
         const searchText = args.searchText ?? "";
         return await UserRepo.getUsersLimit(searchText);
       }),

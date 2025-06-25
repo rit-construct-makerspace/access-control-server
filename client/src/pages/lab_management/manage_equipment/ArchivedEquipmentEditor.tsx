@@ -58,6 +58,7 @@ export default function ArchivedEquipmentEditor({
             notes: equipment.notes ?? "",
             byReservationOnly: equipment.byReservationOnly,
             needsWelcome: equipment.needsWelcome,
+            requiresTrainerApproval: equipment.trainingModules,
           })
         }
       />

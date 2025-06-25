@@ -22,6 +22,9 @@ export function RoomStatCard({ relevantRoomSwipes: relevantRoomSwipes }: RoomSta
 
   relevantRoomSwipes.forEach((roomSwipe: VerboseRoomSwipe) => {
     const date = new Date(roomSwipe.dateTime);
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
 
     //Increment sum for session's day of week
     sumSwipesPerDayOfWeek[new Date(roomSwipe.dateTime).getDay()]++;
@@ -53,7 +56,7 @@ export function RoomStatCard({ relevantRoomSwipes: relevantRoomSwipes }: RoomSta
   });
 
   const numDays = (earliestDate && latestDate) ? Math.round(Math.abs((earliestDate - latestDate) / (24 * 60 * 60 * 1000))) : undefined;
-  const numWeeks = numDays ? Math.floor(numDays / 7) : 1;
+  const numWeeks = numDays ? Math.ceil(numDays / 7) : 1;
 
   var avgSwipesPerDayOfWeek = sumSwipesPerDayOfWeek.map((sum: number) => sum / numWeeks);
 

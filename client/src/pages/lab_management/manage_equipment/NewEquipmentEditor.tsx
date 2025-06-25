@@ -39,6 +39,7 @@ export default function NewEquipmentEditor({
           notes: equipment.notes ?? "",
           byReservationOnly: equipment.byReservationOnly,
           needsWelcome: equipment.needsWelcome,
+          requiresTrainerApproval: equipment.requiresTrainerApproval,
         })
       }
     />

@@ -36,9 +36,11 @@ import NewReaderPage from "./pages/newreaderpage/NewReaderPage";
 import ManageMakerspacePage from "./pages/makerspace_page/ManageMakerspacePage";
 import { useCurrentUser } from "./common/CurrentUserProvider";
 import StaffBar from "./pages/makerspace_page/StaffBar";
-import { isAdmin, isManagerFor, isStaffFor } from "./common/PrivilegeUtils";
+import { isAdmin, isManagerFor, isOnlyTrainer, isStaffFor } from "./common/PrivilegeUtils";
 import NoPrivilegePage from "./pages/NoPrivilegePage";
 import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
+import HoursDisplay from "./pages/signage/HoursDisplay";
+import EventsDisplay from "./pages/signage/EventsDisplay";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -53,6 +55,16 @@ function AuthedRoute() {
     return <Outlet />
   }
 };
+
+function TrainerRoute() {
+  const { makerspaceID } = useParams<{makerspaceID: string}>();
+  const user = useCurrentUser();
+  if (isOnlyTrainer(user) || isStaffFor(user, Number(makerspaceID))) {
+    return <Outlet/>
+  } else {
+    return <NoPrivilegePage/>
+  }
+}
 
 function StaffRoute() {
   const { makerspaceID } = useParams<{makerspaceID: string}>();
@@ -95,6 +107,8 @@ export default function AppRoutes() {
         {/* Routes for the sattic displays around the makerspaces */}
         <Route path="/display">
           <Route path="/display/announcements" element={<AnnouncementsDisplay/>}/>
+          <Route path="/display/hours/:makerspaceID" element={<HoursDisplay/>}/>
+          <Route path="/display/events" element={<EventsDisplay/>}/>
         </Route>
         {/* END STATIC DISPLAYS */}
 
@@ -108,21 +122,29 @@ export default function AppRoutes() {
           <Route element={<AuthedRoute />}> 
             <Route path="/user/trainings" element={<UserTraingingsPage />}/>
             <Route path="/user/settings" element={<UserSettingsPage />}/>
-
-            {/* Routes for staff + higher */}
-            <Route element={<StaffRoute/>}>
+            
+            {/* Routes for trainers + higher */}
+            <Route>
               <Route path="/makerspace/:makerspaceID" element={<StaffBar/>}>
-                {/* Routes for manager + higher */}
-                <Route element={<ManagerRoute/>}>
-                  <Route path="/makerspace/:makerspaceID/edit" element={<ManageMakerspacePage />}/>
-                  <Route path="/makerspace/:makerspaceID/edit/room/:roomID" element={<ManageRoomPage />}/>
+
+              <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />}/>
+              <Route path="/makerspace/:makerspaceID/people/:userID" element={<UsersPage />}/>
+
+              {/* Routes for staff + higher */}
+                <Route element={<StaffRoute/>}>
+
+                  <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />}/>
+                  <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />}/>
+                  <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage/>}/>
+
+                  {/* Routes for manager + higher */}
+                  <Route element={<ManagerRoute/>}>
+                    <Route path="/makerspace/:makerspaceID/edit" element={<ManageMakerspacePage />}/>
+                    <Route path="/makerspace/:makerspaceID/edit/room/:roomID" element={<ManageRoomPage />}/>
+                  </Route>
+                  {/* End manager routes */}
+                  
                 </Route>
-                {/* End manager routes */}
-                <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />}/>
-                <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />}/>
-                <Route path="/makerspace/:makerspaceID/people/:userID" element={<UsersPage />}/>
-                <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />}/>
-                <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage/>}/>
               </Route>
             </Route>
 
@@ -133,6 +155,7 @@ export default function AppRoutes() {
               <Route path="/admin/announcements/new" element={<NewAnnouncementPage />} />
 
               <Route path="/admin/newreader" element={<NewReaderPage />} />
+
             </Route>
 
             <Route path="/maker/training" element={<TrainingPage />} />

@@ -114,14 +114,17 @@ export function Dashboard() {
                                 data.events.length == 0
                                 ? <Typography variant="body1">No Events!</Typography>
                                 : data.events.map((event: MakeEvent) => (
-                                <EventCard
-                                    name={event.name.text}
-                                    description={event.name.html}
-                                    summary={event.summary}
-                                    url={event.url}
-                                    start={event.start.local}
-                                    end={event.end.local}
-                                    logoUrl={event.logo.url} />
+                                    event.ticket_availability.has_available_tickets
+                                    ? <EventCard
+                                        name={event.name.text}
+                                        description={event.name.html}
+                                        summary={event.summary}
+                                        url={event.url}
+                                        start={event.start.local}
+                                        end={event.end.local}
+                                        logoUrl={event.logo.url} 
+                                    />
+                                    : null
                             ))}
                         </Stack>
                     </Box>

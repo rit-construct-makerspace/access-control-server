@@ -39,12 +39,6 @@ export const UsersTypeDefs = gql`
     expirationDate: DateTime!
   }
 
-  type UserAccessCheck {
-    id: ID!
-    equipmentID: ID!
-    approved: Boolean!
-  }
-
   type User {
     id: ID!
     firstName: String!
@@ -57,7 +51,7 @@ export const UsersTypeDefs = gql`
     admin: Boolean!
     holds: [Hold]
     passedModules: [PassedModule]
-    accessChecks: [UserAccessCheck]
+    accessChecks: [AccessCheck]
     expectedGraduation: String
     college: String
     cardTagID: String

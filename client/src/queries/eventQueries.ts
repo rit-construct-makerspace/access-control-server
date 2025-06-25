@@ -24,6 +24,9 @@ export interface MakeEvent {
     logo: {
         url: string;
     };
+    ticket_availability: {
+      has_available_tickets: boolean;
+    }
 }
 
 export const GET_EVENTS = gql`
@@ -51,6 +54,9 @@ export const GET_EVENTS = gql`
       summary
       logo {
         url
+      }
+      ticket_availability {
+        has_available_tickets
       }
     }
   }

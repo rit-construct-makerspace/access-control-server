@@ -24,7 +24,7 @@ const StorefrontResolvers = {
   InventoryLedger: {
     //Map initiator field to User
     initiator: (parent: any) => {
-      return getUserByID(parent.initiator);
+      return parent.initiator ? getUserByID(parent.initiator) : undefined;
     },
     
     //Map purchaser field to Use
