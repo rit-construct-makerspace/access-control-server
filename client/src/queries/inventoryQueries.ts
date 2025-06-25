@@ -5,6 +5,7 @@ export const GET_INVENTORY_ITEMS = gql`
     InventoryItems(storefrontVisible: $storefrontVisible) {
       id
       name
+      image
       unit
       pluralUnit
       count

@@ -1,6 +1,6 @@
 export default interface InventoryItem {
   id: number;
-  image: string;
+  image?: string;
   name: string;
   labels: string[];
   unit: string;
