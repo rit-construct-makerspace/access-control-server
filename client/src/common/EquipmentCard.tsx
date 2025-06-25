@@ -125,7 +125,10 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 </Stack>
                 <CardContent>
                     {/* Desc && learn more */}
-                    <ReactMarkdown>{`${props.equipment.notes} [Learn More](${props.equipment.sopUrl})`}</ReactMarkdown>
+                    <Typography>
+                        <ReactMarkdown>{props.equipment.notes}</ReactMarkdown>
+                        <Link to={props.equipment.sopUrl} target="_blank" rel="noopener noreferrer">Learn More</Link>
+                    </Typography>
                 </CardContent>
             </Stack>
         </Card>
