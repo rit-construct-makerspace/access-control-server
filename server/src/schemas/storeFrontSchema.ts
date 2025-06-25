@@ -51,6 +51,8 @@ export const StoreFrontTypeDefs = gql`
     storefrontVisible: Boolean
     notes: String
     tags: [InventoryTag]
+    makerspace: Zone
+    makerspaceID: ID!
   }
 
   type InventoryTag {
