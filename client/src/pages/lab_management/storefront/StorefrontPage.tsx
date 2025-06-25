@@ -15,6 +15,7 @@ import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isAdmin, isManager, isStaff } from "../../../common/PrivilegeUtils";
 import Page from "../../Page";
 import Privilege from "../../../types/Privilege";
+import { ListingCard } from "./ListingCard";
 
 const REMOVE_INVENTORY_ITEM_AMOUNT = gql`
   mutation RemoveInventoryItemAmount($itemID: ID!, $amountToRemove: Int!) {
@@ -87,6 +88,7 @@ export default function StorefrontPage() {
         id: uuidv4(),
         item,
         count,
+        makerspace: 0
       });
 
       updateLocalStorage(draft);
@@ -159,20 +161,13 @@ export default function StorefrontPage() {
           onClear={() => setSearchText("")}
         />
 
-        <Stack divider={<Divider flexItem />} sx={{ width: "100%" }}>
+        <Stack direction={"row"} flexWrap={"wrap"} divider={<Divider flexItem />} sx={{ width: "100%" }}>
           {data?.InventoryItems?.filter((item: InventoryItem) =>
             item.name.toLowerCase().includes(searchText.toLowerCase())
             && (!showInternalItems ? item.storefrontVisible : true)
             && ((!isManager(currentUser) && showStaffItems) ? !item.staffOnly : true)
           ).map((item: InventoryItem) => (
-            <InventoryRow
-              item={item}
-              key={item.id}
-              onClick={() => {
-                setShowModal(true);
-                setActiveItem(item);
-              }}
-            />
+            <ListingCard item={item} />
           ))}
         </Stack>
 
