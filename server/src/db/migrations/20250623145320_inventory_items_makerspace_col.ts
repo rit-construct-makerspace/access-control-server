@@ -5,6 +5,7 @@ export async function up(knex: Knex): Promise<void> {
   if (!makerspaceColExists) {
     return knex.schema.alterTable("InventoryItems", (t) => {
       t.integer("makerspaceID").references("id").inTable("InventoryCarts").nullable();
+      t.string("description");
     });
   }
 }

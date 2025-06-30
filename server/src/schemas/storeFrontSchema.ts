@@ -50,6 +50,7 @@ export const StoreFrontTypeDefs = gql`
     staffOnly: Boolean
     storefrontVisible: Boolean
     notes: String
+    description: String
     tags: [InventoryTag]
     makerspace: Zone
     makerspaceID: ID!

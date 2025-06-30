@@ -90,6 +90,7 @@ export interface InventoryItemRow {
   staffOnly: boolean;
   storefrontVisible: boolean;
   notes: string;
+  description: string;
   tagID1: number | null;
   tagID2: number | null;
   tagID3: number | null;
