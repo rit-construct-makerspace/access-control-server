@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
   if (!itemsForCartsExists) {
     return knex.schema.createTable("InventoryItemsForCarts", (t) => {
       t.integer("cartID").references("id").inTable("InventoryCarts").notNullable();
-      t.integer("itemID").references("id").inTable("Zones").notNullable();
+      t.integer("itemID").references("id").inTable("InventoryItem").notNullable();
       t.integer("count").notNullable();
       t.primary(["cartID", "itemID"]);
     });
