@@ -16,6 +16,8 @@ import { isAdmin, isManager, isStaff } from "../../../common/PrivilegeUtils";
 import Page from "../../Page";
 import Privilege from "../../../types/Privilege";
 import { ListingCard } from "./ListingCard";
+import { ListingModal } from "./ListingModal";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 const REMOVE_INVENTORY_ITEM_AMOUNT = gql`
   mutation RemoveInventoryItemAmount($itemID: ID!, $amountToRemove: Int!) {
@@ -44,6 +46,7 @@ function updateLocalStorage(cart: ShoppingCartEntry[] | null) {
 
 export default function StorefrontPage() {
   const currentUser = useCurrentUser();
+  const isMobile = useIsMobile();
 
   const { loading, error, data } = useQuery(GET_INVENTORY_ITEMS, {variables: {storefrontVisible: isStaff(currentUser) ? null : true}});
 
@@ -53,6 +56,7 @@ export default function StorefrontPage() {
 
   const [searchText, setSearchText] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [activeItem, setActiveItem] = useState<InventoryItem | undefined>();
   const [addToCartCount, setAddToCartCount] = useState(0);
   const [shoppingCart, setShoppingCart] = useImmer<ShoppingCartEntry[]>([]);
@@ -84,12 +88,17 @@ export default function StorefrontPage() {
 
   const addToShoppingCart = (item: InventoryItem, count: number) =>
     setShoppingCart((draft) => {
-      draft.push({
-        id: uuidv4(),
-        item,
-        count,
-        makerspace: 0
-      });
+      const existing = shoppingCart.find((row) => row.item.id == item.id)
+      if (!existing) {
+        draft.push({
+          id: uuidv4(),
+          item,
+          count,
+          makerspace: 0
+        });
+      } else {
+        existing.count += count;
+      }
 
       updateLocalStorage(draft);
     });
@@ -130,7 +139,7 @@ export default function StorefrontPage() {
 
   return (
     <RequestWrapper loading={loading} error={error}>
-      <Page title={"Store"}>
+      <Page title={"Store"} noPadding={isMobile}>
         <ShoppingCart
           entries={shoppingCart}
           removeEntry={removeFromShoppingCart}
@@ -167,7 +176,7 @@ export default function StorefrontPage() {
             && (!showInternalItems ? item.storefrontVisible : true)
             && ((!isManager(currentUser) && showStaffItems) ? !item.staffOnly : true)
           ).map((item: InventoryItem) => (
-            <ListingCard item={item} />
+            <ListingCard item={item} setActiveItem={(item) => {setActiveItem(item); setShowModal(true)}} openDetailsModal={(item) => {setActiveItem(item); setShowDetailsModal(true)}} />
           ))}
         </Stack>
 
@@ -180,6 +189,13 @@ export default function StorefrontPage() {
             onClose={() => setShowModal(false)}
             item={activeItem}
           />
+        )}
+        {activeItem && showDetailsModal && (
+          <ListingModal 
+            item={activeItem} 
+            open
+            addToCart={(activeItem: InventoryItem, addToCartCount: number) => addToShoppingCart(activeItem, addToCartCount)}
+            onClose={() => setShowDetailsModal(false)} />
         )}
       </Page>
     </RequestWrapper>
