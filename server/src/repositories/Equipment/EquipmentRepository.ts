@@ -273,6 +273,7 @@ export async function updateEquipment(
     notes: equipment.notes ?? undefined,
     byReservationOnly: equipment.byReservationOnly,
     needsWelcome: equipment.needsWelcome ?? true,
+    requiresTrainerApproval: equipment.requiresTrainerApproval,
   });
 
   await updateModules(id, equipment.moduleIDs);

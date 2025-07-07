@@ -45,3 +45,11 @@ export function isTrainerFor(user: CurrentUser, equipmentID: number, makerspaceI
 
     return user.trainer.includes(equipmentID);
 }
+
+export function isOnlyTrainer(user: CurrentUser) {
+    if (isStaff(user)) {
+        return false;
+    }
+
+    return user.trainer.length > 0;
+}

@@ -91,6 +91,7 @@ export const isAdmin =
 export const isManagerFor =
   (expressUser: Express.User | undefined) =>
   (makerspaceID: number, callback: (user: CurrentUser) => any) => {
+    makerspaceID = Number(makerspaceID);
     authenticated(expressUser);
     const user = determineUser(expressUser);
 
@@ -110,6 +111,7 @@ export const isManagerFor =
 export const isStaffFor =
   (expressUser: Express.User | undefined) =>
   (makerspaceID: number, callback: (user: CurrentUser) => any) => {
+    makerspaceID = Number(makerspaceID);
     authenticated(expressUser);
     const user = determineUser(expressUser);
     if (!user.staff.includes(makerspaceID) && !user.manager.includes(makerspaceID) && !user.admin) {
@@ -127,6 +129,7 @@ export const isStaffFor =
 export const isTrainerFor = 
   (expressUser: Express.User | undefined) =>
   (equipmentID: number, callback: (user: CurrentUser) => any) => {
+    equipmentID = Number(equipmentID);
     authenticated(expressUser);
     const user = determineUser(expressUser);
 

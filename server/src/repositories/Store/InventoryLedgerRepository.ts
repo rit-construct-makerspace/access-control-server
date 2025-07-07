@@ -47,7 +47,7 @@ export async function deleteLedger(id: number): Promise<boolean> {
  * @returns new Inventory Ledger
  */
 export async function createLedger(
-    initiator: number,
+    initiator: number | undefined,
     category: string,
     totalCost: number,
     purchaser: number | undefined,
