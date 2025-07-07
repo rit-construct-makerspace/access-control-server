@@ -81,6 +81,7 @@ export default function AddToCartModal({
               sx={{ width: 100 }}
               type="number"
               autoFocus
+              slotProps={{ htmlInput: { min: 0, max: item.count } }}
               onKeyDown={({ key }) => {
                 if (key === "Enter") tryAddToCart();
               }}

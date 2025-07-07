@@ -4,6 +4,8 @@ import { Stack } from "@mui/system";
 
 interface ListingCardProps {
   item: InventoryItem
+  setActiveItem: (item: InventoryItem) => void;
+  openDetailsModal: (item: InventoryItem) => void;
 }
 
 export function ListingCard(props: ListingCardProps) {
@@ -20,9 +22,9 @@ export function ListingCard(props: ListingCardProps) {
       </CardContent>
       <CardActions>
         <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
-          <Button size="small">Details</Button>
+          <Button size="small" onClick={() => props.openDetailsModal(props.item)}>Details</Button>
           {props.item.count > 0
-          ? <Button size="small" variant="contained" color="primary">Add to Cart ({props.item.count} {props.item.count > 1 ? props.item.pluralUnit : props.item.unit} available)</Button>
+          ? <Button size="small" variant="contained" color="primary" onClick={() => props.setActiveItem(props.item)}>Add to Cart ({props.item.count} {props.item.count > 1 ? props.item.pluralUnit : props.item.unit} available)</Button>
           : <Button size="small" variant="contained" color="error" disabled>Out of stock</Button>}
         </Stack>
       </CardActions>
