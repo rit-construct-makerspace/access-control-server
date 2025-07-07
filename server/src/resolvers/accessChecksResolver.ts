@@ -171,12 +171,12 @@ const AccessChecksResolver = {
       { isTrainer }: ApolloContext) =>
       isTrainer(async (user) => {
         const equipmentToCheck = await EquipmentRepo.getEquipment();
-        equipmentToCheck.forEach(async (equipment) => {
-          await purgeUnapprovedAccessChecks(args.userID);
+        await purgeUnapprovedAccessChecks(args.userID);
+        for (const equipment of equipmentToCheck) {
           if (!equipment.archived && !(await accessCheckExists(args.userID, equipment.id)) && ((await EquipmentRepo.getModulesByEquipment(equipment.id)).length == 0 || (await EquipmentRepo.UserIdHasTrainingModules(args.userID, equipment.id)))) {
             await createAccessCheck(args.userID, equipment.id);
           }
-        });
+        }
       }
       ),
 

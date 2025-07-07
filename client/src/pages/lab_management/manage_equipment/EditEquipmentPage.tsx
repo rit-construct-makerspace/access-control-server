@@ -18,6 +18,7 @@ export interface Equipment {
   notes: string;
   byReservationOnly: boolean;
   needsWelcome: boolean;
+  requiresTrainerApproval: boolean;
 }
 
 interface EditEquipmentPageProps {
@@ -39,6 +40,7 @@ export default function EditEquipmentPage(props: EditEquipmentPageProps) {
     notes: "",
     byReservationOnly: false,
     needsWelcome: true,
+    requiresTrainerApproval: false,
   });
 
   const newEquipment = id === "new";

@@ -32,6 +32,9 @@ import { createEquipmentSession, pruneNullLengthEquipmentSessions, setLatestEqui
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
 import { ReaderRow } from "./db/tables.js";
 import { authenticateReader, ws_acs_api } from "./wsapi.js"
+import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
+import { InventoryItem } from "./schemas/storeFrontSchema.js";
+import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 const require = createRequire(import.meta.url);
 
 const allowed_origins = [process.env.REACT_APP_ORIGIN, "https://studio.apollographql.com", "https://make.rit.edu", "https://shibboleth.main.ad.rit.edu"];
@@ -110,7 +113,7 @@ async function startServer() {
   //serves built react app files under make.rit.edu/app
   app.use("/app/", express.static(path.join(__dirname, '../../client/build')));
 
-  
+
   /**
    * REGEX QUERY:
    * matches to all urls EXCEPT:
@@ -739,6 +742,184 @@ async function startServer() {
   });
 
 
+  /**
+   * Inventory API
+   * 
+   * DO NOT REMOVE THIS SECTION WHEN DEPRECATING THE OLD API
+   */
+
+  /**
+   * INVENTORY--
+   * Fetch a list of inventory items according to the fetch type
+   * Request (JSON Body):
+   * - Type: The type of items to fetch
+   *    * "public" | "internal" | "staff" | "all"
+   * - Key: API key for authorization. Required for fetch types "internal", "staff", "all"
+   */
+  app.get("/api/inv", async function (req, res) {
+    try {
+      const fetchType: "public" | "internal" | "staff" | "all" = req.body.Type ?? "public";
+      var items: InventoryItem[] = [];
+
+      if (fetchType === "internal" || fetchType === "staff" || fetchType === "all") {
+        if (req.body.Key != process.env.INV_API_KEY) {
+          if (API_DEBUG_LOGGING) createLog("Inventory Get request failed with error '{error}'", "inventory", { id: 403, label: "Invalid Key" });
+          return res.status(403).json({ error: "Invalid Key" }).send();
+        }
+
+        switch (fetchType) {
+          case "all":
+            items = await getItems();
+            break;
+          case "internal":
+            items = await getItemsWhereStorefront(false);
+            break;
+          case "staff":
+            items = await getItemsWhereStaff(true);
+            break;
+        }
+
+        return res.status(200).json({
+          count: items.length,
+          type: fetchType,
+          items
+        }).send();
+      } else {
+        //fetchType === "public"
+
+        items = await getItemsWhereStorefront(true);
+
+        return res.status(200).json({
+          count: items.length,
+          type: fetchType,
+          items
+        }).send();
+      }
+
+
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send();
+    }
+  });
+
+  /**
+   * COUNT--
+   * Fetch a count for a specified inventory item
+   */
+  app.get("/api/inv/:id", async function (req, res) {
+    try {
+      const id = parseInt(req.params.id);
+      return res.status(200).json({ count: (await getItemById(id))?.count ?? 0 }).send();
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send();
+    }
+  });
+
+  /**
+   * ADD--
+   * Increment the count of a defined item by the declared amount
+   * Request (JSON Body):
+   * - UID: NFC ID of the user 
+   * - Inc: Number to add to the count. Can be negative.
+   * - Key: API key for authorization.
+   */
+  app.post("/api/inv/add/:id", async function (req, res) {
+    try {
+      const id = parseInt(req.params.id);
+      const item = await getItemById(id);
+      const user = req.body.UID ? await getUserByCardTagID(req.body.UID) : undefined;
+
+      if (req.body.Key != process.env.INV_API_KEY) {
+        if (API_DEBUG_LOGGING) createLog("Inventory Add request failed with error '{error}'", "inventory", { id: 403, label: "Invalid Key" });
+        return res.status(403).json({ error: "Invalid Key" }).send();
+      }
+
+      if (!item) return res.status(404).json({ error: "Item does not exist" }).send();
+      if (!req.body.Inc) return res.status(403).json({ error: "Missing Inc" }).send();
+
+      const count = parseInt(req.body.Inc);
+
+      if (count < 0 && count * -1 > item.count) res.status(403).json({ error: "Operation would set count to negative value" }).send();
+
+      if (count != 0) {
+        await addItemAmount(id, count);
+        if (count > 0) {
+          if (user) {
+            await createLedger(user.id, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
+            await createLog(`{user} added ${count} ${count === 1 ? item.unit : item.pluralUnit} to the {inventory} inventory`, "inventory", { id: user.id, label: getUsersFullName(user) }, { id: item.id, label: item.name });
+          } else {
+            await createLedger(undefined, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
+            await createLog(`User added ${count} ${count === 1 ? item.unit : item.pluralUnit} to the {inventory} inventory`, "inventory", { id: item.id, label: item.name });
+          }
+        } else {
+          if (user) {
+            await createLedger(user.id, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
+            await createLog(`{user} removed ${count * -1} ${count === 1 ? item.unit : item.pluralUnit} from the {inventory} inventory`, "inventory", { id: user.id, label: getUsersFullName(user) }, { id: item.id, label: item.name });
+          } else {
+            await createLedger(undefined, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
+            await createLog(`User removed ${count * -1} ${count === 1 ? item.unit : item.pluralUnit} from the {inventory} inventory`, "inventory", { id: item.id, label: item.name });
+          }
+        }
+      }
+
+      return res.status(200).json({
+        count: item.count + count,
+      });
+
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send();
+    }
+  });
+
+    /**
+   * SET--
+   * Set the count of a declared item to a specified amount
+   * Request (JSON Body):
+   * - UID: NFC ID of the user 
+   * - Count: Number to set as the count. Cannot be negative.
+   * - Key: API key for authorization.
+   */
+  app.post("/api/inv/set/:id", async function (req, res) {
+    try {
+      const id = parseInt(req.params.id);
+      const item = await getItemById(id);
+      const user = req.body.UID ? await getUserByCardTagID(req.body.UID) : undefined;
+
+      if (req.body.Key != process.env.INV_API_KEY) {
+        if (API_DEBUG_LOGGING) createLog("Inventory Set request failed with error '{error}'", "inventory", { id: 403, label: "Invalid Key" });
+        return res.status(403).json({ error: "Invalid Key" }).send();
+      }
+
+      if (!item) return res.status(404).json({ error: "Item does not exist" }).send();
+      if (!req.body.Count) return res.status(403).json({ error: "Missing Count" }).send();
+
+      const count = parseInt(req.body.Count);
+
+      if (count >= 0) {
+        await setItemAmount(id, count);
+        if (user) {
+          await createLedger(user.id, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
+          await createLog(`{user} set ${count} ${count === 1 ? item.unit : item.pluralUnit} as the {inventory} inventory`, "inventory", { id: user.id, label: getUsersFullName(user) }, { id: item.id, label: item.name });
+        } else {
+          await createLedger(undefined, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
+          await createLog(`User set ${count} ${count === 1 ? item.unit : item.pluralUnit} as the {inventory} inventory`, "inventory", { id: item.id, label: item.name });
+        }
+      } else {
+        return res.status(403).json({ error: "Cannot have negative count" }).send();
+      }
+
+      return res.status(200).json({
+        count: count,
+      });
+
+    } catch (err) {
+      console.error(err);
+      return res.status(500).send();
+    }
+  });
 
 
   /**=================================
