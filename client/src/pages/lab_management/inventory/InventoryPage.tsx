@@ -51,8 +51,6 @@ export default function InventoryPage() {
   const lowItems = sortedItems.filter((i: any) => i.count < i.threshold);
   const matchingItems = sortedItems.filter((i: any) => i.name.toLowerCase().includes(searchText.toLowerCase()));
 
-  console.log(windowWidth)
-
   const columns: GridColDef<(typeof matchingItems)[number]>[] = [
     {
       field: 'name',
