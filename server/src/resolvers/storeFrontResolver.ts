@@ -6,7 +6,8 @@ import { createLedger, deleteLedger, getLedgers } from "../repositories/Store/In
 import { GraphQLError } from "graphql";
 import { getUserByID, getUserByIDOrUndefined } from "../repositories/Users/UserRepository.js";
 import { notifyInventoryItemBelowThreshold } from "../slack/slack.js";
-import { InventoryItemRow } from "../db/tables.js";
+import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
+import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 
 const StorefrontResolvers = {
   InventoryItem: {
@@ -19,16 +20,20 @@ const StorefrontResolvers = {
       if (parent.tagID3) tags.push(await InventoryRepo.getTagByID(parent.tagID3));
       return tags;
     },
+    //Map field makerspace to corresponding makerspace row, if any
+    makerspace: async (parent: InventoryItemRow) => {
+      return parent.makerspaceID ? await getZoneByID(parent.makerspaceID) : undefined;
+    }
   },
 
   InventoryLedger: {
     //Map initiator field to User
-    initiator: (parent: any) => {
+    initiator: (parent: InventoryLedgerRow) => {
       return parent.initiator ? getUserByID(parent.initiator) : undefined;
     },
-    
+
     //Map purchaser field to Use
-    purchaser: (parent: any) => {
+    purchaser: (parent: InventoryLedgerRow) => {
       return getUserByIDOrUndefined(parent.purchaser);
     }
   },
@@ -44,13 +49,23 @@ const StorefrontResolvers = {
       _: any,
       args: { storefrontVisible?: boolean },
       { isStaff }: ApolloContext) => {
-      if (args.storefrontVisible == null || args.storefrontVisible == undefined)
-        return await InventoryRepo.getItems();
-      if (args.storefrontVisible)
-        isStaff(async () => {
-          return await InventoryRepo.getItemsWhereStorefront(true);
+        console.log(args)
+      if (args.storefrontVisible === null || args.storefrontVisible === undefined) {
+        return isStaff(async () => {
+          console.log(1)
+          return await InventoryRepo.getItems();
         })
-      return await InventoryRepo.getItemsWhereStorefront(false);
+      }
+      else if (args.storefrontVisible == false) {
+        return isStaff(async () => {
+          console.log(2)
+          return await InventoryRepo.getItemsWhereStorefront(false);
+        })
+      }
+      else {
+        console.log(3)
+        return await InventoryRepo.getItemsWhereStorefront(true);
+      }
     },
 
     /**

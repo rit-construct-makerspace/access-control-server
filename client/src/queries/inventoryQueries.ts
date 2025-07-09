@@ -1,10 +1,11 @@
 import { gql } from "@apollo/client";
 
 export const GET_INVENTORY_ITEMS = gql`
-  query getInventoryItems {
-    InventoryItems {
+  query getInventoryItems($storefrontVisible: Boolean) {
+    InventoryItems(storefrontVisible: $storefrontVisible) {
       id
       name
+      image
       unit
       pluralUnit
       count
@@ -69,6 +70,7 @@ export const GET_LEDGERS = gql`
         lastName
       }
       notes
+      description
       items {
         quantity
         name

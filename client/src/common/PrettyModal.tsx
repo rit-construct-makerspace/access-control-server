@@ -4,7 +4,7 @@ import { Card, Modal } from "@mui/material";
 interface PrettyModalProps {
   open: boolean;
   onClose: () => void;
-  width?: number;
+  width?: number | string;
   children: ReactNode;
 }
 

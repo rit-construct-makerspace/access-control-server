@@ -180,13 +180,13 @@ export default function AppRoutes() {
             <Route path="/admin/tools/instance/:instanceid" element={<ToolItemPage />} />
             <Route path="/admin/tools/instance" element={<ToolItemPage />} />
 
-            <Route path="/admin/storefront" element={<StorefrontPage />} />
-
             <Route path="/admin/statistics" element={<StatisticsPage />} />
 
             <Route path="/admin/terms" element={<EditTermsPage />} />
           </Route>
           {/* END OF PROTECTED ROUTES */}
+
+          <Route path="/storefront" element={<StorefrontPage />} />
 
           <Route path="/logoutprompt" element={<LogoutPromptPage />} />
 

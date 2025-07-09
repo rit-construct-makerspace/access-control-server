@@ -1,6 +1,6 @@
 export default interface InventoryItem {
   id: number;
-  image: string;
+  image?: string;
   name: string;
   labels: string[];
   unit: string;
@@ -11,6 +11,7 @@ export default interface InventoryItem {
   staffOnly: boolean;
   storefrontVisible: boolean;
   notes: string;
+  description: string;
   tags: InventoryTag[];
   tagID1: number | null;
   tagID2: number | null;

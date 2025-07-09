@@ -6,6 +6,7 @@ import ShoppingCartRow from "./ShoppingCartRow";
 import CheckoutModal from "./CheckoutModal";
 import EmptyPageSection from "../../../common/EmptyPageSection";
 import UseModal from "./InternalUseModal";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface ShoppingCartProps {
   entries: ShoppingCartEntry[];
@@ -22,6 +23,8 @@ export default function ShoppingCart({
   emptyCart,
   internal,
 }: ShoppingCartProps) {
+  const isMobile = useIsMobile();
+
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
 
   const total = entries
@@ -57,7 +60,7 @@ export default function ShoppingCart({
       {entries.length > 0 && (
         <Stack
           spacing={1}
-          sx={{ width: 150, ml: "auto", mt: 2, alignItems: "flex-start" }}
+          sx={{ width: 150, ml: "auto", mt: isMobile ? 2 : 0, alignItems: "flex-start" }}
         >
           <Typography variant="h6" component="div">
             ${total}
