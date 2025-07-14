@@ -365,6 +365,11 @@ export interface RestrictionRow {
   createDate: Date | null;
 }
 
+export interface ModulesForRoomsRow {
+  roomID: number;
+  moduleID: number;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -400,5 +405,6 @@ declare module "knex/types/tables.js" {
     Staff: StaffRow;
     Trainers: TrainerRow;
     Restrictions: RestrictionRow;
+    ModulesForRooms: ModulesForRoomsRow;
   }
 }

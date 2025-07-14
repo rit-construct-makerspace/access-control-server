@@ -9,7 +9,7 @@ import {
   singleRoomToDomain,
 } from "../../mappers/rooms/roomMapper.js";
 import assert from "assert";
-import { RoomSwipeRow } from "../../db/tables.js";
+import { RoomSwipeRow, TrainingModuleRow } from "../../db/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 
 
@@ -169,4 +169,9 @@ export async function hasSwipedToday(roomID: number, userID: number): Promise<bo
 
   if (!swipe) return false;
   return true;
+}
+
+
+export async function getModulesByRoom(roomID: number): Promise<TrainingModuleRow[]> {
+  return await knex("ModulesForRooms").join("TrainingModule", "TrainingModule.id", "ModulesForRooms.moduleID").select("TrainingModule.*").where("ModulesForRooms.roomID", roomID);
 }
