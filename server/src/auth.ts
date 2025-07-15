@@ -311,31 +311,15 @@ export function setupStagingAuth(app: express.Application) {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
-  let authenticate = passport.authenticate("saml", {
+  const authenticate = passport.authenticate("saml", {
     failureFlash: true,
     failureRedirect: "/login/fail",
-    successRedirect: reactAppUrl, // Replace this to allow for dynamic redirects
+    //successRedirect: reactAppUrl,
   });
 
   app.get("/login", authenticate);
 
-  authenticate = (req: any, res: any, next: any) => {
-    return passport.authenticate("saml", {
-      failureFlash: true,
-      failureRedirect: "/login/fail",
-      successRedirect: req.originalUrl ?? reactAppUrl,
-    });
-  };
-
-  app.post("/login/callback",
-    // (req) => {
-    //   passport.authenticate("saml", {
-    //     failureFlash: true,
-    //     failureRedirect: "/login/fail",
-    //     successRedirect: req.originalUrl,
-    //   })
-    // },
-    authenticate,
+  app.post("/login/callback", authenticate,
     async (req, res) => {
       console.log("Logged in")
       if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {
@@ -345,6 +329,7 @@ export function setupStagingAuth(app: express.Application) {
           { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
         );
       }
+      res.redirect(req.originalUrl);
     }
   );
 
