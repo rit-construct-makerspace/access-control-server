@@ -311,15 +311,22 @@ export function setupStagingAuth(app: express.Application) {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
-  const authenticate = passport.authenticate("saml", {
-    failureFlash: true,
-    failureRedirect: "/login/fail",
-    //successRedirect: reactAppUrl,
+  app.get("/login", (req) => {
+    req.query.RelayState = req.originalUrl;
+    passport.authenticate("saml", {
+      failureFlash: true,
+      failureRedirect: "/login/fail",
+    })
   });
 
-  app.get("/login", authenticate);
-
-  app.post("/login/callback", authenticate,
+  app.post("/login/callback",
+    (req, res) => {
+      passport.authenticate("saml", {
+        failureFlash: true,
+        failureRedirect: "/login/fail",
+      });
+      res.redirect(req.body.RelayParams);
+    },
     async (req, res) => {
       console.log("Logged in")
       if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {
@@ -329,7 +336,6 @@ export function setupStagingAuth(app: express.Application) {
           { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
         );
       }
-      res.redirect(req.originalUrl);
     }
   );
 
