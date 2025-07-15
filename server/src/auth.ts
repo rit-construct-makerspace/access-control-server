@@ -312,7 +312,6 @@ export function setupStagingAuth(app: express.Application) {
   app.use(express.json());
 
   app.get("/login", (req) => {
-    localStorage.setItem("redirect-to", req.originalUrl);
     passport.authenticate("saml", {
       failureFlash: true,
       failureRedirect: "/login/fail",
@@ -326,7 +325,6 @@ export function setupStagingAuth(app: express.Application) {
         failureFlash: true,
         failureRedirect: "/login/fail",
       });
-      res.redirect(localStorage.getItem("redirect-to") ?? reactAppUrl);
     },
     async (req, res) => {
       console.log("Logged in")
