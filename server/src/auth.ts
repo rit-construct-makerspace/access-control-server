@@ -311,24 +311,41 @@ export function setupStagingAuth(app: express.Application) {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
-  const authenticate = passport.authenticate("saml", {
-    failureFlash: true,
-    failureRedirect: "/login/fail",
-    successRedirect: reactAppUrl,
+  // const authenticate = passport.authenticate("saml", {
+  //   failureFlash: true,
+  //   failureRedirect: "/login/fail",
+  //   successRedirect: reactAppUrl, // Replace this to allow for dynamic redirects
+  // });
+
+  // app.get("/login", authenticate);
+
+  app.get("/login", (req) => {
+    passport.authenticate("saml", {
+      failureFlash: true,
+      failureRedirect: "/login/fail",
+      successRedirect: req.originalUrl,
+    })
   });
 
-  app.get("/login", authenticate);
-
-  app.post("/login/callback", authenticate, async (req, res) => {
-    console.log("Logged in")
-    if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {
-      await createLog(
-        `{user} logged in.`,
-        "server",
-        { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
-      );
+  app.post("/login/callback",
+    (req) => {
+      passport.authenticate("saml", {
+        failureFlash: true,
+        failureRedirect: "/login/fail",
+        successRedirect: req.originalUrl,
+      })
+    },
+    async (req, res) => {
+      console.log("Logged in")
+      if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {
+        await createLog(
+          `{user} logged in.`,
+          "server",
+          { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
+        );
+      }
     }
-  });
+  );
 
   app.get("/login/fail", function (req, res) {
     console.log("Login failed");

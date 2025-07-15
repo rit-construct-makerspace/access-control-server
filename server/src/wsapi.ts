@@ -195,10 +195,12 @@ function initConnectionData(ws: ws.WebSocket): ConnectionData {
  */
 async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
     try {
+        // We should always return Auth to show we are an auth response
+        inResponse.Auth = uid;
+
         const reader = await getReaderByID(readerId);
         if (reader == null) {
             wsApiLog(`Failed to retrieve information about reader ${readerId}. Can't authorize`, "auth");
-            inResponse.Auth = uid;
             inResponse.Verified = 0;
             inResponse.Error = "Failed to retrieve info about reader";
             inResponse.Reason = "server-error";
@@ -230,7 +232,6 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
             return inResponse;
         }
         inResponse.Role = user.privilege;
-        inResponse.Auth = uid;
 
         // Find Machine
         if (machine == null) {
@@ -734,6 +735,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                 // First Message is special, identifies the shlug to the server
                 if (shlugMessage.Seq === 0) {
                     // Bootup message
+                    console.log("Boot up msg");
                     if (!await handleBootupMessage(connData, shlugMessage, ws, req.ip ?? "unknown ip")) {
                         // failed to setup  
                         console.error("WSACS: Incorrect Boot Message. Forcing Reconnect")
@@ -741,6 +743,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                         return;
                     }
                 }
+                console.log("msg", shlugMessage);
 
                 addOrUpdateConnection(connData);
                 // Get reader that was setup by handleBootupMessage
@@ -753,7 +756,6 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                     return;
                 }
                 var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [])
-
 
                 if (shlugMessage.Message) {
                     try {

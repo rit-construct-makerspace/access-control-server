@@ -1,0 +1,19 @@
+import { Knex } from "knex";
+
+export async function up(knex: Knex): Promise<void> {
+  const makerspaceColExists = await knex.schema.hasColumn("InventoryItem", "makerspaceID");
+  if (!makerspaceColExists) {
+    return knex.schema.alterTable("InventoryItem", (t) => {
+      t.integer("makerspaceID").references("id").inTable("InventoryCarts").nullable();
+      t.string("description");
+    });
+  }
+}
+
+export async function down(knex: Knex): Promise<void> {
+  const makerspaceColExists = await knex.schema.hasColumn("InventoryItem", "makerspaceID");
+  if (!makerspaceColExists) return;
+  return knex.schema.alterTable("InventoryItem", (t) => {
+    t.dropColumn("makerspaceID");
+  });
+}
