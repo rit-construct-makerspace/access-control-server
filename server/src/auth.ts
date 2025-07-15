@@ -316,6 +316,7 @@ export function setupStagingAuth(app: express.Application) {
     passport.authenticate("saml", {
       failureFlash: true,
       failureRedirect: "/login/fail",
+      successRedirect: reactAppUrl,
     })
   });
 
@@ -324,8 +325,9 @@ export function setupStagingAuth(app: express.Application) {
       passport.authenticate("saml", {
         failureFlash: true,
         failureRedirect: "/login/fail",
+        successRedirect: reactAppUrl,
       });
-      res.redirect(req.body.RelayParams);
+      //res.redirect(req.body.RelayParams);
     },
     async (req, res) => {
       console.log("Logged in")
