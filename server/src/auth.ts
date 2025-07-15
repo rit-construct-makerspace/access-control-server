@@ -317,7 +317,7 @@ export function setupStagingAuth(app: express.Application) {
     successRedirect: reactAppUrl, // Replace this to allow for dynamic redirects
   });
 
-  // app.get("/login", authenticate);
+  app.get("/login", authenticate);
 
   // app.get("/login", (req) => {
   //   passport.authenticate("saml", {
