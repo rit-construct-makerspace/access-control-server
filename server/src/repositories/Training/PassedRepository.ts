@@ -12,3 +12,7 @@ export async function removePassedModule(userID: number, moduleID: number) {
 export async function getPassedModuleIDs(userID: number) {
     return await knex("PassedModules").select("*").where("userID", userID);
 }
+
+export async function purgeExpiredPassedModules() {
+    return await knex("PassedModules").delete().where("passedDate", ">=", "NOW() - INTERVAL '1 year'");
+}
