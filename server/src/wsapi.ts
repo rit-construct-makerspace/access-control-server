@@ -631,7 +631,7 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
     }
     var reader: ReaderRow | undefined = await getReaderBySN(message.SerialNumber ?? "");
     if (reader?.pairTime == null || reader?.SN == null) {
-        wsApiLog(`WSACS: Request from unpaired shlug ${srcIp}. Denying`, "status");
+        wsApiLog(`WSACS: Request from unpaired shlug ${srcIp} (SN: ${reader?.SN}). Denying`, "status");
         console.error(`WSACS: Request from unpaired shlug ${srcIp}. Denying`);
         submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "unpaired", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
         ws.close(4001, "Unpaired Reader. Rejected");
