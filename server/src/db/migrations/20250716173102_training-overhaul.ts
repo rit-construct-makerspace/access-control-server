@@ -19,7 +19,7 @@ export async function up(knex: Knex): Promise<void> {
 
         await knex.raw("INSERT INTO \"PassedModules\" SELECT \"makerID\", \"moduleID\", \"submissionDate\" FROM \"ModuleSubmissions\" WHERE passed = TRUE AND \"submissionDate\" >= NOW() - INTERVAL '1 year' ON CONFLICT (\"userID\", \"moduleID\") DO NOTHING;");
     }
-    // (\"userID\", \"moduleID\", \"passedDate\")
+    
     if (!columnExists) {
         await knex.schema.alterTable("TrainingModule", (t) => {
             t.integer("makerspaceID").references("id").inTable("Zones").nullable()
