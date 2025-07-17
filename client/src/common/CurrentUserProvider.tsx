@@ -23,8 +23,8 @@ export const GET_CURRENT_USER = gql`
       }
       passedModules {
         moduleID
+        moduleName
         submissionDate
-        expirationDate
       }
       accessChecks {
         equipmentID
@@ -44,8 +44,8 @@ export const GET_CURRENT_USER = gql`
 
 export interface PassedModule {
   moduleID: string;
-  submissionDate: string;
-  expirationDate: string;
+  moduleName: string;
+  passedDate: string;
 }
 
 export interface TrainingHold {
