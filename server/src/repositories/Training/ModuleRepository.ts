@@ -147,16 +147,13 @@ export async function getPassedModulesByUser(
   userID: number
 ): Promise<PassedModule[]> {
   return knex("ModuleSubmissions")
-    .join("TrainingModule", "TrainingModule.id", "ModuleSubmissions.moduleID")
+    .join("TrainingModule", "TrainingModule.id", "PassedModules.moduleID")
     .select(
-      "ModuleSubmissions.id",
-      "ModuleSubmissions.moduleID",
+      "PassedModules.moduleID",
       "TrainingModule.name as moduleName",
-      "ModuleSubmissions.submissionDate",
-      "ModuleSubmissions.expirationDate"
+      "PassedModules.submissionDate",
     )
-    .where("ModuleSubmissions.makerID", userID)
-    .andWhere("ModuleSubmissions.passed", true)
+    .where("PassedModules.userID", userID)
     .orderBy("name", "asc");;
 }
 

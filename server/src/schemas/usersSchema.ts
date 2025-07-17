@@ -13,11 +13,9 @@ export enum Privilege {
 }
 
 export interface PassedModule {
-  id: number;
   moduleID: number;
   moduleName: string;
   submissionDate: Date;
-  expirationDate: Date;
 }
 
 export interface User extends UserRow {
