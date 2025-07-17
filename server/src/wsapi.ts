@@ -844,7 +844,6 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                 // First Message is special, identifies the shlug to the server
                 if (shlugMessage.Seq === 0) {
                     // Bootup message
-                    console.log("Boot up msg");
                     if (!await handleBootupMessage(connData, shlugMessage, ws, req.ip ?? "unknown ip")) {
                         // failed to setup  
                         console.error("WSACS: Incorrect Boot Message. Forcing Reconnect")
