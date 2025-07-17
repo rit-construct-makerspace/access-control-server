@@ -7,9 +7,9 @@ import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaff
 import { getEquipmentByID, getMissingTrainingModules, hasAccessByID } from "./repositories/Equipment/EquipmentRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
-import { getRoomByID, getRoomsByZone, hasSwipedToday } from "./repositories/Rooms/RoomRepository.js";
+import { getRoomByID, getRoomsByZone, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
-import { getInstanceByReaderID} from "./repositories/Equipment/EquipmentInstancesRepository.js";
+import { getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstancesRepository.js";
 import { randomInt } from "crypto";
 import { generateRandomHumanName } from "./data/humanReadableNames.js";
 import { generateShlugKey } from "./resolvers/readersResolver.js";
@@ -389,10 +389,20 @@ async function welcomeUID(uid: string, readerID: number, inResponse: ShlugRespon
         wsApiLog("UID {conceal} failed to swipe into {makerspace} with error {error}", "welcome", { id: 0, label: uid }, { id: makerspace.id, label: makerspace.name }, { id: 406, label: "User does not exist" });
         return inResponse;
     }
-    const rooms = await getRoomsByZone(makerspace.id);
-    // TODO: MakerspaceSwipes not RoomSwipes
-    inResponse.Verified = 1;
-    await wsApiLog("{user} has signed into {makerspace}", "welcome", { id: user.id, label: getUsersFullName(user) }, { id: makerspace.id, label: makerspace.name });
+    try {
+        const rooms = await getRoomsByZone(makerspace.id);
+        for (let i = 0; i < rooms.length; i++) {
+            // TODO: MakerspaceSwipes not RoomSwipes
+            await swipeIntoRoom(rooms[i].id, user.id);
+        }
+        inResponse.Verified = 1;
+        await wsApiLog("{user} has signed into {makerspace}", "welcome", { id: user.id, label: getUsersFullName(user) }, { id: makerspace.id, label: makerspace.name });
+    } catch (e) {
+        inResponse.Verified = 0;
+        inResponse.Error = "Server Error";
+        await wsApiLog(`{user} failed to sign into {makerspace} with exception ${JSON.stringify(e)}`, "welcome", {id: user.id, label: getUsersFullName(user)}, {id: makerspace.id, label: makerspace.name})
+    }
+
 
     return inResponse;
 }
@@ -484,7 +494,7 @@ async function handleRequest(connData: ConnectionData | undefined, requested_val
                     obj.State = "Idle";
                 } else {
                     const pairStatus: PairStatus = await getReaderPairStatus(reader.id);
-                    if (pairStatus == PairStatus.PairedAsWelcomer){
+                    if (pairStatus == PairStatus.PairedAsWelcomer) {
                         obj.State = "Welcoming";
                     } else if (reader.state) {
                         if (["Lockout", "Welcoming"].includes(reader.state)) {
@@ -621,7 +631,7 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
     }
     var reader: ReaderRow | undefined = await getReaderBySN(message.SerialNumber ?? "");
     if (reader?.pairTime == null || reader?.SN == null) {
-        wsApiLog(`WSACS: Request from unpaired shlug ${srcIp}. Denying`, "status");
+        wsApiLog(`WSACS: Request from unpaired shlug ${srcIp} (SN: ${reader?.SN}). Denying`, "status");
         console.error(`WSACS: Request from unpaired shlug ${srcIp}. Denying`);
         submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "unpaired", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
         ws.close(4001, "Unpaired Reader. Rejected");
@@ -852,7 +862,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                     }
                 }
                 if (connData.readerId == null) {
-                    wsApiLog("Can not process WSAPI message. Null reader ID (this shouldn't happen): "+ev.data, "status")
+                    wsApiLog("Can not process WSAPI message. Null reader ID (this shouldn't happen): " + ev.data, "status")
                     return;
                 }
 
@@ -888,7 +898,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                     }
                 }
                 if (shlugMessage.State) {
-                    await handleStateTransition(reader, shlugMessage.State, shlugMessage.UID, shlugMessage?.Temp) 
+                    await handleStateTransition(reader, shlugMessage.State, shlugMessage.UID, shlugMessage?.Temp)
                 }
 
                 if (shlugMessage.Auth && (shlugMessage.AuthTo == null || shlugMessage.AuthTo == "Unlocked")) {
