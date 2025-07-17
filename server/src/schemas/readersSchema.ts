@@ -45,6 +45,7 @@ export const ReaderTypeDefs = gql`
   extend type Query {
     readers: [Reader]
     unpairedReaders: [Reader]
+    welcomeReadersForMakerspace(makerspaceId: ID!): [Reader]
     reader(id: ID!): Reader
     readerLogs(makerspaceID: ID, from: DateTime, to: DateTime, pageOffset: Int, pageLimit: Int): [ReaderLog]
   }
@@ -62,6 +63,9 @@ export const ReaderTypeDefs = gql`
     pairReader(
       SN: String!
     ): PairInfo
+
+    pairAsWelcomeReader(readerID: ID!, makerspaceID: ID!): Boolean
+    unpairAsWelcomeReader(readerID: ID!, makerspaceID: ID!): Boolean
 
 
     updateReader(

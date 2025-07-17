@@ -200,6 +200,7 @@ export default function ReaderCard({reader, makerspaceID}: ReaderCardProps) {
               <MenuItem value="Lockout">Lockout</MenuItem>
               <MenuItem value="Fault">Fault</MenuItem>
               <MenuItem value="Startup">Startup</MenuItem>
+              <MenuItem value="Welcoming">Welcoming</MenuItem>
               <MenuItem value="Restart">Restart</MenuItem>
             </Select>
             <Box>
