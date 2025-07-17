@@ -320,6 +320,7 @@ export function setupStagingAuth(app: express.Application) {
   app.get("/login", authenticate);
 
   app.post("/login/callback", authenticate,
+
     async (req, res) => {
       console.log("Logged in")
       if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {
