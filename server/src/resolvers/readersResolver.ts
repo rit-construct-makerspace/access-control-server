@@ -188,8 +188,8 @@ const ReadersResolver = {
     pairReader: async (
       _parent: any,
       args: { SN: string },
-      { isManager }: ApolloContext) =>
-      isManager(async (user) => {
+      { isStaff }: ApolloContext) =>
+      isStaff(async (user) => {
         const timeOfPair = new Date();
 
         var reader = await ReaderRepo.getReaderBySN(args.SN);
