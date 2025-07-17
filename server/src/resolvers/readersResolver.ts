@@ -90,7 +90,7 @@ const ReadersResolver = {
       }),
 
     /**
-     * Fetch all Websocket Readers that are not paired with a machine instance
+     * Fetch all Websocket Readers that are not paired with a machine instance or as welcome readers
      * @returns non paired readers
      * @throws GraphQLError if not MENTOR or STAFF or is on hold
      */
@@ -101,13 +101,27 @@ const ReadersResolver = {
       isStaff(async () => {
         return await ReaderRepo.getUnpairedReaders();
       }),
-
+      
       /**
-     * Fetch Reader by ID
-     * @argument id ID of Reader
-     * @returns Reader
-     * @throws GraphQLError if not MENTOR or STAFF or is on hold
-     */
+       * 
+       * @param _args the id of the makerspace to query upon
+       * @returns a list of welcome readers paired to that makerspace
+       */
+      welcomeReadersForMakerspace: async (
+        _parent: any,
+        _args: {makerspaceId: number},
+        { isStaff }: ApolloContext) =>
+        isStaff(async () => {
+          return await ReaderRepo.getWelcomeReadersForMakerspace(_args.makerspaceId);
+        }),
+      
+
+    /**
+   * Fetch Reader by ID
+   * @argument id ID of Reader
+   * @returns Reader
+   * @throws GraphQLError if not MENTOR or STAFF or is on hold
+   */
     reader: async (
       _parent: any,
       args: { id: string },
@@ -145,7 +159,7 @@ const ReadersResolver = {
      */
     createReader: async (
       _parent: any,
-      args: {machineID?: number, machineType?: string, name?: string, zone?: string},
+      args: { machineID?: number, machineType?: string, name?: string, zone?: string },
       { isManager }: ApolloContext) =>
       isManager(async (user: CurrentUser) => {
         return await ReaderRepo.createReader(args);
@@ -165,17 +179,17 @@ const ReadersResolver = {
         return await ReaderRepo.deleteReader(args.id);
       }),
 
-      /**
-     * Pair a new Reader
-     * @argument SN serial number of the shlug
-     * @returns SerialNumber, ShlugKey, Certs, Domain
-     * @throws GraphQLError if not STAFF or is on hold
-     */
+    /**
+   * Pair a new Reader
+   * @argument SN serial number of the shlug
+   * @returns SerialNumber, ShlugKey, Certs, Domain
+   * @throws GraphQLError if not STAFF or is on hold
+   */
     pairReader: async (
       _parent: any,
       args: { SN: string },
-      { isManager }: ApolloContext) =>
-      isManager(async (user) => {
+      { isStaff }: ApolloContext) =>
+      isStaff(async (user) => {
         const timeOfPair = new Date();
 
         var reader = await ReaderRepo.getReaderBySN(args.SN);
@@ -206,9 +220,30 @@ const ReadersResolver = {
         return { readerKey: newKey, name: reader.name, siteName: process.env.READER_API_URL, certs: certCa }
       }),
 
-
-
-
+    pairAsWelcomeReader: async (
+      _parent: any,
+      args: { readerID: number, makerspaceID: number },
+      { isStaffFor }: ApolloContext
+    ) =>
+      isStaffFor(args.makerspaceID, async (user) => {
+        const success = await ReaderRepo.pairReaderAsMakerspaceWelcomer(args.readerID, args.makerspaceID);
+        if (success){
+          ShlugControl.sendState(user, Number(args.readerID), "Welcoming");
+        }
+        return success;
+      }),
+      
+      unpairAsWelcomeReader: async (
+        _parent: any,
+        args: { readerID: number, makerspaceID: number },
+        { isStaffFor }: ApolloContext
+      ) =>
+        isStaffFor(args.makerspaceID, async (user) => {
+          ShlugControl.sendState(user, Number(args.readerID), "Idle");          
+          return ReaderRepo.unpairReaderAsMakerspaceWelcomer(args.readerID, args.makerspaceID);
+        }),
+      
+  
     /**
      * Update the name of a Reader
      * @argument id of Reader to modify

@@ -3,10 +3,9 @@ import { useParams } from "react-router-dom";
 import { FullZone, GET_ZONE_BY_ID, DELETE_ZONE, UPDATE_ZONE } from "../../queries/zoneQueries";
 import { Box, Button, Divider, Stack, TextField, Typography } from "@mui/material";
 import RequestWrapper2 from "../../common/RequestWrapper2";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from "@mui/icons-material/Delete";
-import AdminPage from "../AdminPage";
 import AddIcon from '@mui/icons-material/Add';
 import { CREATE_ROOM } from "../../queries/roomQueries";
 import Room from "../../types/Room";
@@ -15,6 +14,7 @@ import PrettyModal from "../../common/PrettyModal";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import ZoneHourOptions from "./ZoneHourOptions";
 import { useIsMobile } from "../../common/IsMobileProvider";
+import ManageWelcomReadersCard from "./ManageWelcomeReadersCard";
 
 
 export default function ManageMakerspacePage() {
@@ -127,6 +127,7 @@ export default function ManageMakerspacePage() {
                                     ))
                                 }
                             </Stack>
+                            <ManageWelcomReadersCard makerspaceId={Number(makerspaceID)}/>
                         </Stack>
                         <Box width={isMobile ? "350px" : "800px"}>
                             <ZoneHourOptions zoneID={zone.id} />
