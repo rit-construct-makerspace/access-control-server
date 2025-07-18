@@ -68,5 +68,8 @@ export const TrainingModuleTypeDefs = gql`
     for the user and the grade will be returned as a Float out of 100
     """
     submitModule(moduleID: ID!, answerSheet: [AnswerInput]): ID
+
+
+    deletePassedModule(userID: ID!, moduleID: ID!): ID
   }
 `;

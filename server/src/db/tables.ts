@@ -190,6 +190,7 @@ export interface TrainingModuleRow {
   quiz: TrainingModuleItem[];
   archived: boolean;
   reservationPrompt: ReservationPrompt;
+  makerspaceID: number | null;
 }
 
 // not a table but the json structure for a column on the table above

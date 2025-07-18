@@ -16,6 +16,8 @@ import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js
 import { accessCheckExists, createAccessCheck, hasApprovedAccessCheck } from "../repositories/Equipment/AccessChecksRepository.js";
 import fetch from "node-fetch";
 import { createTrainingHold, getTrainingHoldByUserForModule } from "../repositories/Training/TrainingHoldsRespository.js";
+import * as PassedModuleRepo from "../repositories/Training/PassedRepository.js";
+import * as TrainingModuleReo from "../repositories/Training/ModuleRepository.js";
 
 /**
  * The ID of the quiz that, on pass, will grant 3DPrinterOS Self-Service access
@@ -509,6 +511,18 @@ const TrainingModuleResolvers = {
         }
       );
     },
+
+    deletePassedModule: async (
+      _parent: any,
+      args: {userID: number, moduleID: number},
+      { isStaffFor }: ApolloContext
+    ) => {
+      const module = await TrainingModuleReo.getModuleByID(args.moduleID);
+
+      return isStaffFor(module.makerspaceID ?? -1, (user) => {
+        return PassedModuleRepo.deletePassedModule(args.userID, args.moduleID);
+      });
+    }
   },
 };
 

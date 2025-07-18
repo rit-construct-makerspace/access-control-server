@@ -5,7 +5,7 @@ export async function addPassedModule(userID: number, moduleID: number) {
     return await knex("PassedModules").upsert({userID: userID, moduleID: moduleID});
 }
 
-export async function removePassedModule(userID: number, moduleID: number) {
+export async function deletePassedModule(userID: number, moduleID: number) {
     return await knex("PassedModules").delete().where("userID", userID).andWhere("moduleID", moduleID);
 }
 
