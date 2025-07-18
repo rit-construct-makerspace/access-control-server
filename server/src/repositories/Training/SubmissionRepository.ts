@@ -22,7 +22,7 @@ export async function addSubmission(
     summary: string
 ) {
     if (passed) {
-        PassedRepo.addPassedModule(makerID, moduleID);
+        PassedRepo.addPassedModule(makerID, moduleID, new Date());
     }
     return await knex("ModuleSubmissions").insert({ makerID, moduleID, passed, summary }).returning('id');
 }

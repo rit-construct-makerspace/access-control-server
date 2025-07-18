@@ -1,8 +1,8 @@
 import { knex } from "../../db/index.js";
 
 
-export async function addPassedModule(userID: number, moduleID: number) {
-    return await knex("PassedModules").upsert({userID: userID, moduleID: moduleID});
+export async function addPassedModule(userID: number, moduleID: number, passedDate: Date) {
+    return await knex("PassedModules").insert({userID: userID, moduleID: moduleID, passedDate: passedDate}).onConflict(["userID", "moduleID"]).merge();
 }
 
 export async function deletePassedModule(userID: number, moduleID: number) {
