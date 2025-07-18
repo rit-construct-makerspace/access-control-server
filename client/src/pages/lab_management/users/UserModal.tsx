@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
-import { Alert, Avatar, Box, Button, Card, Chip, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, TextareaAutosize, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Card, Chip, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, TextareaAutosize, TextField, Typography } from "@mui/material";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import InfoBlob from "./InfoBlob";
@@ -9,7 +9,7 @@ import RequestWrapper2 from "../../../common/RequestWrapper2";
 import styled from "styled-components";
 import HistoryIcon from "@mui/icons-material/History";
 import PrivilegeControl from "./PrivilegeControl";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import HoldCard from "./HoldCard";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import CardTagSettings from "./CardTagSettings";
@@ -25,6 +25,7 @@ import RestrictionCard from "./RestrictionCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
 import LockIcon from '@mui/icons-material/Lock';
+import BlockIcon from '@mui/icons-material/Block';
 
 const StyledInfo = styled.div`
   margin-top: 16px;
@@ -216,6 +217,7 @@ interface UserModalProps {
 }
 
 export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
@@ -291,7 +293,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
   };
 
   return (
-    <PrettyModal open={!!selectedUserID} onClose={onClose} width={isMobile ? 300 : 800}>
+    <PrettyModal open={!!selectedUserID} onClose={onClose} width={isMobile ? 300 : 1600}>
       <RequestWrapper2
         result={getUserResult}
         render={({ user }) => {
@@ -306,7 +308,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
           return (
             <Stack>
               <Stack direction="row" justifyContent="space-between">
-                <Stack direction="row" alignItems="baseline" spacing={2}>
+                <Stack direction="row" alignItems="center" spacing={2}>
                   {
                     isMobile
                       ? null
@@ -327,207 +329,222 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                 </IconButton>
               </Stack>
 
-              <StyledInfo>
-                <InfoBlob
-                  label="Member Since"
-                  value={format(parseISO(user.registrationDate), "MM/dd/yyyy")}
-                />
-                <InfoBlob label="College" value={user.college} />
-                <InfoBlob
-                  label="Expected Graduation"
-                  value={user.expectedGraduation}
-                />
-              </StyledInfo>
-
-              <PrivilegeControl user={user} isMobile={isMobile} />
-
-              <Typography variant="h6" component="div" mt={6} mb={1}>
-                Account Holds
-              </Typography>
-
-              {user.holds.length === 0 && (
-                <Alert severity="success">No Holds!</Alert>
-              )}
-
-              <Stack spacing={2}>
-                {user.holds.map((hold: Hold) => (
-                  <HoldCard key={hold.id} hold={hold} userID={user.id} />
-                ))}
-              </Stack>
-
-              <Button
-                sx={{ mt: 2, alignSelf: "flex-start" }}
-                variant="outlined"
-                onClick={handlePlaceHoldClicked}
-              >
-                Place hold
-              </Button>
-
-              <Typography variant="h6" component="div" mt={6} mb={1}>
-                Account Restrictions
-              </Typography>
-
-              {user.restrictions.length === 0 && (
-                <Alert severity="success">No Restrictions!</Alert>
-              )}
-
-              <Stack spacing={2}>
-                {user.restrictions.map((restriction: Restriction) => (
-                  <RestrictionCard key={restriction.id} restriction={restriction} userID={user.id} />
-                ))}
-              </Stack>
-
-              {
-                isStaff(currentUser)
-                  ? <RequestWrapper2 result={getZonesResult} render={(data) => {
-
-                    const fullZones: FullZone[] = data.zones;
-                    // I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript 
-                    const potentialRestrictions = fullZones.filter((zone: FullZone) => isStaffFor(currentUser, Number(zone.id)))
-
-                    return (
-                      <Stack direction="row" spacing={1} mt={2}>
-                        <FormControl fullWidth>
-                          <InputLabel id="restriction-makerspace">Makerspace</InputLabel>
-                          <Select id="restriction-makerspace"
-                            label="Makerspace"
-                            onChange={(e) => setRestrictionMakerspace(Number(e.target.value))}
-                            fullWidth
-                          >
-                            {
-                              potentialRestrictions.map((zone: FullZone) => (
-                                <MenuItem value={zone.id}>{zone.name} ID: {zone.id}</MenuItem>
-                              ))
-                            }
-                          </Select>
-                        </FormControl>
-                        <Button variant="contained" size="small" onClick={handleCreateRestriction} startIcon={<LockIcon />}>
-                          Place Restriction
-                        </Button>
-                      </Stack>
-                    );
-                  }} />
-                  : null
-              }
-
-              <Typography variant="h6" component="div" mt={6} mb={1}>
-                Access Checks
-              </Typography>
-
-              <Stack direction={"row"} spacing={1}>
-                <ActionButton iconSize={5} color="info" appearance={"small"} variant="outlined" handleClick={async () => { refreshCheck() }} loading={refreshCheckResult.loading} buttonText="Refresh Checks" tooltipText="Purge all unapproved checks and repopulate based on currently passed modules." />
-                {isManager(currentUser) && <ActionButton iconSize={5} color="primary" appearance={"small"} variant="outlined" handleClick={async () => { setOpenCreateCheckDialouge(!openCreateCheckDialouge) }} loading={false} buttonText="Create Check" />}
-              </Stack>
-              {openCreateCheckDialouge && <Stack direction={"row"} mt={1}>
-                <RequestWrapper loading={getEquipment.loading} error={getEquipment.error}>
-                  <Select value={newCheckEquipmentID} onChange={(e) => setNewCheckEquipmentID(e.target.value)} sx={{ width: "50%" }}>
-                    {getEquipment.data?.allEquipment.map((equipment: { id: number, name: string, archived: boolean }) => (
-                      <MenuItem value={equipment.id}>{equipment.name} {equipment.archived && <Chip variant="outlined" color="warning" size="small" label="hidden" sx={{ ml: "1em" }} />}</MenuItem>
-                    ))}
-                  </Select>
-                </RequestWrapper>
-                <Button variant="outlined" color="success" onClick={handleCheckCreate}>Create</Button>
-              </Stack>}
-
-              <Stack spacing={2} mt={2}>
-                {filteredACs != null && filteredACs.map((accessCheck: AccessCheckExtraInfo) => (
-                  <AccessCheckCard key={accessCheck.id} accessCheck={accessCheck} userID={user.id} />
-                ))}
-              </Stack>
-
-              {filteredACs == null || filteredACs.length === 0 && (
-                <Alert severity="info">No Access Checks Available</Alert>
-              )}
-
-              <Typography variant="h6" component="div" mt={6} mb={1}>
-                Passed Trainings
-              </Typography>
-
-              {user.passedModules == null || user.passedModules.length === 0 && (
-                <Alert severity="info">No Passed Trainings</Alert>
-              )}
-
-              <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
-                <Stack spacing={0.5}>
-                  {user.passedModules != null && user.passedModules.map((module: { moduleID: number, moduleName: string, passedDate: string }) => (
-                    <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
-                      <Stack direction={"row"} sx={{ justifyContent: "space-between" }}>
-                        <Typography>{module.moduleName}</Typography>
-                        <Typography>{format(new Date(module.passedDate), "M/d/yy h:mmaaa")}</Typography>
-                      </Stack>
-                    </Card>
-                  ))}
+              <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? undefined : "space-between"} mt={4}>
+                <Stack direction={isMobile ? "column" : "row"} spacing={isMobile ? 2 : 6}>
+                  <InfoBlob
+                    label="Member Since"
+                    value={format(parseISO(user.registrationDate), "MM/dd/yyyy")}
+                  />
+                  <InfoBlob
+                    label="College"
+                    value={user.college}
+                  />
+                  <InfoBlob
+                    label="Expected Graduation"
+                    value={user.expectedGraduation}
+                  />
                 </Stack>
-              </Box>
-
-
-              <Typography variant="h6" component="div" mt={6} mb={1}>
-                Locked Trainings
-              </Typography>
-
-              {user.trainingHolds == null || user.trainingHolds.length === 0 && (
-                <Alert severity="success">No Locked Trainings</Alert>
-              )}
-
-              <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
-                <Stack spacing={0.5}>
-                  {user.trainingHolds != null && user.trainingHolds.map((hold: { id: number; expires: Date; module: { id: number; name: string } }) => (
-                    <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
-                      <Stack direction={"row"} alignItems={"center"} sx={{ justifyContent: "space-between" }}>
-                        <Stack direction={"row"} alignItems={"center"} spacing={2}>
-                          <Typography color={"secondary"}><b>Exp: </b>{format(new Date(hold.expires), "M/d/yy h:mmaaa")}</Typography>
-                          <Typography>{hold.module.name}</Typography>
-                        </Stack>
-                        <Button variant="text" color="success" onClick={() => handleTrainingHoldDeleteClick(hold.id)}>Unlock</Button>
-                      </Stack>
-                    </Card>
-                  ))}
-                </Stack>
-              </Box>
-
-
-              <Typography variant="h6" component="div" mt={6} mb={1}>
-                Actions
-              </Typography>
-
-              <Stack direction="row" spacing={2}>
                 <Button
                   startIcon={<HistoryIcon />}
                   variant="outlined"
-                  onClick={() => navigate(`/admin/history?q=<user:${user.id}:`)}
+                  color="secondary"
+                  onClick={() => navigate(`/makerspace/${makerspaceID}/history?q=<user:${user.id}:`)}
                 >
                   View logs
                 </Button>
               </Stack>
 
-              <CardTagSettings userID={user.id} hasCardTag={(user.cardTagID != null && user.cardTagID != "")} />
-
-              {isManager(currentUser) &&
-                <>
-                  <Typography variant="h6" component="div" mt={6} mb={1}>
-                    Notes
+              <Stack direction={isMobile ? "column" : "row"} width="100%" mt={4} spacing={4} justifyContent="center">
+                <Stack width="50%">
+                  <Typography variant="h6" component="div" mb={1}>
+                    Access Checks
                   </Typography>
 
-                  <TextareaAutosize
-                    style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em", marginTop: "2em", marginBottom: "2em" }}
+                  <Stack direction={"row"} spacing={1}>
+                    <ActionButton iconSize={5} color="info" appearance={"small"} variant="outlined" handleClick={async () => { refreshCheck() }} loading={refreshCheckResult.loading} buttonText="Refresh Checks" tooltipText="Purge all unapproved checks and repopulate based on currently passed modules." />
+                    {isManager(currentUser) && <ActionButton iconSize={5} color="primary" appearance={"small"} variant="outlined" handleClick={async () => { setOpenCreateCheckDialouge(!openCreateCheckDialouge) }} loading={false} buttonText="Create Check" />}
+                  </Stack>
+                  {openCreateCheckDialouge && <Stack direction={"row"} mt={1}>
+                    <RequestWrapper loading={getEquipment.loading} error={getEquipment.error}>
+                      <Select value={newCheckEquipmentID} onChange={(e) => setNewCheckEquipmentID(e.target.value)} sx={{ width: "50%" }}>
+                        {getEquipment.data?.allEquipment.map((equipment: { id: number, name: string, archived: boolean }) => (
+                          <MenuItem value={equipment.id}>{equipment.name} {equipment.archived && <Chip variant="outlined" color="warning" size="small" label="hidden" sx={{ ml: "1em" }} />}</MenuItem>
+                        ))}
+                      </Select>
+                    </RequestWrapper>
+                    <Button variant="outlined" color="success" onClick={handleCheckCreate}>Create</Button>
+                  </Stack>}
+
+                  <Stack spacing={1} mt={2}>
+                    {filteredACs != null && filteredACs.map((accessCheck: AccessCheckExtraInfo) => (
+                      <AccessCheckCard key={accessCheck.id} accessCheck={accessCheck} userID={user.id} />
+                    ))}
+                  </Stack>
+
+                  {filteredACs == null || filteredACs.length === 0 && (
+                    <Alert severity="info">No Access Checks Available</Alert>
+                  )}
+
+                  <Typography variant="h6" component="div" mt={4} mb={1}>
+                    Passed Trainings
+                  </Typography>
+
+                  {user.passedModules == null || user.passedModules.length === 0 && (
+                    <Alert severity="info">No Passed Trainings</Alert>
+                  )}
+
+                  <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
+                    <Stack spacing={0.5}>
+                      {user.passedModules != null && user.passedModules.map((module: { moduleID: number, moduleName: string, passedDate: string }) => (
+                        <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
+                          <Stack direction={"row"} sx={{ justifyContent: "space-between" }}>
+                            <Typography>{module.moduleName}</Typography>
+                            <Typography>{format(new Date(module.passedDate), "M/d/yy h:mmaaa")}</Typography>
+                          </Stack>
+                        </Card>
+                      ))}
+                    </Stack>
+                  </Box>
+
+
+                  <Typography variant="h6" component="div" mt={6} mb={1}>
+                    Locked Trainings
+                  </Typography>
+
+                  {user.trainingHolds == null || user.trainingHolds.length === 0 && (
+                    <Alert severity="success">No Locked Trainings</Alert>
+                  )}
+
+                  <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
+                    <Stack spacing={0.5}>
+                      {user.trainingHolds != null && user.trainingHolds.map((hold: { id: number; expires: Date; module: { id: number; name: string } }) => (
+                        <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
+                          <Stack direction={"row"} alignItems={"center"} sx={{ justifyContent: "space-between" }}>
+                            <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                              <Typography color={"secondary"}><b>Exp: </b>{format(new Date(hold.expires), "M/d/yy h:mmaaa")}</Typography>
+                              <Typography>{hold.module.name}</Typography>
+                            </Stack>
+                            <Button variant="text" color="success" onClick={() => handleTrainingHoldDeleteClick(hold.id)}>Unlock</Button>
+                          </Stack>
+                        </Card>
+                      ))}
+                    </Stack>
+                  </Box>
+                </Stack>
+                <Stack width="50%">
+                  <Stack direction="row" justifyContent={"space-between"} mb={1}>
+                    <Typography variant="h6">
+                      Account Holds
+                    </Typography>
+                    <Button
+                      color="error"
+                      variant="contained"
+                      onClick={handlePlaceHoldClicked}
+                      startIcon={<BlockIcon />}
+                    >
+                      Place hold
+                    </Button>
+                  </Stack>
+
+
+                  {user.holds.length === 0 && (
+                    <Alert severity="success">No Holds!</Alert>
+                  )}
+
+                  <Stack spacing={2}>
+                    {user.holds.map((hold: Hold) => (
+                      <HoldCard key={hold.id} hold={hold} userID={user.id} />
+                    ))}
+                  </Stack>
+
+
+                  <Typography variant="h6" component="div" mt={2} mb={1}>
+                    Account Restrictions
+                  </Typography>
+
+                  {user.restrictions.length === 0 && (
+                    <Alert severity="success">No Restrictions!</Alert>
+                  )}
+
+                  <Stack spacing={2}>
+                    {user.restrictions.map((restriction: Restriction) => (
+                      <RestrictionCard key={restriction.id} restriction={restriction} userID={user.id} />
+                    ))}
+                  </Stack>
+
+                  {
+                    isStaff(currentUser)
+                      ? <RequestWrapper2 result={getZonesResult} render={(data) => {
+
+                        const fullZones: FullZone[] = data.zones;
+                        // I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript 
+                        const potentialRestrictions = fullZones.filter((zone: FullZone) => isStaffFor(currentUser, Number(zone.id)))
+
+                        return (
+                          <Stack direction="row" spacing={1} mt={2} alignItems={"center"}>
+                            <FormControl fullWidth>
+                              <InputLabel id="restriction-makerspace">Makerspace</InputLabel>
+                              <Select id="restriction-makerspace"
+                                label="Makerspace"
+                                onChange={(e) => setRestrictionMakerspace(Number(e.target.value))}
+                                fullWidth
+                              >
+                                {
+                                  potentialRestrictions.map((zone: FullZone) => (
+                                    <MenuItem value={zone.id}>{zone.name} ID: {zone.id}</MenuItem>
+                                  ))
+                                }
+                              </Select>
+                            </FormControl>
+                            <Button
+                              variant="contained"
+                              color="error"
+                              onClick={handleCreateRestriction}
+                              startIcon={<LockIcon />}
+                              sx={{ whiteSpace: "nowrap", minWidth: "unset" }}
+                            >
+                              Place Restriction
+                            </Button>
+                          </Stack>
+                        );
+                      }} />
+                      : null
+                  }
+
+                  <PrivilegeControl user={user} isMobile={isMobile} />
+                  <CardTagSettings userID={user.id} hasCardTag={(user.cardTagID != null && user.cardTagID != "")} />
+                </Stack>
+              </Stack>
+
+              {
+                isManager(currentUser) &&
+                <Stack spacing={2}>
+                  <Typography variant="h6" component="div">
+                    Notes
+                  </Typography>
+                  <TextField
                     aria-label="Notes"
                     defaultValue={user.notes ?? ""}
                     placeholder="Notes"
                     value={notes}
                     onChange={handleNotesChanged}
-                    onSubmit={(e) => setNotesMutation({ variables: { userID: selectedUserID, notes: notes } })}></TextareaAutosize>
+                    onSubmit={(e) => setNotesMutation({ variables: { userID: selectedUserID, notes: notes } })}
+                    multiline
+                    minRows={2}
+                  />
                   <Button
                     variant="contained"
                     onClick={() => setNotesMutation({ variables: { userID: selectedUserID, notes: notes } })}
-                    sx={{ mt: 8, alignSelf: "flex-end" }}
+                    sx={{ alignSelf: "flex-end" }}
                   >
                     Update Notes
                   </Button>
-                </>}
+                </Stack>
+              }
             </Stack>
           );
         }}
       />
-    </PrettyModal>
+    </PrettyModal >
   );
 }
