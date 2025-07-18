@@ -16,6 +16,7 @@ export interface PassedModule {
   moduleID: number;
   moduleName: string;
   passedDate: Date;
+  makerspaceID: number;
 }
 
 export interface User extends UserRow {
@@ -33,6 +34,7 @@ export const UsersTypeDefs = gql`
     moduleID: ID!
     moduleName: String!
     passedDate: DateTime!
+    makerspaceID: ID
   }
 
   type User {

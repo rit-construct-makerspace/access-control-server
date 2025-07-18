@@ -152,6 +152,7 @@ export async function getPassedModulesByUser(
       "PassedModules.moduleID",
       "TrainingModule.name as moduleName",
       "PassedModules.passedDate",
+      "TrainingModule.makerspaceID as makerspaceID"
     )
     .where("PassedModules.userID", userID)
     .orderBy("name", "asc");;

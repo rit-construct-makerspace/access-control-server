@@ -26,6 +26,7 @@ import { useIsMobile } from "../../../common/IsMobileProvider";
 import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
 import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const StyledInfo = styled.div`
   margin-top: 16px;
@@ -143,6 +144,7 @@ export const GET_USER = gql`
         moduleID
         moduleName
         passedDate
+        makerspaceID
       }
       trainingHolds {
         id
@@ -210,6 +212,12 @@ const DELETE_TRAINING_HOLD = gql`
   }
 `;
 
+const DELETE_PASSED_MODULE = gql`
+  mutation DeletePassedModule($userID: ID!, $moduleID: ID!) {
+    deletePassedModule(userID: $userID, moduleID: $moduleID)
+  }
+`;
+
 
 interface UserModalProps {
   selectedUserID: string;
@@ -236,6 +244,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
   const [refreshCheck, refreshCheckResult] = useMutation(REFRESH_CHECKS, { variables: { userID: selectedUserID }, refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const [createCheck] = useMutation(CREATE_CHECK, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const [deleteTrainingHold] = useMutation(DELETE_TRAINING_HOLD, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
+  const [deletePassedModule] = useMutation(DELETE_PASSED_MODULE, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const getZonesResult = useQuery(GET_FULL_ZONES);
 
   useEffect(() => {
@@ -395,11 +404,20 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
                   <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
                     <Stack spacing={0.5}>
-                      {user.passedModules != null && user.passedModules.map((module: { moduleID: number, moduleName: string, passedDate: string }) => (
+                      {user.passedModules != null && user.passedModules.map((module: { moduleID: number, moduleName: string, passedDate: string, makerspaceID: string }) => (
                         <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
-                          <Stack direction={"row"} sx={{ justifyContent: "space-between" }}>
+                          <Stack direction={"row"} sx={{ justifyContent: "space-between" }} alignItems={"center"}>
                             <Typography>{module.moduleName}</Typography>
-                            <Typography>{format(new Date(module.passedDate), "M/d/yy h:mmaaa")}</Typography>
+                            <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                              <Typography>{format(new Date(module.passedDate), "M/d/yy h:mmaaa")}</Typography>
+                              <IconButton
+                                color="error"
+                                disabled={!isStaffFor(currentUser, module.moduleID ?? -1)}
+                                onClick={() => deletePassedModule({ variables: { userID: selectedUserID, moduleID: module.moduleID } })}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </Stack>
                           </Stack>
                         </Card>
                       ))}
@@ -518,7 +536,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
               {
                 isManager(currentUser) &&
-                <Stack spacing={2}>
+                <Stack spacing={1} mt={2}>
                   <Typography variant="h6" component="div">
                     Notes
                   </Typography>
