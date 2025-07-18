@@ -15,7 +15,7 @@ export enum Privilege {
 export interface PassedModule {
   moduleID: number;
   moduleName: string;
-  submissionDate: Date;
+  passedDate: Date;
 }
 
 export interface User extends UserRow {
@@ -30,11 +30,9 @@ export const UsersTypeDefs = gql`
   }
 
   type PassedModule {
-    id: ID!
     moduleID: ID!
     moduleName: String!
-    submissionDate: DateTime!
-    expirationDate: DateTime!
+    passedDate: DateTime!
   }
 
   type User {

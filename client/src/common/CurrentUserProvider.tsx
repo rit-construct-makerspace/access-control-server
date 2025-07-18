@@ -24,7 +24,7 @@ export const GET_CURRENT_USER = gql`
       passedModules {
         moduleID
         moduleName
-        submissionDate
+        passedDate
       }
       accessChecks {
         equipmentID
