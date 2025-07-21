@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { ObjectSummary } from "../../../types/Common";
 import PublishTrainingModuleButton from "./PublishTrainingModuleButton";
 import ArchiveTrainingModuleButton from "./ArchiveTrainingModuleButton";
+import { TrainingModule } from "../../../common/TrainingModuleUtils";
 
 interface TrainingModuleProps {
-  module: ObjectSummary;
+  module: TrainingModule;
 }
 
 export default function TrainingModuleRow({ module }: TrainingModuleProps) {

@@ -2,7 +2,7 @@ import { PassedModule, TrainingHold } from "./CurrentUserProvider";
 import { differenceInMonths, differenceInYears, parseISO } from "date-fns";
 
 export interface ModuleStatus {
-  moduleID: string;
+  moduleID: number;
   moduleName: string;
   status: "Passed" | "Expired" | "Not taken" | "Expiring Soon" | "Locked";
   submissionDate: string;
@@ -10,8 +10,9 @@ export interface ModuleStatus {
 }
 
 export interface TrainingModule {
-  id: string;
+  id: number;
   name: string;
+  archived: boolean;
   isLocked?: boolean;
   makerspaceID: number | null;
 }
@@ -20,7 +21,7 @@ export const moduleStatusMapper =
   (passedModules: PassedModule[], trainingHolds: TrainingHold[]) =>
     (module: TrainingModule): ModuleStatus => {
       const passedModule = passedModules.find((pm) => pm.moduleID === module.id);
-      const hold = trainingHolds.find((hold) => hold.moduleID.toString() === module.id);
+      const hold = trainingHolds.find((hold) => hold.moduleID === module.id);
 
       if ((hold || module.isLocked) && !passedModule)
         return {

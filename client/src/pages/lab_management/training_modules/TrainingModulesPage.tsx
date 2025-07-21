@@ -12,9 +12,15 @@ import { GET_TRAINING_MODULES, GET_ARCHIVED_TRAINING_MODULES } from "../../../qu
 import { ObjectSummary } from "../../../types/Common";
 import AdminPage from "../../AdminPage";
 import { TrainingModule } from "../../../common/TrainingModuleUtils";
+import RequestWrapper2 from "../../../common/RequestWrapper2";
+import { useIsMobile } from "../../../common/IsMobileProvider";
+import { isStaffFor } from "../../../common/PrivilegeUtils";
+import { useCurrentUser } from "../../../common/CurrentUserProvider";
 
 export default function TrainingModulesPage() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  const currentUser = useCurrentUser();
 
   const getModuleResults = useQuery(GET_TRAINING_MODULES);
 
@@ -26,8 +32,9 @@ export default function TrainingModulesPage() {
   };
 
   return (
-    <Stack margin="20px" spacing={2}>
-      <Typography variant="h3">Training Modules</Typography>
+    <Stack margin="0 20px" spacing={2}>
+      <title>Manage Trainings | Make @ RIT</title>
+      <Typography variant="h3">Manage Trainings</Typography>
       <Stack direction="row" alignItems="center" spacing={1}>
         <SearchBar
           placeholder="Search training modules"
@@ -45,36 +52,33 @@ export default function TrainingModulesPage() {
         </LoadingButton>
       </Stack>
 
-      <Typography variant="h5">Active Modules</Typography>
-
-      <RequestWrapper
-        loading={getModuleResults.loading}
-        error={getModuleResults.error}
-      >
-        <Stack
-          alignItems="stretch"
-          divider={<Divider flexItem />}
-          sx={{
-            width: "100%",
-            mt: 1,
-            mb: 3
-          }}
-        >
-          {getModuleResults.data?.modules
-            ?.filter((m: TrainingModule) =>
-              m.name
-                .toLocaleLowerCase()
-                .includes(searchText.toLocaleLowerCase())
-            )
-            .map((m: ObjectSummary) => (
-              <TrainingModuleRow key={m.id} module={m} />
-            ))}
-        </Stack>
-      </RequestWrapper>
-
-      <Typography variant="h5">
-        Archived Modules
-      </Typography>
+      <RequestWrapper2 result={getModuleResults} render={(data) => {
+        const rawModules: [TrainingModule] = data.modules;
+        const allModules = rawModules.filter((tm) => (tm.name.toLowerCase().includes(searchText.toLowerCase()) && isStaffFor(currentUser, tm.makerspaceID ?? -1)));
+        const activeModules = allModules.filter((tm) => !tm.archived);
+        const archivedModules = allModules.filter((tm) => tm.archived);
+        return (
+          <Stack direction={isMobile ? "column" : "row"} justifyContent={"space-between"}>
+            <Stack divider={<Divider orientation="horizontal" flexItem />} width={"48%"}>
+              <Typography variant="h5" textAlign={"center"}>Active Modules</Typography>
+              {
+                activeModules.map((tm) => (
+                  <TrainingModuleRow key={tm.id} module={tm} />
+                ))
+              }
+            </Stack>
+            <Stack divider={<Divider orientation="horizontal" flexItem />} width={"48%"}>
+              <Typography variant="h5" textAlign={"center"}>Archived Modules</Typography>
+              {
+                archivedModules.map((tm) => (
+                  <TrainingModuleRow key={tm.id} module={tm} />
+                ))
+              }
+            </Stack>
+          </Stack>
+        );
+      }}
+      />
     </Stack>
   );
 }

@@ -43,7 +43,7 @@ export const GET_CURRENT_USER = gql`
 `;
 
 export interface PassedModule {
-  moduleID: string;
+  moduleID: number;
   moduleName: string;
   passedDate: string;
 }
