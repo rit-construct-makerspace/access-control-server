@@ -13,6 +13,7 @@ export interface TrainingModule {
   id: string;
   name: string;
   isLocked?: boolean;
+  makerspaceID: number | null;
 }
 
 export const moduleStatusMapper =

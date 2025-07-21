@@ -11,12 +11,12 @@ import TrainingModuleRow from "./TrainingModuleRow";
 import { GET_TRAINING_MODULES, GET_ARCHIVED_TRAINING_MODULES } from "../../../queries/trainingQueries";
 import { ObjectSummary } from "../../../types/Common";
 import AdminPage from "../../AdminPage";
+import { TrainingModule } from "../../../common/TrainingModuleUtils";
 
 export default function TrainingModulesPage() {
   const navigate = useNavigate();
 
   const getModuleResults = useQuery(GET_TRAINING_MODULES);
-  const getArchivedModuleResults = useQuery(GET_ARCHIVED_TRAINING_MODULES);
 
   const [searchText, setSearchText] = useState("");
 
@@ -26,9 +26,8 @@ export default function TrainingModulesPage() {
   };
 
   return (
-    <AdminPage>
-      <Box margin="25px">
-        <Typography variant="h3">Training Modules</Typography>
+    <Stack margin="20px" spacing={2}>
+      <Typography variant="h3">Training Modules</Typography>
       <Stack direction="row" alignItems="center" spacing={1}>
         <SearchBar
           placeholder="Search training modules"
@@ -46,14 +45,7 @@ export default function TrainingModulesPage() {
         </LoadingButton>
       </Stack>
 
-      <Typography
-        variant="h5"
-        sx={{
-          mt: 2
-        }}
-      >
-          Active Modules
-      </Typography>
+      <Typography variant="h5">Active Modules</Typography>
 
       <RequestWrapper
         loading={getModuleResults.loading}
@@ -69,7 +61,7 @@ export default function TrainingModulesPage() {
           }}
         >
           {getModuleResults.data?.modules
-            ?.filter((m: ObjectSummary) =>
+            ?.filter((m: TrainingModule) =>
               m.name
                 .toLocaleLowerCase()
                 .includes(searchText.toLocaleLowerCase())
@@ -81,34 +73,8 @@ export default function TrainingModulesPage() {
       </RequestWrapper>
 
       <Typography variant="h5">
-          Archived Modules
+        Archived Modules
       </Typography>
-
-      <RequestWrapper
-        loading={getArchivedModuleResults.loading}
-        error={getArchivedModuleResults.error}
-      >
-        <Stack
-          alignItems="stretch"
-          divider={<Divider flexItem />}
-          sx={{
-            width: "100%",
-            mt: 0.75,
-            mb: 0.75
-          }}
-        >
-          {getArchivedModuleResults.data?.archivedModules
-            ?.filter((m: ObjectSummary) =>
-              m.name
-                .toLocaleLowerCase()
-                .includes(searchText.toLocaleLowerCase())
-            )
-            .map((m: ObjectSummary) => (
-              <TrainingModuleRow key={m.id} module={m} />
-            ))}
-        </Stack>
-      </RequestWrapper>
-      </Box>
-    </AdminPage>
+    </Stack>
   );
 }

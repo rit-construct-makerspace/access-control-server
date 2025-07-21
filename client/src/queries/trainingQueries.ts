@@ -32,6 +32,7 @@ export const GET_TRAINING_MODULES = gql`
       name
       archived
       isLocked
+      makerspaceID
     }
   }
 `;
@@ -42,6 +43,7 @@ export const GET_ARCHIVED_TRAINING_MODULES = gql`
       id
       name
       archived
+      makerspaceID
     }
   }
 `;

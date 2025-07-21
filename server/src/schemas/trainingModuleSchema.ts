@@ -35,6 +35,7 @@ export const TrainingModuleTypeDefs = gql`
     reservationPrompt: JSON
     equipment: [Equipment]
     isLocked: Boolean
+    makerspaceID: ID
   }
 
   type AccessProgress {
@@ -51,7 +52,9 @@ export const TrainingModuleTypeDefs = gql`
 
   extend type Query {
     modules: [TrainingModule]
+    modulesWithAnswers: [TrainingModule]
     module(id: ID!): TrainingModule
+    moduleWithAnswers(id: ID!): TrainingModule
     archivedModules: [TrainingModule]
     archivedModule(id: ID!): TrainingModule
     relatedAccessProgress(sourceTrainingModuleID: ID!): [AccessProgress]
