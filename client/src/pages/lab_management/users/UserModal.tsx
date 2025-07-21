@@ -27,6 +27,7 @@ import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
 import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { LoadingButton } from "@mui/lab";
 
 const StyledInfo = styled.div`
   margin-top: 16px;
@@ -240,7 +241,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
   const [createHold] = useMutation(CREATE_HOLD);
   const [createRestriction] = useMutation(CREATE_RESTRICTION);
   const [deleteUser] = useMutation(ARCHIVE_USER);
-  const [setNotesMutation] = useMutation(SET_NOTES);
+  const [setNotesMutation, setNotesResult] = useMutation(SET_NOTES);
   const [refreshCheck, refreshCheckResult] = useMutation(REFRESH_CHECKS, { variables: { userID: selectedUserID }, refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const [createCheck] = useMutation(CREATE_CHECK, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const [deleteTrainingHold] = useMutation(DELETE_TRAINING_HOLD, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
@@ -552,6 +553,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                   />
                   <Button
                     variant="contained"
+                    loading={setNotesResult.loading}
                     onClick={() => setNotesMutation({ variables: { userID: selectedUserID, notes: notes } })}
                     sx={{ alignSelf: "flex-end" }}
                   >
