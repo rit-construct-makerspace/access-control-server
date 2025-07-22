@@ -197,7 +197,7 @@ const TrainingModuleResolvers = {
       { isStaff }: ApolloContext
     ) => {
       return isStaff(async (user: any) => {
-        let module = await ModuleRepo.getModuleByIDWhereArchived(args.id, false);
+        let module = await ModuleRepo.getModuleByID(args.id);
         return module;
       })
     },

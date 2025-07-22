@@ -133,6 +133,7 @@ export default function AppRoutes() {
                 {/* Routes for staff + higher */}
                 <Route element={<StaffRoute />}>
                   <Route path="/makerspace/:makerspaceID/trainings" element={<TrainingModulesPage />} />
+                  <Route path="/makerspace/:makerspaceID/training/new" element={<EditNewModulePage />} />
                   <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
@@ -170,9 +171,7 @@ export default function AppRoutes() {
             <Route path="/admin/equipment/issues/:logid" element={<ManageEquipmentPage showLogs={true} />} />
             <Route path="/admin/equipment/logs/:logid" element={<ResolutionLogPage />} />
 
-            {/* <Route path="/admin/training" element={<TrainingModulesPage />} /> */}
-            <Route path="/admin/training/new" element={<EditNewModulePage />} />
-            <Route path="/admin/training/:id" element={<EditActiveModulePage />} />
+
             <Route path="/admin/training/archived/:id" element={<EditArchivedModulePage />} />
 
             <Route path="/admin/inventory" element={<InventoryPage />} />
