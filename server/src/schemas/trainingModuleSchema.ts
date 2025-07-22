@@ -35,6 +35,7 @@ export const TrainingModuleTypeDefs = gql`
     reservationPrompt: JSON
     equipment: [Equipment]
     isLocked: Boolean
+    makerspaceID: ID
   }
 
   type AccessProgress {
@@ -51,15 +52,17 @@ export const TrainingModuleTypeDefs = gql`
 
   extend type Query {
     modules: [TrainingModule]
+    modulesWithAnswers: [TrainingModule]
     module(id: ID!): TrainingModule
+    moduleWithAnswers(id: ID!): TrainingModule
     archivedModules: [TrainingModule]
     archivedModule(id: ID!): TrainingModule
     relatedAccessProgress(sourceTrainingModuleID: ID!): [AccessProgress]
   }
 
   extend type Mutation {
-    createModule(name: String!, quiz: JSON!): TrainingModule
-    updateModule(id: ID!, name: String!, quiz: JSON!, reservationPrompt: JSON): TrainingModule
+    createModule(name: String!, quiz: JSON!, makerspaceID: ID): TrainingModule
+    updateModule(id: ID!, name: String!, quiz: JSON!, reservationPrompt: JSON, makerspaceID: ID): TrainingModule
     archiveModule(id: ID!): TrainingModule
     publishModule(id: ID!): TrainingModule
 
@@ -68,5 +71,8 @@ export const TrainingModuleTypeDefs = gql`
     for the user and the grade will be returned as a Float out of 100
     """
     submitModule(moduleID: ID!, answerSheet: [AnswerInput]): ID
+
+
+    deletePassedModule(userID: ID!, moduleID: ID!): ID
   }
 `;

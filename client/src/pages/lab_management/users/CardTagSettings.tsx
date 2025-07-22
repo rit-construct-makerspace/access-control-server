@@ -14,6 +14,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { toast } from "react-toastify";
 import { isStaff } from "../../../common/PrivilegeUtils";
+import AddCardIcon from '@mui/icons-material/AddCard';
 
 
 const SET_CARD_TAG_ID = gql`
@@ -36,7 +37,7 @@ export default function CardTagSettings({
 }: CardTagSettingsProps) {
   const currentUser = useCurrentUser();
   const [setCardTagID, setCardTagIDResult] = useMutation(SET_CARD_TAG_ID);
-  
+
   const [updatedCardTagID, setUpdatedCardTagID] = useState("");
 
   const handleSubmit = () => {
@@ -46,7 +47,7 @@ export default function CardTagSettings({
       );
       return;
     }
-  
+
     setCardTagID({
       variables: {
         userID: userID,
@@ -62,52 +63,52 @@ export default function CardTagSettings({
     });
   };
 
-    const cardTagSuccessAnimation = () => {
-      toast.success('Card Tag Updated Successfully', {
-        position: "bottom-left",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-    }
+  const cardTagSuccessAnimation = () => {
+    toast.success('Card Tag Updated Successfully', {
+      position: "bottom-left",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+  }
 
   return (
-    <>
-      <Typography variant="h6" component="div" mt={6}>
-        Card Tag Settings
-      </Typography>
+    <Stack mt={2} spacing={1}>
+      <Typography variant="h6">Card Tag</Typography>
       {!hasCardTag && (
-        <Alert severity="error">No Associated Card Tag</Alert>
+        <Alert severity="warning">No Associated Card Tag</Alert>
       )}
-
       <FormControl disabled={!isStaff(currentUser) || setCardTagIDResult.loading}>
-        <TextField
-          label="Update RIT ID"
-          value={updatedCardTagID}
-          onChange={(e) => {
-            setUpdatedCardTagID(e.target.value.replaceAll(/(?=[^a-z])([^0-9])/g, ''))
-          }}
-          sx={{ mt: 2 }}
-        />
-        <LoadingButton
-          loading={setCardTagIDResult.loading}
-          size="large"
-          variant="contained"
-          onClick={handleSubmit}
-          sx={{ mt: 1, alignSelf: "flex-end" }}
-        >
-          Update RIT Card Tag
-        </LoadingButton>
+        <Stack direction={"row"} spacing={2} alignItems="center">
+          <TextField
+            label="Update Card Tag ID"
+            value={updatedCardTagID}
+            onChange={(e) => {
+              setUpdatedCardTagID(e.target.value.replaceAll(/(?=[^a-z])([^0-9])/g, ''))
+            }}
+            fullWidth
+          />
+          <LoadingButton
+            loading={setCardTagIDResult.loading}
+            size="large"
+            variant="contained"
+            onClick={handleSubmit}
+            startIcon={<AddCardIcon />}
+            sx={{ whiteSpace: "nowrap", minWidth: "unset" }}
+          >
+            Update Card Tag
+          </LoadingButton>
+        </Stack>
       </FormControl>
       {!isStaff(currentUser) && (
-        <Alert severity="info" sx={{ width: "max-content", mt: 1 }}>
+        <Alert severity="info" sx={{ width: "max-content" }}>
           You do not have permission to change this.
         </Alert>
       )}
-    </>
+    </Stack>
   );
 }

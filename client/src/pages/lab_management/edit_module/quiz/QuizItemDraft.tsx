@@ -41,7 +41,7 @@ export default function QuizItemDraft({
           ref={provided.innerRef}
           {...provided.draggableProps}
           elevation={4}
-          sx={{ width: 600, display: "flex", mb: 4, flexFlow: "column nowrap" }}
+          sx={{ width: 1200, display: "flex", mb: 4, flexFlow: "column nowrap" }}
         >
           <StyledDragHandle {...provided.dragHandleProps}>
             <DragIndicatorIcon />

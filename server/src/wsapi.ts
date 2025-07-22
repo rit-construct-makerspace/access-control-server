@@ -3,8 +3,8 @@ import * as ws from "ws";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { createReaderFromSN, getMakerspaceOfWelcomeReader, getReaderByID, getReaderByName, getReaderBySN, getReaderPairStatus, PairStatus, submitReaderLog, submitReaderLogWithInstance, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
 import { EquipmentRow, ReaderRow, UserRow } from "./db/tables.js";
+import { getEquipmentByID, getMissingTrainingModules, hasAccessByID, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
-import { getEquipmentByID, getMissingTrainingModules, hasAccessByID } from "./repositories/Equipment/EquipmentRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { getRoomByID, getRoomsByZone, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
@@ -316,7 +316,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
         }
 
         //Check that all required trainings are passed
-        if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasAccessByID(user.id, machine.id))) {
+        if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasTrainingModules(user, machine.id))) {
             const incompleteTrainings = await getMissingTrainingModules(user, machine.id);
             var incompleteTrainingsStr = ""
             incompleteTrainings.forEach((module, i) => {

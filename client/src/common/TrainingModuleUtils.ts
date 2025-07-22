@@ -2,7 +2,7 @@ import { PassedModule, TrainingHold } from "./CurrentUserProvider";
 import { differenceInMonths, differenceInYears, parseISO } from "date-fns";
 
 export interface ModuleStatus {
-  moduleID: string;
+  moduleID: number;
   moduleName: string;
   status: "Passed" | "Expired" | "Not taken" | "Expiring Soon" | "Locked";
   submissionDate: string;
@@ -10,16 +10,18 @@ export interface ModuleStatus {
 }
 
 export interface TrainingModule {
-  id: string;
+  id: number;
   name: string;
+  archived: boolean;
   isLocked?: boolean;
+  makerspaceID: number | null;
 }
 
 export const moduleStatusMapper =
   (passedModules: PassedModule[], trainingHolds: TrainingHold[]) =>
     (module: TrainingModule): ModuleStatus => {
       const passedModule = passedModules.find((pm) => pm.moduleID === module.id);
-      const hold = trainingHolds.find((hold) => hold.moduleID.toString() === module.id);
+      const hold = trainingHolds.find((hold) => hold.moduleID === module.id);
 
       if ((hold || module.isLocked) && !passedModule)
         return {
@@ -38,8 +40,9 @@ export const moduleStatusMapper =
           expirationDate: "",
         };
 
-      const submissionDate = parseISO(passedModule.submissionDate);
-      const expirationDate = parseISO(passedModule.expirationDate);
+      const submissionDate = parseISO(passedModule.passedDate);
+      const expirationDate = new Date(submissionDate);
+      expirationDate.setFullYear(submissionDate.getFullYear() + 1);
       const expiringSoon = differenceInMonths(expirationDate, new Date()) <= 1; //differenceInMonths(new Date(), submissionDate) > 11 && differenceInMonths(new Date(), submissionDate) < 12;
       const expired = differenceInYears(submissionDate, new Date()) > 0;
 
@@ -48,15 +51,15 @@ export const moduleStatusMapper =
           moduleID: module.id,
           moduleName: module.name,
           status: "Expiring Soon",
-          submissionDate: passedModule.submissionDate,
-          expirationDate: passedModule.expirationDate,
+          submissionDate: submissionDate.toDateString(),
+          expirationDate: expirationDate.toDateString(),
         }
 
       return {
         moduleID: module.id,
         moduleName: module.name,
         status: expired ? "Expired" : "Passed",
-        submissionDate: passedModule.submissionDate,
-        expirationDate: passedModule.expirationDate,
+        submissionDate: submissionDate.toDateString(),
+        expirationDate: expirationDate.toDateString(),
       };
     };

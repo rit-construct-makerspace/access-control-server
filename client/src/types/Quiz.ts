@@ -38,6 +38,7 @@ export interface Module {
   quiz: QuizItem[];
   reservationPrompt: ReservationPrompt;
   isLocked?: boolean;
+  makerspaceID: number | null;
 };
 
 export interface Submission {
