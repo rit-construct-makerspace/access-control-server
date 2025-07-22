@@ -13,6 +13,20 @@ export const GET_MODULE = gql`
   }
 `;
 
+export const GET_MODULE_WITH_ANSWERS = gql`
+  query GetModuleWithAnswers($id: ID!) {
+    moduleWithAnswers(id: $id) {
+      id
+      name
+      quiz
+      reservationPrompt
+      archived
+      isLocked
+      makerspaceID
+    }
+  }
+`;
+
 export const GET_ARCHIVED_MODULE = gql`
   query GetArchivedModule($id: ID!) {
     archivedModule(id: $id) {

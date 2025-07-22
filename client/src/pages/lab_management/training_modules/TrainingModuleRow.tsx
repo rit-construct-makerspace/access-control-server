@@ -1,5 +1,5 @@
 import { CardActionArea, Stack, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ObjectSummary } from "../../../types/Common";
 import PublishTrainingModuleButton from "./PublishTrainingModuleButton";
 import ArchiveTrainingModuleButton from "./ArchiveTrainingModuleButton";
@@ -10,8 +10,9 @@ interface TrainingModuleProps {
 }
 
 export default function TrainingModuleRow({ module }: TrainingModuleProps) {
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const navigate = useNavigate();
-  const url = module.archived ? "/admin/training/archived/" + module.id : "/admin/training/" + module.id
+  const url = `/makerspace/${makerspaceID}/training/${module.id}`;
 
   return (
     <CardActionArea

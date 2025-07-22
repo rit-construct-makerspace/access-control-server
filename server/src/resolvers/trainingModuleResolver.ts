@@ -169,7 +169,6 @@ const TrainingModuleResolvers = {
     ) => {
       return isStaff(async (user: any) => {
         let modules = await ModuleRepo.getModules();
-
         return modules;
       })
     },
@@ -199,7 +198,6 @@ const TrainingModuleResolvers = {
     ) => {
       return isStaff(async (user: any) => {
         let module = await ModuleRepo.getModuleByIDWhereArchived(args.id, false);
-        removeAnswersFromQuiz(module.quiz);
         return module;
       })
     },

@@ -6,6 +6,7 @@ import {
   Fab,
   Grid,
   IconButton,
+  Select,
   Stack,
   TextField,
   Typography,
@@ -20,7 +21,6 @@ import PublishTrainingModuleButton from "../training_modules/PublishTrainingModu
 import ArchiveTrainingModuleButton from "../training_modules/ArchiveTrainingModuleButton";
 import { DropResult } from "@hello-pangea/dnd";
 import { useNavigate } from "react-router-dom";
-import AdminPage from "../../AdminPage";
 interface EditModulePageProps {
   moduleInitialValue: Module;
   deleteModule: () => Promise<void>;
@@ -29,10 +29,10 @@ interface EditModulePageProps {
 }
 
 export default function EditModulePage({
-    moduleInitialValue,
-    deleteModule,
-    updateModule,
-    updateLoading
+  moduleInitialValue,
+  deleteModule,
+  updateModule,
+  updateLoading
 }: EditModulePageProps) {
 
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ export default function EditModulePage({
       draggable: true,
       progress: undefined,
       theme: "colored",
-      });
+    });
   }
 
   const trainingModDeletedAnimation = () => {
@@ -62,14 +62,14 @@ export default function EditModulePage({
       draggable: true,
       progress: undefined,
       theme: "colored",
-      });
+    });
   }
 
   const handleSaveClicked = async () => {
     await updateModule(module);
 
     trainingModSavedAnimation();
-    
+
     navigate(`/admin/training`)
   }
 
@@ -112,41 +112,56 @@ export default function EditModulePage({
   };
 
   return (
-    <AdminPage>
-      <Box margin="25px">
-        <Typography variant="h4">Edit Training Module</Typography>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="center"
-            spacing={2}
-            padding="15px"
-          >
-            <TextField
-              label="Module title"
-              value={module.name}
-              onChange={(e) => setModule((draft) => {
-                draft.name = e.target.value;
-              })}
-              sx={{width: "600px"}}
-            />
-            {
-              module.archived
-                ? <PublishTrainingModuleButton moduleID={module.id} appearance="large" />
-                : <ArchiveTrainingModuleButton moduleID={module.id} appearance="large" />
-            }
-            <Button onClick={handleSaveClicked} color="primary" variant="contained">
-            {
-            updateLoading ? (
-              <CircularProgress size={20} sx={{ color: "white" }} />
-            ) : (
-              <SaveIcon />
-            )}
-            </Button>
-          </Stack>
+    <Stack margin="0 20px 20px">
+      <title>Edit Training | Make @ RIT</title>
+      <Typography variant="h4" textAlign="center">Edit {module.name}</Typography>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="center"
+        spacing={2}
+        padding="15px"
+      >
+        <TextField
+          label="Module title"
+          value={module.name}
+          onChange={(e) => setModule((draft) => {
+            draft.name = e.target.value;
+          })}
+          sx={{ width: "600px" }}
+        />
+        <Select label="Associated Makerspace" sx={{ width: "600px" }}>
 
-          <QuizBuilder quiz={module.quiz ? module.quiz : []} handleAdd={handleAddQuizItem} handleRemove={handleRemoveQuizItem} handleUpdate={handleUpdateQuizItem} handleOnDragEnd={handleOnDragEnd}/>
-          </Box>
-    </AdminPage>
+        </Select>
+        {
+          module.archived
+            ? <PublishTrainingModuleButton moduleID={module.id} appearance="large" />
+            : <ArchiveTrainingModuleButton moduleID={module.id} appearance="large" />
+        }
+      </Stack>
+      <Fab
+        onClick={handleSaveClicked}
+        color="primary"
+        variant="extended"
+        sx={{
+          margin: 0,
+          top: "auto",
+          right: 30,
+          bottom: 30,
+          left: "auto",
+          position: "fixed",
+        }}
+      >
+        {
+          updateLoading ? (
+            <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
+          ) : (
+            <SaveIcon sx={{ mr: 1 }} />
+          )
+        }
+        Save
+      </Fab>
+      <QuizBuilder quiz={module.quiz ? module.quiz : []} handleAdd={handleAddQuizItem} handleRemove={handleRemoveQuizItem} handleUpdate={handleUpdateQuizItem} handleOnDragEnd={handleOnDragEnd} />
+    </Stack>
   );
 }

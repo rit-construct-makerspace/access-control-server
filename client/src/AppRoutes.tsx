@@ -133,6 +133,7 @@ export default function AppRoutes() {
                 {/* Routes for staff + higher */}
                 <Route element={<StaffRoute />}>
                   <Route path="/makerspace/:makerspaceID/trainings" element={<TrainingModulesPage />} />
+                  <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
                   <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
