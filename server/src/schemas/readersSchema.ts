@@ -84,6 +84,7 @@ export const ReaderTypeDefs = gql`
 
     setName(id: ID!, name: String): Reader
     setState(id: ID!, state: String): String
+    requestOTA(ids: [ID!], otaTag: String!): JSON
     identifyReader(id: ID!, doIdentify: Boolean): Boolean
     }
 `;

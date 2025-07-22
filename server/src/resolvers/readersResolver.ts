@@ -295,6 +295,14 @@ const ReadersResolver = {
           return false;
         }
       }),
+    requestOTA: async (
+      _parent: any,
+      args: {ids: string[], otaTag: string},
+      {isStaff}: ApolloContext
+    ) => 
+      isStaff(async (executingUser: any) => {
+        return ShlugControl.requestOTA(executingUser, args.ids.map(Number), args.otaTag);
+      })
 
   }
 };

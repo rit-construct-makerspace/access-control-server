@@ -7,7 +7,7 @@ import express from "express";
 import expressWs from 'express-ws';
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
-import { createServer } from "http";
+import { createServer, request } from "http";
 import compression from "compression";
 import cors from "cors";
 import { schema } from "./schema.js";
@@ -31,7 +31,7 @@ import { getHoursByZone, WeekDays } from "./repositories/Zones/ZoneHoursReposito
 import { createEquipmentSession, pruneNullLengthEquipmentSessions, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
 import { ReaderRow } from "./db/tables.js";
-import { authenticateReader, ws_acs_api } from "./wsapi.js"
+import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
@@ -196,6 +196,7 @@ async function startServer() {
 
     const ok = await authenticateReader(SN, Key);
     if (!ok) {
+      wsApiLog("Declining API file to unauthed shlug with SN " + SN, "file");
       return res.status(403).send();
     }
     return next();
@@ -208,6 +209,29 @@ async function startServer() {
       return res.status(404).send();
     }
     return res.send(certca);
+  })
+
+  app.get('/api/files/ota/:tagname', async function (req, res) {
+    const tag = req.params["tagname"];
+    console.log(`SN: ${req.headers['shlug-sn']} requested OTA to ${tag}`);
+    
+    const ota_url = `https://github.com/rit-construct-makerspace/access-control-firmware/releases/download/${tag}/Core.bin`
+    fetch(ota_url).then(actual => {
+      actual.headers.forEach((v, n) => res.setHeader(n, v));
+      if (actual?.body) {
+        actual.body.pipeTo(
+          new WritableStream({
+            start() { },
+            write(chunk) {
+              res.write(chunk);
+            },
+            close() {
+              res.end();
+            },
+          })
+        );
+      }
+    })
   })
 
   /**
@@ -874,14 +898,14 @@ async function startServer() {
     }
   });
 
-    /**
-   * SET--
-   * Set the count of a declared item to a specified amount
-   * Request (JSON Body):
-   * - UID: NFC ID of the user 
-   * - Count: Number to set as the count. Cannot be negative.
-   * - Key: API key for authorization.
-   */
+  /**
+ * SET--
+ * Set the count of a declared item to a specified amount
+ * Request (JSON Body):
+ * - UID: NFC ID of the user 
+ * - Count: Number to set as the count. Cannot be negative.
+ * - Key: API key for authorization.
+ */
   app.post("/api/inv/set/:id", async function (req, res) {
     try {
       const id = parseInt(req.params.id);
