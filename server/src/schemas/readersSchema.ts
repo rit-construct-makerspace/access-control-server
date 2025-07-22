@@ -27,6 +27,7 @@ export const ReaderTypeDefs = gql`
     SN: String
     readerKeyCycle: Int
     pairTime: DateTime
+    targetFirmwareVersion: String
   }
   type ReaderLog{
     id: ID!

@@ -19,6 +19,7 @@ export interface Reader {
   HWVer: string,
   SN: string,
   sessionStartTime: number,
+  targetFirmwareVersion?: string,
 }
 
 export const GET_READERS = gql`
@@ -46,6 +47,9 @@ export const GET_READERS = gql`
       HWVer
       sessionStartTime
       SN
+      readerKeyCycle
+      pairTime
+      targetFirmwareVersion
     }
   }
 `;
@@ -74,6 +78,9 @@ export const GET_READER_BY_ID = gql`
       HWVer
       sessionStartTime
       SN
+      readerKeyCycle
+      pairTime
+      targetFirmwareVersion
     }
   }
 `;
@@ -132,6 +139,9 @@ export const GET_UNPAIRED_READERS = gql`
       HWVer
       sessionStartTime
       SN
+      readerKeyCycle
+      pairTime
+      targetFirmwareVersion
     }
   }
 `
@@ -163,6 +173,7 @@ query GetWelcomeReadersForMakerspace($makerspaceId: ID!) {
     SN
     readerKeyCycle
     pairTime
+    targetFirmwareVersion
   }
 }
 `;

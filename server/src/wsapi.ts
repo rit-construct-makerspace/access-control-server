@@ -10,19 +10,15 @@ import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repos
 import { getRoomByID, getRoomsByZone, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import { getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstancesRepository.js";
-import { getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstancesRepository.js";
 import { randomInt } from "crypto";
 import { generateRandomHumanName } from "./data/humanReadableNames.js";
 import { generateShlugKey } from "./resolvers/readersResolver.js";
 import { hasActiveHolds } from "./repositories/Holds/HoldsRepository.js";
 import { hasRestriction } from "./repositories/Restrictions/RestrictionsRepository.js";
-import { isManagerFor } from "./context.js";
 import { getZoneByID } from "./repositories/Zones/ZonesRespository.js";
-import { request } from "http";
 
 
 const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
-const API_DEBUG_LOGGING = process.env.API_DEBUG_LOGGING == "true";
 
 const MIN_SESSION_LENGTH = 15
 

@@ -1,4 +1,6 @@
 import {
+  Autocomplete,
+  Backdrop,
   Box,
   Button,
   Card,
@@ -8,9 +10,15 @@ import {
   Link,
   MenuItem,
   Select,
+  SpeedDial,
+  SpeedDialAction,
+  SpeedDialIcon,
   Stack,
+  TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
+import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { GET_CORRESPONDING_MACHINE_BY_READER_ID_OR_MACHINE_ID } from "../../../queries/equipmentQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
@@ -18,6 +26,18 @@ import AuditLogEntity from "../audit_logs/AuditLogEntity";
 import { useQuery, useMutation } from "@apollo/client";
 import TimeAgo from 'react-timeago'
 import { DELETE_READER, GET_READERS, IDENTIFY_READER, Reader, SET_READER_STATE } from "../../../queries/readersQueries";
+import LanIcon from '@mui/icons-material/Lan';
+import BlockIcon from '@mui/icons-material/Block';
+import SaveIcon from '@mui/icons-material/Save';
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+import HourglassFullIcon from '@mui/icons-material/HourglassFull';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import ReportProblemIcon from '@mui/icons-material/ReportProblemSharp';
+import StarsIcon from '@mui/icons-material/Stars';
+import PendingIcon from '@mui/icons-material/Pending';
+import { useState } from "react";
+
 
 interface ReaderCardProps {
   reader: Reader
@@ -46,6 +66,8 @@ const nullUser = {
 }
 
 export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
+  const theme = useTheme();
+
   const readerUser = reader.user ?? nullUser
 
   const stateContent = reader.state === "Active" ? (
@@ -61,14 +83,11 @@ export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
 
   const now = new Date();
   const lastTimeDifference = now.getTime() - (new Date(reader.lastStatusTime).getTime());
+  const isOffline = lastTimeDifference > 30 * 1000;
 
   const [setReaderState] = useMutation(SET_READER_STATE);
-  const handleChange = (event: any) => {
-    // If the value was the informational one, ignore it
-    if (event.target.value === "State") {
-      return;
-    }
-    setReaderState({ variables: { id: reader.id, state: event.target.value } });
+  const handleChange = (state: string) => {
+    setReaderState({ variables: { id: reader.id, state: state } });
   };
 
   const [doIdentify] = useMutation(IDENTIFY_READER)
@@ -78,14 +97,71 @@ export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
 
   const [deleteReader] = useMutation(DELETE_READER, { refetchQueries: [{ query: GET_READERS }] })
 
+  const [dialOpen, setDialOpen] = useState(false);
+  function machineOrMakerspace() {
+    if (machine) {
+      const l = <Link href={"/app/admin/equipment/" + (machine.archived ? "/archived" : "") + (machine.id)}> {machine.name}</Link>
+      return <span><b>Machine: </b> {l} </span>
+    } else {
+      return <b>Not Paired with Machine or Makerspace</b>
+    }
+  }
+
+  function lastStatusTime() {
+    return <span style={{ fontWeight: isOffline ? 'bold' : 'regular', color: isOffline ? 'red' : 'inherit' }}>
+      <TimeAgo date={reader.lastStatusTime} />
+    </span>
+  }
+
+  function stateAndTemp() {
+
+    return <Card variant="outlined"><CardContent>
+      <Stack direction={"row"}>
+        <Stack direction={"column"} justifyContent={"center"} width={"70%"} >
+          State
+          <Typography textAlign={"center"} variant={"h4"}>{reader.state}</Typography>
+        </Stack>
+
+        <Stack direction={"column"} justifyContent={"center"} width={"30%"} >
+          <Typography textAlign={"right"}>Temp (&#176;C)</Typography>
+          <Typography textAlign={"center"} variant={"h4"}>{Math.round(reader.temp)}</Typography>
+        </Stack>
+      </Stack>
+    </CardContent></Card>;
+  }
+
+
+  function versions() {
+    const labels = true ?
+      ["Current SW", "Pending SW", "HW Version"]
+      : ["BEVer", "FEVer", "HWVer"];
+    const values = [reader.BEVer, reader.FEVer, reader.HWVer];
+
+
+    return <Stack direction={"row"} justifyContent={"center"} spacing={1}>
+      <Stack direction={"column"}>
+        {labels.map(l => <div><b>{l}: </b></div>)}
+      </Stack>
+
+      <Stack direction={"column"}>
+        {values.map(v => <div>{(v !== '') ? v : "N/A"}</div>)}
+      </Stack>
+    </Stack>
+  }
+
+  function OTAControl() {
+    return <Stack direction={"row"}>
+    </Stack>
+  }
+
   return (
     <RequestWrapper
       loading={machineResult.loading}
       error={machineResult.error}
     >
-      <Card sx={{ width: 350, minHeight: 600, border: (reader.lastStatusReason == "Error" || reader.lastStatusReason == "Temperature" ? styles.errorCard : reader.helpRequested ? styles.notifCard : "") }}>
+      <Card sx={{ width: 350, border: '2px solid ' + ((reader.state === "Fault") ? theme.palette.error.main : "#ffffff00") }} >
         <CardContent>
-          <Stack direction={"row"} justifyContent={"space-between"}  paddingBottom={"5px"}>
+          <Stack direction={"row"} justifyContent={"space-between"} paddingBottom={"5px"}>
             <Typography variant="h5">{reader.name}</Typography>
 
             <Button variant="contained" color="error" size="small" onClick={() => {
@@ -95,27 +171,61 @@ export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
             }}><DeleteIcon />
             </Button>
           </Stack>
-          <Typography variant="subtitle2" textOverflow={"scroll"}>
-            <b>SN:</b> {reader.SN}
-          </Typography>
 
 
-          <Typography
-            variant="body2"
-            component="div"
-            sx={{ lineHeight: 1, mb: 1 }}
-            noWrap
-          >
-            <b>Reader ID: </b>{reader.id}
-            <br></br>
-            <b>Machine: </b>
-            {
-              (machine) ?
-                <Link href={"/app/admin/equipment/" + (machine.archived ? "/archived" : "") + (machine.id)}> {machine.name}</Link>
-                : "Not paired"
-            }
+          <Stack direction={"column"} fontSize={".9em"}>
+            <span><b>SN:</b> {reader.SN}</span>
+            <span><b>Reader ID: </b>{reader.id}</span>
+            {machineOrMakerspace()}
+            Last Online: {lastStatusTime()}
+          </Stack>
 
-            <br></br>
+          <br />
+          {stateAndTemp()}
+
+          {versions()}
+
+
+          <Stack direction={"row"} justifyContent={"space-between"} justifyItems={"center"} alignItems={"flex-end"}>
+            <Button
+              variant="contained"
+              endIcon={<LanIcon />}
+              onClick={() => alert("Uh, this button doesnt do anything?.....")}
+
+            >Manage Switch(es)</Button>
+
+            <SpeedDial
+              ariaLabel="Send State Speeddial"
+              color="secondary"
+              icon={<SpeedDialIcon icon={<SendIcon />} />}
+              openIcon={<SpeedDialIcon icon={<BlockIcon />} />}
+              open={dialOpen}
+              onClick={() => setDialOpen(!dialOpen)}
+              sx={{ justifySelf: "right", position: "relative", paddingRight: "5px" }}
+            >
+              {[
+                { name: "Idle", icon: <HourglassFullIcon color="warning" /> },
+                { name: "Unlocked", icon: <LockOpenIcon color="success" /> },
+                { name: "AlwaysOn", icon: <StarsIcon color="success" /> },
+                { name: "Lockout", icon: <LockIcon color="error" /> },
+                { name: "Fault", icon: <ReportProblemIcon color="error" /> },
+                { name: "Restart", icon: <RestartAltIcon color="info" /> },
+              ].map((d, i) => {
+
+                return <SpeedDialAction
+                  key={i}
+                  icon={d.icon}
+                  slotProps={{ tooltip: { title: d.name, open: true } }}
+                  sx={{ position: "absolute", bottom: `${(i + 1) * 40 + 20}px` }}
+                  onClick={() => handleChange(d.name)}
+                ></SpeedDialAction>
+              })}
+
+            </SpeedDial>
+          </Stack>
+
+
+          {/* <br></br>
           </Typography>
           <Card variant="outlined">
             <CardContent>
@@ -158,8 +268,8 @@ export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
                 {reader.state == null ? "NULL" : reader.state}
               </Typography>
             </CardContent>
-          </Card>
-          <br />
+          </Card> */}
+          {/* <br />
           <Stack>
             <Typography
               variant="body2"
@@ -167,7 +277,6 @@ export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
               sx={{ lineHeight: 1, mb: 1 }}
               noWrap
             >
-              {/* @ts-ignore */}
               <b>Last Status:</b> <span style={{ fontWeight: lastTimeDifference > 60000 ? 'bold' : 'regular', color: lastTimeDifference > 60000 ? 'red' : 'inherit' }}><TimeAgo date={reader.lastStatusTime} locale="en-US" /></span>
             </Typography>
             <Typography
@@ -212,6 +321,7 @@ export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
               </Stack>
             </Box>
           </Stack>
+          */ }
         </CardContent>
       </Card>
     </RequestWrapper>
