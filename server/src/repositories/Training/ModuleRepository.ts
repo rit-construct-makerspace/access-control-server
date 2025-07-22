@@ -129,12 +129,13 @@ export async function updateModule(
   id: number,
   name: string,
   quiz: object,
-  reservationPrompt: object
+  reservationPrompt: object,
+  makerspaceID: number,
 ): Promise<TrainingModuleRow> {
   await knex("TrainingModule")
     .where({ id })
     // @ts-ignore
-    .update({ name, quiz: JSON.stringify(quiz), reservationPrompt: JSON.stringify(reservationPrompt) });
+    .update({ name, quiz: JSON.stringify(quiz), reservationPrompt: JSON.stringify(reservationPrompt), makerspaceID: makerspaceID });
   return getModuleByID(id);
 }
 

@@ -71,8 +71,8 @@ export const CREATE_TRAINING_MODULE = gql`
 `;
 
 export const UPDATE_MODULE = gql`
-  mutation UpdateModule($id: ID!, $name: String!, $quiz: JSON!, $reservationPrompt: JSON) {
-    updateModule(id: $id, name: $name, quiz: $quiz, reservationPrompt: $reservationPrompt) {
+  mutation UpdateModule($id: ID!, $name: String!, $quiz: JSON!, $reservationPrompt: JSON, $makerspaceID: ID) {
+    updateModule(id: $id, name: $name, quiz: $quiz, reservationPrompt: $reservationPrompt, makerspaceID: $makerspaceID) {
       id
     }
   }

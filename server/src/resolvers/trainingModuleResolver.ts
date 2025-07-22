@@ -311,7 +311,7 @@ const TrainingModuleResolvers = {
      */
     updateModule: async (
       _parent: any,
-      args: { id: string; name: string; quiz: object; reservationPrompt?: object },
+      args: { id: string; name: string; quiz: object; reservationPrompt?: object; makerspaceID: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user: any) => {
@@ -319,7 +319,8 @@ const TrainingModuleResolvers = {
           Number(args.id),
           args.name,
           args.quiz,
-          args.reservationPrompt ?? { "promptText": "Make reservation", "enabled": false }
+          args.reservationPrompt ?? { "promptText": "Make reservation", "enabled": false },
+          args.makerspaceID,
         );
 
         await createLog(

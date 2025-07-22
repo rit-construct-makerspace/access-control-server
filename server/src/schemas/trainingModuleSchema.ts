@@ -62,7 +62,7 @@ export const TrainingModuleTypeDefs = gql`
 
   extend type Mutation {
     createModule(name: String!, quiz: JSON!): TrainingModule
-    updateModule(id: ID!, name: String!, quiz: JSON!, reservationPrompt: JSON): TrainingModule
+    updateModule(id: ID!, name: String!, quiz: JSON!, reservationPrompt: JSON, makerspaceID: ID): TrainingModule
     archiveModule(id: ID!): TrainingModule
     publishModule(id: ID!): TrainingModule
 

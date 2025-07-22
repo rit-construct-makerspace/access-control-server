@@ -4,8 +4,11 @@ import {
   Button,
   CircularProgress,
   Fab,
+  FormControl,
   Grid,
   IconButton,
+  InputLabel,
+  MenuItem,
   Select,
   Stack,
   TextField,
@@ -20,7 +23,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import PublishTrainingModuleButton from "../training_modules/PublishTrainingModuleButton";
 import ArchiveTrainingModuleButton from "../training_modules/ArchiveTrainingModuleButton";
 import { DropResult } from "@hello-pangea/dnd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useQuery } from "@apollo/client";
+import { FullZone, GET_FULL_ZONES, GET_ZONE_BY_ID } from "../../../queries/zoneQueries";
+import RequestWrapper2 from "../../../common/RequestWrapper2";
+import { isAdmin, isManagerFor } from "../../../common/PrivilegeUtils";
+import { useCurrentUser } from "../../../common/CurrentUserProvider";
 interface EditModulePageProps {
   moduleInitialValue: Module;
   deleteModule: () => Promise<void>;
@@ -34,10 +42,13 @@ export default function EditModulePage({
   updateModule,
   updateLoading
 }: EditModulePageProps) {
-
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
+  const currentUser = useCurrentUser();
   const navigate = useNavigate();
 
   const [module, setModule] = useImmer<Module>(moduleInitialValue);
+
+  const getZonesResult = useQuery(GET_FULL_ZONES);
 
   const trainingModSavedAnimation = () => {
     toast.success('Training Module Saved', {
@@ -70,7 +81,7 @@ export default function EditModulePage({
 
     trainingModSavedAnimation();
 
-    navigate(`/admin/training`)
+    navigate(`/makerspace/${makerspaceID}/trainings`)
   }
 
   const handleDeleteClicked = async () => {
@@ -111,6 +122,8 @@ export default function EditModulePage({
     });
   };
 
+  console.log(module.makerspaceID);
+
   return (
     <Stack margin="0 20px 20px">
       <title>Edit Training | Make @ RIT</title>
@@ -127,12 +140,38 @@ export default function EditModulePage({
           value={module.name}
           onChange={(e) => setModule((draft) => {
             draft.name = e.target.value;
+            console.log(e.target.value);
           })}
           sx={{ width: "600px" }}
         />
-        <Select label="Associated Makerspace" sx={{ width: "600px" }}>
-
-        </Select>
+        <RequestWrapper2 result={getZonesResult} render={(data) => {
+          const zones = data.zones;
+          const possibleZones = zones.filter((zone: FullZone) => (isManagerFor(currentUser, zone.id)))
+          return (
+            <FormControl>
+              <InputLabel id="associated-makerspace">Associated Makerspace</InputLabel>
+              <Select
+                id="associated-makerspace"
+                label="Associated Makerspace"
+                sx={{ width: "600px" }}
+                value={module.makerspaceID}
+                onChange={(e) => setModule((draft) => {
+                  draft.makerspaceID = e.target.value != null ? Number(e.target.value) : null;
+                })}>
+                {
+                  possibleZones.map((zone: FullZone) => (
+                    <MenuItem value={zone.id}>{zone.name}</MenuItem>
+                  ))
+                }
+                {
+                  isAdmin(currentUser) &&
+                  <MenuItem>Unassociate Training</MenuItem>
+                }
+              </Select>
+            </FormControl>
+          );
+        }}
+        />
         {
           module.archived
             ? <PublishTrainingModuleButton moduleID={module.id} appearance="large" />
@@ -162,6 +201,6 @@ export default function EditModulePage({
         Save
       </Fab>
       <QuizBuilder quiz={module.quiz ? module.quiz : []} handleAdd={handleAddQuizItem} handleRemove={handleRemoveQuizItem} handleUpdate={handleUpdateQuizItem} handleOnDragEnd={handleOnDragEnd} />
-    </Stack>
+    </Stack >
   );
 }
