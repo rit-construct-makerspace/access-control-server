@@ -3,7 +3,7 @@ import Page from "../../Page";
 import SearchBar from "../../../common/SearchBar";
 import { Box, Divider, Stack, Typography } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client"
 import { LoadingButton } from "@mui/lab";
 import RequestWrapper from "../../../common/RequestWrapper";
@@ -18,6 +18,7 @@ import { isStaffFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 
 export default function TrainingModulesPage() {
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const currentUser = useCurrentUser();
@@ -28,7 +29,7 @@ export default function TrainingModulesPage() {
 
   const handleNewModuleClicked = async () => {
     // Redirect to the module editor after creation
-    navigate(`/admin/training/new`);
+    navigate(`/makerspace/:makerspaceID/training/new`);
   };
 
   return (
