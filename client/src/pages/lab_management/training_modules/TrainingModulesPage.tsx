@@ -29,7 +29,7 @@ export default function TrainingModulesPage() {
 
   const handleNewModuleClicked = async () => {
     // Redirect to the module editor after creation
-    navigate(`/makerspace/:makerspaceID/training/new`);
+    navigate(`/makerspace/${makerspaceID}/training/new`);
   };
 
   return (

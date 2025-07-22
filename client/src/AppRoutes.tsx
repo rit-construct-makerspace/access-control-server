@@ -171,9 +171,6 @@ export default function AppRoutes() {
             <Route path="/admin/equipment/issues/:logid" element={<ManageEquipmentPage showLogs={true} />} />
             <Route path="/admin/equipment/logs/:logid" element={<ResolutionLogPage />} />
 
-
-            <Route path="/admin/training/archived/:id" element={<EditArchivedModulePage />} />
-
             <Route path="/admin/inventory" element={<InventoryPage />} />
             <Route path="/admin/tools/type/:typeid" element={<ToolItemPage />} />
             <Route path="/admin/tools/type" element={<ToolItemPage />} />
