@@ -281,13 +281,14 @@ const TrainingModuleResolvers = {
      */
     createModule: async (
       _parent: any,
-      args: { name: string; quiz: object },
+      args: { name: string; quiz: object; makerspaceID: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user: any) => {
         const module = await ModuleRepo.addModule(
           args.name,
-          args.quiz
+          args.quiz,
+          args.makerspaceID,
         );
 
         await createLog(

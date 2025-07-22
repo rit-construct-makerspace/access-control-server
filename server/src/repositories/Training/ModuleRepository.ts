@@ -103,14 +103,15 @@ export async function setModuleArchived(id: number, archived: boolean): Promise<
  * @param quiz {TrainingModuleItem} the attached quiz
  * @returns the added module
  */
-export async function addModule(name: string, quiz: object): Promise<TrainingModuleRow> {
+export async function addModule(name: string, quiz: object, makerspaceID: number | null): Promise<TrainingModuleRow> {
 
 
   const addedModule: TrainingModuleRow[] = await knex("TrainingModule")
                       .insert(
                         {
                           name: name,
-                          quiz: JSON.stringify(quiz) as unknown as TrainingModuleItem[] //quiz has same format as TrainingModuleItem, (updateModule does  as unknown as TrainingModuleItem[] behind the scene somewhere but I cannot find how to do that)
+                          quiz: JSON.stringify(quiz) as unknown as TrainingModuleItem[], //quiz has same format as TrainingModuleItem, (updateModule does  as unknown as TrainingModuleItem[] behind the scene somewhere but I cannot find how to do that)
+                          makerspaceID: makerspaceID,
                         }, "*");
 
   if (addedModule.length < 1) throw new EntityNotFound(`Could not add module ${name}`);

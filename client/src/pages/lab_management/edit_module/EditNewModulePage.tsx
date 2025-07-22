@@ -1,5 +1,5 @@
 import { useMutation } from "@apollo/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Moduledraft, QuizItem } from "../../../types/Quiz";
 import { GET_TRAINING_MODULES, GET_ARCHIVED_TRAINING_MODULES, CREATE_TRAINING_MODULE } from "../../../queries/trainingQueries";
 import 'react-toastify/dist/ReactToastify.css';
@@ -12,6 +12,7 @@ import {
   Stack,
   TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useImmer } from "use-immer";
 import QuizBuilder from "./quiz/QuizBuilder";
@@ -23,7 +24,9 @@ import AdminPage from "../../AdminPage";
 
 
 export default function EditNewModulePage() {
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const [moduleDraft, setModuleDraft] = useImmer<Moduledraft>({
     name: "",
@@ -38,12 +41,13 @@ export default function EditNewModulePage() {
       variables: {
         name: updatedModule.name,
         quiz: updatedModule.quiz,
+        makerspaceID: makerspaceID,
       },
       refetchQueries: [
         { query: GET_ARCHIVED_TRAINING_MODULES },
         { query: GET_TRAINING_MODULES },
       ],
-      onCompleted: () => navigate("/admin/training"),
+      onCompleted: () => navigate(`/makerspace/${makerspaceID}/trainings`),
     });
   }
 
@@ -112,32 +116,27 @@ export default function EditNewModulePage() {
   };
 
   return (
-    <AdminPage>
-      <Stack padding="20px" spacing={2}>
-        <Stack direction="row" spacing={2} justifyContent="center">
-          <title>New Training | Make @ RIT</title>
-          <Typography variant="h4">New Training Module</Typography>
-          <Button startIcon={<SaveIcon />} color="success" variant="contained" onClick={handleSaveClicked} size="large">Save</Button>
-        </Stack>
-        <Grid container
-          rowSpacing={2}
-          columnSpacing={2}
-          sx={{ mb: 4 }}
-          alignItems="center"
-          justifyContent="center"
-        >
-          <Grid size={{ xs: 12, md: 8 }}>
-            <TextField
-              label="Module title"
-              value={moduleDraft.name}
-              onChange={handleNameChanged}
-              fullWidth
-            />
-          </Grid>
-        </Grid>
+    <Stack padding="0 20px 20px" spacing={2}>
+      <title>New Training | Make @ RIT</title>
+      <Typography variant="h4" textAlign={"center"}>New Training Module</Typography>
 
-        <QuizBuilder quiz={moduleDraft.quiz ? moduleDraft.quiz : []} handleAdd={handleAddQuizItem} handleRemove={handleRemoveQuizItem} handleUpdate={handleUpdateQuizItem} handleOnDragEnd={handleOnDragEnd} />
+      <Stack justifyContent={"center"} direction={"row"} spacing={2}
+        sx={{
+          position: "sticky",
+          top: "1px",
+          backgroundColor: theme.palette.background.default,
+          zIndex: 3000,
+        }}
+      >
+        <TextField
+          label="Module title"
+          value={moduleDraft.name}
+          onChange={handleNameChanged}
+          sx={{ width: "600px" }}
+        />
+        <Button startIcon={<SaveIcon />} color="secondary" variant="contained" onClick={handleSaveClicked} size="large">Save</Button>
       </Stack>
-    </AdminPage>
+      <QuizBuilder quiz={moduleDraft.quiz ? moduleDraft.quiz : []} handleAdd={handleAddQuizItem} handleRemove={handleRemoveQuizItem} handleUpdate={handleUpdateQuizItem} handleOnDragEnd={handleOnDragEnd} />
+    </Stack>
   );
 }
