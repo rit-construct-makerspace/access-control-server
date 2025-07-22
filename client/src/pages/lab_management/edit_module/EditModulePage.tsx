@@ -13,6 +13,7 @@ import {
   Stack,
   TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
 import Page from "../../Page";
 import SaveIcon from "@mui/icons-material/Save";
@@ -45,6 +46,7 @@ export default function EditModulePage({
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const currentUser = useCurrentUser();
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const [module, setModule] = useImmer<Module>(moduleInitialValue);
 
@@ -123,7 +125,7 @@ export default function EditModulePage({
   };
 
   return (
-    <Stack margin="0 20px 20px">
+    <Stack margin="0 20px 20px" spacing={2}>
       <title>Edit Training | Make @ RIT</title>
       <Typography variant="h4" textAlign="center">Edit {module.name}</Typography>
       <Stack
@@ -132,6 +134,12 @@ export default function EditModulePage({
         justifyContent="center"
         spacing={2}
         padding="15px"
+        sx={{
+          position: "sticky",
+          top: "1px",
+          backgroundColor: theme.palette.background.default,
+          zIndex: 3000,
+        }}
       >
         <TextField
           label="Module title"
@@ -174,29 +182,25 @@ export default function EditModulePage({
             ? <PublishTrainingModuleButton moduleID={module.id} appearance="large" />
             : <ArchiveTrainingModuleButton moduleID={module.id} appearance="large" />
         }
+        <Fab
+          onClick={handleSaveClicked}
+          color="secondary"
+          variant="extended"
+          size="large"
+          sx={{
+            margin: 0,
+          }}
+        >
+          {
+            updateLoading ? (
+              <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
+            ) : (
+              <SaveIcon sx={{ mr: 1 }} />
+            )
+          }
+          Save
+        </Fab>
       </Stack>
-      <Fab
-        onClick={handleSaveClicked}
-        color="primary"
-        variant="extended"
-        sx={{
-          margin: 0,
-          top: "auto",
-          right: 30,
-          bottom: 30,
-          left: "auto",
-          position: "fixed",
-        }}
-      >
-        {
-          updateLoading ? (
-            <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
-          ) : (
-            <SaveIcon sx={{ mr: 1 }} />
-          )
-        }
-        Save
-      </Fab>
       <QuizBuilder quiz={module.quiz ? module.quiz : []} handleAdd={handleAddQuizItem} handleRemove={handleRemoveQuizItem} handleUpdate={handleUpdateQuizItem} handleOnDragEnd={handleOnDragEnd} />
     </Stack >
   );
