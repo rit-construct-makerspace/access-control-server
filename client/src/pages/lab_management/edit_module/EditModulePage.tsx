@@ -122,8 +122,6 @@ export default function EditModulePage({
     });
   };
 
-  console.log(module.makerspaceID);
-
   return (
     <Stack margin="0 20px 20px">
       <title>Edit Training | Make @ RIT</title>
@@ -140,7 +138,6 @@ export default function EditModulePage({
           value={module.name}
           onChange={(e) => setModule((draft) => {
             draft.name = e.target.value;
-            console.log(e.target.value);
           })}
           sx={{ width: "600px" }}
         />
