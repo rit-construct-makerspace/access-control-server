@@ -72,3 +72,13 @@ export async function getZoneStaff(zoneID: number): Promise<number[]> {
 export async function getTrainingsByZone(zoneID: number): Promise<TrainingModuleRow[]> {
     return await knex("ModulesForMakerspaces").join("TrainingModule", "TrainingModule.id", "ModulesForMakerspaces.moduleID").select("TrainingModule.*").where("ModulesForMakerspaces.makerspaceID", zoneID);
 }
+
+export async function addTrainingToZone(zoneID: number, moduleID: number): Promise<TrainingModuleRow[]> {
+    await knex("ModulesForMakerspaces").insert({makerspaceID: zoneID, moduleID: moduleID});
+    return await getTrainingsByZone(zoneID);
+}
+
+export async function removeTrainingFromZone(zoneID: number, moduleID: number): Promise<TrainingModuleRow[]> {
+    await knex("ModulesForMakerspaces").delete().where("makerspaceID", zoneID).andWhere("moduleID", moduleID);
+    return await getTrainingsByZone(zoneID);
+}
