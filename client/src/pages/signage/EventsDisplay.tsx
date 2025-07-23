@@ -6,6 +6,7 @@ import GET_EVENTS, { MakeEvent } from "../../queries/eventQueries";
 import { Fade, LinearProgress, Typography } from "@mui/material";
 import styled from "styled-components";
 import { format } from "date-fns";
+import QRCode from "react-qr-code";
 
 const StyledEventImage = styled.img`
     height: 50%;
@@ -56,10 +57,25 @@ export default function EventsDisplay() {
             const eventGraphics = filteredEvents.map((event) => {
 
                 return (
-                    <Stack height="100%" spacing={3}>
-                        <Typography fontSize={100} color="primary" fontWeight="bold" textAlign="center">{event.name.text}</Typography>
-                        <Typography variant="h2" color="secondary" fontWeight="bold" textAlign="center">{`${format(new Date(event.start.local), "MMM do, h:mm bb")} - ${format(new Date(event.end.local), "MMM do, h:mm bb")}`}</Typography>
-                        <Typography variant="h3" textAlign="center">{event.description.text}</Typography>
+                    <Stack height="100%" spacing={3} alignItems={"center"}>
+                        <Stack>
+                            <Typography fontSize={100} color="primary" fontWeight="bold" textAlign="center">{event.name.text}</Typography>
+                            <Typography variant="h2" color="secondary" fontWeight="bold" textAlign="center">{`${format(new Date(event.start.local), "MMM do, h:mm bb")} - ${format(new Date(event.end.local), "MMM do, h:mm bb")}`}</Typography>
+                            <Typography variant="h3" textAlign="center">{event.description.text}</Typography>
+                        </Stack>
+                        <Stack direction={"row"} alignItems={"center"} spacing={10} height={"100%"} justifyContent={"center"}>
+                            <Stack>
+                                <Typography variant="h2" textAlign={"right"} fontWeight={"bold"}>Register Here!</Typography>
+                                <Typography variant="h3">
+                                    Or on: <Typography variant="h3" color="primary" display={"inline"} sx={{ textDecoration: "underline" }}>make.rit.edu</Typography>
+                                </Typography>
+                            </Stack>
+
+                            <Stack justifyContent={"center"}>
+                                <QRCode value={event.url} size={500} />
+
+                            </Stack>
+                        </Stack>
                     </Stack>
                 );
             })

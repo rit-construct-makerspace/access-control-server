@@ -31,6 +31,7 @@
     "react-google-calendar-api": "^2.3.0",
     "react-iframe": "^1.8.5",
     "react-markdown": "^7.1.2",
+    "react-qr-code": "^2.0.18",
     "react-router-dom": "^6.26.1",
     "react-scripts": "^5.0.1",
     "react-string-replace": "^1.1.1",
