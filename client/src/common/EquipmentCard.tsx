@@ -31,7 +31,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
     );
 
     return (
-        <Card sx={{width: props.isMobile ? "350px" : "600px", minHeight: "350px", backgroundColor: props.equipment.archived ? theme.palette.error.light : undefined}}>
+        <Card sx={{ width: props.isMobile ? "350px" : "600px", minHeight: "350px", backgroundColor: props.equipment.archived ? theme.palette.error.light : undefined }}>
             <Stack>
                 <Stack direction="row" height="200px">
                     {props.isMobile ? null :
@@ -41,29 +41,29 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                                     component="img"
                                     image={(props.equipment.imageUrl == undefined || props.equipment.imageUrl == null || props.equipment.imageUrl == "") ? process.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : "" + process.env.REACT_APP_CDN_URL + process.env.REACT_APP_CDN_EQUIPMENT_DIR + "/" + props.equipment.imageUrl}
                                     alt={`Picture of ${props.equipment.name}`}
-                                    sx={{width: "150px", height: "175px", backgroundColor: "lightgray"}}
+                                    sx={{ width: "150px", height: "175px", backgroundColor: "lightgray" }}
                                 />
                             </Box>
                             {isPriviledged ? <Typography variant="body2">ID {props.equipment.id}</Typography> : null}
                         </Stack>
                     }
-                    <CardContent sx={{width: "100%", height: "100%"}}>
+                    <CardContent sx={{ width: "100%", height: "100%" }}>
                         <Stack height="100%">
                             {/* Title & Edit button */}
                             <Stack direction="row" justifyContent="space-between">
                                 <Typography variant="h6">{props.equipment.archived ? `${props.equipment.name} (Hidden)` : props.equipment.name}</Typography>
                                 {
                                     isPriviledged
-                                    ? <Button
-                                        onClick={() => {navigate(`/admin/equipment/${props.equipment.archived ? "archived/" : ""}${props.equipment.id}`)}}
-                                        aria-label="edit button"
-                                        sx={{width: "40px", height: "40px"}}
-                                        variant="contained"
-                                        color="primary"
-                                    >
-                                        <ConstructionIcon />
-                                    </Button>
-                                    : null
+                                        ? <Button
+                                            onClick={() => { navigate(`/admin/equipment/${props.equipment.archived ? "archived/" : ""}${props.equipment.id}`) }}
+                                            aria-label="edit button"
+                                            sx={{ width: "40px", height: "40px" }}
+                                            variant="contained"
+                                            color="primary"
+                                        >
+                                            <ConstructionIcon />
+                                        </Button>
+                                        : null
                                 }
                             </Stack>
                             <Stack direction="row" justifyContent="space-between" height="100%">
@@ -74,16 +74,16 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                                             <Stack direction="row" spacing={1} alignItems="center" padding="10px" width="100%">
                                                 {
                                                     ms.status === "Passed"
-                                                    ? <CheckCircleIcon color="success" />
-                                                    : ms.status === "Not taken"
-                                                    ? <CloseIcon color="error" />
-                                                    : ms.status === "Expired"
-                                                    ? <WarningIcon color="warning" />
-                                                    : ms.status === "Expiring Soon"
-                                                    ? <HourglassBottomIcon color="warning" />
-                                                    : ms.status === "Locked"
-                                                    ? <LockClockIcon color="error" />
-                                                    : null
+                                                        ? <CheckCircleIcon color="success" />
+                                                        : ms.status === "Not taken"
+                                                            ? <CloseIcon color="error" />
+                                                            : ms.status === "Expired"
+                                                                ? <WarningIcon color="warning" />
+                                                                : ms.status === "Expiring Soon"
+                                                                    ? <HourglassBottomIcon color="warning" />
+                                                                    : ms.status === "Locked"
+                                                                        ? <LockClockIcon color="error" />
+                                                                        : null
                                                 }
                                                 <Typography variant="body2">{ms.moduleName}</Typography>
                                             </Stack>
@@ -91,15 +91,15 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                                     ))}
                                     {
                                         !props.equipment.byReservationOnly
-                                        ? <Stack direction={"row"} spacing={1} alignItems="center" padding="10px">
-                                            {
-                                                hasApprovedAccessCheck
-                                                ? <CheckCircleIcon color="success" />
-                                                : <CloseIcon color="error" />
-                                            }
-                                            <Typography variant="body2">In-Person Competency Check</Typography>
-                                        </Stack>
-                                        : null
+                                            ? <Stack direction={"row"} spacing={1} alignItems="center" padding="10px">
+                                                {
+                                                    hasApprovedAccessCheck
+                                                        ? <CheckCircleIcon color="success" />
+                                                        : <CloseIcon color="error" />
+                                                }
+                                                <Typography variant="body2">In-Person Competency Check</Typography>
+                                            </Stack>
+                                            : null
                                     }
                                 </Stack>
                                 {/* Num available || by reservation only */}
@@ -108,18 +108,21 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                                         ? <Typography variant="subtitle1" ml={1}>
                                             Reservation only. Email <Link to={"mailto:make@rit.edu"} target={"_blank"}>make@rit.edu</Link> to schedule.
                                         </Typography>
-                                        : <Stack height="100%" justifyContent="center" alignItems="center">
-                                            <Typography variant="subtitle1" align="center" fontWeight="bold">
-                                                Machines Available
-                                            </Typography>
-                                            <Typography variant="subtitle1" align="center">
-                                                {`${props.equipment.numAvailable} / ${props.equipment.numAvailable + props.equipment.numInUse}`}
-                                            </Typography>
-                                        </Stack>
+                                        : props.equipment.numAvailable + props.equipment.numInUse > 0 ?
+                                            <Stack height="100%" justifyContent="center" alignItems="center">
+                                                <Typography variant="subtitle1" align="center" fontWeight="bold">
+                                                    Machines Available
+                                                </Typography>
+                                                <Typography variant="subtitle1" align="center">
+                                                    {`${props.equipment.numAvailable} / ${props.equipment.numAvailable + props.equipment.numInUse}`}
+                                                </Typography>
+                                            </Stack>
+                                            :
+                                            <></>
                                     }
                                 </Box>
                             </Stack>
-                            
+
                         </Stack>
                     </CardContent>
                 </Stack>
