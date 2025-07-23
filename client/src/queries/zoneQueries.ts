@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import Equipment from "../types/Equipment";
 import Room, { FullRoom } from "../types/Room";
+import { TrainingModule } from "../common/TrainingModuleUtils";
 
 export const GET_ZONES = gql`
  query GetZones {
@@ -33,6 +34,7 @@ export interface FullZone {
   }[];
   rooms: Room[]
   imageUrl: string;
+  trainingModules: TrainingModule[];
 }
 
 export const GET_ZONES_WITH_HOURS = gql`
@@ -111,6 +113,14 @@ export const GET_ZONE_BY_ID = gql`
           notes
           archived
         }
+        trainingModules {
+          id
+          name
+        }
+      }
+      trainingModules {
+        id
+        name
       }
     }
   }
@@ -134,6 +144,22 @@ export const UPDATE_ZONE = gql`
 export const DELETE_ZONE = gql`
   mutation DeleteZone($id: ID!) {
     deleteZone(id: $id) {
+      id
+    }
+  }
+`;
+
+export const ADD_TRAINING_TO_ZONE = gql`
+  mutation AddTrainingToZone($zoneID: ID!, $moduleID: ID!) {
+    addTrainingToZone(zoneID: $zoneID, moduleID: $moduleID) {
+      id
+    }
+  }
+`;
+
+export const REMOVE_TRAINING_FROM_ZONE = gql`
+  mutation RemoveTrainingFromZone($zoneID: ID!, $moduleID: ID!) {
+    removeTrainingFromZone(zoneID: $zoneID, moduleID: $moduleID) {
       id
     }
   }

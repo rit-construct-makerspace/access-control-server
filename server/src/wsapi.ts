@@ -7,7 +7,7 @@ import { getEquipmentByID, getMissingTrainingModules, hasAccessByID, hasTraining
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
-import { getRoomByID, getRoomsByZone, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
+import { getRoomByID, getRoomsByZone, hasRoomTrainings, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import { getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstancesRepository.js";
 import { randomInt } from "crypto";
@@ -16,7 +16,7 @@ import { generateShlugKey } from "./resolvers/readersResolver.js";
 import { hasActiveHolds } from "./repositories/Holds/HoldsRepository.js";
 import { hasRestriction } from "./repositories/Restrictions/RestrictionsRepository.js";
 import { isManagerFor } from "./context.js";
-import { getZoneByID } from "./repositories/Zones/ZonesRespository.js";
+import { getZoneByID, hasZoneTrainings } from "./repositories/Zones/ZonesRespository.js";
 
 
 const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
@@ -30,9 +30,9 @@ const MIN_SESSION_LENGTH = 15
 var slugPool: Map<number, ConnectionData> = new Map();
 
 function stringSlugPool() {
-    var entries = Array.from(slugPool.entries());
-    var entriesNoWs = entries.map(([_, data]) => ({ "id": data?.readerId, "state": data?.currentState }));
-    return JSON.stringify(entriesNoWs)
+  var entries = Array.from(slugPool.entries());
+  var entriesNoWs = entries.map(([_, data]) => ({ "id": data?.readerId, "state": data?.currentState }));
+  return JSON.stringify(entriesNoWs)
 }
 
 /** 
@@ -40,11 +40,11 @@ function stringSlugPool() {
  * @param connData connection data associated with the shlug
  */
 async function addOrUpdateConnection(connData: ConnectionData) {
-    if (connData.readerId == null) {
-        console.error(`WSACS: Attempting to add invalid connection to active connections\n\tState: ${connData.currentState}\n\tID: ${connData.readerId}\n\tSeqNum: ${connData.toShlugSeqNum}`)
-        return;
-    }
-    slugPool.set(connData.readerId, connData);
+  if (connData.readerId == null) {
+    console.error(`WSACS: Attempting to add invalid connection to active connections\n\tState: ${connData.currentState}\n\tID: ${connData.readerId}\n\tSeqNum: ${connData.toShlugSeqNum}`)
+    return;
+  }
+  slugPool.set(connData.readerId, connData);
 }
 /**
  * removes a shlug connection from the pool
@@ -52,31 +52,31 @@ async function addOrUpdateConnection(connData: ConnectionData) {
  * @returns true if the item was removed. false if it wasn't found
  */
 function removeConnection(connData: ConnectionData): boolean {
-    if (connData.readerId == null) {
-        console.error(`WSACS: Attempting to remove invalid connection to shlug from pool\nData: ${JSON.stringify(connData)}\nPool:${stringSlugPool()}`);
-        return false;
-    } else if (!slugPool.has(connData.readerId)) {
-        console.error(`WSACS: Attempting to remove nonexistent connection to shlug from pool\nData: ${JSON.stringify(connData)}\nPool:${stringSlugPool()}`);
-        return false;
-    }
-    return slugPool.delete(connData.readerId);
+  if (connData.readerId == null) {
+    console.error(`WSACS: Attempting to remove invalid connection to shlug from pool\nData: ${JSON.stringify(connData)}\nPool:${stringSlugPool()}`);
+    return false;
+  } else if (!slugPool.has(connData.readerId)) {
+    console.error(`WSACS: Attempting to remove nonexistent connection to shlug from pool\nData: ${JSON.stringify(connData)}\nPool:${stringSlugPool()}`);
+    return false;
+  }
+  return slugPool.delete(connData.readerId);
 }
 
 export async function identifyReader(executingUser: UserRow, readerId: number, doIdentify: boolean): Promise<boolean> {
-    let connData = slugPool.get(readerId);
-    if (connData == null) {
-        console.error(`WSACS: Couldn't find shlug with id ${readerId} \n in pool ${stringSlugPool()}`)
-        return false;
-    }
+  let connData = slugPool.get(readerId);
+  if (connData == null) {
+    console.error(`WSACS: Couldn't find shlug with id ${readerId} \n in pool ${stringSlugPool()}`)
+    return false;
+  }
 
-    const reader = await getReaderByID(readerId);
-    if (doIdentify) {
-        wsApiLog("{user} identified {access_device}", "status", { id: executingUser.id, label: getUsersFullName(executingUser) }, { id: readerId, label: reader?.name ?? "unknown reader" });
-    }
+  const reader = await getReaderByID(readerId);
+  if (doIdentify) {
+    wsApiLog("{user} identified {access_device}", "status", { id: executingUser.id, label: getUsersFullName(executingUser) }, { id: readerId, label: reader?.name ?? "unknown reader" });
+  }
 
-    sendToShlugUnprompted(connData, { "Identify": doIdentify });
+  sendToShlugUnprompted(connData, { "Identify": doIdentify });
 
-    return true;
+  return true;
 }
 
 /**
@@ -86,68 +86,68 @@ export async function identifyReader(executingUser: UserRow, readerId: number, d
  * @returns text description of success or failure
  */
 export async function sendState(executingUser: UserRow, readerId: number, state: string): Promise<string> {
-    let connData = slugPool.get(readerId);
-    if (connData == null) {
-        console.error(`WSACS: Couldn't find shlug with id ${readerId} \n in pool ${stringSlugPool()}`)
-        return "not found";
-    }
+  let connData = slugPool.get(readerId);
+  if (connData == null) {
+    console.error(`WSACS: Couldn't find shlug with id ${readerId} \n in pool ${stringSlugPool()}`)
+    return "not found";
+  }
 
-    const reader = await getReaderByID(readerId);
-    if (reader == undefined) {
-        throw EntityNotFound;
-    }
+  const reader = await getReaderByID(readerId);
+  if (reader == undefined) {
+    throw EntityNotFound;
+  }
 
-    const instance = await getInstanceByReaderID(readerId);
-    const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
+  const instance = await getInstanceByReaderID(readerId);
+  const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
 
-    if (instance == null || equipment == null) {
-        await createLog(
-            `{user} commanded {access_device}'s state to ${state} (unpaired).`,
-            "admin",
-            { id: executingUser.id, label: getUsersFullName(executingUser) },
-            { id: reader.id, label: reader.name }
-        );
-    } else {
-        const equipmentLabel = { id: equipment?.id, label: equipment ? equipment?.name : "unknown equipment" }
-        await createLog(
-            `{user} commanded {equipment} instance ${instance.name}'s state to ${state}.`,
-            "admin",
-            { id: executingUser.id, label: getUsersFullName(executingUser) },
-            equipmentLabel
-        );
+  if (instance == null || equipment == null) {
+    await createLog(
+      `{user} commanded {access_device}'s state to ${state} (unpaired).`,
+      "admin",
+      { id: executingUser.id, label: getUsersFullName(executingUser) },
+      { id: reader.id, label: reader.name }
+    );
+  } else {
+    const equipmentLabel = { id: equipment?.id, label: equipment ? equipment?.name : "unknown equipment" }
+    await createLog(
+      `{user} commanded {equipment} instance ${instance.name}'s state to ${state}.`,
+      "admin",
+      { id: executingUser.id, label: getUsersFullName(executingUser) },
+      equipmentLabel
+    );
 
-    }
+  }
 
-    sendToShlugUnprompted(connData, { "State": state });
-    return "success";
+  sendToShlugUnprompted(connData, { "State": state });
+  return "success";
 }
 
 // Log helper
 export async function wsApiLog(
-    message: string,
-    category: string | undefined,
-    ...entities: { id: any; label: string }[]
+  message: string,
+  category: string | undefined,
+  ...entities: { id: any; label: string }[]
 ) {
-    if (!API_NORMAL_LOGGING) {
-        return;
-    }
-    createLog(message, category, ...entities);
+  if (!API_NORMAL_LOGGING) {
+    return;
+  }
+  createLog(message, category, ...entities);
 }
 
 
 interface ConnectionData {
-    ws: ws.WebSocket
-    currentState: string
+  ws: ws.WebSocket
+  currentState: string
 
-    readerId?: number
+  readerId?: number
 
-    alreadyComplainedAboutInvalidReader: boolean;
-    toShlugSeqNum: number
+  alreadyComplainedAboutInvalidReader: boolean;
+  toShlugSeqNum: number
 }
 
 // Sends a message to a shlug 
 function sendToShlugRaw(connData: ConnectionData, data: string) {
-    connData.ws.send(data);
+  connData.ws.send(data);
 }
 
 /**
@@ -158,12 +158,12 @@ function sendToShlugRaw(connData: ConnectionData, data: string) {
  */
 function sendToShlugUnprompted(connData: ConnectionData, data: any) {
 
-    const seqNum = connData.toShlugSeqNum;
-    data["Seq"] = seqNum;
-    connData.toShlugSeqNum++;
-    const s: string = JSON.stringify(data);
+  const seqNum = connData.toShlugSeqNum;
+  data["Seq"] = seqNum;
+  connData.toShlugSeqNum++;
+  const s: string = JSON.stringify(data);
 
-    sendToShlugRaw(connData, s);
+  sendToShlugRaw(connData, s);
 }
 
 /**
@@ -173,10 +173,10 @@ function sendToShlugUnprompted(connData: ConnectionData, data: any) {
  * @param replyTo the message number to respond to
  */
 function replyToShlug(connData: ConnectionData, data: any, replyTo: number) {
-    var toSend = data as ShlugResponse;
-    toSend.Seq = replyTo;
+  var toSend = data as ShlugResponse;
+  toSend.Seq = replyTo;
 
-    sendToShlugRaw(connData, JSON.stringify(toSend));
+  sendToShlugRaw(connData, JSON.stringify(toSend));
 }
 
 /**
@@ -185,7 +185,7 @@ function replyToShlug(connData: ConnectionData, data: any, replyTo: number) {
  * @returns the new ConnectionData to work with
  */
 function initConnectionData(ws: ws.WebSocket): ConnectionData {
-    return { ws: ws, toShlugSeqNum: 0, currentState: "Idle", alreadyComplainedAboutInvalidReader: false };
+  return { ws: ws, toShlugSeqNum: 0, currentState: "Idle", alreadyComplainedAboutInvalidReader: false };
 }
 
 /**
@@ -196,282 +196,310 @@ function initConnectionData(ws: ws.WebSocket): ConnectionData {
  * @returns the response message
  */
 async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
-    try {
-        // We should always return Auth to show we are an auth response
-        inResponse.Auth = uid;
-        inResponse.AuthTo = "Unlocked";
+  try {
+    // We should always return Auth to show we are an auth response
+    inResponse.Auth = uid;
+    inResponse.AuthTo = "Unlocked";
 
-        const reader = await getReaderByID(readerId);
-        if (reader == null) {
-            wsApiLog(`Failed to retrieve information about reader ${readerId}. Can't authorize`, "auth");
-            inResponse.Verified = 0;
-            inResponse.Error = "Failed to retrieve info about reader";
-            inResponse.Reason = "server-error";
-            return inResponse
-        }
-        // Find User
-        const user = await getUserByCardTagID(uid);
-        // Find Machine Instance
-        const machineInst = await getInstanceByReaderID(readerId);
+    const reader = await getReaderByID(readerId);
+    if (reader == null) {
+      wsApiLog(`Failed to retrieve information about reader ${readerId}. Can't authorize`, "auth");
+      inResponse.Verified = 0;
+      inResponse.Error = "Failed to retrieve info about reader";
+      inResponse.Reason = "server-error";
+      return inResponse
+    }
+    // Find User
+    const user = await getUserByCardTagID(uid);
+    // Find Machine Instance
+    const machineInst = await getInstanceByReaderID(readerId);
 
-        var machine: EquipmentRow | undefined;
-        if (machineInst) {
-            try {
-                machine = await getEquipmentByID(machineInst.equipmentID);
-                if (machine == null) {
-                    // bizzare error handling bc api getters can be inconsistent
-                    throw EntityNotFound;
-                }
-            } catch (EntityNotFound) {
-                machine = undefined;
-            }
-        }
-
-        if (user == null) {
-            wsApiLog("UID {conceal} failed to activate {machine} - {equipment} with error '{error}'", "auth", { id: 0, label: uid ?? "undefined_uid" }, { id: reader.id, label: reader.name ?? "undefined" }, { id: machine?.id, label: machine?.name ?? "unknown machine" }, { id: 406, label: "User does not exist" });
-
-            inResponse.Error = "User does not exist";
-            inResponse.Reason = "unknown-uid";
-            return inResponse;
-        }
-        inResponse.Role = user.privilege;
-
-        // Find Machine
+    var machine: EquipmentRow | undefined;
+    if (machineInst) {
+      try {
+        machine = await getEquipmentByID(machineInst.equipmentID);
         if (machine == null) {
-            if (reader?.SN == null) {
-                wsApiLog("{user} failed to swipe into a machine with error '{error}'", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader.machineID, label: `Machine ${reader.machineID} does not exist` });
-                inResponse.Error = "Machine does not exist";
-            } else {
-                wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: readerId, label: reader?.name });
-                inResponse.Error = "Reader not paired with a machine instance";
-            }
-            inResponse.Reason = "unknown-machine";
-            return inResponse;
+          // bizzare error handling bc api getters can be inconsistent
+          throw EntityNotFound;
         }
+      } catch (EntityNotFound) {
+        machine = undefined;
+      }
+    }
 
-        //Admin bypass. Skip Welcome and training check.
-        if (user.admin) {
-            wsApiLog("{user} has activated {access_device} - {equipment} with ADMIN access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
-            createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
-            inResponse.Verified = 1;
-            return inResponse;
-        }
+    if (user == null) {
+      wsApiLog("UID {conceal} failed to activate {machine} - {equipment} with error '{error}'", "auth", { id: 0, label: uid ?? "undefined_uid" }, { id: reader.id, label: reader.name ?? "undefined" }, { id: machine?.id, label: machine?.name ?? "unknown machine" }, { id: 406, label: "User does not exist" });
 
-        // Find Makerspace
-        const machineMakerspace = (await getRoomByID(machine.roomID))?.zoneID
+      inResponse.Error = "User does not exist";
+      inResponse.Reason = "unknown-uid";
+      return inResponse;
+    }
+    inResponse.Role = user.privilege;
 
-        // Hold Check
-        if (await hasActiveHolds(user.id)) {
-            wsApiLog("{user} failed to swipe into {access_device} - {equipment} due to an active hold", "auth",
-                { id: user.id, label: getUsersFullName(user) },
-                { id: reader?.id, label: reader?.name },
-                { id: machine.id, label: machine.name }
-            )
+    // Find Machine
+    if (machine == null) {
+      if (reader?.SN == null) {
+        wsApiLog("{user} failed to swipe into a machine with error '{error}'", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader.machineID, label: `Machine ${reader.machineID} does not exist` });
+        inResponse.Error = "Machine does not exist";
+      } else {
+        wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: readerId, label: reader?.name });
+        inResponse.Error = "Reader not paired with a machine instance";
+      }
+      inResponse.Reason = "unknown-machine";
+      return inResponse;
+    }
 
-            inResponse.Verified = 0;
-            inResponse.Error = "User has an active hold";
-            inResponse.Reason = "active-hold"
-            return inResponse;
-        }
+    //Admin bypass. Skip Welcome and training check.
+    if (user.admin) {
+      wsApiLog("{user} has activated {access_device} - {equipment} with ADMIN access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
+      createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
+      inResponse.Verified = 1;
+      return inResponse;
+    }
 
-        // Restriction Check
-        if (await hasRestriction(user.id, machineMakerspace ?? -1)) {
-            wsApiLog("{user} failed to swipe into {access_device} - {equipment} due to an active restriction", "auth",
-                { id: user.id, label: getUsersFullName(user) },
-                { id: reader?.id, label: reader?.name },
-                { id: machine.id, label: machine.name }
-            )
-            inResponse.Verified = 0;
-            inResponse.Error = "User has an active restriction"
-            inResponse.Reason = "active-restriction"
-            return inResponse;
-        }
+    // Find Makerspace
+    const machineMakerspace = (await getRoomByID(machine.roomID))?.zoneID
 
-        // Manager bypass. Skip welcome and training check.
-        if (typeof (machineMakerspace) === "number") {
-            const userManagerPerms = await getUserManagerPerms(user.id);
-            if (userManagerPerms.includes(machineMakerspace)) {
-                wsApiLog("{user} has activated {access_device} - {equipment} with MANAGER access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
-                createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
-                inResponse.Verified = 1;
-                return inResponse;
-            }
-        }
+    // Hold Check
+    if (await hasActiveHolds(user.id)) {
+      wsApiLog("{user} failed to swipe into {access_device} - {equipment} due to an active hold", "auth",
+        { id: user.id, label: getUsersFullName(user) },
+        { id: reader?.id, label: reader?.name },
+        { id: machine.id, label: machine.name }
+      )
 
-        //If needs welcome, check that room swipe has occured in the zone today
-        if (machine.needsWelcome && !(process.env.GLOBAL_WELCOME_BYPASS == "TRUE")) {
-            const welcomed = await hasSwipedToday(machine.roomID, user.id);
-            if (!welcomed) {
-                wsApiLog("{user} failed to swipe into {machine} -{equipment} with error '{error}'", "auth",
-                    { id: user.id, label: getUsersFullName(user) },
-                    { id: reader.id, label: reader?.name ?? "undefined" },
-                    { id: machine.id, label: machine.name },
-                    { id: 401, label: "User requires Welcome" });
+      inResponse.Verified = 0;
+      inResponse.Error = "User has an active hold";
+      inResponse.Reason = "active-hold"
+      return inResponse;
+    }
 
-                inResponse.Verified = 0;
-                inResponse.Error = "User requires Welcome";
-                inResponse.Reason = "no-welcome";
-                return inResponse;
-            }
-        }
+    // Restriction Check
+    if (await hasRestriction(user.id, machineMakerspace ?? -1)) {
+      wsApiLog("{user} failed to swipe into {access_device} - {equipment} due to an active restriction", "auth",
+        { id: user.id, label: getUsersFullName(user) },
+        { id: reader?.id, label: reader?.name },
+        { id: machine.id, label: machine.name }
+      )
+      inResponse.Verified = 0;
+      inResponse.Error = "User has an active restriction"
+      inResponse.Reason = "active-restriction"
+      return inResponse;
+    }
 
-        //Check that all required trainings are passed
-        if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasTrainingModules(user, machine.id))) {
-            const incompleteTrainings = await getMissingTrainingModules(user, machine.id);
-            var incompleteTrainingsStr = ""
-            incompleteTrainings.forEach((module, i) => {
-                incompleteTrainingsStr += module.name;
-                if (i < incompleteTrainings.length - 1) incompleteTrainingsStr += ", ";
-            });
-            wsApiLog(`{user} failed to swipe into {machine} - {equipment} with error '{error}' [${incompleteTrainingsStr}]`, "auth",
-                { id: user.id, label: getUsersFullName(user) },
-                { id: machine.id, label: reader.name ?? "undefined" },
-                { id: machine.id, label: machine.name },
-                { id: 401, label: "Incomplete trainings" });
-
-            inResponse.Verified = 0;
-            inResponse.Error = "Incomplete trainings";
-            inResponse.Reason = "missing-training";
-            return inResponse;
-        }
-
-        //Check that equipment access check is completed
-        if (!(process.env.GLOBAL_ACCESS_CHECK_BYPASS == "TRUE") && !(await isApproved(user.id, machine.id))) {
-            wsApiLog("{user} failed to swipe into {machine} - {equipment} with error '{error}'", "auth",
-                { id: user.id, label: getUsersFullName(user) },
-                { id: machine.id, label: reader.name },
-                { id: machine.id, label: machine.name ?? "undefined" },
-                { id: 401, label: "Missing Staff Approval" });
-            inResponse.Verified = 0;
-            inResponse.Error = "Missing Staff Approval";
-            inResponse.Reason = "no-approval";
-            return inResponse;
-        }
-
-        // Success
-        wsApiLog("{user} has activated {machine} - {equipment}", "auth",
-            { id: user.id, label: getUsersFullName(user) },
-            { id: reader.id, label: reader.name ?? "undefined" },
-            { id: machine.id, label: machine.name });
-
-        createEquipmentSession(machine.id, user.id, reader.name);
+    // Manager bypass. Skip welcome and training check.
+    if (typeof (machineMakerspace) === "number") {
+      const userManagerPerms = await getUserManagerPerms(user.id);
+      if (userManagerPerms.includes(machineMakerspace)) {
+        wsApiLog("{user} has activated {access_device} - {equipment} with MANAGER access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
+        createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
         inResponse.Verified = 1;
         return inResponse;
-    } catch (err) {
-        wsApiLog(`Unhandled error when authorizing on {access_device} - ${err}`, "auth", { id: readerId, label: (await getReaderByID(readerId))?.name ?? "unknown device" })
-        inResponse.Role = "unknown role";
-        inResponse.Verified = 0;
-        inResponse.Error = "Unknown Error";
-        inResponse.Reason = "server-error";
-        return inResponse;
+      }
     }
+
+    //If needs welcome, check that room swipe has occured in the zone today
+    if (machine.needsWelcome && !(process.env.GLOBAL_WELCOME_BYPASS == "TRUE")) {
+      const welcomed = await hasSwipedToday(machine.roomID, user.id);
+      if (!welcomed) {
+        wsApiLog("{user} failed to swipe into {machine} -{equipment} with error '{error}'", "auth",
+          { id: user.id, label: getUsersFullName(user) },
+          { id: reader.id, label: reader?.name ?? "undefined" },
+          { id: machine.id, label: machine.name },
+          { id: 401, label: "User requires Welcome" });
+
+        inResponse.Verified = 0;
+        inResponse.Error = "User requires Welcome";
+        inResponse.Reason = "no-welcome";
+        return inResponse;
+      }
+    }
+
+    //Check all makerspace trainings
+    if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasZoneTrainings(machineMakerspace ?? -1, user.id))) {
+      wsApiLog(`{user} failed to swipe into {machine} - {equipment} due to incomplete makerspace trainings`, "auth",
+        { id: user.id, label: getUsersFullName(user) },
+        { id: machine.id, label: reader.name ?? "undefined" },
+        { id: machine.id, label: machine.name }
+      );
+
+      inResponse.Verified = 0;
+      inResponse.Error = "Incomplete trainings";
+      inResponse.Reason = "missing-training";
+      return inResponse;
+    }
+
+    //Check all room trainings
+    if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasRoomTrainings(machine.roomID, user.id))) {
+      wsApiLog(`{user} failed to swipe into {machine} - {equipment} due to incomplete room trainings`, "auth",
+        { id: user.id, label: getUsersFullName(user) },
+        { id: machine.id, label: reader.name ?? "undefined" },
+        { id: machine.id, label: machine.name }
+      );
+
+      inResponse.Verified = 0;
+      inResponse.Error = "Incomplete trainings";
+      inResponse.Reason = "missing-training";
+      return inResponse;
+    }
+
+    //Check that all required equipment trainings are passed
+    if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasTrainingModules(user, machine.id))) {
+      const incompleteTrainings = await getMissingTrainingModules(user, machine.id);
+      var incompleteTrainingsStr = ""
+      incompleteTrainings.forEach((module, i) => {
+        incompleteTrainingsStr += module.name;
+        if (i < incompleteTrainings.length - 1) incompleteTrainingsStr += ", ";
+      });
+      wsApiLog(`{user} failed to swipe into {machine} - {equipment} with error '{error}' [${incompleteTrainingsStr}]`, "auth",
+        { id: user.id, label: getUsersFullName(user) },
+        { id: machine.id, label: reader.name ?? "undefined" },
+        { id: machine.id, label: machine.name },
+        { id: 401, label: "Incomplete trainings" });
+
+      inResponse.Verified = 0;
+      inResponse.Error = "Incomplete trainings";
+      inResponse.Reason = "missing-training";
+      return inResponse;
+    }
+
+    //Check that equipment access check is completed
+    if (!(process.env.GLOBAL_ACCESS_CHECK_BYPASS == "TRUE") && !(await isApproved(user.id, machine.id))) {
+      wsApiLog("{user} failed to swipe into {machine} - {equipment} with error '{error}'", "auth",
+        { id: user.id, label: getUsersFullName(user) },
+        { id: machine.id, label: reader.name },
+        { id: machine.id, label: machine.name ?? "undefined" },
+        { id: 401, label: "Missing Staff Approval" });
+      inResponse.Verified = 0;
+      inResponse.Error = "Missing Staff Approval";
+      inResponse.Reason = "no-approval";
+      return inResponse;
+    }
+
+    // Success
+    wsApiLog("{user} has activated {machine} - {equipment}", "auth",
+      { id: user.id, label: getUsersFullName(user) },
+      { id: reader.id, label: reader.name ?? "undefined" },
+      { id: machine.id, label: machine.name });
+
+    createEquipmentSession(machine.id, user.id, reader.name);
+    inResponse.Verified = 1;
+    return inResponse;
+  } catch (err) {
+    wsApiLog(`Unhandled error when authorizing on {access_device} - ${err}`, "auth", { id: readerId, label: (await getReaderByID(readerId))?.name ?? "unknown device" })
+    inResponse.Role = "unknown role";
+    inResponse.Verified = 0;
+    inResponse.Error = "Unknown Error";
+    inResponse.Reason = "server-error";
+    return inResponse;
+  }
 }
 
 async function welcomeUID(uid: string, readerID: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
-    inResponse.Auth = uid;
-    inResponse.AuthTo = "Welcomed";
+  inResponse.Auth = uid;
+  inResponse.AuthTo = "Welcomed";
 
-    const reader = await getReaderByID(readerID);
-    const user = await getUserByCardTagID(uid);
+  const reader = await getReaderByID(readerID);
+  const user = await getUserByCardTagID(uid);
 
-    const makerspace = await getMakerspaceOfWelcomeReader(readerID);
-    if (makerspace == null) {
-        await wsApiLog("failed to welcome {user} with {access_device}. Reader not paired with makerspace", "status", { id: user?.id ?? 0, label: user ? getUsersFullName(user) : "Unknown User" }, { id: readerID, label: reader?.name ?? "unknown reader" });
-        inResponse.Error = "Not paired with makerspace";
-        inResponse.Verified = 0;
-        return inResponse;
-    }
-
-    if (user == null) {
-        inResponse.Error = "user not found";
-        inResponse.Verified = 0;
-        // TODO: Report as such
-        wsApiLog("UID {conceal} failed to swipe into {makerspace} with error {error}", "welcome", { id: 0, label: uid }, { id: makerspace.id, label: makerspace.name }, { id: 406, label: "User does not exist" });
-        return inResponse;
-    }
-    try {
-        const rooms = await getRoomsByZone(makerspace.id);
-        for (let i = 0; i < rooms.length; i++) {
-            // TODO: MakerspaceSwipes not RoomSwipes
-            await swipeIntoRoom(rooms[i].id, user.id);
-        }
-        inResponse.Verified = 1;
-        await wsApiLog("{user} has signed into {makerspace}", "welcome", { id: user.id, label: getUsersFullName(user) }, { id: makerspace.id, label: makerspace.name });
-    } catch (e) {
-        inResponse.Verified = 0;
-        inResponse.Error = "Server Error";
-        await wsApiLog(`{user} failed to sign into {makerspace} with exception ${JSON.stringify(e)}`, "welcome", {id: user.id, label: getUsersFullName(user)}, {id: makerspace.id, label: makerspace.name})
-    }
-
-
+  const makerspace = await getMakerspaceOfWelcomeReader(readerID);
+  if (makerspace == null) {
+    await wsApiLog("failed to welcome {user} with {access_device}. Reader not paired with makerspace", "status", { id: user?.id ?? 0, label: user ? getUsersFullName(user) : "Unknown User" }, { id: readerID, label: reader?.name ?? "unknown reader" });
+    inResponse.Error = "Not paired with makerspace";
+    inResponse.Verified = 0;
     return inResponse;
+  }
+
+  if (user == null) {
+    inResponse.Error = "user not found";
+    inResponse.Verified = 0;
+    // TODO: Report as such
+    wsApiLog("UID {conceal} failed to swipe into {makerspace} with error {error}", "welcome", { id: 0, label: uid }, { id: makerspace.id, label: makerspace.name }, { id: 406, label: "User does not exist" });
+    return inResponse;
+  }
+  try {
+    const rooms = await getRoomsByZone(makerspace.id);
+    for (let i = 0; i < rooms.length; i++) {
+      // TODO: MakerspaceSwipes not RoomSwipes
+      await swipeIntoRoom(rooms[i].id, user.id);
+    }
+    inResponse.Verified = 1;
+    await wsApiLog("{user} has signed into {makerspace}", "welcome", { id: user.id, label: getUsersFullName(user) }, { id: makerspace.id, label: makerspace.name });
+  } catch (e) {
+    inResponse.Verified = 0;
+    inResponse.Error = "Server Error";
+    await wsApiLog(`{user} failed to sign into {makerspace} with exception ${JSON.stringify(e)}`, "welcome", { id: user.id, label: getUsersFullName(user) }, { id: makerspace.id, label: makerspace.name })
+  }
+
+
+  return inResponse;
 }
 
 async function authorizeUidToStateChange(uid: string, toState: string, readerId: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
-    inResponse.Auth = uid;
-    const user = await getUserByCardTagID(uid);
+  inResponse.Auth = uid;
+  const user = await getUserByCardTagID(uid);
 
-    if (user == null) {
-        inResponse.Error = "User not found";
-        inResponse.Verified = 0;
-        await wsApiLog(`UID {conceal} could not set state to ${toState}. No such user`, "status", { id: 0, label: uid });
-        return inResponse;
-    }
-    const ulabel = { id: user.id, label: getUsersFullName(user) };
-    const reader = await getReaderByID(readerId);
-    if (reader == null) {
-        inResponse.Error = "Reader not found";
-        inResponse.Verified = 0;
-        wsApiLog("Could not set state. Programming error trying to find reader", "status");
-        return inResponse;
-    }
-    const rlabel = { id: reader.id, label: reader.name };
+  if (user == null) {
+    inResponse.Error = "User not found";
+    inResponse.Verified = 0;
+    await wsApiLog(`UID {conceal} could not set state to ${toState}. No such user`, "status", { id: 0, label: uid });
+    return inResponse;
+  }
+  const ulabel = { id: user.id, label: getUsersFullName(user) };
+  const reader = await getReaderByID(readerId);
+  if (reader == null) {
+    inResponse.Error = "Reader not found";
+    inResponse.Verified = 0;
+    wsApiLog("Could not set state. Programming error trying to find reader", "status");
+    return inResponse;
+  }
+  const rlabel = { id: reader.id, label: reader.name };
 
-    if (!["Idle", "Lockout", "AlwaysOn"].includes(toState)) {
-        inResponse.Error = "Invalid target state";
-        inResponse.Verified = 0;
-        await wsApiLog(`{user} could not set state to ${toState}. {error}`, "status", ulabel, { id: 0, label: "Invalid State" });
-        return inResponse;
-    }
+  if (!["Idle", "Lockout", "AlwaysOn"].includes(toState)) {
+    inResponse.Error = "Invalid target state";
+    inResponse.Verified = 0;
+    await wsApiLog(`{user} could not set state to ${toState}. {error}`, "status", ulabel, { id: 0, label: "Invalid State" });
+    return inResponse;
+  }
 
-    const instance = await getInstanceByReaderID(readerId);
-    if (instance == null) {
-        inResponse.Error = "Not paired with instance";
-        inResponse.Verified = 0;
-        await wsApiLog(`{user} could not set state to ${toState}. {error}`, "status", ulabel, { id: 0, label: "Not paired with instance" });
-        return inResponse;
-    }
+  const instance = await getInstanceByReaderID(readerId);
+  if (instance == null) {
+    inResponse.Error = "Not paired with instance";
+    inResponse.Verified = 0;
+    await wsApiLog(`{user} could not set state to ${toState}. {error}`, "status", ulabel, { id: 0, label: "Not paired with instance" });
+    return inResponse;
+  }
 
-    const equipment = await getEquipmentByID(instance.equipmentID);
-    const room = await getRoomByID(equipment.roomID);
-    const makerspace = await getZoneByID(room?.zoneID ?? 0);
+  const equipment = await getEquipmentByID(instance.equipmentID);
+  const room = await getRoomByID(equipment.roomID);
+  const makerspace = await getZoneByID(room?.zoneID ?? 0);
 
-    if (equipment == null || room == null || makerspace == null) {
-        inResponse.Error = "Programmer Error";
-        inResponse.Verified = 0;
+  if (equipment == null || room == null || makerspace == null) {
+    inResponse.Error = "Programmer Error";
+    inResponse.Verified = 0;
 
-        return inResponse;
-    }
-    const elabel = { id: equipment.id, label: equipment.name };
+    return inResponse;
+  }
+  const elabel = { id: equipment.id, label: equipment.name };
 
-    const canUnlockBcAdmin = user.admin;
-    const canUnlockBcManager = makerspace?.id ? (await getUserManagerPerms(user.id)).includes(makerspace.id) : false;
-    const canUnlockBcStaff = makerspace?.id ? (await getUserStaffPerms(user.id)).includes(makerspace.id) : false
-    const canUnlock = canUnlockBcAdmin || canUnlockBcManager || canUnlockBcStaff;
+  const canUnlockBcAdmin = user.admin;
+  const canUnlockBcManager = makerspace?.id ? (await getUserManagerPerms(user.id)).includes(makerspace.id) : false;
+  const canUnlockBcStaff = makerspace?.id ? (await getUserStaffPerms(user.id)).includes(makerspace.id) : false
+  const canUnlock = canUnlockBcAdmin || canUnlockBcManager || canUnlockBcStaff;
 
 
-    if (canUnlock) {
-        const level = canUnlockBcAdmin ? "ADMIN" : (canUnlockBcManager ? "MANAGER" : "STAFF");
-        await wsApiLog(`{user} set {equipment}-:{reader} with ${level} priveleges`, "status", ulabel, elabel, rlabel)
-        inResponse.Verified = 1;
-        inResponse.AuthTo = toState;
-        return inResponse;
-    } else {
-        await wsApiLog(`{user} failed to set {equipment}:{reader} to ${toState}. {error}`, "status", ulabel, elabel, rlabel, { id: 0, label: "Insuffecient Permissions!" })
-        inResponse.Error = "Insuffecient Perms";
-        inResponse.Verified = 0;
-        return inResponse;
-    }
+  if (canUnlock) {
+    const level = canUnlockBcAdmin ? "ADMIN" : (canUnlockBcManager ? "MANAGER" : "STAFF");
+    await wsApiLog(`{user} set {equipment}-:{reader} with ${level} priveleges`, "status", ulabel, elabel, rlabel)
+    inResponse.Verified = 1;
+    inResponse.AuthTo = toState;
+    return inResponse;
+  } else {
+    await wsApiLog(`{user} failed to set {equipment}:{reader} to ${toState}. {error}`, "status", ulabel, elabel, rlabel, { id: 0, label: "Insuffecient Permissions!" })
+    inResponse.Error = "Insuffecient Perms";
+    inResponse.Verified = 0;
+    return inResponse;
+  }
 }
 
 /**
@@ -481,71 +509,71 @@ async function authorizeUidToStateChange(uid: string, toState: string, readerId:
  * @returns response containing those keys
  */
 async function handleRequest(connData: ConnectionData | undefined, requested_values: string[]): Promise<ShlugResponse> {
-    var obj: ShlugResponse = { Seq: -1 };
-    for (let value of requested_values) {
-        switch (value) {
-            case "Time":
-                obj.Time = Math.floor(Date.now() / 1000);
-                break;
-            case "State":
-                const reader: ReaderRow | undefined = await getReaderByID(connData?.readerId ?? 0);
-                if (reader?.id == null) {
-                    wsApiLog(`Couldn't find requested reader information for id ${connData?.readerId}. Telling Idle`, "State")
-                    obj.State = "Idle";
-                } else {
-                    const pairStatus: PairStatus = await getReaderPairStatus(reader.id);
-                    if (pairStatus == PairStatus.PairedAsWelcomer) {
-                        obj.State = "Welcoming";
-                    } else if (reader.state) {
-                        if (["Lockout", "Welcoming"].includes(reader.state)) {
-                            obj.State = reader.state;
-                        } else {
-                            obj.State = "Idle"
-                        }
+  var obj: ShlugResponse = { Seq: -1 };
+  for (let value of requested_values) {
+    switch (value) {
+      case "Time":
+        obj.Time = Math.floor(Date.now() / 1000);
+        break;
+      case "State":
+        const reader: ReaderRow | undefined = await getReaderByID(connData?.readerId ?? 0);
+        if (reader?.id == null) {
+          wsApiLog(`Couldn't find requested reader information for id ${connData?.readerId}. Telling Idle`, "State")
+          obj.State = "Idle";
+        } else {
+          const pairStatus: PairStatus = await getReaderPairStatus(reader.id);
+          if (pairStatus == PairStatus.PairedAsWelcomer) {
+            obj.State = "Welcoming";
+          } else if (reader.state) {
+            if (["Lockout", "Welcoming"].includes(reader.state)) {
+              obj.State = reader.state;
+            } else {
+              obj.State = "Idle"
+            }
 
-                    }
-                }
-                break;
-            default:
-                wsApiLog(`Invalid request from Shlug ${connData?.readerId}`, "ACS Message")
+          }
         }
+        break;
+      default:
+        wsApiLog(`Invalid request from Shlug ${connData?.readerId}`, "ACS Message")
     }
-    return obj;
+  }
+  return obj;
 }
 
 // What the shlug sends over websockets
 interface ShlugMessage {
-    SerialNumber?: string
+  SerialNumber?: string
 
-    FWVersion?: string;
-    HWVersion?: string;
-    HWType?: string;
-    Request?: string[];
-    Message?: string;  // Log Message to echo to history
-    Log?: string;      // Structured log message to save. Should be JSON 
-    State?: string; // Current State
-    UID?: string; // Reason for switching to that state
+  FWVersion?: string;
+  HWVersion?: string;
+  HWType?: string;
+  Request?: string[];
+  Message?: string;  // Log Message to echo to history
+  Log?: string;      // Structured log message to save. Should be JSON 
+  State?: string; // Current State
+  UID?: string; // Reason for switching to that state
 
-    Auth?: string; // UID to authorize
-    AuthTo?: string // state that the person wants to go to
+  Auth?: string; // UID to authorize
+  AuthTo?: string // state that the person wants to go to
 
-    Temp?: number
+  Temp?: number
 
-    Seq: number;
-    Key?: string;
+  Seq: number;
+  Key?: string;
 }
 // What the server sends to the shlug in response to a ShlugMessage
 interface ShlugResponse {
-    Seq: number
-    Auth?: string
-    AuthTo?: string
-    Verified?: number
-    Role?: string
-    Error?: string
-    Reason?: string
+  Seq: number
+  Auth?: string
+  AuthTo?: string
+  Verified?: number
+  Role?: string
+  Error?: string
+  Reason?: string
 
-    Time?: number /// unix timestamp
-    State?: string
+  Time?: number /// unix timestamp
+  State?: string
 }
 
 /**
@@ -555,23 +583,23 @@ interface ShlugResponse {
  * @returns a valid ShlugMessage on successful parsing. null on error
  */
 function validateShlugMessage(ev: ws.MessageEvent, req: Request): ShlugMessage | undefined {
-    if (typeof ev.data != 'string') {
-        // malformed data
-        console.error(`WSACS: Non-string data received from ${req.ip}`);
-        return undefined;
-    }
-    var jdata: ShlugMessage;
-    try {
-        jdata = JSON.parse(ev.data as string) as ShlugMessage;
-    } catch (err: any) {
-        console.error(`WSACS: Text data from ${req.ip} was not valid JSON: ${err}. Text was: ${ev.data as string}`);
-        return undefined;
-    }
-    if (jdata.Seq == null) {
-        console.error(`WSACS: Received valid JSON  from ${req.ip} with no Sequence Number. Got ${JSON.stringify(jdata)}`);
-        return undefined;
-    }
-    return jdata;
+  if (typeof ev.data != 'string') {
+    // malformed data
+    console.error(`WSACS: Non-string data received from ${req.ip}`);
+    return undefined;
+  }
+  var jdata: ShlugMessage;
+  try {
+    jdata = JSON.parse(ev.data as string) as ShlugMessage;
+  } catch (err: any) {
+    console.error(`WSACS: Text data from ${req.ip} was not valid JSON: ${err}. Text was: ${ev.data as string}`);
+    return undefined;
+  }
+  if (jdata.Seq == null) {
+    console.error(`WSACS: Received valid JSON  from ${req.ip} with no Sequence Number. Got ${JSON.stringify(jdata)}`);
+    return undefined;
+  }
+  return jdata;
 }
 
 /**
@@ -579,14 +607,14 @@ function validateShlugMessage(ev: ws.MessageEvent, req: Request): ShlugMessage |
  * @returns a uniquely generated adjective-color-slug name
  */
 async function generateUniqueHumanName() {
-    const RANDOM_TRIES = 10;
-    for (var i = 0; i < RANDOM_TRIES; i++) {
-        const name = generateRandomHumanName();
-        if (await getReaderByName(name) == null) {
-            return name;
-        }
+  const RANDOM_TRIES = 10;
+  for (var i = 0; i < RANDOM_TRIES; i++) {
+    const name = generateRandomHumanName();
+    if (await getReaderByName(name) == null) {
+      return name;
     }
-    return `${generateRandomHumanName()}-${randomInt(1000)}`
+  }
+  return `${generateRandomHumanName()}-${randomInt(1000)}`
 }
 
 /**
@@ -596,19 +624,19 @@ async function generateUniqueHumanName() {
  * @returns true if that is a valid, paired shlug
  */
 export async function authenticateReader(readerSN: string, readerKey: string): Promise<boolean> {
-    if (!readerSN || !readerKey) {
-        return false;
-    }
-    var reader: ReaderRow | undefined = await getReaderBySN(readerSN);
-    if (reader?.pairTime == null || reader?.SN == null || reader?.readerKeyCycle == null) {
-        return false;
+  if (!readerSN || !readerKey) {
+    return false;
+  }
+  var reader: ReaderRow | undefined = await getReaderBySN(readerSN);
+  if (reader?.pairTime == null || reader?.SN == null || reader?.readerKeyCycle == null) {
+    return false;
 
-    }
-    const keyToMatch = await generateShlugKey(reader.pairTime, reader.SN, reader.readerKeyCycle);
-    if (readerKey != keyToMatch) {
-        return false;
-    }
-    return true;
+  }
+  const keyToMatch = await generateShlugKey(reader.pairTime, reader.SN, reader.readerKeyCycle);
+  if (readerKey != keyToMatch) {
+    return false;
+  }
+  return true;
 }
 
 
@@ -620,97 +648,97 @@ export async function authenticateReader(readerSN: string, readerKey: string): P
  * @returns true on successful parse. False if missing fields or otherwise invalid
  */
 async function handleBootupMessage(connData: ConnectionData, message: ShlugMessage, ws: ws.WebSocket, srcIp: string): Promise<boolean> {
-    if (message.SerialNumber == null || message.Key == null || message.FWVersion == null || message.HWVersion == null || message.HWType == null) {
-        if (message.Key) {
-            message.Key = "<sanitized>";
-        }
-        console.error(`WSACS: Missing fields in boot message from ${srcIp}. Got ${JSON.stringify(message)}`);
-        submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "missing fields", "ReaderIP": srcIp, "message": message });
-        ws.close(4000, "Invalid Fields");
-        return false;
+  if (message.SerialNumber == null || message.Key == null || message.FWVersion == null || message.HWVersion == null || message.HWType == null) {
+    if (message.Key) {
+      message.Key = "<sanitized>";
     }
-    var reader: ReaderRow | undefined = await getReaderBySN(message.SerialNumber ?? "");
-    if (reader?.pairTime == null || reader?.SN == null) {
-        wsApiLog(`WSACS: Request from unpaired shlug ${srcIp} (SN: ${reader?.SN}). Denying`, "status");
-        console.error(`WSACS: Request from unpaired shlug ${srcIp}. Denying`);
-        submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "unpaired", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
-        ws.close(4001, "Unpaired Reader. Rejected");
-        return false;
+    console.error(`WSACS: Missing fields in boot message from ${srcIp}. Got ${JSON.stringify(message)}`);
+    submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "missing fields", "ReaderIP": srcIp, "message": message });
+    ws.close(4000, "Invalid Fields");
+    return false;
+  }
+  var reader: ReaderRow | undefined = await getReaderBySN(message.SerialNumber ?? "");
+  if (reader?.pairTime == null || reader?.SN == null) {
+    wsApiLog(`WSACS: Request from unpaired shlug ${srcIp} (SN: ${reader?.SN}). Denying`, "status");
+    console.error(`WSACS: Request from unpaired shlug ${srcIp}. Denying`);
+    submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "unpaired", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
+    ws.close(4001, "Unpaired Reader. Rejected");
+    return false;
 
-    }
-    const keyToMatch = await generateShlugKey(reader?.pairTime, reader?.SN, reader?.readerKeyCycle);
-    if (message.Key != keyToMatch) {
-        wsApiLog(`WSACS: Invalid key from SN ${reader?.SN} on connect. Was it paired correctly?`, "status");
-        message.Key = "<sanitized>";
-        await submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "wrong key", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
-        console.error(`WSACS: Invalid key from SN ${reader?.SN} on connect.`);
-        ws.close(4002, "Invalid Key. Rejected")
-        return false;
-    }
+  }
+  const keyToMatch = await generateShlugKey(reader?.pairTime, reader?.SN, reader?.readerKeyCycle);
+  if (message.Key != keyToMatch) {
+    wsApiLog(`WSACS: Invalid key from SN ${reader?.SN} on connect. Was it paired correctly?`, "status");
+    message.Key = "<sanitized>";
+    await submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "wrong key", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
+    console.error(`WSACS: Invalid key from SN ${reader?.SN} on connect.`);
+    ws.close(4002, "Invalid Key. Rejected")
+    return false;
+  }
 
 
+  connData.readerId = reader?.id;
+  if (reader == null) {
+    reader = await createReaderFromSN({
+      SN: message.SerialNumber, name: await generateUniqueHumanName(),
+    });
+    console.log("WSACS: Creating new Reader for SN ", message.SerialNumber);
     connData.readerId = reader?.id;
-    if (reader == null) {
-        reader = await createReaderFromSN({
-            SN: message.SerialNumber, name: await generateUniqueHumanName(),
-        });
-        console.log("WSACS: Creating new Reader for SN ", message.SerialNumber);
-        connData.readerId = reader?.id;
 
 
-        if (reader == undefined) {
-            wsApiLog("Failed to create new access device. Error '{error}'", "status", { id: 400, label: "Reader does not exist" });
-            return false;
-        }
-        else {
-            wsApiLog("New Access Device {access_device} registered", "status", { id: reader?.id, label: reader?.name })
-        }
+    if (reader == undefined) {
+      wsApiLog("Failed to create new access device. Error '{error}'", "status", { id: 400, label: "Reader does not exist" });
+      return false;
     }
-
-    const instance = await getInstanceByReaderID(reader.id);
-    const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
-    let offlineForSec = null;
-    if (reader?.lastStatusTime) {
-        let offlineMs = new Date().getTime() - reader.lastStatusTime.getTime();
-        offlineForSec = Math.floor(offlineMs / 1000);
-
+    else {
+      wsApiLog("New Access Device {access_device} registered", "status", { id: reader?.id, label: reader?.name })
     }
-    submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), {
-        "WsEvent": "open",
-        "ReaderIP": srcIp,
-        "OfflineFor": offlineForSec,
-    });
+  }
+
+  const instance = await getInstanceByReaderID(reader.id);
+  const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
+  let offlineForSec = null;
+  if (reader?.lastStatusTime) {
+    let offlineMs = new Date().getTime() - reader.lastStatusTime.getTime();
+    offlineForSec = Math.floor(offlineMs / 1000);
+
+  }
+  submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), {
+    "WsEvent": "open",
+    "ReaderIP": srcIp,
+    "OfflineFor": offlineForSec,
+  });
 
 
-    connData.readerId = reader.id;
+  connData.readerId = reader.id;
 
-    let newState: string = message.State ?? reader.state;
-    if ((message?.Request ?? []).includes("State")) {
-        // If requesting a new state, don't blindly accept a new one
-        // Wait for request handler to do logic about this
-        newState = reader.state;
-    }
+  let newState: string = message.State ?? reader.state;
+  if ((message?.Request ?? []).includes("State")) {
+    // If requesting a new state, don't blindly accept a new one
+    // Wait for request handler to do logic about this
+    newState = reader.state;
+  }
 
-    // update with new info
-    await updateReaderStatus({
-        id: reader.id,
-        machineID: undefined,
-        machineType: "",
-        zone: "",
-        temp: 0,
-        state: newState,
-        currentUID: "",
-        recentSessionLength: reader.recentSessionLength,
-        lastStatusReason: reader.lastStatusReason,
-        scheduledStatusFreq: reader.scheduledStatusFreq,
-        helpRequested: reader.helpRequested,
-        BEVer: message.FWVersion ?? undefined,
-        FEVer: message.FWVersion ?? undefined,
-        HWVer: message.HWVersion ?? undefined,
-        SN: message.SerialNumber,
-    });
+  // update with new info
+  await updateReaderStatus({
+    id: reader.id,
+    machineID: undefined,
+    machineType: "",
+    zone: "",
+    temp: 0,
+    state: newState,
+    currentUID: "",
+    recentSessionLength: reader.recentSessionLength,
+    lastStatusReason: reader.lastStatusReason,
+    scheduledStatusFreq: reader.scheduledStatusFreq,
+    helpRequested: reader.helpRequested,
+    BEVer: message.FWVersion ?? undefined,
+    FEVer: message.FWVersion ?? undefined,
+    HWVer: message.HWVersion ?? undefined,
+    SN: message.SerialNumber,
+  });
 
-    return true;
+  return true;
 }
 
 /**
@@ -720,64 +748,64 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
  * @param activeUID the active UID if there is one. null if no card inserted
  */
 async function handleStateTransition(reader: ReaderRow, newState: string, activeUID: string | undefined, temp: number | undefined) {
-    const timeOfChange: Date = new Date();
-    const oldState = reader.state;
-    const oldUID = reader.currentUID;
+  const timeOfChange: Date = new Date();
+  const oldState = reader.state;
+  const oldUID = reader.currentUID;
 
-    reader.state = newState;
-    reader.currentUID = activeUID ?? "";
-    reader.lastStatusTime = timeOfChange;
-    reader.lastStatusReason = "websocket-poll";
+  reader.state = newState;
+  reader.currentUID = activeUID ?? "";
+  reader.lastStatusTime = timeOfChange;
+  reader.lastStatusReason = "websocket-poll";
 
-    if (reader.recentSessionLength == null) {
-        reader.recentSessionLength = 0;
+  if (reader.recentSessionLength == null) {
+    reader.recentSessionLength = 0;
+  }
+
+  const user = await getUserByCardTagID(oldUID ?? "");
+  const instance = await getInstanceByReaderID(reader.id);
+  const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
+  const tag = (equipment == null) ? "reader {access_device} (unpaired)" : ("{equipment} instance " + (instance?.name ?? "unknown instance"))
+  const label: { id: number, label: string } = (equipment == null) ? { id: reader.id, label: reader.name } : { id: equipment.id, label: equipment.name ?? "unknown equipment" }
+
+
+  if (oldState != newState) {
+    if (user == null) {
+      wsApiLog(`State of ${tag} changed: ${oldState} -> ${newState}`, "state", label);
+    } else {
+      wsApiLog(`{user} changed state of ${tag}: ${oldState} -> ${newState}`, "state", { id: user.id ?? 0, label: user ? getUsersFullName(user) : "NULL" }, label);
     }
-
-    const user = await getUserByCardTagID(oldUID ?? "");
-    const instance = await getInstanceByReaderID(reader.id);
-    const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
-    const tag = (equipment == null) ? "reader {access_device} (unpaired)" : ("{equipment} instance " + (instance?.name ?? "unknown instance"))
-    const label: { id: number, label: string } = (equipment == null) ? { id: reader.id, label: reader.name } : { id: equipment.id, label: equipment.name ?? "unknown equipment" }
-
-
-    if (oldState != newState) {
-        if (user == null) {
-            wsApiLog(`State of ${tag} changed: ${oldState} -> ${newState}`, "state", label);
-        } else {
-            wsApiLog(`{user} changed state of ${tag}: ${oldState} -> ${newState}`, "state", { id: user.id ?? 0, label: user ? getUsersFullName(user) : "NULL" }, label);
-        }
-        submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), { "ACSEvent": "StateChange", "From": oldState, "To": newState, "User": user?.id })
-        if (newState == "Unlocked") {
-            reader.sessionStartTime = new Date();
-            reader.recentSessionLength = 0;
-        }
-
-        if (oldState == "Unlocked" && reader.recentSessionLength > MIN_SESSION_LENGTH) {
-            // end last session normally
-            reader.currentUID = activeUID ?? '';
-            const timeString = new Date(reader.recentSessionLength * 1000).toISOString().slice(11, 19);
-
-            if (instance == null || equipment == null) {
-                if (user != null) {
-                    await createLog(`{user} signed out of {access_device} that was not paired with any instance (Unpaired while in use) (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, { id: reader.id, label: reader.name ?? "undefined" });
-                }
-            } else {
-                // Update equipment session that was created when we authed
-                await setLatestEquipmentSessionLength(equipment.id, reader.recentSessionLength, reader.name);
-                if (user != null) {
-                    await createLog(`{user} signed out of {equipment} (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, label);
-                }
-            }
-        }
-    }
+    submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), { "ACSEvent": "StateChange", "From": oldState, "To": newState, "User": user?.id })
     if (newState == "Unlocked") {
-        const now = new Date();
-        const then = reader.sessionStartTime ?? new Date(); // if not there, set ot 0
-        const elapsedSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-        reader.recentSessionLength = elapsedSeconds;
+      reader.sessionStartTime = new Date();
+      reader.recentSessionLength = 0;
     }
-    reader.temp = temp ?? reader.temp;
-    await updateReaderStatus(reader);
+
+    if (oldState == "Unlocked" && reader.recentSessionLength > MIN_SESSION_LENGTH) {
+      // end last session normally
+      reader.currentUID = activeUID ?? '';
+      const timeString = new Date(reader.recentSessionLength * 1000).toISOString().slice(11, 19);
+
+      if (instance == null || equipment == null) {
+        if (user != null) {
+          await createLog(`{user} signed out of {access_device} that was not paired with any instance (Unpaired while in use) (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, { id: reader.id, label: reader.name ?? "undefined" });
+        }
+      } else {
+        // Update equipment session that was created when we authed
+        await setLatestEquipmentSessionLength(equipment.id, reader.recentSessionLength, reader.name);
+        if (user != null) {
+          await createLog(`{user} signed out of {equipment} (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, label);
+        }
+      }
+    }
+  }
+  if (newState == "Unlocked") {
+    const now = new Date();
+    const then = reader.sessionStartTime ?? new Date(); // if not there, set ot 0
+    const elapsedSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
+    reader.recentSessionLength = elapsedSeconds;
+  }
+  reader.temp = temp ?? reader.temp;
+  await updateReaderStatus(reader);
 
 }
 /**
@@ -787,10 +815,10 @@ async function handleStateTransition(reader: ReaderRow, newState: string, active
  * @returns true if we should send this message to the reader
  */
 function isReplyWorthSending(resp: ShlugResponse): boolean {
-    if (resp.Verified || resp.Auth || resp.Error || resp.Reason || resp.Role || resp.State || resp.Time) {
-        return true
-    }
-    return false
+  if (resp.Verified || resp.Auth || resp.Error || resp.Reason || resp.Role || resp.State || resp.Time) {
+    return true
+  }
+  return false
 }
 
 /**
@@ -799,127 +827,127 @@ function isReplyWorthSending(resp: ShlugResponse): boolean {
  * @param req data from the original request to the endpoint (one per shlug)
  */
 export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
-    var connData: ConnectionData = initConnectionData(ws);
-    console.log(`WSACS: Websocket opened to ${req.ip}`);
-    submitReaderLog(null, new Date(), { "WsEvent": "initial connect", "IP": req.ip })
-    try {
-        ws.onclose = async function (ev: ws.CloseEvent) {
-            try {
-                if (connData.readerId == null) {
-                    // Connection was never associated with a real reader (boot message never sent, probably something fishy)
-                    console.error(`WSACS: Websocket from non-reader ${req.ip} closed with code ${ev.code} ${ev.reason}`);
-                    submitReaderLog(null, new Date(), { "WsEvent": "close nonreader", "IP": req.ip, "WsCloseCode": ev.code, "WsCloseReason": ev.reason });
-                    return;
-                }
-                let reader: ReaderRow | undefined = await getReaderByID(connData.readerId);
-                if (reader == null) {
-                    await submitReaderLog(null, new Date(), {
-                        "WsEvent": "closed",
-                        "WsClosedCode": ev.code,
-                        "WsClosedReason": ev.reason,
-                        "IP": req.ip,
-                    });
-                } else {
-                    await submitReaderLog(reader.id, new Date(), {
-                        "WsEvent": "closed",
-                        "WsClosedCode": ev.code,
-                        "WsClosedReason": ev.reason,
-                    });
-                }
-                removeConnection(connData);
-            } catch (e) {
-                console.error(`WSACS: Close Exception: ${e}`)
-            }
-
-        };
-
-        ws.onerror = async function (ev: ws.ErrorEvent) {
-
-            await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "error", "WsErrorMsg": ev.message });
-            console.error(`WSACS: websocket error ${ev.error} - ${ev.type}: ${ev.message}`)
-            ws.close(4000, "got unrecoverable error");
+  var connData: ConnectionData = initConnectionData(ws);
+  console.log(`WSACS: Websocket opened to ${req.ip}`);
+  submitReaderLog(null, new Date(), { "WsEvent": "initial connect", "IP": req.ip })
+  try {
+    ws.onclose = async function (ev: ws.CloseEvent) {
+      try {
+        if (connData.readerId == null) {
+          // Connection was never associated with a real reader (boot message never sent, probably something fishy)
+          console.error(`WSACS: Websocket from non-reader ${req.ip} closed with code ${ev.code} ${ev.reason}`);
+          submitReaderLog(null, new Date(), { "WsEvent": "close nonreader", "IP": req.ip, "WsCloseCode": ev.code, "WsCloseReason": ev.reason });
+          return;
         }
-
-        ws.onmessage = async function (ev: ws.MessageEvent) {
-            try {
-                const shlugMessage: ShlugMessage | undefined = validateShlugMessage(ev, req);
-                if (shlugMessage == null) {
-                    console.error(`Invalid Shlug Message: ${JSON.stringify(ev.data)}. Forcing reconnect`);
-                    await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "invalid message", "Data": ev.data });
-
-                    ws.close(4001, "Invalid Message");
-                    return;
-                }
-
-                // First Message is special, identifies the shlug to the server
-                if (shlugMessage.Seq === 0) {
-                    // Bootup message
-                    if (!await handleBootupMessage(connData, shlugMessage, ws, req.ip ?? "unknown ip")) {
-                        // failed to setup  
-                        console.error("WSACS: Incorrect Boot Message. Forcing Reconnect")
-                        ws.close(4001, "Invalid Boot Message");
-                        return;
-                    }
-                }
-                if (connData.readerId == null) {
-                    wsApiLog("Can not process WSAPI message. Null reader ID (this shouldn't happen): " + ev.data, "status")
-                    return;
-                }
-
-                addOrUpdateConnection(connData);
-                // Get reader that was setup by handleBootupMessage
-                var reader = await getReaderByID(connData.readerId ?? 0);
-                if (reader == null) {
-                    submitReaderLog(null, new Date(), { "WsEvent": "undefined reader", "ReaderIP": req.ip, "ReaderID": connData?.readerId });
-                    console.error(`Failed to find entry for device. Forcing Reconnect. ID: ${connData.readerId}, Last State: ${connData.currentState}. IP: ${req.ip}: ${JSON.stringify(shlugMessage)}`);
-                    // Closing the websocket will make it reauth and hopefully tell us its id
-                    ws.close(4000, "No Device Found");
-                    return;
-                }
-                var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [])
-
-                if (shlugMessage.Message) {
-                    try {
-                        const instance = await getInstanceByReaderID(reader.id);
-                        const machine = await getEquipmentByID(instance?.equipmentID ?? 0);
-                        if (instance == null || machine == null) {
-                            throw EntityNotFound;
-                        }
-                        wsApiLog(`{access_device} - {machine} instance '${instance.name}' message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: machine.id, label: machine.name })
-                    } catch (e) {
-                        wsApiLog(`{access_device} (unpaired) message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: reader.id, label: reader.name })
-                    }
-                }
-                if (shlugMessage.Log) {
-                    try {
-                        await submitReaderLog(connData.readerId ?? null, new Date(), shlugMessage.Log);
-                    } catch (e: any) {
-                        wsApiLog(`Unable to submit Reader Log '${JSON.stringify(shlugMessage.Log)}': ${e}`, "status");
-                    }
-                }
-                if (shlugMessage.State) {
-                    await handleStateTransition(reader, shlugMessage.State, shlugMessage.UID, shlugMessage?.Temp)
-                }
-
-                if (shlugMessage.Auth && (shlugMessage.AuthTo == null || shlugMessage.AuthTo == "Unlocked")) {
-                    response = await authorizeUIDToUnlock(shlugMessage?.Auth, connData.readerId ?? 0, response)
-                } else if (shlugMessage.Auth && shlugMessage.AuthTo === "Welcomed" && shlugMessage.Auth) {
-                    response = await welcomeUID(shlugMessage.Auth, connData.readerId, response)
-                } else if (shlugMessage.Auth && shlugMessage.AuthTo) {
-                    response = await authorizeUidToStateChange(shlugMessage.Auth, shlugMessage.AuthTo, connData.readerId, response);
-                }
-                if (isReplyWorthSending(response)) {
-                    replyToShlug(connData, response, shlugMessage.Seq);
-                }
-            } catch (e: any) {
-                wsApiLog(`WSACS: Message Exception: ${e}`, "status");
-                console.error(`WSACS: Message Exception: ${e}: ${e?.stack}`)
-            }
-
+        let reader: ReaderRow | undefined = await getReaderByID(connData.readerId);
+        if (reader == null) {
+          await submitReaderLog(null, new Date(), {
+            "WsEvent": "closed",
+            "WsClosedCode": ev.code,
+            "WsClosedReason": ev.reason,
+            "IP": req.ip,
+          });
+        } else {
+          await submitReaderLog(reader.id, new Date(), {
+            "WsEvent": "closed",
+            "WsClosedCode": ev.code,
+            "WsClosedReason": ev.reason,
+          });
         }
+        removeConnection(connData);
+      } catch (e) {
+        console.error(`WSACS: Close Exception: ${e}`)
+      }
 
-    } catch (e) {
-        wsApiLog(`WSACS: Exception: ${e}`, "status");
-        console.error(`WSACS: Exception: ${e}`)
+    };
+
+    ws.onerror = async function (ev: ws.ErrorEvent) {
+
+      await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "error", "WsErrorMsg": ev.message });
+      console.error(`WSACS: websocket error ${ev.error} - ${ev.type}: ${ev.message}`)
+      ws.close(4000, "got unrecoverable error");
     }
+
+    ws.onmessage = async function (ev: ws.MessageEvent) {
+      try {
+        const shlugMessage: ShlugMessage | undefined = validateShlugMessage(ev, req);
+        if (shlugMessage == null) {
+          console.error(`Invalid Shlug Message: ${JSON.stringify(ev.data)}. Forcing reconnect`);
+          await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "invalid message", "Data": ev.data });
+
+          ws.close(4001, "Invalid Message");
+          return;
+        }
+
+        // First Message is special, identifies the shlug to the server
+        if (shlugMessage.Seq === 0) {
+          // Bootup message
+          if (!await handleBootupMessage(connData, shlugMessage, ws, req.ip ?? "unknown ip")) {
+            // failed to setup  
+            console.error("WSACS: Incorrect Boot Message. Forcing Reconnect")
+            ws.close(4001, "Invalid Boot Message");
+            return;
+          }
+        }
+        if (connData.readerId == null) {
+          wsApiLog("Can not process WSAPI message. Null reader ID (this shouldn't happen): " + ev.data, "status")
+          return;
+        }
+
+        addOrUpdateConnection(connData);
+        // Get reader that was setup by handleBootupMessage
+        var reader = await getReaderByID(connData.readerId ?? 0);
+        if (reader == null) {
+          submitReaderLog(null, new Date(), { "WsEvent": "undefined reader", "ReaderIP": req.ip, "ReaderID": connData?.readerId });
+          console.error(`Failed to find entry for device. Forcing Reconnect. ID: ${connData.readerId}, Last State: ${connData.currentState}. IP: ${req.ip}: ${JSON.stringify(shlugMessage)}`);
+          // Closing the websocket will make it reauth and hopefully tell us its id
+          ws.close(4000, "No Device Found");
+          return;
+        }
+        var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [])
+
+        if (shlugMessage.Message) {
+          try {
+            const instance = await getInstanceByReaderID(reader.id);
+            const machine = await getEquipmentByID(instance?.equipmentID ?? 0);
+            if (instance == null || machine == null) {
+              throw EntityNotFound;
+            }
+            wsApiLog(`{access_device} - {machine} instance '${instance.name}' message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: machine.id, label: machine.name })
+          } catch (e) {
+            wsApiLog(`{access_device} (unpaired) message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: reader.id, label: reader.name })
+          }
+        }
+        if (shlugMessage.Log) {
+          try {
+            await submitReaderLog(connData.readerId ?? null, new Date(), shlugMessage.Log);
+          } catch (e: any) {
+            wsApiLog(`Unable to submit Reader Log '${JSON.stringify(shlugMessage.Log)}': ${e}`, "status");
+          }
+        }
+        if (shlugMessage.State) {
+          await handleStateTransition(reader, shlugMessage.State, shlugMessage.UID, shlugMessage?.Temp)
+        }
+
+        if (shlugMessage.Auth && (shlugMessage.AuthTo == null || shlugMessage.AuthTo == "Unlocked")) {
+          response = await authorizeUIDToUnlock(shlugMessage?.Auth, connData.readerId ?? 0, response)
+        } else if (shlugMessage.Auth && shlugMessage.AuthTo === "Welcomed" && shlugMessage.Auth) {
+          response = await welcomeUID(shlugMessage.Auth, connData.readerId, response)
+        } else if (shlugMessage.Auth && shlugMessage.AuthTo) {
+          response = await authorizeUidToStateChange(shlugMessage.Auth, shlugMessage.AuthTo, connData.readerId, response);
+        }
+        if (isReplyWorthSending(response)) {
+          replyToShlug(connData, response, shlugMessage.Seq);
+        }
+      } catch (e: any) {
+        wsApiLog(`WSACS: Message Exception: ${e}`, "status");
+        console.error(`WSACS: Message Exception: ${e}: ${e?.stack}`)
+      }
+
+    }
+
+  } catch (e) {
+    wsApiLog(`WSACS: Exception: ${e}`, "status");
+    console.error(`WSACS: Exception: ${e}`)
+  }
 }
