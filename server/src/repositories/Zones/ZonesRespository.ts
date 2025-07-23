@@ -79,6 +79,6 @@ export async function addTrainingToZone(zoneID: number, moduleID: number): Promi
 }
 
 export async function removeTrainingFromZone(zoneID: number, moduleID: number): Promise<TrainingModuleRow[]> {
-    await knex("ModulesForMakerspaces").delete().where("makerspaceID", zoneID).andWhere("moduleID", moduleID);
+    await knex("ModulesForMakerspaces").where({makerspaceID: zoneID, moduleID: moduleID}).delete();
     return await getTrainingsByZone(zoneID);
 }
