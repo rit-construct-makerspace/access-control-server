@@ -15,7 +15,7 @@ export async function up(knex: Knex): Promise<void> {
         });
     }
 
-    const MakerspaceTrainingTableExists = await knex.schema.hasTable("ModulesForRooms");
+    const MakerspaceTrainingTableExists = await knex.schema.hasTable("ModulesForMakerspaces");
     if (!MakerspaceTrainingTableExists) {
         knex.schema.createTable("ModulesForMakerspaces", (t) => {
             t.integer("makerspaceID").references("id").inTable("Zones").notNullable()
