@@ -128,10 +128,20 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 </Stack>
                 <CardContent>
                     {/* Desc && learn more */}
-                    <Typography>
-                        <ReactMarkdown>{props.equipment.notes}</ReactMarkdown>
-                        <Link to={props.equipment.sopUrl} target="_blank" rel="noopener noreferrer">Learn More</Link>
-                    </Typography>
+                    <Stack>
+                        <Typography>
+                            <ReactMarkdown>{props.equipment.notes}</ReactMarkdown>
+                        </Typography>
+                        <Button
+                            size="small"
+                            variant="contained"
+                            color="info"
+                            onClick={() => window.open(props.equipment.sopUrl, "_blank")}
+                            sx={{ alignSelf: "flex-end" }}
+                        >
+                            Learn More
+                        </Button>
+                    </Stack>
                 </CardContent>
             </Stack>
         </Card>
