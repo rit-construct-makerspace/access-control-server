@@ -18,7 +18,7 @@ var index = 0;
 
 export default function EventsDisplay() {
 
-    const getEvents = useQuery(GET_EVENTS, {pollInterval: 300000});
+    const getEvents = useQuery(GET_EVENTS, { pollInterval: 300000 });
 
     const [progress, setProgress] = useState(0);
 
@@ -31,22 +31,22 @@ export default function EventsDisplay() {
     }
 
     useEffect(() => {
-            const timer = setInterval(() => {
-                setProgress((oldProgress) => {
-                    var newProgress = oldProgress === 100 ? 0 : Math.min(oldProgress + 1, 100);
-    
-                    if (newProgress < oldProgress) {
-                        handleNextEvent();
-                    }
-    
-                    return newProgress;
-                })
-            }, 200);
-    
-            return () => {
-                clearInterval(timer);
-            };
-        }, []);
+        const timer = setInterval(() => {
+            setProgress((oldProgress) => {
+                var newProgress = oldProgress === 100 ? 0 : Math.min(oldProgress + 1, 100);
+
+                if (newProgress < oldProgress) {
+                    handleNextEvent();
+                }
+
+                return newProgress;
+            })
+        }, 200);
+
+        return () => {
+            clearInterval(timer);
+        };
+    }, []);
 
     return (
         <RequestWrapper2 result={getEvents} render={(data) => {
@@ -60,8 +60,6 @@ export default function EventsDisplay() {
                         <Typography fontSize={100} color="primary" fontWeight="bold" textAlign="center">{event.name.text}</Typography>
                         <Typography variant="h2" color="secondary" fontWeight="bold" textAlign="center">{`${format(new Date(event.start.local), "MMM do, h:mm bb")} - ${format(new Date(event.end.local), "MMM do, h:mm bb")}`}</Typography>
                         <Typography variant="h3" textAlign="center">{event.description.text}</Typography>
-                        <Box flexGrow={1}></Box>
-                        <StyledEventImage src={event.logo.url}/>
                     </Stack>
                 );
             })
@@ -72,14 +70,14 @@ export default function EventsDisplay() {
                 <Stack height="100vh" width="100%" justifyContent="space-between">
                     <Fade in={(progress < 99 && progress > 1) || (false && events.length == 1)} appear={false}>
                         <Box height="100%">
-                        {
-                            eventGraphics.slice(index, index + 1)
-                        }
+                            {
+                                eventGraphics.slice(index, index + 1)
+                            }
                         </Box>
                     </Fade>
-                    <LinearProgress variant="determinate" value={progress} sx={{height: "30px"}}/>
+                    <LinearProgress variant="determinate" value={progress} sx={{ height: "30px" }} />
                 </Stack>
             );
-        }}/>
+        }} />
     );
 };
