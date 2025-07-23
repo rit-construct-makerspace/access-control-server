@@ -149,6 +149,42 @@ const RoomResolvers = {
 
       return user;
     },
+
+    addTrainingToRoom: async (
+      _parent: any,
+      args: {
+        roomID: number,
+        moduleID: number,
+      },
+      {isManagerFor}: ApolloContext
+    ) => {
+      const room = await RoomRepo.getRoomByID(args.roomID);
+      if (!room) {
+        throw new GraphQLError("Room not found");
+      }
+
+      return isManagerFor(room.zoneID ?? -1, () => {
+        RoomRepo.addTrainingToRoom(args.roomID, args.moduleID);
+      })
+    },
+
+    removeTrainingFromRoom: async (
+      _parent: any,
+      args: {
+        roomID: number,
+        moduleID: number,
+      },
+      {isManagerFor}: ApolloContext
+    ) => {
+      const room = await RoomRepo.getRoomByID(args.roomID);
+      if (!room) {
+        throw new GraphQLError("Room not found");
+      }
+
+      return isManagerFor(room.zoneID ?? -1, () => {
+        RoomRepo.removeTrainingFromRoom(args.roomID, args.moduleID);
+      })
+    },
   },
 };
 

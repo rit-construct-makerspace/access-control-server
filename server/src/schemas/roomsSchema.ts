@@ -49,5 +49,7 @@ export const RoomTypeDefs = gql`
 
     swipeIntoRoomWithID(roomID: ID!, id: ID!): User
 
+    addTrainingToRoom(roomID: ID!, moduleID: ID!): [TrainingModule]
+    removeTrainingFromRoom(roomID: ID!, moduleID: ID!): [TrainingModule]
   }
 `;
