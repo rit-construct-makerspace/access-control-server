@@ -27,7 +27,8 @@ export default function ManageMakerspaceTrainings(props: ManageMakerspaceTrainin
 
   function handleNewTraining() {
     if (newTraining == 0) {
-      window.alert("Select a training")
+      window.alert("Select a training");
+      return;
     }
 
     addTraining({ variables: { zoneID: props.makerspaceID, moduleID: newTraining } });

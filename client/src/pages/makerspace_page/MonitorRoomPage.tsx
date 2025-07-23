@@ -9,38 +9,15 @@ import {
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper2 from "../../common/RequestWrapper2";
-import styled from "styled-components";
 import RoomZoneAssociation from "./RoomZoneAssociation";
-import AdminPage from "../AdminPage";
 import { DELETE_ROOM, UPDATE_ROOM_NAME } from "../../queries/roomQueries";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import SaveIcon from '@mui/icons-material/Save';
 import { isManagerFor } from "../../common/PrivilegeUtils";
 import { useIsMobile } from "../../common/IsMobileProvider";
-
-const StyledRecentSwipes = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  overflow-x: hidden;
-  padding: 1px;
-  position: relative;
-
-  // 250px is left nav width. Page has 32px padding (x2). 10px for scrollbars
-  max-width: calc(100vw - 250px - 64px - 10px);
-
-  &:after {
-    content: "";
-    background: linear-gradient(270deg, #fafafa 0%, rgba(250, 250, 250, 0) 50%);
-    position: absolute;
-    pointer-events: none;
-
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-`;
+import { TrainingModule } from "../../common/TrainingModuleUtils";
+import ManageRoomTrainings from "./ManageRoomTrainings";
 
 export const GET_ROOM = gql`
   query GetRoom($id: ID!) {
@@ -72,6 +49,10 @@ export const GET_ROOM = gql`
         numInUse
         byReservationOnly
       }
+      trainingModules {
+        id
+        name
+      }
     }
   }
 `;
@@ -84,8 +65,6 @@ export interface Swipe {
     lastName: string;
   };
 }
-
-const url = "/admin/equipment/";
 
 export default function ManageRoomPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
@@ -103,7 +82,7 @@ export default function ManageRoomPage() {
 
   async function handleUpdateRoomName() {
     await updateRoomName({
-      variables: {id: roomID, name: roomName}
+      variables: { id: roomID, name: roomName }
     })
     navigate(`/makerspace/${makerspaceID}/edit`)
   }
@@ -112,7 +91,7 @@ export default function ManageRoomPage() {
     const confirm = window.confirm("Are you sure you want to delete? This cannot be undone.");
     if (confirm) {
       await deleteRoom({
-        variables: {id: roomID}
+        variables: { id: roomID }
       })
       navigate(`/makerspace/${makerspaceID}/edit`)
     }
@@ -135,32 +114,36 @@ export default function ManageRoomPage() {
           initState(room);
         }
 
+        const roomTrainings: TrainingModule[] = room.trainingModules;
+
         return (
-        <Box>
-          <title>{`Manage ${room.name} | Make @ RIT`}</title>
-          <Stack direction="column" spacing={2} margin="25px">
-            <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? undefined : "space-between"} alignItems="flex-end" spacing={2}>
-              <Typography variant={"h4"}>Manage {room.name} [ID: {roomID}]</Typography>
-              {
-                isManagerFor(user, Number(roomID))
-                ? <Button color="error" variant="contained" startIcon={<DeleteIcon/>} onClick={handleDeleteRoom}>
-                  Delete Room
-                </Button>
-                : null
-              }
-            </Stack>
-            <Stack direction={isMobile ? "column" : "row"} width="auto" spacing={2}>
-              <Stack spacing={2} width={isMobile ? "auto" : "50%"} alignItems="flex-end">
-                <TextField label="Name" value={roomName} onChange={(e) => (setRoomName(e.target.value))} fullWidth/>
-                <Button variant="contained" startIcon={<SaveIcon/>} size="large" onClick={handleUpdateRoomName}>Update Room Name</Button>
+          <Box margin={"20px"}>
+            <title>{`Manage ${room.name} | Make @ RIT`}</title>
+            <Stack direction="column" spacing={2}>
+              <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? undefined : "space-between"} alignItems="flex-end" spacing={2}>
+                <Typography variant={"h4"}>Manage {room.name} [ID: {roomID}]</Typography>
+                {
+                  isManagerFor(user, Number(roomID))
+                    ? <Button color="error" variant="contained" startIcon={<DeleteIcon />} onClick={handleDeleteRoom}>
+                      Delete Room
+                    </Button>
+                    : null
+                }
               </Stack>
-              <Stack spacing={2} width={isMobile ? "auto" : "50%"}>
-                <RoomZoneAssociation zoneID={room.zone?.id} roomID={Number(roomID)}></RoomZoneAssociation>
+              <Stack direction={isMobile ? "column" : "row"} width="auto" spacing={2}>
+                <Stack spacing={2} width={isMobile ? "auto" : "50%"} alignItems="flex-end">
+                  <TextField label="Name" value={roomName} onChange={(e) => (setRoomName(e.target.value))} fullWidth />
+                  <Button variant="contained" startIcon={<SaveIcon />} size="large" onClick={handleUpdateRoomName}>Update Room Name</Button>
+                  <ManageRoomTrainings roomID={Number(roomID)} trainings={roomTrainings} />
+                </Stack>
+                <Stack spacing={2} width={isMobile ? "auto" : "50%"}>
+                  <RoomZoneAssociation zoneID={room.zone?.id} roomID={Number(roomID)}></RoomZoneAssociation>
+                </Stack>
               </Stack>
             </Stack>
-          </Stack>
-        </Box>
-      )}}
+          </Box>
+        )
+      }}
     />
   );
 }
