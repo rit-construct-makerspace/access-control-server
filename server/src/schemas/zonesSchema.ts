@@ -36,6 +36,6 @@ export const ZonesTypeDefs = gql`
     addZone(name: String!): Zone
     updateZone(id: ID!, newZone: ZoneInput): Zone
     addTrainingToZone(zoneID: ID!, moduleID: ID!): [TrainingModule]
-    removeTrainingFromZone(zoneID: ID!, moduleID: ID!): [TraingingModule]
+    removeTrainingFromZone(zoneID: ID!, moduleID: ID!): [TrainingModule]
   }
 `;
