@@ -26,6 +26,7 @@ export const RoomTypeDefs = gql`
     equipment: [Equipment]
     recentSwipes: [Swipe]
     mentors: [User]
+    trainingModules: [TrainingModule]
   }
 
   input RoomInput {

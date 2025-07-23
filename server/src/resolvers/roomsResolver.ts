@@ -32,6 +32,10 @@ const RoomResolvers = {
         user: await UserRepo.getUserByID(s.userID),
       }));
     },
+
+    trainingModules: async (parent: Room) => {
+      return await RoomRepo.getModulesByRoom(parent.id);
+    },
   },
 
   Query: {
