@@ -12,12 +12,26 @@ export async function up(knex: Knex): Promise<void> {
                 .onUpdate("CASCADE")
                 .onDelete("CASCADE");
             t.primary(["roomID", "moduleID"]);
-        })
+        });
+    }
+
+    const MakerspaceTrainingTableExists = await knex.schema.hasTable("ModulesForRooms");
+    if (!MakerspaceTrainingTableExists) {
+        knex.schema.createTable("ModulesForMakerspaces", (t) => {
+            t.integer("makerspaceID").references("id").inTable("Zones").notNullable()
+                .onUpdate("CASCADE")
+                .onDelete("CASCADE");
+            t.integer("moduleID").references("id").inTable("TrainingModule").notNullable()
+                .onUpdate("CASCADE")
+                .onDelete("CASCADE");
+            t.primary(["makerspaceID", "moduleID"]);
+        });
     }
 }
 
 
 export async function down(knex: Knex): Promise<void> {
-    return knex.schema.dropTableIfExists("ModulesForRooms");
+    knex.schema.dropTableIfExists("ModulesForRooms");
+    knex.schema.dropTableIfExists("ModulesForMakerspaces");
 }
 
