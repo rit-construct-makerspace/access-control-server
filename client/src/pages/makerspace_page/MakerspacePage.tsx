@@ -65,7 +65,7 @@ export default function MakerspacePage() {
                             <Typography variant="h6">Makerspace Trainings</Typography>
                             {
                                 zoneTrainings.some((ms) => (ms.status != "Passed" && ms.status != "Expiring Soon"))
-                                    ? <Alert severity="error" variant="filled">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
+                                    ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
                                     : null
                             }
                         </Stack>

@@ -70,7 +70,7 @@ export async function getZoneStaff(zoneID: number): Promise<number[]> {
 }
 
 export async function getTrainingsByZone(zoneID: number): Promise<TrainingModuleRow[]> {
-    return await knex("ModulesForMakerspaces").join("TrainingModule", "TrainingModule.id", "ModulesForMakerspaces.moduleID").select("TrainingModule.*").where("ModulesForMakerspaces.makerspaceID", zoneID);
+    return await knex("ModulesForMakerspaces").join("TrainingModule", "TrainingModule.id", "ModulesForMakerspaces.moduleID").select("TrainingModule.*").where("ModulesForMakerspaces.makerspaceID", zoneID).orderBy("TrainingModule.name", "asc");
 }
 
 export async function addTrainingToZone(zoneID: number, moduleID: number): Promise<TrainingModuleRow[]> {

@@ -173,7 +173,7 @@ export async function hasSwipedToday(roomID: number, userID: number): Promise<bo
 
 
 export async function getModulesByRoom(roomID: number): Promise<TrainingModuleRow[]> {
-  return await knex("ModulesForRooms").join("TrainingModule", "TrainingModule.id", "ModulesForRooms.moduleID").select("TrainingModule.*").where("ModulesForRooms.roomID", roomID);
+  return await knex("ModulesForRooms").join("TrainingModule", "TrainingModule.id", "ModulesForRooms.moduleID").select("TrainingModule.*").where("ModulesForRooms.roomID", roomID).orderBy("TrainingModule.name", "asc");;
 }
 
 export async function addTrainingToRoom(roomID: number, moduleID: number): Promise<TrainingModuleRow[]> {
