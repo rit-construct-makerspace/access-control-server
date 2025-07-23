@@ -31,26 +31,31 @@ export default function EquipmentCard(props: EquipmentCardProps) {
     );
 
     return (
-        <Card sx={{ width: props.isMobile ? "350px" : "600px", minHeight: "350px", backgroundColor: props.equipment.archived ? theme.palette.error.light : undefined }}>
-            <Stack>
-                <Stack direction="row" height="200px">
-                    {props.isMobile ? null :
-                        <Stack alignItems="center">
-                            <Box width="150px" height="175px">
-                                <CardMedia
-                                    component="img"
-                                    image={(props.equipment.imageUrl == undefined || props.equipment.imageUrl == null || props.equipment.imageUrl == "") ? process.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : "" + process.env.REACT_APP_CDN_URL + process.env.REACT_APP_CDN_EQUIPMENT_DIR + "/" + props.equipment.imageUrl}
-                                    alt={`Picture of ${props.equipment.name}`}
-                                    sx={{ width: "150px", height: "175px", backgroundColor: "lightgray" }}
-                                />
-                            </Box>
-                            {isPriviledged ? <Typography variant="body2">ID {props.equipment.id}</Typography> : null}
-                        </Stack>
-                    }
-                    <CardContent sx={{ width: "100%", height: "100%" }}>
-                        <Stack height="100%">
+        <Card sx={{
+            width: props.isMobile ? "350px" : "600px",
+            backgroundColor: props.equipment.archived ? theme.palette.error.light : undefined,
+            height: "100%"
+        }}>
+            <CardContent sx={{ width: "100%", height: "100%" }}>
+                <Stack height={"100%"}>
+                    <Stack direction="row" height="200px">
+                        {props.isMobile ? null :
+                            <Stack alignItems="center">
+                                <Box width="150px" height="175px">
+                                    <CardMedia
+                                        component="img"
+                                        image={(props.equipment.imageUrl == undefined || props.equipment.imageUrl == null || props.equipment.imageUrl == "") ? process.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : "" + process.env.REACT_APP_CDN_URL + process.env.REACT_APP_CDN_EQUIPMENT_DIR + "/" + props.equipment.imageUrl}
+                                        alt={`Picture of ${props.equipment.name}`}
+                                        sx={{ width: "150px", height: "175px", backgroundColor: "lightgray" }}
+                                    />
+                                </Box>
+                                {isPriviledged ? <Typography variant="body2">ID {props.equipment.id}</Typography> : null}
+                            </Stack>
+                        }
+
+                        <Stack height="100%" width={"100%"}>
                             {/* Title & Edit button */}
-                            <Stack direction="row" justifyContent="space-between">
+                            <Stack direction="row" justifyContent="space-between" pl={"10px"}>
                                 <Typography variant="h6">{props.equipment.archived ? `${props.equipment.name} (Hidden)` : props.equipment.name}</Typography>
                                 {
                                     isPriviledged
@@ -103,7 +108,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                                     }
                                 </Stack>
                                 {/* Num available || by reservation only */}
-                                <Box width="120px" height="100%">
+                                <Stack width="120px" height="100%" justifyContent={"center"} alignItems={"center"}>
                                     {props.equipment.byReservationOnly
                                         ? <Typography variant="subtitle1" ml={1}>
                                             Reservation only. Email <Link to={"mailto:make@rit.edu"} target={"_blank"}>make@rit.edu</Link> to schedule.
@@ -120,15 +125,13 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                                             :
                                             <></>
                                     }
-                                </Box>
+                                </Stack>
                             </Stack>
 
                         </Stack>
-                    </CardContent>
-                </Stack>
-                <CardContent>
+                    </Stack>
                     {/* Desc && learn more */}
-                    <Stack>
+                    <Stack justifyContent={"space-between"} height={"inherit"}>
                         <Typography>
                             <ReactMarkdown>{props.equipment.notes}</ReactMarkdown>
                         </Typography>
@@ -142,8 +145,8 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                             Learn More
                         </Button>
                     </Stack>
-                </CardContent>
-            </Stack>
+                </Stack>
+            </CardContent>
         </Card>
     );
 }
