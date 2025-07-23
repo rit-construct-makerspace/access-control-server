@@ -11,6 +11,7 @@ import {
 import assert from "assert";
 import { RoomSwipeRow, TrainingModuleRow } from "../../db/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
+import * as ModuleRepo from "../Training/ModuleRepository.js";
 
 
 /**
@@ -184,4 +185,17 @@ export async function addTrainingToRoom(roomID: number, moduleID: number): Promi
 export async function removeTrainingFromRoom(roomID: number, moduleID: number): Promise<TrainingModuleRow[]> {
   await knex("ModulesForRooms").where({roomID: roomID, moduleID: moduleID}).delete();
   return await getModulesByRoom(roomID);
+}
+
+export async function hasRoomTrainings(roomID: number, userID: number): Promise<boolean> {
+  let modules = await getModulesByRoom(roomID);
+    for (let i = 0; i < modules.length; i++) {
+      if (await ModuleRepo.hasPassedModule(userID, modules[i].id)) {
+        continue;
+      } else {
+        return false;
+      }
+    }
+
+  return true;
 }
