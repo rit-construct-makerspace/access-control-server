@@ -9,6 +9,7 @@ import { useCurrentUser } from "../../common/CurrentUserProvider";
 import { isManagerFor } from "../../common/PrivilegeUtils";
 import { useState } from "react";
 import { GET_ROOM } from "./MonitorRoomPage";
+import { useParams } from "react-router-dom";
 
 interface ManageRoomTrainingsProps {
     roomID: number;
@@ -31,6 +32,7 @@ export const REMOVE_TRAINING_FROM_ROOM = gql`
   }
 `;
 export default function ManageRoomTrainings(props: ManageRoomTrainingsProps) {
+    const { makerspaceID } = useParams<{ makerspaceID: string }>();
     const currentUser = useCurrentUser();
 
     const getModuleResults = useQuery(GET_TRAINING_MODULES);
@@ -76,7 +78,7 @@ export default function ManageRoomTrainings(props: ManageRoomTrainingsProps) {
                 const rawModules: [TrainingModule] = data.modules;
                 const possibleModuels = rawModules.filter((possible) =>
                 (
-                    (possible.makerspaceID == null || isManagerFor(currentUser, possible.makerspaceID)) && // Has permission to use this training
+                    (possible.makerspaceID == null || possible.makerspaceID == Number(makerspaceID)) && // Has permission to use this training
                     !props.trainings.some((existing) => existing.id == possible.id) // This training is not already assigned to the makerspace
                 ))
 

@@ -6,7 +6,7 @@ import RequestWrapper2 from "../../common/RequestWrapper2";
 import { useEffect, useState } from "react";
 import ZoneHours from "./ZoneHours";
 import RoomSection from "./RoomSection";
-import { FullRoom } from "../../types/Room";
+import Room, { FullRoom } from "../../types/Room";
 import SearchBar from "../../common/SearchBar";
 import StaffBar from "./StaffBar";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
@@ -60,40 +60,43 @@ export default function MakerspacePage() {
                     </Stack>
                     <ZoneHours hours={fullZone.hours} isMobile={isMobile} />
                     <StaffBar />
-                    <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
-                        <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
-                            <Typography variant="h6">Makerspace Trainings</Typography>
-                            {
-                                zoneTrainings.some((ms) => (ms.status != "Passed" && ms.status != "Expiring Soon"))
-                                    ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
-                                    : null
-                            }
+                    {
+                        zoneTrainings.length > 0 &&
+                        <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
+                            <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
+                                <Typography variant="h6">Makerspace Trainings</Typography>
+                                {
+                                    zoneTrainings.some((ms) => (ms.status != "Passed" && ms.status != "Expiring Soon"))
+                                        ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
+                                        : null
+                                }
+                            </Stack>
+                            <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                                {
+                                    zoneTrainings.map((ms: ModuleStatus) => (
+                                        <CardActionArea onClick={() => navigate(`/maker/training/${ms.moduleID}`)} sx={{ width: "max-content" }}>
+                                            <Stack direction="row" spacing={1} alignItems="center" padding="10px">
+                                                {
+                                                    ms.status === "Passed"
+                                                        ? <CheckCircleIcon color="success" />
+                                                        : ms.status === "Not taken"
+                                                            ? <CloseIcon color="error" />
+                                                            : ms.status === "Expired"
+                                                                ? <WarningIcon color="warning" />
+                                                                : ms.status === "Expiring Soon"
+                                                                    ? <HourglassBottomIcon color="warning" />
+                                                                    : ms.status === "Locked"
+                                                                        ? <LockClockIcon color="error" />
+                                                                        : null
+                                                }
+                                                <Typography variant="body1">{ms.moduleName}</Typography>
+                                            </Stack>
+                                        </CardActionArea>
+                                    ))
+                                }
+                            </Stack>
                         </Stack>
-                        <Stack direction={"row"} spacing={1} alignItems={"center"}>
-                            {
-                                zoneTrainings.map((ms: ModuleStatus) => (
-                                    <CardActionArea onClick={() => navigate(`/maker/training/${ms.moduleID}`)} sx={{ width: "max-content" }}>
-                                        <Stack direction="row" spacing={1} alignItems="center" padding="10px">
-                                            {
-                                                ms.status === "Passed"
-                                                    ? <CheckCircleIcon color="success" />
-                                                    : ms.status === "Not taken"
-                                                        ? <CloseIcon color="error" />
-                                                        : ms.status === "Expired"
-                                                            ? <WarningIcon color="warning" />
-                                                            : ms.status === "Expiring Soon"
-                                                                ? <HourglassBottomIcon color="warning" />
-                                                                : ms.status === "Locked"
-                                                                    ? <LockClockIcon color="error" />
-                                                                    : null
-                                            }
-                                            <Typography variant="body1">{ms.moduleName}</Typography>
-                                        </Stack>
-                                    </CardActionArea>
-                                ))
-                            }
-                        </Stack>
-                    </Stack>
+                    }
                     <Stack padding={"10px"} direction="row" spacing={2}>
                         <SearchBar
                             placeholder="Search Equipment"
@@ -110,7 +113,7 @@ export default function MakerspacePage() {
                         }
                     </Stack>
 
-                    {fullZone.rooms.map((room: FullRoom) => (
+                    {fullZone.rooms.map((room: Room) => (
                         <RoomSection room={room} equipmentSearch={equipmentSearch} isMobile={isMobile} staffMode={staffMode} />
                     ))}
                 </Stack>

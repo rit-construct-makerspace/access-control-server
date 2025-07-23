@@ -113,6 +113,10 @@ export const GET_ZONE_BY_ID = gql`
           notes
           archived
         }
+        trainingModules {
+          id
+          name
+        }
       }
       trainingModules {
         id
