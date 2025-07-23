@@ -46,7 +46,6 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
         <RequestWrapper loading={unpairedReaderResult.loading || pairedWelcomeReaderResult.loading} error={unpairedReaderResult.error || pairedWelcomeReaderResult.error}>
             <Stack spacing={2}>
                 <Typography variant="h5">Welcome Readers</Typography>
-                <hr />
                 <Stack direction={"column"} spacing={2}>
                     {
                         (pairedReaders && pairedReaders.length > 0) ?
