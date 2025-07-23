@@ -18,6 +18,7 @@ export const ZonesTypeDefs = gql`
     rooms: [Room]
     hours: [ZoneHours]
     imageUrl: String
+    trainingModules: [TrainingModule]
   }
 
   input ZoneInput {

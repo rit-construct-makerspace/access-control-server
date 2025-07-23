@@ -4,7 +4,7 @@
  */
 
 import { knex } from "../../db/index.js";
-import { ZoneRow } from "../../db/tables.js";
+import { TrainingModuleRow, ZoneRow } from "../../db/tables.js";
 import { ZoneInput } from "../../schemas/zonesSchema.js";
 
 
@@ -67,4 +67,8 @@ export async function getZoneManagers(zoneID: number): Promise<number[]> {
 
 export async function getZoneStaff(zoneID: number): Promise<number[]> {
     return await knex("Managers").where({makerspaceID: zoneID}).select("userID");
+}
+
+export async function getTrainingsByZone(zoneID: number): Promise<TrainingModuleRow[]> {
+    return await knex("ModulesForMakerspaces").join("TrainingModule", "TrainingModule.id", "ModulesForMakerspaces.moduleID").select("TrainingModule.*").where("ModulesForMakerspaces.makerspaceID", zoneID);
 }
