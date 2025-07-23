@@ -3,9 +3,8 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
   Checkbox,
-  IconButton,
+  Divider,
   Link,
   MenuItem,
   Select,
@@ -21,8 +20,8 @@ import TimeAgo from 'react-timeago'
 import { DELETE_READER, GET_READERS, IDENTIFY_READER, Reader, SET_READER_STATE } from "../../../queries/readersQueries";
 
 interface ReaderCardProps {
-    reader: Reader
-    makerspaceID: string,
+  reader: Reader
+  makerspaceID: string,
 }
 
 
@@ -46,7 +45,7 @@ const nullUser = {
   lastname: ""
 }
 
-export default function ReaderCard({reader, makerspaceID}: ReaderCardProps) {
+export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
   const readerUser = reader.user ?? nullUser
 
   const stateContent = reader.state === "Active" ? (
@@ -54,22 +53,22 @@ export default function ReaderCard({reader, makerspaceID}: ReaderCardProps) {
   ) : (
     <p>Last User: {readerUser.id != null ? (<AuditLogEntity entityCode={`user:${readerUser.id}:${readerUser.firstName} ${readerUser.lastName}`}></AuditLogEntity>) : "NULL"}<br></br>Session Length: {reader.recentSessionLength} sec</p>
   );
-  
+
   const machineResult = useQuery(GET_CORRESPONDING_MACHINE_BY_READER_ID_OR_MACHINE_ID, {
-      variables: {readerid: reader.id, id: reader.machineID }
-    });
+    variables: { readerid: reader.id, id: reader.machineID }
+  });
   const machine = machineResult?.data?.correspondingEquipment;
-    
+
   const now = new Date();
   const lastTimeDifference = now.getTime() - (new Date(reader.lastStatusTime).getTime());
 
-  const [setReaderState]= useMutation(SET_READER_STATE);
+  const [setReaderState] = useMutation(SET_READER_STATE);
   const handleChange = (event: any) => {
     // If the value was the informational one, ignore it
-    if (event.target.value === "State"){
+    if (event.target.value === "State") {
       return;
     }
-    setReaderState({variables: {id: reader.id, state: event.target.value}});
+    setReaderState({ variables: { id: reader.id, state: event.target.value } });
   };
 
   const [doIdentify] = useMutation(IDENTIFY_READER)
@@ -81,24 +80,26 @@ export default function ReaderCard({reader, makerspaceID}: ReaderCardProps) {
 
   return (
     <RequestWrapper
-    loading={machineResult.loading}
-    error={machineResult.error}
+      loading={machineResult.loading}
+      error={machineResult.error}
     >
-      <Card sx={{ width: 350, minHeight: 600, border: (reader.lastStatusReason == "Error" || reader.lastStatusReason == "Temperature" ? styles.errorCard : reader.helpRequested ? styles.notifCard : "")}}>
-        <CardHeader
-          title={reader.name}
-          subheader={`SN: ${reader.SN}`}
-          action={
-            <Button color="error" variant="contained" onClick={() => {
+      <Card sx={{ width: 350, minHeight: 600, border: (reader.lastStatusReason == "Error" || reader.lastStatusReason == "Temperature" ? styles.errorCard : reader.helpRequested ? styles.notifCard : "") }}>
+        <CardContent>
+          <Stack direction={"row"} justifyContent={"space-between"}  paddingBottom={"5px"}>
+            <Typography variant="h5">{reader.name}</Typography>
+
+            <Button variant="contained" color="error" size="small" onClick={() => {
               if (window.confirm(`Are you sure you want to delete ${reader.name}`)) {
                 deleteReader({ variables: { id: reader.id } });
               }
-            }}>
-              <DeleteIcon />
-            </Button>}
-        >
-        </CardHeader>
-        <CardContent>
+            }}><DeleteIcon />
+            </Button>
+          </Stack>
+          <Typography variant="subtitle2" textOverflow={"scroll"}>
+            <b>SN:</b> {reader.SN}
+          </Typography>
+
+
           <Typography
             variant="body2"
             component="div"
@@ -107,10 +108,10 @@ export default function ReaderCard({reader, makerspaceID}: ReaderCardProps) {
           >
             <b>Reader ID: </b>{reader.id}
             <br></br>
-            <b>Machine: </b> 
+            <b>Machine: </b>
             {
-              (machine) ? 
-                <Link href={"/app/admin/equipment/"+(machine.archived ? "/archived" : "")+(machine.id)}> {machine.name}</Link>
+              (machine) ?
+                <Link href={"/app/admin/equipment/" + (machine.archived ? "/archived" : "") + (machine.id)}> {machine.name}</Link>
                 : "Not paired"
             }
 
@@ -118,73 +119,73 @@ export default function ReaderCard({reader, makerspaceID}: ReaderCardProps) {
           </Typography>
           <Card variant="outlined">
             <CardContent>
-                <Typography
-                    variant="h6"
-                    component="div"
-                    sx={{ lineHeight: 1, mb: 1 }}
-                    noWrap
-                >
-                    Temp (&#176;C)
-                </Typography>
-                <Typography
-                    variant="h3"
-                    component="div"
-                    sx={{ lineHeight: 1, mb: 1 }}
-                    align="center"
-                    noWrap
-                >
-                    {reader.temp}
-                </Typography>
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ lineHeight: 1, mb: 1 }}
+                noWrap
+              >
+                Temp (&#176;C)
+              </Typography>
+              <Typography
+                variant="h3"
+                component="div"
+                sx={{ lineHeight: 1, mb: 1 }}
+                align="center"
+                noWrap
+              >
+                {reader.temp}
+              </Typography>
             </CardContent>
           </Card>
           <Card variant="outlined">
             <CardContent>
-            <Typography
-                    variant="h6"
-                    component="div"
-                    sx={{ lineHeight: 1, mb: 1 }}
-                    noWrap
-                >
-                    State
-                </Typography>
-                <Typography
-                    variant="h4"
-                    component="div"
-                    sx={{ lineHeight: 1, mb: 1 }}
-                    noWrap
-                    align="center"
-                >
-                    {reader.state == null ? "NULL" : reader.state}
-                </Typography>
+              <Typography
+                variant="h6"
+                component="div"
+                sx={{ lineHeight: 1, mb: 1 }}
+                noWrap
+              >
+                State
+              </Typography>
+              <Typography
+                variant="h4"
+                component="div"
+                sx={{ lineHeight: 1, mb: 1 }}
+                noWrap
+                align="center"
+              >
+                {reader.state == null ? "NULL" : reader.state}
+              </Typography>
             </CardContent>
           </Card>
           <br />
           <Stack>
             <Typography
-                variant="body2"
-                component="div"
-                sx={{ lineHeight: 1, mb: 1 }}
-                noWrap
+              variant="body2"
+              component="div"
+              sx={{ lineHeight: 1, mb: 1 }}
+              noWrap
             >
               {/* @ts-ignore */}
               <b>Last Status:</b> <span style={{ fontWeight: lastTimeDifference > 60000 ? 'bold' : 'regular', color: lastTimeDifference > 60000 ? 'red' : 'inherit' }}><TimeAgo date={reader.lastStatusTime} locale="en-US" /></span>
             </Typography>
             <Typography
-                variant="body2"
-                component="div"
-                sx={{ lineHeight: 1, mb: 1 }}
-                noWrap
-            >
-              <b>Reason:</b> <span  style={(reader.lastStatusReason == "Error" || reader.lastStatusReason == "Temperature") ? styles.errorText : {}}>{reader.lastStatusReason}</span><br></br>
-            </Typography>
-          </Stack>
-          <Typography
               variant="body2"
               component="div"
               sx={{ lineHeight: 1, mb: 1 }}
               noWrap
+            >
+              <b>Reason:</b> <span style={(reader.lastStatusReason == "Error" || reader.lastStatusReason == "Temperature") ? styles.errorText : {}}>{reader.lastStatusReason}</span><br></br>
+            </Typography>
+          </Stack>
+          <Typography
+            variant="body2"
+            component="div"
+            sx={{ lineHeight: 1, mb: 1 }}
+            noWrap
           >
-              {stateContent}
+            {stateContent}
             <Stack direction="row" justifyContent={"space-between"} alignItems={"center"}>
               Identify Reader
               <Checkbox onChange={(e, checked) => handleIdentifyChecked(checked)}></Checkbox>
@@ -200,6 +201,7 @@ export default function ReaderCard({reader, makerspaceID}: ReaderCardProps) {
               <MenuItem value="Lockout">Lockout</MenuItem>
               <MenuItem value="Fault">Fault</MenuItem>
               <MenuItem value="Startup">Startup</MenuItem>
+              <MenuItem value="Welcoming">Welcoming</MenuItem>
               <MenuItem value="Restart">Restart</MenuItem>
             </Select>
             <Box>

@@ -1,20 +1,22 @@
 import { Request } from "express";
 import * as ws from "ws";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
-import { createReaderFromSN, getReaderByID, getReaderByName, getReaderBySN, submitReaderLog, submitReaderLogWithInstance, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
+import { createReaderFromSN, getMakerspaceOfWelcomeReader, getReaderByID, getReaderByName, getReaderBySN, getReaderPairStatus, PairStatus, submitReaderLog, submitReaderLogWithInstance, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
 import { EquipmentRow, ReaderRow, UserRow } from "./db/tables.js";
-import { getUserByCardTagID, getUserManagerPerms, getUsersFullName } from "./repositories/Users/UserRepository.js";
-import { getEquipmentByID, getMissingTrainingModules, hasAccessByID } from "./repositories/Equipment/EquipmentRepository.js";
+import { getEquipmentByID, getMissingTrainingModules, hasAccessByID, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
+import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
-import { getRoomByID, hasSwipedToday } from "./repositories/Rooms/RoomRepository.js";
+import { getRoomByID, getRoomsByZone, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
-import { getInstanceByReaderID, getReaderByInstanceId } from "./repositories/Equipment/EquipmentInstancesRepository.js";
+import { getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstancesRepository.js";
 import { randomInt } from "crypto";
 import { generateRandomHumanName } from "./data/humanReadableNames.js";
 import { generateShlugKey } from "./resolvers/readersResolver.js";
 import { hasActiveHolds } from "./repositories/Holds/HoldsRepository.js";
 import { hasRestriction } from "./repositories/Restrictions/RestrictionsRepository.js";
+import { isManagerFor } from "./context.js";
+import { getZoneByID } from "./repositories/Zones/ZonesRespository.js";
 
 
 const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
@@ -193,10 +195,11 @@ function initConnectionData(ws: ws.WebSocket): ConnectionData {
  * @param inResponse the response so far to add to
  * @returns the response message
  */
-async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
+async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
     try {
         // We should always return Auth to show we are an auth response
         inResponse.Auth = uid;
+        inResponse.AuthTo = "Unlocked";
 
         const reader = await getReaderByID(readerId);
         if (reader == null) {
@@ -313,7 +316,7 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
         }
 
         //Check that all required trainings are passed
-        if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasAccessByID(user.id, machine.id))) {
+        if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasTrainingModules(user, machine.id))) {
             const incompleteTrainings = await getMissingTrainingModules(user, machine.id);
             var incompleteTrainingsStr = ""
             incompleteTrainings.forEach((module, i) => {
@@ -364,6 +367,113 @@ async function authorizeUid(uid: string, readerId: number, inResponse: ShlugResp
     }
 }
 
+async function welcomeUID(uid: string, readerID: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
+    inResponse.Auth = uid;
+    inResponse.AuthTo = "Welcomed";
+
+    const reader = await getReaderByID(readerID);
+    const user = await getUserByCardTagID(uid);
+
+    const makerspace = await getMakerspaceOfWelcomeReader(readerID);
+    if (makerspace == null) {
+        await wsApiLog("failed to welcome {user} with {access_device}. Reader not paired with makerspace", "status", { id: user?.id ?? 0, label: user ? getUsersFullName(user) : "Unknown User" }, { id: readerID, label: reader?.name ?? "unknown reader" });
+        inResponse.Error = "Not paired with makerspace";
+        inResponse.Verified = 0;
+        return inResponse;
+    }
+
+    if (user == null) {
+        inResponse.Error = "user not found";
+        inResponse.Verified = 0;
+        // TODO: Report as such
+        wsApiLog("UID {conceal} failed to swipe into {makerspace} with error {error}", "welcome", { id: 0, label: uid }, { id: makerspace.id, label: makerspace.name }, { id: 406, label: "User does not exist" });
+        return inResponse;
+    }
+    try {
+        const rooms = await getRoomsByZone(makerspace.id);
+        for (let i = 0; i < rooms.length; i++) {
+            // TODO: MakerspaceSwipes not RoomSwipes
+            await swipeIntoRoom(rooms[i].id, user.id);
+        }
+        inResponse.Verified = 1;
+        await wsApiLog("{user} has signed into {makerspace}", "welcome", { id: user.id, label: getUsersFullName(user) }, { id: makerspace.id, label: makerspace.name });
+    } catch (e) {
+        inResponse.Verified = 0;
+        inResponse.Error = "Server Error";
+        await wsApiLog(`{user} failed to sign into {makerspace} with exception ${JSON.stringify(e)}`, "welcome", {id: user.id, label: getUsersFullName(user)}, {id: makerspace.id, label: makerspace.name})
+    }
+
+
+    return inResponse;
+}
+
+async function authorizeUidToStateChange(uid: string, toState: string, readerId: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
+    inResponse.Auth = uid;
+    const user = await getUserByCardTagID(uid);
+
+    if (user == null) {
+        inResponse.Error = "User not found";
+        inResponse.Verified = 0;
+        await wsApiLog(`UID {conceal} could not set state to ${toState}. No such user`, "status", { id: 0, label: uid });
+        return inResponse;
+    }
+    const ulabel = { id: user.id, label: getUsersFullName(user) };
+    const reader = await getReaderByID(readerId);
+    if (reader == null) {
+        inResponse.Error = "Reader not found";
+        inResponse.Verified = 0;
+        wsApiLog("Could not set state. Programming error trying to find reader", "status");
+        return inResponse;
+    }
+    const rlabel = { id: reader.id, label: reader.name };
+
+    if (!["Idle", "Lockout", "AlwaysOn"].includes(toState)) {
+        inResponse.Error = "Invalid target state";
+        inResponse.Verified = 0;
+        await wsApiLog(`{user} could not set state to ${toState}. {error}`, "status", ulabel, { id: 0, label: "Invalid State" });
+        return inResponse;
+    }
+
+    const instance = await getInstanceByReaderID(readerId);
+    if (instance == null) {
+        inResponse.Error = "Not paired with instance";
+        inResponse.Verified = 0;
+        await wsApiLog(`{user} could not set state to ${toState}. {error}`, "status", ulabel, { id: 0, label: "Not paired with instance" });
+        return inResponse;
+    }
+
+    const equipment = await getEquipmentByID(instance.equipmentID);
+    const room = await getRoomByID(equipment.roomID);
+    const makerspace = await getZoneByID(room?.zoneID ?? 0);
+
+    if (equipment == null || room == null || makerspace == null) {
+        inResponse.Error = "Programmer Error";
+        inResponse.Verified = 0;
+
+        return inResponse;
+    }
+    const elabel = { id: equipment.id, label: equipment.name };
+
+    const canUnlockBcAdmin = user.admin;
+    const canUnlockBcManager = makerspace?.id ? (await getUserManagerPerms(user.id)).includes(makerspace.id) : false;
+    const canUnlockBcStaff = makerspace?.id ? (await getUserStaffPerms(user.id)).includes(makerspace.id) : false
+    const canUnlock = canUnlockBcAdmin || canUnlockBcManager || canUnlockBcStaff;
+
+
+    if (canUnlock) {
+        const level = canUnlockBcAdmin ? "ADMIN" : (canUnlockBcManager ? "MANAGER" : "STAFF");
+        await wsApiLog(`{user} set {equipment}-:{reader} with ${level} priveleges`, "status", ulabel, elabel, rlabel)
+        inResponse.Verified = 1;
+        inResponse.AuthTo = toState;
+        return inResponse;
+    } else {
+        await wsApiLog(`{user} failed to set {equipment}:{reader} to ${toState}. {error}`, "status", ulabel, elabel, rlabel, { id: 0, label: "Insuffecient Permissions!" })
+        inResponse.Error = "Insuffecient Perms";
+        inResponse.Verified = 0;
+        return inResponse;
+    }
+}
+
 /**
  * Finds and packages data requested by the shlug from the server
  * @param connData state of the connection
@@ -379,16 +489,21 @@ async function handleRequest(connData: ConnectionData | undefined, requested_val
                 break;
             case "State":
                 const reader: ReaderRow | undefined = await getReaderByID(connData?.readerId ?? 0);
-                if (reader?.state) {
-                    if (["Lockout", "Welcoming"].includes(reader.state)) {
-                        obj.State = reader.state;
-                    } else {
-                        obj.State = "Idle"
-                    }
-
-                } else {
+                if (reader?.id == null) {
                     wsApiLog(`Couldn't find requested reader information for id ${connData?.readerId}. Telling Idle`, "State")
                     obj.State = "Idle";
+                } else {
+                    const pairStatus: PairStatus = await getReaderPairStatus(reader.id);
+                    if (pairStatus == PairStatus.PairedAsWelcomer) {
+                        obj.State = "Welcoming";
+                    } else if (reader.state) {
+                        if (["Lockout", "Welcoming"].includes(reader.state)) {
+                            obj.State = reader.state;
+                        } else {
+                            obj.State = "Idle"
+                        }
+
+                    }
                 }
                 break;
             default:
@@ -412,6 +527,9 @@ interface ShlugMessage {
     UID?: string; // Reason for switching to that state
 
     Auth?: string; // UID to authorize
+    AuthTo?: string // state that the person wants to go to
+
+    Temp?: number
 
     Seq: number;
     Key?: string;
@@ -420,6 +538,7 @@ interface ShlugMessage {
 interface ShlugResponse {
     Seq: number
     Auth?: string
+    AuthTo?: string
     Verified?: number
     Role?: string
     Error?: string
@@ -512,7 +631,7 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
     }
     var reader: ReaderRow | undefined = await getReaderBySN(message.SerialNumber ?? "");
     if (reader?.pairTime == null || reader?.SN == null) {
-        wsApiLog(`WSACS: Request from unpaired shlug ${srcIp}. Denying`, "status");
+        wsApiLog(`WSACS: Request from unpaired shlug ${srcIp} (SN: ${reader?.SN}). Denying`, "status");
         console.error(`WSACS: Request from unpaired shlug ${srcIp}. Denying`);
         submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "unpaired", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
         ws.close(4001, "Unpaired Reader. Rejected");
@@ -600,7 +719,7 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
  * @param newState the state the shlug changed to
  * @param activeUID the active UID if there is one. null if no card inserted
  */
-async function handleStateTransition(reader: ReaderRow, newState: string, activeUID: string | undefined) {
+async function handleStateTransition(reader: ReaderRow, newState: string, activeUID: string | undefined, temp: number | undefined) {
     const timeOfChange: Date = new Date();
     const oldState = reader.state;
     const oldUID = reader.currentUID;
@@ -657,7 +776,7 @@ async function handleStateTransition(reader: ReaderRow, newState: string, active
         const elapsedSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
         reader.recentSessionLength = elapsedSeconds;
     }
-
+    reader.temp = temp ?? reader.temp;
     await updateReaderStatus(reader);
 
 }
@@ -735,7 +854,6 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                 // First Message is special, identifies the shlug to the server
                 if (shlugMessage.Seq === 0) {
                     // Bootup message
-                    console.log("Boot up msg");
                     if (!await handleBootupMessage(connData, shlugMessage, ws, req.ip ?? "unknown ip")) {
                         // failed to setup  
                         console.error("WSACS: Incorrect Boot Message. Forcing Reconnect")
@@ -743,7 +861,10 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                         return;
                     }
                 }
-                console.log("msg", shlugMessage);
+                if (connData.readerId == null) {
+                    wsApiLog("Can not process WSAPI message. Null reader ID (this shouldn't happen): " + ev.data, "status")
+                    return;
+                }
 
                 addOrUpdateConnection(connData);
                 // Get reader that was setup by handleBootupMessage
@@ -777,11 +898,15 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
                     }
                 }
                 if (shlugMessage.State) {
-                    await handleStateTransition(reader, shlugMessage.State, shlugMessage.UID)
+                    await handleStateTransition(reader, shlugMessage.State, shlugMessage.UID, shlugMessage?.Temp)
                 }
 
-                if (shlugMessage.Auth) {
-                    response = await authorizeUid(shlugMessage?.Auth, connData.readerId ?? 0, response)
+                if (shlugMessage.Auth && (shlugMessage.AuthTo == null || shlugMessage.AuthTo == "Unlocked")) {
+                    response = await authorizeUIDToUnlock(shlugMessage?.Auth, connData.readerId ?? 0, response)
+                } else if (shlugMessage.Auth && shlugMessage.AuthTo === "Welcomed" && shlugMessage.Auth) {
+                    response = await welcomeUID(shlugMessage.Auth, connData.readerId, response)
+                } else if (shlugMessage.Auth && shlugMessage.AuthTo) {
+                    response = await authorizeUidToStateChange(shlugMessage.Auth, shlugMessage.AuthTo, connData.readerId, response);
                 }
                 if (isReplyWorthSending(response)) {
                     replyToShlug(connData, response, shlugMessage.Seq);

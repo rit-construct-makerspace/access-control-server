@@ -10,6 +10,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { GET_USER } from "./UserModal";
 import TrainerCard from "./TrainerCard";
 import TrainerEquipmentSelect from "./TrainerEquipmentSelect";
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 
 interface PrivilegeControlProps {
@@ -21,17 +22,17 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
     const currentUser = useCurrentUser();
 
     const [adminState, setAdminState] = useState(props.user.admin);
-    const [setAdmin] = useMutation(SET_USER_ADMIN, {refetchQueries: [{query: GET_USER, variables: {id: props.user.id}}]});
+    const [setAdmin] = useMutation(SET_USER_ADMIN, { refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
 
     function handleAdminChange(e: ChangeEvent<{}>, checked: boolean) {
         setAdminState(checked);
-        setAdmin({variables: {userID: props.user.id, admin: checked}})
+        setAdmin({ variables: { userID: props.user.id, admin: checked } })
     }
 
     const getZonesResult = useQuery(GET_FULL_ZONES);
-    
-    const [makeUserManager] = useMutation(MAKE_USER_MANAGER, {refetchQueries: [{query: GET_USER, variables: {id: props.user.id}}]});
-    const [revokeUserManager] = useMutation(REVOKE_USER_MANAGER, {refetchQueries: [{query: GET_USER, variables: {id: props.user.id}}]});
+
+    const [makeUserManager] = useMutation(MAKE_USER_MANAGER, { refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
+    const [revokeUserManager] = useMutation(REVOKE_USER_MANAGER, { refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
     const [addManagerPerms, setAddManagerPerms] = useState(-1);
 
     async function handleAddManagerPerms() {
@@ -40,16 +41,16 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
             return;
         }
         await makeUserManager({
-            variables: {userID: props.user.id, makerspaceID: addManagerPerms},
+            variables: { userID: props.user.id, makerspaceID: addManagerPerms },
         });
     }
 
     async function removeManagerPerms(makerspaceID: number) {
-        await revokeUserManager({variables: {userID: props.user.id, makerspaceID: makerspaceID}});
+        await revokeUserManager({ variables: { userID: props.user.id, makerspaceID: makerspaceID } });
     }
 
-    const [makeUserStaff] = useMutation(MAKE_USER_STAFF, {refetchQueries: [{query: GET_USER, variables: {id: props.user.id}}]});
-    const [revokeUserStaff] = useMutation(REVOKE_USER_STAFF, {refetchQueries: [{query: GET_USER, variables: {id: props.user.id}}]});
+    const [makeUserStaff] = useMutation(MAKE_USER_STAFF, { refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
+    const [revokeUserStaff] = useMutation(REVOKE_USER_STAFF, { refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
     const [addStaffPerms, setAddStaffPerms] = useState(-1);
 
     async function handleAddStaffPerms() {
@@ -58,16 +59,16 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
             return;
         }
         await makeUserStaff({
-            variables: {userID: props.user.id, makerspaceID: addStaffPerms}
+            variables: { userID: props.user.id, makerspaceID: addStaffPerms }
         });
     }
 
     async function removeStaffPerms(makerspaceID: number) {
-        await revokeUserStaff({variables: {userID: props.user.id, makerspaceID: makerspaceID}});
+        await revokeUserStaff({ variables: { userID: props.user.id, makerspaceID: makerspaceID } });
     }
 
-    const [makeUserTrainer] = useMutation(MAKE_USER_TRAINER, {refetchQueries: [{query: GET_USER, variables: {id: props.user.id}}]});
-    const [revokeUserTrainer] = useMutation(REVOKE_USER_TRAINER, {refetchQueries: [{query: GET_USER, variables: {id: props.user.id}}]});
+    const [makeUserTrainer] = useMutation(MAKE_USER_TRAINER, { refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
+    const [revokeUserTrainer] = useMutation(REVOKE_USER_TRAINER, { refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
     const [addTrainerPerms, setAddTrainerPerms] = useState(-1);
 
     async function handleAddTrainerPerms() {
@@ -76,26 +77,28 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
             return;
         }
         await makeUserTrainer({
-            variables: {userID: props.user.id, equipmentID: addTrainerPerms}
+            variables: { userID: props.user.id, equipmentID: addTrainerPerms }
         });
     }
 
     async function removeTrainerPerms(equipmentID: number) {
-        await revokeUserTrainer({variables: {userID: props.user.id, equipmentID: equipmentID}});
+        await revokeUserTrainer({ variables: { userID: props.user.id, equipmentID: equipmentID } });
     }
 
     return (
         <Stack>
-            <Typography variant="h6" component="div">
+            <Typography variant="h6" component="div" mt={2}>
                 Permissions
             </Typography>
-            <FormGroup>
+            <FormGroup sx={{ alignSelf: "flex-start" }}>
                 <FormControlLabel
-                    label="Admin"
+                    labelPlacement="start"
+                    label={<Typography variant="subtitle1" fontWeight="bold">Admin</Typography>}
                     checked={adminState}
-                    control={<Checkbox/>}
+                    control={<Checkbox sx={{ padding: "0 9px" }} color="success" />}
                     disabled={!currentUser.admin || props.user.id === currentUser.id}
                     onChange={handleAdminChange}
+                    sx={{ margin: "0" }}
                 />
             </FormGroup>
             <RequestWrapper2 result={getZonesResult} render={(data) => {
@@ -114,23 +117,23 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                             <Stack direction="row" spacing={1}>
                                 {
                                     managerZones.length === 0
-                                    ? <Alert severity="info">Not a Manager!</Alert>
-                                    : managerZones.map((zone: FullZone) => {
-                                        return (
-                                            <Card sx={{maxWidth: "200px", padding: "10px"}}>
-                                                <Stack direction={props.isMobile ? "column" : "row"} justifyContent="space-between">
-                                                    <Typography variant="body2">{zone.name} ID: {zone.id}</Typography>
-                                                    {
-                                                        isManagerFor(currentUser, zone.id) && !(currentUser.id == props.user.id)
-                                                        ? <IconButton color="error" onClick={() => {removeManagerPerms(zone.id)}}>
-                                                            <DeleteIcon/>
-                                                        </IconButton>
-                                                        : null
-                                                    }
-                                                </Stack>
-                                            </Card>
-                                        );
-                                    })
+                                        ? <Alert severity="info">Not a Manager!</Alert>
+                                        : managerZones.map((zone: FullZone) => {
+                                            return (
+                                                <Card sx={{ maxWidth: "200px", padding: "10px" }}>
+                                                    <Stack direction={props.isMobile ? "column" : "row"} justifyContent="space-between">
+                                                        <Typography variant="body2">{zone.name} ID: {zone.id}</Typography>
+                                                        {
+                                                            isManagerFor(currentUser, zone.id) && !(currentUser.id == props.user.id)
+                                                                ? <IconButton color="error" onClick={() => { removeManagerPerms(zone.id) }}>
+                                                                    <DeleteIcon />
+                                                                </IconButton>
+                                                                : null
+                                                        }
+                                                    </Stack>
+                                                </Card>
+                                            );
+                                        })
                                 }
                             </Stack>
                             <Stack direction="row" spacing={1}>
@@ -149,7 +152,7 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                                         }
                                     </Select>
                                 </FormControl>
-                                <Button variant="contained" color="success" onClick={handleAddManagerPerms}>
+                                <Button variant="contained" color="success" onClick={handleAddManagerPerms} startIcon={<PersonAddIcon />}>
                                     Add
                                 </Button>
                             </Stack>
@@ -159,23 +162,23 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                             <Stack direction="row" spacing={1}>
                                 {
                                     staffZones.length === 0
-                                    ? <Alert severity="info">Not Staff!</Alert>
-                                    : staffZones.map((zone: FullZone) => {
-                                        return (
-                                            <Card sx={{maxWidth: "200px", padding: "10px"}}>
-                                                <Stack direction={props.isMobile ? "column" : "row"} justifyContent="space-between">
-                                                    <Typography variant="body2">{zone.name} ID: {zone.id}</Typography>
-                                                    {
-                                                        isManagerFor(currentUser, zone.id)
-                                                        ? <IconButton color="error" onClick={() => {removeStaffPerms(zone.id)}}>
-                                                            <DeleteIcon/>
-                                                        </IconButton>
-                                                        : null
-                                                    }
-                                                </Stack>
-                                            </Card>
-                                        );
-                                    })
+                                        ? <Alert severity="info">Not Staff!</Alert>
+                                        : staffZones.map((zone: FullZone) => {
+                                            return (
+                                                <Card sx={{ maxWidth: "200px", padding: "10px" }}>
+                                                    <Stack direction={props.isMobile ? "column" : "row"} justifyContent="space-between">
+                                                        <Typography variant="body2">{zone.name} ID: {zone.id}</Typography>
+                                                        {
+                                                            isManagerFor(currentUser, zone.id)
+                                                                ? <IconButton color="error" onClick={() => { removeStaffPerms(zone.id) }}>
+                                                                    <DeleteIcon />
+                                                                </IconButton>
+                                                                : null
+                                                        }
+                                                    </Stack>
+                                                </Card>
+                                            );
+                                        })
                                 }
                             </Stack>
                             <Stack direction="row" spacing={1}>
@@ -194,7 +197,7 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                                         }
                                     </Select>
                                 </FormControl>
-                                <Button variant="contained" color="success" onClick={handleAddStaffPerms}>
+                                <Button variant="contained" color="success" onClick={handleAddStaffPerms} startIcon={<PersonAddIcon />}>
                                     Add
                                 </Button>
                             </Stack>
@@ -202,27 +205,27 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                         <Stack spacing={1}>
                             <Typography variant="subtitle1" fontWeight="bold">Trainer</Typography>
                             <Stack direction="row" spacing={1}>
-                                    {
-                                        props.user.trainer.length === 0
+                                {
+                                    props.user.trainer.length === 0
                                         ? <Alert severity="info">Not a Trainer!</Alert>
                                         : props.user.trainer.map((equipmentID: number) => (
-                                            <TrainerCard equipmentID={equipmentID} removeTrainerPerms={removeTrainerPerms}/>
+                                            <TrainerCard equipmentID={equipmentID} removeTrainerPerms={removeTrainerPerms} />
                                         ))
-                                    }
+                                }
                             </Stack>
                             <Stack direction="row" spacing={1}>
                                 <FormControl fullWidth>
                                     <InputLabel id="add-trainer-permissions">Equipment</InputLabel>
-                                    <TrainerEquipmentSelect user={props.user} setAddTrainerPerms={setAddTrainerPerms}/>
+                                    <TrainerEquipmentSelect user={props.user} setAddTrainerPerms={setAddTrainerPerms} />
                                 </FormControl>
-                                <Button variant="contained" color="success" onClick={handleAddTrainerPerms}>
+                                <Button variant="contained" color="success" onClick={handleAddTrainerPerms} startIcon={<PersonAddIcon />}>
                                     Add
                                 </Button>
                             </Stack>
                         </Stack>
                     </Stack>
                 );
-            }}            
+            }}
             />
         </Stack>
     );

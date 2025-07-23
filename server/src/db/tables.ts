@@ -190,6 +190,7 @@ export interface TrainingModuleRow {
   quiz: TrainingModuleItem[];
   archived: boolean;
   reservationPrompt: ReservationPrompt;
+  makerspaceID: number | null;
 }
 
 // not a table but the json structure for a column on the table above
@@ -258,6 +259,11 @@ export interface ReaderRow {
   SN?: string;
   readerKeyCycle: number;
   pairTime?: Date
+}
+
+export interface MakerspaceWelcomeReaderRow{
+  makerspaceID: number;
+  readerID: number;
 }
 
 export interface ReaderLogRow {
@@ -365,6 +371,12 @@ export interface RestrictionRow {
   createDate: Date | null;
 }
 
+
+export interface PassedModulesRow {
+  userID: number;
+  moduleID: number;
+  passedDate: Date;
+
 export interface ModulesForRoomsRow {
   roomID: number;
   moduleID: number;
@@ -388,6 +400,7 @@ declare module "knex/types/tables.js" {
     TrainingHolds: TrainingHoldsRow;
     Users: UserRow;
     Readers: ReaderRow;
+    MakerspaceWelcomeReaders: MakerspaceWelcomeReaderRow;
     ReaderLogs: ReaderLogRow;
     AccessChecks: AccessCheckRow;
     Zones: ZoneRow;
@@ -405,6 +418,7 @@ declare module "knex/types/tables.js" {
     Staff: StaffRow;
     Trainers: TrainerRow;
     Restrictions: RestrictionRow;
+    PassedModules: PassedModulesRow;
     ModulesForRooms: ModulesForRoomsRow;
   }
 }

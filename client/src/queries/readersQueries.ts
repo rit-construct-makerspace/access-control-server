@@ -136,6 +136,37 @@ export const GET_UNPAIRED_READERS = gql`
   }
 `
 
+export const GET_WELCOME_READERS_FOR_MAKERSPACE = gql`
+query GetWelcomeReadersForMakerspace($makerspaceId: ID!) {
+  welcomeReadersForMakerspace(makerspaceId: $makerspaceId){
+    id
+    name
+    machineID
+    machineType
+    zone
+    temp
+    state
+    user {
+      id      
+      firstName
+      lastName
+    }
+    recentSessionLength
+    lastStatusReason
+    scheduledStatusFreq
+    lastStatusTime
+    helpRequested
+    BEVer
+    FEVer
+    HWVer
+    sessionStartTime
+    SN
+    readerKeyCycle
+    pairTime
+  }
+}
+`;
+
 export const CREATE_READER = gql`
   mutation CreateReader(
     $id: ID!,
@@ -165,6 +196,17 @@ export const DELETE_READER = gql`
     deleteReader(id: $id)
   }
 `
+export const PAIR_AS_WELCOME_READER = gql`
+mutation PairAsWelcomeReader($readerId: ID!, $makerspaceId: ID!) {
+  pairAsWelcomeReader(readerID: $readerId, makerspaceID: $makerspaceId)
+}
+`;
+
+export const UNPAIR_AS_WELCOME_READER = gql`
+mutation UnpairAsWelcomeReader($readerId: ID!, $makerspaceId: ID!) {
+  unpairAsWelcomeReader(readerID: $readerId, makerspaceID: $makerspaceId)
+}
+`;
 
 export const PAIR_READER = gql`
   mutation PairReader(

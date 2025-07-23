@@ -16,6 +16,8 @@ import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js
 import { accessCheckExists, createAccessCheck, hasApprovedAccessCheck } from "../repositories/Equipment/AccessChecksRepository.js";
 import fetch from "node-fetch";
 import { createTrainingHold, getTrainingHoldByUserForModule } from "../repositories/Training/TrainingHoldsRespository.js";
+import * as PassedModuleRepo from "../repositories/Training/PassedRepository.js";
+import * as TrainingModuleReo from "../repositories/Training/ModuleRepository.js";
 
 /**
  * The ID of the quiz that, on pass, will grant 3DPrinterOS Self-Service access
@@ -142,7 +144,7 @@ const TrainingModuleResolvers = {
 
   Query: {
     /**
-     * Fetch all TrainingModules that are not archived. If requesting user is a MAKER, question option correct values are stripped
+     * Fetch all TrainingModules. If requesting user is a MAKER, question option correct values are stripped
      * @returns array of TrainingModules
      * @throws GraphQLError if not MAKER, MENTOR, or STAFF or is on hold
      */
@@ -150,15 +152,26 @@ const TrainingModuleResolvers = {
       _parent: any,
       _args: any,
       { ifAuthenticated }: ApolloContext
-    ) =>
-      ifAuthenticated(async (user: any) => {
-        let modules = await ModuleRepo.getModulesWhereArchived(false);
+    ) => {
+      return ifAuthenticated(async (user: any) => {
+        let modules = await ModuleRepo.getModules();
 
-        if (user.privilege === "MAKER")
-          for (let module of modules) removeAnswersFromQuiz(module.quiz);
+        for (let module of modules) removeAnswersFromQuiz(module.quiz);
 
         return modules;
-      }),
+      })
+    },
+
+    modulesWithAnswers: async (
+      _parent: any,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => {
+      return isStaff(async (user: any) => {
+        let modules = await ModuleRepo.getModules();
+        return modules;
+      })
+    },
 
     /**
      * Fetch a TrainingModule by ID. If requesting user is a MAKER, question option correct values are stripped
@@ -170,16 +183,24 @@ const TrainingModuleResolvers = {
       _parent: any,
       args: { id: number },
       { ifAuthenticated }: ApolloContext
-    ) =>
-      ifAuthenticated(async (user: any) => {
+    ) => {
+      return ifAuthenticated(async (user: any) => {
         let module = await ModuleRepo.getModuleByIDWhereArchived(args.id, false);
-
-        if (user.privilege === "MAKER") {
-          removeAnswersFromQuiz(module.quiz);
-        }
-
+        removeAnswersFromQuiz(module.quiz);
         return module;
-      }),
+      })
+    },
+
+    moduleWithAnswers: async (
+      _parent: any,
+      args: { id: number },
+      { isStaff }: ApolloContext
+    ) => {
+      return isStaff(async (user: any) => {
+        let module = await ModuleRepo.getModuleByID(args.id);
+        return module;
+      })
+    },
 
     /**
      * Fetch all archived TrainingModules
@@ -260,13 +281,14 @@ const TrainingModuleResolvers = {
      */
     createModule: async (
       _parent: any,
-      args: { name: string; quiz: object },
+      args: { name: string; quiz: object; makerspaceID: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user: any) => {
         const module = await ModuleRepo.addModule(
           args.name,
-          args.quiz
+          args.quiz,
+          args.makerspaceID,
         );
 
         await createLog(
@@ -290,7 +312,7 @@ const TrainingModuleResolvers = {
      */
     updateModule: async (
       _parent: any,
-      args: { id: string; name: string; quiz: object; reservationPrompt?: object },
+      args: { id: string; name: string; quiz: object; reservationPrompt?: object; makerspaceID: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user: any) => {
@@ -298,7 +320,8 @@ const TrainingModuleResolvers = {
           Number(args.id),
           args.name,
           args.quiz,
-          args.reservationPrompt ?? { "promptText": "Make reservation", "enabled": false }
+          args.reservationPrompt ?? { "promptText": "Make reservation", "enabled": false },
+          args.makerspaceID,
         );
 
         await createLog(
@@ -509,6 +532,18 @@ const TrainingModuleResolvers = {
         }
       );
     },
+
+    deletePassedModule: async (
+      _parent: any,
+      args: {userID: number, moduleID: number},
+      { isStaffFor }: ApolloContext
+    ) => {
+      const module = await TrainingModuleReo.getModuleByID(args.moduleID);
+
+      return isStaffFor(module.makerspaceID ?? -1, (user) => {
+        return PassedModuleRepo.deletePassedModule(args.userID, args.moduleID);
+      });
+    }
   },
 };
 
