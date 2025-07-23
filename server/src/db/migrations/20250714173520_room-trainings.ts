@@ -4,7 +4,7 @@ import type { Knex } from "knex";
 export async function up(knex: Knex): Promise<void> {
     const RoomTrainindTableExists = await knex.schema.hasTable("ModulesForRooms");
     if (!RoomTrainindTableExists) {
-        knex.schema.createTable("ModulesForRooms", (t) => {
+        await knex.schema.createTable("ModulesForRooms", (t) => {
             t.integer("roomID").references("id").inTable("Rooms").notNullable()
                 .onUpdate("CASCADE")
                 .onDelete("CASCADE");
@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
 
     const MakerspaceTrainingTableExists = await knex.schema.hasTable("ModulesForMakerspaces");
     if (!MakerspaceTrainingTableExists) {
-        knex.schema.createTable("ModulesForMakerspaces", (t) => {
+        await knex.schema.createTable("ModulesForMakerspaces", (t) => {
             t.integer("makerspaceID").references("id").inTable("Zones").notNullable()
                 .onUpdate("CASCADE")
                 .onDelete("CASCADE");
@@ -31,7 +31,7 @@ export async function up(knex: Knex): Promise<void> {
 
 
 export async function down(knex: Knex): Promise<void> {
-    knex.schema.dropTableIfExists("ModulesForRooms");
-    knex.schema.dropTableIfExists("ModulesForMakerspaces");
+    await knex.schema.dropTableIfExists("ModulesForRooms");
+    await knex.schema.dropTableIfExists("ModulesForMakerspaces");
 }
 
