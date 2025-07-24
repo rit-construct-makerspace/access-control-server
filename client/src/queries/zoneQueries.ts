@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import Equipment from "../types/Equipment";
 import Room, { FullRoom } from "../types/Room";
 import { TrainingModule } from "../common/TrainingModuleUtils";
+import ZoneHours from "../types/ZoneHours";
 
 export const GET_ZONES = gql`
  query GetZones {
@@ -27,11 +28,7 @@ export interface ZoneWithHours {
 export interface FullZone {
   id: number;
   name: string;
-  hours: {
-    type: string;
-    dayOfTheWeek: number;
-    time: string;
-  }[];
+  hours: ZoneHours[];
   rooms: Room[]
   imageUrl: string;
   trainingModules: TrainingModule[];
