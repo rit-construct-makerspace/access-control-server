@@ -40,10 +40,12 @@ export const GET_ZONES_WITH_HOURS = gql`
     id
     name
     hours {
-      type
-      dayOfTheWeek
-      time
-    }
+        day
+        makerspaceID
+        open
+        close
+        closed
+      }
     imageUrl
   }
  }
@@ -55,9 +57,11 @@ export const GET_FULL_ZONES = gql`
       id
       name
       hours {
-        type
-        dayOfTheWeek
-        time
+        day
+        makerspaceID
+        open
+        close
+        closed
       }
       imageUrl
       rooms {
@@ -87,9 +91,11 @@ export const GET_ZONE_BY_ID = gql`
       id
       name
       hours {
-        type
-        dayOfTheWeek
-        time
+        day
+        makerspaceID
+        open
+        close
+        closed
       }
       imageUrl
       rooms {
