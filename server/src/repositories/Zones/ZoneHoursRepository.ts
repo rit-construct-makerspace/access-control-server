@@ -48,3 +48,17 @@ export async function getZoneHoursNextWeek(makerspaceID: number): Promise<Specia
 
     return week;
 }
+
+export async function addSpecialHours(hours: SpecialHoursRow): Promise<SpecialHoursRow> {
+    await knex("SpecialHours").insert(hours).onConflict(["day", "makerspaceID"]).merge();
+    return hours;
+}
+
+export async function deleteSpecialHours(day: Date, makerspaceID: number): Promise<number> {
+    return await knex("SpecialHours").where({ day: day, makerspaceID: makerspaceID }).delete();
+}
+
+export async function updateDefaultHours(hours: DefaultHoursRow): Promise<DefaultHoursRow> {
+    await knex("DefaultHours").insert(hours).onConflict(["day", "makerspaceID"]).merge();
+    return hours;
+}
