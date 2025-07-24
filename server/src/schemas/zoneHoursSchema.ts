@@ -8,21 +8,37 @@ import { ZoneHoursRow } from "../db/tables.js";
 
 export const ZoneHoursTypeDefs = gql`
   type ZoneHours {
-    id: ID!
-    zoneID: ID!
-    type: String!
-    dayOfTheWeek: String!
-    time: String!
-    imageUrl: String
+    day: DateTime!
+    makerspaceID: ID!
+    open: DateTime
+    close: DateTime
+    closed: Boolean!
   }
 
   extend type Query {
-    zoneHours: [ZoneHours]
-    zoneHoursByZone(zoneID: ID!): [ZoneHours]
+    zoneHoursNextWeek: [ZoneHours]
+    zoneHoursOnDay(day: DateTime!, makerspaceID: ID!): ZoneHours
+  }
+
+  input DefaultHoursInput {
+    dayOfWeek: Int!
+    makerspaceID: ID!
+    open: DateTime
+    close: DateTime
+    closed: Boolean!
+  }
+
+  input SpecialHoursInput {
+    day: DateTime!
+    makerspaceID: ID!
+    open: DateTime
+    close: DateTime
+    closed: Boolean!
   }
 
   extend type Mutation {
-    deleteZoneHours(id: ID!): ZoneHours
-    addZoneHours(zoneID: ID!, type: String!, dayOfTheWeek: String!, time: String!): ZoneHours
+    addSpecialHours(hours: SpecialHoursInput!): [ID]
+    deleteSpecialHours(day: DateTime, makerspaceID: ID!): ID
+    updateDefaultHours(hours: DefaultHoursInput!): [ID]
   }
 `;
