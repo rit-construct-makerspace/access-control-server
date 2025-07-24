@@ -1,9 +1,11 @@
 import {
   Button,
   Card, CardActionArea, CardActions, CardContent, CardHeader, CardMedia,
+  Stack,
   Typography
 } from "@mui/material";
 import { format } from "date-fns";
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 interface EventCardProps {
   name: string | null;
@@ -25,10 +27,14 @@ export default function EventCard(props: EventCardProps) {
     <Card sx={{ maxWidth: "400px" }}>
       <CardActionArea onClick={() => { window.location.href = props.url ?? ""; }}>
         <CardHeader title={props.name} subheader={`${format(startDate, "MMM do, h:mm bb")} - ${format(endDate, "MMM do, h:mm bb")}`} sx={{ "h5": { fontSize: '2em' } }}></CardHeader>
-        <CardContent>
+        <CardContent sx={{ pt: "0" }}>
           <Typography variant="body1">
-            {props.summary}...
+            {props.description}
           </Typography>
+          <Stack spacing={0.5} direction="row" alignItems="center" justifyContent={"flex-end"}>
+            <Typography variant="subtitle1">Register Here</Typography>
+            <ChevronRightIcon color="primary" fontSize="large" />
+          </Stack>
         </CardContent>
       </CardActionArea>
     </Card>
