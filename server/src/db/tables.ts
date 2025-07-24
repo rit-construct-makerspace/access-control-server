@@ -261,7 +261,7 @@ export interface ReaderRow {
   pairTime?: Date
 }
 
-export interface MakerspaceWelcomeReaderRow{
+export interface MakerspaceWelcomeReaderRow {
   makerspaceID: number;
   readerID: number;
 }
@@ -388,6 +388,22 @@ export interface ModulesForMakerspacesRow {
   moduleID: number;
 }
 
+export interface SpecialHoursRow {
+  day: Date;
+  makerspaceID: number;
+  open: Date | null;
+  close: Date | null;
+  closed: boolean;
+}
+
+export interface DefaultHoursRow {
+  dayOfWeek: number;
+  makerspaceID: number;
+  open: Date | null;
+  close: Date | null;
+  closed: boolean;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -427,5 +443,7 @@ declare module "knex/types/tables.js" {
     PassedModules: PassedModulesRow;
     ModulesForRooms: ModulesForRoomsRow;
     ModulesForMakerspaces: ModulesForMakerspacesRow;
+    SpecialHours: SpecialHoursRow;
+    DefaultHours: DefaultHoursRow;
   }
 }
