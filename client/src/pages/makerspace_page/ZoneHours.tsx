@@ -44,15 +44,19 @@ export default function ZoneHoursSection(props: ZoneHoursProps) {
       {
         props.hours.map((hour: ZoneHours) => {
 
+          const dayDate = new Date(hour.day);
+          const openDate = new Date(hour.open ?? now);
+          const closeDate = new Date(hour.close ?? now);
+
           return (
-            <Stack>
-              <Typography color="darkorange" variant="h6">{TimeUtils.dayToString(hour.day.getDay())}</Typography>
-              <Typography variant="body2">{dateFormatter.format(hour.day)}</Typography>
+            <Stack alignItems={"center"}>
+              <Typography color="darkorange" variant="h6">{TimeUtils.dayToString(dayDate.getDay())}</Typography>
+              <Typography variant="body2">{dateFormatter.format(dayDate)}</Typography>
               {
                 hour.closed
                   ? <Typography variant="body1">CLOSED</Typography>
                   : <Typography variant="body1">
-                    {`${timeFormatter.format(hour.open ?? now)} - ${timeFormatter.format(hour.close ?? now)}`}
+                    {`${timeFormatter.format(openDate)} - ${timeFormatter.format(closeDate)}`}
                   </Typography>
               }
 

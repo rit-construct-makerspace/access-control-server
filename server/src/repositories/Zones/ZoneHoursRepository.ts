@@ -43,8 +43,13 @@ export async function getZoneHoursNextWeek(makerspaceID: number): Promise<Specia
 
     var target = new Date();
     for (let i = 0; i < 7; i++) {
-        week[i] = await getZoneHoursOnDay(target, makerspaceID);
+        await getZoneHoursOnDay(target, makerspaceID).then((result) => {
+            week[result.day.getDay()] = { ...result, day: new Date(result.day) };
+            target.setDate(target.getDate() + 1);
+        });
     }
+
+    console.log(week);
 
     return week;
 }
