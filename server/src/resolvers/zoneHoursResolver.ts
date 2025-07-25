@@ -25,7 +25,27 @@ const ZoneHoursResolver = {
       },
       { }: ApolloContext
     ) => {
-      return HoursRepo.getZoneHoursOnDay(args.day, args.makerspaceID);
+      return await HoursRepo.getZoneHoursOnDay(args.day, args.makerspaceID);
+    },
+
+    zoneDefaultHours: async (
+      _parent: any,
+      args: {
+        makerspaceID: number
+      },
+      { }: ApolloContext
+    ) => {
+      return await HoursRepo.getZoneDefaultHours(args.makerspaceID);
+    },
+
+    zoneSpecialHours: async (
+      _parent: any,
+      args: {
+        makerspaceID: number
+      },
+      { }: ApolloContext
+    ) => {
+      return await HoursRepo.getZoneSpecialHours(args.makerspaceID);
     }
   },
 

@@ -49,6 +49,14 @@ export async function getZoneHoursNextWeek(makerspaceID: number): Promise<Specia
     return week;
 }
 
+export async function getZoneSpecialHours(makerspaceID: number): Promise<SpecialHoursRow[]> {
+    return await knex("SpecialHours").where({ makerspaceID: makerspaceID }).select("*");
+};
+
+export async function getZoneDefaultHours(makerspaceID: number): Promise<DefaultHoursRow[]> {
+    return await knex("DefaultHours").where({ makerspaceID: makerspaceID }).select("*");
+}
+
 export async function addSpecialHours(hours: SpecialHoursRow): Promise<number[]> {
     return await knex("SpecialHours").insert(hours).onConflict(["day", "makerspaceID"]).merge();
 }

@@ -15,9 +15,19 @@ export const ZoneHoursTypeDefs = gql`
     closed: Boolean!
   }
 
+  type ZoneDefaultHours {
+    dayOfWeek: Int!
+    makerspaceID: ID!
+    open: DateTime
+    close: DateTime
+    closed: Boolean!
+  }
+
   extend type Query {
     zoneHoursNextWeek: [ZoneHours]
     zoneHoursOnDay(day: DateTime!, makerspaceID: ID!): ZoneHours
+    zoneDefaultHours(makerspaceID: ID!): [ZoneDefaultHours]
+    zoneSpecialHours(makerspaceID: ID!): [ZoneHours]
   }
 
   input DefaultHoursInput {
