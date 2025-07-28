@@ -42,7 +42,6 @@ export default function ZoneHoursSection(props: ZoneHoursProps) {
           return (
             <Stack alignItems={"center"}>
               <Typography color="darkorange" variant="h6">{TimeUtils.dayToString(dayDate.getDay())}</Typography>
-              <Typography variant="body2">{dateFormatter.format(dayDate)}</Typography>
               {
                 hour.closed
                   ? <Typography variant="body1">CLOSED</Typography>
