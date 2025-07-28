@@ -36,12 +36,12 @@ export default function ManageMakerspaceTrainings(props: ManageMakerspaceTrainin
 
   return (
     <Stack spacing={2}>
-      <Typography variant="h5">Assigned Trainings</Typography>
+      <Typography variant="h5" fontWeight={"bold"}>Assigned Trainings</Typography>
       {
         props.trainings.map((training: TrainingModule) => (
           <Card>
             <Stack direction={"row"} justifyContent={"space-between"} padding={"10px"} alignItems={"center"}>
-              <Typography><b>{training.name}</b> ID: {training.id}</Typography>
+              <Typography>{training.name} ID: {training.id}</Typography>
               <IconButton color="error" onClick={() => removeTraining({ variables: { zoneID: props.makerspaceID, moduleID: training.id } })}>
                 <DeleteIcon />
               </IconButton>

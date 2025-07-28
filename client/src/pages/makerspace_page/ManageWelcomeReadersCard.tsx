@@ -45,19 +45,19 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
     return <Box>
         <RequestWrapper loading={unpairedReaderResult.loading || pairedWelcomeReaderResult.loading} error={unpairedReaderResult.error || pairedWelcomeReaderResult.error}>
             <Stack spacing={2}>
-                <Typography variant="h5">Welcome Readers</Typography>
+                <Typography variant="h5" fontWeight={"bold"}>Welcome Readers</Typography>
                 <Stack direction={"column"} spacing={2}>
                     {
                         (pairedReaders && pairedReaders.length > 0) ?
                             (pairedReaders.map((reader: Reader) => {
                                 return <Card>
-                                    <CardContent>
-                                        <Stack direction={"row"} spacing={1} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                            <Typography variant="h6" component="div">
+                                    <CardContent sx={{ pb: "16px" }}>
+                                        <Stack direction={"row"} spacing={1} justifyContent={"space-between"} alignItems={"center"}>
+                                            <Typography>
                                                 {reader.name}
                                             </Typography>
                                             <Stack direction={"row"} alignItems={"center"}>
-                                                <Typography variant="body2" component="div">
+                                                <Typography variant="body2">
                                                     {"ID " + reader.id}
                                                 </Typography>
                                                 <Tooltip title="Unpair as Welcome Reader">
