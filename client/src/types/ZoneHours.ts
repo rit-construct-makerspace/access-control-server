@@ -5,3 +5,11 @@ export default interface ZoneHours {
     close: Date | null;
     closed: boolean;
 }
+
+export interface ZoneDefaultHours {
+    dayOfWeek: number;
+    makerspaceID: number;
+    open: Date | null;
+    close: Date | null;
+    closed: boolean;
+}
