@@ -1,34 +1,45 @@
 import * as TimeUtils from "../../common/TimeUtils"
-import { Button, Checkbox, FormControlLabel, InputAdornment, Stack, TextField, Typography } from "@mui/material";
-import { ZoneDefaultHours } from "../../types/ZoneHours";
+import { Button, Checkbox, FormControlLabel, IconButton, InputAdornment, Stack, TextField, Typography } from "@mui/material";
+import ZoneHours, { ZoneDefaultHours } from "../../types/ZoneHours";
 import { useState } from "react";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
-import { GET_ZONE_DEFAULT_HOURS } from "./ManageMakerspaceHours";
+import { GET_ZONE_SPECIAL_HOURS } from "./ManageMakerspaceHours";
+import DeleteIcon from '@mui/icons-material/Delete';
 
-export const UPDATE_DEFAULT_HOURS = gql`
-  mutation UpdateDefaultHours($hours: DefaultHoursInput!) {
-    updateDefaultHours(hours: $hours)
+export const DELETE_SPECIAL_HOURS = gql`
+  mutation DeleteSpecialHours($day: DateTime!, $makerspaceID: ID!) {
+    deleteSpecialHours(day: $day, makerspaceID: $makerspaceID)
   }
 `;
 
-interface DefaultHoursBlockProps {
-  hours: ZoneDefaultHours;
+interface SpecialHoursBlockProps {
+  hours: ZoneHours;
 }
 
-export default function DefaultHoursBlock(props: DefaultHoursBlockProps) {
+export default function SpecialHoursBlock(props: SpecialHoursBlockProps) {
 
+  const dateFormatter = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    timeZone: "America/New_York",
+  })
 
   const [closed, setClosed] = useState(props.hours.closed);
   const [open, setOpen] = useState(props.hours.open?.substring(0, 5));
   const [close, setClose] = useState(props.hours.close?.substring(0, 5));
 
-  const [updateHours] = useMutation(UPDATE_DEFAULT_HOURS, { refetchQueries: [{ query: GET_ZONE_DEFAULT_HOURS, variables: { makerspaceID: props.hours.makerspaceID } }] })
+  console.log(open);
+
+  const [deleteHours] = useMutation(DELETE_SPECIAL_HOURS, {
+    refetchQueries: [{ query: GET_ZONE_SPECIAL_HOURS, variables: { makerspaceID: props.hours.makerspaceID } }],
+    variables: { day: props.hours.day, makerspaceID: props.hours.makerspaceID }
+  })
 
   return (
     <Stack alignItems={"center"} spacing={1} padding={"15px"} width={"14vw"}>
-      <Typography fontWeight={"bold"} color="primary">{TimeUtils.dayToString(props.hours.dayOfWeek)}</Typography>
+      <Typography fontWeight={"bold"} color="primary">{dateFormatter.format(new Date(props.hours.day))}</Typography>
       <TextField
         label="Open"
         type="time"
@@ -67,25 +78,12 @@ export default function DefaultHoursBlock(props: DefaultHoursBlockProps) {
       />
       <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
         <FormControlLabel control={<Checkbox checked={closed} onClick={() => setClosed(!closed)} />} label={"Closed"} />
-        <Button
-          variant="outlined"
-          color="success"
-          onClick={() => {
-            updateHours({
-              variables: {
-                hours: {
-                  dayOfWeek: props.hours.dayOfWeek,
-                  makerspaceID: props.hours.makerspaceID,
-                  open: open,
-                  close: close,
-                  closed: closed,
-                }
-              }
-            })
-          }}
+        <IconButton
+          color="error"
+          onClick={() => deleteHours()}
         >
-          Update
-        </Button>
+          <DeleteIcon />
+        </IconButton>
       </Stack>
     </Stack>
   );

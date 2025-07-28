@@ -4,8 +4,10 @@ import gql from "graphql-tag";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import { useQuery } from "@apollo/client";
 import RequestWrapper2 from "../../common/RequestWrapper2";
-import { ZoneDefaultHours } from "../../types/ZoneHours";
+import ZoneHours, { ZoneDefaultHours } from "../../types/ZoneHours";
 import DefaultHoursBlock from "./DefaultHoursBlock";
+import SpecialHoursBlock from "./SpecialHoursBlock";
+import NewSpecialHoursBlock from "./NewSpecialHours";
 
 interface ManageMakerspaceHoursProps {
   makerspaceID: number;
@@ -43,7 +45,7 @@ export default function ManageMakerspaceHours(props: ManageMakerspaceHoursProps)
 
   return (
     <Stack>
-      <Typography variant="h5">Makerspace Hours</Typography>
+      <Typography variant="h5" fontWeight={"bold"}>Makerspace Hours</Typography>
       <RequestWrapper2 result={defaultHoursResult} render={(data) => {
 
         const defaultHours: ZoneDefaultHours[] = data.zoneDefaultHours;
@@ -60,6 +62,20 @@ export default function ManageMakerspaceHours(props: ManageMakerspaceHoursProps)
             }
           </Stack>
         );
+      }} />
+      <Typography variant="h5" fontWeight={"bold"}>Special Hours</Typography>
+      <RequestWrapper2 result={specialHoursResult} render={(data) => {
+
+        const specialHours: ZoneHours[] = data.zoneSpecialHours;
+
+        return (
+          <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"center"}>
+            {
+              specialHours.map((hours) => (<SpecialHoursBlock hours={hours} />))
+            }
+            <NewSpecialHoursBlock />
+          </Stack>
+        )
       }} />
     </Stack >
   );

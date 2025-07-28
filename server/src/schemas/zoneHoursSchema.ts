@@ -47,7 +47,7 @@ export const ZoneHoursTypeDefs = gql`
   }
 
   extend type Mutation {
-    addSpecialHours(hours: SpecialHoursInput!): [ID]
+    addSpecialHours(hours: SpecialHoursInput!): ID
     deleteSpecialHours(day: DateTime, makerspaceID: ID!): ID
     updateDefaultHours(hours: DefaultHoursInput!): [ID]
   }
