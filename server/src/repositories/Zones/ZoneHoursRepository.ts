@@ -55,11 +55,11 @@ export async function getZoneHoursNextWeek(makerspaceID: number): Promise<Specia
 }
 
 export async function getZoneSpecialHours(makerspaceID: number): Promise<SpecialHoursRow[]> {
-    return await knex("SpecialHours").where({ makerspaceID: makerspaceID }).select("*");
+    return await knex("SpecialHours").where({ makerspaceID: makerspaceID }).select("*").orderBy("day", "asc");
 };
 
 export async function getZoneDefaultHours(makerspaceID: number): Promise<DefaultHoursRow[]> {
-    return await knex("DefaultHours").where({ makerspaceID: makerspaceID }).select("*");
+    return await knex("DefaultHours").where({ makerspaceID: makerspaceID }).select("*").orderBy("dayOfWeek", "asc");
 }
 
 export async function addSpecialHours(hours: SpecialHoursRow): Promise<number[]> {
@@ -71,5 +71,5 @@ export async function deleteSpecialHours(day: Date, makerspaceID: number): Promi
 }
 
 export async function updateDefaultHours(hours: DefaultHoursRow): Promise<number[]> {
-    return await knex("DefaultHours").insert(hours).onConflict(["day", "makerspaceID"]).merge();
+    return await knex("DefaultHours").insert(hours).onConflict(["dayOfWeek", "makerspaceID"]).merge();
 }

@@ -9,7 +9,7 @@ export default interface ZoneHours {
 export interface ZoneDefaultHours {
     dayOfWeek: number;
     makerspaceID: number;
-    open: Date | null;
-    close: Date | null;
+    open: String | null;
+    close: String | null;
     closed: boolean;
 }

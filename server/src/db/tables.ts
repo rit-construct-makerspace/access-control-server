@@ -391,16 +391,16 @@ export interface ModulesForMakerspacesRow {
 export interface SpecialHoursRow {
   day: Date;
   makerspaceID: number;
-  open: Date | null;
-  close: Date | null;
+  open: String | null;
+  close: String | null;
   closed: boolean;
 }
 
 export interface DefaultHoursRow {
   dayOfWeek: number;
   makerspaceID: number;
-  open: Date | null;
-  close: Date | null;
+  open: String | null;
+  close: String | null;
   closed: boolean;
 }
 

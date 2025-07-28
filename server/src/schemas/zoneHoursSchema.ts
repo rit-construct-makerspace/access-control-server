@@ -10,16 +10,16 @@ export const ZoneHoursTypeDefs = gql`
   type ZoneHours {
     day: DateTime!
     makerspaceID: ID!
-    open: DateTime
-    close: DateTime
+    open: String
+    close: String
     closed: Boolean!
   }
 
   type ZoneDefaultHours {
     dayOfWeek: Int!
     makerspaceID: ID!
-    open: DateTime
-    close: DateTime
+    open: String
+    close: String
     closed: Boolean!
   }
 
@@ -33,16 +33,16 @@ export const ZoneHoursTypeDefs = gql`
   input DefaultHoursInput {
     dayOfWeek: Int!
     makerspaceID: ID!
-    open: DateTime
-    close: DateTime
+    open: String
+    close: String
     closed: Boolean!
   }
 
   input SpecialHoursInput {
     day: DateTime!
     makerspaceID: ID!
-    open: DateTime
-    close: DateTime
+    open: String
+    close: String
     closed: Boolean!
   }
 
