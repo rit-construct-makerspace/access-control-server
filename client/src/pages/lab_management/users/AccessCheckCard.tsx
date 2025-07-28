@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardActions, Stack, Typography } from "@mui/material";
+import { Card, CardActions, Stack, Typography, useTheme } from "@mui/material";
 import { AccessCheck, AccessCheckExtraInfo, GET_USER, Hold } from "./UserModal";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { LoadingButton } from "@mui/lab";
@@ -43,55 +43,54 @@ export default function AccessCheckCard({ accessCheck, userID }: AccessCheckCard
 
   const [width, setWidth] = useState<number>(window.innerWidth);
   function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
+    setWidth(window.innerWidth);
   }
   useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
+    window.addEventListener('resize', handleWindowSizeChange);
+    return () => {
+      window.removeEventListener('resize', handleWindowSizeChange);
+    }
   }, []);
   const isMobile = width <= 1100;
+
+  const theme = useTheme();
 
   return (
     <Card
       sx={{
         backgroundColor: !approved ? (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100") : (localStorage.getItem("themeMode") == "dark" ? "lightGreen.800" : "lightGreen.100"),
-        border: `1px solid ${!approved ? "grey" : "lime"}`,
+        border: `2px solid ${!approved ? "lightgrey" : "palegreen"}`,
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
         flexWrap: isMobile ? 'wrap' : 'nowrap',
         alignItems: 'center',
-        paddingLeft: '1em',
-        paddingRight: '1em'
       }}
     >
-      <div style={{width: isMobile ? "100%" : "40%"}}>
+      <div style={{ width: isMobile ? "100%" : "40%", marginLeft: "10px" }}>
         <AuditLogEntity entityCode={"equipment:" + accessCheck.equipment.id + ":" + ((accessCheck.equipment != undefined) ? accessCheck.equipment.name : "Loading...")}></AuditLogEntity>
       </div>
-      <CardActions sx={{ px: 2 }}>
-        <span style={{paddingRight: '.5em'}}>
-          <b>Status: </b>{accessCheck.approved ? "Approved" : "Pending Approval"}
-        </span>
+      <CardActions>
         {!approved && (
           <LoadingButton
             size="small"
             color="success"
+            variant="outlined"
             loading={approveCheckResult.loading}
             onClick={() => approveCheck()}
           >
-            <b>Approve</b>
+            <b>Approve Check</b>
           </LoadingButton>
         )}
         {approved && (
           <LoadingButton
             size="small"
             color="error"
+            variant="outlined"
             loading={unapproveCheckResult.loading}
             onClick={() => unapproveCheck()}
           >
-            Unapprove
+            <b>Unapprove Check</b>
           </LoadingButton>
         )}
       </CardActions>

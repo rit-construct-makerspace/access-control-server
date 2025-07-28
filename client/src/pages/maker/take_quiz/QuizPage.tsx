@@ -41,7 +41,7 @@ export default function QuizPage() {
     <RequestWrapper2
       result={result}
       render={({ module }: { module: Module }) => (
-        <Page title={module.name} maxWidth="800px">
+        <Page title={module.name} maxWidth="1600px">
           <QuizTaker module={module} />
         </Page>
       )}

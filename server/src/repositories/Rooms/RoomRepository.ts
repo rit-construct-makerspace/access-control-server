@@ -9,8 +9,9 @@ import {
   singleRoomToDomain,
 } from "../../mappers/rooms/roomMapper.js";
 import assert from "assert";
-import { RoomSwipeRow } from "../../db/tables.js";
+import { RoomSwipeRow, TrainingModuleRow } from "../../db/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
+import * as ModuleRepo from "../Training/ModuleRepository.js";
 
 
 /**
@@ -168,5 +169,33 @@ export async function hasSwipedToday(roomID: number, userID: number): Promise<bo
     .whereRaw(`("dateTime") BETWEEN '${startOfDay.toISOString().replace("T", " ").replace("Z", "")}' AND '${endOfDay.toISOString().replace("T", " ").replace("Z", "")}'`)
 
   if (!swipe) return false;
+  return true;
+}
+
+
+export async function getModulesByRoom(roomID: number): Promise<TrainingModuleRow[]> {
+  return await knex("ModulesForRooms").join("TrainingModule", "TrainingModule.id", "ModulesForRooms.moduleID").select("TrainingModule.*").where("ModulesForRooms.roomID", roomID).orderBy("TrainingModule.name", "asc");;
+}
+
+export async function addTrainingToRoom(roomID: number, moduleID: number): Promise<TrainingModuleRow[]> {
+  await knex("ModulesForRooms").insert({roomID: roomID, moduleID: moduleID});
+  return await getModulesByRoom(roomID);
+}
+
+export async function removeTrainingFromRoom(roomID: number, moduleID: number): Promise<TrainingModuleRow[]> {
+  await knex("ModulesForRooms").where({roomID: roomID, moduleID: moduleID}).delete();
+  return await getModulesByRoom(roomID);
+}
+
+export async function hasRoomTrainings(roomID: number, userID: number): Promise<boolean> {
+  let modules = await getModulesByRoom(roomID);
+    for (let i = 0; i < modules.length; i++) {
+      if (await ModuleRepo.hasPassedModule(userID, modules[i].id)) {
+        continue;
+      } else {
+        return false;
+      }
+    }
+
   return true;
 }

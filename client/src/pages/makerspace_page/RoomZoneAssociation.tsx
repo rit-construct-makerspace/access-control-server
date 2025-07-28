@@ -9,7 +9,7 @@ import { useCurrentUser } from "../../common/CurrentUserProvider";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { InputLabel } from "@mui/material";
-
+import SaveIcon from '@mui/icons-material/Save';
 
 const SET_ROOM_ZONE = gql`
   mutation setZone($roomID: ID!, $zoneID: ID!) {
@@ -41,7 +41,7 @@ export default function RoomZoneAssociation({
   const currentUser = useCurrentUser();
   const getZonesResult = useQuery(GET_ZONES);
   const [setNewZone, setNewZoneResult] = useMutation(SET_ROOM_ZONE);
-  
+
   const [updatedZoneID, setUpdatedZoneID] = useState(zoneID);
 
   const handleSubmit = () => {
@@ -63,12 +63,13 @@ export default function RoomZoneAssociation({
           label="Zone"
           onChange={(e) => setUpdatedZoneID(Number(e.target.value))}
         >
-          {getZonesResult.data != null && getZonesResult.data.zones.map((zone: {id: number, name: string}) => (
+          {getZonesResult.data != null && getZonesResult.data.zones.map((zone: { id: number, name: string }) => (
             <MenuItem selected={zone.id === zoneID} value={zone.id}>{zone.name}</MenuItem>
           ))}
         </Select>
       </FormControl>
       <LoadingButton
+        startIcon={<SaveIcon />}
         loading={setNewZoneResult.loading}
         size="large"
         variant="contained"
@@ -77,7 +78,7 @@ export default function RoomZoneAssociation({
       >
         Update Zone
       </LoadingButton>
-      
+
       {!currentUser.admin && (
         <Alert severity="info" sx={{ width: "max-content", mt: 1 }}>
           You do not have permission to change this.

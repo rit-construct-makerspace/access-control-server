@@ -6,6 +6,7 @@ import { knex } from "../../db/index.js";
 import { ModuleSubmissionRow } from "../../db/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import { getModules } from "./ModuleRepository.js";
+import * as PassedRepo from "./PassedRepository.js"; 
 
 /**
  * Create a Module SUbmission and append it to the table
@@ -20,6 +21,9 @@ export async function addSubmission(
     passed: boolean,
     summary: string
 ) {
+    if (passed) {
+        PassedRepo.addPassedModule(makerID, moduleID, new Date());
+    }
     return await knex("ModuleSubmissions").insert({ makerID, moduleID, passed, summary }).returning('id');
 }
 

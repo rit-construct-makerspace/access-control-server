@@ -2,15 +2,15 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { Module } from "../../../types/Quiz";
-import { GET_MODULE, GET_TRAINING_MODULES, UPDATE_MODULE, ARCHIVE_MODULE } from "../../../queries/trainingQueries";
+import { GET_TRAINING_MODULES, UPDATE_MODULE, ARCHIVE_MODULE, GET_MODULE_WITH_ANSWERS } from "../../../queries/trainingQueries";
 import 'react-toastify/dist/ReactToastify.css';
 import EditModulePage from "./EditModulePage";
 
 export default function EditActiveModulePage() {
-  const { id } = useParams<{ id: string }>();
+  const { id, makerspaceID } = useParams<{ id: string, makerspaceID: string }>();
   const navigate = useNavigate();
 
-  const queryResult = useQuery(GET_MODULE, {
+  const queryResult = useQuery(GET_MODULE_WITH_ANSWERS, {
     variables: { id }
   });
 
@@ -19,7 +19,7 @@ export default function EditActiveModulePage() {
   const [deleteModule] = useMutation(ARCHIVE_MODULE, {
     variables: { id },
     refetchQueries: [{ query: GET_TRAINING_MODULES }],
-    onCompleted: () => navigate("/admin/training"),
+    onCompleted: () => navigate(`/makerspace/${makerspaceID}/trainings`),
   });
 
   const executeUpdate = async (updatedModule: Module) => {
@@ -28,9 +28,10 @@ export default function EditActiveModulePage() {
         id: updatedModule.id,
         name: updatedModule.name,
         quiz: updatedModule.quiz,
+        makerspaceID: updatedModule.makerspaceID,
       },
       refetchQueries: [
-        { query: GET_MODULE, variables: { id } },
+        { query: GET_MODULE_WITH_ANSWERS, variables: { id } },
         { query: GET_TRAINING_MODULES },
       ],
     });
@@ -45,10 +46,10 @@ export default function EditActiveModulePage() {
       result={queryResult}
       render={() => (
         <EditModulePage
-            moduleInitialValue={queryResult.data.module}
-            deleteModule={executeDelete}
-            updateModule={executeUpdate}
-            updateLoading={updateResult.loading}
+          moduleInitialValue={queryResult.data.moduleWithAnswers}
+          deleteModule={executeDelete}
+          updateModule={executeUpdate}
+          updateLoading={updateResult.loading}
         />
       )}
     />
