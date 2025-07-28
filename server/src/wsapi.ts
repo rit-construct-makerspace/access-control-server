@@ -562,10 +562,20 @@ async function lookupMostRecentGitTagForTrack(trackname: string): Promise<string
   return tag;
 }
 
+export async function getAvailableFirmwareTags(): Promise<string[]>{
+  const github_api_url = 'https://api.github.com/repos/rit-construct-makerspace/access-control-firmware/releases';
+  
+  return await fetch(github_api_url).then(async resp => {
+    if (resp.body == null) { return []; }
+    const res: any[] = await resp.json();
+    console.log(res);
+    return res.map(o => o.tag_name)
+  })
+}
+
 async function lookupGitTagForShlug(reader: ReaderRow): Promise<string | null> {
   const currentVer = reader.BEVer;
   const track = reader.targetFirmwareVersion ?? "stable";
-  const special_tracks = ["stable"];
 
   if (track == "no-ota") {
     return "";

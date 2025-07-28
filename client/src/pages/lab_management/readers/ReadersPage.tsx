@@ -5,7 +5,7 @@ import Page from "../../Page";
 import SearchBar from "../../../common/SearchBar";
 import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper from "../../../common/RequestWrapper";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReaderCard from "./ReaderCard";
 import AdminPage from "../../AdminPage";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
@@ -13,13 +13,23 @@ import AddIcon from '@mui/icons-material/Add';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 
 export default function ReadersPage() {
-  const { makerspaceID } = useParams<{makerspaceID: string}>();
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
-  const getReadersResult = useQuery(GET_READERS, {pollInterval: 2000});
+  const getReadersResult = useQuery(GET_READERS, { pollInterval: 2000 });
   const user = useCurrentUser();
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    const hash = window.location.hash.slice(1); // Remove the '#' character from the hash
+    if (hash) {
+      const element = document.getElementById(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, []);
 
   return (
     <Box padding="20px">
@@ -46,9 +56,9 @@ export default function ReadersPage() {
               .includes(searchText.toLocaleLowerCase())
           ).map((reader: Reader) => (
             <Grid key={reader.id} alignItems="stretch">
-              <ReaderCard 
+              <ReaderCard
                 reader={reader}
-                makerspaceID={makerspaceID ?? "0"}/>
+                makerspaceID={makerspaceID ?? "0"} />
             </Grid>
           ))}
         </Grid>

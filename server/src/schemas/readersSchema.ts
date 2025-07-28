@@ -47,8 +47,10 @@ export const ReaderTypeDefs = gql`
     readers: [Reader]
     unpairedReaders: [Reader]
     welcomeReadersForMakerspace(makerspaceId: ID!): [Reader]
+    makerspaceForWelcomeReader(readerId: ID): Zone
     reader(id: ID!): Reader
     readerLogs(makerspaceID: ID, from: DateTime, to: DateTime, pageOffset: Int, pageLimit: Int): [ReaderLog]
+    availableFirmwareVersions: [String]
   }
 
   extend type Mutation {
@@ -85,7 +87,7 @@ export const ReaderTypeDefs = gql`
 
     setName(id: ID!, name: String): Reader
     setState(id: ID!, state: String): String
-    requestOTA(ids: [ID!], otaTag: String!): JSON
+    setOTAVersion(ids: [ID!]!, otaTag: String!, updateNow: Boolean!): JSON
     identifyReader(id: ID!, doIdentify: Boolean): Boolean
     }
 `;

@@ -315,6 +315,15 @@ export async function getWelcomeReadersForMakerspace(makerspaceId: number): Prom
     return await knex("MakerspaceWelcomeReaders").where({makerspaceID: makerspaceId}).leftJoin("Readers", "Readers.id", "MakerspaceWelcomeReaders.readerID").select("Readers.*");
 }
 
+/**
+ * Set the target firmware version for some readers
+ * @param ids the list of readers to set for
+ * @param version the firmware tag to set
+ */
+export async function setOTAVersions(ids: number[], version: string){
+    await knex("Readers").update("targetFirmwareVersion", version).whereIn("id", ids)
+}
+
 const ReaderCertCAId = 34;
 export async function getReaderCertCA(): Promise<TextFieldRow | undefined> {
     return await knex("TextFields").select().where({ id: ReaderCertCAId }).first();
