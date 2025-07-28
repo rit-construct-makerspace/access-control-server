@@ -23,6 +23,14 @@ const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
 
 const MIN_SESSION_LENGTH = 15
 
+
+enum WSAPIError {
+  Protocol = 4000,
+  InvalidMessageFormat = 4001,
+  Unauthenticated = 4002,
+  BadBootMessage = 4003,
+}
+
 /**
  * Pool of active shlugs to send info to
  */
@@ -80,24 +88,24 @@ export async function identifyReader(executingUser: UserRow, readerId: number, d
 
 
 export async function requestOTA(executingUser: UserRow, readerIds: number[], otaTag: string): Promise<{ id: number, ret: string }[]> {
-    const url = `https://github.com/rit-construct-makerspace/access-control-firmware/releases/tag/${otaTag}`;
-    await fetch(url).then(res => {
-        if (res.status != 200) {
-            return "no such release";
-        }
-    });
-    async function requestOTAToOne(id: number): Promise<{ id: number, ret: string }> {
-        const connData = slugPool.get(id);
-        console.log(stringSlugPool())
-        if (connData == null) {
-            return { id: id, ret: "no such reader" };
-        }
-        sendToShlugUnprompted(connData, { "OTATag": otaTag });
-        return { id: id, ret: "sent" }
+  const url = `https://github.com/rit-construct-makerspace/access-control-firmware/releases/tag/${otaTag}`;
+  await fetch(url).then(res => {
+    if (res.status != 200) {
+      return "no such release";
     }
-    return await Promise.all(
-        readerIds.map(requestOTAToOne)
-    );;
+  });
+  async function requestOTAToOne(id: number): Promise<{ id: number, ret: string }> {
+    const connData = slugPool.get(id);
+    console.log(stringSlugPool())
+    if (connData == null) {
+      return { id: id, ret: "no such reader" };
+    }
+    sendToShlugUnprompted(connData, { "OTATag": otaTag });
+    return { id: id, ret: "sent" }
+  }
+  return await Promise.all(
+    readerIds.map(requestOTAToOne)
+  );;
 }
 
 
@@ -122,22 +130,22 @@ export async function sendState(executingUser: UserRow, readerId: number, state:
   const instance = await getInstanceByReaderID(readerId);
   const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
 
-    if (instance == null || equipment == null) {
-        await createLog(
-            `{user} commanded {access_device}'s state to ${state} (unpaired).`,
-            "admin",
-            { id: executingUser.id, label: getUsersFullName(executingUser) },
-            { id: reader.id, label: reader.name }
-        );
-    } else {
-        const equipmentLabel = { id: equipment?.id, label: equipment ? equipment?.name : "unknown equipment" }
-        await createLog(
-            `{user} commanded {equipment} instance ${instance.name}'s state to ${state}.`,
-            "admin",
-            { id: executingUser.id, label: getUsersFullName(executingUser) },
-            equipmentLabel
-        );
-    }
+  if (instance == null || equipment == null) {
+    await createLog(
+      `{user} commanded {access_device}'s state to ${state} (unpaired).`,
+      "admin",
+      { id: executingUser.id, label: getUsersFullName(executingUser) },
+      { id: reader.id, label: reader.name }
+    );
+  } else {
+    const equipmentLabel = { id: equipment?.id, label: equipment ? equipment?.name : "unknown equipment" }
+    await createLog(
+      `{user} commanded {equipment} instance ${instance.name}'s state to ${state}.`,
+      "admin",
+      { id: executingUser.id, label: getUsersFullName(executingUser) },
+      equipmentLabel
+    );
+  }
 
   sendToShlugUnprompted(connData, { "State": state });
   return "success";
@@ -524,54 +532,54 @@ async function authorizeUidToStateChange(uid: string, toState: string, readerId:
 }
 
 async function lookupMostRecentGitTagForTrack(trackname: string): Promise<string> {
-    const github_api_url = 'https://api.github.com/repos/rit-construct-makerspace/access-control-firmware/releases';
-    var tag = "";
+  const github_api_url = 'https://api.github.com/repos/rit-construct-makerspace/access-control-firmware/releases';
+  var tag = "";
 
-    try {
-        interface Version {
-            tagname: string,
-            name: string,
-            published_at: Date,
-        };
-        await fetch(github_api_url).then(async resp => {
-            if (resp.body == null) { return; }
-            const res: any[] = await resp.json();
+  try {
+    interface Version {
+      tagname: string,
+      name: string,
+      published_at: Date,
+    };
+    await fetch(github_api_url).then(async resp => {
+      if (resp.body == null) { return; }
+      const res: any[] = await resp.json();
 
-            var releases: Version[] = res.map(r => { return { tagname: r.tag_name as string, name: r.name as string, published_at: new Date(r.published_at) } });
-            releases.sort((a, b) => (b.published_at.getTime() - a.published_at.getTime()))
-            const release = releases.filter(v => v.name.startsWith(trackname))[0];
-            if (release) {
-                tag = release.tagname;
-            } else {
-                console.error(`Failed to find matching release for '${trackname}' track OTA`)
-            }
-        })
-    } catch (e) {
-        console.error("Failed to query github api for OTA version: ", e);
-        return "";
+      var releases: Version[] = res.map(r => { return { tagname: r.tag_name as string, name: r.name as string, published_at: new Date(r.published_at) } });
+      releases.sort((a, b) => (b.published_at.getTime() - a.published_at.getTime()))
+      const release = releases.filter(v => v.name.startsWith(trackname))[0];
+      if (release) {
+        tag = release.tagname;
+      } else {
+        console.error(`Failed to find matching release for '${trackname}' track OTA`)
+      }
+    })
+  } catch (e) {
+    console.error("Failed to query github api for OTA version: ", e);
+    return "";
 
-    }
-    return tag;
+  }
+  return tag;
 }
 
 async function lookupGitTagForShlug(reader: ReaderRow): Promise<string | null> {
-    const currentVer = reader.BEVer;
-    const track = reader.targetFirmwareVersion ?? "stable";
-    const special_tracks = ["stable"];
+  const currentVer = reader.BEVer;
+  const track = reader.targetFirmwareVersion ?? "stable";
+  const special_tracks = ["stable"];
 
-    if (track == "no-ota") {
-        return "";  
-    } else if (track == "stable") {
-        const tag = await lookupMostRecentGitTagForTrack(track);
-        if (tag == currentVer || tag == "") {
-            return null;
-        } else {
-            return tag;
-        }
+  if (track == "no-ota") {
+    return "";
+  } else if (track == "stable") {
+    const tag = await lookupMostRecentGitTagForTrack(track);
+    if (tag == currentVer || tag == "") {
+      return null;
+    } else {
+      return tag;
     }
+  }
 
-    // the track is just a github tag
-    return reader.targetFirmwareVersion ?? null;
+  // the track is just a github tag
+  return reader.targetFirmwareVersion ?? null;
 }
 
 /**
@@ -581,63 +589,63 @@ async function lookupGitTagForShlug(reader: ReaderRow): Promise<string | null> {
  * @returns response containing those keys
  */
 async function handleRequest(connData: ConnectionData | undefined, requested_values: string[], currentFWVersion: string): Promise<ShlugResponse> {
-    console.log("requested: ", requested_values);
-    const reader: ReaderRow | undefined = await getReaderByID(connData?.readerId ?? 0);
+  console.log("requested: ", requested_values);
+  const reader: ReaderRow | undefined = await getReaderByID(connData?.readerId ?? 0);
 
-    var obj: ShlugResponse = { Seq: -1 };
-    for (let value of requested_values) {
-        switch (value) {
-            case "Time":
-                obj.Time = Math.floor(Date.now() / 1000);
-                break;
-            case "State":
-                if (reader?.id == null) {
-                    wsApiLog(`Couldn't find requested reader information for id ${connData?.readerId}. Telling Idle`, "State")
-                    obj.State = "Idle";
-                } else {
-                    const pairStatus: PairStatus = await getReaderPairStatus(reader.id);
-                    if (pairStatus == PairStatus.PairedAsWelcomer) {
-                        obj.State = "Welcoming";
-                    } else if (reader.state) {
-                        if (["Lockout", "Welcoming"].includes(reader.state)) {
-                            obj.State = reader.state;
-                        } else {
-                            obj.State = "Idle"
-                        }
+  var obj: ShlugResponse = { Seq: -1 };
+  for (let value of requested_values) {
+    switch (value) {
+      case "Time":
+        obj.Time = Math.floor(Date.now() / 1000);
+        break;
+      case "State":
+        if (reader?.id == null) {
+          wsApiLog(`Couldn't find requested reader information for id ${connData?.readerId}. Telling Idle`, "State")
+          obj.State = "Idle";
+        } else {
+          const pairStatus: PairStatus = await getReaderPairStatus(reader.id);
+          if (pairStatus == PairStatus.PairedAsWelcomer) {
+            obj.State = "Welcoming";
+          } else if (reader.state) {
+            if (["Lockout", "Welcoming"].includes(reader.state)) {
+              obj.State = reader.state;
+            } else {
+              obj.State = "Idle"
+            }
 
-                    }
-                }
-                break;
-            case "OTATag":
-                if (reader == null) {
-                    break;
-                }
-                const gittag: string | null = await lookupGitTagForShlug(reader);
-                if (gittag) {
-                    obj.OTATag = gittag;
-                }
-                break;
-            default:
-                console.error(`Invalid request from Shlug ${connData?.readerId}:`, value);
+          }
         }
+        break;
+      case "OTATag":
+        if (reader == null) {
+          break;
+        }
+        const gittag: string | null = await lookupGitTagForShlug(reader);
+        if (gittag) {
+          obj.OTATag = gittag;
+        }
+        break;
+      default:
+        console.error(`Invalid request from Shlug ${connData?.readerId}:`, value);
     }
-    return obj;
+  }
+  return obj;
 }
 
 // What the shlug sends over websockets
 interface ShlugMessage {
   SerialNumber?: string
 
-    FWVersion?: string;
-    FEVer?: string;
-    BEVer?: string;
-    HWVersion?: string;
-    HWType?: string;
-    Request?: string[];
-    Message?: string;  // Log Message to echo to history
-    Log?: string;      // Structured log message to save. Should be JSON 
-    State?: string; // Current State
-    UID?: string; // Reason for switching to that state
+  FWVersion?: string;
+  FEVer?: string;
+  BEVer?: string;
+  HWVersion?: string;
+  HWType?: string;
+  Request?: string[];
+  Message?: string;  // Log Message to echo to history
+  Log?: string;      // Structured log message to save. Should be JSON 
+  State?: string; // Current State
+  UID?: string; // Reason for switching to that state
 
   Auth?: string; // UID to authorize
   AuthTo?: string // state that the person wants to go to
@@ -649,18 +657,18 @@ interface ShlugMessage {
 }
 // What the server sends to the shlug in response to a ShlugMessage
 interface ShlugResponse {
-    Seq: number
-    Connected?: boolean
-    Auth?: string
-    AuthTo?: string
-    Verified?: number
-    Role?: string
-    Error?: string
-    Reason?: string
+  Seq: number
+  Connected?: boolean
+  Auth?: string
+  AuthTo?: string
+  Verified?: number
+  Role?: string
+  Error?: string
+  Reason?: string
 
-    Time?: number /// unix timestamp
-    State?: string
-    OTATag?: string // git tag
+  Time?: number /// unix timestamp
+  State?: string
+  OTATag?: string // git tag
 }
 
 /**
@@ -706,31 +714,24 @@ async function generateUniqueHumanName() {
 
 /**
  * Checks if a shlug is valid, paired, and authenticated
- * @param readerSN SN reported by a client
- * @param readerKey Key associated with that SN that a client gave
+ * @param reader the machine that is trying to authenticate
+ * @param submittedKey Key associated with that SN that a client gave
  * @returns true if that is a valid, paired shlug
  */
-export async function authenticateReader(readerSN: string, readerKey: string): Promise<boolean> {
-  if (!readerSN || !readerKey) {
+export async function authenticateReader(reader: ReaderRow, submittedKey: string): Promise<boolean> {
+  if (!reader || !submittedKey) {
     return false;
   }
-  var reader: ReaderRow | undefined = await getReaderBySN(readerSN);
   if (reader?.pairTime == null || reader?.SN == null || reader?.readerKeyCycle == null) {
     return false;
 
   }
   const keyToMatch = await generateShlugKey(reader.pairTime, reader.SN, reader.readerKeyCycle);
-  if (readerKey != keyToMatch) {
+  if (submittedKey != keyToMatch) {
+    console.log("Bad key", submittedKey, " to ", keyToMatch);
     return false;
   }
   return true;
-    }
-    const keyToMatch = await generateShlugKey(reader.pairTime, reader.SN, reader.readerKeyCycle);
-    if (readerKey != keyToMatch) {
-        console.log("Bad key", readerKey, " to ", keyToMatch);
-        return false;
-    }
-    return true;
 }
 
 
@@ -742,32 +743,32 @@ export async function authenticateReader(readerSN: string, readerKey: string): P
  * @returns true on successful parse. False if missing fields or otherwise invalid
  */
 async function handleBootupMessage(connData: ConnectionData, message: ShlugMessage, ws: ws.WebSocket, srcIp: string): Promise<boolean> {
-    const hasSWVersions = (message.FWVersion != null) || (message.FEVer != null && message.BEVer != null);
-    if (message.SerialNumber == null || message.Key == null || !hasSWVersions || message.HWVersion == null || message.HWType == null) {
-        if (message.Key) {
-            message.Key = "<sanitized>";
-        }
-        console.error(`WSACS: Missing fields in boot message from ${srcIp}. Got ${JSON.stringify(message)}`);
-        submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "missing fields", "ReaderIP": srcIp, "message": message });
-        ws.close(4000, "Invalid Fields");
-        return false;
+  const hasSWVersions = (message.FWVersion != null) || (message.FEVer != null && message.BEVer != null);
+  if (message.SerialNumber == null || message.Key == null || !hasSWVersions || message.HWVersion == null || message.HWType == null) {
+    if (message.Key) {
+      message.Key = "<sanitized>";
     }
-    var reader: ReaderRow | undefined = await getReaderBySN(message.SerialNumber ?? "");
-    if (reader?.pairTime == null || reader?.SN == null) {
-        wsApiLog(`WSACS: Request from unpaired shlug ${srcIp} (SN: ${reader?.SN}). Denying`, "status");
-        console.error(`WSACS: Request from unpaired shlug ${srcIp}. Denying`);
-        submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "unpaired", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
-        ws.close(4001, "Unpaired Reader. Rejected");
-        return false;
+    console.error(`WSACS: Missing fields in boot message from ${srcIp}. Got ${JSON.stringify(message)}`);
+    submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "missing fields", "ReaderIP": srcIp, "message": message });
+    ws.close(WSAPIError.InvalidMessageFormat, "Invalid Fields");
+    return false;
+  }
+  var reader: ReaderRow | undefined = await getReaderBySN(message.SerialNumber ?? "");
+  if (reader?.pairTime == null || reader?.SN == null) {
+    wsApiLog(`WSACS: Request from unpaired shlug ${srcIp} (SN: ${reader?.SN}). Denying`, "status");
+    console.error(`WSACS: Request from unpaired shlug ${srcIp}. Denying`);
+    submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "unpaired", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
+    ws.close(WSAPIError.Protocol, "Unpaired Reader. Rejected");
+    return false;
 
   }
-  const keyToMatch = await generateShlugKey(reader?.pairTime, reader?.SN, reader?.readerKeyCycle);
-  if (message.Key != keyToMatch) {
+
+  if (!authenticateReader(reader, message.Key)) {
     wsApiLog(`WSACS: Invalid key from SN ${reader?.SN} on connect. Was it paired correctly?`, "status");
     message.Key = "<sanitized>";
     await submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "wrong key", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
     console.error(`WSACS: Invalid key from SN ${reader?.SN} on connect.`);
-    ws.close(4002, "Invalid Key. Rejected")
+    ws.close(WSAPIError.Unauthenticated, "Invalid Key. Rejected")
     return false;
   }
 
@@ -814,24 +815,24 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
     newState = reader.state;
   }
 
-    // update with new info
-    await updateReaderStatus({
-        id: reader.id,
-        machineID: undefined,
-        machineType: "",
-        zone: "",
-        temp: 0,
-        state: newState,
-        currentUID: "",
-        recentSessionLength: reader.recentSessionLength,
-        lastStatusReason: reader.lastStatusReason,
-        scheduledStatusFreq: reader.scheduledStatusFreq,
-        helpRequested: reader.helpRequested,
-        BEVer: message.BEVer ?? message.FWVersion ?? undefined,
-        FEVer: message.FEVer ?? message.FWVersion ?? undefined,
-        HWVer: message.HWVersion ?? undefined,
-        SN: message.SerialNumber,
-    });
+  // update with new info
+  await updateReaderStatus({
+    id: reader.id,
+    machineID: undefined,
+    machineType: "",
+    zone: "",
+    temp: 0,
+    state: newState,
+    currentUID: "",
+    recentSessionLength: reader.recentSessionLength,
+    lastStatusReason: reader.lastStatusReason,
+    scheduledStatusFreq: reader.scheduledStatusFreq,
+    helpRequested: reader.helpRequested,
+    BEVer: message.BEVer ?? message.FWVersion ?? undefined,
+    FEVer: message.FEVer ?? message.FWVersion ?? undefined,
+    HWVer: message.HWVersion ?? undefined,
+    SN: message.SerialNumber,
+  });
 
   return true;
 }
@@ -843,9 +844,9 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
  * @param activeUID the active UID if there is one. null if no card inserted
  */
 async function handleStateUpdateMessage(reader: ReaderRow, newState: string, activeUID: string | undefined, temp: number | undefined, nextAppVersion: string | undefined) {
-    const timeOfChange: Date = new Date();
-    const oldState = reader.state;
-    const oldUID = reader.currentUID;
+  const timeOfChange: Date = new Date();
+  const oldState = reader.state;
+  const oldUID = reader.currentUID;
 
   reader.state = newState;
   reader.currentUID = activeUID ?? "";
@@ -880,28 +881,28 @@ async function handleStateUpdateMessage(reader: ReaderRow, newState: string, act
       reader.currentUID = activeUID ?? '';
       const timeString = new Date(reader.recentSessionLength * 1000).toISOString().slice(11, 19);
 
-            if (instance == null || equipment == null) {
-                if (user != null) {
-                    await createLog(`{user} signed out of {access_device} that was not paired with any instance (Unpaired while in use) (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, { id: reader.id, label: reader.name ?? "undefined" });
-                }
-            } else {
-                // Update equipment session that was created when we authed
-                await setLatestEquipmentSessionLength(equipment.id, reader.recentSessionLength, reader.name);
-                if (user != null) {
-                    await createLog(`{user} signed out of {equipment} (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, label);
-                }
-            }
+      if (instance == null || equipment == null) {
+        if (user != null) {
+          await createLog(`{user} signed out of {access_device} that was not paired with any instance (Unpaired while in use) (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, { id: reader.id, label: reader.name ?? "undefined" });
         }
+      } else {
+        // Update equipment session that was created when we authed
+        await setLatestEquipmentSessionLength(equipment.id, reader.recentSessionLength, reader.name);
+        if (user != null) {
+          await createLog(`{user} signed out of {equipment} (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, label);
+        }
+      }
     }
-    if (newState == "Unlocked") {
-        const now = new Date();
-        const then = reader.sessionStartTime ?? new Date(); // if not there, set ot 0
-        const elapsedSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-        reader.recentSessionLength = elapsedSeconds;
-    }
-    reader.temp = temp ?? reader.temp;
-    reader.FEVer = nextAppVersion ?? reader.FEVer;
-    await updateReaderStatus(reader);
+  }
+  if (newState == "Unlocked") {
+    const now = new Date();
+    const then = reader.sessionStartTime ?? new Date(); // if not there, set ot 0
+    const elapsedSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
+    reader.recentSessionLength = elapsedSeconds;
+  }
+  reader.temp = temp ?? reader.temp;
+  reader.FEVer = nextAppVersion ?? reader.FEVer;
+  await updateReaderStatus(reader);
 
 }
 /**
@@ -911,10 +912,10 @@ async function handleStateUpdateMessage(reader: ReaderRow, newState: string, act
  * @returns true if we should send this message to the reader
  */
 function isReplyWorthSending(resp: ShlugResponse): boolean {
-    if (resp.Verified || resp.Auth || resp.Error || resp.Reason || resp.Role || resp.State || resp.Time || resp.Connected) {
-        return true
-    }
-    return false
+  if (resp.Verified || resp.Auth || resp.Error || resp.Reason || resp.Role || resp.State || resp.Time || resp.Connected) {
+    return true
+  }
+  return false
 }
 
 /**
@@ -961,7 +962,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
 
       await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "error", "WsErrorMsg": ev.message });
       console.error(`WSACS: websocket error ${ev.error} - ${ev.type}: ${ev.message}`)
-      ws.close(4000, "got unrecoverable error");
+      ws.close(WSAPIError.Protocol, "got unrecoverable error");
     }
 
     ws.onmessage = async function (ev: ws.MessageEvent) {
@@ -971,62 +972,64 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
           console.error(`Invalid Shlug Message: ${JSON.stringify(ev.data)}. Forcing reconnect`);
           await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "invalid message", "Data": ev.data });
 
-          ws.close(4001, "Invalid Message");
+          ws.close(WSAPIError.InvalidMessageFormat, "Invalid Message");
           return;
         }
 
-                // First Message is special, identifies the shlug to the server
-                if (shlugMessage.Seq === 0) {
-                    // Bootup message
-                    if (!await handleBootupMessage(connData, shlugMessage, ws, req.ip ?? "unknown ip")) {
-                        // failed to setup  
-                        console.error("WSACS: Incorrect Boot Message. Forcing Reconnect")
-                        ws.close(4001, "Invalid Boot Message");
-                        return;
-                    }
-                }
-                if (connData.readerId == null) {
-                    wsApiLog("Can not process WSAPI message. Null reader ID (this shouldn't happen): "+ev.data, "status")
-                    return;
-                }
+        // First Message is special, identifies the shlug to the server
+        if (shlugMessage.Seq === 0) {
+          // Bootup message
+          if (!await handleBootupMessage(connData, shlugMessage, ws, req.ip ?? "unknown ip")) {
+            // failed to setup  
+            console.error("WSACS: Incorrect Boot Message. Forcing Reconnect")
+            ws.close(WSAPIError.BadBootMessage, "Invalid Boot Message");
 
-                addOrUpdateConnection(connData);
-                // Get reader that was setup by handleBootupMessage
-                var reader = await getReaderByID(connData.readerId ?? 0);
-                if (reader == null) {
-                    submitReaderLog(null, new Date(), { "WsEvent": "undefined reader", "ReaderIP": req.ip, "ReaderID": connData?.readerId });
-                    console.error(`Failed to find entry for device. Forcing Reconnect. ID: ${connData.readerId}, Last State: ${connData.currentState}. IP: ${req.ip}: ${JSON.stringify(shlugMessage)}`);
-                    // Closing the websocket will make it reauth and hopefully tell us its id
-                    ws.close(4000, "No Device Found");
-                    return;
-                }
-                var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [], reader.BEVer);
-                if (shlugMessage.Seq == 0) {
-                    // always send a response back on connect
-                    response.Connected = true;
-                }
-                if (shlugMessage.Message) {
-                    try {
-                        const instance = await getInstanceByReaderID(reader.id);
-                        const machine = await getEquipmentByID(instance?.equipmentID ?? 0);
-                        if (instance == null || machine == null) {
-                            throw EntityNotFound;
-                        }
-                        wsApiLog(`{access_device} - {machine} instance '${instance.name}' message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: machine.id, label: machine.name })
-                    } catch (e) {
-                        wsApiLog(`{access_device} (unpaired) message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: reader.id, label: reader.name })
-                    }
-                }
-                if (shlugMessage.Log) {
-                    try {
-                        await submitReaderLog(connData.readerId ?? null, new Date(), shlugMessage.Log);
-                    } catch (e: any) {
-                        wsApiLog(`Unable to submit Reader Log '${JSON.stringify(shlugMessage.Log)}': ${e}`, "status");
-                    }
-                }
-                if (shlugMessage.State) {
-                    await handleStateUpdateMessage(reader, shlugMessage.State, shlugMessage.UID, shlugMessage?.Temp, shlugMessage?.FEVer)
-                }
+            return;
+          }
+        }
+        if (connData.readerId == null) {
+          wsApiLog("Can not process WSAPI message -> forcing disconnect. Null reader ID (this shouldn't happen): " + ev.data, "status")
+          ws.close(WSAPIError.Protocol, "Server couldnt process due to null reader id");
+          return;
+        }
+
+        addOrUpdateConnection(connData);
+        // Get reader that was setup by handleBootupMessage
+        var reader = await getReaderByID(connData.readerId ?? 0);
+        if (reader == null) {
+          submitReaderLog(null, new Date(), { "WsEvent": "undefined reader", "ReaderIP": req.ip, "ReaderID": connData?.readerId });
+          console.error(`Failed to find entry for device. Forcing Reconnect. ID: ${connData.readerId}, Last State: ${connData.currentState}. IP: ${req.ip}: ${JSON.stringify(shlugMessage)}`);
+          // Closing the websocket will make it reauth and hopefully tell us its id
+          ws.close(WSAPIError.Protocol, "No Device Found");
+          return;
+        }
+        var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [], reader.BEVer);
+        if (shlugMessage.Seq == 0) {
+          // always send a response back on connect
+          response.Connected = true;
+        }
+        if (shlugMessage.Message) {
+          try {
+            const instance = await getInstanceByReaderID(reader.id);
+            const machine = await getEquipmentByID(instance?.equipmentID ?? 0);
+            if (instance == null || machine == null) {
+              throw EntityNotFound;
+            }
+            wsApiLog(`{access_device} - {machine} instance '${instance.name}' message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: machine.id, label: machine.name })
+          } catch (e) {
+            wsApiLog(`{access_device} (unpaired) message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: reader.id, label: reader.name })
+          }
+        }
+        if (shlugMessage.Log) {
+          try {
+            await submitReaderLog(connData.readerId ?? null, new Date(), shlugMessage.Log);
+          } catch (e: any) {
+            wsApiLog(`Unable to submit Reader Log '${JSON.stringify(shlugMessage.Log)}': ${e}`, "status");
+          }
+        }
+        if (shlugMessage.State) {
+          await handleStateUpdateMessage(reader, shlugMessage.State, shlugMessage.UID, shlugMessage?.Temp, shlugMessage?.FEVer)
+        }
 
         if (shlugMessage.Auth && (shlugMessage.AuthTo == null || shlugMessage.AuthTo == "Unlocked")) {
           response = await authorizeUIDToUnlock(shlugMessage?.Auth, connData.readerId ?? 0, response)
