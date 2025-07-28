@@ -103,14 +103,15 @@ export async function setModuleArchived(id: number, archived: boolean): Promise<
  * @param quiz {TrainingModuleItem} the attached quiz
  * @returns the added module
  */
-export async function addModule(name: string, quiz: object): Promise<TrainingModuleRow> {
+export async function addModule(name: string, quiz: object, makerspaceID: number | null): Promise<TrainingModuleRow> {
 
 
   const addedModule: TrainingModuleRow[] = await knex("TrainingModule")
                       .insert(
                         {
                           name: name,
-                          quiz: JSON.stringify(quiz) as unknown as TrainingModuleItem[] //quiz has same format as TrainingModuleItem, (updateModule does  as unknown as TrainingModuleItem[] behind the scene somewhere but I cannot find how to do that)
+                          quiz: JSON.stringify(quiz) as unknown as TrainingModuleItem[], //quiz has same format as TrainingModuleItem, (updateModule does  as unknown as TrainingModuleItem[] behind the scene somewhere but I cannot find how to do that)
+                          makerspaceID: makerspaceID,
                         }, "*");
 
   if (addedModule.length < 1) throw new EntityNotFound(`Could not add module ${name}`);
@@ -129,12 +130,13 @@ export async function updateModule(
   id: number,
   name: string,
   quiz: object,
-  reservationPrompt: object
+  reservationPrompt: object,
+  makerspaceID: number,
 ): Promise<TrainingModuleRow> {
   await knex("TrainingModule")
     .where({ id })
     // @ts-ignore
-    .update({ name, quiz: JSON.stringify(quiz), reservationPrompt: JSON.stringify(reservationPrompt) });
+    .update({ name, quiz: JSON.stringify(quiz), reservationPrompt: JSON.stringify(reservationPrompt), makerspaceID: makerspaceID });
   return getModuleByID(id);
 }
 
@@ -146,17 +148,15 @@ export async function updateModule(
 export async function getPassedModulesByUser(
   userID: number
 ): Promise<PassedModule[]> {
-  return knex("ModuleSubmissions")
-    .join("TrainingModule", "TrainingModule.id", "ModuleSubmissions.moduleID")
+  return knex("PassedModules")
+    .join("TrainingModule", "TrainingModule.id", "PassedModules.moduleID")
     .select(
-      "ModuleSubmissions.id",
-      "ModuleSubmissions.moduleID",
+      "PassedModules.moduleID",
       "TrainingModule.name as moduleName",
-      "ModuleSubmissions.submissionDate",
-      "ModuleSubmissions.expirationDate"
+      "PassedModules.passedDate",
+      "TrainingModule.makerspaceID as makerspaceID"
     )
-    .where("ModuleSubmissions.makerID", userID)
-    .andWhere("ModuleSubmissions.passed", true)
+    .where("PassedModules.userID", userID)
     .orderBy("name", "asc");;
 }
 
@@ -170,10 +170,7 @@ export async function hasPassedModule(
   userID: number,
   moduleID: number
 ) : Promise<boolean> {
-  return (await getPassedModulesByUser(userID)).some((passedModule: PassedModule) => {
-    // User has this training if they have a passing and non-expired submission
-    return passedModule?.moduleID === moduleID && passedModule?.expirationDate > new Date();
-  });
+  return (await knex("PassedModules").select("*").where("userID", userID).andWhere("moduleID", moduleID)).length > 0;
 }
 
 

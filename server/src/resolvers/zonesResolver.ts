@@ -2,7 +2,7 @@ import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js
 import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
 import { createZoneHours, deleteZoneHours, getHoursByZone, getZoneHours } from "../repositories/Zones/ZoneHoursRepository.js";
-import { createZone, deleteZone, getZoneByID, getZones, updateZone } from "../repositories/Zones/ZonesRespository.js";
+import { addTrainingToZone, createZone, deleteZone, getTrainingsByZone, getZoneByID, getZones, removeTrainingFromZone, updateZone } from "../repositories/Zones/ZonesRespository.js";
 import { ZoneRow } from "../db/tables.js";
 import { getRooms, getRoomsByZone } from "../repositories/Rooms/RoomRepository.js";
 import { ZoneInput } from "../schemas/zonesSchema.js";
@@ -23,6 +23,13 @@ const ZonesResolver = {
       _args: any,
     ) => {
       return getHoursByZone(parent.id);
+    },
+
+    trainingModules: async (
+      parent: ZoneRow,
+      _args: any,
+    ) => {
+      return getTrainingsByZone(parent.id);
     }
   },
 
@@ -91,6 +98,29 @@ const ZonesResolver = {
         await deleteZone(args.id);
         return (await getZones())[0];
       }),
+    
+    addTrainingToZone: async (
+      _parent: any,
+      args: {
+        zoneID: number,
+        moduleID: number,
+      },
+      {isManagerFor}: ApolloContext
+    ) => isManagerFor(args.zoneID, async () => {
+      return await addTrainingToZone(args.zoneID, args.moduleID);
+    }),
+
+    removeTrainingFromZone: async (
+      _parent: any,
+      args: {
+        zoneID: number,
+        moduleID: number,
+      },
+      {isManagerFor} : ApolloContext
+    ) => isManagerFor(args.zoneID, async () => {
+      return await removeTrainingFromZone(args.zoneID, args.moduleID);
+    })
+
   }
 };
 

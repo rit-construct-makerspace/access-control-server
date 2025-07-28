@@ -18,6 +18,7 @@ export const ZonesTypeDefs = gql`
     rooms: [Room]
     hours: [ZoneHours]
     imageUrl: String
+    trainingModules: [TrainingModule]
   }
 
   input ZoneInput {
@@ -34,5 +35,7 @@ export const ZonesTypeDefs = gql`
     deleteZone(id: ID!): Zone
     addZone(name: String!): Zone
     updateZone(id: ID!, newZone: ZoneInput): Zone
+    addTrainingToZone(zoneID: ID!, moduleID: ID!): [TrainingModule]
+    removeTrainingFromZone(zoneID: ID!, moduleID: ID!): [TrainingModule]
   }
 `;

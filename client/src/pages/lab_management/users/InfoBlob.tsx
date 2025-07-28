@@ -1,5 +1,4 @@
-import React from "react";
-import { Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 
 interface InfoBlobProps {
   label: string;
@@ -8,9 +7,9 @@ interface InfoBlobProps {
 
 export default function InfoBlob({ label, value }: InfoBlobProps) {
   return (
-    <div>
+    <Stack>
       <Typography fontWeight={500}>{label}</Typography>
       <Typography>{value}</Typography>
-    </div>
+    </Stack>
   );
 }
