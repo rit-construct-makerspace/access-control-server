@@ -22,7 +22,7 @@ import { createLog, createLogWithArray } from "./repositories/AuditLogs/AuditLog
 import { getEquipmentByID, getMissingTrainingModules, hasAccessByID } from "./repositories/Equipment/EquipmentRepository.js";
 import { Room } from "./models/rooms/room.js";
 import { Privilege } from "./schemas/usersSchema.js";
-import { createReader, getReaderByID, getReaderByName, getReaderCertCA, toggleHelpRequested, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
+import { createReader, getReaderByID, getReaderByName, getReaderBySN, getReaderCertCA, toggleHelpRequested, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import morgan from "morgan"; //Log provider
 import bodyParser from "body-parser"; //JSON request body parser
@@ -194,7 +194,12 @@ async function startServer() {
       return res.status(401).send();
     }
 
-    const ok = await authenticateReader(SN, Key);
+    const reader = await getReaderBySN(SN);
+    if (reader == null){
+      return res.status(404).send();
+    }
+
+    const ok = await authenticateReader(reader, Key);
     if (!ok) {
       wsApiLog("Declining API file to unauthed shlug with SN " + SN, "file");
       return res.status(403).send();
