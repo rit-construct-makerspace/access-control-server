@@ -30,13 +30,6 @@ export default function ZoneHoursSection(props: ZoneHoursProps) {
     timeZone: "America/New_York",
   });
 
-  const timeFormatter = new Intl.DateTimeFormat("en-US", {
-    hour: "numeric",
-    minute: "numeric",
-    timeZone: "America/New_York",
-    hour12: true
-  });
-
   const now = new Date();
 
   return (
@@ -45,8 +38,6 @@ export default function ZoneHoursSection(props: ZoneHoursProps) {
         props.hours.map((hour: ZoneHours) => {
 
           const dayDate = new Date(hour.day);
-          const openDate = new Date(hour.open ?? now);
-          const closeDate = new Date(hour.close ?? now);
 
           return (
             <Stack alignItems={"center"}>
@@ -56,7 +47,7 @@ export default function ZoneHoursSection(props: ZoneHoursProps) {
                 hour.closed
                   ? <Typography variant="body1">CLOSED</Typography>
                   : <Typography variant="body1">
-                    {`${timeFormatter.format(openDate)} - ${timeFormatter.format(closeDate)}`}
+                    {`${TimeUtils.reformatTime(hour.open?.substring(0, 5) ?? "12:00")} - ${TimeUtils.reformatTime(hour.close?.substring(0, 5) ?? "12:00")}`}
                   </Typography>
               }
 

@@ -1,15 +1,15 @@
 export default interface ZoneHours {
     day: Date;
     makerspaceID: number;
-    open: Date | null;
-    close: Date | null;
+    open: string | null;
+    close: string | null;
     closed: boolean;
 }
 
 export interface ZoneDefaultHours {
     dayOfWeek: number;
     makerspaceID: number;
-    open: String | null;
-    close: String | null;
+    open: string | null;
+    close: string | null;
     closed: boolean;
 }
