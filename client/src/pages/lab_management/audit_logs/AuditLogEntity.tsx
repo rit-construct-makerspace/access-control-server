@@ -21,9 +21,9 @@ function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
     case "conceal":
       return "#";
     case "access_device":
-      return `/makerspace/${makerspaceID}/readers`;
+      return `/makerspace/${makerspaceID}/readers#id-${id}`;
     case "machine":
-      return `/makerspace/${makerspaceID}/readers`;
+      return `/makerspace/${makerspaceID}/readers#id-${id}`;
     case "makerspace":
       return `/makerspace/${id}`;
     default:

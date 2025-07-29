@@ -53,7 +53,13 @@ export async function getReaderByMachineID(
  * Fetch all card readers
  */
 export async function getReaders(): Promise<ReaderRow[]> {
-    return await knex("Readers").select("*").orderBy("helpRequested", "desc").orderBy("id", "asc"); //Order them to prevent random ordering everytime the client polls, also prioritize help
+    //Order them to prevent random ordering everytime the client polls, also prioritize help
+    return await knex("Readers")
+        .select("*", knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
+        .orderBy("helpRequested", "desc")
+        .orderBy("faultOrder", "asc")
+        .orderBy("id", "asc")
+        ; 
 }
 
 /**
@@ -313,6 +319,15 @@ export async function getMakerspaceOfWelcomeReader(readerID: number): Promise<Zo
  */
 export async function getWelcomeReadersForMakerspace(makerspaceId: number): Promise<ReaderRow[]>{
     return await knex("MakerspaceWelcomeReaders").where({makerspaceID: makerspaceId}).leftJoin("Readers", "Readers.id", "MakerspaceWelcomeReaders.readerID").select("Readers.*");
+}
+
+/**
+ * Set the target firmware version for some readers
+ * @param ids the list of readers to set for
+ * @param version the firmware tag to set
+ */
+export async function setOTAVersions(ids: number[], version: string){
+    await knex("Readers").update("targetFirmwareVersion", version).whereIn("id", ids)
 }
 
 const ReaderCertCAId = 34;

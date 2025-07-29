@@ -259,6 +259,7 @@ export interface ReaderRow {
   SN?: string;
   readerKeyCycle: number;
   pairTime?: Date
+  targetFirmwareVersion?: string
 }
 
 export interface MakerspaceWelcomeReaderRow{
