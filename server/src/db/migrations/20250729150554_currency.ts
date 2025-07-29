@@ -37,7 +37,7 @@ export async function up(knex: Knex): Promise<void> {
 
     await knex.schema.createTable("CurrencyLedger", (t) => {
         t.integer("id").primary();
-        t.timestamp("date").notNullable().defaultTo(knex.fn.now());
+        t.timestamp("dateTime").notNullable().defaultTo(knex.fn.now());
         t.integer("accountID").references("id").inTable("CurrencyAccounts").notNullable();
         t.integer("amount").notNullable();
         t.string("source").notNullable();

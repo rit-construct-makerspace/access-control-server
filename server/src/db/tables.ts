@@ -419,6 +419,7 @@ export interface OrganizationsRow {
 
 export interface CurrencyLedgerRow {
   id: number;
+  dateTime: Date;
   accountID: number;
   amount: number;
   source: string;
