@@ -60,14 +60,33 @@ export async function getZoneDefaultHours(makerspaceID: number): Promise<Default
     return await knex("DefaultHours").where({ makerspaceID: makerspaceID }).select("*").orderBy("dayOfWeek", "asc");
 }
 
-export async function addSpecialHours(hours: SpecialHoursRow): Promise<number[]> {
-    return await knex("SpecialHours").insert(hours).onConflict(["day", "makerspaceID"]).merge();
+export async function addSpecialHours(hours: SpecialHoursRow): Promise<boolean> {
+    try {
+        await knex("SpecialHours").insert(hours).onConflict(["day", "makerspaceID"]).merge();
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+
 }
 
-export async function deleteSpecialHours(day: Date, makerspaceID: number): Promise<number> {
-    return await knex("SpecialHours").where({ day: day, makerspaceID: makerspaceID }).delete();
+export async function deleteSpecialHours(day: Date, makerspaceID: number): Promise<boolean> {
+    try {
+        await knex("SpecialHours").where({ day: day, makerspaceID: makerspaceID }).delete();
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
 }
 
-export async function updateDefaultHours(hours: DefaultHoursRow): Promise<number[]> {
-    return await knex("DefaultHours").insert(hours).onConflict(["dayOfWeek", "makerspaceID"]).merge();
+export async function updateDefaultHours(hours: DefaultHoursRow): Promise<boolean> {
+    try {
+        await knex("DefaultHours").insert(hours).onConflict(["dayOfWeek", "makerspaceID"]).merge();
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false
+    }
 }
