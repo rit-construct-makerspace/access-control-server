@@ -6,6 +6,7 @@ import { Box, Stack } from "@mui/system";
 import { Alert, Autocomplete, Button, Card, CardContent, IconButton, TextField, Tooltip, Typography } from "@mui/material";
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import AddLinkIcon from '@mui/icons-material/AddLink';
+import AuditLogEntity from "../lab_management/audit_logs/AuditLogEntity";
 
 
 export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId: number }) {
@@ -51,10 +52,10 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
                         (pairedReaders && pairedReaders.length > 0) ?
                             (pairedReaders.map((reader: Reader) => {
                                 return <Card>
-                                    <CardContent sx={{ pb: "16px" }}>
-                                        <Stack direction={"row"} spacing={1} justifyContent={"space-between"} alignItems={"center"}>
-                                            <Typography>
-                                                {reader.name}
+                                    <CardContent>
+                                        <Stack direction={"row"} spacing={1} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                            <Typography variant="h6" component="div">
+                                                <AuditLogEntity entityCode={`access_device:${reader.id}:${reader.name}`} />
                                             </Typography>
                                             <Stack direction={"row"} alignItems={"center"}>
                                                 <Typography variant="body2">

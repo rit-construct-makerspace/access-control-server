@@ -101,27 +101,33 @@ const ReadersResolver = {
       isStaff(async () => {
         return await ReaderRepo.getUnpairedReaders();
       }),
-      
-      /**
-       * 
-       * @param _args the id of the makerspace to query upon
-       * @returns a list of welcome readers paired to that makerspace
-       */
-      welcomeReadersForMakerspace: async (
-        _parent: any,
-        _args: {makerspaceId: number},
-        { isStaff }: ApolloContext) =>
-        isStaff(async () => {
-          return await ReaderRepo.getWelcomeReadersForMakerspace(_args.makerspaceId);
-        }),
-      
 
     /**
-   * Fetch Reader by ID
-   * @argument id ID of Reader
-   * @returns Reader
-   * @throws GraphQLError if not MENTOR or STAFF or is on hold
-   */
+     * 
+     * @param _args the id of the makerspace to query upon
+     * @returns a list of welcome readers paired to that makerspace
+     */
+    welcomeReadersForMakerspace: async (
+      _parent: any,
+      _args: { makerspaceId: number },
+      { isStaff }: ApolloContext) =>
+      isStaff(async () => {
+        return await ReaderRepo.getWelcomeReadersForMakerspace(_args.makerspaceId);
+      }),
+    makerspaceForWelcomeReader: async (
+      _parent: any,
+      args: { readerId: number },
+      { isStaff }: ApolloContext) =>
+      isStaff(async () => {
+        return await ReaderRepo.getMakerspaceOfWelcomeReader(Number(args.readerId));
+      }),
+
+    /**
+    * Fetch Reader by ID
+    * @argument id ID of Reader
+    * @returns Reader
+    * @throws GraphQLError if not MENTOR or STAFF or is on hold
+    */
     reader: async (
       _parent: any,
       args: { id: string },
@@ -145,6 +151,16 @@ const ReadersResolver = {
       isStaff(async () => {
         return await ReaderRepo.getReaderLogs(args);
       }),
+
+
+    availableFirmwareVersions: async (
+      _parent: any,
+      args: {},
+      { isStaff }: ApolloContext) =>
+      isStaff(async () => {
+        return ShlugControl.getAvailableFirmwareTags();
+      }),
+
   },
 
   Mutation: {
@@ -227,23 +243,23 @@ const ReadersResolver = {
     ) =>
       isStaffFor(args.makerspaceID, async (user) => {
         const success = await ReaderRepo.pairReaderAsMakerspaceWelcomer(args.readerID, args.makerspaceID);
-        if (success){
+        if (success) {
           ShlugControl.sendState(user, Number(args.readerID), "Welcoming");
         }
         return success;
       }),
-      
-      unpairAsWelcomeReader: async (
-        _parent: any,
-        args: { readerID: number, makerspaceID: number },
-        { isStaffFor }: ApolloContext
-      ) =>
-        isStaffFor(args.makerspaceID, async (user) => {
-          ShlugControl.sendState(user, Number(args.readerID), "Idle");          
-          return ReaderRepo.unpairReaderAsMakerspaceWelcomer(args.readerID, args.makerspaceID);
-        }),
-      
-  
+
+    unpairAsWelcomeReader: async (
+      _parent: any,
+      args: { readerID: number, makerspaceID: number },
+      { isStaffFor }: ApolloContext
+    ) =>
+      isStaffFor(args.makerspaceID, async (user) => {
+        ShlugControl.sendState(user, Number(args.readerID), "Idle");
+        return ReaderRepo.unpairReaderAsMakerspaceWelcomer(args.readerID, args.makerspaceID);
+      }),
+
+
     /**
      * Update the name of a Reader
      * @argument id of Reader to modify
@@ -295,6 +311,17 @@ const ReadersResolver = {
           return false;
         }
       }),
+    setOTAVersion: async (
+      _parent: any,
+      args: { ids: string[], otaTag: string, updateNow: boolean },
+      { isStaff }: ApolloContext
+    ) =>
+      isStaff(async (executingUser: any) => {
+        ReaderRepo.setOTAVersions(args.ids.map(Number), args.otaTag);
+        if (args.updateNow) {
+          return ShlugControl.requestOTA(executingUser, args.ids.map(Number), args.otaTag);
+        }
+      })
 
   }
 };
