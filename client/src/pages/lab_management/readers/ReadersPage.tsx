@@ -1,16 +1,13 @@
 import { useQuery } from "@apollo/client";
 import { GET_READERS, Reader } from "../../../queries/readersQueries";
 import { Box, Button, Grid, Link, Stack } from "@mui/material";
-import Page from "../../Page";
 import SearchBar from "../../../common/SearchBar";
 import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { isValidElement, useEffect, useState } from "react";
 import ReaderCard from "./ReaderCard";
-import AdminPage from "../../AdminPage";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import AddIcon from '@mui/icons-material/Add';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
 
 export default function ReadersPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();

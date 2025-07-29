@@ -3,9 +3,9 @@ import { UserRow } from "./db/tables.js";
 import { GraphQLError } from "graphql/error/GraphQLError.js";
 import { knex } from "./db/index.js";
 
-console.log("Migrating");
-const ret = await knex.migrate.latest()
-console.log("Done", ret);
+// console.log("Migrating");
+// const ret = await knex.migrate.latest()
+// console.log("Done", ret);
 
 export interface CurrentUser extends UserRow {
   hasHolds: boolean;
