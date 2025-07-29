@@ -69,7 +69,7 @@ export default function ManageMakerspaceHours(props: ManageMakerspaceHoursProps)
         const specialHours: ZoneHours[] = data.zoneSpecialHours;
 
         return (
-          <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"center"}>
+          <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"center"} sx={{ flexWrap: "wrap" }}>
             {
               specialHours.map((hours) => (<SpecialHoursBlock hours={hours} />))
             }
