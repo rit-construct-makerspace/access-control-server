@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FullZone, GET_ZONE_BY_ID } from "../../queries/zoneQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { useEffect, useState } from "react";
-import ZoneHours from "./ZoneHours";
 import RoomSection from "./RoomSection";
 import Room, { FullRoom } from "../../types/Room";
 import SearchBar from "../../common/SearchBar";
@@ -20,6 +19,7 @@ import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import LockClockIcon from '@mui/icons-material/LockClock';
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import ZoneHoursSection from "./ZoneHours";
 
 export default function MakerspacePage() {
     const { makerspaceID } = useParams<{ makerspaceID: string }>();
@@ -58,7 +58,7 @@ export default function MakerspacePage() {
                         }
 
                     </Stack>
-                    <ZoneHours hours={fullZone.hours} isMobile={isMobile} />
+                    <ZoneHoursSection hours={fullZone.hours} isMobile={isMobile} />
                     <StaffBar />
                     {
                         zoneTrainings.length > 0 &&

@@ -27,7 +27,6 @@ import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import morgan from "morgan"; //Log provider
 import bodyParser from "body-parser"; //JSON request body parser
 import { createRequire } from "module";
-import { getHoursByZone, WeekDays } from "./repositories/Zones/ZoneHoursRepository.js";
 import { createEquipmentSession, pruneNullLengthEquipmentSessions, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
 import { ReaderRow } from "./db/tables.js";
@@ -35,6 +34,7 @@ import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
+import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 const require = createRequire(import.meta.url);
 
 const allowed_origins = [process.env.REACT_APP_ORIGIN, "https://studio.apollographql.com", "https://make.rit.edu", "https://shibboleth.main.ad.rit.edu"];
@@ -716,52 +716,9 @@ async function startServer() {
    */
   app.get("/api/hours/:zone", async function (req, res) {
     try {
-      const hourRows = await getHoursByZone(Number(req.params.zone));
-
-      var hoursString = "";
-      hourRows.forEach(function (hourRow) {
-        /**
-         * Format:
-         * Monday Open: 09:00
-         * Monday Close: 22:00
-         * Tuesday Open: 09:00
-         * etc.
-         */
-
-        switch (hourRow.dayOfTheWeek) {
-          case WeekDays.SUNDAY:
-            hoursString += "Sunday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Monday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Tuesday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Wednesday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Thursday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Friday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Saturday ";
-            break;
-          default:
-            hoursString += "Undefined ";
-            break;
-        };
-
-        hoursString += hourRow.type + ": ";
-
-        hoursString += hourRow.time + "\n";
-      });
+      const hourRows = await getZoneHoursNextWeek(Number(req.params.zone));
 
       return res.status(200).json({
-        text: hoursString,
         obj: hourRows
       }).send();
     } catch (err) {

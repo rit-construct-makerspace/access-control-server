@@ -1,105 +1,59 @@
 import { Stack, Typography } from "@mui/material";
 import { FullZone } from "../../queries/zoneQueries";
+import ZoneHours from "../../types/ZoneHours";
+import * as TimeUtils from "../../common/TimeUtils";
 
 interface ZoneHoursProps {
-    hours: FullZone["hours"];
-    isMobile: boolean;
+  hours: ZoneHours[];
+  isMobile: boolean;
 }
 
 function reformatTime(time: string) {
-    const split = time.split(":");
-    var hours = Number(split[0]);
+  const split = time.split(":");
+  var hours = Number(split[0]);
 
-    var suffix = " AM";
-    //Hours in PM
-    if (hours > 11) {
-        suffix = " PM";
-        hours = hours == 12 ? 12 : hours - 12
-    }
+  var suffix = " AM";
+  //Hours in PM
+  if (hours > 11) {
+    suffix = " PM";
+    hours = hours == 12 ? 12 : hours - 12
+  }
 
-    return "" + hours + ":" + split[1] + suffix;
+  return "" + hours + ":" + split[1] + suffix;
 }
 
-function getOpen(hours: FullZone["hours"]) {
-    const openTime = hours.find((time) => time.type === "OPEN");
-    return openTime ? reformatTime(openTime.time) : "";
-}
+export default function ZoneHoursSection(props: ZoneHoursProps) {
 
-function getClose(hours: FullZone["hours"]) {
-    const closeTime = hours.find((time) => time.type === "CLOSE");
-    return closeTime ? reformatTime(closeTime.time) : ""
-}
+  const dateFormatter = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    timeZone: "America/New_York",
+  });
 
-function makeHours(hours: FullZone["hours"]) {
-    const open = getOpen(hours);
-    const close = getClose(hours);
-    if (open === "" || close === "") {
-        return "CLOSED";
-    }
+  const now = new Date();
 
-    return `${open} - ${close}`;
-}
+  return (
+    <Stack padding="10px 0px" direction={props.isMobile ? "column" : "row"} justifyContent={props.isMobile ? "center" : "space-around"}>
+      {
+        props.hours.map((hour: ZoneHours) => {
 
-export default function ZoneHours(props: ZoneHoursProps) {
+          const dayDate = new Date(hour.day);
 
-    const sunday = props.hours.filter(
-        (time) => time.dayOfTheWeek == 1
-    );
+          return (
+            <Stack alignItems={"center"}>
+              <Typography color="darkorange" variant="h6">{TimeUtils.dayToString(dayDate.getDay())}</Typography>
+              {
+                hour.closed
+                  ? <Typography variant="body1">CLOSED</Typography>
+                  : <Typography variant="body1">
+                    {`${TimeUtils.reformatTime(hour.open?.substring(0, 5) ?? "12:00")} - ${TimeUtils.reformatTime(hour.close?.substring(0, 5) ?? "12:00")}`}
+                  </Typography>
+              }
 
-    const monday = props.hours.filter(
-        (time) => time.dayOfTheWeek == 2
-    );
-
-    const tuesday = props.hours.filter(
-        (time) => time.dayOfTheWeek == 3
-    );
-
-    const wednesday = props.hours.filter(
-        (time) => time.dayOfTheWeek == 4
-    );
-    
-    const thursday = props.hours.filter(
-        (time) => time.dayOfTheWeek == 5
-    );
-    
-    const friday = props.hours.filter(
-        (time) => time.dayOfTheWeek == 6
-    );
-    
-    const saturday = props.hours.filter(
-        (time) => time.dayOfTheWeek == 7
-    );
-
-    return (
-        <Stack padding="10px 0px" direction={props.isMobile ? "column" : "row"} justifyContent={props.isMobile ? "center" : "space-around"}>
-            <Stack alignItems="center" direction={props.isMobile ? "row" : "column"} justifyContent={props.isMobile ? "space-between" : undefined}>
-                <Typography color="darkorange" variant="h6">Sunday</Typography>
-                <Typography variant="body2">{makeHours(sunday)}</Typography>
             </Stack>
-            <Stack alignItems="center" direction={props.isMobile ? "row" : "column"} justifyContent={props.isMobile ? "space-between" : undefined}>
-                <Typography color="darkorange" variant="h6">Monday</Typography>
-                <Typography variant="body2">{makeHours(monday)}</Typography>
-            </Stack>
-            <Stack alignItems="center" direction={props.isMobile ? "row" : "column"} justifyContent={props.isMobile ? "space-between" : undefined}> 
-                <Typography color="darkorange" variant="h6">Tuesday</Typography>
-                <Typography variant="body2">{makeHours(tuesday)}</Typography>
-            </Stack>
-            <Stack alignItems="center" direction={props.isMobile ? "row" : "column"} justifyContent={props.isMobile ? "space-between" : undefined}>
-                <Typography color="darkorange" variant="h6">Wednesday</Typography>
-                <Typography variant="body2">{makeHours(wednesday)}</Typography>
-            </Stack>
-            <Stack alignItems="center" direction={props.isMobile ? "row" : "column"} justifyContent={props.isMobile ? "space-between" : undefined}>
-                <Typography color="darkorange" variant="h6">Thursday</Typography>
-                <Typography variant="body2">{makeHours(thursday)}</Typography>
-            </Stack>
-            <Stack alignItems="center" direction={props.isMobile ? "row" : "column"} justifyContent={props.isMobile ? "space-between" : undefined}>
-                <Typography color="darkorange" variant="h6">Friday</Typography>
-                <Typography variant="body2">{makeHours(friday)}</Typography>
-            </Stack>
-            <Stack alignItems="center" direction={props.isMobile ? "row" : "column"} justifyContent={props.isMobile ? "space-between" : undefined}>
-                <Typography color="darkorange" variant="h6">Saturday</Typography>
-                <Typography variant="body2">{makeHours(saturday)}</Typography>
-            </Stack>
-        </Stack>
-    );
+          )
+        })
+      }
+    </Stack>
+  );
 }
