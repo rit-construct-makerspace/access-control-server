@@ -24,7 +24,10 @@ export default function DefaultHoursBlock(props: DefaultHoursBlockProps) {
   const [open, setOpen] = useState(props.hours.open?.substring(0, 5));
   const [close, setClose] = useState(props.hours.close?.substring(0, 5));
 
-  const [updateHours] = useMutation(UPDATE_DEFAULT_HOURS, { refetchQueries: [{ query: GET_ZONE_DEFAULT_HOURS, variables: { makerspaceID: props.hours.makerspaceID } }] })
+  const [updateHours] = useMutation(UPDATE_DEFAULT_HOURS, {
+    refetchQueries: ["GetZoneDefaultHours"], // Doesn't work for some reason
+    awaitRefetchQueries: true,
+  });
 
   return (
     <Stack alignItems={"center"} spacing={1} padding={"15px"} width={"14vw"}>

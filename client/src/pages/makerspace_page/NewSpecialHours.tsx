@@ -24,7 +24,10 @@ export default function NewSpecialHoursBlock() {
 
   const splitDate = date.split("-");
 
-  const [createHours] = useMutation(ADD_SPECIAL_HOURS, { refetchQueries: [{ query: GET_ZONE_SPECIAL_HOURS, variables: { makerspaceID: makerspaceID } }] })
+  const [createHours] = useMutation(ADD_SPECIAL_HOURS, {
+    refetchQueries: ["GetZoneSpecialHours"],
+    awaitRefetchQueries: true,
+  });
 
   return (
     <Stack alignItems={"center"} spacing={1} padding={"15px"} width={"14vw"}>

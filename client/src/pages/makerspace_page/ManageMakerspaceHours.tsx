@@ -26,7 +26,7 @@ export const GET_ZONE_DEFAULT_HOURS = gql`
 `;
 
 export const GET_ZONE_SPECIAL_HOURS = gql`
-  query GetZoneDefaultHours($makerspaceID: ID!) {
+  query GetZoneSpecialHours($makerspaceID: ID!) {
     zoneSpecialHours(makerspaceID: $makerspaceID) {
       day
       makerspaceID

@@ -31,11 +31,10 @@ export default function SpecialHoursBlock(props: SpecialHoursBlockProps) {
   const open = props.hours.open?.substring(0, 5);
   const close = props.hours.close?.substring(0, 5);
 
-  console.log(open);
-
   const [deleteHours] = useMutation(DELETE_SPECIAL_HOURS, {
-    refetchQueries: [{ query: GET_ZONE_SPECIAL_HOURS, variables: { makerspaceID: props.hours.makerspaceID } }],
-    variables: { day: props.hours.day, makerspaceID: props.hours.makerspaceID }
+    refetchQueries: ["GetZoneSpecialHours"],
+    variables: { day: props.hours.day, makerspaceID: props.hours.makerspaceID },
+    awaitRefetchQueries: true,
   })
 
   return (
