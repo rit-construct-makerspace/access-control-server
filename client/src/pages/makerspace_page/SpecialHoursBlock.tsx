@@ -23,12 +23,13 @@ export default function SpecialHoursBlock(props: SpecialHoursBlockProps) {
   const dateFormatter = new Intl.DateTimeFormat("en-US", {
     month: "long",
     day: "numeric",
+    year: "numeric",
     timeZone: "America/New_York",
   })
 
-  const [closed, setClosed] = useState(props.hours.closed);
-  const [open, setOpen] = useState(props.hours.open?.substring(0, 5));
-  const [close, setClose] = useState(props.hours.close?.substring(0, 5));
+  const closed = props.hours.closed;
+  const open = props.hours.open?.substring(0, 5);
+  const close = props.hours.close?.substring(0, 5);
 
   console.log(open);
 
@@ -43,9 +44,8 @@ export default function SpecialHoursBlock(props: SpecialHoursBlockProps) {
       <TextField
         label="Open"
         type="time"
-        disabled={closed}
+        disabled
         value={open}
-        onChange={(e) => setOpen(e.target.value)}
         slotProps={{
           inputLabel: { shrink: true },
           input: {
@@ -61,9 +61,8 @@ export default function SpecialHoursBlock(props: SpecialHoursBlockProps) {
       <TextField
         label="Close"
         type="time"
-        disabled={closed}
+        disabled
         value={close}
-        onChange={(e) => setClose(e.target.value)}
         slotProps={{
           inputLabel: { shrink: true },
           input: {
@@ -77,7 +76,7 @@ export default function SpecialHoursBlock(props: SpecialHoursBlockProps) {
         fullWidth
       />
       <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
-        <FormControlLabel control={<Checkbox checked={closed} onClick={() => setClosed(!closed)} />} label={"Closed"} />
+        <FormControlLabel control={<Checkbox checked={closed} />} label={"Closed"} />
         <IconButton
           color="error"
           onClick={() => deleteHours()}

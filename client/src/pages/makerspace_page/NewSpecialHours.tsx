@@ -31,7 +31,7 @@ export default function NewSpecialHoursBlock() {
       <TextField
         label="Day"
         type="date"
-        disabled={closed}
+        required
         value={date}
         onChange={(e) => setDate(e.target.value)}
         slotProps={{
@@ -93,8 +93,8 @@ export default function NewSpecialHoursBlock() {
                 hours: {
                   day: new Date(Number(splitDate[0]), Number(splitDate[1]) - 1, Number(splitDate[2])),
                   makerspaceID: makerspaceID,
-                  open: open,
-                  close: close,
+                  open: open === "" ? null : open,
+                  close: close === "" ? null : close,
                   closed: closed,
                 }
               }
