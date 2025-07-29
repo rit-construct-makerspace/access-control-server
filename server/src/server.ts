@@ -7,7 +7,7 @@ import express from "express";
 import expressWs from 'express-ws';
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
-import { createServer } from "http";
+import { createServer, request } from "http";
 import compression from "compression";
 import cors from "cors";
 import { schema } from "./schema.js";
@@ -22,7 +22,7 @@ import { createLog, createLogWithArray } from "./repositories/AuditLogs/AuditLog
 import { getEquipmentByID, getMissingTrainingModules, hasAccessByID } from "./repositories/Equipment/EquipmentRepository.js";
 import { Room } from "./models/rooms/room.js";
 import { Privilege } from "./schemas/usersSchema.js";
-import { createReader, getReaderByID, getReaderByName, getReaderCertCA, toggleHelpRequested, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
+import { createReader, getReaderByID, getReaderByName, getReaderBySN, getReaderCertCA, toggleHelpRequested, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import morgan from "morgan"; //Log provider
 import bodyParser from "body-parser"; //JSON request body parser
@@ -30,7 +30,7 @@ import { createRequire } from "module";
 import { createEquipmentSession, pruneNullLengthEquipmentSessions, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
 import { ReaderRow } from "./db/tables.js";
-import { authenticateReader, ws_acs_api } from "./wsapi.js"
+import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
@@ -194,8 +194,14 @@ async function startServer() {
       return res.status(401).send();
     }
 
-    const ok = await authenticateReader(SN, Key);
+    const reader = await getReaderBySN(SN);
+    if (reader == null){
+      return res.status(404).send();
+    }
+
+    const ok = await authenticateReader(reader, Key);
     if (!ok) {
+      wsApiLog("Declining API file to unauthed shlug with SN " + SN, "file");
       return res.status(403).send();
     }
     return next();
@@ -208,6 +214,29 @@ async function startServer() {
       return res.status(404).send();
     }
     return res.send(certca);
+  })
+
+  app.get('/api/files/ota/:tagname', async function (req, res) {
+    const tag = req.params["tagname"];
+    console.log(`SN: ${req.headers['shlug-sn']} requested OTA to ${tag}`);
+    
+    const ota_url = `https://github.com/rit-construct-makerspace/access-control-firmware/releases/download/${tag}/Core.bin`
+    fetch(ota_url).then(actual => {
+      actual.headers.forEach((v, n) => res.setHeader(n, v));
+      if (actual?.body) {
+        actual.body.pipeTo(
+          new WritableStream({
+            start() { },
+            write(chunk) {
+              res.write(chunk);
+            },
+            close() {
+              res.end();
+            },
+          })
+        );
+      }
+    })
   })
 
   /**
