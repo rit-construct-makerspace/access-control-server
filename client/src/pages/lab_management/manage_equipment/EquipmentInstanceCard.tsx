@@ -20,6 +20,7 @@ import ReportProblemIcon from '@mui/icons-material/ReportProblemSharp';
 import StarsIcon from '@mui/icons-material/Stars';
 import PendingIcon from '@mui/icons-material/Pending';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
+import AuditLogEntity from "../audit_logs/AuditLogEntity";
 
 interface EquipmentInstanceCardProps {
     instance: EquipmentInstance;
@@ -186,7 +187,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
                         />
                         : <Typography variant="body1" align="center">{
                             reader ?
-                                <span>Paired with: <Link href="/app/admin/readers">{reader.name}</Link></span>
+                                <span>Paired with: <AuditLogEntity entityCode={`access_device:${reader.id}:${reader.name}`}/></span>
                                 : <Alert severity="warning" variant="filled">No Reader Paired</Alert>}
                         </Typography>
                 }
