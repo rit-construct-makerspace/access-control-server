@@ -38,9 +38,19 @@ import CloseIcon from '@mui/icons-material/Close';
 interface ReaderCardProps {
   reader: Reader
   makerspaceID: string,
+  searchQuery: string,
 }
 
-export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
+
+
+function shouldShowBasedOnSearchTerm(search: string, reader: Reader, pairedThing: string): boolean{
+  const lowerSearch = search.toLocaleLowerCase();
+  const lowerReader = reader.name.toLocaleLowerCase();
+  const lowerPaired = pairedThing.toLocaleLowerCase();
+  return lowerReader.includes(lowerSearch) || lowerPaired.includes(lowerSearch)
+}
+
+export default function ReaderCard({ reader, makerspaceID, searchQuery }: ReaderCardProps) {
   const theme = useTheme();
 
   const machineResult = useQuery(GET_CORRESPONDING_MACHINE_BY_READER_ID_OR_MACHINE_ID, {
@@ -51,6 +61,9 @@ export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
   });
   const machine = machineResult?.data?.correspondingEquipment;
   const makerspace = makerspaceResult?.data?.makerspaceForWelcomeReader
+
+  const pairedThing = (machine ? machine.name : makerspace ? makerspace.name : "");
+  const shouldShow = shouldShowBasedOnSearchTerm(searchQuery, reader, pairedThing);
 
   const now = new Date();
   const lastTimeDifference = now.getTime() - (new Date(reader.lastStatusTime).getTime());
@@ -71,6 +84,9 @@ export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
   const [deleteReader] = useMutation(DELETE_READER, { refetchQueries: [{ query: GET_READERS }] })
 
   const [dialOpen, setDialOpen] = useState(false);
+  
+
+
   function machineOrMakerspace() {
     if (machine) {
       const l = <Link href={"/app/admin/equipment/" + (machine.archived ? "/archived" : "") + (machine.id)}> {machine.name}</Link>
@@ -204,12 +220,12 @@ export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
     </SpeedDial>
   }
 
-  return (
+  return shouldShow ? (
     <RequestWrapper
       loading={machineResult.loading}
       error={machineResult.error}
     >
-      <Card id={`id-${reader.id}`} sx={{ width: 350, border: '2px solid ' + ((reader.state === "Fault") ? theme.palette.error.main : "#ffffff00") }} >
+      <Card id={`id-${reader.id}`} sx={{ width: 350, margin: "10px", border: '2px solid ' + ((reader.state === "Fault") ? theme.palette.error.main : "#ffffff00") }} >
         <CardContent id={reader.name}>
           <Stack direction={"row"} justifyContent={"space-between"} paddingBottom={"5px"}>
             <Typography variant="h5">{reader.name}</Typography>
@@ -252,5 +268,5 @@ export default function ReaderCard({ reader, makerspaceID }: ReaderCardProps) {
         </CardContent>
       </Card>
     </RequestWrapper>
-  );
+  ) : false;
 }

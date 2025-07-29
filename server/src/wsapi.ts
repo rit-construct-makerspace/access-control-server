@@ -96,7 +96,6 @@ export async function requestOTA(executingUser: UserRow, readerIds: number[], ot
   });
   async function requestOTAToOne(id: number): Promise<{ id: number, ret: string }> {
     const connData = slugPool.get(id);
-    console.log(stringSlugPool())
     if (connData == null) {
       return { id: id, ret: "no such reader" };
     }
@@ -562,13 +561,12 @@ async function lookupMostRecentGitTagForTrack(trackname: string): Promise<string
   return tag;
 }
 
-export async function getAvailableFirmwareTags(): Promise<string[]>{
+export async function getAvailableFirmwareTags(): Promise<string[]> {
   const github_api_url = 'https://api.github.com/repos/rit-construct-makerspace/access-control-firmware/releases';
-  
+
   return await fetch(github_api_url).then(async resp => {
     if (resp.body == null) { return []; }
     const res: any[] = await resp.json();
-    console.log(res);
     return res.map(o => o.tag_name)
   })
 }
@@ -599,7 +597,6 @@ async function lookupGitTagForShlug(reader: ReaderRow): Promise<string | null> {
  * @returns response containing those keys
  */
 async function handleRequest(connData: ConnectionData | undefined, requested_values: string[], currentFWVersion: string): Promise<ShlugResponse> {
-  console.log("requested: ", requested_values);
   const reader: ReaderRow | undefined = await getReaderByID(connData?.readerId ?? 0);
 
   var obj: ShlugResponse = { Seq: -1 };
@@ -631,7 +628,7 @@ async function handleRequest(connData: ConnectionData | undefined, requested_val
           break;
         }
         const gittag: string | null = await lookupGitTagForShlug(reader);
-        if (gittag) {
+        if (gittag && gittag != currentFWVersion) {
           obj.OTATag = gittag;
         }
         break;
@@ -738,7 +735,6 @@ export async function authenticateReader(reader: ReaderRow, submittedKey: string
   }
   const keyToMatch = await generateShlugKey(reader.pairTime, reader.SN, reader.readerKeyCycle);
   if (submittedKey != keyToMatch) {
-    console.log("Bad key", submittedKey, " to ", keyToMatch);
     return false;
   }
   return true;
@@ -998,7 +994,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
           }
         }
         if (connData.readerId == null) {
-          wsApiLog("Can not process WSAPI message -> forcing disconnect. Null reader ID (this shouldn't happen): " + ev.data, "status")
+          wsApiLog("Can not process WSAPI message -> forcing disconnect. Null reader ID: " + ev.data, "status")
           ws.close(WSAPIError.Protocol, "Server couldnt process due to null reader id");
           return;
         }

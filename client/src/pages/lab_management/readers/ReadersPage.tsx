@@ -5,7 +5,7 @@ import Page from "../../Page";
 import SearchBar from "../../../common/SearchBar";
 import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper from "../../../common/RequestWrapper";
-import { useEffect, useState } from "react";
+import { isValidElement, useEffect, useState } from "react";
 import ReaderCard from "./ReaderCard";
 import AdminPage from "../../AdminPage";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
@@ -34,7 +34,7 @@ export default function ReadersPage() {
   return (
     <Box padding="20px">
       <title>Readers | Make @ RIT</title>
-      <Stack direction="row" spacing={2}>
+      <Stack direction="row" spacing={2} marginBottom={"10px"}>
         <SearchBar
           placeholder="Search access devices"
           value={searchText}
@@ -49,18 +49,18 @@ export default function ReadersPage() {
         loading={getReadersResult.loading}
         error={getReadersResult.error}
       >
-        <Grid container spacing={3} mt={2}>
-          {getReadersResult.data?.readers?.filter((m: Reader) =>
-            m.name
-              .toLocaleLowerCase()
-              .includes(searchText.toLocaleLowerCase())
-          ).map((reader: Reader) => (
-            <Grid key={reader.id} alignItems="stretch">
-              <ReaderCard
-                reader={reader}
-                makerspaceID={makerspaceID ?? "0"} />
+        <Grid container >
+          {getReadersResult.data?.readers?.map((reader: Reader) => ({
+            reader: reader,
+            card: <ReaderCard
+              reader={reader}
+              makerspaceID={makerspaceID ?? "0"}
+              searchQuery={searchText} />,
+          })).filter((o: { reader: Reader, card: any }) => {return isValidElement(o.card)}).map((o: { reader: Reader, card: any }) => {
+            return <Grid key={o.reader.id} alignItems="stretch">
+              {o.card}
             </Grid>
-          ))}
+          })}
         </Grid>
       </RequestWrapper>
     </Box>

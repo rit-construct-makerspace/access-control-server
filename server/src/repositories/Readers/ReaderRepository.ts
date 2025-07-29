@@ -53,7 +53,13 @@ export async function getReaderByMachineID(
  * Fetch all card readers
  */
 export async function getReaders(): Promise<ReaderRow[]> {
-    return await knex("Readers").select("*").orderBy("helpRequested", "desc").orderBy("id", "asc"); //Order them to prevent random ordering everytime the client polls, also prioritize help
+    //Order them to prevent random ordering everytime the client polls, also prioritize help
+    return await knex("Readers")
+        .select("*", knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
+        .orderBy("helpRequested", "desc")
+        .orderBy("faultOrder", "asc")
+        .orderBy("id", "asc")
+        ; 
 }
 
 /**
