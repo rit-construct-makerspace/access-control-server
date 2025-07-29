@@ -26,6 +26,7 @@ export async function up(knex: Knex): Promise<void> {
 
     await knex.schema.alterTable("Users", (t) => {
         t.dropNullable("accountID");
+        t.unique("accountID");
     });
 
     await knex.schema.createTable("Organizations", (t) => {
