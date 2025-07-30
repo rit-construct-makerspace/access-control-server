@@ -44,11 +44,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          
       - uses: actions/setup-node@v3
         with:
           node-version: "16"
           cache: npm
           cache-dependency-path: client/package-lock.json
+          
 
       - name: Install Node modules
         run: npm ci
