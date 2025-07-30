@@ -1,7 +1,13 @@
 import express from "express";
 import xmlparser from "express-xml-bodyparser";
 import * as xml2js from "xml2js"
+import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 
+const papercut_security_secret = process.env.PRINTER_PAPERCUT_SECRET;
+
+
+/// Type of xmlrpc values. see XMLRPCValueToXMLObject and valueToTS  for converting to and from these values
+type XMLRPCValue = string | XMLRPCInteger | number | boolean | XMLRPCStruct | XMLRPCValue[] | undefined;
 
 class XMLRPCInteger {
     underlying: number;
@@ -10,12 +16,17 @@ class XMLRPCInteger {
     }
 }
 
-type XMLRPCValue = string | XMLRPCInteger | number | boolean | XMLRPCStruct | XMLRPCValue[] | undefined;
 interface XMLRPCStruct {
-    [key: string]: XMLRPCValue
+    [rpcStructKeys: string]: XMLRPCValue
 }
 
+/**
+ * Parse an xml2js parsed xmlrpc struct into a typescript object, removing superflous tags
+ * @param obj a subobject of a parsed xmlrpc body
+ * @returns an XMLRPCStruct or undefined if failed to parse 
+ */
 function structToTS(obj: object): XMLRPCStruct | undefined {
+
     if (!("member" in obj)) {
         // bad struct format
         return undefined;
@@ -27,15 +38,24 @@ function structToTS(obj: object): XMLRPCStruct | undefined {
     });
     return struct;
 }
+/**
+ * Parse an xml2js parsed xmlrpc arary into a typescript array, removing superflous tags
+ * @param obj a subobject of a parsed xmlrpc body
+ * @returns a typescript array of values (or undefined if failure to parse)
+ */
 function arrayToTS(obj: unknown): XMLRPCValue[] | undefined {
     if (!("data" in obj)) {
         return undefined;
     }
     const elements: object[] = (obj as any)["data"][0]["value"];
-    console.log("array", elements)
     return elements.map(valueToTS);
 }
 
+/**
+ * Translate xml2js object into a simpler and easier to work with typescript value
+ * @param obj the object returned by the xml body parser - an object corresponding to raw xml keys
+ * @returns a simplified object that removes unnecessary tags and keeps track of types with the typescript type system
+ */
 function valueToTS(obj: object): XMLRPCValue {
     if ("string" in obj) {
         return (obj['string'] as string[])[0];
@@ -53,9 +73,6 @@ function valueToTS(obj: object): XMLRPCValue {
     console.error("Couldnt parse xmlrpc value: ", obj);
     return undefined
 }
-
-const papercut_security_secret = 'freeprints';
-
 
 async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
     // params
@@ -75,7 +92,6 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
         return;
     }
 
-    console.log("getUserAccountBalance", params);
     const balance: number = 4;
     xmlrpcRespond(res, [new XMLRPCInteger(balance)]);
 }
@@ -96,10 +112,8 @@ function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCVa
     const adjustment = params[1];
     const comment = params[2];
     var accountname = undefined;
-    console.log(params)
 
     if (typeof username !== "string" || typeof adjustment !== "number" || typeof comment !== "string") {
-        console.log("asdf");
         xmlrpcRespondFault(res, 2, `incorrect types for adjustUserAccountBalanceIfAvailable takes (string, double, string, string)`);
         return;
     }
@@ -107,7 +121,6 @@ function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCVa
     if (params.length === 4) {
         accountname = params[3];
         if (typeof accountname !== "string") {
-            console.log("gdfcs")
             xmlrpcRespondFault(res, 2, `incorrect types for adjustUserAccountBalanceIfAvailable takes (string, double, string, string)`);
             return;
         }
@@ -118,10 +131,20 @@ function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCVa
     return;
 }
 
-
+/**
+ * Translate a JS object into an appropriately formatted object to pass into an xml2js builder
+ * NOTE: this does not return the XML but returns an object that will behave correctly when 
+ * passed through the builder according to the xmlrpc spec
+ * @param val the xmlrpc value to translate
+ * @returns an appropriately formatted json object
+ */
 function XMLRPCValueToXMLObject(val: XMLRPCValue): object {
     if (val instanceof XMLRPCInteger) {
         return { 'int': val.underlying };
+    } else if (Array.isArray(val)) {
+        // TODO as an array
+    } else if ("rpcStructKeys" in (val as object)){
+        // TODO as a struct
     }
     switch (typeof val) {
         case "string":
@@ -130,7 +153,6 @@ function XMLRPCValueToXMLObject(val: XMLRPCValue): object {
             return { 'double': val };
         case "boolean":
             return { 'boolean': val ? 1 : 0 };
-
         default:
             console.error("dunno what to do with ", typeof val);
             return {};
@@ -138,6 +160,12 @@ function XMLRPCValueToXMLObject(val: XMLRPCValue): object {
     }
 }
 
+/**
+ * Format and send a response to an xmlrpc request
+ * NOTE: This is not to be used for a faulting return. see {@link xmlrpcRespondFault} for error responses
+ * @param response the response to write the data to
+ * @param params a list of xmlrpc values to return
+ */
 function xmlrpcRespond(response: any, params: XMLRPCValue[]) {
     const b = new xml2js.Builder();
     const s = b.buildObject({
@@ -150,6 +178,12 @@ function xmlrpcRespond(response: any, params: XMLRPCValue[]) {
     response.send(s);
 }
 
+/**
+ * format and send a fault response for the xml rpc server
+ * @param response the request-response part to reply to client
+ * @param fault the fault code for xmlrpc request
+ * @param faultString the human readable fault code for xmlrpc
+ */
 function xmlrpcRespondFault(response: any, fault: number, faultString: string) {
     const b = new xml2js.Builder();
     const s = b.buildObject({
@@ -170,11 +204,19 @@ function xmlrpcRespondFault(response: any, fault: number, faultString: string) {
             }
         }
     });
-    console.log(s)
     response.status(200).send(s);
 }
 
+/**
+ * register handler for xmlrpc 3dPrinterOS papercut server
+ * @param app the express application server to bind to
+ */
 export function registerEndpoints(app: express.Application) {
+    if (papercut_security_secret == null) {
+        console.error("COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK");
+        createLog("COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK", "server");
+        return;
+    }
     var handlers: Map<string, Function> = new Map();
     handlers.set("getUserAccountBalance", papercut_getUserAccountBalance);
     handlers.set("adjustUserAccountBalanceIfAvailable", papercut_adjustUserAccountBalanceIfAvailable);
@@ -208,7 +250,7 @@ export function registerEndpoints(app: express.Application) {
         }
 
         const handler = handlers.get(method);
-        if (handler){
+        if (handler) {
             handler(res, params.slice(1, params.length));
         } else {
             xmlrpcRespondFault(res, 1, `method "${method}" is not supported`);
