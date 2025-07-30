@@ -16,6 +16,7 @@ export async function up(knex: Knex): Promise<void> {
     await knex.schema.alterTable("Users", (t) => {
         t.dropColumn("balance");
         t.integer("accountID").references("id").inTable("CurrencyAccounts").nullable();
+        t.string("atriumToken").nullable();
     });
 
     const users = await knex("Users").select("id");
