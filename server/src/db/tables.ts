@@ -405,6 +405,10 @@ export interface DefaultHoursRow {
   closed: boolean;
 }
 
+export interface TempRolesRow {
+  name: string;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -446,5 +450,6 @@ declare module "knex/types/tables.js" {
     ModulesForMakerspaces: ModulesForMakerspacesRow;
     SpecialHours: SpecialHoursRow;
     DefaultHours: DefaultHoursRow;
+    RolesTemp: TempRolesRow;
   }
 }
