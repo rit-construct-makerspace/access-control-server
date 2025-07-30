@@ -1,6 +1,8 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
 import { CurrencyAccountsRow } from "../../db/tables.js";
+import * as OrgRepo from "../Users/OrganizationRepository.js";
+import * as UserRepo from "../Users/UserRepository.js";
 
 export async function getAccountBalanceCents(id: number): Promise<number> {
     const result = await knex("CurrencyAccounts").where({ id: id }).select("balance");
@@ -113,4 +115,18 @@ export async function chargeAccountReturnRemainingCents(accountID: number, amoun
 
     await setAccountBalanceCents(accountID, balance - amount);
     return 0;
+}
+
+export async function getAccountIDByUsername(username: string): Promise<number | undefined> {
+    const org = await OrgRepo.getOrganizationByUsername(username);
+    if (org) {
+        return org.accountID;
+    }
+
+    const user = await UserRepo.getUserByRitUsername(username);
+    if (user) {
+        return user.accountID;
+    }
+
+    return undefined;
 }

@@ -1,6 +1,7 @@
 import * as CurrencyAccountRepo from "../Currency/CurrencyAccountsRepository.js"
 import { knex } from "../../db/index.js";
 import { GraphQLError } from "graphql";
+import { OrganizationsRow } from "../../db/tables.js";
 
 export async function createOrganization(username: string, displayname?: string): Promise<number> {
   // Create the account for the organization
@@ -21,4 +22,8 @@ export async function createOrganization(username: string, displayname?: string)
     CurrencyAccountRepo.deleteAccount(accountID);
     throw new GraphQLError("Failed to create organization")
   }
+}
+
+export async function getOrganizationByUsername(username: string): Promise<OrganizationsRow | undefined> {
+  return await knex("Organizations").where({ username: username }).select("*").first();
 }
