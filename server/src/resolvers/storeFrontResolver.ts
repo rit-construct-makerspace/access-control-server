@@ -1,4 +1,4 @@
-import { ApolloContext, CurrentUser } from "../context.js";
+import { ApolloContext, CurrentUser, isAdmin } from "../context.js";
 import * as InventoryRepo from "../repositories/Store/InventoryRepository.js";
 import { InventoryItem, InventoryItemInput } from "../schemas/storeFrontSchema.js";
 import { deleteInventoryItem } from "../repositories/Store/InventoryRepository.js";
@@ -42,29 +42,26 @@ const StorefrontResolvers = {
     /**
      * Fetch all InventoryItems
      * @argument storefrontVisible If defined, fetch records of matching storefrontVisible value
+     * @argument makerspaceID If defined, fetch records of matching makerspaceID value
      * @returns array of InventoryItems
      * @throws GraphQLError if not MENTOR or STAFF or is on hold
      */
     InventoryItems: async (
       _: any,
-      args: { storefrontVisible?: boolean },
+      args: { storefrontVisible?: boolean, makerspaceID?: number },
       { isStaff }: ApolloContext) => {
-        console.log(args)
       if (args.storefrontVisible === null || args.storefrontVisible === undefined) {
         return isStaff(async () => {
-          console.log(1)
-          return await InventoryRepo.getItems();
+          return await InventoryRepo.getItems(args.makerspaceID);
         })
       }
       else if (args.storefrontVisible == false) {
         return isStaff(async () => {
-          console.log(2)
-          return await InventoryRepo.getItemsWhereStorefront(false);
+          return await InventoryRepo.getItemsWhereStorefront(false, args.makerspaceID);
         })
       }
       else {
-        console.log(3)
-        return await InventoryRepo.getItemsWhereStorefront(true);
+        return await InventoryRepo.getItemsWhereStorefront(true, args.makerspaceID);
       }
     },
 
@@ -132,8 +129,8 @@ const StorefrontResolvers = {
     createInventoryItem: async (
       _: any,
       args: { item: InventoryItemInput },
-      { isStaff }: ApolloContext) =>
-      isStaff(async (user) => {
+      { isAdmin }: ApolloContext) =>
+      isAdmin(async (user) => {
         const result = await InventoryRepo.addItem(args.item);
         await createLedger(user.id, "Create", Number(args.item.pricePerUnit) * Number(args.item.count), undefined, "", [{ name: args.item.name, quantity: Number(args.item.count) }]);
         return result;

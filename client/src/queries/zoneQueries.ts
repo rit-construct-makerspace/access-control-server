@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import Equipment from "../types/Equipment";
 import Room, { FullRoom } from "../types/Room";
+import InventoryItem from "../types/InventoryItem";
 
 export const GET_ZONES = gql`
  query GetZones {
@@ -33,6 +34,12 @@ export interface FullZone {
   }[];
   rooms: Room[]
   imageUrl: string;
+}
+
+export interface ZoneWithItems {
+  id: number;
+  name: string;
+  items: InventoryItem[];
 }
 
 export const GET_ZONES_WITH_HOURS = gql`
@@ -80,6 +87,34 @@ export const GET_FULL_ZONES = gql`
       }
     }
   }
+`;
+
+export const GET_ZONES_WITH_ITEMS = gql`
+ query GetZonesWithItems {
+  zones {
+    id
+    name
+    items {
+      id
+      name
+      labels
+      unit
+      pluralUnit
+      count
+      pricePerUnit
+      threshold
+      staffOnly
+      storefrontVisible
+      notes
+      description
+      tags {
+        id
+        label
+        color
+      }
+    }
+  }
+ }
 `;
 
 export const GET_ZONE_BY_ID = gql`

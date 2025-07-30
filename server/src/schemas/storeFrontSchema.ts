@@ -104,7 +104,7 @@ export const StoreFrontTypeDefs = gql`
   }
 
   extend type Query {
-    InventoryItems(storefrontVisible: Boolean): [InventoryItem]
+    InventoryItems(storefrontVisible: Boolean, makerspaceID: ID): [InventoryItem]
     InventoryItem(id: ID!): InventoryItem
     Labels: [String]
     Ledgers(startDate: DateTime, stopDate: DateTime, searchText: String): [InventoryLedger]

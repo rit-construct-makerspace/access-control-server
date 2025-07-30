@@ -6,6 +6,7 @@ import { createZone, deleteZone, getZoneByID, getZones, updateZone } from "../re
 import { ZoneRow } from "../db/tables.js";
 import { getRooms, getRoomsByZone } from "../repositories/Rooms/RoomRepository.js";
 import { ZoneInput } from "../schemas/zonesSchema.js";
+import { getItems } from "../repositories/Store/InventoryRepository.js";
 
 const ZonesResolver = {
   Zone: {
@@ -23,6 +24,14 @@ const ZonesResolver = {
       _args: any,
     ) => {
       return getHoursByZone(parent.id);
+    },
+
+    //Map items field to array of InventoryItems
+    items: async (
+      parent: ZoneRow,
+      _args: any,
+    ) => {
+      return getItems(parent.id);
     }
   },
 

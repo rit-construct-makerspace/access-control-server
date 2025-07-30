@@ -18,9 +18,13 @@ import {
  * Fetch all Inventory Items
  * @returns all InventoryItems
  */
-export async function getItems(): Promise<InventoryItem[]> {
-  const knexResult = await knex("InventoryItem").select().where('archived', false);
-  return inventoryItemsToDomain(knexResult);
+export async function getItems(makerspaceID?: number): Promise<InventoryItem[]> {
+  const knexResult = knex("InventoryItem").select().where('archived', false);
+  if (makerspaceID) {
+    knexResult.where('makerspaceID', makerspaceID);
+  }
+
+  return inventoryItemsToDomain(await knexResult);
 }
 
 /**
@@ -28,8 +32,12 @@ export async function getItems(): Promise<InventoryItem[]> {
  * @param staffOnly whether to fetch staffOnly items or not staffOnly items
  * @returns matching Inventory Items
  */
-export async function getItemsWhereStaff(staffOnly: boolean): Promise<InventoryItem[]> {
-  return inventoryItemsToDomain(await knex("InventoryItem").select().where({staffOnly}));
+export async function getItemsWhereStaff(staffOnly: boolean, makerspaceID?: number): Promise<InventoryItem[]> {
+  const knexResult = knex("InventoryItem").select().where({staffOnly});
+  if (makerspaceID) {
+    knexResult.where('makerspaceID', makerspaceID);
+  }
+  return inventoryItemsToDomain(await knexResult);
 }
 
 /**
@@ -37,8 +45,12 @@ export async function getItemsWhereStaff(staffOnly: boolean): Promise<InventoryI
  * @param storefrontVisible 
  * @returns matching Inventory Items
  */
-export async function getItemsWhereStorefront(storefrontVisible: boolean): Promise<InventoryItem[]> {
-  return inventoryItemsToDomain(await knex("InventoryItem").select().where({storefrontVisible}));
+export async function getItemsWhereStorefront(storefrontVisible: boolean, makerspaceID?: number): Promise<InventoryItem[]> {
+  const knexResult = knex("InventoryItem").select().where({storefrontVisible});
+  if (makerspaceID) {
+    knexResult.where('makerspaceID', makerspaceID);
+  }
+  return inventoryItemsToDomain(await knexResult);
 }
 
 /**

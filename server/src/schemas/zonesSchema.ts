@@ -17,6 +17,7 @@ export const ZonesTypeDefs = gql`
     name: String!
     rooms: [Room]
     hours: [ZoneHours]
+    items: [InventoryItem]
     imageUrl: String
   }
 

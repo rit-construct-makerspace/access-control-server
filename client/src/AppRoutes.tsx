@@ -130,6 +130,8 @@ export default function AppRoutes() {
               <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />}/>
               <Route path="/makerspace/:makerspaceID/people/:userID" element={<UsersPage />}/>
 
+              <Route path="/makerspace/:makerspaceID/inventory" element={<InventoryPage />} />
+
               {/* Routes for staff + higher */}
                 <Route element={<StaffRoute/>}>
 
@@ -174,7 +176,7 @@ export default function AppRoutes() {
             <Route path="/admin/training/:id" element={<EditActiveModulePage />} />
             <Route path="/admin/training/archived/:id" element={<EditArchivedModulePage />} />
 
-            <Route path="/admin/inventory" element={<InventoryPage />} />
+            
             <Route path="/admin/tools/type/:typeid" element={<ToolItemPage />} />
             <Route path="/admin/tools/type" element={<ToolItemPage />} />
             <Route path="/admin/tools/instance/:instanceid" element={<ToolItemPage />} />
