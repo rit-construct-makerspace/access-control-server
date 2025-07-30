@@ -92,7 +92,7 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
         return;
     }
 
-    const balance: number = 4;
+    const balance: number = 9999.99;
     xmlrpcRespond(res, [new XMLRPCInteger(balance)]);
 }
 
