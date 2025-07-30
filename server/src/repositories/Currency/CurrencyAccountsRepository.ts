@@ -3,6 +3,7 @@ import { knex } from "../../db/index.js";
 import { CurrencyAccountsRow } from "../../db/tables.js";
 import * as OrgRepo from "../Users/OrganizationRepository.js";
 import * as UserRepo from "../Users/UserRepository.js";
+import * as CurrencyLedgerRepo from "./CurrencyLedgerRepository.js";
 
 export async function getAccountBalanceCents(id: number): Promise<number> {
     const result = await knex("CurrencyAccounts").where({ id: id }).select("balance");
@@ -22,7 +23,7 @@ export async function getAccountBalanceDollars(id: number): Promise<number> {
     }
 }
 
-export async function setAccountBalanceCents(id: number, balance: number): Promise<number> {
+async function setAccountBalanceCents(id: number, balance: number): Promise<number> {
     const result = await knex("CurrencyAccounts").where({ id: id }).update({ balance: balance }).returning("id");
     if (result.length > 0) {
         return result[0].id;
@@ -61,12 +62,14 @@ export async function deleteAccount(accountID: number): Promise<boolean> {
  * @returns true if successful
  * @throws an error if the account isn't found
  */
-export async function adjustAccountBalanceCents(accountID: number, amount: number): Promise<boolean> {
+export async function adjustAccountBalanceCents(accountID: number, amount: number, source: string, description?: string): Promise<boolean> {
     const balance = await getAccountBalanceCents(accountID);
 
     const new_balance = amount + balance < 0 ? 0 : balance + amount;
 
     await setAccountBalanceCents(accountID, new_balance);
+
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, amount, source, description);
 
     return true;
 }
@@ -78,7 +81,7 @@ export async function adjustAccountBalanceCents(accountID: number, amount: numbe
  * @returns true if successful, false if the amount is greater than the account balance
  * @throws an error if the account can't be found
  */
-export async function adjustAccountBalanceIfAvailableCents(accountID: number, amount: number): Promise<boolean> {
+export async function adjustAccountBalanceIfAvailableCents(accountID: number, amount: number, source: string, description?: string): Promise<boolean> {
     const balance = await getAccountBalanceCents(accountID);
 
     if (amount + balance < 0) {
@@ -88,6 +91,8 @@ export async function adjustAccountBalanceIfAvailableCents(accountID: number, am
     const new_balance = balance + amount;
 
     await setAccountBalanceCents(accountID, new_balance);
+
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, amount, source, description);
 
     return true;
 }
@@ -100,7 +105,7 @@ export async function adjustAccountBalanceIfAvailableCents(accountID: number, am
  * @returns the amount remaining that was not able to be charged
  * @throws an error if the account isn't found, or if the {@link amount} is < 0
  */
-export async function chargeAccountReturnRemainingCents(accountID: number, amount: number): Promise<number> {
+export async function chargeAccountReturnRemainingCents(accountID: number, amount: number, source: string, description?: string): Promise<number> {
     if (amount < 0) {
         throw new GraphQLError("Cannot charge a negative amount");
     }
@@ -110,10 +115,14 @@ export async function chargeAccountReturnRemainingCents(accountID: number, amoun
     if (amount > balance) {
         await setAccountBalanceCents(accountID, 0);
         const left = amount - balance;
+        await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -balance, source, description);
         return left;
     }
 
     await setAccountBalanceCents(accountID, balance - amount);
+
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -amount, source, description);
+
     return 0;
 }
 
