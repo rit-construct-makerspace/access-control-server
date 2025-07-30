@@ -49,6 +49,12 @@ export async function up(knex: Knex): Promise<void> {
         t.bigInteger("refID").nullable();
         t.check("?? >= 0", ["refID"]);
     });
+
+    await knex.schema.createTable("RefIDCounter", (t) => {
+        t.integer("refID").notNullable();
+    })
+
+    await knex("RefIDCounter").insert({ refID: 1 });
 }
 
 
