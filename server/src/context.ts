@@ -29,7 +29,6 @@ const testuser: CurrentUser = {
   setupComplete: true,
   ritUsername: "tu1000",
   archived: false,
-  balance: "0",
   manager: [],
   staff: [],
   trainer: [],
@@ -39,6 +38,7 @@ const testuser: CurrentUser = {
   admin: true,
   hasHolds: false,
   hasCardTag: true,
+  accountID: 1
 };
 
 export interface ApolloContext {

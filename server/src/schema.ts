@@ -119,6 +119,6 @@ export const schema = makeExecutableSchema({
     MaintenanceLogsResolver,
     ToolItemResolver,
     RestrictionResolver,
-    CurrencyAccountResolvers
+    //CurrencyAccountResolvers
   ]
 });

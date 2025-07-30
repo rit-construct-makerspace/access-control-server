@@ -52,3 +52,8 @@ export async function getCurrencyLedgerEntry(id: number): Promise<CurrencyLedger
         throw new GraphQLError(`Failed to find CurrencyLedger entry with ID: ${id}`);
     }
 }
+
+export async function getNextRefID(): Promise<number> {
+    const result = await knex.raw("UPDATE \"RefIDCounter\" SET \"refID\" = CASE WHEN \"refID\" = 2147483647 THEN 1 ELSE \"refID\" + 1 END RETURNING \"refID\"");
+    return result.rows[0].refID;
+}
