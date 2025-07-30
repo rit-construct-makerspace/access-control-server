@@ -100,7 +100,9 @@ export async function updateItemById(
     count: item.count,
     pricePerUnit: item.pricePerUnit,
     threshold: item.threshold,
-    notes: item.notes
+    notes: item.notes,
+    description: item.description,
+    makerspaceID: item.makerspaceID,
   });
 
   return await getItemById(itemId);
@@ -124,7 +126,9 @@ export async function addItem(
         count: item.count,
         pricePerUnit: item.pricePerUnit,
         threshold: item.threshold,
-        notes: item.notes
+        notes: item.notes,
+        description: item.description,
+        makerspaceID: item.makerspaceID,
       },
       "id"
     )
@@ -304,5 +308,10 @@ export async function updateTag(id: number, label: string, color: string): Promi
  */
 export async function deleteTag(id: number): Promise<boolean> {
   await knex("InventoryTags").delete().where({id});
+  return true;
+}
+
+export async function updateMakerspace(id: number, makerspaceID: number): Promise<boolean> {
+  await knex("InventoryItem").update({makerspaceID}).where({id});
   return true;
 }

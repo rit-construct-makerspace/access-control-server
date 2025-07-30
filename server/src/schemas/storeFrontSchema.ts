@@ -17,6 +17,8 @@ export interface InventoryItem {
   staffOnly: boolean;
   storefrontVisible: boolean;
   notes: string;
+  description: string;
+  makerspaceID: number;
   tagID1: number | null;
   tagID2: number | null;
   tagID3: number | null;
@@ -32,6 +34,8 @@ export interface InventoryItemInput {
   pricePerUnit: number;
   threshold: number;
   notes: string;
+  description: string;
+  makerspaceID: number;
 }
 
 export const StoreFrontTypeDefs = gql`
@@ -53,7 +57,7 @@ export const StoreFrontTypeDefs = gql`
     description: String
     tags: [InventoryTag]
     makerspace: Zone
-    makerspaceID: ID!
+    makerspaceID: ID
   }
 
   type InventoryTag {
@@ -73,7 +77,9 @@ export const StoreFrontTypeDefs = gql`
     threshold: Int
     staffOnly: Boolean
     storefrontVisible: Boolean
+    makerspaceID: ID
     notes: String
+    description: String
   }
 
   input CartItem {
@@ -129,5 +135,6 @@ export const StoreFrontTypeDefs = gql`
     createTag(label: String!, color: String!): Boolean
     updateTag(id: ID!, label: String!, color: String!): Boolean
     deleteTag(id: ID!): Boolean
+    updateMakerspace(id: ID!, makerspaceID: ID!): Boolean
   }
 `;

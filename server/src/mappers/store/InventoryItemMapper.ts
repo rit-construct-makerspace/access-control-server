@@ -27,6 +27,8 @@ export function singleInventoryItemToDomain(raw: any): InventoryItem | null {
     notes: raw.notes,
     tagID1: raw.tagID1,
     tagID2: raw.tagID2,
-    tagID3: raw.tagID3
+    tagID3: raw.tagID3,
+    description: raw.description,
+    makerspaceID: raw.makerspaceID,
   };
 }

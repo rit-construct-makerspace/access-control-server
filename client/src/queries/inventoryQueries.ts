@@ -34,7 +34,10 @@ export const GET_INVENTORY_ITEM = gql`
       threshold
       staffOnly
       storefrontVisible
+      image
+      makerspaceID
       notes
+      description
       tags {
         id
         label
@@ -159,5 +162,11 @@ export const CREATE_INVENTORY_TAG = gql`
 export const UPDATE_INVENTORY_TAG = gql`
   mutation UpdateTag($id: ID!, $label: String!, $color: String!) {
     updateTag(id: $id, label: $label, color: $color)
+  }
+`;
+
+export const UPDATE_MAKERSPACE = gql`
+  mutation UpdateMakerspace($id: ID!, $makerspaceID: ID!) {
+    updateMakerspace(id: $id, makerspaceID: $makerspaceID)
   }
 `;

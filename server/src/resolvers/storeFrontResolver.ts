@@ -147,6 +147,7 @@ const StorefrontResolvers = {
       _: any,
       args: { itemId: string; item: InventoryItemInput },
       { isStaff, isManager }: ApolloContext) => {
+        console.log(args.itemId, args.item);
       const orig = await InventoryRepo.getItemById(Number(args.itemId))
       //If item is STAFF ONLY, only allow edits by staff
       if (!(orig)?.staffOnly) {
@@ -440,6 +441,20 @@ const StorefrontResolvers = {
       args: { itemID: number, tagID: number },
       { isManager }: ApolloContext) => {
       return isManager(() => InventoryRepo.removeTagFromItem(args.itemID, args.tagID));
+    },
+
+    /**
+     * Update the makerspaceID of an InventoryItem
+     * @argument id ID of InventoryItem to modify
+     * @argument makerspaceID new makerspaceID
+     * @returns true
+     * @throws GraphQLError if not admin or is on hold
+     */
+    updateMakerspace: async (
+      _parent: any,
+      args: { id: number, makerspaceID: number },
+      { isAdmin }: ApolloContext) => {
+      return isAdmin(() => InventoryRepo.updateMakerspace(args.id, args.makerspaceID));
     },
   }
 };
