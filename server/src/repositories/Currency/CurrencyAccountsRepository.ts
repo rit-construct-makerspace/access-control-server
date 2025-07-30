@@ -37,3 +37,17 @@ export async function getAccountByID(id: number): Promise<CurrencyAccountsRow> {
         throw new GraphQLError(`Could not find account with ID: ${id}`);
     }
 }
+
+export async function createAccount(): Promise<number> {
+    const id = await knex("CurrencyAccounts").insert({}).returning("id");
+    if (id.length > 0) {
+        return id[0].id;
+    } else {
+        throw new GraphQLError("Failed to create new CurrencyAccount");
+    }
+}
+
+export async function deleteAccount(accountID: number): Promise<boolean> {
+    await knex("CurrencyAccounts").where({ id: accountID }).delete();
+    return true;
+}
