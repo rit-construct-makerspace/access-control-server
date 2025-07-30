@@ -241,12 +241,17 @@ export function setupStagingAuth(app: express.Application) {
 
       // TEMPORARY -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
       try {
-        await insertTempRole(ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"]);
-        //Name is unique, so will fail on duplicates
+        ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"].forEach(async (element: string) => {
+          try {
+            await insertTempRole(element);
+            //Name is unique, so will fail on duplicates
+          } catch (error) {
+            //nothig
+          }
+        });
       } catch (error) {
-        //nothig
+        console.error("Error iterating temp roles:", error);
       }
-
 
       /*
         "attributes": {
