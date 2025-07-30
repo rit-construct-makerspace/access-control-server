@@ -46,7 +46,7 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
     return <Box>
         <RequestWrapper loading={unpairedReaderResult.loading || pairedWelcomeReaderResult.loading} error={unpairedReaderResult.error || pairedWelcomeReaderResult.error}>
             <Stack spacing={2}>
-                <Typography variant="h5">Welcome Readers</Typography>
+                <Typography variant="h5" fontWeight={"bold"}>Welcome Readers</Typography>
                 <Stack direction={"column"} spacing={2}>
                     {
                         (pairedReaders && pairedReaders.length > 0) ?
@@ -58,7 +58,7 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
                                                 <AuditLogEntity entityCode={`access_device:${reader.id}:${reader.name}`} />
                                             </Typography>
                                             <Stack direction={"row"} alignItems={"center"}>
-                                                <Typography variant="body2" component="div">
+                                                <Typography variant="body2">
                                                     {"ID " + reader.id}
                                                 </Typography>
                                                 <Tooltip title="Unpair as Welcome Reader">
