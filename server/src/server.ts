@@ -14,7 +14,6 @@ import { schema } from "./schema.js";
 import { setupSessions, setupDevAuth, setupStagingAuth, setupAuth } from "./auth.js";
 import context from "./context.js";
 import json from "body-parser";
-import xml from "body-parser"
 import path from "path";
 import * as schedule from "node-schedule";
 import { getUserByCardTagID, getUsersFullName } from "./repositories/Users/UserRepository.js";
@@ -36,7 +35,6 @@ import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhere
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
-import xmlrpc from "xmlrpc"
 import * as Atrium from "./integrations/atrium-integration/atrium.js"
 
 const require = createRequire(import.meta.url);
