@@ -44,7 +44,7 @@ function structToTS(obj: object): XMLRPCStruct | undefined {
  * @returns a typescript array of values (or undefined if failure to parse)
  */
 function arrayToTS(obj: unknown): XMLRPCValue[] | undefined {
-    if (!("data" in obj)) {
+    if (!("data" in (obj as any))) {
         return undefined;
     }
     const elements: object[] = (obj as any)["data"][0]["value"];
@@ -70,7 +70,7 @@ function valueToTS(obj: object): XMLRPCValue {
     } else if ("array" in obj) {
         return arrayToTS((obj["array"] as object[])[0]);
     }
-    console.error("Couldnt parse xmlrpc value: ", obj);
+    console.error("PAPERCUT: Couldnt parse xmlrpc value: ", obj);
     return undefined
 }
 
@@ -154,7 +154,7 @@ function XMLRPCValueToXMLObject(val: XMLRPCValue): object {
         case "boolean":
             return { 'boolean': val ? 1 : 0 };
         default:
-            console.error("dunno what to do with ", typeof val);
+            console.error("PAPERCUT: Dont know how to convert xmlrpcvalue to xml ", typeof val);
             return {};
 
     }
@@ -213,7 +213,7 @@ function xmlrpcRespondFault(response: any, fault: number, faultString: string) {
  */
 export function registerEndpoints(app: express.Application) {
     if (papercut_security_secret == null) {
-        console.error("COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK");
+        console.error("PAPERCUT: COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK");
         createLog("COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK", "server");
         return;
     }
@@ -224,6 +224,7 @@ export function registerEndpoints(app: express.Application) {
     app.post("/papercut/api/xmlrpc", xmlparser(), (req, res) => {
         console.log("XML RPC request from", req.ip);
         console.log(new xml2js.Builder().buildObject(req.body));
+        try{
         const methodU: object | undefined = req.body?.methodcall?.methodname;
         const paramsU: object | undefined = req.body?.methodcall?.params[0].param;
 
@@ -255,5 +256,9 @@ export function registerEndpoints(app: express.Application) {
         } else {
             xmlrpcRespondFault(res, 1, `method "${method}" is not supported`);
         }
+    } catch (e){
+        console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", e);
+        res.status(500).send();
+    }
     });
 }
