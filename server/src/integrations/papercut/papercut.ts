@@ -78,8 +78,46 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
     console.log("getUserAccountBalance", params);
     const balance: number = 4;
     xmlrpcRespond(res, [new XMLRPCInteger(balance)]);
-    return 0;
 }
+
+function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCValue[]) {
+    // params
+    // Username:        string
+    // Adjustment:      double
+    // Comment:         string
+    // Account name:    string
+    // returns
+    // 1 if success, 0 if not
+    if (params.length != 3 && params.length != 4) {
+        xmlrpcRespondFault(res, 2, `adjustUserAccountBalanceIfAvailable takes 3 or 4 arguments (username, adjustment, comment, account name (optional)) but ${params.length} were provided`)
+        return;
+    }
+    const username = params[0];
+    const adjustment = params[1];
+    const comment = params[2];
+    var accountname = undefined;
+    console.log(params)
+
+    if (typeof username !== "string" || typeof adjustment !== "number" || typeof comment !== "string") {
+        console.log("asdf");
+        xmlrpcRespondFault(res, 2, `incorrect types for adjustUserAccountBalanceIfAvailable takes (string, double, string, string)`);
+        return;
+    }
+
+    if (params.length === 4) {
+        accountname = params[3];
+        if (typeof accountname !== "string") {
+            console.log("gdfcs")
+            xmlrpcRespondFault(res, 2, `incorrect types for adjustUserAccountBalanceIfAvailable takes (string, double, string, string)`);
+            return;
+        }
+    }
+
+
+    xmlrpcRespond(res, [false]);
+    return;
+}
+
 
 function XMLRPCValueToXMLObject(val: XMLRPCValue): object {
     if (val instanceof XMLRPCInteger) {
@@ -91,7 +129,7 @@ function XMLRPCValueToXMLObject(val: XMLRPCValue): object {
         case "number":
             return { 'double': val };
         case "boolean":
-            return { 'boolean': val };
+            return { 'boolean': val ? 1 : 0 };
 
         default:
             console.error("dunno what to do with ", typeof val);
@@ -105,7 +143,7 @@ function xmlrpcRespond(response: any, params: XMLRPCValue[]) {
     const s = b.buildObject({
         "methodResponse": {
             "params": {
-                "param": params.map(XMLRPCValueToXMLObject).map(o => {return {value: o}})
+                "param": params.map(XMLRPCValueToXMLObject).map(o => { return { value: o } })
             }
         }
     })
@@ -137,9 +175,13 @@ function xmlrpcRespondFault(response: any, fault: number, faultString: string) {
 }
 
 export function registerEndpoints(app: express.Application) {
+    var handlers: Map<string, Function> = new Map();
+    handlers.set("getUserAccountBalance", papercut_getUserAccountBalance);
+    handlers.set("adjustUserAccountBalanceIfAvailable", papercut_adjustUserAccountBalanceIfAvailable);
+
     app.post("/papercut/api/xmlrpc", xmlparser(), (req, res) => {
-        console.log("XML RPC request");
-        console.log(req.body)
+        console.log("XML RPC request from", req.ip);
+        console.log(new xml2js.Builder().buildObject(req.body));
         const methodU: object | undefined = req.body?.methodcall?.methodname;
         const paramsU: object | undefined = req.body?.methodcall?.params[0].param;
 
@@ -160,31 +202,16 @@ export function registerEndpoints(app: express.Application) {
             return res.status(401).send();
         } else {
             const securityCode = params[0];
+            if (typeof securityCode !== "string" || securityCode !== papercut_security_secret) {
+                return res.status(401).send();
+            }
         }
 
-        switch (method) {
-            case "getUserAccountBalance":
-                papercut_getUserAccountBalance(res, params.slice(1, params.length));
-                break;
-            // case "adjustUserAccountBalanceIfAvailable":
-            default:
-                xmlrpcRespondFault(res, 1, `method "${method}" is not supported`);
-                break;
-
+        const handler = handlers.get(method);
+        if (handler){
+            handler(res, params.slice(1, params.length));
+        } else {
+            xmlrpcRespondFault(res, 1, `method "${method}" is not supported`);
         }
-
     });
-
-    console.log(`PAPER: getUserAccountBalance called with params`);
-
-
-    console.log(`PAPER: adjustUserAccountBalanceIfAvailable called`);
-    // params
-    // Username:        string
-    // Adjustment:      double
-    // Comment:         string
-    // Account name:    string
-    // returns
-    // 1 if success, 0 if not
-
 }
