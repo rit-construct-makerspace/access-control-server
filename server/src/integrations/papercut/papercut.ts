@@ -3,7 +3,7 @@ import xmlparser from "express-xml-bodyparser";
 import * as xml2js from "xml2js"
 import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 
-const papercut_security_secret = process.env.PRINTER_PAPERCUT_SECRET;
+const PAPERCUT_SECURITY_SECRET = process.env.PRINTER_PAPERCUT_SECRET;
 
 
 /// Type of xmlrpc values. see XMLRPCValueToXMLObject and valueToTS  for converting to and from these values
@@ -212,7 +212,7 @@ function xmlrpcRespondFault(response: any, fault: number, faultString: string) {
  * @param app the express application server to bind to
  */
 export function registerEndpoints(app: express.Application) {
-    if (papercut_security_secret == null) {
+    if (PAPERCUT_SECURITY_SECRET == null) {
         console.error("PAPERCUT: COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK");
         createLog("COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK", "server");
         return;
@@ -245,7 +245,7 @@ export function registerEndpoints(app: express.Application) {
             return res.status(401).send();
         } else {
             const securityCode = params[0];
-            if (typeof securityCode !== "string" || securityCode !== papercut_security_secret) {
+            if (typeof securityCode !== "string" || securityCode !== PAPERCUT_SECURITY_SECRET) {
                 return res.status(401).send();
             }
         }
