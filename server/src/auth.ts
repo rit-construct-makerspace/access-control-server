@@ -214,7 +214,7 @@ export function setupStagingAuth(app: express.Application) {
       identifierFormat: process.env.ID_FORMAT ?? "",
       decryptionPvk: process.env.SSL_PVKEY ?? "",
       //privateKey: process.env.SSL_PVKEY ?? "",
-      cert: process.env.IDP_PUBKEY ?? "",
+      idpCert: process.env.IDP_PUBKEY ?? "",
       //validateInResponseTo: ValidateInResponseTo.never,
       disableRequestedAuthnContext: true,
       signatureAlgorithm: "sha256",

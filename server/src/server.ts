@@ -6,8 +6,7 @@ import * as papercut from "./integrations/papercut/papercut.js"
 import express from "express";
 import expressWs from 'express-ws';
 import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
-import { createServer, request } from "http";
+import { expressMiddleware } from "@as-integrations/express5";
 import compression from "compression";
 import cors from "cors";
 import { schema } from "./schema.js";
@@ -27,7 +26,7 @@ import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import morgan from "morgan"; //Log provider
 import bodyParser from "body-parser"; //JSON request body parser
 import { createRequire } from "module";
-import { createEquipmentSession, pruneNullLengthEquipmentSessions, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
+import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
 import { ReaderRow } from "./db/tables.js";
 import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
@@ -35,7 +34,6 @@ import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhere
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
-import { getNextRefID } from "./repositories/Currency/CurrencyLedgerRepository.js";
 
 const require = createRequire(import.meta.url);
 
@@ -158,7 +156,7 @@ async function startServer() {
 
 
 
-  app.get("/app/*", function (req, res) {
+  app.get("/app/*apppage", function (req, res) {
     res.header
     res.sendFile(path.join(__dirname, "../../client/build", "index.html"));
   });
@@ -187,7 +185,7 @@ async function startServer() {
   // Websocket ACS Handler
   app.ws("/api/ws", ws_acs_api);
 
-  app.all("/api/files/*", async function (req, res, next) {
+  app.all("/api/files/*filename", async function (req, res, next) {
     const SNHeader = 'shlug-sn';
     const KeyHeader = 'shlug-key';
     if (!req.headers[SNHeader] || !req.headers[KeyHeader]) {

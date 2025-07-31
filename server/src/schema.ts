@@ -5,7 +5,6 @@ import {
 } from "graphql-scalars";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { AnnouncementsTypeDefs } from "./schemas/announcementsSchema.js";
-import { mergeResolvers } from "@graphql-tools/merge";
 import { TrainingModuleTypeDefs } from "./schemas/trainingModuleSchema.js";
 import { TrainingSubmissionTypeDefs } from "./schemas/trainingSubmissionSchema.js";
 import { StoreFrontTypeDefs } from "./schemas/storeFrontSchema.js";

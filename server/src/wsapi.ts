@@ -712,7 +712,7 @@ async function generateUniqueHumanName() {
   const RANDOM_TRIES = 10;
   for (var i = 0; i < RANDOM_TRIES; i++) {
     const name = generateRandomHumanName();
-    if (await getReaderByName(name) == null) {
+    if ((await getReaderByName(name)) == null) {
       return name;
     }
   }
@@ -985,7 +985,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
         // First Message is special, identifies the shlug to the server
         if (shlugMessage.Seq === 0) {
           // Bootup message
-          if (!await handleBootupMessage(connData, shlugMessage, ws, req.ip ?? "unknown ip")) {
+          if (!(await handleBootupMessage(connData, shlugMessage, ws, req.ip ?? "unknown ip"))) {
             // failed to setup  
             console.error("WSACS: Incorrect Boot Message. Forcing Reconnect")
             ws.close(WSAPIError.BadBootMessage, "Invalid Boot Message");
