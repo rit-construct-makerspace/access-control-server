@@ -37,11 +37,6 @@ export const UsersTypeDefs = gql`
     makerspaceID: ID
   }
 
-  type CurrencyAccount {
-    id: ID!
-    balance: Int!
-  }
-
   type User {
     id: ID!
     firstName: String!

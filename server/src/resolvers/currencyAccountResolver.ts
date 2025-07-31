@@ -7,9 +7,9 @@ export const CurrencyAccountResolvers = {
         owner: async (
             parent: CurrencyAccountsRow,
             _args: any,
-            { isStaff }: ApolloContext
+            _context: ApolloContext
         ) => {
-            return isStaff(async () => (await CurrencyAccountRepo.getAccountOwner(parent.id)))
+            return await CurrencyAccountRepo.getAccountOwner(parent.id);
         }
     },
 
