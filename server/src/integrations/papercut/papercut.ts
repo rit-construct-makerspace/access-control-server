@@ -130,8 +130,6 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
     const comment = params[2];
     var accountname = undefined;
 
-    console.log(`user: '${username}'`)
-
     if (typeof username !== "string" || typeof adjustment !== "number" || typeof comment !== "string") {
         xmlrpcRespondFault(res, 2, `incorrect types for adjustUserAccountBalanceIfAvailable takes (string, double, string, string)`);
         return;
