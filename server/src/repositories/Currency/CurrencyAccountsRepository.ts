@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
-import { CurrencyAccountsRow } from "../../db/tables.js";
+import { CurrencyAccountsRow, OrganizationsRow } from "../../db/tables.js";
 import * as OrgRepo from "../Users/OrganizationRepository.js";
 import * as UserRepo from "../Users/UserRepository.js";
 import * as CurrencyLedgerRepo from "./CurrencyLedgerRepository.js";
@@ -171,4 +171,20 @@ export async function getAccountOwner(accountID: number): Promise<AccountOwner |
   }
 
   return undefined;
+}
+
+export async function getAccountsLimit(searchText?: string): Promise<CurrencyAccountsRow[]> {
+  if (!searchText || searchText === "") {
+    return await knex("CurrencyAccounts").select("*").limit(25);
+  }
+
+  return await knex("CurrencyAccounts")
+    .join("Users", "Users.accountID", "CurrencyAccounts.id")
+    .join("Organizations", "Organizations.accountID", "CurrencyAccounts.id")
+    .whereILike("Users.ritUsername", `%${searchText}%`)
+    .orWhereILike("Users.accountID", `%${searchText}%`)
+    .orWhereILike("Organizations.displayname", `%${searchText}%`)
+    .orWhereILike("Users.firstName", `%${searchText}%`)
+    .orWhereILike("Users.lastName", `%${searchText}%`)
+    .select("CurrencyAccounts.*").limit(25);
 }
