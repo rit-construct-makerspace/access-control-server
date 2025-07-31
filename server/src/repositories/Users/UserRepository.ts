@@ -8,6 +8,7 @@ import { createLog } from "../AuditLogs/AuditLogRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import { UserRow } from "../../db/tables.js";
 import { GraphQLError } from "graphql";
+import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js";
 
 
 /**
@@ -114,7 +115,8 @@ export async function createUser(user: {
   ritUsername: string;
 }): Promise<UserRow> {
   console.log("Creating user entry: " + user.ritUsername);
-  const [newID] = await knex("Users").insert(user, "id");
+  const accountID = await CurrencyAccountRepo.createAccount();
+  const [newID] = await knex("Users").insert({ ...user, accountID: accountID }, "id");
   return await getUserByID(newID.id);
 }
 
