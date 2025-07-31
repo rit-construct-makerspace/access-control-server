@@ -52,10 +52,10 @@ export default function RoomSection(props: RoomSectionProps) {
                 roomTrainings.length > 0 &&
                 <Stack direction={"column"} alignItems={isMobile ? "center" : "flex-start"} pl={"10px"} spacing={1}>
                     <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
-                        <Typography variant="h6">Makerspace Trainings</Typography>
+                        <Typography variant="h6">Area Trainings</Typography>
                         {
                             roomTrainings.some((ms) => (ms.status != "Passed" && ms.status != "Expiring Soon"))
-                                ? <Alert severity="error">You must pass the room trainings before you can use equipment in the room!</Alert>
+                                ? <Alert severity="error">You must pass the area trainings before you can use equipment in the area!</Alert>
                                 : null
                         }
                     </Stack>
