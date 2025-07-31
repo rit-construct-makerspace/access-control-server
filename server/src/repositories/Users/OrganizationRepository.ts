@@ -27,3 +27,7 @@ export async function createOrganization(username: string, displayname?: string)
 export async function getOrganizationByUsername(username: string): Promise<OrganizationsRow | undefined> {
   return await knex("Organizations").where({ username: username }).select("*").first();
 }
+
+export async function getOrganizationByAccountID(accountID: number): Promise<OrganizationsRow | undefined> {
+  return await knex("Organizations").where({ accountID: accountID }).select("*").first();
+}
