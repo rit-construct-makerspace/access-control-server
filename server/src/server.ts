@@ -2,7 +2,7 @@
  * server.ts
  * Server Configuration and API
  */
-
+import * as papercut from "./integrations/papercut/papercut.js"
 import express from "express";
 import expressWs from 'express-ws';
 import { ApolloServer } from "@apollo/server";
@@ -35,7 +35,7 @@ import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhere
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
-import * as Atrium from "./integrations/atrium-integration/atrium.js"
+import { getNextRefID } from "./repositories/Currency/CurrencyLedgerRepository.js";
 
 const require = createRequire(import.meta.url);
 
@@ -61,6 +61,7 @@ async function startServer() {
   var exp = express();
   var wsserver = expressWs(exp);
   var app = wsserver.app;
+  
 
   //Configure CORS
   app.use(cors(CORS_CONFIG));
@@ -115,6 +116,8 @@ async function startServer() {
   //serves built react app files under make.rit.edu/app
   app.use("/app/", express.static(path.join(__dirname, '../../client/build')));
 
+
+  papercut.registerEndpoints(app)
 
   /**
    * REGEX QUERY:
@@ -197,7 +200,7 @@ async function startServer() {
     }
 
     const reader = await getReaderBySN(SN);
-    if (reader == null){
+    if (reader == null) {
       return res.status(404).send();
     }
 
@@ -221,7 +224,7 @@ async function startServer() {
   app.get('/api/files/ota/:tagname', async function (req, res) {
     const tag = req.params["tagname"];
     console.log(`SN: ${req.headers['shlug-sn']} requested OTA to ${tag}`);
-    
+
     const ota_url = `https://github.com/rit-construct-makerspace/access-control-firmware/releases/download/${tag}/Core.bin`
     fetch(ota_url).then(actual => {
       actual.headers.forEach((v, n) => res.setHeader(n, v));

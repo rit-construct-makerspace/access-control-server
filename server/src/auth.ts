@@ -27,6 +27,7 @@ import { getHoldsByUser } from "./repositories/Holds/HoldsRepository.js";
 import { CurrentUser } from "./context.js";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import path from "path";
+import { insertTempRole } from './repositories/tempRolesRepo.js';
 
 const __dirname = import.meta.dirname;
 
@@ -238,14 +239,30 @@ export function setupStagingAuth(app: express.Application) {
       process.env.SAML_IDP === "TEST" ? mapSamlTestToRit(user) : user.attributes; //user is the full response data. attributes has the things we need
 
 
+      // TEMPORARY -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      try {
+        ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"].forEach(async (element: string) => {
+          try {
+            await insertTempRole(element);
+            //Name is unique, so will fail on duplicates
+          } catch (error) {
+            //nothig
+          }
+        });
+      } catch (error) {
+        console.error("Error iterating temp roles:", error);
+      }
+
       /*
         "attributes": {
           "urn:oid:2.5.4.42": "FirstName",
           "urn:oid:2.5.4.4": "LastName",
           "urn:oid:0.9.2342.19200300.100.1.1": "userName",
-          "urn:oid:1.3.6.1.4.1.4447.1.20": "uid"
+          "urn:oid:1.3.6.1.4.1.4447.1.20": "uid",
+          "urn:oid:1.3.6.1.4.1.4447.1.41": ["roles"]
         }
       */
+     
 
     // Create user in our database if they don't exist
     const existingUser = await getUserByRitUsername(ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);

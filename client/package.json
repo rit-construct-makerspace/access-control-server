@@ -20,6 +20,7 @@
     "client": "file:",
     "date-fns": "^2.30.0",
     "ejs": "^3.1.10",
+    "express-xml-bodyparser": "^0.4.1",
     "graphql": "^16.9.0",
     "immer": "^9.0.21",
     "install": "^0.13.0",
