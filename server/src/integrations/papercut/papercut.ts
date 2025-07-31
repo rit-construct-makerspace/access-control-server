@@ -2,8 +2,10 @@ import express from "express";
 import xmlparser from "express-xml-bodyparser";
 import * as xml2js from "xml2js"
 import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
+import * as Currency from "../currency/currency.js"
 
-const PAPERCUT_SECURITY_SECRET = process.env.PRINTER_PAPERCUT_SECRET;
+const PAPERCUT_SECURITY_SECRET = process.env.PAPERCUT_SECURITY_SECRET;
+const FREE_3D_PRINTS = process.env.FREE_3D_PRINTS === "true";
 
 
 /// Type of xmlrpc values. see XMLRPCValueToXMLObject and valueToTS  for converting to and from these values
@@ -92,11 +94,26 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
         return;
     }
 
-    const balance: number = 9999.99;
-    xmlrpcRespond(res, [new XMLRPCInteger(balance)]);
+    if (FREE_3D_PRINTS){
+        xmlrpcRespond(res, [9999.49]);
+        return;
+    }
+
+
+    try {
+        const result = await Currency.getAccountBalance(username);
+        if (typeof result === "number") { // number result
+            const balanceDollars = result / 100.0;
+            xmlrpcRespond(res, [balanceDollars]);
+        } else { // string error
+            xmlrpcRespondFault(res, 404, `could not query balance for user '${username}': ${result}`)
+        }
+    } catch (e) {
+        xmlrpcRespondFault(res, 404, `could not query balance for user '${username}' exception: ${e}`)
+    }
 }
 
-function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCValue[]) {
+async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCValue[]) {
     // params
     // Username:        string
     // Adjustment:      double
@@ -113,6 +130,8 @@ function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCVa
     const comment = params[2];
     var accountname = undefined;
 
+    console.log(`user: '${username}'`)
+
     if (typeof username !== "string" || typeof adjustment !== "number" || typeof comment !== "string") {
         xmlrpcRespondFault(res, 2, `incorrect types for adjustUserAccountBalanceIfAvailable takes (string, double, string, string)`);
         return;
@@ -126,9 +145,19 @@ function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCVa
         }
     }
 
+    if (FREE_3D_PRINTS){
+        xmlrpcRespond(res, [true]);
+        return;
+    }
 
-    xmlrpcRespond(res, [false]);
-    return;
+    const amountCents = Math.round(adjustment * 100);
+    try {
+        
+        const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, amountCents, "3DPrinterOS", `Transaction from 3DPrinterOS for user '${username}' of ${Currency.centsToDollarString(amountCents)} with comment '${comment}'`);
+        xmlrpcRespond(res, [success]);
+    } catch {
+        xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)
+    }
 }
 
 /**
@@ -143,7 +172,7 @@ function XMLRPCValueToXMLObject(val: XMLRPCValue): object {
         return { 'int': val.underlying };
     } else if (Array.isArray(val)) {
         // TODO as an array
-    } else if ("rpcStructKeys" in (val as object)){
+    } else if (typeof val === 'object' && !Array.isArray(val) && "rpcStructKeys" in (val as object)) {
         // TODO as a struct
     }
     switch (typeof val) {
@@ -217,48 +246,52 @@ export function registerEndpoints(app: express.Application) {
         createLog("COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK", "server");
         return;
     }
+    if (FREE_3D_PRINTS){
+        console.error("PAPERCUT: Free 3D Printing is turned on");
+        createLog("Free 3D Printing is enabled", "server");
+    }
     var handlers: Map<string, Function> = new Map();
-    handlers.set("getUserAccountBalance", papercut_getUserAccountBalance);
-    handlers.set("adjustUserAccountBalanceIfAvailable", papercut_adjustUserAccountBalanceIfAvailable);
+    handlers.set("api.getUserAccountBalance", papercut_getUserAccountBalance);
+    handlers.set("api.adjustUserAccountBalanceIfAvailable", papercut_adjustUserAccountBalanceIfAvailable);
 
     app.post("/papercut/api/xmlrpc", xmlparser(), (req, res) => {
         console.log("XML RPC request from", req.ip);
         console.log(new xml2js.Builder().buildObject(req.body));
-        try{
-        const methodU: object | undefined = req.body?.methodcall?.methodname;
-        const paramsU: object | undefined = req.body?.methodcall?.params[0].param;
+        try {
+            const methodU: object | undefined = req.body?.methodcall?.methodname;
+            const paramsU: object | undefined = req.body?.methodcall?.params[0].param;
 
-        if (!methodU || !paramsU) {
-            // bad call
-            res.status(401).send()
-            return;
-        }
-        if ((!Array.isArray(methodU)) || !Array.isArray(paramsU)) {
-            // bad call
-            res.status(401).send()
-            return;
-        }
-        const method: string = methodU[0] as string;
-        const params: XMLRPCValue[] = paramsU.map((o: any) => valueToTS(o.value[0]));
-
-        if (params.length == 0) {
-            return res.status(401).send();
-        } else {
-            const securityCode = params[0];
-            if (typeof securityCode !== "string" || securityCode !== PAPERCUT_SECURITY_SECRET) {
-                return res.status(401).send();
+            if (!methodU || !paramsU) {
+                // bad call
+                res.status(401).send()
+                return;
             }
-        }
+            if ((!Array.isArray(methodU)) || !Array.isArray(paramsU)) {
+                // bad call
+                res.status(401).send()
+                return;
+            }
+            const method: string = methodU[0] as string;
+            const params: XMLRPCValue[] = paramsU.map((o: any) => valueToTS(o.value[0]));
 
-        const handler = handlers.get(method);
-        if (handler) {
-            handler(res, params.slice(1, params.length));
-        } else {
-            xmlrpcRespondFault(res, 1, `method "${method}" is not supported`);
+            if (params.length == 0) {
+                return res.status(401).send();
+            } else {
+                const securityCode = params[0];
+                if (typeof securityCode !== "string" || securityCode !== PAPERCUT_SECURITY_SECRET) {
+                    return res.status(401).send();
+                }
+            }
+
+            const handler = handlers.get(method);
+            if (handler) {
+                handler(res, params.slice(1, params.length));
+            } else {
+                xmlrpcRespondFault(res, 1, `method "${method}" is not supported`);
+            }
+        } catch (e) {
+            console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", e);
+            res.status(500).send();
         }
-    } catch (e){
-        console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", e);
-        res.status(500).send();
-    }
     });
 }

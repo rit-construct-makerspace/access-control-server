@@ -32,14 +32,18 @@ export async function getAccountBalance(username: string): Promise<number | Make
 export async function adjustAccountBalanceIfAvailableCents(username: string, deltaCents: number, source: string, description?: string): Promise<boolean> {
   const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
   var remaining = deltaCents;
-  if (makeAccountID) { // if no make account, go directly to tigerbucks
+  if (makeAccountID) { // found make account, use that first
+    console.log("on make");
     if (deltaCents < 0) { // Delta cents is negative, indicating a charge
       remaining = -(await CurrencyAccountRepo.chargeAccountReturnRemainingCents(makeAccountID, -deltaCents, source, description));
     }
     // If it is positive, do nothing. We want to refund entirely to tigerbucks.
   }
+    console.log("remaining", remaining);
+
 
   if (remaining == 0) {
+    console.log("none remaining");
     return true;
   }
   const wasAdjusted = await Atrium.adjustBalanceIfPossible(username, remaining);
@@ -53,4 +57,9 @@ export async function adjustAccountBalanceIfAvailableCents(username: string, del
   }
 
   return false;
+}
+
+
+export function centsToDollarString(cents: number){
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 }
