@@ -2,7 +2,7 @@
  * server.ts
  * Server Configuration and API
  */
-
+import * as papercut from "./integrations/papercut/papercut.js"
 import express from "express";
 import expressWs from 'express-ws';
 import { ApolloServer } from "@apollo/server";
@@ -61,6 +61,7 @@ async function startServer() {
   var exp = express();
   var wsserver = expressWs(exp);
   var app = wsserver.app;
+  
 
   //Configure CORS
   app.use(cors(CORS_CONFIG));
@@ -115,6 +116,8 @@ async function startServer() {
   //serves built react app files under make.rit.edu/app
   app.use("/app/", express.static(path.join(__dirname, '../../client/build')));
 
+
+  papercut.registerEndpoints(app)
 
   /**
    * REGEX QUERY:

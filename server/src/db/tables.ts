@@ -432,6 +432,10 @@ export interface RefIDCounterRow {
   refID: number;
 }
 
+export interface TempRolesRow {
+  name: string;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -477,5 +481,6 @@ declare module "knex/types/tables.js" {
     Organizations: OrganizationsRow;
     CurrencyLedger: CurrencyLedgerRow;
     RefIDCounter: RefIDCounterRow;
+    RolesTemp: TempRolesRow;
   }
 }
