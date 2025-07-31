@@ -55,6 +55,7 @@ import { TrainingHoldsTypeDefs } from "./schemas/trainingHoldsSchema.js";
 import { TrainingHoldResolver } from "./resolvers/trainingHoldResolver.js";
 import { RestrictionTypeDefs } from "./schemas/restrictionSchema.js";
 import { RestrictionResolver } from "./resolvers/restrictionResolver.js";
+import { CurrencyAccountResolvers } from "./resolvers/currencyAccountResolver.js"
 
 // for custom scalars such as Date
 const resolveFunctions = {
@@ -117,6 +118,7 @@ export const schema = makeExecutableSchema({
     TermsResolver,
     MaintenanceLogsResolver,
     ToolItemResolver,
-    RestrictionResolver
+    RestrictionResolver,
+    //CurrencyAccountResolvers
   ]
 });

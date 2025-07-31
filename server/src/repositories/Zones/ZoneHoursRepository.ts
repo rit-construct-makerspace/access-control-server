@@ -8,7 +8,7 @@ import { knex } from "../../db/index.js";
 import { DefaultHoursRow, SpecialHoursRow } from "../../db/tables.js";
 
 export async function getZoneHoursOnDay(day: Date, makerspaceID: number): Promise<SpecialHoursRow> {
-    const special = await knex("SpecialHours").where({ makerspaceID: makerspaceID }).andWhereRaw(`CAST(day as DATE) = CAST('${day.toISOString()}' as DATE)`).select("*").debug(true);
+    const special = await knex("SpecialHours").where({ makerspaceID: makerspaceID }).andWhereRaw(`CAST(day as DATE) = CAST('${day.toISOString()}' as DATE)`).select("*");
     console.log(special);
     if (special.length > 0) {
         return special[0];

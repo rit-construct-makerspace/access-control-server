@@ -37,6 +37,11 @@ export const UsersTypeDefs = gql`
     makerspaceID: ID
   }
 
+  type CurrencyAccount {
+    id: ID!
+    balance: Int!
+  }
+
   type User {
     id: ID!
     firstName: String!
@@ -62,6 +67,7 @@ export const UsersTypeDefs = gql`
     staff: [Int]
     trainer: [Int]
     restrictions: [Restriction]
+    currencyAccount: CurrencyAccount!
 
     """
     The number-letter combination that is attached to your RIT email
