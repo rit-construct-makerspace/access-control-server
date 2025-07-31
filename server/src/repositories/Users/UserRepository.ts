@@ -319,11 +319,6 @@ export async function revokeUserTrainer(userID: number, equipmentID: number): Pr
   return await getUserTrainerPerms(userID);
 }
 
-export async function getUserByAccountID(accountID: number): Promise<UserRow> {
-  const result = await knex("Users").where({ accountID: accountID }).select("*");
-  if (result.length > 0) {
-    return result[0];
-  } else {
-    throw new GraphQLError(`User with accountID: ${accountID} not found`);
-  }
+export async function getUserByAccountID(accountID: number): Promise<UserRow | undefined> {
+  return await knex("Users").where({ accountID: accountID }).select("*").first();
 }
