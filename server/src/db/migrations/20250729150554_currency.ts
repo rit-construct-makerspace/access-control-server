@@ -21,9 +21,15 @@ export async function up(knex: Knex): Promise<void> {
 
     const users = await knex("Users").select("id");
     for (let i = 0; i < users.length; i++) {
+        // log every 5%
+        const every = Math.round(users.length/20);
+        if (i % every == 0){
+            console.log(`Adding accounts to users progress ${Math.round(100*(i / users.length))}%`)
+        }
         const row = await knex("CurrencyAccounts").insert({ balance: 0 }).returning("id");
         await knex("Users").where({ id: users[i].id }).update({ accountID: row[0].id });
     }
+    console.log("Finished adding accounts to users");
 
     await knex.schema.alterTable("Users", (t) => {
         t.dropNullable("accountID");

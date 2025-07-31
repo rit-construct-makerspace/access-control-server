@@ -16,7 +16,6 @@ export const GET_CURRENT_USER = gql`
       lastName
       privilege
       setupComplete
-      balance
       admin
       holds {
         removeDate
@@ -38,6 +37,10 @@ export const GET_CURRENT_USER = gql`
       manager
       staff
       trainer
+      currencyAccount{
+        id
+        balance
+      }
     }
   }
 `;

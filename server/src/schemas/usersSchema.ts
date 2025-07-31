@@ -47,7 +47,6 @@ export const UsersTypeDefs = gql`
     firstName: String!
     lastName: String!
     pronouns: String
-    balance: String!
     isStudent: Boolean!
     privilege: Privilege!
     registrationDate: DateTime!
