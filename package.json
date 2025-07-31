@@ -25,13 +25,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@apollo/server": "^4.3.3",
+    "@apollo/server": "^4.0.0",
     "@apollo/server-plugin-landing-page-graphql-playground": "^4.0.0",
     "@google-cloud/local-auth": "^2.1.1",
     "@graphql-tools/schema": "^8.2.0",
     "@mui/x-charts": "^7.15.0",
     "@mui/x-data-grid": "^8.3.1",
-    "@node-saml/passport-saml": "~4.0.2",
+    "@node-saml/passport-saml": "^5.1.0",
     "@slack/web-api": "^7.7.0",
     "@types/express-ws": "^3.0.5",
     "body-parser": "^1.19.0",
@@ -106,6 +106,6 @@
     "tsx": "^4.16.5"
   },
   "engines": {
-    "node": "16.x"
+    "node": ">=20.x"
   }
 }
