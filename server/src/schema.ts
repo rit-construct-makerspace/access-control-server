@@ -56,6 +56,8 @@ import { RestrictionTypeDefs } from "./schemas/restrictionSchema.js";
 import { RestrictionResolver } from "./resolvers/restrictionResolver.js";
 import { CurrencyAccountResolvers } from "./resolvers/currencyAccountResolver.js"
 import { CurrencyAccountsTypeDefs } from "./schemas/currencyAccountSchema.js";
+import { CurrencyLedgerResolvers } from "./resolvers/currencyLedgerResolver.js";
+import { CurrencyLedgerTypeDefs } from "./schemas/currencyLedgerSchema.js";
 
 // for custom scalars such as Date
 const resolveFunctions = {
@@ -93,6 +95,7 @@ export const schema = makeExecutableSchema({
     MaintenanceLogsTypeDefs,
     ToolItemTypeDefs,
     CurrencyAccountsTypeDefs,
+    CurrencyLedgerTypeDefs,
   ],
   resolvers: [
     resolveFunctions,
@@ -121,5 +124,6 @@ export const schema = makeExecutableSchema({
     ToolItemResolver,
     RestrictionResolver,
     CurrencyAccountResolvers,
+    CurrencyLedgerResolvers,
   ]
 });

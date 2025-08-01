@@ -51,7 +51,7 @@ export default function CurrencyAccounts() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const queryString = searchParams.get("q") ?? "";
+    const queryString = searchParams.get("a") ?? "";
 
     setSearchText(queryString);
 
@@ -79,8 +79,8 @@ export default function CurrencyAccounts() {
             sx={{ maxWidth: 300 }}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            onClear={() => setUrlParam("q", "")}
-            onSubmit={() => setUrlParam("q", searchText)}
+            onClear={() => setUrlParam("a", "")}
+            onSubmit={() => setUrlParam("a", searchText)}
           />
           <Grid container spacing={2} justifyContent={"center"}>
             {
