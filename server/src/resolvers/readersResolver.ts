@@ -41,7 +41,7 @@ async function generateUniqueHumanName() {
   const RANDOM_TRIES = 10;
   for (var i = 0; i < RANDOM_TRIES; i++) {
     const name = generateRandomHumanName();
-    if (await ReaderRepo.getReaderByName(name) == null) {
+    if ((await ReaderRepo.getReaderByName(name)) == null) {
       return name;
     }
   }

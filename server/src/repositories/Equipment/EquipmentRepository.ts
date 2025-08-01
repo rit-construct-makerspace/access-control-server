@@ -206,7 +206,7 @@ export async function hasAccessByID(
   const user = await UserRepo.getUserByID(userID);   // Get user for this university ID
   return user !== undefined &&                              // Ensure user exists
     !(await HoldsRepo.hasActiveHolds(user.id)) &&           // Ensure user has no holds
-    await hasTrainingModules(user, equipmentID);            // Ensure user has completed necessary training
+    (await hasTrainingModules(user, equipmentID));            // Ensure user has completed necessary training
 }
 
 /**

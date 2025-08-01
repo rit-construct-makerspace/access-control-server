@@ -14,7 +14,6 @@ import { MODULE_PASSING_THRESHOLD } from "../constants.js";
 import { EquipmentRow, TrainingModuleItem, TrainingModuleRow } from "../db/tables.js";
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import { accessCheckExists, createAccessCheck, hasApprovedAccessCheck } from "../repositories/Equipment/AccessChecksRepository.js";
-import fetch from "node-fetch";
 import { createTrainingHold, getTrainingHoldByUserForModule } from "../repositories/Training/TrainingHoldsRespository.js";
 import * as PassedModuleRepo from "../repositories/Training/PassedRepository.js";
 import * as TrainingModuleReo from "../repositories/Training/ModuleRepository.js";
