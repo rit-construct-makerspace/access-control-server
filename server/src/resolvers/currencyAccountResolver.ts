@@ -23,5 +23,15 @@ export const CurrencyAccountResolvers = {
         ) => {
             return isStaff(async () => (await CurrencyAccountRepo.getAccountByID(args.accountID)));
         },
+
+        currencyAccountsLimit: async (
+            _parent: any,
+            args: {
+                searchText: string
+            },
+            { isManager }: ApolloContext
+        ) => {
+            return isManager(async () => (await CurrencyAccountRepo.getAccountsLimit(args.searchText)));
+        }
     },
 }

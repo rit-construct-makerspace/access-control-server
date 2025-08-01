@@ -16,5 +16,6 @@ export const CurrencyAccountsTypeDefs = gql`
 
     extend type Query {
         currencyAccount(accountID: ID!): CurrencyAccount
+        currencyAccountsLimit(searchText: String): [CurrencyAccount]
     }
 `;
