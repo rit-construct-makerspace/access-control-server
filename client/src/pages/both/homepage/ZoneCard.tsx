@@ -27,7 +27,7 @@ function getHoursToday(times: ZoneHours[]) {
         <Typography color="darkorange" fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
         <Typography paddingLeft={"10px"}>
           {
-            status === "CLOSED"
+            hours_today.closed
               ? ""
               : `${TimeUtils.reformatTime(times[now.getDay()].open?.substring(0, 5) ?? "12:00")} - ${TimeUtils.reformatTime(times[now.getDay()].close?.substring(0, 5) ?? "12:00")}`
           }
