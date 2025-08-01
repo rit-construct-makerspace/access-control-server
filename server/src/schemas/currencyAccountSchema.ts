@@ -1,0 +1,20 @@
+import { gql } from "graphql-tag";
+
+export const CurrencyAccountsTypeDefs = gql`
+    type CurrencyAccount {
+        id: ID!
+        balance: Int!
+        owner: CurrencyAccountOwner!
+    }
+
+    type CurrencyAccountOwner {
+        displayName: String!
+        username: String!
+        userID: ID
+        orgID: ID
+    }
+
+    extend type Query {
+        currencyAccount(accountID: ID!): CurrencyAccount
+    }
+`;

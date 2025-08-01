@@ -231,11 +231,11 @@ export interface UserRow {
   setupComplete: boolean;
   ritUsername: string;
   archived: boolean;
-  balance: string;
   cardTagID: string;
   notes: string;
   activeHold: boolean;
   admin: boolean;
+  accountID: number;
 }
 
 export interface ReaderRow {
@@ -405,6 +405,33 @@ export interface DefaultHoursRow {
   closed: boolean;
 }
 
+export interface CurrencyAccountsRow {
+  id: number;
+  balance: number; // Cents
+}
+
+export interface OrganizationsRow {
+  id: number;
+  username: string;
+  displayname: string;
+  accountID: number;
+}
+
+export interface CurrencyLedgerRow {
+  id: number;
+  dateTime: Date;
+  accountID: number;
+  amount: number;
+  source: string;
+  description: string;
+  atxID: number;
+  refID: number
+}
+
+export interface RefIDCounterRow {
+  refID: number;
+}
+
 export interface TempRolesRow {
   name: string;
 }
@@ -450,6 +477,10 @@ declare module "knex/types/tables.js" {
     ModulesForMakerspaces: ModulesForMakerspacesRow;
     SpecialHours: SpecialHoursRow;
     DefaultHours: DefaultHoursRow;
+    CurrencyAccounts: CurrencyAccountsRow;
+    Organizations: OrganizationsRow;
+    CurrencyLedger: CurrencyLedgerRow;
+    RefIDCounter: RefIDCounterRow;
     RolesTemp: TempRolesRow;
   }
 }

@@ -42,7 +42,6 @@ export const UsersTypeDefs = gql`
     firstName: String!
     lastName: String!
     pronouns: String
-    balance: String!
     isStudent: Boolean!
     privilege: Privilege!
     registrationDate: DateTime!
@@ -62,6 +61,7 @@ export const UsersTypeDefs = gql`
     staff: [Int]
     trainer: [Int]
     restrictions: [Restriction]
+    currencyAccount: CurrencyAccount!
 
     """
     The number-letter combination that is attached to your RIT email

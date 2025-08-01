@@ -2,12 +2,11 @@
  * server.ts
  * Server Configuration and API
  */
-
+import * as papercut from "./integrations/papercut/papercut.js"
 import express from "express";
 import expressWs from 'express-ws';
 import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
-import { createServer, request } from "http";
+import { expressMiddleware } from "@as-integrations/express5";
 import compression from "compression";
 import cors from "cors";
 import { schema } from "./schema.js";
@@ -27,7 +26,7 @@ import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import morgan from "morgan"; //Log provider
 import bodyParser from "body-parser"; //JSON request body parser
 import { createRequire } from "module";
-import { createEquipmentSession, pruneNullLengthEquipmentSessions, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
+import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
 import { ReaderRow } from "./db/tables.js";
 import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
@@ -35,7 +34,6 @@ import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhere
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
-import * as Atrium from "./integrations/atrium-integration/atrium.js"
 
 const require = createRequire(import.meta.url);
 
@@ -61,6 +59,7 @@ async function startServer() {
   var exp = express();
   var wsserver = expressWs(exp);
   var app = wsserver.app;
+  
 
   //Configure CORS
   app.use(cors(CORS_CONFIG));
@@ -116,6 +115,8 @@ async function startServer() {
   app.use("/app/", express.static(path.join(__dirname, '../../client/build')));
 
 
+  papercut.registerEndpoints(app)
+
   /**
    * REGEX QUERY:
    * matches to all urls EXCEPT:
@@ -155,7 +156,7 @@ async function startServer() {
 
 
 
-  app.get("/app/*", function (req, res) {
+  app.get("/app/*apppage", function (req, res) {
     res.header
     res.sendFile(path.join(__dirname, "../../client/build", "index.html"));
   });
@@ -184,7 +185,7 @@ async function startServer() {
   // Websocket ACS Handler
   app.ws("/api/ws", ws_acs_api);
 
-  app.all("/api/files/*", async function (req, res, next) {
+  app.all("/api/files/*filename", async function (req, res, next) {
     const SNHeader = 'shlug-sn';
     const KeyHeader = 'shlug-key';
     if (!req.headers[SNHeader] || !req.headers[KeyHeader]) {
@@ -197,7 +198,7 @@ async function startServer() {
     }
 
     const reader = await getReaderBySN(SN);
-    if (reader == null){
+    if (reader == null) {
       return res.status(404).send();
     }
 
@@ -221,7 +222,7 @@ async function startServer() {
   app.get('/api/files/ota/:tagname', async function (req, res) {
     const tag = req.params["tagname"];
     console.log(`SN: ${req.headers['shlug-sn']} requested OTA to ${tag}`);
-    
+
     const ota_url = `https://github.com/rit-construct-makerspace/access-control-firmware/releases/download/${tag}/Core.bin`
     fetch(ota_url).then(actual => {
       actual.headers.forEach((v, n) => res.setHeader(n, v));

@@ -7,6 +7,8 @@ import { knex } from "../../db/index.js";
 import { createLog } from "../AuditLogs/AuditLogRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import { UserRow } from "../../db/tables.js";
+import { GraphQLError } from "graphql";
+import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js";
 
 
 /**
@@ -25,8 +27,8 @@ export function getUsersFullName(user: UserRow) {
  */
 export async function getUsers(searchText?: string): Promise<UserRow[]> {
   return knex("Users").select()
-  .whereRaw(searchText && searchText != "" ? `("ritUsername" || "firstName" || ' ' || "lastName") ilike '%${searchText}%'` : ``)
-  .orderBy("ritUsername", "ASC");
+    .whereRaw(searchText && searchText != "" ? `("ritUsername" || "firstName" || ' ' || "lastName") ilike '%${searchText}%'` : ``)
+    .orderBy("ritUsername", "ASC");
 }
 
 /**
@@ -47,7 +49,7 @@ export async function getUsersLimit(searchText?: string): Promise<UserRow[]> {
  */
 export async function getUserByID(userID: number): Promise<UserRow> {
   const user = await knex("Users").first().where("id", userID);
-  
+
   if (!user) throw new EntityNotFound(`User #${userID} not found`);
 
   return user;
@@ -60,7 +62,7 @@ export async function getUserByID(userID: number): Promise<UserRow> {
  */
 export async function getUserByIDOrUndefined(userID: number): Promise<UserRow | undefined> {
   const user = await knex("Users").first().where("id", userID);
-  
+
   if (!user) return undefined
 
   return user;
@@ -99,7 +101,7 @@ export async function getUserByCardTagID(
  * @returns matching User or undefined if none
  */
 export async function getUserByUsernameOrUID(value: string): Promise<UserRow | undefined> {
-  return await knex("Users").select().where({ritUsername: value}).orWhere({cardTagID: value}).first();
+  return await knex("Users").select().where({ ritUsername: value }).orWhere({ cardTagID: value }).first();
 }
 
 /**
@@ -113,7 +115,8 @@ export async function createUser(user: {
   ritUsername: string;
 }): Promise<UserRow> {
   console.log("Creating user entry: " + user.ritUsername);
-  const [newID] = await knex("Users").insert(user, "id");
+  const accountID = await CurrencyAccountRepo.createAccount();
+  const [newID] = await knex("Users").insert({ ...user, accountID: accountID }, "id");
   return await getUserByID(newID.id);
 }
 
@@ -131,12 +134,12 @@ export async function updateStudentProfile(args: {
   const user = await getUserByID(args.userID);
 
   if (!user.setupComplete) {
-    await createLog("{user} has joined The SHED!", 
+    await createLog("{user} has joined The SHED!",
       "server",
       {
         id: args.userID,
         label: getUsersFullName(user),
-    });
+      });
   }
 
   await knex("Users").where({ id: args.userID }).update({
@@ -156,8 +159,8 @@ export async function updateStudentProfile(args: {
  * @param lastName new last name
  */
 export async function updateUserName(id: number, firstName: string, lastName: string) {
-  await knex("Users").update({firstName, lastName}).where({id});
-  await createLog("{user}'s profile info has been automatically updated", "server", {id: id, label: (firstName + " " + lastName)});
+  await knex("Users").update({ firstName, lastName }).where({ id });
+  await createLog("{user}'s profile info has been automatically updated", "server", { id: id, label: (firstName + " " + lastName) });
 }
 
 /**
@@ -192,7 +195,7 @@ export async function setActiveHold(
   userID: number,
   activeHold: boolean
 ): Promise<UserRow> {
-  await knex("Users").where({ id: userID }).update({activeHold});
+  await knex("Users").where({ id: userID }).update({ activeHold });
   return await getUserByID(userID);
 }
 
@@ -237,8 +240,8 @@ export async function getNumUsers(): Promise<string> {
  */
 export async function getUserManagerPerms(userID: number): Promise<number[]> {
   var makerspaceIDs: number[] = [];
-  
-  (await knex("Managers").where({userID: userID}).select("makerspaceID")).map((row) => {
+
+  (await knex("Managers").where({ userID: userID }).select("makerspaceID")).map((row) => {
     makerspaceIDs.push(row.makerspaceID);
   })
 
@@ -252,8 +255,8 @@ export async function getUserManagerPerms(userID: number): Promise<number[]> {
  */
 export async function getUserStaffPerms(userID: number): Promise<number[]> {
   var makerspaceIDs: number[] = [];
-  
-  (await knex("Staff").where({userID: userID}).select("makerspaceID")).map((row) => {
+
+  (await knex("Staff").where({ userID: userID }).select("makerspaceID")).map((row) => {
     makerspaceIDs.push(row.makerspaceID);
   })
 
@@ -267,8 +270,8 @@ export async function getUserStaffPerms(userID: number): Promise<number[]> {
  */
 export async function getUserTrainerPerms(userID: number): Promise<number[]> {
   var equipmentIDs: number[] = [];
-  
-  (await knex("Trainers").where({userID: userID}).select("equipmentID")).map((row) => {
+
+  (await knex("Trainers").where({ userID: userID }).select("equipmentID")).map((row) => {
     equipmentIDs.push(row.equipmentID);
   })
 
@@ -276,42 +279,46 @@ export async function getUserTrainerPerms(userID: number): Promise<number[]> {
 }
 
 export async function setUserAdmin(userID: number, admin: boolean): Promise<boolean> {
-  await knex("Users").where({id: userID}).update({admin: admin});
+  await knex("Users").where({ id: userID }).update({ admin: admin });
   return admin;
 }
 
 export async function makeUserManager(userID: number, makerspaceID: number): Promise<number[]> {
-  await knex("Managers").insert({userID, makerspaceID});
+  await knex("Managers").insert({ userID, makerspaceID });
 
   return await getUserManagerPerms(userID);
 }
 
 export async function makeUserStaff(userID: number, makerspaceID: number): Promise<number[]> {
-  await knex("Staff").insert({userID, makerspaceID});
+  await knex("Staff").insert({ userID, makerspaceID });
 
   return await getUserStaffPerms(userID);
 }
 
 export async function makeUserTrainer(userID: number, equipmentID: number): Promise<number[]> {
-  await knex("Trainers").insert({userID, equipmentID});
+  await knex("Trainers").insert({ userID, equipmentID });
 
   return await getUserTrainerPerms(userID);
 }
 
 export async function revokeUserManager(userID: number, makerspaceID: number): Promise<number[]> {
-  await knex("Managers").where({userID: userID, makerspaceID: makerspaceID}).delete();
+  await knex("Managers").where({ userID: userID, makerspaceID: makerspaceID }).delete();
 
   return await getUserManagerPerms(userID);
 }
 
 export async function revokeUserStaff(userID: number, makerspaceID: number): Promise<number[]> {
-  await knex("Staff").where({userID: userID, makerspaceID: makerspaceID}).delete();
+  await knex("Staff").where({ userID: userID, makerspaceID: makerspaceID }).delete();
 
   return await getUserStaffPerms(userID);
 }
 
 export async function revokeUserTrainer(userID: number, equipmentID: number): Promise<number[]> {
-  await knex("Trainers").where({userID: userID, equipmentID: equipmentID}).delete();
+  await knex("Trainers").where({ userID: userID, equipmentID: equipmentID }).delete();
 
   return await getUserTrainerPerms(userID);
+}
+
+export async function getUserByAccountID(accountID: number): Promise<UserRow | undefined> {
+  return await knex("Users").where({ accountID: accountID }).select("*").first();
 }

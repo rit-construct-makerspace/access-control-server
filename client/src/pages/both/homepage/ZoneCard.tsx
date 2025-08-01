@@ -16,7 +16,9 @@ interface ZoneCardProps {
 function getHoursToday(times: ZoneHours[]) {
   const now = new Date();
 
-  const status = TimeUtils.currentStatus(times[now.getDay()].open?.substring(0, 5) ?? "12:00", times[now.getDay()].close?.substring(0, 5) ?? "12:00");
+  const hours_today = times[now.getDay()];
+
+  const status = hours_today.closed ? "CLOSED" : TimeUtils.currentStatus(hours_today.open?.substring(0, 5) ?? "12:00", hours_today.close?.substring(0, 5) ?? "12:00");
 
   return (
     <Stack justifyContent="space-between" direction="row">
@@ -25,7 +27,7 @@ function getHoursToday(times: ZoneHours[]) {
         <Typography color="darkorange" fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
         <Typography paddingLeft={"10px"}>
           {
-            status === "CLOSED"
+            hours_today.closed
               ? ""
               : `${TimeUtils.reformatTime(times[now.getDay()].open?.substring(0, 5) ?? "12:00")} - ${TimeUtils.reformatTime(times[now.getDay()].close?.substring(0, 5) ?? "12:00")}`
           }
