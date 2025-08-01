@@ -1,17 +1,13 @@
-import { Box, Button, Card, CardActionArea, CardContent, CardHeader, CardMedia, IconButton, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Button, Card, CardContent, CardMedia, Stack, Typography, useTheme } from "@mui/material";
 import Equipment from "../types/Equipment";
 import { useCurrentUser } from "./CurrentUserProvider";
-import EditIcon from '@mui/icons-material/Edit';
 import { ModuleStatus, moduleStatusMapper } from "./TrainingModuleUtils";
-import TrainingModuleRow from "./TrainingModuleRow";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { Link, useNavigate } from "react-router-dom";
-import WarningIcon from "@mui/icons-material/Warning";
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
-import LockClockIcon from '@mui/icons-material/LockClock';
 import ConstructionIcon from '@mui/icons-material/Construction';
 import ReactMarkdown from "react-markdown";
+import ModuleStatusRow from "./ModuleStatusRow";
 
 interface EquipmentCardProps {
     equipment: Equipment;
@@ -75,24 +71,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                                 {/* Trainings & Access Check */}
                                 <Stack width="100%">
                                     {moduleStatuses.map((ms: ModuleStatus) => (
-                                        <CardActionArea onClick={() => navigate(`/maker/training/${ms.moduleID}`)}>
-                                            <Stack direction="row" spacing={1} alignItems="center" padding="10px" width="100%">
-                                                {
-                                                    ms.status === "Passed"
-                                                        ? <CheckCircleIcon color="success" />
-                                                        : ms.status === "Not taken"
-                                                            ? <CloseIcon color="error" />
-                                                            : ms.status === "Expired"
-                                                                ? <WarningIcon color="warning" />
-                                                                : ms.status === "Expiring Soon"
-                                                                    ? <HourglassBottomIcon color="warning" />
-                                                                    : ms.status === "Locked"
-                                                                        ? <LockClockIcon color="error" />
-                                                                        : null
-                                                }
-                                                <Typography variant="body2">{ms.moduleName}</Typography>
-                                            </Stack>
-                                        </CardActionArea>
+                                        <ModuleStatusRow ms={ms} />
                                     ))}
                                     {
                                         !props.equipment.byReservationOnly
