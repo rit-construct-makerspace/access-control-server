@@ -178,13 +178,16 @@ export async function getAccountsLimit(searchText?: string): Promise<CurrencyAcc
     return await knex("CurrencyAccounts").select("*").limit(25);
   }
 
-  return await knex("CurrencyAccounts")
-    .join("Users", "Users.accountID", "CurrencyAccounts.id")
-    .join("Organizations", "Organizations.accountID", "CurrencyAccounts.id")
+  const res = await knex("CurrencyAccounts")
+    .leftOuterJoin("Users", "Users.accountID", "CurrencyAccounts.id")
+    .leftOuterJoin("Organizations", "Organizations.accountID", "CurrencyAccounts.id")
     .whereILike("Users.ritUsername", `%${searchText}%`)
-    .orWhereILike("Users.accountID", `%${searchText}%`)
+    .orWhere("Users.accountID", Number.isNaN(Number(searchText)) ? -1 : searchText)
     .orWhereILike("Organizations.displayname", `%${searchText}%`)
     .orWhereILike("Users.firstName", `%${searchText}%`)
     .orWhereILike("Users.lastName", `%${searchText}%`)
     .select("CurrencyAccounts.*").limit(25);
+
+  console.log(res);
+  return res;
 }
