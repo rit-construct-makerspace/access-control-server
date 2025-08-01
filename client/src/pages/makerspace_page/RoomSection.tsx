@@ -12,6 +12,7 @@ import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import LockClockIcon from '@mui/icons-material/LockClock';
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import ModuleStatusRow from "../../common/ModuleStatusRow";
 
 interface RoomSectionProps {
     room: Room;
@@ -59,27 +60,10 @@ export default function RoomSection(props: RoomSectionProps) {
                                 : null
                         }
                     </Stack>
-                    <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                    <Stack direction={isMobile ? "column" : "row"} spacing={1} alignItems={"center"}>
                         {
                             roomTrainings.length > 0 && roomTrainings.map((ms: ModuleStatus) => (
-                                <CardActionArea onClick={() => navigate(`/maker/training/${ms.moduleID}`)} sx={{ width: "max-content" }}>
-                                    <Stack direction="row" spacing={1} alignItems="center" padding="10px">
-                                        {
-                                            ms.status === "Passed"
-                                                ? <CheckCircleIcon color="success" />
-                                                : ms.status === "Not taken"
-                                                    ? <CloseIcon color="error" />
-                                                    : ms.status === "Expired"
-                                                        ? <WarningIcon color="warning" />
-                                                        : ms.status === "Expiring Soon"
-                                                            ? <HourglassBottomIcon color="warning" />
-                                                            : ms.status === "Locked"
-                                                                ? <LockClockIcon color="error" />
-                                                                : null
-                                        }
-                                        <Typography variant="body1">{ms.moduleName}</Typography>
-                                    </Stack>
-                                </CardActionArea>
+                                <ModuleStatusRow ms={ms} />
                             ))
                         }
                     </Stack>

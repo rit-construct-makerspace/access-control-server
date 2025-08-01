@@ -13,6 +13,7 @@ import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { getActiveTrainingHoldsByUser, getTrainingHoldsByUser } from "../repositories/Training/TrainingHoldsRespository.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
+import { UserRow } from "../db/tables.js";
 
 const UsersResolvers = {
   User: {
@@ -85,11 +86,11 @@ const UsersResolvers = {
     },
 
     currencyAccount: async (
-      parent: { id: string },
+      parent: UserRow,
       _args: any,
       { ifStaffOrSelf }: ApolloContext
     ) => {
-      return ifStaffOrSelf(Number(parent.id), () => (CurrencyAccountRepo.getAccountByID(Number(parent.id))));
+      return ifStaffOrSelf(Number(parent.id), () => (CurrencyAccountRepo.getAccountByID(Number(parent.accountID))));
     }
 
   },

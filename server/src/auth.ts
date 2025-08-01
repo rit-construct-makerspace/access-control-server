@@ -238,6 +238,7 @@ export function setupStagingAuth(app: express.Application) {
     const ritUser =
       process.env.SAML_IDP === "TEST" ? mapSamlTestToRit(user) : user.attributes; //user is the full response data. attributes has the things we need
 
+      console.log("Username: " + ritUser["urn:oid:0.9.2342.19200300.100.1.1"] + "\nRoles: " + ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"]);
 
       // TEMPORARY -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
       try {
