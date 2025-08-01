@@ -20,104 +20,88 @@ import LockClockIcon from '@mui/icons-material/LockClock';
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import ZoneHoursSection from "./ZoneHours";
+import ModuleStatusRow from "../../common/ModuleStatusRow";
 
 export default function MakerspacePage() {
-    const { makerspaceID } = useParams<{ makerspaceID: string }>();
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
-    const user = useCurrentUser();
-    const navigate = useNavigate();
-    const isMobile = useIsMobile();
+  const user = useCurrentUser();
+  const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
-    const getZone = useQuery(GET_ZONE_BY_ID, { variables: { id: makerspaceID } });
+  const getZone = useQuery(GET_ZONE_BY_ID, { variables: { id: makerspaceID } });
 
-    const [equipmentSearch, setEquipmentSearch] = useState("");
+  const [equipmentSearch, setEquipmentSearch] = useState("");
 
-    const staffMode = isStaffFor(user, Number(makerspaceID))
+  const staffMode = isStaffFor(user, Number(makerspaceID))
 
-    return (
-        <RequestWrapper2 result={getZone} render={(data) => {
+  return (
+    <RequestWrapper2 result={getZone} render={(data) => {
 
-            const fullZone: FullZone = data.zoneByID;
+      const fullZone: FullZone = data.zoneByID;
 
-            const zoneTrainings = fullZone.trainingModules.map(moduleStatusMapper(user.passedModules, user.trainingHolds));
+      const zoneTrainings = fullZone.trainingModules.map(moduleStatusMapper(user.passedModules, user.trainingHolds));
 
-            return (
-                <Stack spacing={"2"} padding="20px" divider={<Divider orientation="horizontal" flexItem />}>
-                    <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
-                        <title>{`${fullZone.name} | Make @ RIT`}</title>
-                        <Typography variant="h3" align="center">{fullZone.name}</Typography>
-                        {
-                            isManagerFor(user, Number(makerspaceID))
-                                ? <IconButton
-                                    onClick={() => { navigate(`/makerspace/${makerspaceID}/edit`) }}
-                                    sx={{ color: "gray" }}
-                                >
-                                    <EditIcon />
-                                </IconButton>
-                                : null
-                        }
+      return (
+        <Stack spacing={"2"} padding="20px" divider={<Divider orientation="horizontal" flexItem />}>
+          <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
+            <title>{`${fullZone.name} | Make @ RIT`}</title>
+            <Typography variant="h3" align="center">{fullZone.name}</Typography>
+            {
+              isManagerFor(user, Number(makerspaceID))
+                ? <IconButton
+                  onClick={() => { navigate(`/makerspace/${makerspaceID}/edit`) }}
+                  sx={{ color: "gray" }}
+                >
+                  <EditIcon />
+                </IconButton>
+                : null
+            }
 
-                    </Stack>
-                    <ZoneHoursSection hours={fullZone.hours} isMobile={isMobile} />
-                    <StaffBar />
-                    {
-                        zoneTrainings.length > 0 &&
-                        <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
-                            <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
-                                <Typography variant="h6">Makerspace Trainings</Typography>
-                                {
-                                    zoneTrainings.some((ms) => (ms.status != "Passed" && ms.status != "Expiring Soon"))
-                                        ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
-                                        : null
-                                }
-                            </Stack>
-                            <Stack direction={"row"} spacing={1} alignItems={"center"}>
-                                {
-                                    zoneTrainings.map((ms: ModuleStatus) => (
-                                        <CardActionArea onClick={() => navigate(`/maker/training/${ms.moduleID}`)} sx={{ width: "max-content" }}>
-                                            <Stack direction="row" spacing={1} alignItems="center" padding="10px">
-                                                {
-                                                    ms.status === "Passed"
-                                                        ? <CheckCircleIcon color="success" />
-                                                        : ms.status === "Not taken"
-                                                            ? <CloseIcon color="error" />
-                                                            : ms.status === "Expired"
-                                                                ? <WarningIcon color="warning" />
-                                                                : ms.status === "Expiring Soon"
-                                                                    ? <HourglassBottomIcon color="warning" />
-                                                                    : ms.status === "Locked"
-                                                                        ? <LockClockIcon color="error" />
-                                                                        : null
-                                                }
-                                                <Typography variant="body1">{ms.moduleName}</Typography>
-                                            </Stack>
-                                        </CardActionArea>
-                                    ))
-                                }
-                            </Stack>
-                        </Stack>
-                    }
-                    <Stack padding={"10px"} direction="row" spacing={2}>
-                        <SearchBar
-                            placeholder="Search Equipment"
-                            value={equipmentSearch}
-                            onChange={(e) => setEquipmentSearch(e.target.value)}
-                            onClear={() => setEquipmentSearch("")}
-                        />
-                        {
-                            isManagerFor(user, Number(makerspaceID))
-                                ? <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={() => (navigate("/admin/equipment/new"))}>
-                                    Create New Equipment
-                                </Button>
-                                : null
-                        }
-                    </Stack>
+          </Stack>
+          <ZoneHoursSection hours={fullZone.hours} isMobile={isMobile} />
+          <StaffBar />
+          {
+            zoneTrainings.length > 0 &&
+            <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
+              <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
+                <Typography variant="h6">Makerspace Trainings</Typography>
+                {
+                  zoneTrainings.some((ms) => (ms.status != "Passed" && ms.status != "Expiring Soon"))
+                    ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
+                    : null
+                }
+              </Stack>
+              <Stack direction={isMobile ? "column" : "row"} spacing={1} alignItems={"center"}>
+                {
+                  zoneTrainings.map((ms: ModuleStatus) => (
+                    <ModuleStatusRow ms={ms} />
+                  ))
+                }
+              </Stack>
+            </Stack>
+          }
+          <Stack padding={"10px"} direction="row" spacing={2}>
+            <SearchBar
+              placeholder="Search Equipment"
+              value={equipmentSearch}
+              onChange={(e) => setEquipmentSearch(e.target.value)}
+              onClear={() => setEquipmentSearch("")}
+            />
+            {
+              isManagerFor(user, Number(makerspaceID))
+                ? <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={() => (navigate("/admin/equipment/new"))}>
+                  Create New Equipment
+                </Button>
+                : null
+            }
+          </Stack>
 
-                    {fullZone.rooms.map((room: Room) => (
-                        <RoomSection room={room} equipmentSearch={equipmentSearch} isMobile={isMobile} staffMode={staffMode} />
-                    ))}
-                </Stack>
-            );
-        }} />
-    );
+          {fullZone.rooms.map((room: Room) => (
+            <RoomSection room={room} equipmentSearch={equipmentSearch} isMobile={isMobile} staffMode={staffMode} />
+          ))}
+        </Stack>
+      );
+    }} />
+  );
 }
