@@ -5,6 +5,7 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import SearchBar from "../../../common/SearchBar";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import ManageAccountModal from "./ManageAccountModal";
 
 const GET_CURRENCY_ACCOUNTS_LIMIT = gql`
   query CurrencyAccountsLimit($searchText: String) {
@@ -21,14 +22,14 @@ const GET_CURRENCY_ACCOUNTS_LIMIT = gql`
   }
 `;
 
-type CurrencyAccountOwner = {
+export type CurrencyAccountOwner = {
   username: string;
   displayName: string;
   userID: number | null;
   orgID: number | null;
 }
 
-type CurrencyAccount = {
+export type CurrencyAccount = {
   id: number;
   balance: number;
   owner: CurrencyAccountOwner;
@@ -42,6 +43,8 @@ export default function CurrencyAccounts() {
   const [getCurrencyAccounts, currencyAccountsResult] = useLazyQuery(GET_CURRENCY_ACCOUNTS_LIMIT);
 
   const [searchText, setSearchText] = useState("");
+  const [account, setAccount] = useState<CurrencyAccount | null>(null);
+  const [open, setOpen] = useState(false);
 
   const setUrlParam = (paramName: string, paramValue: string) => {
     const params = new URLSearchParams(location.search);
@@ -65,7 +68,7 @@ export default function CurrencyAccounts() {
   const moneyForamtter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-  })
+  });
 
   return (
     <RequestWrapper2 result={currencyAccountsResult} render={(data) => {
@@ -93,9 +96,16 @@ export default function CurrencyAccounts() {
                         <Typography color="primary" fontWeight={"bold"}>{account.owner.displayName} ({account.owner.username})</Typography>
                         <Stack direction={"row"} justifyContent={"space-around"} alignItems={"center"} width={"100%"}>
                           <Typography><b>Account ID:</b> {account.id}</Typography>
-                          <Typography><b>Credits:</b> {moneyForamtter.format(account.balance)}</Typography>
+                          <Typography><b>Credits:</b> {moneyForamtter.format(account.balance / 100)}</Typography>
                         </Stack>
-                        <Button color="secondary" sx={{ alignSelf: "flex-end" }}>
+                        <Button
+                          color="secondary"
+                          sx={{ alignSelf: "flex-end" }}
+                          onClick={() => {
+                            setAccount(account);
+                            setOpen(true);
+                          }}
+                        >
                           Manage
                         </Button>
                       </Stack>
@@ -105,6 +115,10 @@ export default function CurrencyAccounts() {
               })
             }
           </Grid>
+          {
+            account &&
+            <ManageAccountModal account={account} open={open} onClose={() => setOpen(false)} />
+          }
         </Stack>
       );
     }} />
