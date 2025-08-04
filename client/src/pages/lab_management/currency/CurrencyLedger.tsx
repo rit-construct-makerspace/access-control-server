@@ -87,9 +87,9 @@ export default function CurrencyLedger() {
         { field: "amount", headerName: "Amount", width: 200 },
         { field: "dateTime", headerName: "Date", width: 200 },
         { field: "source", headerName: "Source", width: 200 },
-        { field: "description", headerName: "Description", width: 500 },
-        { field: "atxID", headerName: "ATX ID", width: 150 },
-        { field: "refID", headerName: "REF ID", width: 150 },
+        { field: "description", headerName: "Description", width: 550 },
+        { field: "atxID", headerName: "ATX ID", width: 250 },
+        { field: "refID", headerName: "REF ID", width: 250 },
       ];
 
       const rows: GridRowsProp = entries.map((entry) => ({

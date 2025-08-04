@@ -28,7 +28,7 @@ export default function ManageAccountModal(props: ManageAccountModalProps) {
     currency: "USD",
   });
 
-  const [adjustAcountBalanceCents] = useMutation(ADJUST_ACCOUNT_CENTS, { refetchQueries: ["CurrencyAccountsLimit"] });
+  const [adjustAcountBalanceCents] = useMutation(ADJUST_ACCOUNT_CENTS, { refetchQueries: ["CurrencyAccountsLimit", "CurrencyLedgerEntriesLimit"] });
 
   async function handleAdjustment(rawDollars: number) {
     if (Number.isNaN(rawDollars)) {
