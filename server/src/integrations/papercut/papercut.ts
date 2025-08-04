@@ -150,8 +150,14 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
 
   const amountCents = Math.round(adjustment * 100);
   try {
+    const transaction = new Currency.Transaction(
+      "3DPrinterOS",
+      `Transaction from 3DPrinterOS for user '${username}' of ${Currency.centsToDollarString(amountCents)} with comment '${comment}'`,
+      [{ name: "3D Printer OS Transaction", cents: amountCents }],
+      false
+    );
 
-    const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, amountCents, "3DPrinterOS", `Transaction from 3DPrinterOS for user '${username}' of ${Currency.centsToDollarString(amountCents)} with comment '${comment}'`);
+    const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction);
     xmlrpcRespond(res, [success]);
   } catch {
     xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)

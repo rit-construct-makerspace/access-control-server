@@ -962,11 +962,11 @@ async function startServer() {
 
 
 
-  app.listen({ port: PORT }, (): void => {
+  app.listen({ port: PORT }, async () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     )
-    const res = Atrium.generateAtriumToken("123456");
+    const res = await Atrium.generateAtriumToken("123456");
     console.log("RESP", res);
   }
   );
