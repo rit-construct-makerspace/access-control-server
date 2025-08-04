@@ -12,10 +12,11 @@ export default interface InventoryItem {
   storefrontVisible: boolean;
   notes: string;
   description: string;
-<<<<<<< HEAD
   makerspaceID?: number;
-=======
->>>>>>> origin/main
+  makerspace?: {
+    id: number;
+    name: string;
+  }
   tags: InventoryTag[];
   tagID1: number | null;
   tagID2: number | null;

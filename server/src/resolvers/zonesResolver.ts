@@ -5,7 +5,7 @@ import { addTrainingToZone, createZone, deleteZone, getTrainingsByZone, getZoneB
 import { ZoneRow } from "../db/tables.js";
 import { getRooms, getRoomsByZone } from "../repositories/Rooms/RoomRepository.js";
 import { ZoneInput } from "../schemas/zonesSchema.js";
-import { getItems } from "../repositories/Store/InventoryRepository.js";
+import { getItems, getItemsWhereStorefront } from "../repositories/Store/InventoryRepository.js";
 import * as HoursRepo from "../repositories/Zones/ZoneHoursRepository.js";
 
 const ZonesResolver = {
@@ -34,9 +34,11 @@ const ZonesResolver = {
     },
     items: async (
       parent: ZoneRow,
-      _args: any,
+      args: {storefrontVisible?: boolean},
     ) => {
-      return getItems(parent.id);
+      return args.storefrontVisible == undefined
+        ? getItems(parent.id)
+        : getItemsWhereStorefront(args.storefrontVisible, parent.id);
     }
   },
 

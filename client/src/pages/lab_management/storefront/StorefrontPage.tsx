@@ -18,6 +18,7 @@ import Privilege from "../../../types/Privilege";
 import { ListingCard } from "./ListingCard";
 import { ListingModal } from "./ListingModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQueries";
 
 const REMOVE_INVENTORY_ITEM_AMOUNT = gql`
   mutation RemoveInventoryItemAmount($itemID: ID!, $amountToRemove: Int!) {
@@ -48,7 +49,7 @@ export default function StorefrontPage() {
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
 
-  const { loading, error, data } = useQuery(GET_INVENTORY_ITEMS, {variables: {storefrontVisible: isStaff(currentUser) ? null : true}});
+  const { loading, error, data } = useQuery(GET_ZONES_WITH_ITEMS, {variables: {storefrontVisible: isStaff(currentUser) ? null : true}});
 
   const [checkoutItems] = useMutation(CHECKOUT_ITEMS, {
     refetchQueries: [{ query: GET_INVENTORY_ITEMS }],
@@ -171,12 +172,24 @@ export default function StorefrontPage() {
         />
 
         <Stack direction={"row"} flexWrap={"wrap"} divider={<Divider flexItem />} sx={{ width: "100%" }}>
-          {data?.InventoryItems?.filter((item: InventoryItem) =>
-            item.name.toLowerCase().includes(searchText.toLowerCase())
-            && (!showInternalItems ? item.storefrontVisible : true)
-            && ((!isManager(currentUser) && showStaffItems) ? !item.staffOnly : true)
-          ).map((item: InventoryItem) => (
-            <ListingCard item={item} setActiveItem={(item) => {setActiveItem(item); setShowModal(true)}} openDetailsModal={(item) => {setActiveItem(item); setShowDetailsModal(true)}} />
+          {data?.zones?.map((zone: ZoneWithItems) => (
+            <Box key={zone.id} sx={{ width: "100%", mb: 2 }}>
+              <Typography variant="h4" sx={{ mb: 1 }}>{zone.name}</Typography>
+              <Stack direction={"row"} flexWrap={"wrap"} justifyContent={"flex-start"}>
+                {zone.items.filter((item: InventoryItem) => {
+                  const matchesSearch = item.name.toLowerCase().includes(searchText.toLowerCase());
+                  const isVisible = item.storefrontVisible || (showInternalItems && item.staffOnly) || (showStaffItems && item.staffOnly);
+                  return matchesSearch && isVisible;
+                }).map((item: InventoryItem) => (
+                  <ListingCard
+                    key={item.id}
+                    item={item}
+                    setActiveItem={setActiveItem}
+                    openDetailsModal={(item) => {setActiveItem(item); setShowDetailsModal(true)}}
+                  />
+                ))}
+              </Stack>
+            </Box>
           ))}
         </Stack>
 

@@ -93,8 +93,8 @@ export const GET_FULL_ZONES = gql`
 `;
 
 export const GET_ZONES_WITH_ITEMS = gql`
- query GetZonesWithItems {
-  zones {
+ query GetZonesWithItems($storefrontVisible: Boolean) {
+  zones(storefrontVisible: $storefrontVisible) {
     id
     name
     items {

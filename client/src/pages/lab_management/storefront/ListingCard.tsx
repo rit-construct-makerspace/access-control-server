@@ -18,7 +18,7 @@ export function ListingCard(props: ListingCardProps) {
       />
       <CardContent sx={{minHeight: 125}}>
         <Typography gutterBottom variant="h5" component="div">{props.item.name}</Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>Makerspace Name</Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>{props.item.makerspace?.name}</Typography>
       </CardContent>
       <CardActions>
         <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
