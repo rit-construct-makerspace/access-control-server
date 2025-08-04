@@ -57,7 +57,7 @@ export default function ManageAccountModal(props: ManageAccountModalProps) {
         </Stack>
         <Stack direction={"row"} justifyContent={"space-around"} alignItems={"center"} width={"100%"}>
           <Typography fontWeight={"bold"}>Account {props.account.id}</Typography>
-          <Typography><b>Credits:</b> {moneyForamtter.format(props.account.balance)}</Typography>
+          <Typography><b>Credits:</b> {moneyForamtter.format(props.account.balance / 100)}</Typography>
         </Stack>
         <Stack direction={"row"} spacing={1} width={"100%"}>
           <Button color="success" variant="contained" onClick={() => handleAdjustment(amount)}>

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import SearchBar from "../../../common/SearchBar";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import { DataGrid, GridRowsProp, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridRowsProp, GridColDef, GridColumnMenuProps, GridColumnMenu } from '@mui/x-data-grid';
 
 const GET_CURRENCY_LEDGER_ENTRIES = gql`
   query CurrencyLedgerEntriesLimit($searchText: String) {
@@ -31,6 +31,17 @@ type CurrencyLedgerEntry = {
   description: string | null
   atxID: number | null
   refID: number | null
+}
+
+function CustomColumnMenu(props: GridColumnMenuProps) {
+  return (
+    <GridColumnMenu
+      {...props}
+      slots={{
+        columnMenuFilterItem: null,
+      }}
+    />
+  );
 }
 
 export default function CurrencyLedger() {
@@ -113,7 +124,7 @@ export default function CurrencyLedger() {
             onClear={() => setUrlParam("l", "")}
             onSubmit={() => setUrlParam("l", searchText)}
           />
-          <DataGrid rows={rows} columns={columns} />
+          <DataGrid rows={rows} columns={columns} slots={{ columnMenu: CustomColumnMenu }} />
         </Stack>
       );
     }} />
