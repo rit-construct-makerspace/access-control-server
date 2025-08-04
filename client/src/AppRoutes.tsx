@@ -129,17 +129,8 @@ export default function AppRoutes() {
 
                 <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />} />
                 <Route path="/makerspace/:makerspaceID/people/:userID" element={<UsersPage />} />
+                <Route path="/makerspace/:makerspaceID/inventory" element={<InventoryPage />} />
 
-<<<<<<< HEAD
-              <Route path="/makerspace/:makerspaceID/inventory" element={<InventoryPage />} />
-
-              {/* Routes for staff + higher */}
-                <Route element={<StaffRoute/>}>
-
-                  <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />}/>
-                  <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />}/>
-                  <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage/>}/>
-=======
                 {/* Routes for staff + higher */}
                 <Route element={<StaffRoute />}>
                   <Route path="/makerspace/:makerspaceID/trainings" element={<TrainingModulesPage />} />
@@ -148,7 +139,6 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
                   <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
->>>>>>> origin/main
 
                   {/* Routes for manager + higher */}
                   <Route element={<ManagerRoute />}>
@@ -182,20 +172,12 @@ export default function AppRoutes() {
             <Route path="/admin/equipment/issues/:logid" element={<ManageEquipmentPage showLogs={true} />} />
             <Route path="/admin/equipment/logs/:logid" element={<ResolutionLogPage />} />
 
-<<<<<<< HEAD
-            <Route path="/admin/training" element={<TrainingModulesPage />} />
-            <Route path="/admin/training/new" element={<EditNewModulePage />} />
-            <Route path="/admin/training/:id" element={<EditActiveModulePage />} />
-            <Route path="/admin/training/archived/:id" element={<EditArchivedModulePage />} />
-
-            
-=======
             <Route path="/admin/inventory" element={<InventoryPage />} />
->>>>>>> origin/main
             <Route path="/admin/tools/type/:typeid" element={<ToolItemPage />} />
             <Route path="/admin/tools/type" element={<ToolItemPage />} />
             <Route path="/admin/tools/instance/:instanceid" element={<ToolItemPage />} />
             <Route path="/admin/tools/instance" element={<ToolItemPage />} />
+            <Route path="/admin/inventory" element={<InventoryPage />} />
 
             <Route path="/admin/statistics" element={<StatisticsPage />} />
 

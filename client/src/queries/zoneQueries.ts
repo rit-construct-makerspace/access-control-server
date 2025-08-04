@@ -1,12 +1,9 @@
 import { gql } from "@apollo/client";
 import Equipment from "../types/Equipment";
 import Room, { FullRoom } from "../types/Room";
-<<<<<<< HEAD
 import InventoryItem from "../types/InventoryItem";
-=======
 import { TrainingModule } from "../common/TrainingModuleUtils";
 import ZoneHours from "../types/ZoneHours";
->>>>>>> origin/main
 
 export const GET_ZONES = gql`
  query GetZones {

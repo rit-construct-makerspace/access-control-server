@@ -1,8 +1,7 @@
 import React from "react";
-import { IconButton, InputAdornment, TextField } from "@mui/material";
+import { IconButton, InputAdornment, StandardTextFieldProps, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
-import { StandardTextFieldProps } from "@mui/material/TextField/TextField";
 
 export function searchFilter<T>(
   searchText: string,
