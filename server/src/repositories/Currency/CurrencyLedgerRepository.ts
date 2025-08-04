@@ -46,12 +46,12 @@ export async function getCurrencyLedgerEntries(): Promise<CurrencyLedgerRow[]> {
 
 export async function getCurrencyLedgerEntriesLimit(searchText?: string): Promise<CurrencyLedgerRow[]> {
     if (!searchText || searchText === "") {
-        return await knex("CurrencyLedger").select("*").orderBy("dateTime", "asc").limit(100);
+        return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc").limit(100);
     }
 
     if (Number.isNaN(Number(searchText))) {
         // searchText can be compared to the number fields
-        return await knex("CurrencyLedger").select("*").orderBy("dateTime", "asc")
+        return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
             .whereILike("description", `%${searchText}%`)
             .orWhereILike("source", `%${searchText}%`)
             .limit(100);
