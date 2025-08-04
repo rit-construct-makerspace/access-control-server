@@ -94,7 +94,7 @@ export default function CurrencyLedger() {
 
       const rows: GridRowsProp = entries.map((entry) => ({
         id: entry.id,
-        acountID: entry.accountID,
+        accountID: entry.accountID,
         amount: moneyForamtter.format(entry.amount / 100),
         dateTime: dateTimeFormatter.format(new Date(entry.dateTime)),
         source: entry.source,

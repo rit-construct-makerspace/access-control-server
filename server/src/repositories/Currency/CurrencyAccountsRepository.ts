@@ -74,9 +74,13 @@ export async function adjustAccountBalanceCents(accountID: number, amount: numbe
 
   const new_balance = amount + balance < 0 ? 0 : balance + amount;
 
+  if (balance === new_balance) {
+    return true;
+  }
+
   await setAccountBalanceCents(accountID, new_balance);
 
-  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, amount, source, description);
+  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, new_balance - balance, source, description);
 
   return true;
 }
@@ -96,6 +100,10 @@ export async function adjustAccountBalanceIfAvailableCents(accountID: number, am
   }
 
   const new_balance = balance + amount;
+
+  if (new_balance === balance) {
+    return true;
+  }
 
   await setAccountBalanceCents(accountID, new_balance);
 
