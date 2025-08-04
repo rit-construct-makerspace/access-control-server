@@ -18,4 +18,8 @@ export const CurrencyAccountsTypeDefs = gql`
         currencyAccount(accountID: ID!): CurrencyAccount
         currencyAccountsLimit(searchText: String): [CurrencyAccount]
     }
+
+    extend type Mutation {
+        adjustAccountBalanceCents(accountID: ID!, amount: Int!): Boolean
+    }
 `;
