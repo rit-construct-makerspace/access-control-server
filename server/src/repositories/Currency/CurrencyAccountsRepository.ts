@@ -175,7 +175,7 @@ export async function getAccountOwner(accountID: number): Promise<AccountOwner |
 
 export async function getAccountsLimit(searchText?: string): Promise<CurrencyAccountsRow[]> {
   if (!searchText || searchText === "") {
-    return await knex("CurrencyAccounts").select("*").limit(25);
+    return (await knex("CurrencyAccounts").select("*").limit(25).orderBy("id", "asc"));
   }
 
   const res = await knex("CurrencyAccounts")
@@ -186,7 +186,7 @@ export async function getAccountsLimit(searchText?: string): Promise<CurrencyAcc
     .orWhereILike("Organizations.displayname", `%${searchText}%`)
     .orWhereILike("Users.firstName", `%${searchText}%`)
     .orWhereILike("Users.lastName", `%${searchText}%`)
-    .select("CurrencyAccounts.*").limit(25);
+    .select("CurrencyAccounts.*").limit(25).orderBy("id", "asc");
 
   console.log(res);
   return res;
