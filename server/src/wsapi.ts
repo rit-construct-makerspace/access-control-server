@@ -1034,10 +1034,10 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
         }
         if (shlugMessage.Message) {
           const instance = await getInstanceByReaderID(reader.id);
-          const machine =instance ?  await getEquipmentByID(instance.equipmentID) : undefined;
+          const machine = instance ? await getEquipmentByID(instance.equipmentID) : undefined;
           const makerspaceForWhomeIWelcome = await getMakerspaceOfWelcomeReader(reader.id);
           const [paired, tag, label] = pairedLabel(instance, machine, makerspaceForWhomeIWelcome);
-          if(paired){
+          if (paired) {
             wsApiLog(`{access_device} - ${tag} message: ${shlugMessage.Message}`, "message", label, { id: reader.id, label: reader.name }, { id: machine.id, label: machine.name })
           } else {
             wsApiLog(`{access_device} (unpaired) message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: reader.id, label: reader.name })
