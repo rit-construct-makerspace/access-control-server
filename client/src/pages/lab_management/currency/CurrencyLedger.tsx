@@ -1,10 +1,11 @@
 import { useLazyQuery } from "@apollo/client";
-import { Divider, Stack, Typography } from "@mui/material";
+import { Box, Divider, Stack, Typography } from "@mui/material";
 import gql from "graphql-tag";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import SearchBar from "../../../common/SearchBar";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
+import { DataGrid, GridRowsProp, GridColDef } from '@mui/x-data-grid';
 
 const GET_CURRENCY_LEDGER_ENTRIES = gql`
   query CurrencyLedgerEntriesLimit($searchText: String) {
@@ -73,37 +74,39 @@ export default function CurrencyLedger() {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-  })
+  });
 
   return (
     <RequestWrapper2 result={ledgerEntriesResults} render={(data) => {
 
       const entries: CurrencyLedgerEntry[] = data.currencyLedgerEntriesLimit;
 
+      const columns: GridColDef[] = [
+        { field: "id", headerName: "ID", width: 100 },
+        { field: "accountID", headerName: "Account ID", width: 150 },
+        { field: "amount", headerName: "Amount", width: 200 },
+        { field: "dateTime", headerName: "Date", width: 200 },
+        { field: "source", headerName: "Source", width: 200 },
+        { field: "description", headerName: "Description", width: 500 },
+        { field: "atxID", headerName: "ATX ID", width: 150 },
+        { field: "refID", headerName: "REF ID", width: 150 },
+      ];
+
+      const rows: GridRowsProp = entries.map((entry) => ({
+        id: entry.id,
+        acountID: entry.accountID,
+        amount: moneyForamtter.format(entry.amount),
+        dateTime: dateTimeFormatter.format(new Date(entry.dateTime)),
+        source: entry.source,
+        description: entry.description,
+        atxID: entry.atxID,
+        refID: entry.refID,
+      }))
+
       return (
-        <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
-          <SearchBar
-            placeholder="Search Ledger"
-            sx={{ maxWidth: 300 }}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            onClear={() => setUrlParam("l", "")}
-            onSubmit={() => setUrlParam("l", searchText)}
-          />
-          {
-            entries.map((entry) => (
-              <Stack direction={"row"} justifyContent={"space-between"}>
-                <Typography>ID: {entry.id}</Typography>
-                <Typography>Account: {entry.accountID}</Typography>
-                <Typography>{dateTimeFormatter.format(new Date(entry.dateTime))}</Typography>
-                <Typography>Source: {entry.source}</Typography>
-                <Typography>Description: {entry.description}</Typography>
-                <Typography>ATX ID: {entry.atxID}</Typography>
-                <Typography>REF ID: {entry.refID}</Typography>
-              </Stack>
-            ))
-          }
-        </Stack>
+        <Box width={"100%"}>
+          <DataGrid rows={rows} columns={columns} />
+        </Box>
       );
     }} />
   );

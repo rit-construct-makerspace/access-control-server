@@ -6,7 +6,7 @@ import CurrencyLedger from "./CurrencyLedger";
 export default function CurrencyPage() {
 
   return (
-    <Stack padding={"0 10px"} spacing={2}>
+    <Stack padding={"0 10px 15px"} spacing={2}>
       <title>Currency | Make @ RIT</title>
       <Typography variant="h5">Currency Accounts</Typography>
       <CurrencyAccounts />
