@@ -23,8 +23,11 @@ import { StaffOnlyToggle } from "./common/StaffOnlyToggle";
 import { StorefrontVisibleToggle } from "./common/StorefrontVisibleToggle";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
+<<<<<<< HEAD
 import { FullZone, GET_ZONES, GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQueries";
 import { InventoryForMakerspace } from "./common/InventoryForMakerspace";
+=======
+>>>>>>> origin/main
 
 
 function sortItemsByName(items: InventoryItem[]): InventoryItem[] {
@@ -50,6 +53,55 @@ export default function InventoryPage() {
   const zonesWithItemsResult = useQuery(GET_ZONES_WITH_ITEMS);
 
 
+  const columns: GridColDef<(typeof matchingItems)[number]>[] = [
+    {
+      field: 'name',
+      headerName: 'Item',
+      minWidth: 400,
+      width: windowWidth > 1550 ? windowWidth*0.425 : windowWidth*0.2,
+      maxWidth: 700
+    },
+    {
+      field: 'tags',
+      headerName: 'Tags',
+      minWidth: 230,
+      width: windowWidth > 1550 ? windowWidth*0.35 : windowWidth*0.2,
+      maxWidth: 500,
+      valueGetter: (value, row) => (row.tags),
+      renderCell: (params) => (<TagsCell item={params.row} allTags={inventoryTagsResult.data?.inventoryTags ?? []} />)
+    },
+    {
+      field: 'count',
+      headerName: 'Units Available',
+      width: 110,
+      valueGetter: (value, row) => (row.count),
+    },
+    {
+      field: 'pricePerUnit',
+      headerName: 'Price / Unit',
+      width: 130,
+      valueGetter: (value, row) => (`$${row.pricePerUnit.toFixed(2)}`),
+    },
+    {
+      field: 'staffOnly',
+      headerName: 'Staff Only',
+      width: 160,
+      renderCell: (params) => (<StaffOnlyToggle item={params.row} />)
+    },
+    {
+      field: 'storefrontVisible',
+      headerName: 'Available on Storefront',
+      width: 170,
+      renderCell: (params) => (<StorefrontVisibleToggle item={params.row} />)
+    },
+    {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 90,
+      renderCell: (params) => (<IconButton onClick={() => setModalItemId(params.row.id + "")} disabled={params.row.staffOnly && !isManager(currentUser)} defaultChecked={params.row.storefrontVisible}><ModeEditIcon /></IconButton>)
+    },
+  ];
+
   return (
     <RequestWrapper loading={zonesWithItemsResult.loading} error={zonesWithItemsResult.error}>
       <AdminPage>
@@ -58,6 +110,31 @@ export default function InventoryPage() {
             <Typography variant="h4">Inventory</Typography>
             <Button variant="outlined" onClick={() => setTagsModalOpen(true)}>Manage Tags</Button>
           </Stack>
+<<<<<<< HEAD
+=======
+
+          <PageSectionHeader top>Running Low</PageSectionHeader>
+
+          <Box sx={{ width: "100%", overflowX: "scroll" }}>
+            <DataGrid
+              rows={lowItems}
+              columns={columns}
+              rowHeight={70}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 10,
+                  },
+                },
+              }}
+              pageSizeOptions={[10]}
+              //checkboxSelection
+              disableRowSelectionOnClick
+            />
+          </Box>
+
+          <PageSectionHeader>All Materials</PageSectionHeader>
+>>>>>>> origin/main
 
           <Stack direction="row" alignItems="center" spacing={1}>
             <SearchBar
@@ -77,9 +154,27 @@ export default function InventoryPage() {
           </Stack>
 
           <Box sx={{ width: "100%", overflowX: "scroll" }}>
+<<<<<<< HEAD
             {zonesWithItemsResult.data?.zones.map((zone: ZoneWithItems) => (
               <InventoryForMakerspace key={zone.id} makerspace={zone} searchText={searchText} tags={inventoryTagsResult.data?.inventoryTags || []} setModalItemId={setModalItemId} />
             ))}
+=======
+            <DataGrid
+              rows={matchingItems}
+              columns={columns}
+              rowHeight={70}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 50,
+                  },
+                },
+              }}
+              pageSizeOptions={[50]}
+              //checkboxSelection
+              disableRowSelectionOnClick
+            />
+>>>>>>> origin/main
           </Box>
 
           <Ledger></Ledger>

@@ -1,9 +1,11 @@
+import { TrainingModule } from "../common/TrainingModuleUtils";
 import Equipment from "./Equipment";
 
 export default interface Room {
   id: number;
   name: string;
   equipment: Equipment[];
+  trainingModules: TrainingModule[];
 }
 
 export default interface Zone {

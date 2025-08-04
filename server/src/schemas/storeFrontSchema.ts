@@ -57,7 +57,11 @@ export const StoreFrontTypeDefs = gql`
     description: String
     tags: [InventoryTag]
     makerspace: Zone
+<<<<<<< HEAD
     makerspaceID: ID
+=======
+    makerspaceID: ID!
+>>>>>>> origin/main
   }
 
   type InventoryTag {
@@ -110,7 +114,11 @@ export const StoreFrontTypeDefs = gql`
   }
 
   extend type Query {
+<<<<<<< HEAD
     InventoryItems(storefrontVisible: Boolean, makerspaceID: ID): [InventoryItem]
+=======
+    InventoryItems(storefrontVisible: Boolean): [InventoryItem]
+>>>>>>> origin/main
     InventoryItem(id: ID!): InventoryItem
     Labels: [String]
     Ledgers(startDate: DateTime, stopDate: DateTime, searchText: String): [InventoryLedger]

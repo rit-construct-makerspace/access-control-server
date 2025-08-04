@@ -19,6 +19,7 @@ export interface Reader {
   HWVer: string,
   SN: string,
   sessionStartTime: number,
+  targetFirmwareVersion?: string,
 }
 
 export const GET_READERS = gql`
@@ -46,6 +47,9 @@ export const GET_READERS = gql`
       HWVer
       sessionStartTime
       SN
+      readerKeyCycle
+      pairTime
+      targetFirmwareVersion
     }
   }
 `;
@@ -74,6 +78,9 @@ export const GET_READER_BY_ID = gql`
       HWVer
       sessionStartTime
       SN
+      readerKeyCycle
+      pairTime
+      targetFirmwareVersion
     }
   }
 `;
@@ -132,9 +139,81 @@ export const GET_UNPAIRED_READERS = gql`
       HWVer
       sessionStartTime
       SN
+      readerKeyCycle
+      pairTime
+      targetFirmwareVersion
     }
   }
 `
+
+export const GET_MAKERSPACE_FOR_WELCOME_READER = gql`
+query Query($readerId: ID) {
+  makerspaceForWelcomeReader(readerId: $readerId){
+      id
+      name
+      imageUrl
+      rooms {
+        id
+        name
+        equipment {
+          id
+          name
+          imageUrl
+          sopUrl
+          trainingModules {
+            id
+            name
+          }
+          numAvailable
+          numInUse
+          byReservationOnly
+          notes
+          archived
+        }
+        trainingModules {
+          id
+          name
+        }
+      }
+      trainingModules {
+        id
+        name
+      }
+  }
+}
+`;
+
+export const GET_WELCOME_READERS_FOR_MAKERSPACE = gql`
+query GetWelcomeReadersForMakerspace($makerspaceId: ID!) {
+  welcomeReadersForMakerspace(makerspaceId: $makerspaceId){
+    id
+    name
+    machineID
+    machineType
+    zone
+    temp
+    state
+    user {
+      id      
+      firstName
+      lastName
+    }
+    recentSessionLength
+    lastStatusReason
+    scheduledStatusFreq
+    lastStatusTime
+    helpRequested
+    BEVer
+    FEVer
+    HWVer
+    sessionStartTime
+    SN
+    readerKeyCycle
+    pairTime
+    targetFirmwareVersion
+  }
+}
+`;
 
 export const CREATE_READER = gql`
   mutation CreateReader(
@@ -165,6 +244,17 @@ export const DELETE_READER = gql`
     deleteReader(id: $id)
   }
 `
+export const PAIR_AS_WELCOME_READER = gql`
+mutation PairAsWelcomeReader($readerId: ID!, $makerspaceId: ID!) {
+  pairAsWelcomeReader(readerID: $readerId, makerspaceID: $makerspaceId)
+}
+`;
+
+export const UNPAIR_AS_WELCOME_READER = gql`
+mutation UnpairAsWelcomeReader($readerId: ID!, $makerspaceId: ID!) {
+  unpairAsWelcomeReader(readerID: $readerId, makerspaceID: $makerspaceId)
+}
+`;
 
 export const PAIR_READER = gql`
   mutation PairReader(
@@ -211,5 +301,18 @@ export const IDENTIFY_READER = gql`
 export const SET_READER_STATE = gql`
   mutation SetReaderState($id: ID!, $state: String) {
     setState(id: $id, state: $state)
+  }
+`;
+
+
+export const GET_AVAILABLE_FIRMWARE_VERSIONS = gql`
+  query Query {
+    availableFirmwareVersions
+  }
+`;
+
+export const REQUEST_OTA_UPDATE = gql`
+  mutation SetOTAVersion($ids: [ID!]!, $otaTag: String!, $updateNow: Boolean!) {
+    setOTAVersion(ids: $ids, otaTag: $otaTag, updateNow: $updateNow)
   }
 `;

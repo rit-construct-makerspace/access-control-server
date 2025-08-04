@@ -5,6 +5,7 @@ import * as AccessCheckRepo from "../repositories/Equipment/AccessChecksReposito
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
 import * as RestrictionRepo from "../repositories/Restrictions/RestrictionsRepository.js";
+import * as CurrencyAccountRepo from "../repositories/Currency/CurrencyAccountsRepository.js";
 import { Privilege } from "../schemas/usersSchema.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { ApolloContext, CurrentUser } from "../context.js";
@@ -26,7 +27,7 @@ const UsersResolvers = {
 
     // Map restrictions field to array of Restricitons
     restrictions: async (
-      parent: { id: string},
+      parent: { id: string },
       _args: any,
       _context: ApolloContext
     ) => {
@@ -60,7 +61,7 @@ const UsersResolvers = {
     },
 
     manager: async (
-      parent: {id: string},
+      parent: { id: string },
       _args: any,
       _context: ApolloContext
     ) => {
@@ -68,7 +69,7 @@ const UsersResolvers = {
     },
 
     staff: async (
-      parent: {id: string},
+      parent: { id: string },
       _args: any,
       _context: ApolloContext
     ) => {
@@ -76,12 +77,20 @@ const UsersResolvers = {
     },
 
     trainer: async (
-      parent: {id: string},
+      parent: { id: string },
       _args: any,
       _context: ApolloContext
     ) => {
       return UserRepo.getUserTrainerPerms(Number(parent.id))
     },
+
+    currencyAccount: async (
+      parent: { id: string },
+      _args: any,
+      { ifStaffOrSelf }: ApolloContext
+    ) => {
+      return ifStaffOrSelf(Number(parent.id), () => (CurrencyAccountRepo.getAccountByID(Number(parent.id))));
+    }
 
   },
 
@@ -135,8 +144,8 @@ const UsersResolvers = {
       _parent: any,
       _args: any,
       { user }: ApolloContext) => {
-        return user;
-      },
+      return user;
+    },
 
     /**
      * Fetch the number of total users
@@ -300,10 +309,10 @@ const UsersResolvers = {
           return await UserRepo.archiveUser(Number(args.userID));
         }
       ),
-    
+
     setUserAdmin: async (
       _parent: any,
-      args: { userID: number, admin: boolean},
+      args: { userID: number, admin: boolean },
       { isAdmin }: ApolloContext
     ) => isAdmin(async (user: CurrentUser) => {
       const target = await UserRepo.getUserByID(Number(args.userID));
@@ -318,7 +327,7 @@ const UsersResolvers = {
 
     makeUserManager: async (
       _parent: any,
-      args: {userID: number, makerspaceID: number},
+      args: { userID: number, makerspaceID: number },
       { isAdmin }: ApolloContext
     ) => isAdmin(async (user: CurrentUser) => {
       const target = await UserRepo.getUserByID(args.userID);
@@ -329,17 +338,17 @@ const UsersResolvers = {
       await createLog(
         `{user} granted MANAGER access for {makerspace} to {user}`,
         "admin",
-        { id: user.id, label: getUsersFullName(user)},
-        { id: args.makerspaceID, label: makerspace.name},
-        { id: args.userID, label: getUsersFullName(target)}
+        { id: user.id, label: getUsersFullName(user) },
+        { id: args.makerspaceID, label: makerspace.name },
+        { id: args.userID, label: getUsersFullName(target) }
       );
       return await UserRepo.makeUserManager(args.userID, args.makerspaceID);
     }),
 
     makeUserStaff: async (
       _parent: any,
-      args: {userID: number, makerspaceID: number},
-      {isManagerFor}: ApolloContext
+      args: { userID: number, makerspaceID: number },
+      { isManagerFor }: ApolloContext
     ) => isManagerFor(args.makerspaceID, async (user: CurrentUser) => {
       const target = await UserRepo.getUserByID(args.userID);
       const makerspace = await getZoneByID(args.makerspaceID);
@@ -349,17 +358,17 @@ const UsersResolvers = {
       await createLog(
         `{user} granted STAFF access for {makerspace} to {user}`,
         "admin",
-        { id: user.id, label: getUsersFullName(user)},
-        { id: args.makerspaceID, label: makerspace.name},
-        { id: args.userID, label: getUsersFullName(target)}
+        { id: user.id, label: getUsersFullName(user) },
+        { id: args.makerspaceID, label: makerspace.name },
+        { id: args.userID, label: getUsersFullName(target) }
       );
       return await UserRepo.makeUserStaff(args.userID, args.makerspaceID);
     }),
 
     makeUserTrainer: async (
       _parent: any,
-      args: {userID: number, equipmentID: number},
-      {isManagerFor}: ApolloContext
+      args: { userID: number, equipmentID: number },
+      { isManagerFor }: ApolloContext
     ) => {
       const equipment = await EquipmentRepo.getEquipmentByID(args.equipmentID);
       const room = await RoomRepo.getRoomByID(equipment.roomID);
@@ -368,9 +377,9 @@ const UsersResolvers = {
         await createLog(
           `{user} granted TRAINER access for {equipment} to {user}`,
           "admin",
-          { id: user.id, label: getUsersFullName(user)},
-          { id: args.equipmentID, label: equipment.name},
-          { id: args.userID, label: getUsersFullName(target)}
+          { id: user.id, label: getUsersFullName(user) },
+          { id: args.equipmentID, label: equipment.name },
+          { id: args.userID, label: getUsersFullName(target) }
         );
         return await UserRepo.makeUserTrainer(args.userID, args.equipmentID);
       })
@@ -378,7 +387,7 @@ const UsersResolvers = {
 
     revokeUserManager: async (
       _parent: any,
-      args: {userID: number, makerspaceID: number},
+      args: { userID: number, makerspaceID: number },
       { isAdmin }: ApolloContext
     ) => isAdmin(async (user: CurrentUser) => {
       const target = await UserRepo.getUserByID(args.userID);
@@ -389,17 +398,17 @@ const UsersResolvers = {
       await createLog(
         `{user} revoked MANAGER access for {makerspace} from {user}`,
         "admin",
-        { id: user.id, label: getUsersFullName(user)},
-        { id: args.makerspaceID, label: makerspace.name},
-        { id: args.userID, label: getUsersFullName(target)}
+        { id: user.id, label: getUsersFullName(user) },
+        { id: args.makerspaceID, label: makerspace.name },
+        { id: args.userID, label: getUsersFullName(target) }
       );
       return await UserRepo.revokeUserManager(args.userID, args.makerspaceID);
     }),
 
     revokeUserStaff: async (
       _parent: any,
-      args: {userID: number, makerspaceID: number},
-      {isManagerFor}: ApolloContext
+      args: { userID: number, makerspaceID: number },
+      { isManagerFor }: ApolloContext
     ) => isManagerFor(args.makerspaceID, async (user: CurrentUser) => {
       const target = await UserRepo.getUserByID(args.userID);
       const makerspace = await getZoneByID(args.makerspaceID);
@@ -409,17 +418,17 @@ const UsersResolvers = {
       await createLog(
         `{user} revoked STAFF access for {makerspace} from {user}`,
         "admin",
-        { id: user.id, label: getUsersFullName(user)},
-        { id: args.makerspaceID, label: makerspace.name},
-        { id: args.userID, label: getUsersFullName(target)}
+        { id: user.id, label: getUsersFullName(user) },
+        { id: args.makerspaceID, label: makerspace.name },
+        { id: args.userID, label: getUsersFullName(target) }
       );
       return await UserRepo.revokeUserStaff(args.userID, args.makerspaceID);
     }),
 
     revokeUserTrainer: async (
       _parent: any,
-      args: {userID: number, equipmentID: number},
-      {isManagerFor}: ApolloContext
+      args: { userID: number, equipmentID: number },
+      { isManagerFor }: ApolloContext
     ) => {
       const equipment = await EquipmentRepo.getEquipmentByID(args.equipmentID);
       const room = await RoomRepo.getRoomByID(equipment.roomID);
@@ -428,9 +437,9 @@ const UsersResolvers = {
         await createLog(
           `{user} revoked TRAINER access for {equipment} from {user}`,
           "admin",
-          { id: user.id, label: getUsersFullName(user)},
-          { id: args.equipmentID, label: equipment.name},
-          { id: args.userID, label: getUsersFullName(target)}
+          { id: user.id, label: getUsersFullName(user) },
+          { id: args.equipmentID, label: equipment.name },
+          { id: args.userID, label: getUsersFullName(target) }
         );
         return await UserRepo.revokeUserTrainer(args.userID, args.equipmentID);
       })

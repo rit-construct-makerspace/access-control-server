@@ -54,7 +54,7 @@ export function Dashboard() {
                     >
                         {sortedZones.map((zone: ZoneWithHours) => (
                             <Grid gap={2}>
-                                <ZoneCard 
+                                <ZoneCard
                                     id={zone.id}
                                     name={zone.name}
                                     hours={zone.hours}
@@ -65,8 +65,8 @@ export function Dashboard() {
                         ))}
                     </Grid>
                 );
-            } }/>
-                
+            }} />
+
             {/* Announcments */}
             <RequestWrapper loading={getAnnouncementsResult.loading} error={getAnnouncementsResult.error}>
                 <>
@@ -74,16 +74,16 @@ export function Dashboard() {
                         <Typography variant={isMobile ? "h4" : "h3"}>Announcements</Typography>
                         {
                             adminMode
-                            ? <IconButton onClick={() => navigate("/admin/announcements")} sx={{color: "gray"}}>
-                                <EditIcon />
-                            </IconButton>
-                            : undefined
+                                ? <IconButton onClick={() => navigate("/admin/announcements")} sx={{ color: "gray" }}>
+                                    <EditIcon />
+                                </IconButton>
+                                : undefined
                         }
                     </Stack>
                     <Grid container margin="0px 20px" alignItems="stretch" width="auto">
                         {getAnnouncementsResult.data?.getAllAnnouncements?.map((thisAnnouncement: Announcement) => (
                             <Grid width="400px" margin="10px">
-                                <AnnouncementCard announcement={thisAnnouncement}/>
+                                <AnnouncementCard announcement={thisAnnouncement} />
                             </Grid>
                         ))}
                     </Grid>
@@ -94,12 +94,12 @@ export function Dashboard() {
 
                 return (
                     <Box>
-                        <Stack  direction="row" margin="30px 30px 10px 30px" justifyContent="space-between" alignItems="center">
+                        <Stack direction="row" margin="30px 30px 10px 30px" justifyContent="space-between" alignItems="center">
                             <Typography variant={isMobile ? "h4" : "h3"}>Upcoming Events</Typography>
                             <Typography variant="h6">
-                                <a 
-                                    href="https://www.eventbrite.com/o/rit-shed-makerspace-92409962123" 
-                                    target="_blank" 
+                                <a
+                                    href="https://www.eventbrite.com/o/rit-shed-makerspace-92409962123"
+                                    target="_blank"
                                     rel="noopener noreferrer"
                                 >
                                     All Events
@@ -107,30 +107,30 @@ export function Dashboard() {
                             </Typography>
                         </Stack>
                         <Stack direction={isMobile ? "column" : "row"} justifyContent="flex-start" alignItems="stretch" spacing={2}
-                            divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem/>}
+                            divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />}
                             margin="0px 20px 20px 20px"
                         >
                             {
                                 data.events.length == 0
-                                ? <Typography variant="body1">No Events!</Typography>
-                                : data.events.map((event: MakeEvent) => (
-                                    event.ticket_availability.has_available_tickets
-                                    ? <EventCard
-                                        name={event.name.text}
-                                        description={event.name.html}
-                                        summary={event.summary}
-                                        url={event.url}
-                                        start={event.start.local}
-                                        end={event.end.local}
-                                        logoUrl={event.logo.url} 
-                                    />
-                                    : null
-                            ))}
+                                    ? <Typography variant="body1">No Events!</Typography>
+                                    : data.events.map((event: MakeEvent) => (
+                                        event.ticket_availability.has_available_tickets
+                                            ? <EventCard
+                                                name={event.name.text}
+                                                description={event.description.text}
+                                                summary={event.summary}
+                                                url={event.url}
+                                                start={event.start.local}
+                                                end={event.end.local}
+                                                logoUrl={null}
+                                            />
+                                            : null
+                                    ))}
                         </Stack>
                     </Box>
                 );
             }} />
-            
+
         </Box>
     );
 };

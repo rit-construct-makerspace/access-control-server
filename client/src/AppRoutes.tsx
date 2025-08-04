@@ -57,41 +57,41 @@ function AuthedRoute() {
 };
 
 function TrainerRoute() {
-  const { makerspaceID } = useParams<{makerspaceID: string}>();
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const user = useCurrentUser();
   if (isOnlyTrainer(user) || isStaffFor(user, Number(makerspaceID))) {
-    return <Outlet/>
+    return <Outlet />
   } else {
-    return <NoPrivilegePage/>
+    return <NoPrivilegePage />
   }
 }
 
 function StaffRoute() {
-  const { makerspaceID } = useParams<{makerspaceID: string}>();
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const user = useCurrentUser();
   if (isStaffFor(user, Number(makerspaceID))) {
-    return <Outlet/>
+    return <Outlet />
   } else {
-    return <NoPrivilegePage/>
+    return <NoPrivilegePage />
   }
 }
 
 function ManagerRoute() {
-  const { makerspaceID } = useParams<{makerspaceID: string}>();
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const user = useCurrentUser();
   if (isManagerFor(user, Number(makerspaceID))) {
     return <Outlet />
   } else {
-    return <NoPrivilegePage/>
+    return <NoPrivilegePage />
   }
 }
 
 function AdminRoute() {
   const user = useCurrentUser();
   if (isAdmin(user)) {
-    return <Outlet/>
+    return <Outlet />
   } else {
-    return <NoPrivilegePage/>
+    return <NoPrivilegePage />
   }
 }
 
@@ -99,37 +99,38 @@ export default function AppRoutes() {
   return (
     <div className="app">
 
-    <Routes>
+      <Routes>
 
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/admin/storefront/preview" element={<StorefrontPreviewPage />} />
 
         {/* Routes for the sattic displays around the makerspaces */}
         <Route path="/display">
-          <Route path="/display/announcements" element={<AnnouncementsDisplay/>}/>
-          <Route path="/display/hours/:makerspaceID" element={<HoursDisplay/>}/>
-          <Route path="/display/events" element={<EventsDisplay/>}/>
+          <Route path="/display/announcements" element={<AnnouncementsDisplay />} />
+          <Route path="/display/hours/:makerspaceID" element={<HoursDisplay />} />
+          <Route path="/display/events" element={<EventsDisplay />} />
         </Route>
         {/* END STATIC DISPLAYS */}
 
         <Route path={"/"} element={<TopNav />}>
 
           <Route path="/" element={<Dashboard />} />
-          <Route path="/makerspace/:makerspaceID" element={<MakerspacePage />}/>
+          <Route path="/makerspace/:makerspaceID" element={<MakerspacePage />} />
           <Route path="/terms" element={<TermsPage />} />
 
           {/* Routes that need to be protected by auth */}
-          <Route element={<AuthedRoute />}> 
-            <Route path="/user/trainings" element={<UserTraingingsPage />}/>
-            <Route path="/user/settings" element={<UserSettingsPage />}/>
-            
+          <Route element={<AuthedRoute />}>
+            <Route path="/user/trainings" element={<UserTraingingsPage />} />
+            <Route path="/user/settings" element={<UserSettingsPage />} />
+
             {/* Routes for trainers + higher */}
             <Route>
-              <Route path="/makerspace/:makerspaceID" element={<StaffBar/>}>
+              <Route path="/makerspace/:makerspaceID" element={<StaffBar />}>
 
-              <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />}/>
-              <Route path="/makerspace/:makerspaceID/people/:userID" element={<UsersPage />}/>
+                <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />} />
+                <Route path="/makerspace/:makerspaceID/people/:userID" element={<UsersPage />} />
 
+<<<<<<< HEAD
               <Route path="/makerspace/:makerspaceID/inventory" element={<InventoryPage />} />
 
               {/* Routes for staff + higher */}
@@ -138,20 +139,30 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />}/>
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />}/>
                   <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage/>}/>
+=======
+                {/* Routes for staff + higher */}
+                <Route element={<StaffRoute />}>
+                  <Route path="/makerspace/:makerspaceID/trainings" element={<TrainingModulesPage />} />
+                  <Route path="/makerspace/:makerspaceID/training/new" element={<EditNewModulePage />} />
+                  <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
+                  <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
+                  <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
+>>>>>>> origin/main
 
                   {/* Routes for manager + higher */}
-                  <Route element={<ManagerRoute/>}>
-                    <Route path="/makerspace/:makerspaceID/edit" element={<ManageMakerspacePage />}/>
-                    <Route path="/makerspace/:makerspaceID/edit/room/:roomID" element={<ManageRoomPage />}/>
+                  <Route element={<ManagerRoute />}>
+                    <Route path="/makerspace/:makerspaceID/edit" element={<ManageMakerspacePage />} />
+                    <Route path="/makerspace/:makerspaceID/edit/room/:roomID" element={<ManageRoomPage />} />
                   </Route>
                   {/* End manager routes */}
-                  
+
                 </Route>
               </Route>
             </Route>
 
             {/* Routes for admins */}
-            <Route element={<AdminRoute/>}>
+            <Route element={<AdminRoute />}>
               <Route path="/admin/announcements" element={<AnnouncementsPage />} />
               <Route path="/admin/announcements/:id" element={<EditAnnouncement />} />
               <Route path="/admin/announcements/new" element={<NewAnnouncementPage />} />
@@ -171,12 +182,16 @@ export default function AppRoutes() {
             <Route path="/admin/equipment/issues/:logid" element={<ManageEquipmentPage showLogs={true} />} />
             <Route path="/admin/equipment/logs/:logid" element={<ResolutionLogPage />} />
 
+<<<<<<< HEAD
             <Route path="/admin/training" element={<TrainingModulesPage />} />
             <Route path="/admin/training/new" element={<EditNewModulePage />} />
             <Route path="/admin/training/:id" element={<EditActiveModulePage />} />
             <Route path="/admin/training/archived/:id" element={<EditArchivedModulePage />} />
 
             
+=======
+            <Route path="/admin/inventory" element={<InventoryPage />} />
+>>>>>>> origin/main
             <Route path="/admin/tools/type/:typeid" element={<ToolItemPage />} />
             <Route path="/admin/tools/type" element={<ToolItemPage />} />
             <Route path="/admin/tools/instance/:instanceid" element={<ToolItemPage />} />
@@ -194,7 +209,7 @@ export default function AppRoutes() {
 
           <Route path="*" element={<NotFoundPage />} />
         </Route>
-    </Routes>
+      </Routes>
     </div>
   );
 }

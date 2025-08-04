@@ -16,15 +16,14 @@ export const GET_CURRENT_USER = gql`
       lastName
       privilege
       setupComplete
-      balance
       admin
       holds {
         removeDate
       }
       passedModules {
         moduleID
-        submissionDate
-        expirationDate
+        moduleName
+        passedDate
       }
       accessChecks {
         equipmentID
@@ -38,14 +37,18 @@ export const GET_CURRENT_USER = gql`
       manager
       staff
       trainer
+      currencyAccount{
+        id
+        balance
+      }
     }
   }
 `;
 
 export interface PassedModule {
-  moduleID: string;
-  submissionDate: string;
-  expirationDate: string;
+  moduleID: number;
+  moduleName: string;
+  passedDate: string;
 }
 
 export interface TrainingHold {

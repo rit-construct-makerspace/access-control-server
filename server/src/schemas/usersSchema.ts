@@ -13,11 +13,10 @@ export enum Privilege {
 }
 
 export interface PassedModule {
-  id: number;
   moduleID: number;
   moduleName: string;
-  submissionDate: Date;
-  expirationDate: Date;
+  passedDate: Date;
+  makerspaceID: number;
 }
 
 export interface User extends UserRow {
@@ -32,11 +31,10 @@ export const UsersTypeDefs = gql`
   }
 
   type PassedModule {
-    id: ID!
     moduleID: ID!
     moduleName: String!
-    submissionDate: DateTime!
-    expirationDate: DateTime!
+    passedDate: DateTime!
+    makerspaceID: ID
   }
 
   type User {
@@ -44,7 +42,6 @@ export const UsersTypeDefs = gql`
     firstName: String!
     lastName: String!
     pronouns: String
-    balance: String!
     isStudent: Boolean!
     privilege: Privilege!
     registrationDate: DateTime!
@@ -64,6 +61,7 @@ export const UsersTypeDefs = gql`
     staff: [Int]
     trainer: [Int]
     restrictions: [Restriction]
+    currencyAccount: CurrencyAccount!
 
     """
     The number-letter combination that is attached to your RIT email

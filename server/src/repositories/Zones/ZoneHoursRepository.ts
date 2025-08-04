@@ -3,53 +3,89 @@
  * DB Operations for Zone Hours / Open Hours
  */
 
+import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
-import { ZoneHoursRow } from "../../db/tables.js";
+import { DefaultHoursRow, SpecialHoursRow } from "../../db/tables.js";
 
-export enum WeekDays {
-    SUNDAY = 1,
-    MONDAY = 2,
-    TUESDAY = 3,
-    WEDNESDAY = 4,
-    THURSDAY = 5,
-    FRIDAY = 6,
-    SATURDAY = 7
+export async function getZoneHoursOnDay(day: Date, makerspaceID: number): Promise<SpecialHoursRow> {
+    const special = await knex("SpecialHours").where({ makerspaceID: makerspaceID }).andWhereRaw(`CAST(day as DATE) = CAST('${day.toISOString()}' as DATE)`).select("*");
+    if (special.length > 0) {
+        return special[0];
+    }
+
+    const defaultHours = await knex("DefaultHours").where({ dayOfWeek: day.getDay(), makerspaceID: makerspaceID }).select("*");
+
+    if (defaultHours.length < 1) {
+        throw new GraphQLError(`Hours not found on ${day.toDateString()} for makerspace ${makerspaceID}`);
+    }
+
+    const result: SpecialHoursRow = {
+        day: day,
+        makerspaceID: makerspaceID,
+        open: defaultHours[0].open,
+        close: defaultHours[0].close,
+        closed: defaultHours[0].closed,
+    }
+
+    return result;
 }
 
-/**
- * Fetch all Zone Hours attributed to a noted zone
- * @param zoneID ID of zone to filter by
- * @returns all Zone Hours for the noted zone
- */
-export async function getHoursByZone(zoneID: number): Promise<ZoneHoursRow[]> {
-    return await knex("OpenHours").select().where({zoneID}).orderBy("dayOfTheWeek", "asc").orderBy("time", "asc");
+export async function getZoneHoursNextWeek(makerspaceID: number): Promise<SpecialHoursRow[]> {
+    const temp: SpecialHoursRow = {
+        day: new Date(),
+        makerspaceID: 0,
+        open: null,
+        close: null,
+        closed: false
+    }
+    var week: SpecialHoursRow[] = [temp, temp, temp, temp, temp, temp, temp];
+
+    var target = new Date();
+    for (let i = 0; i < 7; i++) {
+        await getZoneHoursOnDay(target, makerspaceID).then((result) => {
+            week[result.day.getDay()] = { ...result, day: new Date(result.day) };
+            target.setDate(target.getDate() + 1);
+        });
+    }
+
+    return week;
 }
 
-/**
- * Fetch all Zone Hours
- * @returns all Zone Hours
- */
-export async function getZoneHours(): Promise<ZoneHoursRow[]> {
-    return await knex("OpenHours").select().orderBy("zoneID", "desc").orderBy("dayOfTheWeek", "asc").orderBy("time", "asc");
+export async function getZoneSpecialHours(makerspaceID: number): Promise<SpecialHoursRow[]> {
+    return await knex("SpecialHours").where({ makerspaceID: makerspaceID }).select("*").orderBy("day", "asc");
+};
+
+export async function getZoneDefaultHours(makerspaceID: number): Promise<DefaultHoursRow[]> {
+    return await knex("DefaultHours").where({ makerspaceID: makerspaceID }).select("*").orderBy("dayOfWeek", "asc");
 }
 
-/**
- * Insert new Zone Hours entry into table
- * @param zoneID ID of zone to apply to
- * @param type event type (i.e. "OPEN", "CLOSE")
- * @param dayOfTheWeek day of the week (represented by int 1-7) to apply to
- * @param time colon-seperated representation of 24-hour time
- * @returns new Zone Hours entry
- */
-export async function createZoneHours(zoneID: number, type: string, dayOfTheWeek: WeekDays, time: string): Promise<ZoneHoursRow> {
-    await knex("OpenHours").insert({zoneID, type, dayOfTheWeek, time});
-    return await knex("OpenHours").select().orderBy("id", "desc").first();
+export async function addSpecialHours(hours: SpecialHoursRow): Promise<boolean> {
+    try {
+        await knex("SpecialHours").insert(hours).onConflict(["day", "makerspaceID"]).merge();
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+
 }
 
-/**
- * Delete a Zone Hours entry
- * @param id ID of Zone Hours entry to delete
- */
-export async function deleteZoneHours(id: number): Promise<void> {
-    await knex("OpenHours").delete().where({id});
+export async function deleteSpecialHours(day: Date, makerspaceID: number): Promise<boolean> {
+    try {
+        await knex("SpecialHours").where({ day: day, makerspaceID: makerspaceID }).delete();
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false;
+    }
+}
+
+export async function updateDefaultHours(hours: DefaultHoursRow): Promise<boolean> {
+    try {
+        await knex("DefaultHours").insert(hours).onConflict(["dayOfWeek", "makerspaceID"]).merge();
+        return true;
+    } catch (e) {
+        console.log(e);
+        return false
+    }
 }

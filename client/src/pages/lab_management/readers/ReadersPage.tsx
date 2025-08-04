@@ -1,30 +1,37 @@
 import { useQuery } from "@apollo/client";
 import { GET_READERS, Reader } from "../../../queries/readersQueries";
 import { Box, Button, Grid, Link, Stack } from "@mui/material";
-import Page from "../../Page";
 import SearchBar from "../../../common/SearchBar";
 import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper from "../../../common/RequestWrapper";
-import { useState } from "react";
+import { isValidElement, useEffect, useState } from "react";
 import ReaderCard from "./ReaderCard";
-import AdminPage from "../../AdminPage";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import AddIcon from '@mui/icons-material/Add';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
 
 export default function ReadersPage() {
-  const { makerspaceID } = useParams<{makerspaceID: string}>();
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
-  const getReadersResult = useQuery(GET_READERS, {pollInterval: 2000});
+  const getReadersResult = useQuery(GET_READERS, { pollInterval: 2000 });
   const user = useCurrentUser();
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
 
+  useEffect(() => {
+    const hash = window.location.hash.slice(1); // Remove the '#' character from the hash
+    if (hash) {
+      const element = document.getElementById(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, []);
+
   return (
     <Box padding="20px">
       <title>Readers | Make @ RIT</title>
-      <Stack direction="row" spacing={2}>
+      <Stack direction="row" spacing={2} marginBottom={"10px"}>
         <SearchBar
           placeholder="Search access devices"
           value={searchText}
@@ -39,18 +46,18 @@ export default function ReadersPage() {
         loading={getReadersResult.loading}
         error={getReadersResult.error}
       >
-        <Grid container spacing={3} mt={2}>
-          {getReadersResult.data?.readers?.filter((m: Reader) =>
-            m.name
-              .toLocaleLowerCase()
-              .includes(searchText.toLocaleLowerCase())
-          ).map((reader: Reader) => (
-            <Grid key={reader.id} alignItems="stretch">
-              <ReaderCard 
-                reader={reader}
-                makerspaceID={makerspaceID ?? "0"}/>
+        <Grid container >
+          {getReadersResult.data?.readers?.map((reader: Reader) => ({
+            reader: reader,
+            card: <ReaderCard
+              reader={reader}
+              makerspaceID={makerspaceID ?? "0"}
+              searchQuery={searchText} />,
+          })).filter((o: { reader: Reader, card: any }) => {return isValidElement(o.card)}).map((o: { reader: Reader, card: any }) => {
+            return <Grid key={o.reader.id} alignItems="stretch">
+              {o.card}
             </Grid>
-          ))}
+          })}
         </Grid>
       </RequestWrapper>
     </Box>

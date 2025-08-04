@@ -190,6 +190,7 @@ export interface TrainingModuleRow {
   quiz: TrainingModuleItem[];
   archived: boolean;
   reservationPrompt: ReservationPrompt;
+  makerspaceID: number | null;
 }
 
 // not a table but the json structure for a column on the table above
@@ -230,11 +231,11 @@ export interface UserRow {
   setupComplete: boolean;
   ritUsername: string;
   archived: boolean;
-  balance: string;
   cardTagID: string;
   notes: string;
   activeHold: boolean;
   admin: boolean;
+  accountID: number;
 }
 
 export interface ReaderRow {
@@ -258,6 +259,12 @@ export interface ReaderRow {
   SN?: string;
   readerKeyCycle: number;
   pairTime?: Date
+  targetFirmwareVersion?: string
+}
+
+export interface MakerspaceWelcomeReaderRow {
+  makerspaceID: number;
+  readerID: number;
 }
 
 export interface ReaderLogRow {
@@ -365,6 +372,70 @@ export interface RestrictionRow {
   createDate: Date | null;
 }
 
+
+export interface PassedModulesRow {
+  userID: number;
+  moduleID: number;
+  passedDate: Date;
+}
+
+export interface ModulesForRoomsRow {
+  roomID: number;
+  moduleID: number;
+}
+
+export interface ModulesForMakerspacesRow {
+  makerspaceID: number;
+  moduleID: number;
+}
+
+export interface SpecialHoursRow {
+  day: Date;
+  makerspaceID: number;
+  open: String | null;
+  close: String | null;
+  closed: boolean;
+}
+
+export interface DefaultHoursRow {
+  dayOfWeek: number;
+  makerspaceID: number;
+  open: String | null;
+  close: String | null;
+  closed: boolean;
+}
+
+export interface CurrencyAccountsRow {
+  id: number;
+  balance: number; // Cents
+}
+
+export interface OrganizationsRow {
+  id: number;
+  username: string;
+  displayname: string;
+  accountID: number;
+}
+
+export interface CurrencyLedgerRow {
+  id: number;
+  dateTime: Date;
+  accountID: number;
+  amount: number;
+  source: string;
+  description: string;
+  atxID: number;
+  refID: number
+}
+
+export interface RefIDCounterRow {
+  refID: number;
+}
+
+export interface TempRolesRow {
+  name: string;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -383,6 +454,7 @@ declare module "knex/types/tables.js" {
     TrainingHolds: TrainingHoldsRow;
     Users: UserRow;
     Readers: ReaderRow;
+    MakerspaceWelcomeReaders: MakerspaceWelcomeReaderRow;
     ReaderLogs: ReaderLogRow;
     AccessChecks: AccessCheckRow;
     Zones: ZoneRow;
@@ -400,5 +472,15 @@ declare module "knex/types/tables.js" {
     Staff: StaffRow;
     Trainers: TrainerRow;
     Restrictions: RestrictionRow;
+    PassedModules: PassedModulesRow;
+    ModulesForRooms: ModulesForRoomsRow;
+    ModulesForMakerspaces: ModulesForMakerspacesRow;
+    SpecialHours: SpecialHoursRow;
+    DefaultHours: DefaultHoursRow;
+    CurrencyAccounts: CurrencyAccountsRow;
+    Organizations: OrganizationsRow;
+    CurrencyLedger: CurrencyLedgerRow;
+    RefIDCounter: RefIDCounterRow;
+    RolesTemp: TempRolesRow;
   }
 }

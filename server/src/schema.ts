@@ -4,8 +4,7 @@ import {
   JSONResolver,
 } from "graphql-scalars";
 import { makeExecutableSchema } from "@graphql-tools/schema";
-import { AnnouncementsTypeDefs } from "./schemas/announcementsSchema.js"; 
-import { mergeResolvers } from "@graphql-tools/merge";
+import { AnnouncementsTypeDefs } from "./schemas/announcementsSchema.js";
 import { TrainingModuleTypeDefs } from "./schemas/trainingModuleSchema.js";
 import { TrainingSubmissionTypeDefs } from "./schemas/trainingSubmissionSchema.js";
 import { StoreFrontTypeDefs } from "./schemas/storeFrontSchema.js";
@@ -55,6 +54,8 @@ import { TrainingHoldsTypeDefs } from "./schemas/trainingHoldsSchema.js";
 import { TrainingHoldResolver } from "./resolvers/trainingHoldResolver.js";
 import { RestrictionTypeDefs } from "./schemas/restrictionSchema.js";
 import { RestrictionResolver } from "./resolvers/restrictionResolver.js";
+import { CurrencyAccountResolvers } from "./resolvers/currencyAccountResolver.js"
+import { CurrencyAccountsTypeDefs } from "./schemas/currencyAccountSchema.js";
 
 // for custom scalars such as Date
 const resolveFunctions = {
@@ -91,8 +92,9 @@ export const schema = makeExecutableSchema({
     TermsTypeDefs,
     MaintenanceLogsTypeDefs,
     ToolItemTypeDefs,
+    CurrencyAccountsTypeDefs,
   ],
-  resolvers: [ 
+  resolvers: [
     resolveFunctions,
     EquipmentResolvers,
     EquipmentInstanceResolver,
@@ -117,6 +119,7 @@ export const schema = makeExecutableSchema({
     TermsResolver,
     MaintenanceLogsResolver,
     ToolItemResolver,
-    RestrictionResolver
+    RestrictionResolver,
+    CurrencyAccountResolvers,
   ]
 });

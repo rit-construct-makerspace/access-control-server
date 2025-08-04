@@ -25,12 +25,12 @@ interface QuizBuilderProps {
   handleOnDragEnd: any
 }
 
-export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdate, handleOnDragEnd}: QuizBuilderProps) {
+export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdate, handleOnDragEnd }: QuizBuilderProps) {
 
   const addItem = (item: QuizItem) =>
     handleAdd(item)
 
-  const removeItem = (itemId: string) => 
+  const removeItem = (itemId: string) =>
     handleRemove(itemId)
 
   const duplicateItem = (item: QuizItem) => {
@@ -42,7 +42,7 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
     });
   }
 
-  const updateItem = (itemId: string, updatedItem: QuizItem) => 
+  const updateItem = (itemId: string, updatedItem: QuizItem) =>
     handleUpdate(itemId, updatedItem)
 
   const createQuestion = () =>
@@ -74,14 +74,14 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
       text: "",
     });
 
-    const createPdfEmbed = () =>
-      addItem({
-        id: uuidv4(),
-        type: QuizItemType.PdfEmbed,
-        text: "",
-      });
+  const createPdfEmbed = () =>
+    addItem({
+      id: uuidv4(),
+      type: QuizItemType.PdfEmbed,
+      text: "",
+    });
 
-  const onDragEnd = (result: DropResult) => 
+  const onDragEnd = (result: DropResult) =>
     handleOnDragEnd(result)
 
   return (
@@ -175,23 +175,23 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
         )}
 
         <ButtonGroup fullWidth sx={{ width: 600, backgroundColor: "white" }}>
-          <Button sx={{fontSize: 13}} startIcon={<ContactSupportIcon />} onClick={createQuestion}>
+          <Button sx={{ fontSize: 13 }} startIcon={<ContactSupportIcon />} onClick={createQuestion}>
             Question
           </Button>
 
-          <Button sx={{fontSize: 13}} startIcon={<TextFieldsIcon />} onClick={createText}>
+          <Button sx={{ fontSize: 13 }} startIcon={<TextFieldsIcon />} onClick={createText}>
             Text
           </Button>
 
-          <Button sx={{fontSize: 13}} startIcon={<YouTubeIcon />} onClick={createYoutubeEmbed}>
+          <Button sx={{ fontSize: 13 }} startIcon={<YouTubeIcon />} onClick={createYoutubeEmbed}>
             Video
           </Button>
 
-          <Button sx={{fontSize: 13}} startIcon={<ImageIcon />} onClick={createImageEmbed}>
+          <Button sx={{ fontSize: 13 }} startIcon={<ImageIcon />} onClick={createImageEmbed}>
             Image
           </Button>
 
-          <Button sx={{fontSize: 13}} startIcon={<DocumentScannerIcon/>} onClick={createPdfEmbed}>
+          <Button sx={{ fontSize: 13 }} startIcon={<DocumentScannerIcon />} onClick={createPdfEmbed}>
             PDF
           </Button>
         </ButtonGroup>

@@ -73,6 +73,7 @@ export const GET_LEDGERS = gql`
         lastName
       }
       notes
+      description
       items {
         quantity
         name

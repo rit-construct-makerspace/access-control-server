@@ -27,6 +27,7 @@ import { getHoldsByUser } from "./repositories/Holds/HoldsRepository.js";
 import { CurrentUser } from "./context.js";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import path from "path";
+import { insertTempRole } from './repositories/tempRolesRepo.js';
 
 const __dirname = import.meta.dirname;
 
@@ -213,7 +214,7 @@ export function setupStagingAuth(app: express.Application) {
       identifierFormat: process.env.ID_FORMAT ?? "",
       decryptionPvk: process.env.SSL_PVKEY ?? "",
       //privateKey: process.env.SSL_PVKEY ?? "",
-      cert: process.env.IDP_PUBKEY ?? "",
+      idpCert: (process.env.IDP_PUBKEY ?? "").replace(' ', '').replace('\n', '').replace('\r', ''),
       //validateInResponseTo: ValidateInResponseTo.never,
       disableRequestedAuthnContext: true,
       signatureAlgorithm: "sha256",
@@ -238,14 +239,30 @@ export function setupStagingAuth(app: express.Application) {
       process.env.SAML_IDP === "TEST" ? mapSamlTestToRit(user) : user.attributes; //user is the full response data. attributes has the things we need
 
 
+      // TEMPORARY -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      try {
+        ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"].forEach(async (element: string) => {
+          try {
+            await insertTempRole(element);
+            //Name is unique, so will fail on duplicates
+          } catch (error) {
+            //nothig
+          }
+        });
+      } catch (error) {
+        console.error("Error iterating temp roles:", error);
+      }
+
       /*
         "attributes": {
           "urn:oid:2.5.4.42": "FirstName",
           "urn:oid:2.5.4.4": "LastName",
           "urn:oid:0.9.2342.19200300.100.1.1": "userName",
-          "urn:oid:1.3.6.1.4.1.4447.1.20": "uid"
+          "urn:oid:1.3.6.1.4.1.4447.1.20": "uid",
+          "urn:oid:1.3.6.1.4.1.4447.1.41": ["roles"]
         }
       */
+     
 
     // Create user in our database if they don't exist
     const existingUser = await getUserByRitUsername(ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);
@@ -319,16 +336,19 @@ export function setupStagingAuth(app: express.Application) {
 
   app.get("/login", authenticate);
 
-  app.post("/login/callback", authenticate, async (req, res) => {
-    console.log("Logged in")
-    if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {
-      await createLog(
-        `{user} logged in.`,
-        "server",
-        { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
-      );
+  app.post("/login/callback", authenticate,
+
+    async (req, res) => {
+      console.log("Logged in")
+      if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {
+        await createLog(
+          `{user} logged in.`,
+          "server",
+          { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
+        );
+      }
     }
-  });
+  );
 
   app.get("/login/fail", function (req, res) {
     console.log("Login failed");

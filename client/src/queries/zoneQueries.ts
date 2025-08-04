@@ -1,7 +1,12 @@
 import { gql } from "@apollo/client";
 import Equipment from "../types/Equipment";
 import Room, { FullRoom } from "../types/Room";
+<<<<<<< HEAD
 import InventoryItem from "../types/InventoryItem";
+=======
+import { TrainingModule } from "../common/TrainingModuleUtils";
+import ZoneHours from "../types/ZoneHours";
+>>>>>>> origin/main
 
 export const GET_ZONES = gql`
  query GetZones {
@@ -27,13 +32,10 @@ export interface ZoneWithHours {
 export interface FullZone {
   id: number;
   name: string;
-  hours: {
-    type: string;
-    dayOfTheWeek: number;
-    time: string;
-  }[];
+  hours: ZoneHours[];
   rooms: Room[]
   imageUrl: string;
+  trainingModules: TrainingModule[];
 }
 
 export interface ZoneWithItems {
@@ -48,10 +50,12 @@ export const GET_ZONES_WITH_HOURS = gql`
     id
     name
     hours {
-      type
-      dayOfTheWeek
-      time
-    }
+        day
+        makerspaceID
+        open
+        close
+        closed
+      }
     imageUrl
   }
  }
@@ -63,9 +67,11 @@ export const GET_FULL_ZONES = gql`
       id
       name
       hours {
-        type
-        dayOfTheWeek
-        time
+        day
+        makerspaceID
+        open
+        close
+        closed
       }
       imageUrl
       rooms {
@@ -123,9 +129,11 @@ export const GET_ZONE_BY_ID = gql`
       id
       name
       hours {
-        type
-        dayOfTheWeek
-        time
+        day
+        makerspaceID
+        open
+        close
+        closed
       }
       imageUrl
       rooms {
@@ -146,6 +154,14 @@ export const GET_ZONE_BY_ID = gql`
           notes
           archived
         }
+        trainingModules {
+          id
+          name
+        }
+      }
+      trainingModules {
+        id
+        name
       }
     }
   }
@@ -169,6 +185,22 @@ export const UPDATE_ZONE = gql`
 export const DELETE_ZONE = gql`
   mutation DeleteZone($id: ID!) {
     deleteZone(id: $id) {
+      id
+    }
+  }
+`;
+
+export const ADD_TRAINING_TO_ZONE = gql`
+  mutation AddTrainingToZone($zoneID: ID!, $moduleID: ID!) {
+    addTrainingToZone(zoneID: $zoneID, moduleID: $moduleID) {
+      id
+    }
+  }
+`;
+
+export const REMOVE_TRAINING_FROM_ZONE = gql`
+  mutation RemoveTrainingFromZone($zoneID: ID!, $moduleID: ID!) {
+    removeTrainingFromZone(zoneID: $zoneID, moduleID: $moduleID) {
       id
     }
   }

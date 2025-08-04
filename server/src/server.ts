@@ -2,12 +2,11 @@
  * server.ts
  * Server Configuration and API
  */
-
+import * as papercut from "./integrations/papercut/papercut.js"
 import express from "express";
 import expressWs from 'express-ws';
 import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@apollo/server/express4";
-import { createServer } from "http";
+import { expressMiddleware } from "@as-integrations/express5";
 import compression from "compression";
 import cors from "cors";
 import { schema } from "./schema.js";
@@ -22,19 +21,20 @@ import { createLog, createLogWithArray } from "./repositories/AuditLogs/AuditLog
 import { getEquipmentByID, getMissingTrainingModules, hasAccessByID } from "./repositories/Equipment/EquipmentRepository.js";
 import { Room } from "./models/rooms/room.js";
 import { Privilege } from "./schemas/usersSchema.js";
-import { createReader, getReaderByID, getReaderByName, getReaderCertCA, toggleHelpRequested, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
+import { createReader, getReaderByID, getReaderByName, getReaderBySN, getReaderCertCA, toggleHelpRequested, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import morgan from "morgan"; //Log provider
 import bodyParser from "body-parser"; //JSON request body parser
 import { createRequire } from "module";
-import { getHoursByZone, WeekDays } from "./repositories/Zones/ZoneHoursRepository.js";
-import { createEquipmentSession, pruneNullLengthEquipmentSessions, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
+import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
 import { ReaderRow } from "./db/tables.js";
-import { authenticateReader, ws_acs_api } from "./wsapi.js"
+import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
+import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
+
 const require = createRequire(import.meta.url);
 
 const allowed_origins = [process.env.REACT_APP_ORIGIN, "https://studio.apollographql.com", "https://make.rit.edu", "https://shibboleth.main.ad.rit.edu"];
@@ -59,6 +59,7 @@ async function startServer() {
   var exp = express();
   var wsserver = expressWs(exp);
   var app = wsserver.app;
+  
 
   //Configure CORS
   app.use(cors(CORS_CONFIG));
@@ -114,6 +115,8 @@ async function startServer() {
   app.use("/app/", express.static(path.join(__dirname, '../../client/build')));
 
 
+  papercut.registerEndpoints(app)
+
   /**
    * REGEX QUERY:
    * matches to all urls EXCEPT:
@@ -153,7 +156,7 @@ async function startServer() {
 
 
 
-  app.get("/app/*", function (req, res) {
+  app.get("/app/*apppage", function (req, res) {
     res.header
     res.sendFile(path.join(__dirname, "../../client/build", "index.html"));
   });
@@ -182,7 +185,7 @@ async function startServer() {
   // Websocket ACS Handler
   app.ws("/api/ws", ws_acs_api);
 
-  app.all("/api/files/*", async function (req, res, next) {
+  app.all("/api/files/*filename", async function (req, res, next) {
     const SNHeader = 'shlug-sn';
     const KeyHeader = 'shlug-key';
     if (!req.headers[SNHeader] || !req.headers[KeyHeader]) {
@@ -194,8 +197,14 @@ async function startServer() {
       return res.status(401).send();
     }
 
-    const ok = await authenticateReader(SN, Key);
+    const reader = await getReaderBySN(SN);
+    if (reader == null) {
+      return res.status(404).send();
+    }
+
+    const ok = await authenticateReader(reader, Key);
     if (!ok) {
+      wsApiLog("Declining API file to unauthed shlug with SN " + SN, "file");
       return res.status(403).send();
     }
     return next();
@@ -208,6 +217,29 @@ async function startServer() {
       return res.status(404).send();
     }
     return res.send(certca);
+  })
+
+  app.get('/api/files/ota/:tagname', async function (req, res) {
+    const tag = req.params["tagname"];
+    console.log(`SN: ${req.headers['shlug-sn']} requested OTA to ${tag}`);
+
+    const ota_url = `https://github.com/rit-construct-makerspace/access-control-firmware/releases/download/${tag}/Core.bin`
+    fetch(ota_url).then(actual => {
+      actual.headers.forEach((v, n) => res.setHeader(n, v));
+      if (actual?.body) {
+        actual.body.pipeTo(
+          new WritableStream({
+            start() { },
+            write(chunk) {
+              res.write(chunk);
+            },
+            close() {
+              res.end();
+            },
+          })
+        );
+      }
+    })
   })
 
   /**
@@ -687,52 +719,9 @@ async function startServer() {
    */
   app.get("/api/hours/:zone", async function (req, res) {
     try {
-      const hourRows = await getHoursByZone(Number(req.params.zone));
-
-      var hoursString = "";
-      hourRows.forEach(function (hourRow) {
-        /**
-         * Format:
-         * Monday Open: 09:00
-         * Monday Close: 22:00
-         * Tuesday Open: 09:00
-         * etc.
-         */
-
-        switch (hourRow.dayOfTheWeek) {
-          case WeekDays.SUNDAY:
-            hoursString += "Sunday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Monday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Tuesday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Wednesday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Thursday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Friday ";
-            break;
-          case WeekDays.MONDAY:
-            hoursString += "Saturday ";
-            break;
-          default:
-            hoursString += "Undefined ";
-            break;
-        };
-
-        hoursString += hourRow.type + ": ";
-
-        hoursString += hourRow.time + "\n";
-      });
+      const hourRows = await getZoneHoursNextWeek(Number(req.params.zone));
 
       return res.status(200).json({
-        text: hoursString,
         obj: hourRows
       }).send();
     } catch (err) {
@@ -874,14 +863,14 @@ async function startServer() {
     }
   });
 
-    /**
-   * SET--
-   * Set the count of a declared item to a specified amount
-   * Request (JSON Body):
-   * - UID: NFC ID of the user 
-   * - Count: Number to set as the count. Cannot be negative.
-   * - Key: API key for authorization.
-   */
+  /**
+ * SET--
+ * Set the count of a declared item to a specified amount
+ * Request (JSON Body):
+ * - UID: NFC ID of the user 
+ * - Count: Number to set as the count. Cannot be negative.
+ * - Key: API key for authorization.
+ */
   app.post("/api/inv/set/:id", async function (req, res) {
     try {
       const id = parseInt(req.params.id);

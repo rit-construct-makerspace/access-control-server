@@ -4,8 +4,9 @@
  */
 
 import { knex } from "../../db/index.js";
-import { ReaderLogRow, ReaderRow, TextFieldRow } from "../../db/tables.js";
+import { ReaderLogRow, ReaderRow, TextFieldRow, ZoneRow } from "../../db/tables.js";
 import { getInstanceByReaderID } from "../Equipment/EquipmentInstancesRepository.js";
+import { getZoneByID } from "../Zones/ZonesRespository.js";
 
 /**
  * Fetch a card ready buy it's primary key
@@ -52,18 +53,76 @@ export async function getReaderByMachineID(
  * Fetch all card readers
  */
 export async function getReaders(): Promise<ReaderRow[]> {
-    return await knex("Readers").select("*").orderBy("helpRequested", "desc").orderBy("id", "asc"); //Order them to prevent random ordering everytime the client polls, also prioritize help
+    //Order them to prevent random ordering everytime the client polls, also prioritize help
+    return await knex("Readers")
+        .select("*", knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
+        .orderBy("helpRequested", "desc")
+        .orderBy("faultOrder", "asc")
+        .orderBy("id", "asc")
+        ; 
 }
 
 /**
  * Fetch unpaired card readers
- * @return list of readers that are not paired with an instance 
+ * @return list of readers that are not already in use as an instance reader or a welcom reader 
  */
 export async function getUnpairedReaders(): Promise<ReaderRow[]> {
     return await knex("Readers").select("Readers.*")
         .leftJoin("EquipmentInstances", "Readers.id", "EquipmentInstances.readerID")
+        .leftJoin("MakerspaceWelcomeReaders as mwr", "Readers.id", "mwr.readerID")
         .whereNotNull("SN").andWhere(function () { this.whereNull("EquipmentInstances.readerID") })
+        .andWhere(function () { this.whereNull("mwr.readerID") })
         .orderBy("Readers.name", "desc").orderBy("Readers.id", "asc")
+}
+
+export enum PairStatus {
+    Unpaired,
+    PairedAsInstance,
+    PairedAsWelcomer
+}
+/**
+ * Get how a reader is paired
+ * @param readerID the reader to check
+ * @returns PairedAsInstance if associated with machine instance
+ * @returns PairedAsWelcomer if paired as welcome reader for a makerspace
+ * @returns Unpaired if neither
+ */
+export async function getReaderPairStatus(readerID: number): Promise<PairStatus> {
+    const instances = await knex("EquipmentInstances").select("*").where("readerID", "=", readerID);
+    if (instances.length > 0) {
+        return PairStatus.PairedAsInstance;
+    }
+    const makerspaces = await knex("MakerspaceWelcomeReaders").where("readerID", "=", readerID);
+    if (makerspaces.length > 0) {
+        return PairStatus.PairedAsWelcomer;
+    }
+    return PairStatus.Unpaired;
+}
+
+/**
+ * Pair reader as a welcome reader for a makerspace
+ * @param readerID the reader to pair
+ * @param makerspaceID the makerspace to pair with
+ * @returns true if paired. or throws if either are not found
+ */
+export async function pairReaderAsMakerspaceWelcomer(readerID: number, makerspaceID: number): Promise<Boolean> {
+    try {
+        await knex("MakerspaceWelcomeReaders").insert({ makerspaceID: makerspaceID, readerID: readerID });
+        return true; // or throw if not found
+    } catch {
+    }
+ 
+    return false;
+}
+
+/**
+ * unpair reader as a welcome reader from a makerspace
+ * @param readerID the reader to unpair
+ * @param makerspaceID the makerspace to unpair from
+ * @returns true if paired. or throws if either are not found
+ */
+export async function unpairReaderAsMakerspaceWelcomer(readerID: number, makerspaceID: number) {
+    await knex("MakerspaceWelcomeReaders").delete().where({ readerID: readerID, makerspaceID: makerspaceID });
 }
 
 export async function getReaderLogs(searchParams: { makerspaceID?: number, from: Date, to: Date, pageOffset?: number, pageLimit: number }): Promise<ReaderLogRow[]> {
@@ -205,7 +264,7 @@ export async function updateReaderStatus(reader: {
  * @param name the updated name of the reader
  */
 export async function setReaderName(
-    id: number, 
+    id: number,
     name: string
 ): Promise<ReaderRow | undefined> {
     await knex("Readers").where({ id: id }).update({ name });
@@ -219,7 +278,7 @@ export async function setReaderName(
  */
 export async function toggleHelpRequested(id: number): Promise<void> {
     const oldRow = await knex("Readers").select("*").where({ id: id }).first()
-    return await knex("Readers").where({ id: id }).update({ helpRequested: !(oldRow?.helpRequested)})
+    return await knex("Readers").where({ id: id }).update({ helpRequested: !(oldRow?.helpRequested) })
 }
 
 /**
@@ -239,6 +298,37 @@ export async function submitReaderLogWithInstance(readerID: number | null, curre
     return await knex("ReaderLogs").insert({ readerID, currentInstanceID, dateTime, log }).returning("id");
 }
 
+/**
+ * Return the makerspace that this reader is welcoming or null if there is no such makerspace
+ * @param readerID the reader to query the makerspace on
+ * @returns the id of the makerspace that this reader is linked with
+ */
+export async function getMakerspaceOfWelcomeReader(readerID: number): Promise<ZoneRow | undefined> {
+    const res = (await knex("Readers as r").leftJoin("MakerspaceWelcomeReaders as mwr", "r.id", 'mwr.readerID').where({ readerID: readerID }).select("mwr.makerspaceID").first())
+
+    if (res == null) {
+        return undefined;
+    }
+    return getZoneByID(res.makerspaceID);
+}
+
+/**
+ * Get active welcome readers for a space
+ * @param makerspaceId the makerspace to check
+ * @returns a list of readers that are acting as welcome readers for the space
+ */
+export async function getWelcomeReadersForMakerspace(makerspaceId: number): Promise<ReaderRow[]>{
+    return await knex("MakerspaceWelcomeReaders").where({makerspaceID: makerspaceId}).leftJoin("Readers", "Readers.id", "MakerspaceWelcomeReaders.readerID").select("Readers.*");
+}
+
+/**
+ * Set the target firmware version for some readers
+ * @param ids the list of readers to set for
+ * @param version the firmware tag to set
+ */
+export async function setOTAVersions(ids: number[], version: string){
+    await knex("Readers").update("targetFirmwareVersion", version).whereIn("id", ids)
+}
 
 const ReaderCertCAId = 34;
 export async function getReaderCertCA(): Promise<TextFieldRow | undefined> {
