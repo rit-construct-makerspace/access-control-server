@@ -34,6 +34,7 @@ import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhere
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
+import * as Atrium from "./integrations/atrium-integration/atrium.js"
 
 const require = createRequire(import.meta.url);
 
@@ -59,7 +60,7 @@ async function startServer() {
   var exp = express();
   var wsserver = expressWs(exp);
   var app = wsserver.app;
-  
+
 
   //Configure CORS
   app.use(cors(CORS_CONFIG));
@@ -958,11 +959,19 @@ async function startServer() {
 
   console.log(process.env.ID_FORMAT);
 
-  app.listen({ port: PORT }, (): void =>
+
+
+
+  app.listen({ port: PORT }, (): void => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     )
+    const res = Atrium.generateAtriumToken("123456");
+    console.log("RESP", res);
+  }
   );
+
+
 }
 
 startServer();
