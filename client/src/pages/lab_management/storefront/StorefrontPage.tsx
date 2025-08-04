@@ -184,7 +184,7 @@ export default function StorefrontPage() {
                   <ListingCard
                     key={item.id}
                     item={item}
-                    setActiveItem={setActiveItem}
+                    setActiveItem={(item) => {setActiveItem(item); setShowModal(true)}}
                     openDetailsModal={(item) => {setActiveItem(item); setShowDetailsModal(true)}}
                   />
                 ))}
