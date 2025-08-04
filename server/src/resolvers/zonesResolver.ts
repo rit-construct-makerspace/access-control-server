@@ -31,6 +31,12 @@ const ZonesResolver = {
       _args: any,
     ) => {
       return getTrainingsByZone(parent.id);
+    },
+    items: async (
+      parent: ZoneRow,
+      _args: any,
+    ) => {
+      return getItems(parent.id);
     }
   },
 

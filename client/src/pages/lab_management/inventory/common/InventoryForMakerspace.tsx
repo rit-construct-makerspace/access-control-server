@@ -10,6 +10,7 @@ import { ZoneWithItems } from "../../../../queries/zoneQueries";
 import InventoryItem, { InventoryTag } from "../../../../types/InventoryItem";
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import PageSectionHeader from "../../../../common/PageSectionHeader";
 
 function sortItemsByName(items: InventoryItem[]): InventoryItem[] {
   return [...items].sort((a, b) => (a.name > b.name ? 1 : -1)) ?? [];
@@ -84,22 +85,25 @@ export function InventoryForMakerspace(props: InventoryForMakerspaceProps) {
   ];
 
   return (
-    <Box sx={{ width: "100%", overflowX: "scroll" }}>
-      <DataGrid
-        rows={matchingItems}
-        columns={columns}
-        rowHeight={70}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 50,
+    <Box>
+      <PageSectionHeader>{props.makerspace.name}</PageSectionHeader>
+      <Box sx={{ width: "100%", overflowX: "scroll" }}>
+        <DataGrid
+          rows={matchingItems}
+          columns={columns}
+          rowHeight={70}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 50,
+              },
             },
-          },
-        }}
-        pageSizeOptions={[50]}
-        //checkboxSelection
-        disableRowSelectionOnClick
-      />
+          }}
+          pageSizeOptions={[50]}
+          //checkboxSelection
+          disableRowSelectionOnClick
+        />
+      </Box>
     </Box>
   )
 }
