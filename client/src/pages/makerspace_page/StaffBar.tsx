@@ -16,6 +16,7 @@ import { isOnlyTrainer, isStaffFor } from "../../common/PrivilegeUtils";
 import { useIsMobile } from "../../common/IsMobileProvider";
 import { Outlet, useParams } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PaidIcon from '@mui/icons-material/Paid';
 
 export default function StaffBar() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
@@ -130,6 +131,11 @@ export default function StaffBar() {
           primary={"Statistics"}
           to={"/admin/statistics"}
           icon={<BarChartIcon />}
+        />
+        <NavLink
+          primary={"Finances"}
+          to={`/makerspace/${makerspaceID}/currency`}
+          icon={<PaidIcon />}
         />
       </Stack>
     );
