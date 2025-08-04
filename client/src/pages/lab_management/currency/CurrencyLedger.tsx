@@ -1,5 +1,5 @@
 import { useLazyQuery } from "@apollo/client";
-import { Box, Divider, Stack, Typography } from "@mui/material";
+import { Divider, Stack, Typography } from "@mui/material";
 import gql from "graphql-tag";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -50,7 +50,7 @@ export default function CurrencyLedger() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const queryString = searchParams.get("a") ?? "";
+    const queryString = searchParams.get("l") ?? "";
 
     setSearchText(queryString);
 
@@ -95,7 +95,7 @@ export default function CurrencyLedger() {
       const rows: GridRowsProp = entries.map((entry) => ({
         id: entry.id,
         acountID: entry.accountID,
-        amount: moneyForamtter.format(entry.amount),
+        amount: moneyForamtter.format(entry.amount / 100),
         dateTime: dateTimeFormatter.format(new Date(entry.dateTime)),
         source: entry.source,
         description: entry.description,
@@ -104,9 +104,17 @@ export default function CurrencyLedger() {
       }))
 
       return (
-        <Box width={"100%"}>
+        <Stack spacing={2}>
+          <SearchBar
+            placeholder="Search Ledger"
+            sx={{ maxWidth: 300 }}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onClear={() => setUrlParam("l", "")}
+            onSubmit={() => setUrlParam("l", searchText)}
+          />
           <DataGrid rows={rows} columns={columns} />
-        </Box>
+        </Stack>
       );
     }} />
   );
