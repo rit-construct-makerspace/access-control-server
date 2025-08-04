@@ -1,3 +1,6 @@
 [submodule "server/src/integrations/atrium-integration"]
 	path = server/src/integrations/atrium-integration
 	url = git@github.com:rit-construct-makerspace/atrium-integration.git
+[submodule "server/src/integrations/atrium-integration/atrium-integration"]
+	path = server/src/integrations/atrium-integration/atrium-integration
+	url = git@github.com:rit-construct-makerspace/atrium-integration.git
