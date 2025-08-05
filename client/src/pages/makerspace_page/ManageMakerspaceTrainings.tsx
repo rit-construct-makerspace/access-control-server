@@ -5,8 +5,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { useMutation, useQuery } from "@apollo/client";
 import GET_TRAINING_MODULES from "../../queries/trainingQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
-import { useCurrentUser } from "../../common/CurrentUserProvider";
-import { isManagerFor } from "../../common/PrivilegeUtils";
 import { ADD_TRAINING_TO_ZONE, GET_ZONE_BY_ID, REMOVE_TRAINING_FROM_ZONE } from "../../queries/zoneQueries";
 import { useState } from "react";
 
@@ -16,8 +14,6 @@ interface ManageMakerspaceTrainingsProps {
 }
 
 export default function ManageMakerspaceTrainings(props: ManageMakerspaceTrainingsProps) {
-  const currentUser = useCurrentUser();
-
   const getModuleResults = useQuery(GET_TRAINING_MODULES);
 
   const [addTraining] = useMutation(ADD_TRAINING_TO_ZONE, { refetchQueries: [{ query: GET_ZONE_BY_ID, variables: { id: props.makerspaceID } }] });
@@ -26,7 +22,7 @@ export default function ManageMakerspaceTrainings(props: ManageMakerspaceTrainin
   const [newTraining, setNewTraining] = useState(0);
 
   function handleNewTraining() {
-    if (newTraining == 0) {
+    if (newTraining === 0) {
       window.alert("Select a training");
       return;
     }

@@ -32,7 +32,7 @@ export default function HoldCard({ hold, userID }: HoldCardProps) {
   return (
     <Card
       sx={{
-        backgroundColor: removed ? (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100") : (localStorage.getItem("themeMode") == "dark" ? "#150000" : "#fff8f8"),
+        backgroundColor: removed ? (localStorage.getItem("themeMode") === "dark" ? "grey.900" : "grey.100") : (localStorage.getItem("themeMode") === "dark" ? "#150000" : "#fff8f8"),
         border: `1px solid ${removed ? "grey" : "red"}`,
       }}
     >

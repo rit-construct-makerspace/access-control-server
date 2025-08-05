@@ -6,9 +6,6 @@ import PrettyModal from "../../../common/PrettyModal";
 import { CREATE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
 import EquipmentInstanceRow from "./EquipmentInstanceRow";
 
-
-
-
 export default function EquipmentInstancesModal({equipmentID, equipmentName, isOpen, setIsOpen} : {equipmentID: number, equipmentName: string, isOpen: boolean, setIsOpen: React.Dispatch<React.SetStateAction<boolean>>}) {
 
   const [width, setWidth] = useState<number>(window.innerWidth);
