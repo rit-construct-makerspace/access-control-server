@@ -6,7 +6,8 @@ import {
   CardContent,
   CardMedia,
   Typography,
-  Tooltip} from "@mui/material";
+  Tooltip
+} from "@mui/material";
 import PublishEquipmentButton from "./PublishEquipmentButton";
 import ArchiveEquipmentButton from "./ArchiveEquipmentButton";
 import SopButton from "../../../common/SopButton";
