@@ -41,6 +41,7 @@ import NoPrivilegePage from "./pages/NoPrivilegePage";
 import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
 import HoursDisplay from "./pages/signage/HoursDisplay";
 import EventsDisplay from "./pages/signage/EventsDisplay";
+import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -143,6 +144,7 @@ export default function AppRoutes() {
                   <Route element={<ManagerRoute />}>
                     <Route path="/makerspace/:makerspaceID/edit" element={<ManageMakerspacePage />} />
                     <Route path="/makerspace/:makerspaceID/edit/room/:roomID" element={<ManageRoomPage />} />
+                    <Route path="/makerspace/:makerspaceID/currency" element={<CurrencyPage />} />
                   </Route>
                   {/* End manager routes */}
 

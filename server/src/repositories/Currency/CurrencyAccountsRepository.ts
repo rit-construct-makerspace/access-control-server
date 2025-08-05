@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
-import { CurrencyAccountsRow } from "../../db/tables.js";
+import { CurrencyAccountsRow, OrganizationsRow } from "../../db/tables.js";
 import * as OrgRepo from "../Users/OrganizationRepository.js";
 import * as UserRepo from "../Users/UserRepository.js";
 import * as CurrencyLedgerRepo from "./CurrencyLedgerRepository.js";
@@ -74,9 +74,13 @@ export async function adjustAccountBalanceCents(accountID: number, amount: numbe
 
   const new_balance = amount + balance < 0 ? 0 : balance + amount;
 
+  if (balance === new_balance) {
+    return true;
+  }
+
   await setAccountBalanceCents(accountID, new_balance);
 
-  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, amount, source, description);
+  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, new_balance - balance, source, description);
 
   return true;
 }
@@ -96,6 +100,10 @@ export async function adjustAccountBalanceIfAvailableCents(accountID: number, am
   }
 
   const new_balance = balance + amount;
+
+  if (new_balance === balance) {
+    return true;
+  }
 
   await setAccountBalanceCents(accountID, new_balance);
 
@@ -171,4 +179,28 @@ export async function getAccountOwner(accountID: number): Promise<AccountOwner |
   }
 
   return undefined;
+}
+
+/**
+ * 
+ * @param searchText The query to filter the accounts by, can be undefined
+ * @param limit The number of accounts to limit the search to (defaults to 25)
+ * @returns Up to {@link limit} accounts that match the {@link searchText}
+ */
+export async function getAccountsLimit(searchText?: string, limit = 25): Promise<CurrencyAccountsRow[]> {
+  if (!searchText || searchText === "") {
+    return (await knex("CurrencyAccounts").select("*").limit(limit).orderBy("id", "asc"));
+  }
+
+  const res = await knex("CurrencyAccounts")
+    .leftOuterJoin("Users", "Users.accountID", "CurrencyAccounts.id")
+    .leftOuterJoin("Organizations", "Organizations.accountID", "CurrencyAccounts.id")
+    .whereILike("Users.ritUsername", `%${searchText}%`)
+    .orWhere("Users.accountID", Number.isNaN(Number(searchText)) ? -1 : searchText)
+    .orWhereILike("Organizations.displayname", `%${searchText}%`)
+    .orWhereILike("Users.firstName", `%${searchText}%`)
+    .orWhereILike("Users.lastName", `%${searchText}%`)
+    .select("CurrencyAccounts.*").limit(limit).orderBy("id", "asc");
+
+  return res;
 }

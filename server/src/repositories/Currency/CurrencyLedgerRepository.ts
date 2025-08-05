@@ -44,6 +44,34 @@ export async function getCurrencyLedgerEntries(): Promise<CurrencyLedgerRow[]> {
     return result;
 }
 
+/**
+ * 
+ * @param searchText optional parmeter to filter the entries by
+ * @param limit The number of entries ot limit the return to (defaults to 100)
+ * @returns up to {@link limit} entries that match the {@link searchText}
+ */
+export async function getCurrencyLedgerEntriesLimit(searchText?: string, limit = 100): Promise<CurrencyLedgerRow[]> {
+    if (!searchText || searchText === "") {
+        return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc").limit(limit);
+    }
+
+    if (Number.isNaN(Number(searchText))) {
+        // searchText can't be compared to the number fields
+        return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
+            .whereILike("description", `%${searchText}%`)
+            .orWhereILike("source", `%${searchText}%`)
+            .limit(limit);
+    }
+
+    return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
+        .where("id", searchText)
+        .orWhere("accountID", searchText)
+        .orWhere("amount", searchText)
+        .orWhere("atxID", searchText)
+        .orWhere("refID", searchText)
+        .limit(limit);
+}
+
 export async function getCurrencyLedgerEntry(id: number): Promise<CurrencyLedgerRow> {
     const result = await knex("CurrencyLedger").where({ id: id }).select("*");
     if (result.length > 0) {
