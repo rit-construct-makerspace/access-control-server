@@ -68,12 +68,12 @@ export function RoomStats() {
 
   function handleStartDateChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setStartDate(e.target.value)
-    if (startDate && startDate != "") setShowClearButton(true);
+    if (startDate && startDate !== "") setShowClearButton(true);
   }
 
   function handleEndDateChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setEndDate(e.target.value)
-    if (endDate && endDate != "") setShowClearButton(true);
+    if (endDate && endDate !== "") setShowClearButton(true);
   }
 
   function handleRoomIDsChange(e: SelectChangeEvent<string[]>) {
@@ -90,8 +90,8 @@ export function RoomStats() {
 
   function handleSubmit() {
     var variables = {
-      ...(startDate && startDate != "" && { startDate }),
-      ...(endDate && endDate != "" && { endDate }),
+      ...(startDate && startDate !== "" && { startDate }),
+      ...(endDate && endDate !== "" && { endDate }),
       ...(roomIDs && roomIDs.length > 0 && { roomIDs: roomIDs })
     };
     getRoomSwipes({ variables });
@@ -118,7 +118,7 @@ export function RoomStats() {
 
   function handleCSVExport() {
     let csvContent =
-      Object.keys(getRoomSwipesResult.data.getRoomSwipesWithAttachedEntities[0] as VerboseRoomSwipe).map((s: string) => s == "__typename" ? '' : `${s},`).join('')
+      Object.keys(getRoomSwipesResult.data.getRoomSwipesWithAttachedEntities[0] as VerboseRoomSwipe).map((s: string) => s === "__typename" ? '' : `${s},`).join('')
       + '\n' + getRoomSwipesResult.data.getRoomSwipesWithAttachedEntities.map((e: VerboseRoomSwipe) => joinRoomSession(e)).join("\n");
     download(csvContent, "roomSwipes.csv");
   }
