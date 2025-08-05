@@ -145,5 +145,7 @@ export const UsersTypeDefs = gql`
     revokeUserManager(userID: ID!, makerspaceID: ID!): [Int]
     revokeUserStaff(userID: ID!, makerspaceID: ID!): [Int]
     revokeUserTrainer(userID: ID!, equipmentID: ID!): [Int]
+
+    forceArchiveUser(userID: ID!, force: Boolean): User
   }
 `;
