@@ -1,5 +1,4 @@
-import React from "react";
-import { Option as IOption, QuizItemType } from "../../../types/Quiz";
+import { QuizItemType } from "../../../types/Quiz";
 import { IconButton, Stack, Typography } from "@mui/material";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";

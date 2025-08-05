@@ -1,7 +1,6 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Button, TextareaAutosize } from "@mui/material";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isAdmin } from "../../../common/PrivilegeUtils";
@@ -22,7 +21,6 @@ export default function EditTermsPage() {
     const text = useQuery(GET_TERMS_TEXT);
     const [edit] = useMutation(SET_TERMS_TEXT, {refetchQueries: [{query: GET_TERMS_TEXT}]});
     const currentUser = useCurrentUser();
-    const navigate = useNavigate();
 
     const [editText, setEditText] = useState<string>();
 

@@ -1,11 +1,11 @@
 import { useQuery } from "@apollo/client";
-import { Alert, Box, Button, CardActionArea, Divider, IconButton, Stack, Typography } from "@mui/material";
+import { Alert, Button, Divider, IconButton, Stack, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { FullZone, GET_ZONE_BY_ID } from "../../queries/zoneQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import RoomSection from "./RoomSection";
-import Room, { FullRoom } from "../../types/Room";
+import Room from "../../types/Room";
 import SearchBar from "../../common/SearchBar";
 import StaffBar from "./StaffBar";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
@@ -14,11 +14,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useIsMobile } from "../../common/IsMobileProvider";
 import { isManagerFor, isStaffFor } from "../../common/PrivilegeUtils";
 import { ModuleStatus, moduleStatusMapper } from "../../common/TrainingModuleUtils";
-import WarningIcon from "@mui/icons-material/Warning";
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
-import LockClockIcon from '@mui/icons-material/LockClock';
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CloseIcon from "@mui/icons-material/Close";
 import ZoneHoursSection from "./ZoneHours";
 import ModuleStatusRow from "../../common/ModuleStatusRow";
 
@@ -67,7 +62,7 @@ export default function MakerspacePage() {
               <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
                 <Typography variant="h6">Makerspace Trainings</Typography>
                 {
-                  zoneTrainings.some((ms) => (ms.status != "Passed" && ms.status != "Expiring Soon"))
+                  zoneTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
                     ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
                     : null
                 }

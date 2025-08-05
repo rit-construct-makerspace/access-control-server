@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import MaterialModalContents, {
   InventoryItemInput,
 } from "./MaterialModalContents";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_INVENTORY_ITEMS, GET_INVENTORY_ITEM, UPDATE_INVENTORY_ITEM, DELETE_INVENTORY_ITEM } from "../../../queries/inventoryQueries";
 
@@ -27,7 +27,7 @@ export default function EditMaterial({ itemId, onClose }: EditMaterialProps) {
     ],
   });
 
-  const [deleteInventoryItem, deletion] = useMutation(DELETE_INVENTORY_ITEM, {
+  const [deleteInventoryItem, ] = useMutation(DELETE_INVENTORY_ITEM, {
     variables: { id: itemId },
     refetchQueries: [
       { query: GET_INVENTORY_ITEMS },
@@ -45,7 +45,7 @@ export default function EditMaterial({ itemId, onClose }: EditMaterialProps) {
 
   // Close the modal upon successful mutation
   useEffect(() => {
-    if (mutation.data != undefined) onClose();
+    if (mutation.data !== undefined) onClose();
   }, [mutation.data, onClose]);
 
   return (

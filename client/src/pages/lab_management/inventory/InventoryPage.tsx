@@ -1,10 +1,7 @@
-import React, { useState } from "react";
-import Page from "../../Page";
-import { Box, Button, Divider, IconButton, Stack, Switch, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { useState } from "react";
+import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import PageSectionHeader from "../../../common/PageSectionHeader";
-import { useNavigate } from "react-router-dom";
-import InventoryRow from "../../../common/InventoryRow";
 import CreateIcon from "@mui/icons-material/Create";
 import { useQuery } from "@apollo/client";
 import InventoryItem from "../../../types/InventoryItem";
@@ -16,9 +13,7 @@ import Ledger from "./Ledger";
 import InventoryTagsModal from "./InventoryTagsModal";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { TagsCell } from "./common/TagsCell";
-import { format } from "date-fns";
 import { isManager } from "../../../common/PrivilegeUtils";
-import { secondsToHumanString } from "../statistics/StatisticsFunctions";
 import { StaffOnlyToggle } from "./common/StaffOnlyToggle";
 import { StorefrontVisibleToggle } from "./common/StorefrontVisibleToggle";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
@@ -30,7 +25,6 @@ function sortItemsByName(items: InventoryItem[]): InventoryItem[] {
 }
 
 export default function InventoryPage() {
-  const navigate = useNavigate();
   const currentUser = useCurrentUser();
 
   const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
