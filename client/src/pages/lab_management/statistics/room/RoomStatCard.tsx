@@ -2,17 +2,15 @@ import { Card, CardHeader, Divider, Stack, Typography } from "@mui/material";
 import AuditLogEntity from "../../audit_logs/AuditLogEntity";
 import { VerboseRoomSwipe } from "./RoomStats";
 import { Box } from "@mui/system";
-import { ScatterChart } from '@mui/x-charts/ScatterChart';
-import { chartsTooltipClasses, LineChart } from "@mui/x-charts";
-import { formatSecondsToHoursMinutes, formatTimeToMillisecondsUTC, getDateRange, secondsToHumanString } from "../StatisticsFunctions";
-import { DatasetType } from "@mui/x-charts/internals";
+import { LineChart } from "@mui/x-charts";
+import { getDateRange } from "../StatisticsFunctions";
 
 type RoomStatCardProps = {
   relevantRoomSwipes: VerboseRoomSwipe[]
 }
 
 
-export function RoomStatCard({ relevantRoomSwipes: relevantRoomSwipes }: RoomStatCardProps) {
+export function RoomStatCard({ relevantRoomSwipes }: RoomStatCardProps) {
   var uniqueUsers: number[] = [];
   var sumSwipesPerDayOfWeek = [0, 0, 0, 0, 0, 0, 0];
   var earliestDate: Date | undefined = undefined;
@@ -44,9 +42,9 @@ export function RoomStatCard({ relevantRoomSwipes: relevantRoomSwipes }: RoomSta
 
     //increment swipes per exact date
     const sumSwipesPerDateIndex = sumSwipesPerDate.findIndex((item) => 
-      item.date.getFullYear() == date.getFullYear()
-      && item.date.getMonth() == date.getMonth()
-      && item.date.getDate() == date.getDate()
+      item.date.getFullYear() === date.getFullYear()
+      && item.date.getMonth() === date.getMonth()
+      && item.date.getDate() === date.getDate()
     );
     if (sumSwipesPerDateIndex === -1) {
       sumSwipesPerDate.push({date, num: 1, id: date.getTime()});
