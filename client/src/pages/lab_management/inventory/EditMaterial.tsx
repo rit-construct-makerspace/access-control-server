@@ -27,7 +27,7 @@ export default function EditMaterial({ itemId, onClose }: EditMaterialProps) {
     ],
   });
 
-  const [deleteInventoryItem, ] = useMutation(DELETE_INVENTORY_ITEM, {
+  const [deleteInventoryItem] = useMutation(DELETE_INVENTORY_ITEM, {
     variables: { id: itemId },
     refetchQueries: [
       { query: GET_INVENTORY_ITEMS },
