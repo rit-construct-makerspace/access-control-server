@@ -202,6 +202,5 @@ export async function getAccountsLimit(searchText?: string, limit = 25): Promise
     .orWhereILike("Users.lastName", `%${searchText}%`)
     .select("CurrencyAccounts.*").limit(limit).orderBy("id", "asc");
 
-  console.log(res);
   return res;
 }
