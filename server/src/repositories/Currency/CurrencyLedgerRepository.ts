@@ -44,26 +44,32 @@ export async function getCurrencyLedgerEntries(): Promise<CurrencyLedgerRow[]> {
     return result;
 }
 
-export async function getCurrencyLedgerEntriesLimit(searchText?: string): Promise<CurrencyLedgerRow[]> {
+/**
+ * 
+ * @param searchText optional parmeter to filter the entries by
+ * @param limit The number of entries ot limit the return to (defaults to 100)
+ * @returns up to {@link limit} entries that match the {@link searchText}
+ */
+export async function getCurrencyLedgerEntriesLimit(searchText?: string, limit = 100): Promise<CurrencyLedgerRow[]> {
     if (!searchText || searchText === "") {
-        return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc").limit(100);
+        return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc").limit(limit);
     }
 
     if (Number.isNaN(Number(searchText))) {
-        // searchText can be compared to the number fields
+        // searchText can't be compared to the number fields
         return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
             .whereILike("description", `%${searchText}%`)
             .orWhereILike("source", `%${searchText}%`)
-            .limit(100);
+            .limit(limit);
     }
 
-    return await knex("CurrencyLedger").select("*").orderBy("dateTime", "asc")
+    return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
         .where("id", searchText)
         .orWhere("accountID", searchText)
         .orWhere("amount", searchText)
         .orWhere("atxID", searchText)
         .orWhere("refID", searchText)
-        .limit(100);
+        .limit(limit);
 }
 
 export async function getCurrencyLedgerEntry(id: number): Promise<CurrencyLedgerRow> {

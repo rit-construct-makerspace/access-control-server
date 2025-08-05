@@ -181,9 +181,15 @@ export async function getAccountOwner(accountID: number): Promise<AccountOwner |
   return undefined;
 }
 
-export async function getAccountsLimit(searchText?: string): Promise<CurrencyAccountsRow[]> {
+/**
+ * 
+ * @param searchText The query to filter the accounts by, can be undefined
+ * @param limit The number of accounts to limit the search to (defaults to 25)
+ * @returns Up to {@link limit} accounts that match the {@link searchText}
+ */
+export async function getAccountsLimit(searchText?: string, limit = 25): Promise<CurrencyAccountsRow[]> {
   if (!searchText || searchText === "") {
-    return (await knex("CurrencyAccounts").select("*").limit(25).orderBy("id", "asc"));
+    return (await knex("CurrencyAccounts").select("*").limit(limit).orderBy("id", "asc"));
   }
 
   const res = await knex("CurrencyAccounts")
@@ -194,7 +200,7 @@ export async function getAccountsLimit(searchText?: string): Promise<CurrencyAcc
     .orWhereILike("Organizations.displayname", `%${searchText}%`)
     .orWhereILike("Users.firstName", `%${searchText}%`)
     .orWhereILike("Users.lastName", `%${searchText}%`)
-    .select("CurrencyAccounts.*").limit(25).orderBy("id", "asc");
+    .select("CurrencyAccounts.*").limit(limit).orderBy("id", "asc");
 
   console.log(res);
   return res;
