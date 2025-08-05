@@ -323,3 +323,13 @@ export async function revokeUserTrainer(userID: number, equipmentID: number): Pr
 export async function getUserByAccountID(accountID: number): Promise<UserRow | undefined> {
   return await knex("Users").where({ accountID: accountID }).select("*").first();
 }
+
+export async function setForceArchive(userID: number, force: boolean | null): Promise<UserRow | undefined> {
+  if (force === true) {
+    await archiveUser(userID, true);
+  } else if (force === false) {
+    await archiveUser(userID, false);
+  }
+
+  return await knex("Users").where("id", userID).update("forceArchive", force).returning("*").first();
+}
