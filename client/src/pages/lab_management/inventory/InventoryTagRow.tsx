@@ -1,15 +1,11 @@
-import PrettyModal from "../../../common/PrettyModal";
-import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery } from "@apollo/client";
-import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
+import { useMutation } from "@apollo/client";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
-import { Box, Chip, IconButton, MenuItem, Select, Stack, TableCell, TableRow, TextField } from "@mui/material";
+import { Chip, MenuItem, Select, Stack, TableCell, TableRow, TextField } from "@mui/material";
 import { useState } from "react";
 import ActionButton from "../../../common/ActionButton";
-import AuditLogEntity from "../audit_logs/AuditLogEntity";
 import { DELETE_INVENTORY_TAG, GET_INVENTORY_TAGS, UPDATE_INVENTORY_TAG } from "../../../queries/inventoryQueries";
 
 const CHIP_COLORS: ("default" | "primary" | "secondary" | "warning" | "info" | "error" | "success")[] = ["primary", "secondary", "warning", "info", "error", "success"];

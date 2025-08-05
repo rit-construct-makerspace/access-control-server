@@ -1,6 +1,6 @@
 import { Alert, Button, Card, Checkbox, FormControl, FormControlLabel, FormGroup, IconButton, InputLabel, MenuItem, Select, Stack, Typography } from "@mui/material";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { ChangeEvent, ReactElement, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { MAKE_USER_MANAGER, MAKE_USER_STAFF, MAKE_USER_TRAINER, REVOKE_USER_MANAGER, REVOKE_USER_STAFF, REVOKE_USER_TRAINER, SET_USER_ADMIN } from "../../../queries/permissionQueries";
 import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
@@ -124,7 +124,7 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                                                     <Stack direction={props.isMobile ? "column" : "row"} justifyContent="space-between">
                                                         <Typography variant="body2">{zone.name} ID: {zone.id}</Typography>
                                                         {
-                                                            isManagerFor(currentUser, zone.id) && !(currentUser.id == props.user.id)
+                                                            isManagerFor(currentUser, zone.id) && !(currentUser.id === props.user.id)
                                                                 ? <IconButton color="error" onClick={() => { removeManagerPerms(zone.id) }}>
                                                                     <DeleteIcon />
                                                                 </IconButton>

@@ -1,9 +1,8 @@
 import { useQuery } from "@apollo/client";
-import { Grid, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { useImmer } from "use-immer";
 import RequestWrapper from "../../../common/RequestWrapper";
-import { GET_LATEST_SUBMISSION, GET_SUBMISSION, GET_SUBMISSIONS } from "../../../queries/getSubmissions";
+import { GET_LATEST_SUBMISSION } from "../../../queries/getSubmissions";
 import { GET_MODULE } from "../../../queries/trainingQueries";
 import { Module } from "../../../types/Quiz";
 import Page from "../../Page";

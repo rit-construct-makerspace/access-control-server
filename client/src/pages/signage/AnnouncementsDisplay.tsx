@@ -3,7 +3,7 @@ import { Box, Divider, LinearProgress, Slide, Typography } from "@mui/material";
 import { Announcement, GET_ANNOUNCEMENTS } from "../../queries/announcementsQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { Stack } from "@mui/system";
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import MakeQRCode from "../../assets/make-qr-code.png";
 

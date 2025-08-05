@@ -1,4 +1,4 @@
-import { Box, ButtonBase, Stack, Typography } from "@mui/material";
+import { ButtonBase, Stack, Typography } from "@mui/material";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import NavLink from "../../top_nav/NavLink";
 import InventoryIcon from "@mui/icons-material/Inventory";

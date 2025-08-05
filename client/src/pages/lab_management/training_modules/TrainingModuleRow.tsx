@@ -1,6 +1,5 @@
 import { CardActionArea, Stack, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { ObjectSummary } from "../../../types/Common";
 import PublishTrainingModuleButton from "./PublishTrainingModuleButton";
 import ArchiveTrainingModuleButton from "./ArchiveTrainingModuleButton";
 import { TrainingModule } from "../../../common/TrainingModuleUtils";

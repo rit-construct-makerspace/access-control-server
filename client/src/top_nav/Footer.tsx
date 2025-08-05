@@ -1,9 +1,7 @@
-import { AppBar, Link, Stack, Typography, useTheme } from "@mui/material";
+import { AppBar, Link, Stack, Typography } from "@mui/material";
 
 
 export default function Footer() {
-
-    const theme = useTheme();
 
     return (
         <Stack marginTop="auto" justifyContent="flex-end">
