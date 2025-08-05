@@ -8,7 +8,7 @@ import { useCurrentUser } from "../../../../common/CurrentUserProvider";
 export function StorefrontVisibleToggle(props: { item: InventoryItem }) {
   const currentUser = useCurrentUser();
 
-  const [setStorefront, setStorefrontMutation] = useMutation(SET_STOREFRONT_VISIBLE, {
+  const [setStorefront] = useMutation(SET_STOREFRONT_VISIBLE, {
     variables: {id: props.item.id, storefrontVisible: !props.item.storefrontVisible}, 
     refetchQueries: [{query: GET_INVENTORY_ITEMS}]});
 
