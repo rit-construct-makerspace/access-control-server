@@ -279,10 +279,13 @@ export function setupStagingAuth(app: express.Application) {
     }
 
     // Archive user if they do not have a whitelisted role
-    const whitelist = (process.env.USER_WHITELIST ?? "").split(",");
-    const roles: string[] = ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"]
-    if (!roles.some((role) => (whitelist.includes(role)))) {
-      await archiveUser(existingUser.id);
+    if (process.env.USER_WHITELIST) { // If the env varaible is not set, skip the check. We don't want to archive everyone
+      const whitelist = process.env.USER_WHITELIST.split(",");
+      const roles: string[] = ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"];
+
+      if (!roles.some((role) => (whitelist.includes(role)))) {
+        await archiveUser(existingUser.id);
+      }
     }
 
     done(null, ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);
