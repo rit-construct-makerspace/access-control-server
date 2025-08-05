@@ -153,7 +153,7 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
     const transaction = new Currency.Transaction(
       "3DPrinterOS",
       `Transaction from 3DPrinterOS for user '${username}' of ${Currency.centsToDollarString(amountCents)} with comment '${comment}'`,
-      [{ name: "3D Printer OS Transaction", cents: amountCents }],
+      [{ name: "3D Printer OS Print", cents: amountCents }],
       false
     );
 
