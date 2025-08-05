@@ -283,9 +283,7 @@ export function setupStagingAuth(app: express.Application) {
       const whitelist = process.env.USER_WHITELIST.split(",");
       const roles: string[] = ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"];
 
-      if (!roles.some((role) => (whitelist.includes(role)))) {
-        await archiveUser(existingUser.id);
-      }
+      await archiveUser(existingUser.id, !roles.some((role) => (whitelist.includes(role))));
     }
 
     done(null, ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);

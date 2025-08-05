@@ -216,11 +216,12 @@ export async function setNotes(
 
 /**
  * Archive a User
- * @param userID ID of user to archive
+ * @param userID ID of user to modify
+ * @param archive Whether to archive or unarchive the user
  * @returns updated User
  */
-export async function archiveUser(userID: number): Promise<UserRow> {
-  await knex("Users").where({ id: userID }).update({ archived: true });
+export async function archiveUser(userID: number, archive: boolean): Promise<UserRow> {
+  await knex("Users").where({ id: userID }).update({ archived: archive });
   return await getUserByID(userID);
 }
 
