@@ -31,3 +31,13 @@ export async function getOrganizationByUsername(username: string): Promise<Organ
 export async function getOrganizationByAccountID(accountID: number): Promise<OrganizationsRow | undefined> {
   return await knex("Organizations").where({ accountID: accountID }).select("*").first();
 }
+
+export async function searchOrganizationsLimit(searchText?: string, limit = 100): Promise<OrganizationsRow[]> {
+  if (!searchText || searchText === "") {
+    return await knex("Organizations").select("*").limit(limit);
+  }
+
+  return await knex("Organizations").select("*").limit(limit)
+    .whereILike("displayname", `%${searchText}%`)
+    .orWhereILike("username", `%${searchText}%`);
+}
