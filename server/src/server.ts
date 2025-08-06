@@ -961,6 +961,7 @@ async function startServer() {
   const PORT = process.env.PORT || 3000;
 
   console.log(process.env.ID_FORMAT);
+  Emailer.send_email();
 
   app.listen({ port: PORT }, (): void =>
     console.log(

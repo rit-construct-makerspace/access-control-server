@@ -11,12 +11,12 @@ export function send_email() {
     ], tax: 243 });
     
     mg.messages.create(MAILGUN_DOMAIN, {
-        from: `make.rit.edu <mailgun@${MAILGUN_DOMAIN}>`,
+        from: `make.rit.edu <receipts@${MAILGUN_DOMAIN}>`,
         to: ["res3453@rit.edu"],
         subject: "Test Receipt",
         text: content.text,
         html: content.html
     })
-        .then(msg => console.log(msg)) // logs response data
-        .catch(err => console.error(err)); // logs any error
+        .then((msg: any) => console.log(msg)) // logs response data
+        .catch((err: any) => console.error(err)); // logs any error
 }
