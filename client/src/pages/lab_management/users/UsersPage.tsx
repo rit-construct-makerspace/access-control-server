@@ -7,7 +7,6 @@ import { GET_NUM_USERS, GET_USERS_LIMIT, PartialUser } from "../../../queries/ge
 import RequestWrapper from "../../../common/RequestWrapper";
 import UserModal from "./UserModal";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import AdminPage from "../../AdminPage";
 
 export default function UsersPage() {
   const { makerspaceID, userID } = useParams<{ makerspaceID: string, userID: string }>();

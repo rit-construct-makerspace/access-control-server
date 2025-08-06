@@ -5,7 +5,6 @@ import { useState } from "react";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
-import { GET_ZONE_DEFAULT_HOURS } from "./ManageMakerspaceHours";
 
 export const UPDATE_DEFAULT_HOURS = gql`
   mutation UpdateDefaultHours($hours: DefaultHoursInput!) {

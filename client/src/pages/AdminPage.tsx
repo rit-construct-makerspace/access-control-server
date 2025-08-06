@@ -1,5 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
-import Typography from "@mui/material/Typography";
+import { ReactNode, useEffect, useState } from "react";
 import { Stack } from "@mui/material";
 import { gql, useQuery } from "@apollo/client";
 import RequestWrapper from "../common/RequestWrapper";

@@ -1,16 +1,9 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { Box, Button, Divider, FormControlLabel, IconButton, InputLabel, MenuItem, Select, Stack, styled, Switch, Tab, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Tabs, TextareaAutosize, TextField, Typography } from "@mui/material";
-import PageSectionHeader from "../../../common/PageSectionHeader";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useState } from "react";
+import { Box, Button, FormControlLabel, InputLabel, MenuItem, Select, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, TextField, Typography } from "@mui/material";
+import { useMutation, useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
-import { DELETE_INVENTORY_LEDGER, GET_LEDGERS } from "../../../queries/inventoryQueries";
-import AuditLogEntity from "../audit_logs/AuditLogEntity";
-import { InventoryLedger } from "../../../types/InventoryItem";
-import { format } from "date-fns";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { CREATE_MAINTENANCE_LOG, CREATE_RESOLUTION_LOG, DELETE_MAINTENANCE_LOG, GET_MAINTENANCE_LOGS, GET_MAINTENANCE_TAGS, GET_RESOLUTION_LOGS, MaintenanceLogItem, ResolutionLogItem } from "../../../queries/maintenanceLogQueries";
-import MaintenanceLogEntry from "./MaintenanceLogEntry";
-import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { CREATE_RESOLUTION_LOG, DELETE_MAINTENANCE_LOG, GET_MAINTENANCE_LOGS, GET_MAINTENANCE_TAGS, GET_RESOLUTION_LOGS, ResolutionLogItem } from "../../../queries/maintenanceLogQueries";
 import AdminPage from "../../AdminPage";
 import LabelIcon from '@mui/icons-material/Label';
 import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
@@ -37,20 +30,6 @@ export default function ResolutionLogPage() {
 
   const issueID = issueParams.get("id");
   const [autoDelete, setAutoDelete] = useState<boolean>(!!issueParams.get("id"));
-
-  const currentUser = useCurrentUser();
-
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
 
   const navigate = useNavigate();
 
@@ -111,7 +90,7 @@ export default function ResolutionLogPage() {
                     >
                       <TableSortLabel
                         direction={timestampSort}
-                        onClick={() => setTimestampSort(timestampSort == 'asc' ? 'desc' : 'asc')}
+                        onClick={() => setTimestampSort(timestampSort === 'asc' ? 'desc' : 'asc')}
                       >
                         Timestamp
                       </TableSortLabel>
@@ -127,7 +106,7 @@ export default function ResolutionLogPage() {
                     >
                       <TableSortLabel
                         direction={authorSort}
-                        onClick={() => setAuthorSort(authorSort == 'asc' ? 'desc' : 'asc')}
+                        onClick={() => setAuthorSort(authorSort === 'asc' ? 'desc' : 'asc')}
                       >
                         Author
                       </TableSortLabel>
@@ -148,7 +127,7 @@ export default function ResolutionLogPage() {
                   {resolutionLogsQueryResult.data && resolutionLogsQueryResult.data.getResolutionLogsByEquipment.map((item: ResolutionLogItem) => (
                     <ResolutionLogEntry logItem={item} allTags={maintenanceTagsResult.data?.getMaintenanceTags ?? []} />
                   ))}
-                  {!resolutionLogsQueryResult.data || resolutionLogsQueryResult.data.getResolutionLogsByEquipment.length == 0 && <Typography variant="h6" color={"secondary"} p={3}>No logs.</Typography>}
+                  {(!resolutionLogsQueryResult.data || (resolutionLogsQueryResult.data.getResolutionLogsByEquipment.length === 0)) && <Typography variant="h6" color={"secondary"} p={3}>No logs.</Typography>}
                 </TableBody>
               </Table>
             </Box>
@@ -157,9 +136,9 @@ export default function ResolutionLogPage() {
               <Stack direction={"column"} width={"15%"}>
                 <InputLabel>Instance</InputLabel>
                 <RequestWrapper loading={instancesQueryResult.loading} error={instancesQueryResult.error}>
-                  <Select value={newInstance} onChange={(e) => setNewInstance(Number(e.target.value))} fullWidth defaultValue={instancesQueryResult.data?.equipmentInstances.length == 1 ? instancesQueryResult.data?.equipmentInstances[0].id: (Number(issueParams.get("instance")) ?? null)}>
+                  <Select value={newInstance} onChange={(e) => setNewInstance(Number(e.target.value))} fullWidth defaultValue={instancesQueryResult.data?.equipmentInstances.length === 1 ? instancesQueryResult.data?.equipmentInstances[0].id: (Number(issueParams.get("instance")) ?? null)}>
                     {instancesQueryResult.data?.equipmentInstances.map((instance: EquipmentInstance) => (
-                      <MenuItem value={instance.id} defaultChecked={instancesQueryResult.data?.equipmentInstances.length == 1}>{instance.name}</MenuItem>
+                      <MenuItem value={instance.id} defaultChecked={instancesQueryResult.data?.equipmentInstances.length === 1}>{instance.name}</MenuItem>
                     ))}
                   </Select>
                 </RequestWrapper>

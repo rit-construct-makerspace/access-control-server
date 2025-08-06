@@ -71,10 +71,10 @@ export default function ResolutionLogEntry({ logItem, allTags }: { logItem: Reso
       </TableCell>
       <TableCell>
         <Stack direction={isMobile ? "row" : "column"}>
-          <Typography color={localStorage.getItem("themeMode") == "dark" ? "grey.300" : "grey.700"} sx={{ width: 70 }} variant="body2">
+          <Typography color={localStorage.getItem("themeMode") === "dark" ? "grey.300" : "grey.700"} sx={{ width: 70 }} variant="body2">
             {date}
           </Typography>
-          <Typography color={localStorage.getItem("themeMode") == "dark" ? "grey.300" : "grey.700"} sx={{ width: 93 }} variant="body2">
+          <Typography color={localStorage.getItem("themeMode") === "dark" ? "grey.300" : "grey.700"} sx={{ width: 93 }} variant="body2">
             {time}
           </Typography>
         </Stack>

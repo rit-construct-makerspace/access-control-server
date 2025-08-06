@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Box, Divider, Stack, Switch, Typography } from "@mui/material";
-import InventoryRow from "../../../common/InventoryRow";
+import { Divider, Stack, Switch } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import InventoryItem from "../../../types/InventoryItem";
 import AddToCartModal from "./AddToCartModal";
@@ -10,22 +9,13 @@ import { v4 as uuidv4 } from "uuid";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_INVENTORY_ITEMS } from "../../../queries/inventoryQueries";
-import AdminPage from "../../AdminPage";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isAdmin, isManager, isStaff } from "../../../common/PrivilegeUtils";
 import Page from "../../Page";
-import Privilege from "../../../types/Privilege";
 import { ListingCard } from "./ListingCard";
 import { ListingModal } from "./ListingModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 
-const REMOVE_INVENTORY_ITEM_AMOUNT = gql`
-  mutation RemoveInventoryItemAmount($itemID: ID!, $amountToRemove: Int!) {
-    removeItemAmount(itemId: $itemID, count: $amountToRemove) {
-      id
-    }
-  }
-`;
 
 const CHECKOUT_ITEMS = gql`
   mutation CheckoutItems($items: [CartItem], $notes: String, $recievingUserID: ID) {
@@ -88,7 +78,7 @@ export default function StorefrontPage() {
 
   const addToShoppingCart = (item: InventoryItem, count: number) =>
     setShoppingCart((draft) => {
-      const existing = shoppingCart.find((row) => row.item.id == item.id)
+      const existing = shoppingCart.find((row) => row.item.id === item.id)
       if (!existing) {
         draft.push({
           id: uuidv4(),

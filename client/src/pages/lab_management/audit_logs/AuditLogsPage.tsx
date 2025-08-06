@@ -87,16 +87,16 @@ export default function LogPage() {
 
   const [filters, setFilters] = useState<Filters>({
     errors: localStorage.getItem("errors") ?? "both",
-    welcome: localStorage.getItem("welcome") == "1",
-    auth: localStorage.getItem("auth") == "1",
-    status: localStorage.getItem("status") == "1",
-    state: localStorage.getItem("state") == "1",
-    help: localStorage.getItem("help") == "1",
-    message: localStorage.getItem("message") == "1",
-    server: localStorage.getItem("server") == "1",
-    training: localStorage.getItem("training") == "1",
-    admin: localStorage.getItem("admin") == "1",
-    uncategorized: localStorage.getItem("uncategorized") == "1"
+    welcome: localStorage.getItem("welcome") === "1",
+    auth: localStorage.getItem("auth") === "1",
+    status: localStorage.getItem("status") === "1",
+    state: localStorage.getItem("state") === "1",
+    help: localStorage.getItem("help") === "1",
+    message: localStorage.getItem("message") === "1",
+    server: localStorage.getItem("server") === "1",
+    training: localStorage.getItem("training") === "1",
+    admin: localStorage.getItem("admin") === "1",
+    uncategorized: localStorage.getItem("uncategorized") === "1"
   });
 
   function handleAdvSearchChange(e: any, property: string) {
