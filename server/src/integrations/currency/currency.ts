@@ -10,8 +10,7 @@ export enum MakeMoneyError {
 };
 
 function calculateTax(amountCents: number): number {
-  const taxRatePercent = 4.5;
-  return Math.round(amountCents * taxRatePercent / 100);
+  return Math.round(amountCents * TAX_RATE_PERCENT / 100);
 }
 
 // Split the price of something such that newItemPrice + taxOnItem = amountCents
