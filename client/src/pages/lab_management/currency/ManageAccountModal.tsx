@@ -60,8 +60,8 @@ export default function ManageAccountModal(props: ManageAccountModalProps) {
           <Typography><b>Credits:</b> {moneyForamtter.format(props.account.balance / 100)}</Typography>
         </Stack>
         <Stack direction={"row"} spacing={1} width={"100%"}>
-          <Button color="success" variant="contained" onClick={() => handleAdjustment(amount)}>
-            Add
+          <Button color="error" variant="contained" onClick={() => (handleAdjustment(amount * -1))}>
+            Deduct
           </Button>
           <TextField
             label="Amount"
@@ -80,7 +80,9 @@ export default function ManageAccountModal(props: ManageAccountModalProps) {
             }}
             fullWidth
           />
-          <Button color="error" variant="contained" onClick={() => (handleAdjustment(amount * -1))}>Deduct</Button>
+          <Button color="success" variant="contained" onClick={() => handleAdjustment(amount)}>
+            Add
+          </Button>
         </Stack>
       </Stack>
     </PrettyModal>
