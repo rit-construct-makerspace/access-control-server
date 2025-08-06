@@ -331,5 +331,11 @@ export async function setForceArchive(userID: number, force: boolean | null): Pr
     await archiveUser(userID, false);
   }
 
-  return await knex("Users").where("id", userID).update("forceArchive", force).returning("*").first();
+  const result = await knex("Users").where("id", userID).update("forceArchive", force).returning("*");
+
+  if (result.length > 0) {
+    return result[0];
+  } else {
+    return undefined;
+  }
 }
