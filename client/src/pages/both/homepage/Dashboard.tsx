@@ -1,5 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
-import { Alert, Box, Divider, Grid, IconButton, Stack } from "@mui/material";
+import { Box, Divider, Grid, IconButton, Stack } from "@mui/material";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";

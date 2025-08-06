@@ -1,4 +1,4 @@
-import { Card, CardContent, Stack, Typography } from "@mui/material";
+import { Card, CardContent, Typography } from "@mui/material";
 import { Announcement } from "../../../queries/announcementsQueries";
 import Markdown from "react-markdown";
 

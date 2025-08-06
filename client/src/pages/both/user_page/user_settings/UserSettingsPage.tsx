@@ -3,22 +3,12 @@ import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_USER } from "../../../lab_management/users/UserModal";
 import InfoBlob from "../../../lab_management/users/InfoBlob";
-import styled from "styled-components";
 import EditIcon from '@mui/icons-material/Edit';
 import { useEffect, useState } from "react";
 import { UPDATE_STUDENT_PROFILE } from "../../../maker/signup/SignupPage";
 import RequestWrapper2 from "../../../../common/RequestWrapper2";
 import { stringAvatar } from "../../../../common/avatarGenerator";
 import ThemeToggle from "../../../../left_nav/ThemeToggle";
-
-const StyledInfo = styled.div`
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  row-gap: 32px;
-  width: auto;
-`;
-
 
 export default function UserSettingsPage() {
     const currentUser = useCurrentUser();

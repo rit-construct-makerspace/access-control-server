@@ -1,6 +1,4 @@
-import React from "react";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { Button, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { useMutation } from "@apollo/client";
 import { DELETE_INVENTORY_LEDGER, GET_LEDGERS } from "../../../queries/inventoryQueries";
 import DeleteIcon from '@mui/icons-material/Delete';
