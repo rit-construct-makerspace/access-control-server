@@ -3,8 +3,6 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { Chip, Stack } from '@mui/material';
 import { useState } from 'react';
 
-const CHIP_COLORS: ("default" | "primary" | "secondary" | "warning" | "info" | "error" | "success")[] = ["primary", "secondary", "warning", "info", "error", "success"];
-
 export default function InventoryTagChip(props: { id: number, label: string, color: string, removeTag: (id: number) => void}) {
 
   const [isHover, setIsHover] = useState(false);

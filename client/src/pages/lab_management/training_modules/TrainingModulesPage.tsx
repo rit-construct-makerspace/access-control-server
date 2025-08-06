@@ -1,16 +1,12 @@
-import React, { useState } from "react";
-import Page from "../../Page";
+import { useState } from "react";
 import SearchBar from "../../../common/SearchBar";
-import { Box, Divider, Stack, Typography } from "@mui/material";
+import { Divider, Stack, Typography } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client"
 import { LoadingButton } from "@mui/lab";
-import RequestWrapper from "../../../common/RequestWrapper";
 import TrainingModuleRow from "./TrainingModuleRow";
-import { GET_TRAINING_MODULES, GET_ARCHIVED_TRAINING_MODULES } from "../../../queries/trainingQueries";
-import { ObjectSummary } from "../../../types/Common";
-import AdminPage from "../../AdminPage";
+import { GET_TRAINING_MODULES } from "../../../queries/trainingQueries";
 import { TrainingModule } from "../../../common/TrainingModuleUtils";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { useIsMobile } from "../../../common/IsMobileProvider";

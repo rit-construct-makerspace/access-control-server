@@ -1,10 +1,9 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { Box, Button, Collapse, CollapseProps, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, styled, TextField, Tooltip } from "@mui/material";
+import { Box, Button, Collapse, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Tooltip } from "@mui/material";
 import gql from "graphql-tag";
 import { ReactElement, useEffect, useState } from "react";
 import PageSectionHeader from "../../../../common/PageSectionHeader";
 import GET_EQUIPMENTS from "../../../../queries/equipmentQueries";
-import RequestWrapper from "../../../../common/RequestWrapper";
 import Equipment from "../../../../types/Equipment";
 import CloseIcon from '@mui/icons-material/Close';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
@@ -15,7 +14,6 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { EquipmentStatCard } from "./EquipmentStatCard";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { JSX } from "react/jsx-runtime";
 import { secondsToHumanString } from "../StatisticsFunctions";
 
 const GET_VERBOSE_EQUIPMENT_SESSIONS = gql`
@@ -83,12 +81,12 @@ export function EquipmentStats() {
 
   function handleStartDateChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setStartDate(e.target.value)
-    if (startDate && startDate != "") setShowClearButton(true);
+    if (startDate && startDate !== "") setShowClearButton(true);
   }
 
   function handleEndDateChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setEndDate(e.target.value)
-    if (endDate && endDate != "") setShowClearButton(true);
+    if (endDate && endDate !== "") setShowClearButton(true);
   }
 
   function handleEquipmentIDsChange(e: SelectChangeEvent<string[]>) {
@@ -105,8 +103,8 @@ export function EquipmentStats() {
 
   function handleSubmit() {
     var variables = {
-      ...(startDate && startDate != "" && { startDate }),
-      ...(endDate && endDate != "" && { endDate }),
+      ...(startDate && startDate !== "" && { startDate }),
+      ...(endDate && endDate !== "" && { endDate }),
       ...(equipmentIDs && equipmentIDs.length > 0 && { equipmentIDs })
     };
     getEquipmentSessions({ variables });
@@ -133,7 +131,7 @@ export function EquipmentStats() {
 
   function handleCSVExport() {
     let csvContent =
-      Object.keys(getEquipmentSessionsResult.data.getEquipmentSessionsWithAttachedEntities[0] as VerboseEquipmentSession).map((s: string) => s == "__typename" ? '' : `${s},`).join('')
+      Object.keys(getEquipmentSessionsResult.data.getEquipmentSessionsWithAttachedEntities[0] as VerboseEquipmentSession).map((s: string) => s === "__typename" ? '' : `${s},`).join('')
       + '\n' + getEquipmentSessionsResult.data.getEquipmentSessionsWithAttachedEntities.map((e: VerboseEquipmentSession) => joinEquipmentSession(e)).join("\n");
     download(csvContent, "equipmentSessions.csv");
   }

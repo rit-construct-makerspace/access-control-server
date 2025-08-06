@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { Card, CardActions, Stack, Typography, useTheme } from "@mui/material";
-import { AccessCheck, AccessCheckExtraInfo, GET_USER, Hold } from "./UserModal";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
+import { Card, CardActions } from "@mui/material";
+import { AccessCheckExtraInfo, GET_USER } from "./UserModal";
+import { gql, useMutation } from "@apollo/client";
 import { LoadingButton } from "@mui/lab";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
-import { GET_ANY_EQUIPMENT_BY_ID, GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
-import InfoBlob from "./InfoBlob";
-import RequestWrapper from "../../../common/RequestWrapper";
 
 const APPROVE_CHECK = gql`
   mutation ApproveAccessCheck($id: ID!) {
@@ -53,12 +50,10 @@ export default function AccessCheckCard({ accessCheck, userID }: AccessCheckCard
   }, []);
   const isMobile = width <= 1100;
 
-  const theme = useTheme();
-
   return (
     <Card
       sx={{
-        backgroundColor: !approved ? (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100") : (localStorage.getItem("themeMode") == "dark" ? "lightGreen.800" : "lightGreen.100"),
+        backgroundColor: !approved ? (localStorage.getItem("themeMode") === "dark" ? "grey.900" : "grey.100") : (localStorage.getItem("themeMode") === "dark" ? "lightGreen.800" : "lightGreen.100"),
         border: `2px solid ${!approved ? "lightgrey" : "palegreen"}`,
         display: 'flex',
         flexDirection: 'row',
@@ -68,7 +63,7 @@ export default function AccessCheckCard({ accessCheck, userID }: AccessCheckCard
       }}
     >
       <div style={{ width: isMobile ? "100%" : "40%", marginLeft: "10px" }}>
-        <AuditLogEntity entityCode={"equipment:" + accessCheck.equipment.id + ":" + ((accessCheck.equipment != undefined) ? accessCheck.equipment.name : "Loading...")}></AuditLogEntity>
+        <AuditLogEntity entityCode={"equipment:" + accessCheck.equipment.id + ":" + ((accessCheck.equipment !== undefined) ? accessCheck.equipment.name : "Loading...")}></AuditLogEntity>
       </div>
       <CardActions>
         {!approved && (

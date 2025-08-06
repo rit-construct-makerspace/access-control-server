@@ -34,6 +34,7 @@ import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhere
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
+import { purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email.js"
 
 
@@ -61,7 +62,7 @@ async function startServer() {
   var exp = express();
   var wsserver = expressWs(exp);
   var app = wsserver.app;
-  
+
 
   //Configure CORS
   app.use(cors(CORS_CONFIG));
@@ -936,6 +937,7 @@ async function startServer() {
     console.log('Wiping daily records...');
     if (API_DEBUG_LOGGING) await createLog('It is now 4:00am. Wiping Daily Temp Records...', "server")
     await setDataPointValue(1, 0).then(async () => await createLog('Daily Visits reset.', "server"));
+    await purgeExpiredPassedModules().then(async (result) => await createLog(`Purged ${result} expired trainings.`, "server"));
     //await pruneNullLengthEquipmentSessions().then(async () => await createLog('Unfinished Equipment Sessions pruned.', "server"));;
   });
 

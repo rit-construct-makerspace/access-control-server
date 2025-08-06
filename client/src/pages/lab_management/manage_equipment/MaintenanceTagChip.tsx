@@ -3,8 +3,6 @@ import { useState } from "react";
 import CircleIcon from '@mui/icons-material/Circle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
-const CHIP_COLORS: ("default" | "primary" | "secondary" | "warning" | "info" | "error" | "success")[] = ["primary", "secondary", "warning", "info", "error", "success"];
-
 export default function MaintenanceTagChip(props: { id: number, label: string, color: string, removeTag: (id: number) => void}) {
 
   const [isHover, setIsHover] = useState(false);

@@ -3,7 +3,6 @@ import AuditLogEntity from "../../audit_logs/AuditLogEntity";
 import { VerboseEquipmentSession } from "./EquipmentStats";
 import { Box } from "@mui/system";
 import { ScatterChart } from '@mui/x-charts/ScatterChart';
-import { chartsTooltipClasses } from "@mui/x-charts";
 import { formatSecondsToHoursMinutes, formatTimeToMillisecondsUTC, secondsToHumanString } from "../StatisticsFunctions";
 
 type EquipmentStatCardProps = {

@@ -1,8 +1,4 @@
-import React from "react";
-import Page from "../../Page";
-import { Box, Card, CardContent, CardHeader, Stack, Typography } from "@mui/material";
-import { gql, OperationVariables, QueryResult } from "@apollo/client";
-import RequestWrapper from "../../../common/RequestWrapper";
+import { Card, CardContent, CardHeader, Typography } from "@mui/material";
 
 interface CountCardProps {
   count: string | null;

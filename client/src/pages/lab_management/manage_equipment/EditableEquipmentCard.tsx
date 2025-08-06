@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardActionArea,
@@ -6,12 +6,10 @@ import {
   CardContent,
   CardMedia,
   Typography,
-  Tooltip,
-  Button
+  Tooltip
 } from "@mui/material";
 import PublishEquipmentButton from "./PublishEquipmentButton";
 import ArchiveEquipmentButton from "./ArchiveEquipmentButton";
-import FilePresentIcon from '@mui/icons-material/FilePresent';
 import SopButton from "../../../common/SopButton";
 import LogsButton from "./LogsButton";
 
@@ -65,7 +63,7 @@ export default function EditableEquipmentCard({ id, name, to, archived, imageUrl
         </Typography>
         <div>
         {
-          sopUrl && sopUrl != ""
+          (sopUrl && sopUrl !== "")
             ? <SopButton appearance="icon-only" url={sopUrl} disabled={false} toolTipText="View SOP" buttonText="View SOP"></SopButton>
             : <SopButton appearance="icon-only" url={""} disabled={true} toolTipText="No SOP" buttonText="No SOP"></SopButton>
         }

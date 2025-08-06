@@ -6,14 +6,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { isValidElement, useEffect, useState } from "react";
 import ReaderCard from "./ReaderCard";
-import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import AddIcon from '@mui/icons-material/Add';
 
 export default function ReadersPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
   const getReadersResult = useQuery(GET_READERS, { pollInterval: 2000 });
-  const user = useCurrentUser();
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");

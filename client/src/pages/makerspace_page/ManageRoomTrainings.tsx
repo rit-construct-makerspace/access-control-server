@@ -5,8 +5,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { gql, useMutation, useQuery } from "@apollo/client";
 import GET_TRAINING_MODULES from "../../queries/trainingQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
-import { useCurrentUser } from "../../common/CurrentUserProvider";
-import { isManagerFor } from "../../common/PrivilegeUtils";
 import { useState } from "react";
 import { GET_ROOM } from "./MonitorRoomPage";
 import { useParams } from "react-router-dom";
@@ -33,7 +31,6 @@ export const REMOVE_TRAINING_FROM_ROOM = gql`
 `;
 export default function ManageRoomTrainings(props: ManageRoomTrainingsProps) {
     const { makerspaceID } = useParams<{ makerspaceID: string }>();
-    const currentUser = useCurrentUser();
 
     const getModuleResults = useQuery(GET_TRAINING_MODULES);
 
@@ -43,7 +40,7 @@ export default function ManageRoomTrainings(props: ManageRoomTrainingsProps) {
     const [newTraining, setNewTraining] = useState(0);
 
     async function handleNewTraining() {
-        if (newTraining == 0) {
+        if (newTraining === 0) {
             window.alert("Select a training");
             return;
         }
@@ -78,8 +75,8 @@ export default function ManageRoomTrainings(props: ManageRoomTrainingsProps) {
                 const rawModules: [TrainingModule] = data.modules;
                 const possibleModuels = rawModules.filter((possible) =>
                 (
-                    (possible.makerspaceID == null || possible.makerspaceID == Number(makerspaceID)) && // Has permission to use this training
-                    !props.trainings.some((existing) => existing.id == possible.id) // This training is not already assigned to the makerspace
+                    (possible.makerspaceID == null || possible.makerspaceID === Number(makerspaceID)) && // Has permission to use this training
+                    !props.trainings.some((existing) => existing.id === possible.id) // This training is not already assigned to the makerspace
                 ))
 
                 const sortedModules = possibleModuels.sort((a, b) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));

@@ -1,13 +1,9 @@
 import Page from "../../Page";
-import {Button, Grid, Stack, Typography} from "@mui/material";
+import {Button, Typography} from "@mui/material";
 import {useCallback} from "react";
-import {redirect, useNavigate} from "react-router-dom";
+import {redirect} from "react-router-dom";
 
 export default function LogoutPromptPage() {
-
-    const navigate = useNavigate();
-
-
     const logout = useCallback(() => {
         console.log("Logging out...")
         fetch("/logout", {
