@@ -28,6 +28,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { LoadingButton } from "@mui/lab";
+import ManageUserArchive from "./ManageUserArchive";
 
 const StyledInfo = styled.div`
   margin-top: 16px;
@@ -100,6 +101,8 @@ export const GET_USER = gql`
       ritUsername
       cardTagID
       notes
+      isArchived
+      forceArchive
       holds {
         id
         creator {
@@ -218,7 +221,6 @@ const DELETE_PASSED_MODULE = gql`
     deletePassedModule(userID: $userID, moduleID: $moduleID)
   }
 `;
-
 
 interface UserModalProps {
   selectedUserID: string;
@@ -532,6 +534,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
                   <PrivilegeControl user={user} isMobile={isMobile} />
                   <CardTagSettings userID={user.id} hasCardTag={(user.cardTagID != null && user.cardTagID != "")} />
+                  <ManageUserArchive userID={user.id} />
                 </Stack>
               </Stack>
 

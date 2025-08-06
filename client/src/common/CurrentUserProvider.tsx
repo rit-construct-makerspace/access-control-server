@@ -16,7 +16,7 @@ export const GET_CURRENT_USER = gql`
       lastName
       privilege
       setupComplete
-      archived
+      isArchived
       admin
       holds {
         removeDate
@@ -66,7 +66,7 @@ export interface CurrentUser {
   setupComplete: boolean;
   balance: string;
   hasHolds: boolean;
-  archived: boolean;
+  isArchived: boolean;
   passedModules: PassedModule[];
   accessChecks: AccessCheck[];
   cardTagID: string;
@@ -115,7 +115,7 @@ const visitor: CurrentUser = {
   trainingHolds: [],
   visitor: true,
   admin: false,
-  archived: false,
+  isArchived: false,
   manager: [],
   staff: [],
   trainer: []
