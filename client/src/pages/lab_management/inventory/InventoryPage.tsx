@@ -28,9 +28,6 @@ export default function InventoryPage() {
   const currentUser = useCurrentUser();
 
   const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWindowWidth(window.innerWidth);
-  }
 
   const [searchText, setSearchText] = useState<string>("");
   const [modalItemId, setModalItemId] = useState<string>("");
