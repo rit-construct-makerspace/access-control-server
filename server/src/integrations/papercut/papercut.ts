@@ -153,6 +153,7 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
 
     const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username,
       new Currency.Transaction(
+        new Date(),
         "3DPrinterOs",
         `Transaction from 3DPrinterOS for user '${username}' of ${Currency.centsToDollarString(amountCents)} with comment '${comment}'`,
         [

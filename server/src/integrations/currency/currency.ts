@@ -22,23 +22,84 @@ function splitTax(amountCents: number): { nonTax: number, tax: number } {
 
 
 export class Transaction {
+  date: Date
   source: string;
   description?: string;
   items: { name: string, cents: number }[];
   // subtotal is sum(items.cents)
+  tigerbucksUsed: number;
   taxCents: number;
-  constructor(source: string, description: string, items: { name: string, cents: number }[], applyTax: boolean) {
+  constructor(date: Date, source: string, description: string, items: { name: string, cents: number }[], applyTax: boolean) {
+    this.date = date;
     this.source = source;
     this.items = items;
     this.description = description;
     const subtotalCents = items.reduce((acc, obj) => acc + obj.cents, 0);
+    this.tigerbucksUsed = 0;
     this.taxCents = calculateTax(subtotalCents);
-
   }
 
-  public totalCents(): number {
-    const subtotalCents = this.items.reduce((acc, obj) => acc + obj.cents, 0);
-    return subtotalCents + this.taxCents;
+  // add tigerbucks 'promotion'
+  // if amount > cost, this will saturate at 0 and return the remaining
+  // this will recalculate tax such that remainingCents = subtotal + subtotal*taxRate
+  public useTigerbucks(amountUsed: number): number {
+    if (this.grandTotalIncludingTax() < 0) {
+      // this was a refund, dont use any tigerbucks
+      return amountUsed;
+    }
+
+    // if tigerbucks were already used for some reason, combine them to prepare for new calculation
+    if (this.tigerbucksUsed !== 0) {
+      throw "alreadt applied tigerbucks";
+      // amountUsed += this.tigerbucksUsed;
+      // this.tigerbucksUsed = 0;
+      // this.taxCents = calculateTax(this.subtotalBeforeTigerbucks())
+    }
+
+    // too much or just enough
+    if (amountUsed >= this.grandTotalIncludingTax()) {
+      const unused = amountUsed - this.grandTotalIncludingTax();
+      this.tigerbucksUsed = this.grandTotalIncludingTax();
+      this.taxCents = 0;
+      return unused;
+    }
+
+    // from here, amountUsed == grandTotal
+
+    // not entire cost, no tigerbucks leftover, NO TAX, dont need to split funny
+    if (this.taxCents == 0) {
+      this.tigerbucksUsed = amountUsed;
+      return 0;
+    }
+
+    // not entire cost, no tigerbucks leftover, YES TAX, need to split remaining funny s.t. subtotal + tax*subtotal = remaining cost
+    // TODO talk to lawyers about taxing original total vs post-tigerbucks total
+    // const centsRemaining = this.grandTotalIncludingTax() - amountUsed; 
+    // IDK what to do in this situation
+    this.tigerbucksUsed = 0;
+    // charge it all to atriumt
+    this.taxCents = calculateTax(this.subtotalBeforeTigerbucks());
+    return amountUsed;
+  }
+  /**
+   * @returns sum(items)
+   */
+  public subtotalBeforeTigerbucks(): number {
+    return this.items.reduce((acc, obj) => acc + obj.cents, 0);
+  }
+  /**
+   * 
+   * @returns sum(items) - tigerbucksUsed
+   */
+  public subtotalAfterTigerbucks(): number {
+    return this.subtotalBeforeTigerbucks() - (this.tigerbucksUsed ?? 0);
+  }
+  /**
+   * Calculate complete total
+   * @returns sum(items) - tigerbucksUsed + tax
+   */
+  public grandTotalIncludingTax(): number {
+    return this.subtotalAfterTigerbucks() + this.taxCents;
   }
 }
 
@@ -67,7 +128,7 @@ export async function getAccountBalance(username: string): Promise<number | Make
 
 export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction): Promise<boolean> {
   const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
-  const deltaCents = -transaction.totalCents(); // - if a charge, + if a refund
+  const deltaCents = -transaction.grandTotalIncludingTax(); // - if a charge, + if a refund
   var remaining = deltaCents;
   if (makeAccountID) { // found make account, use that first
     if (deltaCents < 0) { // Delta cents is negative, indicating a charge
