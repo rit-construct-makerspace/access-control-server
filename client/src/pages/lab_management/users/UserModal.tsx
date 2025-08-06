@@ -24,15 +24,7 @@ import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
 import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { LoadingButton } from "@mui/lab";
 import ManageUserArchive from "./ManageUserArchive";
-
-const StyledInfo = styled.div`
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  row-gap: 32px;
-`;
 
 export interface Hold {
   id: string;
