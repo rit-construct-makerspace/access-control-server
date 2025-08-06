@@ -12,7 +12,7 @@ export default interface InventoryItem {
   storefrontVisible: boolean;
   notes: string;
   description: string;
-  makerspaceID?: number;
+  makerspaceID: number;
   makerspace?: {
     id: number;
     name: string;

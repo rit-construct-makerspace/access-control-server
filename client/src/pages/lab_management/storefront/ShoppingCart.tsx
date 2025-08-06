@@ -7,6 +7,7 @@ import CheckoutModal from "./CheckoutModal";
 import EmptyPageSection from "../../../common/EmptyPageSection";
 import UseModal from "./InternalUseModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { Box } from "@mui/system";
 
 interface ShoppingCartProps {
   entries: ShoppingCartEntry[];
@@ -31,6 +32,39 @@ export default function ShoppingCart({
     .reduce((acc, { count, item }) => acc + count * item.pricePerUnit, 0)
     .toFixed(2);
 
+    console.log("ShoppingCart entries:", entries.map((entry) => ({
+      id: entry.id,
+      makerspaceID: entry.item.makerspaceID,
+      makerspace: entry.item.makerspace
+    })));
+
+  const groupedEntries = entries.reduce((groups: Record<string, ShoppingCartEntry[]>, entry: ShoppingCartEntry) => {
+    const key: number = entry.item.makerspaceID;
+    if (!groups[key]) {
+      groups[key] = [];
+    }
+    groups[key].push(entry);
+    return groups;
+  }, {});
+
+  const groupedEntriesMapping = Object.entries(groupedEntries).map(([makerspaceID, entries]) => (
+    <Box key={makerspaceID} sx={{ mb: 2 }}>
+      <Typography variant="h6" component="div" sx={{ mb: 1 }}>
+        {entries[0].item.makerspace?.name || "Unknown Makerspace"}
+      </Typography>
+      {entries.map((entry) => (
+        <ShoppingCartRow
+          key={entry.id}
+          shoppingCartEntry={entry}
+          removeEntry={() => removeEntry(entry.id)}
+          setEntryCount={(newCount: number) =>
+            setEntryCount(entry.id, newCount)
+          }
+        />
+      ))}
+    </Box>
+  ));
+
   return (
     <>
       <Typography variant="h5" component="div" sx={{ mb: 2 }}>
@@ -45,16 +79,7 @@ export default function ShoppingCart({
       )}
 
       <Stack spacing={1} divider={<Divider flexItem />}>
-        {entries.map((entry) => (
-          <ShoppingCartRow
-            shoppingCartEntry={entry}
-            key={entry.id}
-            removeEntry={() => removeEntry(entry.id)}
-            setEntryCount={(newCount: number) =>
-              setEntryCount(entry.id, newCount)
-            }
-          />
-        ))}
+        {groupedEntriesMapping}
       </Stack>
 
       {entries.length > 0 && (

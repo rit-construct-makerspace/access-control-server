@@ -38,7 +38,6 @@ export interface ShoppingCartEntry {
   id: string;
   item: InventoryItem;
   count: number;
-  makerspace: number;
 }
 
 function updateLocalStorage(cart: ShoppingCartEntry[] | null) {
@@ -94,8 +93,7 @@ export default function StorefrontPage() {
         draft.push({
           id: uuidv4(),
           item,
-          count,
-          makerspace: 0
+          count
         });
       } else {
         existing.count += count;

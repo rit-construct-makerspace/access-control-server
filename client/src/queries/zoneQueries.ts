@@ -110,6 +110,11 @@ export const GET_ZONES_WITH_ITEMS = gql`
       storefrontVisible
       notes
       description
+      makerspaceID
+      makerspace {
+        id
+        name
+      }
       tags {
         id
         label
