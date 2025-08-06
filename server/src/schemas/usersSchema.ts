@@ -79,6 +79,7 @@ export const UsersTypeDefs = gql`
     Is the user's account suspended/archived?
     """
     isArchived: Boolean
+    forceArchive: Boolean
   }
 
   input StudentUserInput {
