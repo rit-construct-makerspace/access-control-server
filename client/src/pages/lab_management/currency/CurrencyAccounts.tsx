@@ -1,7 +1,7 @@
 import { Button, Card, Grid, Stack, Typography } from "@mui/material";
 import gql from "graphql-tag";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import SearchBar from "../../../common/SearchBar";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";

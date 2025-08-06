@@ -16,8 +16,6 @@ export default function UserTraingingsPage() {
     const getAllModules = useQuery(GET_ALL_TRAINING_MODULES);
     const getAccessChecks = useQuery(GET_ACCESS_CHECKS_BY_USERID, {variables: {userID: user.id}});
 
-    const [modalID, setModalID] = useState<number | undefined>(undefined);
-
     const [width, setWidth] = useState<number>(window.innerWidth);
     function handleWindowSizeChange() {
         setWidth(window.innerWidth);
@@ -30,18 +28,6 @@ export default function UserTraingingsPage() {
     }, []);
 
     const isMobile = width <= 1100;
-
-    const [manageEquipment, setManageEquipment] = useState(false);
-    const [curEquipID, setCurEquipID] = useState(0);
-
-    function handleOpen(id: number) {
-        setCurEquipID(id);
-        setManageEquipment(true);
-    }
-
-    function handleClose() {
-        setManageEquipment(false);
-    }
 
     return (
         <Stack
@@ -63,12 +49,6 @@ export default function UserTraingingsPage() {
                     );
                     const passed = moduleStatuses.filter(
                         (ms: ModuleStatus) => ms.status === "Passed"
-                    );
-                    const notTaken = moduleStatuses.filter(
-                        (ms: ModuleStatus) => ms.status === "Not taken"
-                    );
-                    const locked = moduleStatuses.filter(
-                        (ms: ModuleStatus) => ms.status === "Locked"
                     );
 
                     return (

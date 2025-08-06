@@ -1,13 +1,10 @@
 import {
   Card,
-  CardActionArea,
   CardContent,
   Typography,
   Stack,
-  Grid,
   CardHeader
 } from "@mui/material";
-import { Module, Submission } from "../../../types/Quiz";
 import Markdown from "react-markdown";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
