@@ -5,7 +5,9 @@ import { useState } from "react";
 
 const SET_USER_FORCE = gql`
   mutation ForceArchiveUser($userID: ID!, $force: Boolean) {
-    forceArchiveUser(userID: $userID, force: $force)
+    forceArchiveUser(userID: $userID, force: $force) {
+      id
+    }
   }
 `;
 
