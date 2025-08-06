@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { GET_USER } from "./UserModal";
 import { useState } from "react";
 
@@ -22,7 +22,8 @@ export default function ManageUserArchive(props: { userID: number, forceArchive:
   }
 
   return (
-    <Stack direction={"row"}>
+    <Stack mt={2} spacing={1}>
+      <Typography variant="h6">Force Archive</Typography>
       <ToggleButtonGroup
         exclusive
         value={props.forceArchive === null ? "unset" : props.forceArchive}
