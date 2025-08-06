@@ -38,7 +38,8 @@ const testuser: CurrentUser = {
   admin: true,
   hasHolds: false,
   hasCardTag: true,
-  accountID: 1
+  accountID: 1,
+  forceArchive: false,
 };
 
 export interface ApolloContext {
