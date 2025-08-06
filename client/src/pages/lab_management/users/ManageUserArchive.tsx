@@ -2,6 +2,8 @@ import { gql, useMutation } from "@apollo/client";
 import { Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { GET_USER } from "./UserModal";
 import { useState } from "react";
+import { isManager } from "../../../common/PrivilegeUtils";
+import { useCurrentUser } from "../../../common/CurrentUserProvider";
 
 const SET_USER_FORCE = gql`
   mutation ForceArchiveUser($userID: ID!, $force: Boolean) {
@@ -12,6 +14,7 @@ const SET_USER_FORCE = gql`
 `;
 
 export default function ManageUserArchive(props: { userID: number, forceArchive: boolean | null }) {
+  const currentUser = useCurrentUser();
 
   const [setUserForceArchive] = useMutation(SET_USER_FORCE, { refetchQueries: [{ query: GET_USER, variables: { id: props.userID } }] });
 
@@ -28,6 +31,7 @@ export default function ManageUserArchive(props: { userID: number, forceArchive:
         exclusive
         value={props.forceArchive === null ? "unset" : props.forceArchive}
         onChange={handleSelection}
+        disabled={!isManager(currentUser)}
       >
         <ToggleButton value={true} color="error">
           Force Archive
