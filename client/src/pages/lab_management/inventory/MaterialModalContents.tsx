@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   Button,
   InputAdornment,
@@ -12,17 +12,8 @@ import DeleteMaterialButton from "./DeleteMaterialButton";
 import HelpTooltip from "../../../common/HelpTooltip";
 import { LoadingButton } from "@mui/lab";
 import SaveIcon from "@mui/icons-material/Save";
-import styled from "styled-components";
 import InventoryItem from "../../../types/InventoryItem";
-import Page from "../../Page";
 import AdminPage from "../../AdminPage";
-
-const StyledMaterialImage = styled.img`
-  width: 200px;
-  height: 200px;
-  border-radius: 4px;
-  object-fit: cover;
-`;
 
 interface InputErrors {
   name?: boolean;

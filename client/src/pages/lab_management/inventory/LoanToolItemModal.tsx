@@ -1,8 +1,7 @@
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import { ToolItemInstance, ToolItemType } from "../../../types/ToolItem";
 import { BORROW_INSTANCE, GET_TOOL_ITEM_INSTANCES_BY_BORROWER, GET_TOOL_ITEM_INSTANCES_BY_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES } from "../../../queries/toolItemQueries";
 import PrettyModal from "../../../common/PrettyModal";
-import PageSectionHeader from "../../../common/PageSectionHeader";
 import { Box, Button, Card, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { GET_USER_BY_USERNAME_OR_UID, PartialUser } from "../../../queries/getUsers";
@@ -60,7 +59,7 @@ export function LoanToolItemModal({item, setItem, type}: {item: ToolItemInstance
     <PrettyModal open={!!item} onClose={() => setItem(undefined)}>
       <Typography variant="h5">Loan {item.type.name} - '{item.uniqueIdentifier}'</Typography>
 
-      {type.checkoutNote && type.checkoutNote != "" && <Card sx={{mt: 3, p: 1}}>
+      {type.checkoutNote && type.checkoutNote !== "" && <Card sx={{mt: 3, p: 1}}>
         <Typography variant="h6">Note:</Typography>
         <Typography variant="body1">{type.checkoutNote}</Typography>
       </Card>}
