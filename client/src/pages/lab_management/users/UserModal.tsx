@@ -534,7 +534,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
                   <PrivilegeControl user={user} isMobile={isMobile} />
                   <CardTagSettings userID={user.id} hasCardTag={(user.cardTagID != null && user.cardTagID != "")} />
-                  <ManageUserArchive userID={user.id} />
+                  <ManageUserArchive userID={user.id} forceArchive={user.forceArchive} />
                 </Stack>
               </Stack>
 
