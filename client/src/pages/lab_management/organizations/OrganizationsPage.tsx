@@ -139,7 +139,7 @@ export default function OrganizationsPage() {
                           <Typography><b>Account ID:</b> {org.account.id}</Typography>
                           <Typography><b>Credits:</b> {moneyForamtter.format(org.account.balance / 100)}</Typography>
                         </Stack>
-                        <Stack direction={"row"} justifyContent={"space-between"}>
+                        <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
                           <Button
                             color="error"
                             startIcon={<DeleteIcon />}
