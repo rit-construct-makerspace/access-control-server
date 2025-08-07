@@ -3,6 +3,7 @@ import xmlparser from "express-xml-bodyparser";
 import * as xml2js from "xml2js"
 import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as Currency from "../currency/currency.js"
+import { send_transaction_email } from "../email/email.js";
 
 const PAPERCUT_SECURITY_SECRET = process.env.PAPERCUT_SECURITY_SECRET;
 const FREE_3D_PRINTS = process.env.FREE_3D_PRINTS === "true";
@@ -150,16 +151,16 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
 
   const amountCents = Math.round(adjustment * 100);
   try {
+    const transaction = new Currency.Transaction(
+      new Date(),
+      "3DPrinterOS",
+      `Transaction from 3DPrinterOS for user '${username}' of ${Currency.centsToDollarString(amountCents)} with comment '${comment}'`,
+      [
+        { name: "3D Print", cents: amountCents }
+      ], false);
+    const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction);
 
-    const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username,
-      new Currency.Transaction(
-        new Date(),
-        "3DPrinterOS",
-        `Transaction from 3DPrinterOS for user '${username}' of ${Currency.centsToDollarString(amountCents)} with comment '${comment}'`,
-        [
-          { name: "3D Print", cents: amountCents }
-        ], false)
-      );
+    send_transaction_email(transaction);
     xmlrpcRespond(res, [success]);
   } catch {
     xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)

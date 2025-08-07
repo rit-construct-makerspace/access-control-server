@@ -33,7 +33,7 @@ import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
-import * as Emailer from "./integrations/email.js"
+import * as Emailer from "./integrations/email/email.js"
 
 
 const require = createRequire(import.meta.url);
@@ -959,7 +959,6 @@ async function startServer() {
   const PORT = process.env.PORT || 3000;
 
   console.log(process.env.ID_FORMAT);
-  Emailer.send_email();
 
   app.listen({ port: PORT }, (): void =>
     console.log(

@@ -89,19 +89,7 @@ const templateSource: string = `
     <table class="total-table">
         <tr>
             <td>Subtotal: </td>
-            <td><%= formatCents(transaction.subtotalBeforeTigerbucks()) %></td>
-        </tr>
-
-        <% if (transaction.tigerbucksUsed) {%>
-        <tr>
-            <td>Tigerbucks: </td>
-            <td>-<%= formatCents(transaction.tigerbucksUsed) %></td>
-        </tr>
-        <% } %>
-        <tr class="separator"></tr>
-        <tr> 
-            <td>Total: </td>
-            <td><%= formatCents(transaction.subtotalAfterTigerbucks()) %></td>
+            <td><%= formatCents(transaction.subtotal()) %></td>
         </tr>
 
         <% if (transaction.taxCents) {%>
@@ -139,7 +127,7 @@ Items:
 ${r.items.map(item => `${1}  ${centsToDollarString(item.cents)}\t${item.name}\n`)}
 
 -----------------
-Subtotal: ${centsToDollarString(r.subtotalAfterTigerbucks())}
+Subtotal: ${centsToDollarString(r.subtotal())}
 Tax:      ${centsToDollarString(r.taxCents)}
 
 Total:    ${centsToDollarString(r.grandTotalIncludingTax() + r.taxCents)}
@@ -155,7 +143,7 @@ function generateHTMLReceipt(r: Transaction) {
     return template(data);
 }
 
-export function generateEmail(r: Transaction): { text: string, html: string } {
+export function generateReceiptEmail(r: Transaction): { text: string, html: string } {
     const text = generateTextReceipt(r);
     const html = generateHTMLReceipt(r);
     return { text, html }

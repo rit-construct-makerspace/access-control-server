@@ -34,7 +34,7 @@
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
-    "ejs": "^3.1.9",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
     "express-session": "^1.17.2",
     "express-ws": "^5.0.2",
