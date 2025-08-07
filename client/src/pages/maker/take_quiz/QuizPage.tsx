@@ -8,12 +8,15 @@ import { Stack } from "@mui/system";
 import { Typography } from "@mui/material";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 
+
+// we're going to bring this back soon probably 
+// eslint-disable-next-line 
 function shuffle(array: any[] | undefined) {
-  if (array == undefined) return undefined;
+  if (array === undefined) return undefined;
   let currentIndex = array.length;
 
   // While there remain elements to shuffle...
-  while (currentIndex != 0) {
+  while (currentIndex !== 0) {
 
     // Pick a remaining element...
     let randomIndex = Math.floor(Math.random() * currentIndex);

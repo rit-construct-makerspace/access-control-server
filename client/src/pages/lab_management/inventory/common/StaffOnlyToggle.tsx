@@ -8,7 +8,7 @@ import { useCurrentUser } from "../../../../common/CurrentUserProvider";
 export function StaffOnlyToggle(props: { item: InventoryItem }) {
   const currentUser = useCurrentUser();
 
-  const [setStaffOnly, setStaffOnlyMutation] = useMutation(SET_STAFF_ONLY, {
+  const [setStaffOnly] = useMutation(SET_STAFF_ONLY, {
     variables: { id: props.item.id, staffOnly: !props.item.staffOnly },
     refetchQueries: [{ query: GET_INVENTORY_ITEMS }]
   });

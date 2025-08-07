@@ -56,7 +56,7 @@ export function reformatTime(time: string) {
     //Hours in PM
     if (hours > 11) {
         suffix = " PM";
-        hours = hours == 12 ? 12 : hours - 12
+        hours = hours === 12 ? 12 : hours - 12
     }
 
     return "" + hours + ":" + split[1] + suffix;
