@@ -37,7 +37,7 @@ export async function send_transaction_email(emailAddress: string, transaction: 
     await send_generic_email({
         fromAccount: 'receipts',
         to: [emailAddress],
-        subject: 'RIT SHED Receipt',
+        subject: `RIT SHED Receipt - ${transaction.date.toLocaleString()}`,
         textContent: content.text,
         htmlContent: content.html
     }).catch((err: any) => {console.error("Error sending receipt email", err)});
