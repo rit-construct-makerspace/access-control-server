@@ -9,6 +9,7 @@ import RequestWrapper2 from "../../../common/RequestWrapper2";
 import AddIcon from '@mui/icons-material/Add';
 import PrettyModal from "../../../common/PrettyModal";
 import CloseIcon from '@mui/icons-material/Close';
+import { CurrencyAccount } from "../currency/CurrencyAccounts";
 
 const SEARCH_ORGS_LIMIT = gql`
   query SearchOrganizationsLimit($searchText: String!) {
@@ -17,6 +18,10 @@ const SEARCH_ORGS_LIMIT = gql`
       username
       displayname
       accountID
+      account {
+        id
+        balance
+      }
     }
   }
 `;
@@ -33,7 +38,7 @@ type Organization = {
   id: number;
   username: string;
   displayname: string;
-  accountID: number;
+  account: CurrencyAccount
 }
 
 export default function OrganizationsPage() {
@@ -117,15 +122,19 @@ export default function OrganizationsPage() {
                     <Card variant="outlined" sx={{ height: "100%" }}>
                       <Stack padding={"10px"} width={"350px"} height={"100%"} justifyContent={"space-between"} alignItems={"center"}>
                         <Typography color="primary" fontWeight={"bold"}>{org.displayname} ({org.username})</Typography>
-                        <Button
-                          color="secondary"
-                          sx={{ alignSelf: "flex-end" }}
-                          onClick={() => {
-                            navigate(`/makerspace/${makerspaceID}/currency?a=${org.username}`)
-                          }}
-                        >
-                          View Account
-                        </Button>
+                        <Stack direction={"row"} justifyContent={"space-between"}>
+
+
+                          <Button
+                            color="secondary"
+                            sx={{ alignSelf: "flex-end" }}
+                            onClick={() => {
+                              navigate(`/makerspace/${makerspaceID}/currency?a=${org.username}`)
+                            }}
+                          >
+                            View Account
+                          </Button>
+                        </Stack>
                       </Stack>
                     </Card>
                   </Grid>

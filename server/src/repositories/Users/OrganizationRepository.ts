@@ -24,6 +24,10 @@ export async function createOrganization(username: string, displayname?: string)
   }
 }
 
+export async function getOrganizationByOrgID(id: number): Promise<OrganizationsRow | undefined> {
+  return await knex("Organizations").where("id", id).select("*").first();
+}
+
 export async function getOrganizationByUsername(username: string): Promise<OrganizationsRow | undefined> {
   return await knex("Organizations").where({ username: username }).select("*").first();
 }
@@ -40,4 +44,22 @@ export async function searchOrganizationsLimit(searchText?: string, limit = 100)
   return await knex("Organizations").select("*").limit(limit)
     .whereILike("displayname", `%${searchText}%`)
     .orWhereILike("username", `%${searchText}%`);
+}
+
+export async function deleteOrganization(orgID: number): Promise<Boolean> {
+  const org = await getOrganizationByOrgID(orgID);
+
+  if (!org) {
+    return false;
+  }
+
+  // Delete account if able
+  const success = CurrencyAccountRepo.deleteAccount(org.accountID);
+
+  if (!success) {
+    return false;
+  }
+
+  await knex("Organizations").where("id", orgID).delete();
+  return true;
 }
