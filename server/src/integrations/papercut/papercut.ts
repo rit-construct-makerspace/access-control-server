@@ -151,15 +151,17 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
 
   const amountCents = Math.round(adjustment * 100);
   try {
-    const transaction = new Currency.Transaction(
+    const changeAmount = -amountCents; // we want negative if refund
+    var transaction = new Currency.Transaction(
       new Date(),
       "3DPrinterOS",
       `Transaction from 3DPrinterOS for user '${username}' of ${Currency.centsToDollarString(amountCents)} with comment '${comment}'`,
       [
-        { name: "3D Print", cents: amountCents }
+        { name: "3D Print", cents: changeAmount }
       ], false);
     const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction);
 
+    transaction.description = `3DPrinterOS Transaction for ${username}: ${comment}`
     send_transaction_email(transaction);
     xmlrpcRespond(res, [success]);
   } catch {
@@ -297,7 +299,7 @@ export function registerEndpoints(app: express.Application) {
         xmlrpcRespondFault(res, 1, `method "${method}" is not supported`);
       }
     } catch (e) {
-      console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", e);
+      console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", (new xml2js.Builder().buildObject(req.body)), e);
       res.status(500).send();
     }
   });

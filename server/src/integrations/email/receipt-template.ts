@@ -1,6 +1,5 @@
 import ejs from "ejs"
 import { centsToDollarString, Transaction } from "../currency/currency.js"
-import { readFileSync } from "fs"
 
 const templateSource: string = `
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
@@ -63,7 +62,7 @@ const templateSource: string = `
     <h2><%= transaction.source %></h2>
 
     <% if (typeof transaction.description !== 'undefined') { %>
-    <h6><%= transaction.description %></h6>
+    <h4><%= transaction.description %></h4>
     <% } %>
     
     <table class="item-table">
