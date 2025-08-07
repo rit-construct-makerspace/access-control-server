@@ -18,7 +18,7 @@ export async function purgeExpiredPassedModules(): Promise<number> {
   return result.length;
 }
 
-export async function getPassedTrainingsWeeksAgo(weeks: number): Promise<{ userID: number, }> {
+export async function getPassedTrainingsWeeksAgo(weeks: number): Promise<{ userID: number, modules: number[] }> {
   const result = await knex.raw(`select "userID", array_agg("moduleID") as modules from "PassedModules" where "passedDate" <= NOW() - INTERVAL '${weeks} weeks' group by "userID"`)
 
   return result.rows;
