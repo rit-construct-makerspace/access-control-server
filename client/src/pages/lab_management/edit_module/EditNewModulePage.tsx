@@ -29,7 +29,7 @@ export default function EditNewModulePage() {
     quiz: [],
   });
 
-  const [updateModule, updateResult] = useMutation(CREATE_TRAINING_MODULE);
+  const [updateModule] = useMutation(CREATE_TRAINING_MODULE);
 
   const executeSave = async (updatedModule: Moduledraft) => {
     await updateModule({

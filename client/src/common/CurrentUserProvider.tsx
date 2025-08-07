@@ -5,8 +5,6 @@ import { Navigate, useLocation } from "react-router-dom";
 import Privilege from "../types/Privilege";
 import { AccessCheck } from "../pages/lab_management/users/UserModal";
 
-const loginUrl = process.env.REACT_APP_LOGIN_URL ?? "/";
-
 export const GET_CURRENT_USER = gql`
   query GetCurrentUser {
     currentUser {

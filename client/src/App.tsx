@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
-import { createTheme, CssBaseline, GlobalStyles, ThemeProvider } from "@mui/material";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 import { CurrentUserProvider } from "./common/CurrentUserProvider";
 import AppRoutes from "./AppRoutes";
 import { BrowserRouter } from "react-router-dom";

@@ -133,7 +133,7 @@ export default function LogPage() {
         filters: filters
       },
     });
-  }, [search, query]);
+  }, [search, query, filters]);
 
   const setUrlParam = (paramName: string, paramValue: string) => {
     const params = new URLSearchParams(search);

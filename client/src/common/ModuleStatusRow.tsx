@@ -1,4 +1,4 @@
-import { CardActionArea, Link, Stack, Typography } from "@mui/material";
+import { CardActionArea, Link, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { ModuleStatus } from "./TrainingModuleUtils";
 import WarningIcon from "@mui/icons-material/Warning";

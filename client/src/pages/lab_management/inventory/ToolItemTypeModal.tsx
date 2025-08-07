@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { UPDATE_TOOL_ITEM_INSTANCE, GET_TOOL_ITEM_INSTANCES_BY_TYPE, CREATE_TOOL_ITEM_INSTANCE, UPDATE_TOOL_ITEM_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES, GET_TOOL_ITEM_TYPES, CREATE_TOOL_ITEM_TYPE } from "../../../queries/toolItemQueries";
-import { TOOL_ITEM_CONDITION_ARRAY, TOOL_ITEM_STATUS_ARRAY, ToolItemCondition, ToolItemInstance, ToolItemInstanceInput, ToolItemStatus, ToolItemType, ToolItemTypeInput } from "../../../types/ToolItem";
+import { UPDATE_TOOL_ITEM_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES, GET_TOOL_ITEM_TYPES, CREATE_TOOL_ITEM_TYPE } from "../../../queries/toolItemQueries";
+import { ToolItemType, ToolItemTypeInput } from "../../../types/ToolItem";
 import { useEffect, useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
 import { useNavigate } from "react-router-dom";
@@ -47,7 +47,7 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
   }
 
   function handleEditSubmit() {
-    if (!newType.name || newType.name == "") {
+    if (!newType.name || newType.name === "") {
       setNameAlert(true);
       return;
     } else setNameAlert(false);

@@ -1,12 +1,11 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, CardMedia, Chip, Collapse, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Table, TableCell, TableRow, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Chip, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Table, TableCell, TableRow, Typography, useTheme } from "@mui/material";
 import { ToolItemCondition, ToolItemInstance, ToolItemStatus } from "../../../types/ToolItem";
-import ActionButton from "../../../common/ActionButton";
 import { useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useMutation } from "@apollo/client";
-import { DELETE_INSTANCE, GET_TOOL_ITEM_INSTANCES_BY_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES, UPDATE_TOOL_ITEM_INSTANCE } from "../../../queries/toolItemQueries";
+import { DELETE_INSTANCE, GET_TOOL_ITEM_INSTANCES_BY_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES } from "../../../queries/toolItemQueries";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
 import TimeAgo from 'react-timeago'
 import {makeIntlFormatter} from 'react-timeago/defaultFormatter';
@@ -39,34 +38,34 @@ export function ToolItemInstanceCard({ item, handleLoanClick, handleReturnClick 
   const theme = useTheme();
 
   const CARD_COLOR = ((
-    item.status == ToolItemStatus.OUT ||
-    item.status == ToolItemStatus.INTERNAL_USE
-  ) ? ((localStorage.getItem("themeMode") == "dark") ? "#382a29" : "#f1d1ce")
+    item.status === ToolItemStatus.OUT ||
+    item.status === ToolItemStatus.INTERNAL_USE
+  ) ? ((localStorage.getItem("themeMode") === "dark") ? "#382a29" : "#f1d1ce")
     : (
-      item.status == ToolItemStatus.MISSING ||
-      item.condition == ToolItemCondition.DAMAGED ||
-      item.condition == ToolItemCondition.MISSING_PARTS
-    ) ? ((localStorage.getItem("themeMode") == "dark") ? "#382a29" : "#f1d1ce")
+      item.status === ToolItemStatus.MISSING ||
+      item.condition === ToolItemCondition.DAMAGED ||
+      item.condition === ToolItemCondition.MISSING_PARTS
+    ) ? ((localStorage.getItem("themeMode") === "dark") ? "#382a29" : "#f1d1ce")
       : null);
 
   const STATUS_COLOR = ((
-    item.status == ToolItemStatus.OUT ||
-    item.status == ToolItemStatus.INTERNAL_USE ||
-    item.status == ToolItemStatus.MISSING ||
-    item.status == ToolItemStatus.DO_NOT_USE
+    item.status === ToolItemStatus.OUT ||
+    item.status === ToolItemStatus.INTERNAL_USE ||
+    item.status === ToolItemStatus.MISSING ||
+    item.status === ToolItemStatus.DO_NOT_USE
   ) ? "error"
     : (
-      item.status == ToolItemStatus.AVAILABLE
+      item.status === ToolItemStatus.AVAILABLE
     ) ? "success"
       : undefined);
 
   const CONDITION_COLOR = ((
-    item.condition == ToolItemCondition.NEW ||
-    item.condition == ToolItemCondition.GOOD
+    item.condition === ToolItemCondition.NEW ||
+    item.condition === ToolItemCondition.GOOD
   ) ? theme.palette.primary
     : (
-      item.condition == ToolItemCondition.DAMAGED ||
-      item.condition == ToolItemCondition.MISSING_PARTS
+      item.condition === ToolItemCondition.DAMAGED ||
+      item.condition === ToolItemCondition.MISSING_PARTS
     ) ? theme.palette.error
       : null)?.main;
 
@@ -132,9 +131,9 @@ export function ToolItemInstanceCard({ item, handleLoanClick, handleReturnClick 
         </Table>
       </CardContent>
       <CardActions>
-        {item.status == ToolItemStatus.OUT && <Button variant="text" color="error" fullWidth onClick={() => handleReturnClick(item)}>Return</Button>}
-        {item.status == ToolItemStatus.AVAILABLE && <Button variant="text" color="secondary" fullWidth onClick={() => handleLoanClick(item)}>Loan</Button>}
-        {(item.status == ToolItemStatus.DO_NOT_USE || item.status == ToolItemStatus.MISSING || item.status == ToolItemStatus.INTERNAL_USE) && 
+        {item.status === ToolItemStatus.OUT && <Button variant="text" color="error" fullWidth onClick={() => handleReturnClick(item)}>Return</Button>}
+        {item.status === ToolItemStatus.AVAILABLE && <Button variant="text" color="secondary" fullWidth onClick={() => handleLoanClick(item)}>Loan</Button>}
+        {(item.status === ToolItemStatus.DO_NOT_USE || item.status === ToolItemStatus.MISSING || item.status === ToolItemStatus.INTERNAL_USE) && 
           <Button variant="text" color="error" fullWidth disabled>Cannot Loan</Button>}
       </CardActions>
     </Card>

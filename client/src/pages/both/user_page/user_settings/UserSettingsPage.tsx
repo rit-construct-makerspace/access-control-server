@@ -14,7 +14,7 @@ export default function UserSettingsPage() {
     const currentUser = useCurrentUser();
 
     const userResult = useQuery(GET_USER, {variables: {id: currentUser.id}});
-    const [updateStudentProfile, result] = useMutation(UPDATE_STUDENT_PROFILE);
+    const [updateStudentProfile] = useMutation(UPDATE_STUDENT_PROFILE);
 
     const [editInfo, setEditInfo] = useState(false);
     const [pronouns, setPronouns] = useState("");

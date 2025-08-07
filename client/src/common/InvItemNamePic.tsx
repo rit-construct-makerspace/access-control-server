@@ -1,6 +1,5 @@
-import React from "react";
 import InventoryItem from "../types/InventoryItem";
-import { Avatar, Stack, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 
 interface InventoryItemNamePicProps {
   item: InventoryItem;

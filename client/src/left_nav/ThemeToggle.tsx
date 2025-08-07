@@ -9,7 +9,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 
 export default function ThemeToggle() {
   const url = useLocation();
-  const [mode, setMode] = useState(localStorage.getItem("themeMode") == "dark")
+  const [mode, setMode] = useState(localStorage.getItem("themeMode") === "dark")
 
   return (
     <ListItemButton sx={{height: "4em"}} onClick={(e) => {

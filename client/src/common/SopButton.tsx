@@ -1,5 +1,3 @@
-import { useMutation } from "@apollo/client";
-import { useNavigate } from "react-router-dom";
 import ActionButton from "./ActionButton";
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 
@@ -11,8 +9,6 @@ interface sopButtonProps {  appearance: "icon-only" | "small" | "medium" | "larg
 }
 
 export default function SopButton(props: sopButtonProps) {
-  const navigate = useNavigate();
-
   const handleClick = async () => {
     window.location.href = props.url;
   };

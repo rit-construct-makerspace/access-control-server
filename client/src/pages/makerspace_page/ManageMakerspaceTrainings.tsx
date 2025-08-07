@@ -50,8 +50,8 @@ export default function ManageMakerspaceTrainings(props: ManageMakerspaceTrainin
         const rawModules: [TrainingModule] = data.modules;
         const possibleModuels = rawModules.filter((possible) =>
         (
-          (possible.makerspaceID == null || possible.makerspaceID == props.makerspaceID) && // This makerspace may use this training
-          !props.trainings.some((existing) => existing.id == possible.id) // This training is not already assigned to this makerspace
+          (possible.makerspaceID == null || Number(possible.makerspaceID) === Number(props.makerspaceID)) && // This makerspace may use this training
+          !props.trainings.some((existing) => Number(existing.id) === Number(possible.id)) // This training is not already assigned to this makerspace
         ))
 
         const sortedModules = possibleModuels.sort((a, b) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));

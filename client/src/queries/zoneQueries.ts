@@ -16,11 +16,7 @@ export const GET_ZONES = gql`
 export interface ZoneWithHours {
   id: number;
   name: string;
-  hours: [{
-    type: string;
-    dayOfTheWeek: number;
-    time: string;
-  }];
+  hours: ZoneHours[];
   imageUrl: string;
 }
 

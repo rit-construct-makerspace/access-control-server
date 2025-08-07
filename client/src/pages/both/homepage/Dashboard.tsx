@@ -57,7 +57,7 @@ export function Dashboard() {
                                     id={zone.id}
                                     name={zone.name}
                                     hours={zone.hours}
-                                    imageUrl={zone.imageUrl == undefined || zone.imageUrl == null || zone.imageUrl == "" ? process.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : zone.imageUrl}
+                                    imageUrl={zone.imageUrl === undefined || zone.imageUrl == null || zone.imageUrl === "" ? process.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : zone.imageUrl}
                                     isMobile={isMobile}
                                 />
                             </Grid>
@@ -110,7 +110,7 @@ export function Dashboard() {
                             margin="0px 20px 20px 20px"
                         >
                             {
-                                data.events.length == 0
+                                data.events.length === 0
                                     ? <Typography variant="body1">No Events!</Typography>
                                     : data.events.map((event: MakeEvent) => (
                                         event.ticket_availability.has_available_tickets
