@@ -32,7 +32,11 @@ export class Transaction {
     this.items = items;
     this.description = description;
     const subtotalCents = items.reduce((acc, obj) => acc + obj.cents, 0);
-    this.taxCents = calculateTax(subtotalCents);
+    if (applyTax) {
+      this.taxCents = calculateTax(subtotalCents);
+    } else {
+      this.taxCents = 0
+    }
 
   }
 
@@ -46,52 +50,26 @@ export class Transaction {
 export async function getAccountBalance(username: string): Promise<number | MakeMoneyError> {
   const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
 
-  const atriumBalance = await Atrium.getBalance(username);
-
-  var sum_bal = 0;
-  if (makeAccountID) {
-    const make_bal = await CurrencyAccountRepo.getAccountBalanceCents(makeAccountID);
-    sum_bal = sum_bal + make_bal;
-  }
-
-  if (typeof (atriumBalance) === "number") {
-    sum_bal = sum_bal + atriumBalance;
-  }
-
-  if (typeof (atriumBalance) === "number" || makeAccountID) {
-    return sum_bal;
-  } else {
+  if (!makeAccountID) {
     return MakeMoneyError.NoAccount;
+  }
+  try {
+    const make_bal = await CurrencyAccountRepo.getAccountBalanceCents(makeAccountID);
+    return make_bal;
+  } catch {
+    return MakeMoneyError.SomethingElse;
   }
 }
 
 export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction): Promise<boolean> {
   const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
   const deltaCents = -transaction.totalCents(); // - if a charge, + if a refund
-  var remaining = deltaCents;
   if (makeAccountID) { // found make account, use that first
-    if (deltaCents < 0) { // Delta cents is negative, indicating a charge
-      remaining = -(await CurrencyAccountRepo.chargeAccountReturnRemainingCents(makeAccountID, -deltaCents, transaction.source, transaction.description));
-    }
-    // If it is positive, do nothing. We want to refund entirely to tigerbucks.
+    const success = await CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(makeAccountID, deltaCents, transaction.source, transaction.description);
+    return success;
   }
 
-
-  if (remaining == 0) {
-    return true;
-  }
-
-  const split = splitTax(remaining);
-  const wasAdjusted = await Atrium.adjustBalanceIfPossible(username, split.nonTax, split.tax);
-
-  if (wasAdjusted) {
-    return true;
-  }
-
-  if (makeAccountID && (deltaCents - remaining != 0)) {
-    await CurrencyAccountRepo.adjustAccountBalanceCents(makeAccountID, deltaCents - remaining, transaction.source, "Rectification due to failed atrium charge");
-  }
-
+  // ATRIUM IS NOT YET WIRED UP SO IF IT CANT CONSTRUCT CREDITS, IT FAILS
   return false;
 }
 
