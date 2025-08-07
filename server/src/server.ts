@@ -33,7 +33,6 @@ import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
-import * as Emailer from "./integrations/email/email.js"
 
 
 const require = createRequire(import.meta.url);

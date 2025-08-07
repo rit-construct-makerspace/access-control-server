@@ -5,7 +5,7 @@ import { Transaction } from "../currency/currency.js";
 
 const mailgun = new Mailgun.default(FormData);
 const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere' });
-const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN ?? "";
+const MAIL_DOMAIN = process.env.MAIL_DOMAIN ?? "";
 
 
 type MessageSendResult = {
@@ -15,9 +15,8 @@ type MessageSendResult = {
     details?: string;
 }
 export function send_generic_email(args: { fromAccount: string, to: string[], subject: string, htmlContent: string, textContent: string }): Promise<MessageSendResult> {
-    console.log(`make@rit.edu <${args.fromAccount}@${MAILGUN_DOMAIN}`, process.env.NODE_ENV);
-    return mg.messages.create(MAILGUN_DOMAIN, {
-        from: `make@rit.edu <${args.fromAccount}@${MAILGUN_DOMAIN}>`,
+    return mg.messages.create(MAIL_DOMAIN, {
+        from: `make@rit.edu <${args.fromAccount}@${MAIL_DOMAIN}>`,
         bcc: ((process.env.NODE_ENV !== "development") ? ['make@rit.edu'] : []),
         to: args.to,
         subject: args.subject,
@@ -27,18 +26,19 @@ export function send_generic_email(args: { fromAccount: string, to: string[], su
     });
 }
 
+const OVERRIDE_RECEIPT_EMAIL = process.env.OVERRIDE_RECEIPT_EMAIL;
 
-
-export async function send_transaction_email(transaction: Transaction) {
+export async function send_transaction_email(emailAddress: string, transaction: Transaction) {
     const content = generateReceiptEmail(transaction);
-    console.log(content.html)
 
+    if (OVERRIDE_RECEIPT_EMAIL){
+        emailAddress = OVERRIDE_RECEIPT_EMAIL;
+    }
     await send_generic_email({
         fromAccount: 'receipts',
-        to: ['res3453@rit.edu'],
+        to: [emailAddress],
         subject: 'RIT SHED Receipt',
         textContent: content.text,
         htmlContent: content.html
-    }).then(res => {console.log("Email Sent: ",res)})
-    .catch((err: any) => {console.error("Error sending receipt email", err)});
+    }).catch((err: any) => {console.error("Error sending receipt email", err)});
 }

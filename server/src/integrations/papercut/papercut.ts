@@ -152,18 +152,16 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
   const amountCents = Math.round(adjustment * 100);
   try {
     const changeAmount = -amountCents; // we want negative if refund
-    var transaction = new Currency.Transaction(
+    const transaction = new Currency.Transaction(
       new Date(),
       "3DPrinterOS",
-      `Transaction from 3DPrinterOS for user '${username}' of ${Currency.centsToDollarString(amountCents)} with comment '${comment}'`,
+      `for user ${username}: '${comment}'`,
       [
         { name: "3D Print", cents: changeAmount }
       ], false);
     const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction);
 
-    // less repetitive description for receipt
-    transaction.description = `3DPrinterOS Transaction for ${username}: ${comment}`
-    send_transaction_email(transaction);
+    send_transaction_email(username+"@rit.edu", transaction);
     xmlrpcRespond(res, [success]);
   } catch {
     xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)
