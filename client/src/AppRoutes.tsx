@@ -125,7 +125,7 @@ export default function AppRoutes() {
             <Route path="/user/settings" element={<UserSettingsPage />} />
 
             {/* Routes for trainers + higher */}
-            <Route path="makerspace/:makerspaceID" element={<TrainerRoute />}>
+            <Route>
               <Route path="/makerspace/:makerspaceID" element={<StaffBar />}>
 
                 <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />} />
