@@ -935,6 +935,10 @@ async function startServer() {
     if (API_DEBUG_LOGGING) await createLog('It is now 4:00am. Wiping Daily Temp Records...', "server")
     await setDataPointValue(1, 0).then(async () => await createLog('Daily Visits reset.', "server"));
     await purgeExpiredPassedModules().then(async (result) => await createLog(`Purged ${result} expired trainings.`, "server"));
+    
+    const expiryWarnings = TrainingRe;
+    const expiryNotices = [];
+    
     //await pruneNullLengthEquipmentSessions().then(async () => await createLog('Unfinished Equipment Sessions pruned.', "server"));;
   });
 

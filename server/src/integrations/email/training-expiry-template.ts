@@ -37,13 +37,16 @@ const templateSource: string = `
         <img src="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange.png"
             alt="RIT The Shed Logo" width="600px">
     </picture>
-    <h1>Training Expiry <%= (noticeType == "warning") "Warning" ? : "Notice" %></h1>
+    <h1>Training Expiry <%= (type == "warning") ? "Warning" : "Notice" %></h1>
 
     <b>If your training lapses, you will be unable to use this equipment. Once you re-take the trainings, your access will be restored. </b>
 
+    <ul>
     <% for (const training of modules) { %>
-        <a anchor=<%= training.link %>> <%= training.name %> </a>
+        <li><a href=<%= training.link %>> <%= training.name %> </a></li>
     <% } %>
+    
+    </ul>
 
 If you have already passed the in-person competency check, you will not need to re-take it.
 

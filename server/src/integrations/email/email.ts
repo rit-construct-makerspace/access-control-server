@@ -46,5 +46,13 @@ export async function send_transaction_email(emailAddress: string, transaction: 
 
 
 export async function send_training_expiry_email(email: string, desc: ExpiryDescription){
-
+    const content = generateExpiryEmail(desc);
+    console.log(content.html)
+    send_generic_email({
+        fromAccount: "training",
+        to: ['res3453@rit.edu'],
+        subject: (desc.type == "warning") ? "Trainings Expiring Soon" : "Training Expiry Notice",
+        textContent: content.text,
+        htmlContent: content.html,
+    })
 }
