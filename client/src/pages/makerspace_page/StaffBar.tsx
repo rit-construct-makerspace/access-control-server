@@ -120,7 +120,7 @@ export default function StaffBar() {
         />
         <NavLink
           primary={"Organizations"}
-          to={`#`}
+          to={`/makerspace/${makerspaceID}/organizations`}
           icon={<AccountBalanceIcon />}
         />
         <NavLink

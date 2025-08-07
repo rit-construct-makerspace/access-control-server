@@ -43,7 +43,7 @@ export default function OrganizationsPage() {
   const navigate = useNavigate();
 
   const [getOrganizations, getOrganizationsResult] = useLazyQuery(SEARCH_ORGS_LIMIT);
-  const [createOrganization] = useMutation(CREATE_ORG, { refetchQueries: ["SearchOrganizationsLimit"] })
+  const [createOrganization] = useMutation(CREATE_ORG, { refetchQueries: ["searchOrganizationsLimit"] })
 
   const [searchText, setSearchText] = useState("");
   const [open, setOpen] = useState(false);
@@ -54,7 +54,7 @@ export default function OrganizationsPage() {
   const setUrlParam = (paramName: string, paramValue: string) => {
     const params = new URLSearchParams(location.search);
     params.set(paramName, paramValue);
-    navigate(`/makerspace/${makerspaceID}/currency?` + params, { replace: true });
+    navigate(`/makerspace/${makerspaceID}/organizations?` + params, { replace: true });
   };
 
   useEffect(() => {
@@ -77,6 +77,13 @@ export default function OrganizationsPage() {
     }
 
     createOrganization({ variables: { username: username, displayname: displayname } });
+    handleExit();
+  }
+
+  function handleExit() {
+    setUsername("");
+    setDisplayname("");
+    setOpen(false);
   }
 
   return (
@@ -94,8 +101,8 @@ export default function OrganizationsPage() {
               sx={{ maxWidth: 300 }}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              onClear={() => setUrlParam("a", "")}
-              onSubmit={() => setUrlParam("a", searchText)}
+              onClear={() => setUrlParam("q", "")}
+              onSubmit={() => setUrlParam("q", searchText)}
             />
             <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={() => setOpen(true)}>
               New Organization
@@ -114,7 +121,7 @@ export default function OrganizationsPage() {
                           color="secondary"
                           sx={{ alignSelf: "flex-end" }}
                           onClick={() => {
-                            navigate(`/makerspace/${makerspaceID}/currency?a=${org.accountID}`)
+                            navigate(`/makerspace/${makerspaceID}/currency?a=${org.username}`)
                           }}
                         >
                           View Account
@@ -126,34 +133,33 @@ export default function OrganizationsPage() {
               })
             }
           </Grid>
-          <PrettyModal open={open} onClose={() => setOpen(false)}>
-            <Stack width={"300px"} spacing={2}>
-              <Stack direction={"row"} spacing={1} justifyContent={"space-between"}>
-                <Typography variant="h4">Create new Organization</Typography>
-                <IconButton color="error" onClick={() => setOpen(false)}>
+          <PrettyModal open={open} onClose={handleExit} width={"400px"}>
+            <Stack width={"100%"} spacing={2} alignItems={"center"}>
+              <Stack direction={"row"} spacing={1} justifyContent={"space-between"} width={"100%"} alignItems={"center"}>
+                <Typography variant="h5">Create new Organization</Typography>
+                <IconButton color="error" onClick={handleExit}>
                   <CloseIcon />
                 </IconButton>
               </Stack>
 
               <TextField
                 label="Username"
+                fullWidth
+                required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
               <TextField
                 label="Display Name"
+                fullWidth
                 value={displayname}
                 onChange={(e) => setDisplayname(e.target.value)}
               />
-              <Stack direction={"row"} justifyContent={"space-between"}>
+              <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
                 <Button
                   variant="contained"
                   color="error"
-                  onClick={() => {
-                    setUsername("");
-                    setDisplayname("");
-                    setOpen(false);
-                  }}
+                  onClick={handleExit}
                 >
                   Cancel
                 </Button>
