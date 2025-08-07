@@ -41,11 +41,12 @@ export const CurrencyAccountResolvers = {
       args: {
         accountID: number,
         amount: number,
+        description: string,
       },
       { isManager }: ApolloContext
     ) => {
       return isManager(async (user) => (
-        await CurrencyAccountRepo.adjustAccountBalanceCents(args.accountID, args.amount, "make-website", `${user.ritUsername} adjusted balance for account ${args.accountID}`)
+        await CurrencyAccountRepo.adjustAccountBalanceCents(args.accountID, args.amount, "make-website", `adjustment by ${user.ritUsername}: ${args.description}`)
       ))
     },
   },
