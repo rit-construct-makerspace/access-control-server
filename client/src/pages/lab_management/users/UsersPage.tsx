@@ -7,7 +7,6 @@ import { GET_NUM_USERS, GET_USERS_LIMIT, PartialUser } from "../../../queries/ge
 import RequestWrapper from "../../../common/RequestWrapper";
 import UserModal from "./UserModal";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import AdminPage from "../../AdminPage";
 
 export default function UsersPage() {
   const { makerspaceID, userID } = useParams<{ makerspaceID: string, userID: string }>();
@@ -23,7 +22,7 @@ export default function UsersPage() {
     params.set(paramName, paramValue);
     navigate(`/makerspace/${makerspaceID}/people?` + params, { replace: true });
   };
-  
+
 
   useEffect(() => {
     const searchParams = new URLSearchParams(search);
@@ -50,31 +49,31 @@ export default function UsersPage() {
       loading={queryResult.loading}
       error={queryResult.error}
     >
-      <Box margin="25px">
+      <Box margin="10px 25px">
         <title>People | Make @ RIT</title>
-      <Typography variant="h4">People</Typography>
-      <Stack direction={"row"} spacing={1} sx={{mb: 2}}>
-        <SearchBar 
-          placeholder={"Search " + numUsersResult.data?.numUsers.count + " users"}
-          sx={{ maxWidth: 300 }} 
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          onClear={() => setSearchText("")}
-          onSubmit={() => setUrlParam("q", searchText)}
-        />
-        <Button onClick={(e) => setUrlParam("q", searchText)} variant="contained" color="primary">Search</Button>
-      </Stack>
-      <Stack direction="row" flexWrap="wrap" justifyContent="center">
-        {safeUsers?.map((user: PartialUser) => (
-          <UserCard
-            user={user}
-            key={user.id}
-            onClick={() => navigate(`/makerspace/${makerspaceID}/people/` + user.id)}
+        <Typography variant="h4" sx={{ mb: 2 }}>People</Typography>
+        <Stack direction={"row"} spacing={1} sx={{ mb: 2 }}>
+          <SearchBar
+            placeholder={"Search " + numUsersResult.data?.numUsers.count + " users"}
+            sx={{ maxWidth: 300 }}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onClear={() => setSearchText("")}
+            onSubmit={() => setUrlParam("q", searchText)}
           />
-        ))}
-      </Stack>
-      <p>This page is limited to 100 users. Consider narrowing your search.</p>
-      <UserModal selectedUserID={userID ?? ""} onClose={handleUserModalClosed} />
+          <Button onClick={(e) => setUrlParam("q", searchText)} variant="contained" color="primary">Search</Button>
+        </Stack>
+        <Stack direction="row" flexWrap="wrap" justifyContent="center">
+          {safeUsers?.map((user: PartialUser) => (
+            <UserCard
+              user={user}
+              key={user.id}
+              onClick={() => navigate(`/makerspace/${makerspaceID}/people/` + user.id)}
+            />
+          ))}
+        </Stack>
+        <p>This page is limited to 100 users. Consider narrowing your search.</p>
+        <UserModal selectedUserID={userID ?? ""} onClose={handleUserModalClosed} />
       </Box>
     </RequestWrapper>
   );

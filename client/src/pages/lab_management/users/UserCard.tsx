@@ -1,5 +1,5 @@
 import React from "react";
-import { Avatar, Card, CardActionArea, Chip, Stack, Typography, useTheme } from "@mui/material";
+import { Avatar, Card, CardActionArea, Stack, Typography, useTheme } from "@mui/material";
 import { PartialUser } from "../../../queries/getUsers";
 import PrivilegeChip from "./PrivilegeChip";
 import { stringAvatar } from "../../../common/avatarGenerator";

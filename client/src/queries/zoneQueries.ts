@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import Equipment from "../types/Equipment";
-import Room, { FullRoom } from "../types/Room";
+import Room from "../types/Room";
 import { TrainingModule } from "../common/TrainingModuleUtils";
 import ZoneHours from "../types/ZoneHours";
 

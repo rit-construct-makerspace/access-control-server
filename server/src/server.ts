@@ -12,7 +12,6 @@ import cors from "cors";
 import { schema } from "./schema.js";
 import { setupSessions, setupDevAuth, setupStagingAuth, setupAuth } from "./auth.js";
 import context from "./context.js";
-import json from "body-parser";
 import path from "path";
 import * as schedule from "node-schedule";
 import { getUserByCardTagID, getUsersFullName } from "./repositories/Users/UserRepository.js";
@@ -24,7 +23,6 @@ import { Privilege } from "./schemas/usersSchema.js";
 import { createReader, getReaderByID, getReaderByName, getReaderBySN, getReaderCertCA, toggleHelpRequested, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import morgan from "morgan"; //Log provider
-import bodyParser from "body-parser"; //JSON request body parser
 import { createRequire } from "module";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
@@ -34,6 +32,8 @@ import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhere
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
+import { purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
+
 
 const require = createRequire(import.meta.url);
 
@@ -59,7 +59,7 @@ async function startServer() {
   var exp = express();
   var wsserver = expressWs(exp);
   var app = wsserver.app;
-  
+
 
   //Configure CORS
   app.use(cors(CORS_CONFIG));
@@ -71,7 +71,7 @@ async function startServer() {
   app.use(morgan("combined"));
 
   //JSON request body parsing
-  app.use(bodyParser.json());
+  app.use(express.json());
 
   //Prepare client session handler
   setupSessions(app);
@@ -934,6 +934,7 @@ async function startServer() {
     console.log('Wiping daily records...');
     if (API_DEBUG_LOGGING) await createLog('It is now 4:00am. Wiping Daily Temp Records...', "server")
     await setDataPointValue(1, 0).then(async () => await createLog('Daily Visits reset.', "server"));
+    await purgeExpiredPassedModules().then(async (result) => await createLog(`Purged ${result} expired trainings.`, "server"));
     //await pruneNullLengthEquipmentSessions().then(async () => await createLog('Unfinished Equipment Sessions pruned.', "server"));;
   });
 
@@ -950,7 +951,7 @@ async function startServer() {
   app.use(
     "/graphql",
     cors<cors.CorsRequest>(CORS_CONFIG),
-    json(),
+    express.json(),
     expressMiddleware(server, { context: context })
   );
 

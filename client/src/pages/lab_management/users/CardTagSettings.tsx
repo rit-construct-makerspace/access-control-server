@@ -10,7 +10,6 @@ import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { gql, useMutation } from "@apollo/client";
 import GET_USERS from "../../../queries/getUsers";
 import { GET_USER } from "./UserModal";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { toast } from "react-toastify";
 import { isStaff } from "../../../common/PrivilegeUtils";
@@ -41,7 +40,7 @@ export default function CardTagSettings({
   const [updatedCardTagID, setUpdatedCardTagID] = useState("");
 
   const handleSubmit = () => {
-    if (!updatedCardTagID || updatedCardTagID == "") {
+    if (!updatedCardTagID || updatedCardTagID === "") {
       window.alert(
         "New RIT ID cannot be empty."
       );

@@ -1,26 +1,15 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { Box, Button, Divider, FormControlLabel, IconButton, InputLabel, MenuItem, Select, Stack, styled, Switch, Tab, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, Tabs, TextareaAutosize, TextField, Typography } from "@mui/material";
-import PageSectionHeader from "../../../common/PageSectionHeader";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { Box, Button, FormControlLabel, IconButton, InputLabel, MenuItem, Select, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, TextField, Typography } from "@mui/material";
+import { useMutation, useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
-import { DELETE_INVENTORY_LEDGER, GET_LEDGERS } from "../../../queries/inventoryQueries";
-import AuditLogEntity from "../audit_logs/AuditLogEntity";
-import { InventoryLedger } from "../../../types/InventoryItem";
-import { format } from "date-fns";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { CREATE_MAINTENANCE_LOG, CREATE_RESOLUTION_LOG, DELETE_MAINTENANCE_LOG, GET_MAINTENANCE_LOGS, GET_MAINTENANCE_TAGS, GET_RESOLUTION_LOGS, MaintenanceLogItem } from "../../../queries/maintenanceLogQueries";
+import { useNavigate } from "react-router-dom";
+import { CREATE_MAINTENANCE_LOG, GET_MAINTENANCE_LOGS, GET_MAINTENANCE_TAGS, MaintenanceLogItem } from "../../../queries/maintenanceLogQueries";
 import MaintenanceLogEntry from "./MaintenanceLogEntry";
-import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import AdminPage from "../../AdminPage";
-import LabelIcon from '@mui/icons-material/Label';
-import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import MaintenanceTagsModal from "./MaintenanceTagsModal";
 import PrettyModal from "../../../common/PrettyModal";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES, SET_INSTANCE_STATUS } from "../../../queries/equipmentInstanceQueries";
-import AutoAwesomeMotionIcon from '@mui/icons-material/AutoAwesomeMotion';
-import EquipmentInstancesModal from "./EquipmentInstancesModal";
 import CloseIcon from '@mui/icons-material/Close';
+import { useState } from "react";
 
 interface IsseueLogModalProps {
   open: boolean;
@@ -32,20 +21,6 @@ export default function IssueLogModal(props: IsseueLogModalProps) {
   const [newContent, setNewContent] = useState<string>("");
   const [newInstance, setNewInstance] = useState<number>();
   const [markInstanceNeedsRepairs, setMarkInstanceNeedsRepairs] = useState<boolean>(true);
-
-  const currentUser = useCurrentUser();
-
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
 
   const navigate = useNavigate();
 
@@ -71,9 +46,6 @@ export default function IssueLogModal(props: IsseueLogModalProps) {
     setNewContent("");
     setNewInstance(undefined);
   }
-
-  const [instancesModalOpen, setInstancesModalOpen] = useState<boolean>(false);
-
 
   return (
     <PrettyModal
@@ -108,7 +80,7 @@ export default function IssueLogModal(props: IsseueLogModalProps) {
                     >
                       <TableSortLabel
                         direction={instanceSort}
-                        onClick={() => setInstanceSort(instanceSort == 'asc' ? 'desc' : 'asc')}
+                        onClick={() => setInstanceSort(instanceSort === 'asc' ? 'desc' : 'asc')}
                       >
                         Instance
                       </TableSortLabel>
@@ -119,7 +91,7 @@ export default function IssueLogModal(props: IsseueLogModalProps) {
                     >
                       <TableSortLabel
                         direction={timestampSort}
-                        onClick={() => setTimestampSort(timestampSort == 'asc' ? 'desc' : 'asc')}
+                        onClick={() => setTimestampSort(timestampSort === 'asc' ? 'desc' : 'asc')}
                       >
                         Timestamp
                       </TableSortLabel>
@@ -135,7 +107,7 @@ export default function IssueLogModal(props: IsseueLogModalProps) {
                     >
                       <TableSortLabel
                         direction={authorSort}
-                        onClick={() => setAuthorSort(authorSort == 'asc' ? 'desc' : 'asc')}
+                        onClick={() => setAuthorSort(authorSort === 'asc' ? 'desc' : 'asc')}
                       >
                         Author
                       </TableSortLabel>
@@ -151,7 +123,7 @@ export default function IssueLogModal(props: IsseueLogModalProps) {
                   {maintenanceLogsQueryResult.data && maintenanceLogsQueryResult.data.getMaintenanceLogsByEquipment.map((item: MaintenanceLogItem) => (
                     <MaintenanceLogEntry logItem={item} allTags={maintenanceTagsResult.data?.getMaintenanceTags ?? []} />
                   ))}
-                  {!maintenanceLogsQueryResult.data || maintenanceLogsQueryResult.data.getMaintenanceLogsByEquipment.length == 0 && <Typography variant="h6" color={"secondary"} p={3}>No logs.</Typography>}
+                  {(!maintenanceLogsQueryResult.data || (maintenanceLogsQueryResult.data.getMaintenanceLogsByEquipment.length === 0)) && <Typography variant="h6" color={"secondary"} p={3}>No logs.</Typography>}
                 </TableBody>
               </Table>
             </Box>
@@ -160,9 +132,9 @@ export default function IssueLogModal(props: IsseueLogModalProps) {
               <Stack direction={"column"} width={"25%"}>
                 <InputLabel>Instance</InputLabel>
                 <RequestWrapper loading={instancesQueryResult.loading} error={instancesQueryResult.error}>
-                  <Select value={newInstance} onChange={(e) => setNewInstance(Number(e.target.value))} fullWidth defaultValue={instancesQueryResult.data?.equipmentInstances.length == 1 ? instancesQueryResult.data?.equipmentInstances[0].id: null}>
+                  <Select value={newInstance} onChange={(e) => setNewInstance(Number(e.target.value))} fullWidth defaultValue={instancesQueryResult.data?.equipmentInstances.length === 1 ? instancesQueryResult.data?.equipmentInstances[0].id: null}>
                     {instancesQueryResult.data?.equipmentInstances.map((instance: EquipmentInstance) => (
-                      <MenuItem value={instance.id} defaultChecked={instancesQueryResult.data?.equipmentInstances.length == 1}>{instance.name}</MenuItem>
+                      <MenuItem value={instance.id} defaultChecked={instancesQueryResult.data?.equipmentInstances.length === 1}>{instance.name}</MenuItem>
                     ))}
                   </Select>
                 </RequestWrapper>

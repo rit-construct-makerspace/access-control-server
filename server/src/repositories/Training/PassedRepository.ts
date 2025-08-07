@@ -2,7 +2,7 @@ import { knex } from "../../db/index.js";
 
 
 export async function addPassedModule(userID: number, moduleID: number, passedDate: Date) {
-    return await knex("PassedModules").insert({userID: userID, moduleID: moduleID, passedDate: passedDate}).onConflict(["userID", "moduleID"]).merge();
+    return await knex("PassedModules").insert({ userID: userID, moduleID: moduleID, passedDate: passedDate }).onConflict(["userID", "moduleID"]).merge();
 }
 
 export async function deletePassedModule(userID: number, moduleID: number) {
@@ -14,5 +14,5 @@ export async function getPassedModuleIDs(userID: number) {
 }
 
 export async function purgeExpiredPassedModules() {
-    return await knex("PassedModules").delete().where("passedDate", ">=", "NOW() - INTERVAL '1 year'");
+    return (await knex("PassedModules").delete().where("passedDate", "<=", "NOW() - INTERVAL '1 year'").returning("*")).length;
 }

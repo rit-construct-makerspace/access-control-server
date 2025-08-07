@@ -1,9 +1,8 @@
-import { Card, CardHeader, CircularProgress, Divider, LinearProgress, Stack, Typography } from "@mui/material";
+import { Card, CardHeader, Divider, LinearProgress, Stack, Typography } from "@mui/material";
 import AuditLogEntity from "../../audit_logs/AuditLogEntity";
 import { VerboseTrainingSubmission } from "./TrainingStats";
 import { Box } from "@mui/system";
-import { ScatterChart } from '@mui/x-charts/ScatterChart';
-import { chartsTooltipClasses, Gauge, gaugeClasses, PieChart } from "@mui/x-charts";
+import { Gauge, gaugeClasses } from "@mui/x-charts";
 import { LinearProgressProps } from "@mui/x-data-grid/models/gridBaseSlots";
 
 type TrainingStatCardProps = {
@@ -70,7 +69,7 @@ function getColor(value: number) {
 }
 
 
-export function TrainingStatCard({ relevantTrainingSubmissions: relevantTrainingSubmissions }: TrainingStatCardProps) {
+export function TrainingStatCard({ relevantTrainingSubmissions }: TrainingStatCardProps) {
   var passedAttempts: number = 0;
   var failedAttempts: number = 0;
   var uniqueUsers: number[] = [];
@@ -79,7 +78,7 @@ export function TrainingStatCard({ relevantTrainingSubmissions: relevantTraining
 
   var questionStats: { questionText: string, correct: number, incorrect: number, percent: number }[] = []
 
-  const currentQuestions = relevantTrainingSubmissions[0].quiz.filter((item) => item.type === "MULTIPLE_CHOICE" || item.type == "CHECKBOX");
+  const currentQuestions = relevantTrainingSubmissions[0].quiz.filter((item) => item.type === "MULTIPLE_CHOICE" || item.type === "CHECKBOX");
 
   relevantTrainingSubmissions.forEach((submission: VerboseTrainingSubmission) => {
 

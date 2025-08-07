@@ -3,7 +3,6 @@ import {
   CardActionArea,
   CardContent,
   Typography,
-  Stack,
   Grid
 } from "@mui/material";
 import { Module, Submission } from "../../../types/Quiz";

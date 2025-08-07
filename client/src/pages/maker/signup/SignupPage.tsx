@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Checkbox,
   Chip,
   Link,
   MenuItem,
@@ -121,41 +120,49 @@ export default function SignupPage() {
   }, [currentUser, navigate]);
 
   return (
-    <Stack sx={{ maxWidth: 715, mx: "auto", mt: 8 }}>
+    <Stack spacing={3} sx={{ maxWidth: 715, mx: "auto", mt: 8 }}>
       <title>Signup | Make @ RIT</title>
-      <Typography variant="h3">Welcome to The SHED at RIT!</Typography>
-      <Typography variant="body1" mt={4}>
-        The SHED is the premier makerspace at RIT. Join a growing community
-        of creative thinkers and makers, and use our tools and machinery to
-        bring your projects to life!
+      <Typography variant="h3">Welcome to <Typography variant="h3" display={"inline"} color="primary" fontWeight={"bold"}>Make @ RIT!</Typography></Typography>
+      <Typography variant="body1">
+        Make is the gateway to accessing trainings and equipment at the <b>SHED</b>, RIT's largest makerspace.
+        Join a community of creative thinkers and makers, and use our tools and machinery
+        to bring your project to life. <Link
+          href="https://docs.make.rit.edu/%E2%80%8BPolicies%20%26%20Guidances/Makerspace%20Policies/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Read about our policies here!
+        </Link>
       </Typography>
-      <Typography variant="body1" mt={2}>
-        Before you begin making, please answer a few questions to finish setting
+
+      <Typography variant="body1">
+        Before you get started, please answer a few questions to finish setting
         up your account.
       </Typography>
 
-      <Stack direction="row" spacing={4} mt={8}>
+      <Stack direction="row" spacing={4}>
         <StyledFakeTextField>{`${currentUser.firstName} ${currentUser.lastName}`}</StyledFakeTextField>
       </Stack>
 
-      <TextField
-        label="Pronouns"
-        value={pronouns}
-        onChange={(e) => setPronouns(e.target.value)}
-        sx={{ mt: 4 }}
-      />
-      <Stack
-        direction="row"
-        spacing={1}
-        alignItems="center"
-        sx={{ mt: 1, ml: 2 }}
-      >
-        <Typography variant="body2" fontSize="13px">
-          Quick fill:
-        </Typography>
-        <Chip label="He / Him" onClick={() => setPronouns("He / Him")} />
-        <Chip label="She / Her" onClick={() => setPronouns("She / Her")} />
-        <Chip label="They / Them" onClick={() => setPronouns("They / Them")} />
+      <Stack spacing={1}>
+        <TextField
+          label="Pronouns"
+          value={pronouns}
+          onChange={(e) => setPronouns(e.target.value)}
+        />
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          sx={{ pl: 3 }}
+        >
+          <Typography variant="body2" fontSize="13px">
+            Quick fill:
+          </Typography>
+          <Chip label="He / Him" onClick={() => setPronouns("He / Him")} />
+          <Chip label="She / Her" onClick={() => setPronouns("She / Her")} />
+          <Chip label="They / Them" onClick={() => setPronouns("They / Them")} />
+        </Stack>
       </Stack>
 
       <TextField
@@ -172,13 +179,13 @@ export default function SignupPage() {
           </MenuItem>
         ))}
       </TextField>
-      
+
       <TextField
         select
         label="Expected Graduation"
         value={expectedGraduation}
         onChange={(e) => setExpectedGraduation(e.target.value)}
-        sx={{ mt: 4, display: (IS_FACULTY_REGEX.test(currentUser.ritUsername) ? "none" : null)}}
+        sx={{ mt: 4, display: (IS_FACULTY_REGEX.test(currentUser.ritUsername) ? "none" : null) }}
         hidden={IS_FACULTY_REGEX.test(currentUser.ritUsername) ? true : undefined} //Only if faculty/staff
       >
         {generateGradDates().map((d) => (
@@ -193,7 +200,7 @@ export default function SignupPage() {
         size="large"
         variant="contained"
         onClick={handleSubmit}
-        sx={{ mt: 8, alignSelf: "flex-end" }}
+        sx={{ alignSelf: "flex-end" }}
       >
         Start making!
       </LoadingButton>

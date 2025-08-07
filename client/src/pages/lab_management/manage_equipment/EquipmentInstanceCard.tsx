@@ -1,11 +1,11 @@
-import { Alert, Autocomplete, Button, Card, Checkbox, IconButton, Link, MenuItem, Select, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { Alert, Autocomplete, Button, Card, IconButton, MenuItem, Select, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES, InstanceStatus, UPDATE_INSTANCE } from "../../../queries/equipmentInstanceQueries";
 import ActionButton from "../../../common/ActionButton";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 
 import { useMutation, useQuery } from "@apollo/client";
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import { GET_READER_BY_ID, GET_UNPAIRED_READERS, IDENTIFY_READER, Reader, SET_READER_STATE } from "../../../queries/readersQueries";
+import { GET_READER_BY_ID, GET_UNPAIRED_READERS, Reader, SET_READER_STATE } from "../../../queries/readersQueries";
 import { useEffect, useState } from "react";
 
 import BlockIcon from '@mui/icons-material/Block';

@@ -3,7 +3,6 @@ import { Autocomplete, Button, Divider, FormControlLabel, Stack, Switch, TextFie
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_TRAINING_MODULES } from "../../../queries/trainingQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
-import styled from "styled-components";
 import GET_ROOMS from "../../../queries/roomQueries";
 import { Equipment } from "./EditEquipmentPage";
 import AttachedModule from "./AttachedModule";
@@ -12,20 +11,12 @@ import PublishEquipmentButton from "./PublishEquipmentButton";
 import { ObjectSummary } from "../../../types/Common";
 import AdminPage from "../../AdminPage";
 import SpeakerNotesIcon from '@mui/icons-material/SpeakerNotes';
-import { useNavigate } from "react-router-dom";
-import { CREATE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
-import EquipmentInstanceRow from "./EquipmentInstanceRow";
+import { CREATE_EQUIPMENT_INSTANCE } from "../../../queries/equipmentInstanceQueries";
 import AddIcon from '@mui/icons-material/Add';
 import SaveIcon from '@mui/icons-material/Save';
 import IssueLogModal from "./IssueLogModal";
 import PrettyModal from "../../../common/PrettyModal";
 import InstanceGrid from "./InstanceGrid";
-
-const StyledMachineImage = styled.img`
-  width: 128px;
-  height: 128px;
-  border-radius: 4px;
-`;
 
 interface EquipmentEditorProps {
   newEquipment: boolean;
@@ -40,8 +31,6 @@ export default function EquipmentEditor({
   setEquipment,
   onSave,
 }: EquipmentEditorProps) {
-  const navigate = useNavigate();
-
   const getRoomsResult = useQuery(GET_ROOMS);
   const getModulesResult = useQuery(GET_TRAINING_MODULES);
 
@@ -124,9 +113,6 @@ export default function EquipmentEditor({
     })
   }
 
-
-  const [instancesModalOpen, setInstancesModalOpen] = useState<boolean>(false);
-
   const [width, setWidth] = useState<number>(window.innerWidth);
   function handleWindowSizeChange() {
       setWidth(window.innerWidth);
@@ -140,7 +126,6 @@ export default function EquipmentEditor({
 
   const isMobile = width <= 1100;
 
-  const equipmentInstancesResult = useQuery(GET_EQUIPMENT_INSTANCES, {variables: {equipmentID: equipment.id}});
   const [issuesModal, setIssuesModal] = useState(false);
   const [newInstanceModal, setNewInstanceModal] = useState(false);
   const [newInstanceName, setNewInstanceName] = useState("");

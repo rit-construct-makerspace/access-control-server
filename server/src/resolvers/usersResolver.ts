@@ -307,7 +307,7 @@ const UsersResolvers = {
             { id: args.userID, label: getUsersFullName(userSubject) }
           );
 
-          return await UserRepo.archiveUser(Number(args.userID));
+          return await UserRepo.archiveUser(Number(args.userID), true);
         }
       ),
 
@@ -444,8 +444,20 @@ const UsersResolvers = {
         );
         return await UserRepo.revokeUserTrainer(args.userID, args.equipmentID);
       })
-    }
+    },
 
+    forceArchiveUser: async (
+      _parent: any,
+      args: {
+        userID: number,
+        force: boolean | null
+      },
+      { isManager }: ApolloContext
+    ) => {
+      return await isManager(async () => {
+        return await UserRepo.setForceArchive(args.userID, args.force);
+      })
+    }
 
   }
 };
