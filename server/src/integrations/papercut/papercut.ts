@@ -260,7 +260,7 @@ export function registerEndpoints(app: express.Application) {
   handlers.set("api.adjustUserAccountBalanceIfAvailable", papercut_adjustUserAccountBalanceIfAvailable);
 
   app.post("/papercut/api/xmlrpc", xmlparser(), (req, res) => {
-    console.log(`XML RPC request over proto ${req.headers['X-Forwarded-Proto']} from ${req.ip}`);
+    console.log(`XML RPC request over proto ${req.headers['X-Forwarded-Proto'] ?? 'unknown'} from ${req.ip}`);
     console.log(new xml2js.Builder().buildObject(req.body));
     try {
       const methodU: object | undefined = req.body?.methodcall?.methodname;
