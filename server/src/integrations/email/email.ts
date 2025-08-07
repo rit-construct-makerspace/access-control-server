@@ -2,7 +2,7 @@ import FormData from "form-data";
 import * as Mailgun from "mailgun.js"
 import { generateReceiptEmail } from "./receipt-template.js"
 import { Transaction } from "../currency/currency.js";
-
+import {generateExpiryEmail, ExpiryDescription} from "./training-expiry-template.js"
 const mailgun = new Mailgun.default(FormData);
 const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere' });
 const MAIL_DOMAIN = process.env.MAIL_DOMAIN ?? "";
@@ -41,4 +41,10 @@ export async function send_transaction_email(emailAddress: string, transaction: 
         textContent: content.text,
         htmlContent: content.html
     }).catch((err: any) => {console.error("Error sending receipt email", err)});
+}
+
+
+
+export async function send_training_expiry_email(email: string, desc: ExpiryDescription){
+
 }

@@ -112,12 +112,6 @@ const templateSource: string = `
 `
 let template = ejs.compile(templateSource, { async: false })
 
-type R = {
-    items: { name: string, quantity: number, price: number }[]
-    tax: number;
-}
-
-
 function generateTextReceipt(r: Transaction): string {
     return `
 **make.rit.edu receipt**
