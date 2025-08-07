@@ -302,6 +302,19 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
       return inResponse;
     }
 
+    if (user.archived) {
+      wsApiLog("{user} failed to swipe into {access_device} - {euipment} due to being archived", "auth",
+        { id: user.id, label: getUsersFullName(user) },
+        { id: reader?.id, label: reader?.name },
+        { id: machine.id, label: machine.name }
+      );
+
+      inResponse.Verified = 0;
+      inResponse.Error = "User is archived";
+      inResponse.Reason = "user-archived"
+      return inResponse;
+    }
+
     // Find Makerspace
     const machineMakerspace = (await getRoomByID(machine.roomID))?.zoneID
 

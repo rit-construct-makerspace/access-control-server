@@ -24,6 +24,7 @@ import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
 import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ManageUserArchive from "./ManageUserArchive";
 
 export interface Hold {
   id: string;
@@ -89,6 +90,8 @@ export const GET_USER = gql`
       ritUsername
       cardTagID
       notes
+      isArchived
+      forceArchive
       holds {
         id
         creator {
@@ -207,7 +210,6 @@ const DELETE_PASSED_MODULE = gql`
     deletePassedModule(userID: $userID, moduleID: $moduleID)
   }
 `;
-
 
 interface UserModalProps {
   selectedUserID: string;
@@ -520,6 +522,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
                   <PrivilegeControl user={user} isMobile={isMobile} />
                   <CardTagSettings userID={user.id} hasCardTag={(user.cardTagID != null && user.cardTagID !== "")} />
+                  <ManageUserArchive userID={user.id} forceArchive={user.forceArchive} />
                 </Stack>
               </Stack>
 

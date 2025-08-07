@@ -39,7 +39,7 @@ const testuser: CurrentUser = {
   hasHolds: false,
   hasCardTag: true,
   accountID: 1,
-  atriumToken: null,
+  forceArchive: false,
 };
 
 export interface ApolloContext {
