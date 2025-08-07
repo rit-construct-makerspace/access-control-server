@@ -14,14 +14,15 @@ interface ManageAccountModalProps {
 }
 
 const ADJUST_ACCOUNT_CENTS = gql`
-  mutation AdjustAccountBalanceCents($accountID: ID!, $amount: Int!) {
-    adjustAccountBalanceCents(accountID: $accountID, amount: $amount)
+  mutation AdjustAccountBalanceCents($accountID: ID!, $amount: Int!, $description: String!) {
+    adjustAccountBalanceCents(accountID: $accountID, amount: $amount, description: $description)
   }
 `;
 
 export default function ManageAccountModal(props: ManageAccountModalProps) {
 
   const [amount, setAmount] = useState(0);
+  const [description, setDescription] = useState("");
 
   const moneyForamtter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -30,9 +31,21 @@ export default function ManageAccountModal(props: ManageAccountModalProps) {
 
   const [adjustAcountBalanceCents] = useMutation(ADJUST_ACCOUNT_CENTS, { refetchQueries: ["CurrencyAccountsLimit", "CurrencyLedgerEntriesLimit"] });
 
+  function handleClose() {
+    setAmount(0);
+    setDescription("");
+
+    props.onClose();
+  }
+
   async function handleAdjustment(rawDollars: number) {
     if (Number.isNaN(rawDollars)) {
       alert(`Invalid number {${rawDollars}} submitted`);
+      return;
+    }
+
+    if (description === "") {
+      alert("Description required!")
       return;
     }
 
@@ -40,18 +53,19 @@ export default function ManageAccountModal(props: ManageAccountModalProps) {
       variables: {
         accountID: props.account.id,
         amount: Math.round(rawDollars * 100),
+        description: description,
       }
     });
 
-    props.onClose();
+    handleClose();
   }
 
   return (
-    <PrettyModal open={props.open} onClose={props.onClose} width={"600px"}>
+    <PrettyModal open={props.open} onClose={handleClose} width={"600px"}>
       <Stack spacing={2} width={"100%"} alignItems={"center"}>
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
           <Typography color="primary" fontWeight={"bold"} variant="h5">{props.account.owner.displayName} ({props.account.owner.username})</Typography>
-          <IconButton color="error" onClick={props.onClose}>
+          <IconButton color="error" onClick={handleClose}>
             <CloseIcon />
           </IconButton>
         </Stack>
@@ -59,12 +73,20 @@ export default function ManageAccountModal(props: ManageAccountModalProps) {
           <Typography fontWeight={"bold"}>Account {props.account.id}</Typography>
           <Typography><b>Credits:</b> {moneyForamtter.format(props.account.balance / 100)}</Typography>
         </Stack>
+        <TextField
+          label="Description"
+          fullWidth
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+        />
         <Stack direction={"row"} spacing={1} width={"100%"}>
-          <Button color="success" variant="contained" onClick={() => handleAdjustment(amount)}>
-            Add
+          <Button color="error" variant="contained" onClick={() => (handleAdjustment(amount * -1))}>
+            Deduct
           </Button>
           <TextField
             label="Amount"
+            required
             type="number"
             value={amount}
             onChange={(e) => setAmount(Math.abs(Number(e.target.value)))}
@@ -80,7 +102,9 @@ export default function ManageAccountModal(props: ManageAccountModalProps) {
             }}
             fullWidth
           />
-          <Button color="error" variant="contained" onClick={() => (handleAdjustment(amount * -1))}>Deduct</Button>
+          <Button color="success" variant="contained" onClick={() => handleAdjustment(amount)}>
+            Add
+          </Button>
         </Stack>
       </Stack>
     </PrettyModal>

@@ -197,7 +197,9 @@ export async function getAccountsLimit(searchText?: string, limit = 25): Promise
     .leftOuterJoin("Organizations", "Organizations.accountID", "CurrencyAccounts.id")
     .whereILike("Users.ritUsername", `%${searchText}%`)
     .orWhere("Users.accountID", Number.isNaN(Number(searchText)) ? -1 : searchText)
+    .orWhere("Organizations.accountID", Number.isNaN(Number(searchText)) ? -1 : searchText)
     .orWhereILike("Organizations.displayname", `%${searchText}%`)
+    .orWhereILike("Organizations.username", `%${searchText}%`)
     .orWhereILike("Users.firstName", `%${searchText}%`)
     .orWhereILike("Users.lastName", `%${searchText}%`)
     .select("CurrencyAccounts.*").limit(limit).orderBy("id", "asc");

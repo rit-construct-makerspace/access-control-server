@@ -20,6 +20,6 @@ export const CurrencyAccountsTypeDefs = gql`
     }
 
     extend type Mutation {
-        adjustAccountBalanceCents(accountID: ID!, amount: Int!): Boolean
+        adjustAccountBalanceCents(accountID: ID!, amount: Int!, description: String!): Boolean
     }
 `;
