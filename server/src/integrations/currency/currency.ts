@@ -22,12 +22,14 @@ function splitTax(amountCents: number): { nonTax: number, tax: number } {
 
 
 export class Transaction {
+  date: Date
   source: string;
   description?: string;
   items: { name: string, cents: number }[];
   // subtotal is sum(items.cents)
   taxCents: number;
-  constructor(source: string, description: string, items: { name: string, cents: number }[], applyTax: boolean) {
+  constructor(date: Date, source: string, description: string, items: { name: string, cents: number }[], applyTax: boolean) {
+    this.date = date;
     this.source = source;
     this.items = items;
     this.description = description;
@@ -39,10 +41,12 @@ export class Transaction {
     }
 
   }
-
-  public totalCents(): number {
-    const subtotalCents = this.items.reduce((acc, obj) => acc + obj.cents, 0);
-    return subtotalCents + this.taxCents;
+  public subtotal(): number{
+    return this.items.reduce((acc, obj) => acc + obj.cents, 0);
+  }
+  public grandTotalIncludingTax(): number {
+    // TODO take into account tigerbucks
+    return this.subtotal() + this.taxCents;
   }
 }
 
@@ -63,7 +67,7 @@ export async function getAccountBalance(username: string): Promise<number | Make
 
 export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction): Promise<boolean> {
   const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
-  const deltaCents = -transaction.totalCents(); // - if a charge, + if a refund
+  const deltaCents = -transaction.grandTotalIncludingTax(); // - if a charge, + if a refund
   if (makeAccountID) { // found make account, use that first
     const success = await CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(makeAccountID, deltaCents, transaction.source, transaction.description);
     return success;

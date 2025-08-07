@@ -34,6 +34,7 @@ import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js"
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 
+
 const require = createRequire(import.meta.url);
 
 const allowed_origins = [process.env.REACT_APP_ORIGIN, "https://studio.apollographql.com", "https://make.rit.edu", "https://shibboleth.main.ad.rit.edu"];

@@ -3,6 +3,7 @@ import xmlparser from "express-xml-bodyparser";
 import * as xml2js from "xml2js"
 import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as Currency from "../currency/currency.js"
+import { send_transaction_email } from "../email/email.js";
 
 const PAPERCUT_SECURITY_SECRET = process.env.PAPERCUT_SECURITY_SECRET;
 const FREE_3D_PRINTS = process.env.FREE_3D_PRINTS === "true";
@@ -150,15 +151,17 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
 
   const amountCents = Math.round(adjustment * 100);
   try {
+    const changeAmount = -amountCents; // we want negative if refund
+    const transaction = new Currency.Transaction(
+      new Date(),
+      "3DPrinterOS",
+      `for user ${username}: '${comment}'`,
+      [
+        { name: "3D Print", cents: changeAmount }
+      ], false);
+    const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction);
 
-    const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username,
-      new Currency.Transaction(
-        "3DPrinterOS",
-        `Transaction from 3DPrinterOS for user '${username}' of ${Currency.centsToDollarString(amountCents)} with comment '${comment}'`,
-        [
-          { name: "3D Print", cents: amountCents }
-        ], false)
-      );
+    send_transaction_email(username+"@rit.edu", transaction);
     xmlrpcRespond(res, [success]);
   } catch {
     xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)
@@ -295,7 +298,7 @@ export function registerEndpoints(app: express.Application) {
         xmlrpcRespondFault(res, 1, `method "${method}" is not supported`);
       }
     } catch (e) {
-      console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", e);
+      console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", (new xml2js.Builder().buildObject(req.body)), e);
       res.status(500).send();
     }
   });
