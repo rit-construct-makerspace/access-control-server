@@ -17,6 +17,7 @@ import { useIsMobile } from "../../common/IsMobileProvider";
 import { Outlet, useParams } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PaidIcon from '@mui/icons-material/Paid';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 
 export default function StaffBar() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
@@ -116,6 +117,11 @@ export default function StaffBar() {
           primary={"People"}
           to={`/makerspace/${makerspaceID}/people`}
           icon={<PeopleIcon />}
+        />
+        <NavLink
+          primary={"Organizations"}
+          to={`/makerspace/${makerspaceID}/organizations`}
+          icon={<AccountBalanceIcon />}
         />
         <NavLink
           primary={"History"}
