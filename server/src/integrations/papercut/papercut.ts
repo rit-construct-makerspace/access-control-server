@@ -161,6 +161,7 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
       ], false);
     const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction);
 
+    // less repetitive description for receipt
     transaction.description = `3DPrinterOS Transaction for ${username}: ${comment}`
     send_transaction_email(transaction);
     xmlrpcRespond(res, [success]);
