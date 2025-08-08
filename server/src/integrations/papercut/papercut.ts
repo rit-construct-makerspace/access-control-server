@@ -184,18 +184,19 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
       transaction.setCreditsAfter(amountAfter);
     }
 
-    const operation = printCommentParser(comment);
-    console.log(operation);
     let subject = "3D Print";
+    
+    const operation = printCommentParser(comment);
     if (operation && operation.operation == "new") {
       subject = `3D Print Job #${operation.jobID}`
     } else if (operation && (operation.operation == "cancelled" || operation.operation == "failed")) {
       subject = `3D Print Refund Job ${operation.jobID}`;
     }
+
     send_transaction_email(username + "@rit.edu", subject, transaction);
     xmlrpcRespond(res, [success]);
   } catch (e) {
-    console.log(e)
+    console.error(e)
     xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)
   }
 }
@@ -295,8 +296,6 @@ export function registerEndpoints(app: express.Application) {
   handlers.set("api.adjustUserAccountBalanceIfAvailable", papercut_adjustUserAccountBalanceIfAvailable);
 
   app.post("/papercut/api/xmlrpc", xmlparser(), (req, res) => {
-    console.log(`XML RPC request over proto ${req.headers['X-Forwarded-Proto'] ?? 'unknown'} from ${req.ip}`);
-    console.log(new xml2js.Builder().buildObject(req.body));
     try {
       const methodU: object | undefined = req.body?.methodcall?.methodname;
       const paramsU: object | undefined = req.body?.methodcall?.params[0].param;
@@ -330,7 +329,7 @@ export function registerEndpoints(app: express.Application) {
         xmlrpcRespondFault(res, 1, `method "${method}" is not supported`);
       }
     } catch (e) {
-      console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", (new xml2js.Builder().buildObject(req.body)), e);
+      console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", e, "\n", (new xml2js.Builder().buildObject(req.body)));
       res.status(500).send();
     }
   });

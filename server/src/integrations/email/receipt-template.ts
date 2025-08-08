@@ -142,7 +142,6 @@ function generateHTMLReceipt(r: Transaction) {
 export function generateReceiptEmail(r: Transaction): { text: string, html: string } {
     const text = generateTextReceipt(r);
     const html = generateHTMLReceipt(r);
-    console.log(html);
     return { text, html }
 }
 
