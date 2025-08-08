@@ -1,12 +1,10 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
-import { Alert, Avatar, Box, Button, Card, Chip, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, TextareaAutosize, TextField, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Card, Chip, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import InfoBlob from "./InfoBlob";
 import { format, parseISO } from "date-fns";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import styled from "styled-components";
 import HistoryIcon from "@mui/icons-material/History";
 import PrivilegeControl from "./PrivilegeControl";
 import { useNavigate, useParams } from "react-router-dom";
@@ -20,21 +18,13 @@ import RequestWrapper from "../../../common/RequestWrapper";
 import CloseIcon from '@mui/icons-material/Close';
 import { stringAvatar } from "../../../common/avatarGenerator";
 import { isManager, isStaff, isStaffFor, isTrainerFor } from "../../../common/PrivilegeUtils";
-import RestricitonCard from "./RestrictionCard";
 import RestrictionCard from "./RestrictionCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
 import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { LoadingButton } from "@mui/lab";
-
-const StyledInfo = styled.div`
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  row-gap: 32px;
-`;
+import ManageUserArchive from "./ManageUserArchive";
 
 export interface Hold {
   id: string;
@@ -100,6 +90,8 @@ export const GET_USER = gql`
       ritUsername
       cardTagID
       notes
+      isArchived
+      forceArchive
       holds {
         id
         creator {
@@ -219,7 +211,6 @@ const DELETE_PASSED_MODULE = gql`
   }
 `;
 
-
 interface UserModalProps {
   selectedUserID: string;
   onClose: () => void;
@@ -240,7 +231,6 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
   const getEquipment = useQuery(GET_ALL_EQUIPMENTS)
   const [createHold] = useMutation(CREATE_HOLD);
   const [createRestriction] = useMutation(CREATE_RESTRICTION);
-  const [deleteUser] = useMutation(ARCHIVE_USER);
   const [setNotesMutation, setNotesResult] = useMutation(SET_NOTES);
   const [refreshCheck, refreshCheckResult] = useMutation(REFRESH_CHECKS, { variables: { userID: selectedUserID }, refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const [createCheck] = useMutation(CREATE_CHECK, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
@@ -254,7 +244,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
   const handlePlaceHoldClicked = () => {
     const description = window.prompt("Enter hold description:");
-    if (description == "") {
+    if (description === "") {
       window.alert("Description required.");
       return;
     }
@@ -269,13 +259,13 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
   };
 
   function handleCreateRestriction() {
-    if (restrictionMakerspace == -1) {
+    if (restrictionMakerspace === -1) {
       window.alert("Makerspace Required");
       return;
     }
 
     const reason = window.prompt("Enter reason for restriction:")
-    if (reason == "") {
+    if (reason === "") {
       window.alert("Reason required.");
       return;
     } else if (!reason) {
@@ -391,7 +381,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                     ))}
                   </Stack>
 
-                  {filteredACs == null || filteredACs.length === 0 && (
+                  {(filteredACs == null || (filteredACs.length === 0)) && (
                     <Alert severity="info">No Access Checks Available</Alert>
                   )}
 
@@ -399,14 +389,14 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                     Passed Trainings
                   </Typography>
 
-                  {user.passedModules == null || user.passedModules.length === 0 && (
+                  {(user.passedModules == null || (user.passedModules.length === 0)) && (
                     <Alert severity="info">No Passed Trainings</Alert>
                   )}
 
                   <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
                     <Stack spacing={0.5}>
                       {user.passedModules != null && user.passedModules.map((module: { moduleID: number, moduleName: string, passedDate: string, makerspaceID: string }) => (
-                        <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
+                        <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") === "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
                           <Stack direction={"row"} sx={{ justifyContent: "space-between" }} alignItems={"center"}>
                             <Typography>{module.moduleName}</Typography>
                             <Stack direction={"row"} spacing={1} alignItems={"center"}>
@@ -430,14 +420,14 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                     Locked Trainings
                   </Typography>
 
-                  {user.trainingHolds == null || user.trainingHolds.length === 0 && (
+                  {(user.trainingHolds == null || (user.trainingHolds.length === 0)) && (
                     <Alert severity="success">No Locked Trainings</Alert>
                   )}
 
                   <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
                     <Stack spacing={0.5}>
                       {user.trainingHolds != null && user.trainingHolds.map((hold: { id: number; expires: Date; module: { id: number; name: string } }) => (
-                        <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
+                        <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") === "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
                           <Stack direction={"row"} alignItems={"center"} sx={{ justifyContent: "space-between" }}>
                             <Stack direction={"row"} alignItems={"center"} spacing={2}>
                               <Typography color={"secondary"}><b>Exp: </b>{format(new Date(hold.expires), "M/d/yy h:mmaaa")}</Typography>
@@ -531,7 +521,8 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                   }
 
                   <PrivilegeControl user={user} isMobile={isMobile} />
-                  <CardTagSettings userID={user.id} hasCardTag={(user.cardTagID != null && user.cardTagID != "")} />
+                  <CardTagSettings userID={user.id} hasCardTag={(user.cardTagID != null && user.cardTagID !== "")} />
+                  <ManageUserArchive userID={user.id} forceArchive={user.forceArchive} />
                 </Stack>
               </Stack>
 
@@ -547,7 +538,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                     placeholder="Notes"
                     value={notes}
                     onChange={handleNotesChanged}
-                    onSubmit={(e) => setNotesMutation({ variables: { userID: selectedUserID, notes: notes } })}
+                    onSubmit={() => setNotesMutation({ variables: { userID: selectedUserID, notes: notes } })}
                     multiline
                     minRows={2}
                   />

@@ -39,6 +39,7 @@ const testuser: CurrentUser = {
   hasHolds: false,
   hasCardTag: true,
   accountID: 1,
+  forceArchive: false,
   atriumToken: null,
 };
 

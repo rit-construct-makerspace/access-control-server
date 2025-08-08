@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
-import Equipment from "../types/Equipment";
-import Room, { FullRoom } from "../types/Room";
+import Room from "../types/Room";
 import { TrainingModule } from "../common/TrainingModuleUtils";
 import ZoneHours from "../types/ZoneHours";
 
@@ -17,11 +16,7 @@ export const GET_ZONES = gql`
 export interface ZoneWithHours {
   id: number;
   name: string;
-  hours: [{
-    type: string;
-    dayOfTheWeek: number;
-    time: string;
-  }];
+  hours: ZoneHours[];
   imageUrl: string;
 }
 

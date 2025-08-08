@@ -1,5 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
-import Typography from "@mui/material/Typography";
+import { ReactNode } from "react";
 import { Stack } from "@mui/material";
 import { gql, useQuery } from "@apollo/client";
 import RequestWrapper from "../common/RequestWrapper";
@@ -25,19 +24,6 @@ export default function AdminPage({
   children,
   noPadding = false
 }: PageProps) {
-
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 1100;
-
   const isMentorOrHigherResult = useQuery(IS_MENTOR_OR_HIGHER);
 
   return (

@@ -4,15 +4,9 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import GET_EVENTS, { MakeEvent } from "../../queries/eventQueries";
 import { Fade, LinearProgress, Typography } from "@mui/material";
-import styled from "styled-components";
 import { format } from "date-fns";
 import QRCode from "react-qr-code";
 
-const StyledEventImage = styled.img`
-    height: 50%;
-    aspect-ratio: 1;
-    object-fit: cover;
-`;
 
 var listLength = 0;
 var index = 0;
@@ -84,7 +78,7 @@ export default function EventsDisplay() {
 
             return (
                 <Stack height="100vh" width="100%" justifyContent="space-between">
-                    <Fade in={(progress < 99 && progress > 1) || (false && events.length == 1)} appear={false}>
+                    <Fade in={(progress < 99 && progress > 1) || (false && events.length === 1)} appear={false}>
                         <Box height="100%">
                             {
                                 eventGraphics.slice(index, index + 1)

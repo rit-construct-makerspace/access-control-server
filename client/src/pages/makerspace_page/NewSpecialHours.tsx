@@ -1,11 +1,8 @@
-import * as TimeUtils from "../../common/TimeUtils"
-import { Button, Checkbox, FormControlLabel, InputAdornment, Stack, TextField, Typography } from "@mui/material";
-import ZoneHours, { ZoneDefaultHours } from "../../types/ZoneHours";
+import { Button, Checkbox, FormControlLabel, InputAdornment, Stack, TextField } from "@mui/material";
 import { useState } from "react";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import gql from "graphql-tag";
-import { split, useMutation } from "@apollo/client";
-import { GET_ZONE_SPECIAL_HOURS } from "./ManageMakerspaceHours";
+import { useMutation } from "@apollo/client";
 import { useParams } from "react-router-dom";
 
 const ADD_SPECIAL_HOURS = gql`

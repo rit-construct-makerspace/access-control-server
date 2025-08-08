@@ -1,20 +1,15 @@
-import React, { forwardRef, useMemo, useState } from "react";
+import { useState } from "react";
 import {
-  Link as RouterLink,
-  LinkProps as RouterLinkProps,
   useLocation,
-  useNavigate,
 } from "react-router-dom";
-import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import { Box, Chip, FormControl, InputLabel, ListItemButton, Stack, Switch, Typography } from "@mui/material";
+import { ListItemButton, Stack, Switch, Typography } from "@mui/material";
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 
 
 export default function ThemeToggle() {
   const url = useLocation();
-  const [mode, setMode] = useState(localStorage.getItem("themeMode") == "dark")
+  const [mode, setMode] = useState(localStorage.getItem("themeMode") === "dark")
 
   return (
     <ListItemButton sx={{height: "4em"}} onClick={(e) => {

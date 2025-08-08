@@ -16,7 +16,6 @@ import AnnouncementsPage from "./pages/lab_management/announcements/Announcement
 import ManageEquipmentPage from "./pages/lab_management/manage_equipment/ManageEquipmentPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import EditActiveModulePage from "./pages/lab_management/edit_module/EditActiveModulePage";
-import EditArchivedModulePage from "./pages/lab_management/edit_module/EditArchivedModulePage";
 import LogoutPromptPage from "./pages/both/logout/LogoutPromptPage";
 import EditNewModulePage from "./pages/lab_management/edit_module/EditNewModulePage";
 import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnouncementPage";
@@ -41,6 +40,8 @@ import NoPrivilegePage from "./pages/NoPrivilegePage";
 import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
 import HoursDisplay from "./pages/signage/HoursDisplay";
 import EventsDisplay from "./pages/signage/EventsDisplay";
+import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
+import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -138,11 +139,13 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
                   <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
+                  <Route path="/makerspace/:makerspaceID/organizations" element={<OrganizationsPage />} />
 
                   {/* Routes for manager + higher */}
                   <Route element={<ManagerRoute />}>
                     <Route path="/makerspace/:makerspaceID/edit" element={<ManageMakerspacePage />} />
                     <Route path="/makerspace/:makerspaceID/edit/room/:roomID" element={<ManageRoomPage />} />
+                    <Route path="/makerspace/:makerspaceID/currency" element={<CurrencyPage />} />
                   </Route>
                   {/* End manager routes */}
 

@@ -216,11 +216,12 @@ export async function setNotes(
 
 /**
  * Archive a User
- * @param userID ID of user to archive
+ * @param userID ID of user to modify
+ * @param archive Whether to archive or unarchive the user
  * @returns updated User
  */
-export async function archiveUser(userID: number): Promise<UserRow> {
-  await knex("Users").where({ id: userID }).update({ archived: true });
+export async function archiveUser(userID: number, archive: boolean): Promise<UserRow> {
+  await knex("Users").where({ id: userID }).update({ archived: archive });
   return await getUserByID(userID);
 }
 
@@ -321,4 +322,20 @@ export async function revokeUserTrainer(userID: number, equipmentID: number): Pr
 
 export async function getUserByAccountID(accountID: number): Promise<UserRow | undefined> {
   return await knex("Users").where({ accountID: accountID }).select("*").first();
+}
+
+export async function setForceArchive(userID: number, force: boolean | null): Promise<UserRow | undefined> {
+  if (force === true) {
+    await archiveUser(userID, true);
+  } else if (force === false) {
+    await archiveUser(userID, false);
+  }
+
+  const result = await knex("Users").where("id", userID).update("forceArchive", force).returning("*");
+
+  if (result.length > 0) {
+    return result[0];
+  } else {
+    return undefined;
+  }
 }

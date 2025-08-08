@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
-import { FullZone, GET_ZONE_BY_ID, ZoneWithHours } from "../../queries/zoneQueries";
+import { FullZone, GET_ZONE_BY_ID } from "../../queries/zoneQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { Divider, Typography } from "@mui/material";
 import { Stack } from "@mui/system";

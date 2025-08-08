@@ -1,7 +1,5 @@
-import { Button, Checkbox, Divider, FormControl, FormControlLabel, InputLabel, Stack, TextField, Typography } from "@mui/material";
-import * as TimeUtils from "../../common/TimeUtils"
+import { Divider, Stack, Typography } from "@mui/material";
 import gql from "graphql-tag";
-import { useCurrentUser } from "../../common/CurrentUserProvider";
 import { useQuery } from "@apollo/client";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import ZoneHours, { ZoneDefaultHours } from "../../types/ZoneHours";
@@ -38,8 +36,6 @@ export const GET_ZONE_SPECIAL_HOURS = gql`
 `;
 
 export default function ManageMakerspaceHours(props: ManageMakerspaceHoursProps) {
-  const currentUser = useCurrentUser();
-
   const defaultHoursResult = useQuery(GET_ZONE_DEFAULT_HOURS, { variables: { makerspaceID: props.makerspaceID } });
   const specialHoursResult = useQuery(GET_ZONE_SPECIAL_HOURS, { variables: { makerspaceID: props.makerspaceID } });
 

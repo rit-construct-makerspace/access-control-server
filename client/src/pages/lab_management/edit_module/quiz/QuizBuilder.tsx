@@ -1,6 +1,4 @@
-import React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Updater } from "use-immer";
 import QuestionDraft from "./QuestionDraft";
 import { Button, ButtonGroup, Stack } from "@mui/material";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
@@ -11,10 +9,9 @@ import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import YouTubeEmbedDraft from "./YouTubeEmbedDraft";
 import ImageEmbedDraft from "./ImageEmbedDraft";
 import TextDraft from "./TextDraft";
-import { Module, QuizItem, QuizItemType } from "../../../../types/Quiz";
+import { QuizItem, QuizItemType } from "../../../../types/Quiz";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import EmptyPageSection from "../../../../common/EmptyPageSection";
-import { Moduledraft } from "../../../../types/Quiz";
 import PdfEmbedDraft from "./PdfEmbedDraft";
 
 interface QuizBuilderProps {

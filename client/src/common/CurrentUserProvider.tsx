@@ -5,8 +5,6 @@ import { Navigate, useLocation } from "react-router-dom";
 import Privilege from "../types/Privilege";
 import { AccessCheck } from "../pages/lab_management/users/UserModal";
 
-const loginUrl = process.env.REACT_APP_LOGIN_URL ?? "/";
-
 export const GET_CURRENT_USER = gql`
   query GetCurrentUser {
     currentUser {
@@ -16,6 +14,7 @@ export const GET_CURRENT_USER = gql`
       lastName
       privilege
       setupComplete
+      isArchived
       admin
       holds {
         removeDate
@@ -65,6 +64,7 @@ export interface CurrentUser {
   setupComplete: boolean;
   balance: string;
   hasHolds: boolean;
+  isArchived: boolean;
   passedModules: PassedModule[];
   accessChecks: AccessCheck[];
   cardTagID: string;
@@ -113,6 +113,7 @@ const visitor: CurrentUser = {
   trainingHolds: [],
   visitor: true,
   admin: false,
+  isArchived: false,
   manager: [],
   staff: [],
   trainer: []

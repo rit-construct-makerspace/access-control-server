@@ -7,7 +7,6 @@ import { useState } from "react";
 import PrinterOsIcon from "../common/PrinterOSIcon";
 import SlackIcon from "../common/SlackIcon";
 import EventIcon from "@mui/icons-material/Event";
-import SharepointIcon from "../common/SharepointIcon";
 import NavLink from "./NavLink";
 import { useCurrentUser } from "../common/CurrentUserProvider";
 import SchoolIcon from "@mui/icons-material/School";
@@ -17,7 +16,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Footer from "./Footer";
 import PersonIcon from '@mui/icons-material/Person';
 import { useIsMobile } from "../common/IsMobileProvider";
-import { isStaff } from "../common/PrivilegeUtils";
 import ArticleIcon from '@mui/icons-material/Article';
 
 const StyledLogo = styled.img`
@@ -32,7 +30,6 @@ export default function TopNav() {
   const navigate = useNavigate();
 
   const currentUser = useCurrentUser();
-  const isPriviledged = isStaff(currentUser);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(anchorEl);
 
@@ -44,7 +41,7 @@ export default function TopNav() {
     setAnchorEl(null);
   };
 
-  const [labTraining, setLabTraining] = useState(!(localStorage.getItem("showLabTraining") == "false"));
+  const [labTraining, setLabTraining] = useState(!(localStorage.getItem("showLabTraining") === "false"));
 
   const [mobileDrawer, setMobileDrawer] = useState(false);
 
@@ -57,6 +54,13 @@ export default function TopNav() {
 
     return (
       <Stack>
+        { // Archived account alert
+          currentUser.isArchived
+            ? <Alert variant="filled" severity="error" sx={{ borderRadius: 0 }}>
+              Your account has been archived. You are still able to take trainings and review reference materials, but you won't be able to use any machines. Please speak to a member of staff if you believe this was a mistake.
+            </Alert>
+            : null
+        }
         { // Hold alert
           currentUser.hasHolds
             ? <Alert variant="filled" severity="error" sx={{ borderRadius: 0 }}>
@@ -65,7 +69,7 @@ export default function TopNav() {
             : null
         }
         { // No ID alert
-          currentUser.cardTagID == null || currentUser.cardTagID == ""
+          currentUser.cardTagID == null || currentUser.cardTagID === ""
             ? <Alert variant="filled" severity="warning" sx={{ borderRadius: 0 }}>
               Your RIT ID has not been associated with your Makerspace account yet. Please speak to a member of staff in the makerspace to rectify this before using any makerspace equipment. Trainings and 3DPrinterOS will remain available.
             </Alert>
@@ -87,7 +91,7 @@ export default function TopNav() {
       {isMobile
         ? <AppBar position="static">
           <Stack direction="row" justifyContent="space-between">
-            <StyledLogo width="75%" src={localStorage.getItem("themeMode") == "dark" ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" onClick={() => { navigate(`/`); }} />
+            <StyledLogo width="75%" src={(localStorage.getItem("themeMode") === "dark") ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" onClick={() => { navigate(`/`); }} />
             <IconButton onClick={() => setMobileDrawer(true)}>
               <MenuIcon />
             </IconButton>
@@ -157,7 +161,7 @@ export default function TopNav() {
           <AppBar position="static">
             <Stack component="nav" direction="row" justifyContent="space-between" alignItems="center">
               <ButtonBase onClick={() => { navigate(`/`); }} sx={{ width: "15%" }} focusRipple>
-                <StyledLogo width="100%" src={localStorage.getItem("themeMode") == "dark" ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" />
+                <StyledLogo width="100%" src={localStorage.getItem("themeMode") === "dark" ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" />
               </ButtonBase>
               <NavLink
                 to="https://cloud.3dprinteros.com/ssosaml/rit/auth"
