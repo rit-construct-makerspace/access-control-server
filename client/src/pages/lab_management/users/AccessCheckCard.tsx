@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, CardActions } from "@mui/material";
 import { AccessCheckExtraInfo, GET_USER } from "./UserModal";
 import { gql, useMutation } from "@apollo/client";
-import { LoadingButton } from "@mui/lab";
+import LoadingButton from "@mui/lab/LoadingButton";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
 
 const APPROVE_CHECK = gql`

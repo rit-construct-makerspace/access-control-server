@@ -1,4 +1,4 @@
-import { LoadingButton } from "@mui/lab";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { CircularProgress, IconButton, Tooltip } from "@mui/material";
 
 interface ActionButtonProps {

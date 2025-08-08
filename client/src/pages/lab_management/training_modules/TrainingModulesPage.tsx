@@ -4,7 +4,7 @@ import { Divider, Stack, Typography } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client"
-import { LoadingButton } from "@mui/lab";
+import LoadingButton from "@mui/lab/LoadingButton";
 import TrainingModuleRow from "./TrainingModuleRow";
 import { GET_TRAINING_MODULES } from "../../../queries/trainingQueries";
 import { TrainingModule } from "../../../common/TrainingModuleUtils";

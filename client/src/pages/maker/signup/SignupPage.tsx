@@ -13,7 +13,7 @@ import {
 } from "../../../common/CurrentUserProvider";
 import styled from "styled-components";
 import { gql, useMutation } from "@apollo/client";
-import { LoadingButton } from "@mui/lab";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { useNavigate } from "react-router-dom";
 
 const StyledFakeTextField = styled.div`

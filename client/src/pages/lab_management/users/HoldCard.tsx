@@ -2,7 +2,7 @@ import { Card, CardActions, Stack, Typography } from "@mui/material";
 import { GET_USER, Hold } from "./UserModal";
 import { format, parseISO } from "date-fns";
 import { gql, useMutation } from "@apollo/client";
-import { LoadingButton } from "@mui/lab";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManager } from "../../../common/PrivilegeUtils";
 

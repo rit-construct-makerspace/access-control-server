@@ -4,7 +4,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
+import LoadingButton from "@mui/lab/LoadingButton";
 import SaveIcon from "@mui/icons-material/Save";
 import { Announcement } from "../../../queries/announcementsQueries";
 import { useNavigate } from "react-router-dom";
