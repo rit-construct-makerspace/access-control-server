@@ -14,7 +14,7 @@ export async function up(knex: Knex): Promise<void> {
     t.foreign("accountID").references("id").inTable("CurrencyAccounts")
       .onUpdate("CASCADE")
       .onDelete("SET NULL");
-    t.string("owner").notNullable();
+    t.string("owner").notNullable().defaultTo("");
   })
 }
 
