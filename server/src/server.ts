@@ -15,18 +15,11 @@ import context from "./context.js";
 import path from "path";
 import * as schedule from "node-schedule";
 import { getUserByCardTagID, getUsersFullName } from "./repositories/Users/UserRepository.js";
-import { getRoomByID, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
-import { createLog, createLogWithArray } from "./repositories/AuditLogs/AuditLogRepository.js";
-import { getEquipmentByID, getMissingTrainingModules, hasAccessByID } from "./repositories/Equipment/EquipmentRepository.js";
-import { Room } from "./models/rooms/room.js";
-import { Privilege } from "./schemas/usersSchema.js";
-import { createReader, getReaderByID, getReaderByName, getReaderBySN, getReaderCertCA, toggleHelpRequested, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
-import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
+import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
+import { getReaderBySN, getReaderCertCA } from "./repositories/Readers/ReaderRepository.js";
 import morgan from "morgan"; //Log provider
 import { createRequire } from "module";
-import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
-import { ReaderRow, TrainingModuleRow } from "./db/tables.js";
 import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
@@ -34,8 +27,6 @@ import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js"
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
-import { getModules } from "./repositories/Training/ModuleRepository.js";
-import { ExpiryDescription } from "./integrations/email/training-expiry-template.js";
 
 const require = createRequire(import.meta.url);
 
