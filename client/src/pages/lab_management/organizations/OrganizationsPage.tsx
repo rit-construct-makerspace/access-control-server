@@ -9,6 +9,8 @@ import RequestWrapper2 from "../../../common/RequestWrapper2";
 import AddIcon from '@mui/icons-material/Add';
 import PrettyModal from "../../../common/PrettyModal";
 import CloseIcon from '@mui/icons-material/Close';
+import { CurrencyAccount } from "../currency/CurrencyAccounts";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const SEARCH_ORGS_LIMIT = gql`
   query SearchOrganizationsLimit($searchText: String!) {
@@ -17,6 +19,10 @@ const SEARCH_ORGS_LIMIT = gql`
       username
       displayname
       accountID
+      account {
+        id
+        balance
+      }
     }
   }
 `;
@@ -29,11 +35,17 @@ const CREATE_ORG = gql`
   }
 `;
 
+const DELETE_ORG = gql`
+  mutation DeleteOrganization($orgID: ID!) {
+    deleteOrganization(orgID: $orgID)
+  }
+`;
+
 type Organization = {
   id: number;
   username: string;
   displayname: string;
-  accountID: number;
+  account: CurrencyAccount
 }
 
 export default function OrganizationsPage() {
@@ -43,7 +55,8 @@ export default function OrganizationsPage() {
   const navigate = useNavigate();
 
   const [getOrganizations, getOrganizationsResult] = useLazyQuery(SEARCH_ORGS_LIMIT);
-  const [createOrganization] = useMutation(CREATE_ORG, { refetchQueries: ["searchOrganizationsLimit"] })
+  const [createOrganization] = useMutation(CREATE_ORG, { refetchQueries: ["SearchOrganizationsLimit"] })
+  const [deleteOrganization] = useMutation(DELETE_ORG, { refetchQueries: ["SearchOrganizationsLimit"] })
 
   const [searchText, setSearchText] = useState("");
   const [open, setOpen] = useState(false);
@@ -86,6 +99,11 @@ export default function OrganizationsPage() {
     setOpen(false);
   }
 
+  const moneyForamtter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  });
+
   return (
     <RequestWrapper2 result={getOrganizationsResult} render={(data) => {
 
@@ -117,15 +135,30 @@ export default function OrganizationsPage() {
                     <Card variant="outlined" sx={{ height: "100%" }}>
                       <Stack padding={"10px"} width={"350px"} height={"100%"} justifyContent={"space-between"} alignItems={"center"}>
                         <Typography color="primary" fontWeight={"bold"}>{org.displayname} ({org.username})</Typography>
-                        <Button
-                          color="secondary"
-                          sx={{ alignSelf: "flex-end" }}
-                          onClick={() => {
-                            navigate(`/makerspace/${makerspaceID}/currency?a=${org.username}`)
-                          }}
-                        >
-                          View Account
-                        </Button>
+                        <Stack direction={"row"} justifyContent={"space-around"} alignItems={"center"} width={"100%"}>
+                          <Typography><b>Account ID:</b> {org.account.id}</Typography>
+                          <Typography><b>Credits:</b> {moneyForamtter.format(org.account.balance / 100)}</Typography>
+                        </Stack>
+                        <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
+                          <Button
+                            color="error"
+                            startIcon={<DeleteIcon />}
+                            disabled={org.account.balance !== 0}
+                            onClick={() => deleteOrganization({ variables: { orgID: org.id } })}
+                          >
+                            Delete
+                          </Button>
+
+                          <Button
+                            color="secondary"
+                            sx={{ alignSelf: "flex-end" }}
+                            onClick={() => {
+                              navigate(`/makerspace/${makerspaceID}/currency?a=${org.username}`)
+                            }}
+                          >
+                            View Account
+                          </Button>
+                        </Stack>
                       </Stack>
                     </Card>
                   </Grid>

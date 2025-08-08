@@ -49,6 +49,29 @@ export const OrganizationResolver = {
 
         return result;
       })
+    },
+
+    deleteOrganization: async (
+      _parent: any,
+      args: {
+        orgID: number
+      },
+      { isManager }: ApolloContext
+    ) => {
+      return isManager(async (user) => {
+        const org = await OrgRepo.getOrganizationByOrgID(args.orgID);
+        const result = await OrgRepo.deleteOrganization(args.orgID);
+
+        if (!result) {
+          return false;
+        }
+
+        createLog(`{user} deleted the ${org?.displayname} organization`, "admin",
+          { id: user.id, label: getUsersFullName(user) }
+        )
+
+        return result;
+      })
     }
   }
 };
