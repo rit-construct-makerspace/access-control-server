@@ -53,13 +53,14 @@ export async function deleteOrganization(orgID: number): Promise<Boolean> {
     return false;
   }
 
+  await knex("Organizations").where("id", orgID).delete();
+
   // Delete account if able
-  const success = CurrencyAccountRepo.deleteAccount(org.accountID);
+  const success = await CurrencyAccountRepo.deleteAccount(org.accountID);
 
   if (!success) {
-    return false;
+    await knex("Organizations").insert(org); // might blow up, but shouldn't happen
   }
 
-  await knex("Organizations").where("id", orgID).delete();
-  return true;
+  return success;
 }

@@ -1,6 +1,8 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
 import { CurrencyLedgerRow } from "../../db/tables.js";
+import * as OrgRepo from "../Users/OrganizationRepository.js";
+import * as UserRepo from "../Users/UserRepository.js";
 
 export async function createCurrencyLedgerEntry(
     accountID: number,
@@ -10,8 +12,14 @@ export async function createCurrencyLedgerEntry(
     atxID?: number,
     refID?: number
 ): Promise<number> {
+
+    const org = await OrgRepo.getOrganizationByAccountID(accountID);
+
+    const owner = org ? org.username : (await UserRepo.getUserByAccountID(accountID))?.ritUsername
+
     const data = {
         accountID: accountID,
+        owner: owner,
         amount: amount,
         source: source,
         description: description,
@@ -60,6 +68,7 @@ export async function getCurrencyLedgerEntriesLimit(searchText?: string, limit =
         return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
             .whereILike("description", `%${searchText}%`)
             .orWhereILike("source", `%${searchText}%`)
+            .orWhereILike("owner", `%${searchText}%`)
             .limit(limit);
     }
 
