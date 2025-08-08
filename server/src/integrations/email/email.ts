@@ -15,7 +15,7 @@ type MessageSendResult = {
     details?: string;
 }
 export async function send_generic_email(args: { fromAccount: string, to: string[], subject: string, htmlContent: string, textContent: string }): Promise<MessageSendResult> {
-    if (process.env.NODE_ENV !== 'development') {
+    if (true || process.env.NODE_ENV !== 'development') {
         return mg.messages.create(MAIL_DOMAIN, {
             from: `make@rit.edu <${args.fromAccount}@${MAIL_DOMAIN}>`,
             bcc: ((process.env.NODE_ENV !== "development") ? ['make@rit.edu'] : []),
@@ -33,7 +33,13 @@ export async function send_generic_email(args: { fromAccount: string, to: string
 
 const OVERRIDE_RECEIPT_EMAIL = process.env.OVERRIDE_RECEIPT_EMAIL;
 
-export async function send_transaction_email(emailAddress: string, transaction: Transaction) {
+/**
+ * Send an email describing a transaction of tigerbucks and or construct credits
+ * @param emailAddress the email address to send to
+ * @param subjectInfo info for the subject line. will appear as "RIT SHED Receipt - ${subjectInfo} - Date"
+ * @param transaction the transaction information to generate a receipt for
+ */
+export async function send_transaction_email(emailAddress: string, subjectInfo: string, transaction: Transaction) {
     const content = generateReceiptEmail(transaction);
 
     if (OVERRIDE_RECEIPT_EMAIL) {
@@ -42,7 +48,7 @@ export async function send_transaction_email(emailAddress: string, transaction: 
     await send_generic_email({
         fromAccount: 'receipts',
         to: [emailAddress],
-        subject: `RIT SHED Receipt - ${transaction.date.toLocaleString()}`,
+        subject: `RIT SHED Receipt - ${subjectInfo} - ${transaction.date.toLocaleString()}`,
         textContent: content.text,
         htmlContent: content.html
     }).catch((err: any) => { console.error("Error sending receipt email", err) });
