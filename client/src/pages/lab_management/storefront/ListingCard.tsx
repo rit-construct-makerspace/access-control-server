@@ -1,6 +1,7 @@
 import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material";
 import InventoryItem from "../../../types/InventoryItem";
 import { Stack } from "@mui/system";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface ListingCardProps {
   item: InventoryItem
@@ -9,16 +10,18 @@ interface ListingCardProps {
 }
 
 export function ListingCard(props: ListingCardProps) {
+  const isMobile = useIsMobile();
 
   return (
     <Card sx={{width: 400, m: 2}}>
-      <CardMedia
+      {!isMobile && <CardMedia
         sx={{ height: 140 }}
         image={(props.item.image && props.item.image != "") ? props.item.image : (process.env.PUBLIC_URL + "/shed_acronym_vert.jpg")}
-      />
+      />}
       <CardContent sx={{minHeight: 125}}>
         <Typography gutterBottom variant="h5" component="div">{props.item.name}</Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>{props.item.makerspace?.name}</Typography>
+        <Typography variant="body1">${props.item.pricePerUnit.toFixed(2)} / {props.item.unit}</Typography>
       </CardContent>
       <CardActions>
         <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>

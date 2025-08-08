@@ -29,8 +29,8 @@ const REMOVE_INVENTORY_ITEM_AMOUNT = gql`
 `;
 
 const CHECKOUT_ITEMS = gql`
-  mutation CheckoutItems($items: [CartItem], $notes: String, $recievingUserID: ID) {
-    checkoutItems(items: $items, notes: $notes, recievingUserID: $recievingUserID)
+  mutation CheckoutItems($items: [CartItem], $notes: String) {
+    checkoutItems(items: $items, notes: $notes)
   }
 `;
 
@@ -121,14 +121,13 @@ export default function StorefrontPage() {
       updateLocalStorage(draft);
     });
 
-  const handleCheckout = async (checkoutNotes: string, recievingUserID: number | undefined) => {
+  const handleCheckout = async (checkoutNotes: string, recievingUserID?: number) => {
     const items: { id: number, count: number }[] = shoppingCart.map((cartItem) => ({ id: cartItem.item.id, count: cartItem.count }));
 
     await checkoutItems({
       variables: {
         items,
         notes: checkoutNotes,
-        recievingUserID
       },
     });
 

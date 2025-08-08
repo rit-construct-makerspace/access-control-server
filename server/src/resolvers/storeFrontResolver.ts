@@ -8,6 +8,7 @@ import { getUserByID, getUserByIDOrUndefined } from "../repositories/Users/UserR
 import { notifyInventoryItemBelowThreshold } from "../slack/slack.js";
 import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
+import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
 
 const StorefrontResolvers = {
   InventoryItem: {
@@ -147,7 +148,7 @@ const StorefrontResolvers = {
       _: any,
       args: { itemId: string; item: InventoryItemInput },
       { isStaff, isManager }: ApolloContext) => {
-        console.log(args.itemId, args.item);
+      console.log(args.itemId, args.item);
       const orig = await InventoryRepo.getItemById(Number(args.itemId))
       //If item is STAFF ONLY, only allow edits by staff
       if (!(orig)?.staffOnly) {
@@ -290,14 +291,21 @@ const StorefrontResolvers = {
      */
     checkoutItems: async (
       _parent: any,
-      args: { items: { id: number, count: number }[], notes: string | null, recievingUserID: number | null },
-      { isStaff }: ApolloContext) => {
-      return isStaff(async (user) => {
-        const allItems = await InventoryRepo.getItems();
+      args: { items: { id: number, count: number }[], notes: string | null },
+      { ifAuthenticated }: ApolloContext) => {
+      return ifAuthenticated(async (user) => {
+        const allItems = await InventoryRepo.getItemsByID(args.items.map(item => item.id));
         for (var i = 0; i < args.items.length; i++) {
-          if (allItems.find((item) => item.id = args.items[i].id)?.staffOnly && user.manager.length <= 0) {
+          const item = allItems.find((item) => item.id === args.items[i].id);
+          if (!item) {
+            throw new GraphQLError("Item with ID " + args.items[i].id + " does not exist");
+          }
+          if (item.staffOnly && user.manager.length <= 0) {
             //Fail if user is trying to checkout a staff item
-            throw new GraphQLError("Unauthorized")
+            throw new GraphQLError("Unauthorized to checkout staff-only item");
+          }
+          if (item.count < args.items[i].count) {
+            throw new GraphQLError("Insufficient stock for item " + item.name);
           }
         }
 
@@ -314,8 +322,48 @@ const StorefrontResolvers = {
           totalCost -= args.items[i].count * item.pricePerUnit
         }
 
-        await createLedger(user.id, (args.recievingUserID ? "Purchase" : "Internal Use"), totalCost, (args.recievingUserID ?? undefined), args.notes ?? "", ledgerItems);
-        return true;
+
+        var atriumTransactionSuccess = false;
+        /***********************************************************************************************
+         * TODO: Atrium Logic
+         ***********************************************************************************************/
+        atriumTransactionSuccess = true;
+
+        if (atriumTransactionSuccess) {
+          await getInventoryCartsByUser(user.id).then(async (carts) => {
+            const groupedItems = allItems.reduce((groups: Record<string, InventoryItem[]>, entry: InventoryItem) => {
+              const key: number = entry.makerspaceID;
+              if (!groups[key]) {
+                groups[key] = [];
+              }
+              groups[key].push(entry);
+              return groups;
+            }, {});
+
+            for (const [makerspaceID, items] of Object.entries(groupedItems)) {
+              var cart = carts.find(cart => cart.makerspaceID === Number(makerspaceID));
+              if (!cart) {
+                // Create a new cart if it doesn't exist
+                await createInventoryCart(user.id, Number(makerspaceID)).then(async (newCart) => {
+                  //Then add the items to the cart
+                  await addItemsToCart(newCart.id, items.map(item => ({
+                    itemID: item.id,
+                    quantity: item.count
+                  })));
+                });
+              } else {
+                // Cart exists, add new items or update the existing items
+                await addOrUpdateItemsInCart(cart.id, items.map(item => ({
+                  itemID: item.id,
+                  quantity: item.count
+                })));
+              }
+            }
+          });
+
+          await createLedger(user.id, "Purchase", totalCost, user.id, args.notes ?? "", ledgerItems);
+        }
+        return atriumTransactionSuccess;
       });
     },
 

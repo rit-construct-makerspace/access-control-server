@@ -28,6 +28,16 @@ export async function getItems(makerspaceID?: number): Promise<InventoryItem[]> 
 }
 
 /**
+ * Fetch Inventory Items by Multiple IDs
+ * @param itemIds IDs of Inventory Items to find
+ * @returns matching Inventory Items
+ */
+export async function getItemsByID(itemIds: number[]): Promise<InventoryItem[]> {
+  const knexResult = knex("InventoryItem").select().whereIn("id", itemIds);
+  return inventoryItemsToDomain(await knexResult);
+}
+
+/**
  * Fetch Inventory Items by "staffOnly" column
  * @param staffOnly whether to fetch staffOnly items or not staffOnly items
  * @returns matching Inventory Items

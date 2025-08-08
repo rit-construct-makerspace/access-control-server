@@ -13,7 +13,7 @@ interface ShoppingCartProps {
   entries: ShoppingCartEntry[];
   removeEntry: (id: string) => void;
   setEntryCount: (id: string, newCount: number) => void;
-  emptyCart: (checkoutNotes: string, recievingUserID: number | undefined) => void;
+  emptyCart: (checkoutNotes: string, recievingUserID?: number) => void;
   internal: boolean;
 }
 
@@ -32,11 +32,6 @@ export default function ShoppingCart({
     .reduce((acc, { count, item }) => acc + count * item.pricePerUnit, 0)
     .toFixed(2);
 
-    console.log("ShoppingCart entries:", entries.map((entry) => ({
-      id: entry.id,
-      makerspaceID: entry.item.makerspaceID,
-      makerspace: entry.item.makerspace
-    })));
 
   const groupedEntries = entries.reduce((groups: Record<string, ShoppingCartEntry[]>, entry: ShoppingCartEntry) => {
     const key: number = entry.item.makerspaceID;
@@ -113,10 +108,12 @@ export default function ShoppingCart({
       : <CheckoutModal
         open={showCheckoutModal}
         onClose={() => setShowCheckoutModal(false)}
-        onFinalize={(checkoutNotes: string, recievingUserID: number | undefined) => {
+        onFinalize={(checkoutNotes: string) => {
           setShowCheckoutModal(false);
-          emptyCart(checkoutNotes, recievingUserID);
+          emptyCart(checkoutNotes);
         }}
+        groupedEntries={groupedEntries}
+        totalCost={total}
       />}
     </>
   );

@@ -126,7 +126,7 @@ export const StoreFrontTypeDefs = gql`
     createLabel(label: String): String
     archiveLabel(label: String): String
     deleteInventoryItem(id: ID!): Boolean
-    checkoutItems(items: [CartItem], notes: String, recievingUserID: ID): Boolean
+    checkoutItems(items: [CartItem], notes: String): Boolean
     setStaffOnly(id: ID!, staffOnly: Boolean!): InventoryItem
     setStorefrontVisible(id: ID!, storefrontVisible: Boolean!): InventoryItem
     addTagToItem(itemID: ID!, tagID: ID!): Boolean
