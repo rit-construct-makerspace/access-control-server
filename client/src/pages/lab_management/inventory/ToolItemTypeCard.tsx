@@ -80,7 +80,7 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
           component="img"
           width={150}
           height={150}
-          image={type.imageUrl ? `${process.env.REACT_APP_CDN_URL}${process.env.REACT_APP_CDN_TOOL_DIR}/${type.imageUrl}` : `${process.env.REACT_APP_CDN_URL}/shed_acronym_vert.jpg`}
+          image={type.imageUrl ? `${import.meta.env.VITE_CDN_URL}${import.meta.env.VITE_CDN_TOOL_DIR}/${type.imageUrl}` : `${import.meta.env.VITE_CDN_URL}/shed_acronym_vert.jpg`}
           alt={`${type.name} image`}
           sx={{ width: 150 }} />
         <Box width={"98.5%"} pl={"1.5%"}>

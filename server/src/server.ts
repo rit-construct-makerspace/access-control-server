@@ -30,7 +30,7 @@ import * as Emailer from "./integrations/email/email.js"
 
 const require = createRequire(import.meta.url);
 
-const allowed_origins = [process.env.REACT_APP_ORIGIN, "https://studio.apollographql.com", "https://make.rit.edu", "https://shibboleth.main.ad.rit.edu"];
+const allowed_origins = [process.env.VITE_ORIGIN, "https://studio.apollographql.com", "https://make.rit.edu", "https://shibboleth.main.ad.rit.edu"];
 
 const __dirname = import.meta.dirname;
 
@@ -38,7 +38,7 @@ const __dirname = import.meta.dirname;
  * set up Cross-Origin Request allowances
  */
 const CORS_CONFIG = {
-  origin: process.env.REACT_APP_ORIGIN,
+  origin: process.env.VITE_ORIGIN,
   credentials: true,
 };
 
@@ -445,7 +445,7 @@ async function startServer() {
           modules: expiry.moduleIds.map((id, index) => {
             return {
               name: expiry.moduleNames[index],
-              link: `${process.env.REACT_APP_ORIGIN}/app/maker/training/${id}`
+              link: `${process.env.VITE_ORIGIN}/app/maker/training/${id}`
             }
           })
         }
