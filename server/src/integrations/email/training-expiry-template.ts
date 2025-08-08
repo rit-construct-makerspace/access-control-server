@@ -54,19 +54,19 @@ If you have already passed the in-person competency check, you will not need to 
 `
 let template = ejs.compile(templateSource, { async: false })
 
-function generateTextReceipt(desc: ExpiryDescription): string {
+function generateTextNotification(desc: ExpiryDescription): string {
     return `warning`
 }
 
 
-function generateHTMLReceipt(desc: ExpiryDescription) {
+function generateHTMLNotification(desc: ExpiryDescription) {
     return template(desc);
 }
 
 
 export function generateExpiryEmail(r: ExpiryDescription): { text: string, html: string } {
-    const text = generateTextReceipt(r);
-    const html = generateHTMLReceipt(r);
+    const text = generateTextNotification(r);
+    const html = generateHTMLNotification(r);
     return { text, html }
 }
 
