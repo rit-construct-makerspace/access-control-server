@@ -20,7 +20,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
     const navigate = useNavigate();
     const theme = useTheme();
     const isPriviledged = props.staffMode;
-    const hasApprovedAccessCheck: boolean = !!user.accessChecks.find((ac) => Number(ac.equipmentID) === props.equipment.id && ac.approved)
+    const hasApprovedAccessCheck: boolean = user.accessChecks.some((ac) => Number(ac.equipmentID) == props.equipment.id && ac.approved)
 
     const moduleStatuses = props.equipment.trainingModules.map(
         moduleStatusMapper(user.passedModules, user.trainingHolds)
