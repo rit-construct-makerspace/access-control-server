@@ -96,7 +96,7 @@ export default function CurrencyLedger() {
 
       const columns: GridColDef[] = [
         { field: "id", headerName: "ID", width: 100 },
-        { field: "accountID", headerName: "Account ID", width: 150 },
+        { field: "accountID", headerName: "Account ID", width: 100 },
         { field: "owner", headerName: "Account Owner", width: 150 },
         { field: "amount", headerName: "Amount", width: 200 },
         { field: "dateTime", headerName: "Date", width: 200 },
