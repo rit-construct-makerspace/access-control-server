@@ -13,6 +13,7 @@ const GET_CURRENCY_LEDGER_ENTRIES = gql`
       id
       dateTime
       accountID
+      owner
       amount
       source
       description
@@ -26,6 +27,7 @@ type CurrencyLedgerEntry = {
   id: number;
   dateTime: Date;
   accountID: number;
+  owner: string;
   amount: number;
   source: string
   description: string | null
@@ -95,6 +97,7 @@ export default function CurrencyLedger() {
       const columns: GridColDef[] = [
         { field: "id", headerName: "ID", width: 100 },
         { field: "accountID", headerName: "Account ID", width: 150 },
+        { field: "owner", headerName: "Account Owner", width: 150 },
         { field: "amount", headerName: "Amount", width: 200 },
         { field: "dateTime", headerName: "Date", width: 200 },
         { field: "source", headerName: "Source", width: 200 },
@@ -106,6 +109,7 @@ export default function CurrencyLedger() {
       const rows: GridRowsProp = entries.map((entry) => ({
         id: entry.id,
         accountID: entry.accountID,
+        owner: entry.owner,
         amount: moneyForamtter.format(entry.amount / 100),
         dateTime: dateTimeFormatter.format(new Date(entry.dateTime)),
         source: entry.source,
