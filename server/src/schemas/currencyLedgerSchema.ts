@@ -4,7 +4,8 @@ export const CurrencyLedgerTypeDefs = gql`
   type CurrencyLedgerEntry {
     id: ID!
     dateTime: DateTime!
-    accountID: ID!
+    accountID: ID
+    owner: String!
     amount: Int!
     source: String!
     description: String

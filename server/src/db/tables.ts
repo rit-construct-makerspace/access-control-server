@@ -421,7 +421,8 @@ export interface OrganizationsRow {
 export interface CurrencyLedgerRow {
   id: number;
   dateTime: Date;
-  accountID: number;
+  accountID: number | null;
+  owner: string;
   amount: number;
   source: string;
   description: string;

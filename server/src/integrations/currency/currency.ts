@@ -28,6 +28,7 @@ export class Transaction {
   items: { name: string, cents: number }[];
   // subtotal is sum(items.cents)
   taxCents: number;
+  creditsRemainingAfterTransaction: number;
   constructor(date: Date, source: string, description: string, items: { name: string, cents: number }[], applyTax: boolean) {
     this.date = date;
     this.source = source;
@@ -39,7 +40,7 @@ export class Transaction {
     } else {
       this.taxCents = 0
     }
-
+    this.creditsRemainingAfterTransaction = 0;
   }
   public subtotal(): number{
     return this.items.reduce((acc, obj) => acc + obj.cents, 0);
@@ -47,6 +48,11 @@ export class Transaction {
   public grandTotalIncludingTax(): number {
     // TODO take into account tigerbucks
     return this.subtotal() + this.taxCents;
+  }
+
+  // THIS WILL BE REPLACED LATER WHEN SPLITTING CC/TB HAPPENS, JUST USED TO FILL IN RECEIPT
+  public setCreditsAfter(amountAfter: number){
+    this.creditsRemainingAfterTransaction = amountAfter;
   }
 }
 

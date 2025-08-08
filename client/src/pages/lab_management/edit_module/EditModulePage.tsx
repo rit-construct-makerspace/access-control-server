@@ -1,12 +1,8 @@
 import QuizBuilder from "./quiz/QuizBuilder";
 import {
-  Box,
-  Button,
   CircularProgress,
   Fab,
   FormControl,
-  Grid,
-  IconButton,
   InputLabel,
   MenuItem,
   Select,
@@ -15,7 +11,6 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import Page from "../../Page";
 import SaveIcon from "@mui/icons-material/Save";
 import { useImmer } from "use-immer";
 import { Module, QuizItem } from "../../../types/Quiz";
@@ -26,7 +21,7 @@ import ArchiveTrainingModuleButton from "../training_modules/ArchiveTrainingModu
 import { DropResult } from "@hello-pangea/dnd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
-import { FullZone, GET_FULL_ZONES, GET_ZONE_BY_ID } from "../../../queries/zoneQueries";
+import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isAdmin, isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
@@ -85,7 +80,8 @@ export default function EditModulePage({
 
     navigate(`/makerspace/${makerspaceID}/trainings`)
   }
-
+  // we should be able to delete soon
+  // eslint-disable-next-line
   const handleDeleteClicked = async () => {
     if (!window.confirm("Are you sure you want to delete this module?")) {
       return;

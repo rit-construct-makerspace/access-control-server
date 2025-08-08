@@ -85,13 +85,13 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
           sx={{ width: 150 }} />
         <Box width={"98.5%"} pl={"1.5%"}>
           <CardHeader title={<Typography variant="h4" pt={"2%"}>{type.name}</Typography>} action={isManager(currentUser) && CONTROL_MENU} sx={{ height: 15, pb: 3, pl: 1 }}></CardHeader>
-          <Box my={2} mx={2} py={1} px={1} border={`1px solid ${localStorage.getItem("themeMode") == "dark" ? "#000000" : "#fafafa"}`}>
+          <Box my={2} mx={2} py={1} px={1} border={`1px solid ${localStorage.getItem("themeMode") === "dark" ? "#000000" : "#fafafa"}`}>
             <Markdown>{type.description}</Markdown>
           </Box>
         </Box>
       </Stack>
       <Divider />
-      <CardContent sx={{ background: localStorage.getItem("themeMode") == "dark" ? "linear-gradient(to bottom, #1e1e1e, #000000)" : "linear-gradient(to bottom, #ffffff, #fafafa)", p: 0 }}>
+      <CardContent sx={{ background: localStorage.getItem("themeMode") === "dark" ? "linear-gradient(to bottom, #1e1e1e, #000000)" : "linear-gradient(to bottom, #ffffff, #fafafa)", p: 0 }}>
         <Stack direction={"row"} onClick={() => setShowInstances(!showInstances)} width={"95%"} justifyContent={"space-between"} p={"16px"}>
           <Typography variant="h6">Instances ({type.instances.length})</Typography>
           <Stack direction={"row"} alignItems={"center"} spacing={1}>
@@ -101,7 +101,7 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
         </Stack>
         <Collapse in={showInstances}>
           <Grid container spacing={2} py={2} px={"16px"}>
-            {type.instances.length == 0 && <Grid pl={2}><Typography variant="body2" ml={5}>No Instances</Typography></Grid>}
+            {type.instances.length === 0 && <Grid pl={2}><Typography variant="body2" ml={5}>No Instances</Typography></Grid>}
             {type.instances.map((instance: ToolItemInstance) => (
               <Grid>
                 <ToolItemInstanceCard item={instance} handleLoanClick={(item: ToolItemInstance) => handleLoanInstanceClick(item, type)} handleReturnClick={(item: ToolItemInstance) => handleReturnInstanceClick(item, type)} />

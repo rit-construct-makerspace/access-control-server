@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Chip, Stack, SxProps, Typography } from "@mui/material";
 import { format, parseISO } from "date-fns";
 import reactStringReplace from "react-string-replace";
@@ -49,10 +49,10 @@ export default function AuditLogRow({ dateTime, message, category }: AuditLogRow
     <Stack direction={isMobile ? "column" : "row"} alignItems={isMobile ? "flex-start" : "center"} px={2}>
       <Stack direction={isMobile ? "row" : "column"}>
         <Stack direction={"row"}>
-          <Typography color={localStorage.getItem("themeMode") == "dark" ? "grey.300" : "grey.700"} sx={{ width: 70 }} variant="body2">
+          <Typography color={localStorage.getItem("themeMode") === "dark" ? "grey.300" : "grey.700"} sx={{ width: 70 }} variant="body2">
             {date}
           </Typography>
-          <Typography color={localStorage.getItem("themeMode") == "dark" ? "grey.300" : "grey.700"} sx={{ width: 93 }} variant="body2">
+          <Typography color={localStorage.getItem("themeMode") === "dark" ? "grey.300" : "grey.700"} sx={{ width: 93 }} variant="body2">
             {time}
           </Typography>
         </Stack>

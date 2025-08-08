@@ -29,19 +29,21 @@ const templateSource: string = `
         text-align: left;
     }
 
-    .total-table td {
-        padding-left: 15px;
-        padding-right: 15px;
+
+    .item-table > td,th {
+        padding-left: 50px;
+        padding-right: 50px;
+        margin: 10px;
+        display: block;
     }
 
     .item-table {
+      border-spacing: 30px;
+
         margin: 0px auto;
-        padding: 15px;
     }
     .item-table td{
         text-align: left;
-        padding-left: 15px;
-        padding-right: 15px;
     }
 
     tr.separator {
@@ -49,14 +51,8 @@ const templateSource: string = `
     }    
 </style>
 <div class="email-body">
-    <picture id="logo-image">
-        <source srcset="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange.png"
-            media="(prefers-color-scheme: light)" />
-        <source srcset="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_orange_white.png"
-            media="(prefers-color-scheme: dark)" />
-        <img src="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange.png"
-            alt="RIT The Shed Logo" width="600px">
-    </picture>
+    <img src="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange_white_bg.png"
+        alt="RIT The Shed Logo" width="600px">
     <h1>Transaction Receipt - <%= transaction.date.toLocaleString() %></h1>
 
     <h2><%= transaction.source %></h2>
@@ -105,18 +101,15 @@ const templateSource: string = `
             <td><%= formatCents(transaction.grandTotalIncludingTax()) %></td>
         </tr>
 
-
     </table>
+
+    <br><br>
+    <br><br>
+    You have <%= formatCents(transaction.creditsRemainingAfterTransaction) %> Construct Credits remaining.
 
 </div>
 `
 let template = ejs.compile(templateSource, { async: false })
-
-type R = {
-    items: { name: string, quantity: number, price: number }[]
-    tax: number;
-}
-
 
 function generateTextReceipt(r: Transaction): string {
     return `
@@ -130,6 +123,10 @@ Subtotal: ${centsToDollarString(r.subtotal())}
 Tax:      ${centsToDollarString(r.taxCents)}
 
 Total:    ${centsToDollarString(r.grandTotalIncludingTax() + r.taxCents)}
+
+
+You have ${centsToDollarString(r.creditsRemainingAfterTransaction)} Construct Credits remaining.
+
 `
 }
 

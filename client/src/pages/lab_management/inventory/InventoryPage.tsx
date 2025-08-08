@@ -27,7 +27,7 @@ function sortItemsByName(items: InventoryItem[]): InventoryItem[] {
 export default function InventoryPage() {
   const currentUser = useCurrentUser();
 
-  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
+  const [windowWidth] = useState<number>(window.innerWidth);
 
   const [searchText, setSearchText] = useState<string>("");
   const [modalItemId, setModalItemId] = useState<string>("");

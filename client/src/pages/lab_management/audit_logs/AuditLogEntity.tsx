@@ -40,7 +40,7 @@ export default function AuditLogEntity({ entityCode }: AuditLogEntityProps) {
 
   const url = getEntityUrl(entityType, id, makerspaceID ?? "0");
 
-  const [reveal, setReveal] = useState(entityType != "conceal");
+  const [reveal, setReveal] = useState(entityType !== "conceal");
 
   const toggleConcealment = () => {
       setReveal(reveal => !reveal)
