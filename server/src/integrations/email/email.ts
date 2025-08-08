@@ -14,7 +14,7 @@ type MessageSendResult = {
     status: number;
     details?: string;
 }
-export function send_generic_email(args: { fromAccount: string, to: string[], subject: string, htmlContent: string, textContent: string }): Promise<MessageSendResult> {
+export async function send_generic_email(args: { fromAccount: string, to: string[], subject: string, htmlContent: string, textContent: string }): Promise<MessageSendResult> {
     if (process.env.NODE_ENV !== 'development') {
         return mg.messages.create(MAIL_DOMAIN, {
             from: `make@rit.edu <${args.fromAccount}@${MAIL_DOMAIN}>`,
@@ -27,6 +27,7 @@ export function send_generic_email(args: { fromAccount: string, to: string[], su
         });
     } else {
         console.log("NOT SENDING EMAIL BC DEV ENVIRONMENT");
+        return {status: 500};
     }
 }
 
