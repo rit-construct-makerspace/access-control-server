@@ -114,7 +114,13 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
   }
 }
 
+
 const print_comment_matcher: RegExp = /(New job|Job Failed \(Refund\)|Job Aborted \(Refund\)) \(jobID #(\d*?)\)/;
+/**
+ * Parse the 3dprinteros provided comment string to figure out what the adjustment was for
+ * @param comment the comment given to us by 3dprinter os
+ * @returns a description or undefined if we don't know how to parse it (havent seen it before)
+ */
 function printCommentParser(comment: string): { operation: "new" | "failed" | "cancelled", jobID: number } | undefined {
   const res = print_comment_matcher.exec(comment)
   if (res == null || res.length != 3) {
