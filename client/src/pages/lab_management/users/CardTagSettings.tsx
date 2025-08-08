@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   Alert,
+  Button,
   FormControl,
   Stack,
   TextField,
@@ -10,7 +11,6 @@ import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { gql, useMutation } from "@apollo/client";
 import GET_USERS from "../../../queries/getUsers";
 import { GET_USER } from "./UserModal";
-import LoadingButton from "@mui/lab/LoadingButton";
 import { toast } from "react-toastify";
 import { isStaff } from "../../../common/PrivilegeUtils";
 import AddCardIcon from '@mui/icons-material/AddCard';
@@ -91,7 +91,7 @@ export default function CardTagSettings({
             }}
             fullWidth
           />
-          <LoadingButton
+          <Button
             loading={setCardTagIDResult.loading}
             size="large"
             variant="contained"
@@ -100,7 +100,7 @@ export default function CardTagSettings({
             sx={{ whiteSpace: "nowrap", minWidth: "unset" }}
           >
             Update Card Tag
-          </LoadingButton>
+          </Button>
         </Stack>
       </FormControl>
       {!isStaff(currentUser) && (
