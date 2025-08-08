@@ -1,6 +1,4 @@
-import React from "react";
-import { Alert } from "@mui/lab";
-import { Button, Link, Stack, Typography } from "@mui/material";
+import { Alert, Button, Link, Stack, Typography } from "@mui/material";
 import MonitorIcon from "@mui/icons-material/Monitor";
 
 export default function MonitorAlert() {

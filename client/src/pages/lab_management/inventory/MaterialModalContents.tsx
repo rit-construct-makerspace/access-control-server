@@ -10,7 +10,6 @@ import {
 import HistoryIcon from "@mui/icons-material/History";
 import DeleteMaterialButton from "./DeleteMaterialButton";
 import HelpTooltip from "../../../common/HelpTooltip";
-import LoadingButton from "@mui/lab/LoadingButton";
 import SaveIcon from "@mui/icons-material/Save";
 import InventoryItem from "../../../types/InventoryItem";
 import AdminPage from "../../AdminPage";
