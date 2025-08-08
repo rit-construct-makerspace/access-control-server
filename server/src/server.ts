@@ -34,9 +34,7 @@ import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js"
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
-import { getModules } from "./repositories/Training/ModuleRepository.js";
-import { ExpiryDescription } from "./integrations/email/training-expiry-template.js";
-
+import * as Atrium from "./integrations/atrium-integration/atrium.js"
 const require = createRequire(import.meta.url);
 
 const allowed_origins = [process.env.REACT_APP_ORIGIN, "https://studio.apollographql.com", "https://make.rit.edu", "https://shibboleth.main.ad.rit.edu"];

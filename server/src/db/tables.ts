@@ -236,8 +236,8 @@ export interface UserRow {
   activeHold: boolean;
   admin: boolean;
   accountID: number;
-  forceArchive: boolean | null;
   atriumToken: string | null;
+  forceArchive: boolean | null;
 }
 
 export interface ReaderRow {
