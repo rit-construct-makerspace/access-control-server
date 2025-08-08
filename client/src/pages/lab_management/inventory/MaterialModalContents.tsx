@@ -210,7 +210,7 @@ export default function MaterialModalContents({
           </Stack>
         )}
 
-        <LoadingButton
+        <Button
           loading={loading}
           size="large"
           variant="contained"
@@ -219,7 +219,7 @@ export default function MaterialModalContents({
           onClick={handleSaveClick}
         >
           Save
-        </LoadingButton>
+        </Button>
       </Stack>
     </AdminPage>
   );

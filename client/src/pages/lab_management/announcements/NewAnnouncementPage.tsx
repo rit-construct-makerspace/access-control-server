@@ -83,7 +83,7 @@ export default function NewAnnouncementPage() {
                     Cancel
                 </Button>
 
-                <LoadingButton
+                <Button
                     loading={mutation.loading}
                     size="large"
                     variant="contained"
@@ -93,7 +93,7 @@ export default function NewAnnouncementPage() {
                     onClick={handleSaveClick}
                 >
                     Save
-                </LoadingButton>
+                </Button>
             </Stack>
         </Stack>
     );

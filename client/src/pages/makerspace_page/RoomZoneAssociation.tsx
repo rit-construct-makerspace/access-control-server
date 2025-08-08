@@ -1,13 +1,13 @@
 import { useState } from "react";
 import {
   Alert,
+  Button,
   FormControl,
   MenuItem,
   Select,
 } from "@mui/material";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import LoadingButton from "@mui/lab/LoadingButton";
 import { InputLabel } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
 
@@ -68,7 +68,7 @@ export default function RoomZoneAssociation({
           ))}
         </Select>
       </FormControl>
-      <LoadingButton
+      <Button
         startIcon={<SaveIcon />}
         loading={setNewZoneResult.loading}
         size="large"
@@ -77,7 +77,7 @@ export default function RoomZoneAssociation({
         sx={{ mt: 8, alignSelf: "flex-end" }}
       >
         Update Zone
-      </LoadingButton>
+      </Button>
 
       {!currentUser.admin && (
         <Alert severity="info" sx={{ width: "max-content", mt: 1 }}>

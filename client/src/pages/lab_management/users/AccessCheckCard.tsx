@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Card, CardActions } from "@mui/material";
+import { Button, Card, CardActions } from "@mui/material";
 import { AccessCheckExtraInfo, GET_USER } from "./UserModal";
 import { gql, useMutation } from "@apollo/client";
-import LoadingButton from "@mui/lab/LoadingButton";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
 
 const APPROVE_CHECK = gql`
@@ -67,7 +66,7 @@ export default function AccessCheckCard({ accessCheck, userID }: AccessCheckCard
       </div>
       <CardActions>
         {!approved && (
-          <LoadingButton
+          <Button
             size="small"
             color="success"
             variant="outlined"
@@ -75,10 +74,10 @@ export default function AccessCheckCard({ accessCheck, userID }: AccessCheckCard
             onClick={() => approveCheck()}
           >
             <b>Approve Check</b>
-          </LoadingButton>
+          </Button>
         )}
         {approved && (
-          <LoadingButton
+          <Button
             size="small"
             color="error"
             variant="outlined"
@@ -86,7 +85,7 @@ export default function AccessCheckCard({ accessCheck, userID }: AccessCheckCard
             onClick={() => unapproveCheck()}
           >
             <b>Unapprove Check</b>
-          </LoadingButton>
+          </Button>
         )}
       </CardActions>
     </Card>

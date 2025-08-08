@@ -5,7 +5,6 @@ import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
 import Question from "./Question";
 import styled, { css } from "styled-components";
 import { gql, useMutation } from "@apollo/client";
-import LoadingButton from "@mui/lab/LoadingButton";
 import { GET_CURRENT_USER } from "../../../common/CurrentUserProvider";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -239,7 +238,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
       })}
 
       <Stack direction={"row-reverse"} spacing={2}>
-        <LoadingButton
+        <Button
           loading={result.loading}
           variant="contained"
           sx={{ alignSelf: "flex-end" }}
@@ -247,7 +246,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
           onClick={() => submitAndViewResults()}
         >
           Submit
-        </LoadingButton>
+        </Button>
         <Button
           variant="outlined"
           sx={{ alignSelf: "flex-end" }}
