@@ -58,8 +58,12 @@ export async function createAccount(): Promise<number> {
 }
 
 export async function deleteAccount(accountID: number): Promise<boolean> {
-  await knex("CurrencyAccounts").where({ id: accountID }).delete();
-  return true;
+  const result = await knex("CurrencyAccounts").where({ id: accountID, balance: 0 }).delete();
+  if (result > 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /**

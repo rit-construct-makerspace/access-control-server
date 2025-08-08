@@ -16,5 +16,6 @@ export const OrganizationTypeDefs = gql`
 
   extend type Mutation {
     createOrganization(username: String!, displayname: String): Organization
+    deleteOrganization(orgID: ID!): Boolean
   }
 `;
