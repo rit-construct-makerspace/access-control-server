@@ -27,20 +27,20 @@ const templateSource: string = `
         margin: 0px auto;
         width: 90%;
     }
+
 </style>
 <div class="email-body">
-    <picture id="logo-image">
-        <source srcset="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange.png"
-            media="(prefers-color-scheme: light)" />
-        <source srcset="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_orange_white.png"
-            media="(prefers-color-scheme: dark)" />
-        <img src="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange.png"
-            alt="RIT The Shed Logo" width="600px">
-    </picture>
+    <img src="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange_white_bg.png"
+        alt="RIT The Shed Logo" width="600px">
     <h1>Training Expiry <%= (type == "warning") ? "Warning" : "Notice" %></h1>
 
     <b>If your training lapses, you will be unable to use this equipment. Once you re-take the trainings, your access will be restored. </b>
 
+    <% if (type == "notice") { %>
+    <h2> The following trainings have expired </h2>
+    <% } else { %> 
+    <h2> The following trainings will expire in 1 week</h2>
+    <% } %>
     <ul>
     <% for (const training of modules) { %>
         <li><a href=<%= training.link %>> <%= training.name %> </a></li>

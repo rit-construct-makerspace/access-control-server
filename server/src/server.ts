@@ -26,7 +26,7 @@ import morgan from "morgan"; //Log provider
 import { createRequire } from "module";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
-import { ReaderRow } from "./db/tables.js";
+import { ReaderRow, TrainingModuleRow } from "./db/tables.js";
 import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
@@ -34,6 +34,8 @@ import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js"
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
+import { getModules } from "./repositories/Training/ModuleRepository.js";
+import { ExpiryDescription } from "./integrations/email/training-expiry-template.js";
 
 const require = createRequire(import.meta.url);
 
@@ -915,6 +917,40 @@ async function startServer() {
    * SCHEDULED ACTIONS
   ==================================*/
 
+  async function handleTrainingExpiriesAndEmails() {
+    function sendEmails(type: "warning" | "expiry", expiries: { email: string, moduleIds: number[], moduleNames: string[] }[]) {
+      expiries.forEach((expiry) => {
+        Emailer.send_training_expiry_email(expiry.email, {
+          type: type,
+          modules: expiry.moduleIds.map((id, index) => {
+            return {
+              name: expiry.moduleNames[index],
+              link: `${process.env.REACT_APP_ORIGIN}/app/maker/training/${id}`
+            }
+          })
+        }
+        );
+      })
+    };
+
+    let expiryNotices = await getPassedTrainingsWeeksAgo(52);
+    if (expiryNotices.length > 99){
+      // dont overload the emails (100 / hr, 400 / day)
+      expiryNotices = expiryNotices.slice(0, 99);
+    }
+    sendEmails("expiry", expiryNotices)
+    const numPurged = await purgeExpiredPassedModules();
+
+    // DONT SEND THESE AT THE SAME TIME, YOULL PROBABLY LOCKOUT OUR EMAIL PROVIDER FOR SENDING TOO MANY EMAILS
+    // const expiryWarnings = await getPassedTrainingsWeeksAgo(49); // 51
+    // sendEmails("warning", expiryWarnings)
+    // const numWarned = expiryWarnings.length;
+
+    const numNotified = expiryNotices.length
+    
+    createLog(`Trainings: Sent ${numNotified} expiry notices, and purged ${numPurged} expired trainings.`, "server")
+
+  }
   /**
    Cron Format:
     *    *    *    *    *    *
@@ -935,10 +971,8 @@ async function startServer() {
     if (API_DEBUG_LOGGING) await createLog('It is now 4:00am. Wiping Daily Temp Records...', "server")
     await setDataPointValue(1, 0).then(async () => await createLog('Daily Visits reset.', "server"));
     await purgeExpiredPassedModules().then(async (result) => await createLog(`Purged ${result} expired trainings.`, "server"));
-    
-    const expiryWarnings = TrainingRe;
-    const expiryNotices = [];
-    
+
+    handleTrainingExpiriesAndEmails();
     //await pruneNullLengthEquipmentSessions().then(async () => await createLog('Unfinished Equipment Sessions pruned.', "server"));;
   });
 
@@ -962,10 +996,6 @@ async function startServer() {
   const PORT = process.env.PORT || 3000;
 
   console.log(process.env.ID_FORMAT);
-  Emailer.send_training_expiry_email("res3453", {
-    type: "expiry",
-    modules: [{name: "shed training", link: "https://http.cat/404"}]
-  });
 
   app.listen({ port: PORT }, (): void =>
     console.log(
