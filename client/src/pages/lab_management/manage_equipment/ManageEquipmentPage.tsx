@@ -54,7 +54,7 @@ export default function ManageEquipmentPage({ showLogs }: { showLogs?: boolean }
               )
               .map((e: Equipment) => (
                 <Grid key={e.id}>
-                  <EditableEquipmentCard id={e.id} name={e.name} to={url + e.id} archived={false} sopUrl={e.sopUrl} imageUrl={((e.imageUrl === undefined || e.imageUrl == null || e.imageUrl === "") ? import.meta.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/" + e.imageUrl)} />
+                  <EditableEquipmentCard id={e.id} name={e.name} to={url + e.id} archived={false} sopUrl={e.sopUrl} imageUrl={((e.imageUrl === undefined || e.imageUrl == null || e.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/" + e.imageUrl)} />
                 </Grid>
               ))}
           </Grid>
@@ -77,7 +77,7 @@ export default function ManageEquipmentPage({ showLogs }: { showLogs?: boolean }
               )
               .map((e: Equipment) => (
                 <Grid key={e.id}>
-                  <EditableEquipmentCard id={e.id} name={e.name} to={url + "/archived/" + e.id} archived={true} sopUrl={e.sopUrl} imageUrl={((e.imageUrl === undefined || e.imageUrl == null || e.imageUrl === "") ? import.meta.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/" + e.imageUrl)} />
+                  <EditableEquipmentCard id={e.id} name={e.name} to={url + "/archived/" + e.id} archived={true} sopUrl={e.sopUrl} imageUrl={((e.imageUrl === undefined || e.imageUrl == null || e.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/" + e.imageUrl)} />
                 </Grid>
               ))}
           </Grid>

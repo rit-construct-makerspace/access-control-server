@@ -96,6 +96,7 @@
     "husky": "^7.0.4",
     "lint-staged": "^12.5.0",
     "prettier": "^2.8.8",
-    "vite": "^7.1.1"
+    "vite": "^7.1.1",
+    "vite-bundle-analyzer": "^1.2.0"
   }
 }

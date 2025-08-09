@@ -57,7 +57,7 @@ export function Dashboard() {
                                     id={zone.id}
                                     name={zone.name}
                                     hours={zone.hours}
-                                    imageUrl={zone.imageUrl === undefined || zone.imageUrl == null || zone.imageUrl === "" ? import.meta.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : zone.imageUrl}
+                                    imageUrl={zone.imageUrl === undefined || zone.imageUrl == null || zone.imageUrl === "" ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : zone.imageUrl}
                                     isMobile={isMobile}
                                 />
                             </Grid>
