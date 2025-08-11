@@ -90,7 +90,7 @@ export const GET_USER = gql`
       ritUsername
       cardTagID
       notes
-      isArchived
+      archived
       forceArchive
       holds {
         id
@@ -353,7 +353,9 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                   View logs
                 </Button>
               </Stack>
-
+              {
+                user.archived && <Alert severity="warning" variant="filled">This user is archived!</Alert>
+              }
               <Stack direction={isMobile ? "column" : "row"} width="100%" mt={4} spacing={4} justifyContent="center">
                 <Stack width="50%">
                   <Typography variant="h6" component="div" mb={1}>
