@@ -32,3 +32,4 @@ process.env
 
 # React build
 /client/build
+client/.eslintcache

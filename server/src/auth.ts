@@ -97,9 +97,9 @@ export function setupSessions(app: express.Application) {
 
 // Unsafe auth -- local development only
 export function setupDevAuth(app: express.Application) {
-  const reactAppUrl = process.env.REACT_APP_URL;
+  const reactAppUrl = process.env.VITE_URL;
 
-  assert(reactAppUrl, "REACT_APP_URL env value is null");
+  assert(reactAppUrl, "VITE_URL env value is null");
 
   const authStrategy = new LocalStrategy(
     async function (username: string, password: string, done: any) {
@@ -160,7 +160,7 @@ export function setupDevAuth(app: express.Application) {
         } else {
           res.clearCookie("connect.sid");
 
-          res.redirect(process.env.REACT_APP_LOGGED_OUT_URL ?? "");
+          res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
         }
       });
     } else {
@@ -174,12 +174,12 @@ export function setupStagingAuth(app: express.Application) {
   const issuer = process.env.ISSUER;
   const callbackUrl = process.env.CALLBACK_URL;
   const entryPoint = process.env.ENTRY_POINT;
-  const reactAppUrl = process.env.REACT_APP_URL;
+  const reactAppUrl = process.env.VITE_URL;
 
   assert(issuer, "ISSUER env value is null");
   assert(callbackUrl, "CALLBACK_URL env value is null");
   assert(entryPoint, "ENTRY_POINT env value is null");
-  assert(reactAppUrl, "REACT_APP_URL env value is null");
+  assert(reactAppUrl, "VITE_URL env value is null");
 
   /*
   identifierFormat defaults to urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress.
@@ -375,7 +375,7 @@ export function setupStagingAuth(app: express.Application) {
           res.status(400).send("Logout failed");
         } else {
           // res.clearCookie("connect.sid");
-          res.redirect(process.env.REACT_APP_LOGGED_OUT_URL ?? "");
+          res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
         }
       });
     } else {

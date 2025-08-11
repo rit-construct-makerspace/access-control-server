@@ -66,7 +66,7 @@ export default function UnpagedEquipmentModal({ equipmentID, setEquipmentID }: E
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Avatar
                   sx={{ width: 80, height: 80 }}
-                  src={(equipment.imageUrl == undefined || equipment.imageUrl == null ? "" + process.env.REACT_APP_CDN_URL + "shed_acronym_vert.jpg" : "" + process.env.REACT_APP_CDN_URL + process.env.REACT_APP_CDN_EQUIPMENT_DIR + "/" + equipment.imageUrl)}
+                  src={(equipment.imageUrl == undefined || equipment.imageUrl == null ? "" + import.meta.env.VITE_CDN_URL + "shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/" + equipment.imageUrl)}
                 />
                 <Stack>
                   <Typography variant="h4">{equipment.name}</Typography>

@@ -50,7 +50,7 @@ import OrganizationsPage from "./pages/lab_management/organizations/Organization
 function AuthedRoute() {
   const user = useCurrentUser();
   if (user.visitor) {
-    window.location.replace(process.env.REACT_APP_LOGIN_URL ?? "/")
+    window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")
     return <></>;
   } else {
     return <Outlet />
