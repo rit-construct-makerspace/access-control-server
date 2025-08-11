@@ -3,7 +3,7 @@ import { UPDATE_TOOL_ITEM_INSTANCE, GET_TOOL_ITEM_INSTANCES_BY_TYPE, CREATE_TOOL
 import { TOOL_ITEM_CONDITION_ARRAY, TOOL_ITEM_STATUS_ARRAY, ToolItemCondition, ToolItemInstance, ToolItemInstanceInput, ToolItemStatus, ToolItemType } from "../../../types/ToolItem";
 import { useEffect, useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Divider, FormControl, InputLabel, MenuItem, Select, Stack, TextareaAutosize, TextField, Tooltip, Typography } from "@mui/material";
 import GET_ROOMS from "../../../queries/roomQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
@@ -11,11 +11,11 @@ import Room from "../../../types/Room";
 
 
 export function ToolItemInstanceModal({ item, type }: { item?: ToolItemInstance, type: ToolItemType }) {
+  const {makerspaceID} = useParams<{makerspaceID: string}>();
   const navigate = useNavigate();
 
   const getRooms = useQuery(GET_ROOMS);
 
-  console.log(item)
 
   const currItem: ToolItemInstanceInput = {
     locationRoomID: item?.locationRoom.id ?? undefined,
@@ -42,7 +42,7 @@ export function ToolItemInstanceModal({ item, type }: { item?: ToolItemInstance,
   const [newItem, setNewItem] = useState<ToolItemInstanceInput>((item ? currItem : blankItem));
 
   function close() {
-    navigate('/admin/tools')
+    navigate(`/makerspace/${makerspaceID}/tools`)
   }
 
   function handleEditSubmit() {

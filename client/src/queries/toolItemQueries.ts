@@ -36,6 +36,7 @@ export const GET_TOOL_ITEM_TYPES_WITH_INSTANCES = gql`
         }
         borrowedAt
       }
+      imageUrl
     }
   }
 `;

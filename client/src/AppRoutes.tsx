@@ -137,6 +137,11 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/training/new" element={<EditNewModulePage />} />
                   <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/type/:typeid" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/type/" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/instance/:instanceid" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/instance/" element={<ToolItemPage />} />
+
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
                   <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
                   <Route path="/makerspace/:makerspaceID/organizations" element={<OrganizationsPage />} />
@@ -175,10 +180,6 @@ export default function AppRoutes() {
             <Route path="/admin/equipment/logs/:logid" element={<ResolutionLogPage />} />
 
             <Route path="/admin/inventory" element={<InventoryPage />} />
-            <Route path="/admin/tools/type/:typeid" element={<ToolItemPage />} />
-            <Route path="/admin/tools/type" element={<ToolItemPage />} />
-            <Route path="/admin/tools/instance/:instanceid" element={<ToolItemPage />} />
-            <Route path="/admin/tools/instance" element={<ToolItemPage />} />
 
             <Route path="/admin/statistics" element={<StatisticsPage />} />
 
