@@ -83,15 +83,15 @@ export async function notifyMachineIssueCreated(equipmentID: number, instanceID:
     console.log(`Successfully sent message ${result.ts} in conversation ${conversationId}`);
 }
 
-export async function notifyToolItemMarked(uniqueIdentifier: string, instanceID: number, typeID: number, newStatusOrCondition: string) {
+export async function notifyToolItemMarked(uniqueIdentifier: string, makerspaceID: number, instanceID: number, typeID: number, newStatusOrCondition: string) {
     return await web.chat.postMessage({
-        text: `Tool Item <${process.env.VITE_URL}/admin/tools/instance/${instanceID}?type=${typeID}|${uniqueIdentifier}> has been marked as *${newStatusOrCondition}*`,
+        text: `Tool Item <${process.env.VITE_URL}/makerspace/${makerspaceID}/tools/instance/${instanceID}?type=${typeID}|${uniqueIdentifier}> has been marked as *${newStatusOrCondition}*`,
         blocks: [
             {
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": `Tool Item <${process.env.VITE_URL}/admin/tools/instance/${instanceID}?type=${typeID}|${uniqueIdentifier}> has been marked as *${newStatusOrCondition}*`
+                    "text": `Tool Item <${process.env.VITE_URL}/makerspace/${makerspaceID}/tools/instance/${instanceID}?type=${typeID}|${uniqueIdentifier}> has been marked as *${newStatusOrCondition}*`
                 }
             }
         ],
@@ -101,7 +101,7 @@ export async function notifyToolItemMarked(uniqueIdentifier: string, instanceID:
 
 export async function notifyInventoryItemBelowThreshold(itemName: string, count: number) {
     return await web.chat.postMessage({
-        text: `Inventory Item <${process.env.VITE_URL}/admin/tools/inventory|${itemName}> is running low (${count})`,
+        text: `Inventory Item <${process.env.VITE_URL}/admin/inventory|${itemName}> is running low (${count})`,
         blocks: [
             {
                 "type": "section",

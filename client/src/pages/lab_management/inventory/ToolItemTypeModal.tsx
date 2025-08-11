@@ -3,7 +3,7 @@ import { UPDATE_TOOL_ITEM_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES, GET_TOOL_ITE
 import { ToolItemType, ToolItemTypeInput } from "../../../types/ToolItem";
 import { useEffect, useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Divider, InputLabel, FormControl, MenuItem, Select, Stack, Switch, TextField, Tooltip, Typography, FormControlLabel, TextareaAutosize } from "@mui/material";
 import GET_ROOMS from "../../../queries/roomQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
@@ -11,7 +11,8 @@ import Room from "../../../types/Room";
 
 
 export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
-  
+  const {makerspaceID} = useParams<{makerspaceID: string}>();
+
   const navigate = useNavigate();
 
   const getRooms = useQuery(GET_ROOMS);
@@ -20,8 +21,6 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
   const [createType] = useMutation(CREATE_TOOL_ITEM_TYPE, { refetchQueries: [{ query: GET_TOOL_ITEM_TYPES_WITH_INSTANCES }, { query: GET_TOOL_ITEM_TYPES }] });
 
   const [nameAlert, setNameAlert] = useState<boolean>(false);
-
-  console.log(type)
 
   const currType = {
     defaultLocationRoomID: type?.defaultLocationRoom.id ?? undefined,
@@ -43,7 +42,7 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
   const [newType, setNewType] = useState<ToolItemTypeInput>((type ? currType : blankType));
 
   function close() {
-    navigate('/admin/tools')
+    navigate(`/makerspace/${makerspaceID}/tools`)
   }
 
   function handleEditSubmit() {

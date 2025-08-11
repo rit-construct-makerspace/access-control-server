@@ -19,6 +19,8 @@ import { isManager } from "../../../common/PrivilegeUtils";
 
 export function ToolItemPage() {
   const { typeid, instanceid, makerspaceID } = useParams<{ typeid: string, instanceid: string, makerspaceID: string }>();
+
+  console.log(typeid, instanceid, makerspaceID);
   const [searchParams] = useSearchParams()
   const location = useLocation();
   const navigate = useNavigate();
@@ -47,7 +49,7 @@ export function ToolItemPage() {
       <title>Tools | Make @ RIT</title>
       <Stack direction="row" justifyContent="space-between" alignItems="baseline" paddingBottom="10px">
         <Typography variant="h4">Tools</Typography>
-        {isManager(currentUser) && <Button startIcon={<AddIcon />} variant="outlined" color="primary" onClick={() => navigate(`/admin/tools/type`)}>Create Type</Button>}
+        {isManager(currentUser) && <Button startIcon={<AddIcon />} variant="outlined" color="primary" onClick={() => navigate(`/makerspace/${makerspaceID}/tools/type`)}>Create Type</Button>}
       </Stack>
 
       <RequestWrapper loading={getToolItemTypes.loading || getZone.loading} error={getToolItemTypes.error || getZone.error}>
