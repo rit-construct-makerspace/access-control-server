@@ -362,7 +362,8 @@ const StorefrontResolvers = {
             }
           });
 
-          await createLedger(user.id, "Purchase", totalCost, user.id, args.notes ?? "", ledgerItems);
+          //await createLedger(user.id, "Purchase", totalCost, user.id, args.notes ?? "", ledgerItems);
+          //Not yet actually
         }
         return atriumTransactionSuccess;
       });

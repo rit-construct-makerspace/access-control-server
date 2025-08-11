@@ -50,3 +50,17 @@ export interface InventoryTag {
   label: string;
   color: string;
 }
+
+export interface InventoryCart {
+  id: number;
+  user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+  };
+  makerspace: {
+    id: number;
+    name: string;
+  };
+  items?: InventoryItem[];
+}

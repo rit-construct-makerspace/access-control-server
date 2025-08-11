@@ -90,6 +90,7 @@ export default function ShoppingCart({
             color={internal ? "warning" : "primary"}
             onClick={() => setShowCheckoutModal(true)}
             sx={{minWidth: "150px"}}
+            disabled = {import.meta.env.VITE_DISABLE_STORE_CHECKOUT === "true"}
           >
             {internal ? "Use" : "Checkout"}
           </Button>

@@ -4,14 +4,14 @@
  */
 
 import { knex } from "../../db/index.js";
-import { InventoryCartsRow, InventoryItemsForCartsRow } from "../../db/tables.js";
+import { InventoryCartsRow, InventoryItemRow, InventoryItemsForCartsRow } from "../../db/tables.js";
 
 export async function getInventoryCarts(): Promise<InventoryCartsRow[]> {
   return await knex("InventoryCarts").select();
 }
 
-export async function getInventoryCartsByID(cartID: number): Promise<InventoryCartsRow[]> {
-  return await knex("InventoryCarts").where({ id: cartID });
+export async function getInventoryCartByID(cartID: number): Promise<InventoryCartsRow | undefined> {
+  return await knex("InventoryCarts").where({ id: cartID }).first();
 }
 
 export async function getInventoryCartsByUser(userID: number): Promise<InventoryCartsRow[]> {
@@ -39,8 +39,8 @@ export async function deleteInventoryCart(cartID: number): Promise<void> {
  * Inventory Items For Carts ===
  */
 
-export async function getItemsInCart(cartID: number): Promise<InventoryItemsForCartsRow[]> {
-  return await knex("InventoryItemsForCarts").where({ cartID });
+export async function getItemsInCart(cartID: number): Promise<InventoryItemRow[]> {
+  return await knex("InventoryItemsForCarts").where({ cartID }).join("InventoryItems", "InventoryItemsForCarts.itemID", "InventoryItems.id");
 }
 
 export async function addItemsToCart(cartID: number, items: { itemID: number; quantity: number }[]): Promise<void> {
@@ -61,6 +61,15 @@ export async function updateItemAmounts(cartID: number, items: { itemID: number;
         .update({ count: item.quantity })
     )
   );
+}
+
+export async function subtractItemFromCart(cartID: number, itemID: number, quantity: number): Promise<boolean> {
+  const result = await knex("InventoryItemsForCarts")
+    .where({ cartID, itemID })
+    .decrement("count", quantity)
+    .returning("count");
+
+  return (result[0]?.count ?? 0) > 0;
 }
 
 //This one might abuse the connection limit. Unclear how knex manages concurrency.
