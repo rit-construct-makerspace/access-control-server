@@ -9,12 +9,11 @@ interface ActionButtonProps {
   handleClick: () => Promise<void>;
   loading: boolean;
   disabled?: boolean
-  variant?: "text" | "outlined" | "filled"
+  variant?: "text" | "outlined" | "filled";
 }
 
 export default function ActionButton(props: React.PropsWithChildren<ActionButtonProps>) {
   let size: "small" | "medium" | "large";
-  props.variant = props.variant ?? "text";
   switch(props.appearance) {
     case "large":
       size = "large"
