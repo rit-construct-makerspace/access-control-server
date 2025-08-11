@@ -10,7 +10,6 @@ import {
 import HistoryIcon from "@mui/icons-material/History";
 import DeleteMaterialButton from "./DeleteMaterialButton";
 import HelpTooltip from "../../../common/HelpTooltip";
-import { LoadingButton } from "@mui/lab";
 import SaveIcon from "@mui/icons-material/Save";
 import InventoryItem from "../../../types/InventoryItem";
 import AdminPage from "../../AdminPage";
@@ -210,7 +209,7 @@ export default function MaterialModalContents({
           </Stack>
         )}
 
-        <LoadingButton
+        <Button
           loading={loading}
           size="large"
           variant="contained"
@@ -219,7 +218,7 @@ export default function MaterialModalContents({
           onClick={handleSaveClick}
         >
           Save
-        </LoadingButton>
+        </Button>
       </Stack>
     </AdminPage>
   );

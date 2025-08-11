@@ -55,7 +55,7 @@ export default function TopNav() {
     return (
       <Stack>
         { // Archived account alert
-          currentUser.isArchived
+          currentUser.archived
             ? <Alert variant="filled" severity="error" sx={{ borderRadius: 0 }}>
               Your account has been archived. You are still able to take trainings and review reference materials, but you won't be able to use any machines. Please speak to a member of staff if you believe this was a mistake.
             </Alert>
