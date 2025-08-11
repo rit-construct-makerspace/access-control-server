@@ -138,7 +138,9 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />
                   <Route path="/makerspace/:makerspaceID/tools/type/:typeid" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/type/" element={<ToolItemPage />} />
                   <Route path="/makerspace/:makerspaceID/tools/instance/:instanceid" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/instance/" element={<ToolItemPage />} />
 
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
                   <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
