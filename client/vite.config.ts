@@ -9,16 +9,13 @@ export default defineConfig({
     eslint({
       dev: true,
       
-      // Optional: Configure ESLint options here
-      // For example, to enable caching for faster builds:
-      build: true,
-      cache: true,
+      build: true, // lint on build
+      cache: true, // cache lints
       emitWarning: true,
       emitError: true,
-      emitErrorAsWarning: true,
-      // To show ESLint warnings as build errors:
-      // failOnWarning: false, // Set to true to fail build on warnings
-      // failOnError: true,
+      // Don't fail build on errors (bc the entire build would fail rn)
+      // if its 2026 and this is still here you should feel bad
+      emitErrorAsWarning: true, 
       
     }),
   ],

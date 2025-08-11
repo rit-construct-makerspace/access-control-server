@@ -37,8 +37,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start:dev": "vite",
-    "build": "vite build"
+    "start": "vite",
+    "build": "vite build",
+    "lint:fix": "eslint --fix src/**/*.{ts,tsx}",
+    "lint": "eslint --fix src/**/*.{ts,tsx}"
   },
   "husky": {
     "hooks": {
