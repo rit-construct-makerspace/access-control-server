@@ -1,11 +1,11 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
 import eslint from "vite-plugin-eslint2";
+import eslintPluginReact from 'eslint-plugin-react'
 
 
 export default defineConfig({
   plugins: [
-    react(),
+    eslintPluginReact.configs.flat.recommended,
     eslint({
       dev: true,
       
