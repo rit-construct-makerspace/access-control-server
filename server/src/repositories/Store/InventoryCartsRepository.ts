@@ -4,7 +4,7 @@
  */
 
 import { knex } from "../../db/index.js";
-import { InventoryCartsRow } from "../../db/tables.js";
+import { InventoryCartsRow, InventoryItemsForCartsRow } from "../../db/tables.js";
 
 export async function getInventoryCarts(): Promise<InventoryCartsRow[]> {
   return await knex("InventoryCarts").select();
@@ -39,7 +39,7 @@ export async function deleteInventoryCart(cartID: number): Promise<void> {
  * Inventory Items For Carts ===
  */
 
-export async function getItemsInCart(cartID: number): Promise<{ itemID: number; quantity: number }[]> {
+export async function getItemsInCart(cartID: number): Promise<InventoryItemsForCartsRow[]> {
   return await knex("InventoryItemsForCarts").where({ cartID });
 }
 
@@ -48,7 +48,7 @@ export async function addItemsToCart(cartID: number, items: { itemID: number; qu
     items.map(item => ({
       cartID,
       itemID: item.itemID,
-      quantity: item.quantity
+      count: item.quantity
     }))
   );
 }
@@ -58,7 +58,7 @@ export async function updateItemAmounts(cartID: number, items: { itemID: number;
     items.map(item =>
       knex("InventoryItemsForCarts")
         .where({ cartID, itemID: item.itemID })
-        .update({ quantity: item.quantity })
+        .update({ count: item.quantity })
     )
   );
 }
@@ -68,7 +68,7 @@ export async function addOrUpdateItemsInCart(cartID: number, items: { itemID: nu
   await Promise.all(
     items.map(item =>
       knex("InventoryItemsForCarts")
-        .insert({ cartID, itemID: item.itemID, quantity: item.quantity })
+        .insert({ cartID, itemID: item.itemID, count: item.quantity })
         .onConflict(["cartID", "itemID"])
         .merge()
     )

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Box, Divider, Stack, Switch, Typography } from "@mui/material";
+import { Box, Divider, Snackbar, Stack, Switch, Typography } from "@mui/material";
 import InventoryRow from "../../../common/InventoryRow";
 import SearchBar from "../../../common/SearchBar";
 import InventoryItem from "../../../types/InventoryItem";
@@ -19,6 +19,7 @@ import { ListingCard } from "./ListingCard";
 import { ListingModal } from "./ListingModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQueries";
+import CheckoutSuccessModal from "./CheckoutSuccessModal";
 
 const REMOVE_INVENTORY_ITEM_AMOUNT = gql`
   mutation RemoveInventoryItemAmount($itemID: ID!, $amountToRemove: Int!) {
@@ -48,7 +49,7 @@ export default function StorefrontPage() {
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
 
-  const { loading, error, data } = useQuery(GET_ZONES_WITH_ITEMS, {variables: {storefrontVisible: isStaff(currentUser) ? null : true}});
+  const { loading, error, data } = useQuery(GET_ZONES_WITH_ITEMS, { variables: { storefrontVisible: isStaff(currentUser) ? null : true } });
 
   const [checkoutItems] = useMutation(CHECKOUT_ITEMS, {
     refetchQueries: [{ query: GET_INVENTORY_ITEMS }],
@@ -60,9 +61,14 @@ export default function StorefrontPage() {
   const [activeItem, setActiveItem] = useState<InventoryItem | undefined>();
   const [addToCartCount, setAddToCartCount] = useState(0);
   const [shoppingCart, setShoppingCart] = useImmer<ShoppingCartEntry[]>([]);
+  const [purchasedItems, setPurchasedItems] = useImmer<ShoppingCartEntry[]>([]);
+
 
   const [showInternalItems, setShowInternalItems] = useState(false);
   const [showStaffItems, setShowStaffItems] = useState(false);
+
+  const [checkoutFailureSnackbarOpen, setCheckoutFailureSnackbarOpen] = useState(false);
+  const [checkoutSuccessModalOpen, setCheckoutSuccessModalOpen] = useState(false);
 
   function handleShowInternalChange(e: any) {
     setShowInternalItems(!showInternalItems)
@@ -124,15 +130,19 @@ export default function StorefrontPage() {
   const handleCheckout = async (checkoutNotes: string, recievingUserID?: number) => {
     const items: { id: number, count: number }[] = shoppingCart.map((cartItem) => ({ id: cartItem.item.id, count: cartItem.count }));
 
-    await checkoutItems({
+    const success = await checkoutItems({
       variables: {
         items,
         notes: checkoutNotes,
       },
     });
 
-    setShoppingCart(() => []);
-    updateLocalStorage([]);
+    if (success) {
+      setPurchasedItems(shoppingCart);
+      setCheckoutSuccessModalOpen(true);
+      setShoppingCart(() => []);
+      updateLocalStorage([]);
+    }
   };
 
   return (
@@ -146,19 +156,19 @@ export default function StorefrontPage() {
           internal={showInternalItems || showStaffItems}
         />
 
-        { isAdmin(currentUser) &&
-        <Stack direction={"row"} sx={{ mb: 2, mt: 8, justifyContent: "space-between" }}>
-          <Stack direction={"row"} spacing={2}>
-            <Stack direction={"row"} alignItems={"center"}>
-              <Switch color="warning" onChange={handleShowInternalChange}></Switch><span> Internal Use Items</span>
-            </Stack>
-            <Stack direction={"row"} alignItems={"center"}>
-              <Switch color="warning" onChange={handleShowStaffChange} disabled={!isManager(currentUser)}></Switch><span> Staff Only Items</span>
+        {isAdmin(currentUser) &&
+          <Stack direction={"row"} sx={{ mb: 2, mt: 8, justifyContent: "space-between" }}>
+            <Stack direction={"row"} spacing={2}>
+              <Stack direction={"row"} alignItems={"center"}>
+                <Switch color="warning" onChange={handleShowInternalChange}></Switch><span> Internal Use Items</span>
+              </Stack>
+              <Stack direction={"row"} alignItems={"center"}>
+                <Switch color="warning" onChange={handleShowStaffChange} disabled={!isManager(currentUser)}></Switch><span> Staff Only Items</span>
+              </Stack>
             </Stack>
           </Stack>
-        </Stack>
         }
-        
+
 
         <SearchBar
           placeholder="Search inventory"
@@ -181,8 +191,8 @@ export default function StorefrontPage() {
                   <ListingCard
                     key={item.id}
                     item={item}
-                    setActiveItem={(item) => {setActiveItem(item); setShowModal(true)}}
-                    openDetailsModal={(item) => {setActiveItem(item); setShowDetailsModal(true)}}
+                    setActiveItem={(item) => { setActiveItem(item); setShowModal(true) }}
+                    openDetailsModal={(item) => { setActiveItem(item); setShowDetailsModal(true) }}
                   />
                 ))}
               </Stack>
@@ -201,12 +211,31 @@ export default function StorefrontPage() {
           />
         )}
         {activeItem && showDetailsModal && (
-          <ListingModal 
-            item={activeItem} 
+          <ListingModal
+            item={activeItem}
             open
             addToCart={(activeItem: InventoryItem, addToCartCount: number) => addToShoppingCart(activeItem, addToCartCount)}
             onClose={() => setShowDetailsModal(false)} />
         )}
+
+        <Snackbar
+          open={checkoutFailureSnackbarOpen}
+          autoHideDuration={120000}
+          onClose={() => setCheckoutFailureSnackbarOpen(false)}
+          message="Checkout failed. Please make sure you have sufficient funds and then try again."
+        />
+        <CheckoutSuccessModal
+          open={checkoutSuccessModalOpen}
+          onClose={() => setCheckoutSuccessModalOpen(false)}
+          groupedEntries={purchasedItems.reduce((groups: Record<string, ShoppingCartEntry[]>, entry: ShoppingCartEntry) => {
+            const key: number = entry.item.makerspaceID;
+            if (!groups[key]) {
+              groups[key] = [];
+            }
+            groups[key].push(entry);
+            return groups;
+          }, {})}
+        />
       </Page>
     </RequestWrapper>
   );

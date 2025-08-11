@@ -9,6 +9,7 @@ import { notifyInventoryItemBelowThreshold } from "../slack/slack.js";
 import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
+import { adjustAccountBalanceIfAvailableCents } from "../integrations/currency/currency.js";
 
 const StorefrontResolvers = {
   InventoryItem: {
@@ -294,9 +295,11 @@ const StorefrontResolvers = {
       args: { items: { id: number, count: number }[], notes: string | null },
       { ifAuthenticated }: ApolloContext) => {
       return ifAuthenticated(async (user) => {
+        console.log("Items", args.items)
         const allItems = await InventoryRepo.getItemsByID(args.items.map(item => item.id));
+        console.log("All Items", allItems)
         for (var i = 0; i < args.items.length; i++) {
-          const item = allItems.find((item) => item.id === args.items[i].id);
+          const item = allItems.find((item) => item.id == args.items[i].id);
           if (!item) {
             throw new GraphQLError("Item with ID " + args.items[i].id + " does not exist");
           }
@@ -322,12 +325,10 @@ const StorefrontResolvers = {
           totalCost -= args.items[i].count * item.pricePerUnit
         }
 
+        const transDescription = `Purchase of items: ${ledgerItems.map(item => `${item.name} x${item.quantity}`).join(", ")}`;
 
-        var atriumTransactionSuccess = false;
-        /***********************************************************************************************
-         * TODO: Atrium Logic
-         ***********************************************************************************************/
-        atriumTransactionSuccess = true;
+        //Attempt Purchase
+        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, Math.floor(totalCost)*100, "SHED Store", transDescription);
 
         if (atriumTransactionSuccess) {
           await getInventoryCartsByUser(user.id).then(async (carts) => {

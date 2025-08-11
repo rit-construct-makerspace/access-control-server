@@ -78,7 +78,7 @@ export default function CheckoutModal({
         </Stack>
 
         <Typography variant="body2">
-          The amount of <b>${totalCost}</b> will be charged to your Tiger Bucks account balance.<br />
+          The amount of <b>${totalCost}</b> will be charged to your Construct Credits account balance.<br />
           Please ensure you have sufficient funds before proceeding.
           To add or view funds, visit the <a href="https://tigerspend.rit.edu/" target="_blank" rel="noopener noreferrer">RIT Tiger Spend site</a>.<br />
           This transaction will be canceled if you do not have enough funds.<br /><br />
