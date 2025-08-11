@@ -14,14 +14,15 @@ export default function TrainingModuleRow({ module }: TrainingModuleProps) {
   const url = `/makerspace/${makerspaceID}/training/${module.id}`;
 
   return (
-    <CardActionArea
-      sx={{
-        p: 1,
-        pl: 2
-      }}
-      onClick={() => navigate(url)}
-    >
-      <Stack direction="row" alignItems="center" spacing={2}>
+
+    <Stack direction="row" alignItems="center" spacing={2}>
+      <CardActionArea
+        sx={{
+          p: 2,
+          pl: 2
+        }}
+        onClick={() => navigate(url)}
+      >
         <Typography
           variant="body1"
           fontWeight={500}
@@ -30,12 +31,12 @@ export default function TrainingModuleRow({ module }: TrainingModuleProps) {
         >
           {module.name}
         </Typography>
-        {
-          module.archived
-            ? <PublishTrainingModuleButton moduleID={module.id} appearance="icon-only" />
-            : <ArchiveTrainingModuleButton moduleID={module.id} appearance="icon-only" />
-        }
-      </Stack>
-    </CardActionArea>
+      </CardActionArea>
+      {
+        module.archived
+          ? <PublishTrainingModuleButton moduleID={module.id} appearance="icon-only" />
+          : <ArchiveTrainingModuleButton moduleID={module.id} appearance="icon-only" />
+      }
+    </Stack>
   );
 }

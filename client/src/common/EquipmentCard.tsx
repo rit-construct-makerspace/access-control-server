@@ -40,7 +40,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                                 <Box width="150px" height="175px">
                                     <CardMedia
                                         component="img"
-                                        image={(props.equipment.imageUrl === undefined || props.equipment.imageUrl == null || props.equipment.imageUrl === "") ? process.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : "" + process.env.REACT_APP_CDN_URL + process.env.REACT_APP_CDN_EQUIPMENT_DIR + "/" + props.equipment.imageUrl}
+                                        image={(props.equipment.imageUrl === undefined || props.equipment.imageUrl == null || props.equipment.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/" + props.equipment.imageUrl}
                                         alt={`Picture of ${props.equipment.name}`}
                                         sx={{ width: "150px", height: "175px", backgroundColor: "lightgray" }}
                                     />

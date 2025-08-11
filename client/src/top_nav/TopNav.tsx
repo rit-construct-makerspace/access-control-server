@@ -124,7 +124,7 @@ export default function TopNav() {
               />
               {
                 currentUser.visitor
-                  ? <Button sx={{ height: "95%" }} variant="contained" color="secondary" endIcon={<PersonIcon />} onClick={() => window.location.replace(process.env.REACT_APP_LOGIN_URL ?? "/")}>
+                  ? <Button sx={{ height: "95%" }} variant="contained" color="secondary" endIcon={<PersonIcon />} onClick={() => window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")}>
                     LOGIN
                   </Button>
                   : <ButtonBase onClick={handleUserMenuOpen}>
@@ -189,7 +189,7 @@ export default function TopNav() {
               />
               {
                 currentUser.visitor
-                  ? <Button sx={{ height: "95%", marginRight: "10px" }} variant="contained" color="secondary" endIcon={<PersonIcon />} onClick={() => window.location.replace(process.env.REACT_APP_LOGIN_URL ?? "/")}>
+                  ? <Button sx={{ height: "95%", marginRight: "10px" }} variant="contained" color="secondary" endIcon={<PersonIcon />} onClick={() => window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")}>
                     LOGIN
                   </Button>
                   : <ButtonBase onClick={handleUserMenuOpen} focusRipple>

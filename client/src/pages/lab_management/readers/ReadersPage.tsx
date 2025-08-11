@@ -37,7 +37,7 @@ export default function ReadersPage() {
           onClear={() => setSearchText("")}
         />
         <Button color="success" variant="contained" onClick={() => { navigate("/admin/newreader") }}><AddIcon />Pair New Reader</Button>
-        <Link href={process.env.REACT_APP_GRAFANA_READER_STATS_URL}>Reader Stats</Link>
+        <Link href={import.meta.env.VITE_GRAFANA_READER_STATS_URL}>Reader Stats</Link>
       </Stack>
 
       <RequestWrapper

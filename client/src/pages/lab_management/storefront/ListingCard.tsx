@@ -14,7 +14,7 @@ export function ListingCard(props: ListingCardProps) {
     <Card sx={{width: 400, m: 2}}>
       <CardMedia
         sx={{ height: 140 }}
-        image={(props.item.image && props.item.image !== "") ? props.item.image : (process.env.PUBLIC_URL + "/shed_acronym_vert.jpg")}
+        image={(props.item.image && props.item.image !== "") ? props.item.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")}
       />
       <CardContent sx={{minHeight: 125}}>
         <Typography gutterBottom variant="h5" component="div">{props.item.name}</Typography>
