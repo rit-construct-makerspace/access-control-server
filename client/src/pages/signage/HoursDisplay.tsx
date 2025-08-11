@@ -38,7 +38,7 @@ export default function HoursDisplay() {
 
       const today = new Date();
 
-      const status = TimeUtils.currentStatus(week[today.getDay()].open ?? "", week[today.getDay()].close ?? "");
+      const status = week[today.getDay()].closed === true ? "CLOSED" : TimeUtils.currentStatus(week[today.getDay()].open ?? "", week[today.getDay()].close ?? "");
 
       return (
         <Stack pt="25px" width="100%" height="100vh" divider={<Divider orientation="horizontal" flexItem />}>
@@ -46,7 +46,7 @@ export default function HoursDisplay() {
           <Stack alignItems="center" justifyContent="center" flexGrow={1}>
             <Typography fontSize={160} color={status === "OPEN" ? "success" : "error"} fontWeight="bold">{status}</Typography>
             {
-              week[today.getDay()].open && week[today.getDay()].close &&
+              !week[today.getDay()].closed && week[today.getDay()].open && week[today.getDay()].close &&
               <Typography fontSize={90}>{`${TimeUtils.reformatTime(week[today.getDay()].open ?? "")} - ${TimeUtils.reformatTime(week[today.getDay()].close ?? "")}`}</Typography>
             }
             <Typography fontSize={100} fontWeight="bold">{formatter.format(date)}</Typography>
