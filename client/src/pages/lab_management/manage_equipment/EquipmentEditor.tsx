@@ -142,8 +142,6 @@ export default function EquipmentEditor({
     window.location.reload()
   }
 
-  console.log(equipment.trainingModules.length);
-
   return (
     <RequestWrapper
       loading={getRoomsResult.loading || getModulesResult.loading}

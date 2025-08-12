@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { GET_CORRESPONDING_MACHINE_BY_READER_ID_OR_MACHINE_ID } from "../../../queries/equipmentQueries";
+import { GET_CORRESPONDING_MACHINE_BY_READER_ID } from "../../../queries/equipmentQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { useQuery, useMutation } from "@apollo/client";
 import TimeAgo from 'react-timeago'
@@ -53,7 +53,7 @@ function shouldShowBasedOnSearchTerm(search: string, reader: Reader, pairedThing
 export default function ReaderCard({ reader, makerspaceID, searchQuery }: ReaderCardProps) {
   const theme = useTheme();
 
-  const machineResult = useQuery(GET_CORRESPONDING_MACHINE_BY_READER_ID_OR_MACHINE_ID, {
+  const machineResult = useQuery(GET_CORRESPONDING_MACHINE_BY_READER_ID, {
     variables: { readerid: reader.id }
   });
   const makerspaceResult = useQuery(GET_MAKERSPACE_FOR_WELCOME_READER, {
