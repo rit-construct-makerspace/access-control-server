@@ -90,6 +90,7 @@ export const ReaderTypeDefs = gql`
 
     setName(id: ID!, name: String): Reader
     setState(id: ID!, state: String): String
+    restartAllReaders(makerspaceID: ID!): String
     setOTAVersion(ids: [ID!]!, otaTag: String!, updateNow: Boolean!): JSON
     identifyReader(id: ID!, doIdentify: Boolean): Boolean
     }

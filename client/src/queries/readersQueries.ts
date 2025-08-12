@@ -312,6 +312,11 @@ export const SET_READER_STATE = gql`
   }
 `;
 
+export const RESTART_ALL_READERS = gql`
+  mutation RestartAllReaders($makerspaceID: ID!) {
+    restartAllReaders(makerspaceID: $makerspaceID)
+  }
+`;
 
 export const GET_AVAILABLE_FIRMWARE_VERSIONS = gql`
   query Query {

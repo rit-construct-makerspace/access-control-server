@@ -323,7 +323,28 @@ const ReadersResolver = {
           return `failed to parse id: ${e}`;
         }
       }),
-    identifyReader: async (
+    
+      restartAllReaders: async (
+        _parent: any,
+        args: { makerspaceID: number },
+        { isManagerFor }: ApolloContext
+      ) =>
+        isManagerFor(Number(args.makerspaceID), async (executingUser: any) => {
+          if (isNaN(Number(args.makerspaceID))){
+            return "specify a makerspace";
+          }
+          try {
+            const readers = await ReaderRepo.getReaders(args.makerspaceID);
+            readers?.forEach((reader) =>{
+              ShlugControl.sendState(executingUser, reader.id, "Restart");
+            });
+            return "sent";
+          } catch (e) {
+            return `failed to restart all: ${e}`;
+          }
+        }),
+
+        identifyReader: async (
       _parent: any,
       args: { id: number, doIdentify: boolean },
       { isStaff }: ApolloContext

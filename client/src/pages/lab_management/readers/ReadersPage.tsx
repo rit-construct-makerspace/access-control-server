@@ -1,5 +1,5 @@
-import { useQuery } from "@apollo/client";
-import { GET_AVAILABLE_FIRMWARE_VERSIONS, GET_READERS_WITH_PAIRINGS, Reader } from "../../../queries/readersQueries";
+import { useMutation, useQuery } from "@apollo/client";
+import { GET_AVAILABLE_FIRMWARE_VERSIONS, GET_READERS_WITH_PAIRINGS, Reader, RESTART_ALL_READERS, SET_READER_STATE } from "../../../queries/readersQueries";
 import { Box, Button, Checkbox, FormControlLabel, Grid, Link, Stack } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import { useNavigate, useParams } from "react-router-dom";
@@ -16,8 +16,6 @@ export default function ReadersPage() {
   const getReadersResult = useQuery(GET_READERS_WITH_PAIRINGS, { pollInterval: 2000, variables: {makerspaceID: showAllReaders ? null : makerspaceID} });
   const firmwareVersions = useQuery(GET_AVAILABLE_FIRMWARE_VERSIONS);
 
-
-
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
@@ -33,6 +31,15 @@ export default function ReadersPage() {
     }
   }, []);
 
+  const [restartAllReaders] = useMutation(RESTART_ALL_READERS, {variables: {makerspaceID: Number(makerspaceID)}});
+
+  function restartAll(){
+    const warning = "This will restart ALL online card readers. Are you sure you want to do this?"+(showAllReaders ? " THIS INCLUDES READERS IN OTHER MAKERSPACES" : "")
+    if (confirm(warning)){
+      restartAllReaders();
+    }
+  }
+
   return (
     <Box padding="20px">
       <title>Readers | Make @ RIT</title>
@@ -47,6 +54,9 @@ export default function ReadersPage() {
         <FormControlLabel labelPlacement="start" label = "Show All Readers" control = {<Checkbox onChange={(e)=>setShowAllReaders(e.target.checked)}></Checkbox>} />
 
         <Link href={import.meta.env.VITE_GRAFANA_READER_STATS_URL}>Reader Stats</Link>
+
+        <Button onClick={restartAll}>Restart All</Button>
+
       </Stack>
 
       <RequestWrapper2 result={getReadersResult} render={(data) => {

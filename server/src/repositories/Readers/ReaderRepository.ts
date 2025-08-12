@@ -110,7 +110,7 @@ export async function getReadersWithPairings(): Promise<ReaderRowWithPairings[]>
  * @return list of readers that are not already in use as an instance reader or a welcom reader 
  */
 export async function getUnpairedReaders(): Promise<ReaderRow[]> {
-    return await knex("Readers").select("Readers.*", "z.id", "z.name")
+    return await knex("Readers").select("Readers.*")
         .leftJoin("EquipmentInstances", "Readers.id", "EquipmentInstances.readerID")
         .leftJoin("MakerspaceWelcomeReaders as mwr", "Readers.id", "mwr.readerID")
         .whereNotNull("SN").andWhere(function () { this.whereNull("EquipmentInstances.readerID") })
