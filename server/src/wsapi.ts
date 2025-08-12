@@ -263,10 +263,6 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     if (machineInst) {
       try {
         machine = await getEquipmentByID(machineInst.equipmentID);
-        if (machine == undefined) {
-          // bizzare error handling bc api getters can be inconsistent
-          throw EntityNotFound;
-        }
       } catch (EntityNotFound) {
         machine = undefined;
       }
