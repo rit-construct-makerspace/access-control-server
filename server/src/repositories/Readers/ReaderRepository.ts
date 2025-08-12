@@ -43,7 +43,6 @@ export async function getReaderBySN(
  * Fetch all card readers
  */
 export async function getReaders(makerspaceID: number | null = null): Promise<ReaderRow[]> {
-    console.log("gerReaders", makerspaceID)
     //Order them to prevent random ordering everytime the client polls, also prioritize help
     if (makerspaceID == null) {
         // don't need to sort by zone, easy mode
