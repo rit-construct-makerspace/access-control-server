@@ -126,14 +126,14 @@ const ZonesResolver = {
     archiveZone: async (
       _parent: any,
       args: {
-        zoneID: number
+        id: number
       },
       { isAdmin }: ApolloContext
     ) => isAdmin(async (user) => {
-      createLog(`{user} archived makerspace ${args.zoneID}`, "admin",
+      createLog(`{user} archived makerspace ${args.id}`, "admin",
         { id: user.id, label: getUsersFullName(user) }
       )
-      return await archiveZone(args.zoneID);
+      return await archiveZone(args.id);
     })
 
   }
