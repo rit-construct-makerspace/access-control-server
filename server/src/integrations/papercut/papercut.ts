@@ -288,7 +288,7 @@ function xmlrpcRespondFault(response: any, fault: number, faultString: string) {
  * @param app the express application server to bind to
  */
 export function registerEndpoints(app: express.Application) {
-  if (PAPERCUT_SECURITY_SECRET == null) {
+  if (PAPERCUT_SECURITY_SECRET === undefined) {
     console.error("PAPERCUT: COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK");
     createLog("COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK", "server");
     return;
