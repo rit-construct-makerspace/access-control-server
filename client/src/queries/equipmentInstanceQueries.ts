@@ -134,7 +134,6 @@ export const GET_READER_PAIRED_WITH_INSTANCE_BY_INSTANCE_ID = gql`
       lastStatusReason
       scheduledStatusFreq
       lastStatusTime
-      helpRequested
       BEVer
       FEVer
       HWVer

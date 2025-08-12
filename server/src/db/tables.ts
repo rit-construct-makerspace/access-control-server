@@ -249,7 +249,6 @@ export interface ReaderRow {
   lastStatusReason: string;
   scheduledStatusFreq: number;
   lastStatusTime: Date;
-  helpRequested: boolean;
   BEVer: string;
   FEVer: string;
   HWVer: string;

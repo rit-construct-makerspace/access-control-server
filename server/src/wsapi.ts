@@ -860,7 +860,6 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
     recentSessionLength: reader.recentSessionLength,
     lastStatusReason: reader.lastStatusReason,
     scheduledStatusFreq: reader.scheduledStatusFreq,
-    helpRequested: reader.helpRequested,
     BEVer: message.BEVer ?? message.FWVersion ?? undefined,
     FEVer: message.FEVer ?? message.FWVersion ?? undefined,
     HWVer: message.HWVersion ?? undefined,

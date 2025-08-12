@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 
 export interface Reader {
-  helpRequested: boolean;
   id: number,
   name: string,
   temp: number,
@@ -35,7 +34,6 @@ export const GET_READERS = gql`
       lastStatusReason
       scheduledStatusFreq
       lastStatusTime
-      helpRequested
       BEVer
       FEVer
       HWVer
@@ -63,7 +61,6 @@ export const GET_READER_BY_ID = gql`
       lastStatusReason
       scheduledStatusFreq
       lastStatusTime
-      helpRequested
       BEVer
       FEVer
       HWVer
@@ -121,7 +118,6 @@ export const GET_UNPAIRED_READERS = gql`
       lastStatusReason
       scheduledStatusFreq
       lastStatusTime
-      helpRequested
       BEVer
       FEVer
       HWVer
@@ -187,7 +183,6 @@ query GetWelcomeReadersForMakerspace($makerspaceId: ID!) {
     lastStatusReason
     scheduledStatusFreq
     lastStatusTime
-    helpRequested
     BEVer
     FEVer
     HWVer

@@ -16,7 +16,6 @@ export const ReaderTypeDefs = gql`
     lastStatusReason: String
     scheduledStatusFreq: String
     lastStatusTime: DateTime
-    helpRequested: Boolean
     BEVer: String
     FEVer: String
     HWVer: String

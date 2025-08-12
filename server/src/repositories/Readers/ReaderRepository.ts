@@ -46,7 +46,6 @@ export async function getReaders(): Promise<ReaderRow[]> {
     //Order them to prevent random ordering everytime the client polls, also prioritize help
     return await knex("Readers")
         .select("*", knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
-        .orderBy("helpRequested", "desc")
         .orderBy("faultOrder", "asc")
         .orderBy("id", "asc")
         ; 
@@ -209,7 +208,6 @@ export async function updateReaderStatus(reader: {
     recentSessionLength: number,
     lastStatusReason: string,
     scheduledStatusFreq: number,
-    helpRequested: boolean,
     BEVer?: string,
     FEVer?: string,
     HWVer?: string,
@@ -226,7 +224,6 @@ export async function updateReaderStatus(reader: {
         lastStatusReason: reader.lastStatusReason,
         scheduledStatusFreq: reader.scheduledStatusFreq,
         lastStatusTime: knex.fn.now(),
-        helpRequested: reader.helpRequested,
         BEVer: reader.BEVer,
         FEVer: reader.FEVer,
         HWVer: reader.HWVer,
@@ -250,16 +247,6 @@ export async function setReaderName(
 ): Promise<ReaderRow | undefined> {
     await knex("Readers").where({ id: id }).update({ name });
     return await getReaderByID(id);
-}
-
-/**
- * Toggle the "helpRequested" column of a noted Reader
- * @param id ID of Reader to modify
- * @returns void
- */
-export async function toggleHelpRequested(id: number): Promise<void> {
-    const oldRow = await knex("Readers").select("*").where({ id: id }).first()
-    return await knex("Readers").where({ id: id }).update({ helpRequested: !(oldRow?.helpRequested) })
 }
 
 /**
