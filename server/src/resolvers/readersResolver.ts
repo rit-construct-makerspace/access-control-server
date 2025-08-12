@@ -166,16 +166,13 @@ const ReadersResolver = {
   Mutation: {
     /**
      * Create a Reader
-     * @argument machineID ID of Equipment
-     * @argument machineType Type indication string (mostly deprecated)
      * @argument name Reader name
-     * @argument zone comma seperated list of zone IDs the machine resides in (usually just the one)
      * @returns new Reader
      * @throws GraphQLError if not STAFF or is on hold
      */
     createReader: async (
       _parent: any,
-      args: { machineID?: number, machineType?: string, name?: string, zone?: string },
+      args: { name?: string },
       { isManager }: ApolloContext) =>
       isManager(async (user: CurrentUser) => {
         return await ReaderRepo.createReader(args);

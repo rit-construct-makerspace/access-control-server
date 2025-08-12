@@ -241,10 +241,7 @@ export interface UserRow {
 
 export interface ReaderRow {
   id: number;
-  machineID: number;
-  machineType: string;
   name: string;
-  zone: string;
   temp: number;
   state: string;
   currentUID: string;

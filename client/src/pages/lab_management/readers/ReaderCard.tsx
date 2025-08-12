@@ -43,7 +43,7 @@ interface ReaderCardProps {
 
 
 
-function shouldShowBasedOnSearchTerm(search: string, reader: Reader, pairedThing: string): boolean{
+function shouldShowBasedOnSearchTerm(search: string, reader: Reader, pairedThing: string): boolean {
   const lowerSearch = search.toLocaleLowerCase();
   const lowerReader = reader.name.toLocaleLowerCase();
   const lowerPaired = pairedThing.toLocaleLowerCase();
@@ -54,7 +54,7 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
   const theme = useTheme();
 
   const machineResult = useQuery(GET_CORRESPONDING_MACHINE_BY_READER_ID_OR_MACHINE_ID, {
-    variables: { readerid: reader.id, id: reader.machineID }
+    variables: { readerid: reader.id }
   });
   const makerspaceResult = useQuery(GET_MAKERSPACE_FOR_WELCOME_READER, {
     variables: { readerId: reader.id },
@@ -84,7 +84,7 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
   const [deleteReader] = useMutation(DELETE_READER, { refetchQueries: [{ query: GET_READERS }] })
 
   const [dialOpen, setDialOpen] = useState(false);
-  
+
 
 
   function machineOrMakerspace() {
@@ -126,8 +126,8 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
   function ShowVersions() {
     const isVersion1 = (reader.BEVer ?? "").trim().startsWith("1");
     const labels = isVersion1 ?
-    ["BEVer", "FEVer", "HWVer"]
-    : ["Current SW", "Pending SW", "HW Version"];
+      ["BEVer", "FEVer", "HWVer"]
+      : ["Current SW", "Pending SW", "HW Version"];
     const values = [reader.BEVer, reader.FEVer, reader.HWVer];
 
 

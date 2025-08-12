@@ -284,7 +284,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     // Find Machine
     if (machine == null) {
       if (reader?.SN == null) {
-        wsApiLog("{user} failed to swipe into a machine with error '{error}'", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader.machineID, label: `Machine ${reader.machineID} does not exist` });
+        wsApiLog("{user} failed to swipe into a machine with error '{error}'", "auth", { id: user.id, label: getUsersFullName(user) }, { id: 0, label: `Machine does not exist` });
         inResponse.Error = "Machine does not exist";
       } else {
         wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: readerId, label: reader?.name });
@@ -854,9 +854,6 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
   // update with new info
   await updateReaderStatus({
     id: reader.id,
-    machineID: undefined,
-    machineType: "",
-    zone: "",
     temp: 0,
     state: newState,
     currentUID: "",

@@ -20,7 +20,7 @@ export async function getReaderByID(
 
 /**
  * Fetch areader by the id of the machine it is associated with
- * @param machineID the machine ID of the machine
+ * @param name name of the reader (adjective-color-shlug)
  */
 export async function getReaderByName(
     name: string
@@ -37,16 +37,6 @@ export async function getReaderBySN(
     SN: string
 ): Promise<ReaderRow | undefined> {
     return await knex("Readers").from("Readers").first().where({ SN: SN });
-}
-
-/**
- * Fetch areader by the id of the machine it is associated with
- * @param machineID the machine ID of the machine
- */
-export async function getReaderByMachineID(
-    machineID: number
-): Promise<ReaderRow | undefined> {
-    return await knex("Readers").from("Readers").first().where({ machineID: machineID });
 }
 
 /**
@@ -152,28 +142,28 @@ export async function getReaderLogs(searchParams: { makerspaceID?: number, from:
 
 /**
  * Get number of idle ACS readers
- * @param machineID the equipment ID to find readers for
+ * @param equipmentID the equipment ID to find readers for
  * @returns number of reader rows where status="Idle"
  */
-export async function getNumIdleReadersByEquipment(machineID: number): Promise<number> {
+export async function getNumIdleReadersByEquipment(equipmentID: number): Promise<number> {
     return (await knex("Readers")
         .select("*")
         .leftJoin("EquipmentInstances", "EquipmentInstances.readerID", "Readers.id")
-        .where({ equipmentID: machineID })
+        .where({ equipmentID: equipmentID })
         .andWhere({ state: "Idle" })
         .andWhereRaw(`"lastStatusTime" > now() - interval '5 min'`)).length;
 }
 
 /**
  * Get number of active ACS readers
- * @param machineID the equipment ID to find readers for
+ * @param equipmentID the equipment ID to find readers for
  * @returns number of reader rows where status != "Idle"
  */
-export async function getNumUnavailableReadersByEquipment(machineID: number): Promise<number> {
+export async function getNumUnavailableReadersByEquipment(equipmentID: number): Promise<number> {
     return (await knex("Readers")
         .select("*")
         .leftJoin("EquipmentInstances", "EquipmentInstances.readerID", "Readers.id")
-        .where({ equipmentID: machineID })
+        .where({ equipmentID: equipmentID })
         .andWhere(q =>
             q.where("state", "!=", "Idle")
                 .orWhereRaw(`"lastStatusTime" < now() - interval '5 min'`)
@@ -185,10 +175,7 @@ export async function getNumUnavailableReadersByEquipment(machineID: number): Pr
  * @param reader the static attributes of the card reader
  */
 export async function createReader(reader: {
-    machineID?: number,
-    machineType?: string,
     name?: string,
-    zone?: string
 }): Promise<ReaderRow | undefined> {
     const [newID] = await knex("Readers").insert(reader, "id");
     return await getReaderByID(newID.id);
@@ -216,9 +203,6 @@ export async function createReaderFromSN(reader: {
  */
 export async function updateReaderStatus(reader: {
     id: number,
-    machineID: number | undefined,
-    machineType: string | undefined,
-    zone: string,
     temp: number,
     state: string,
     currentUID: string,
@@ -235,9 +219,6 @@ export async function updateReaderStatus(reader: {
     pairTime?: Date,
 }): Promise<ReaderRow | undefined> {
     await knex("Readers").where({ id: reader.id }).update({
-        machineID: reader.machineID,
-        machineType: reader.machineType,
-        zone: reader.zone,
         temp: reader.temp,
         state: reader.state,
         currentUID: reader.currentUID,

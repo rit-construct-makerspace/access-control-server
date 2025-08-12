@@ -8,10 +8,7 @@ import { gql } from "graphql-tag";
 export const ReaderTypeDefs = gql`
   type Reader {
     id: ID!
-    machineID: String
-    machineType: String
     name: String
-    zone: String
     temp: String
     state: String
     user: User
@@ -55,10 +52,7 @@ export const ReaderTypeDefs = gql`
 
   extend type Mutation {
     createReader(
-      machineID: ID!
-      machineType: String
       name: String
-      zone: String
     ): Reader
 
     deleteReader(id: ID!): Boolean
@@ -73,9 +67,6 @@ export const ReaderTypeDefs = gql`
 
     updateReader(
       id: ID!
-      machineID: String
-      machineType: String
-      zone: String
       temp: String
       state: String
       currentUID: String

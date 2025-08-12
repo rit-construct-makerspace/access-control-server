@@ -89,8 +89,8 @@ export const GET_ANY_EQUIPMENT_BY_ID = gql`
 `;
 
 export const GET_CORRESPONDING_MACHINE_BY_READER_ID_OR_MACHINE_ID = gql`
-  query GetCorrespondingEquipment($readerid: ID, $id: ID) {
-    correspondingEquipment(readerid: $readerid, id: $id) {
+  query GetCorrespondingEquipment($readerid: ID!) {
+    correspondingEquipment(readerid: $readerid) {
       id
       name
       archived

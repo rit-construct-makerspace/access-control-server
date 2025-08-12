@@ -122,10 +122,7 @@ export const GET_READER_PAIRED_WITH_INSTANCE_BY_INSTANCE_ID = gql`
     query GetReaderPairedWithInstanceByInstanceId($instanceID: ID!){
         getReaderPairedWithInstanceByInstanceId(instanceID: $instanceID){
       id
-      machineID
-      machineType
       name
-      zone
       temp
       state
       user {
