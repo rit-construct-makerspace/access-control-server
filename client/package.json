@@ -21,8 +21,6 @@
     "install": "^0.13.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-google-calendar-api": "^2.3.0",
-    "react-iframe": "^1.8.5",
     "react-markdown": "^7.1.2",
     "react-qr-code": "^2.0.18",
     "react-router-dom": "^6.26.1",
@@ -46,17 +44,6 @@
       "pre-commit": "lint-staged"
     }
   },
-  "jest": {
-    "coveragePathIgnorePatterns": [
-      "src/App.tsx",
-      "src/index.tsx",
-      "src/reportWebVitals.ts",
-      "src/test/*",
-      "src/queries/*",
-      "src/test_data/*",
-      "src/types/*"
-    ]
-  },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
       "prettier --write"
@@ -75,11 +62,6 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/gapi.auth2": "^0.0.57",
-    "@types/jest": "^27.5.2",
     "@types/react": "^19.1.5",
     "@types/react-dom": "^19.1.5",
     "@types/react-router-dom": "^5.3.3",
