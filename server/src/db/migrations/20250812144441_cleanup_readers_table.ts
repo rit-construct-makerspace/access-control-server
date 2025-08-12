@@ -8,6 +8,8 @@ export async function up(knex: Knex): Promise<void> {
 
     await knex.schema.alterTable("Readers", (t)=>{
         t.dropColumns("machineType", "machineID", "zone", "helpRequested");
+        // t.("SN");
+        t.dropNullable("SN");
     })
 }
 
@@ -22,6 +24,7 @@ export async function down(knex: Knex): Promise<void> {
         t.string("machineType");
         t.string("zone");
         t.boolean("helpRequested").defaultTo(false);
+        t.setNullable("SN");
     })
 }
 

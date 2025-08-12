@@ -259,11 +259,11 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     // Find Machine Instance
     const machineInst = await getInstanceByReaderID(readerId);
 
-    var machine: EquipmentRow | undefined;
+    var machine: EquipmentRow | undefined = undefined;
     if (machineInst) {
       try {
         machine = await getEquipmentByID(machineInst.equipmentID);
-        if (machine == null) {
+        if (machine == undefined) {
           // bizzare error handling bc api getters can be inconsistent
           throw EntityNotFound;
         }
@@ -282,14 +282,9 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     inResponse.Role = user.privilege;
 
     // Find Machine
-    if (machine == null) {
-      if (reader?.SN == null) {
-        wsApiLog("{user} failed to swipe into a machine with error '{error}'", "auth", { id: user.id, label: getUsersFullName(user) }, { id: 0, label: `Machine does not exist` });
-        inResponse.Error = "Machine does not exist";
-      } else {
+    if (machine === undefined) {
         wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: readerId, label: reader?.name });
         inResponse.Error = "Reader not paired with a machine instance";
-      }
       inResponse.Reason = "unknown-machine";
       return inResponse;
     }

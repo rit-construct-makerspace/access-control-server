@@ -168,7 +168,7 @@ const ReadersResolver = {
      * Create a Reader
      * @argument name Reader name
      * @returns new Reader
-     * @throws GraphQLError if not STAFF or is on hold
+     * @throws GraphQLError if not MANAGER or is on hold
      */
     createReader: async (
       _parent: any,

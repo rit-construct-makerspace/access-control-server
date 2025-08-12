@@ -253,7 +253,7 @@ export interface ReaderRow {
   FEVer: string;
   HWVer: string;
   sessionStartTime: Date;
-  SN?: string;
+  SN: string;
   readerKeyCycle: number;
   pairTime?: Date
   targetFirmwareVersion?: string
