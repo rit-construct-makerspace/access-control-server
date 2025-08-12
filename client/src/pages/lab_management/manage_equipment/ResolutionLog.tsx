@@ -25,7 +25,8 @@ export default function ResolutionLogPage() {
 
   const [newContent, setNewContent] = useState<string>("");
   const [newIssue, setNewIssue] = useState<string>(issueParams.get("issue") ?? "");
-  const [newInstance, setNewInstance] = useState<number | undefined>(Number(issueParams.get("instance")) ?? undefined);
+  const instNum = Number(issueParams.get("instance"));
+  const [newInstance, setNewInstance] = useState<number | undefined>(isNaN(instNum) ? undefined : instNum);
   const [markInstanceActive, setMarkInstanceActive] = useState<boolean>(true);
 
   const issueID = issueParams.get("id");
@@ -47,7 +48,7 @@ export default function ResolutionLogPage() {
   const [authorSort, setAuthorSort] = useState<'asc' | 'desc'>('desc');
 
   function handleSubmit() {
-    createResolutionLog({ variables: { equipmentID, issue: newIssue, content: newContent, instanceID: (newInstance) } }).then((result) => {
+    createResolutionLog({ variables: { equipmentID, issue: newIssue, content: newContent, instanceID: (newInstance) } }).then(() => {
       if (issueID && autoDelete) deleteIssueLog({variables: {id: issueID}, refetchQueries: [{query: GET_MAINTENANCE_LOGS, variables: {equipmentID}}]});
       if (newInstance && markInstanceActive) {
         setInstanceNeedsRepairs();
@@ -59,10 +60,6 @@ export default function ResolutionLogPage() {
       setIssueParams(undefined);
     });
   }
-
-  console.log(issueParams)
-  console.log(newInstance)
-  console.log(newIssue)
 
   const [instancesModalOpen, setInstancesModalOpen] = useState<boolean>(false);
 
@@ -136,9 +133,20 @@ export default function ResolutionLogPage() {
               <Stack direction={"column"} width={"15%"}>
                 <InputLabel>Instance</InputLabel>
                 <RequestWrapper loading={instancesQueryResult.loading} error={instancesQueryResult.error}>
-                  <Select value={newInstance} onChange={(e) => setNewInstance(Number(e.target.value))} fullWidth defaultValue={instancesQueryResult.data?.equipmentInstances.length === 1 ? instancesQueryResult.data?.equipmentInstances[0].id: (Number(issueParams.get("instance")) ?? null)}>
-                    {instancesQueryResult.data?.equipmentInstances.map((instance: EquipmentInstance) => (
-                      <MenuItem value={instance.id} defaultChecked={instancesQueryResult.data?.equipmentInstances.length === 1}>{instance.name}</MenuItem>
+                  <Select 
+                    value={newInstance} 
+                    onChange={(e) => setNewInstance(Number(e.target.value))} 
+                    fullWidth 
+                    defaultValue={(instancesQueryResult.data?.equipmentInstances.length === 1) 
+                                    ? instancesQueryResult.data?.equipmentInstances[0].id
+                                    : (isNaN(instNum) ? null : instNum)}>
+                    
+                    {instancesQueryResult.data?.equipmentInstances
+                    .map((instance: EquipmentInstance) => (
+                      <MenuItem 
+                        value={instance.id} 
+                        defaultChecked={instancesQueryResult.data?.equipmentInstances.length === 1}>{instance.name}
+                      </MenuItem>
                     ))}
                   </Select>
                 </RequestWrapper>

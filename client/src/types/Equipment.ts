@@ -1,5 +1,3 @@
-import { ObjectSummary } from "./Common";
-
 export default interface Equipment {
   id: number;
   name: string;
@@ -27,7 +25,7 @@ export interface EquipmentWithRoom {
   archived: boolean;
   notes: string;
   room: {
-    name: String;
+    name: string;
     id: number;
     zone: any;
   };

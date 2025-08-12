@@ -27,7 +27,7 @@ export default function SubmissionCard({ module, submission }: SubmissionCardPro
   const isMobile = width <= 768;
 
 
-  let submissionDate = new Date(+(submission.submissionDate)).toLocaleString('en-US');
+  const submissionDate = new Date(+(submission.submissionDate)).toLocaleString('en-US');
   return (
     <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>
         <CardActionArea>

@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 import { Stack, TextField } from "@mui/material";
 import QuizItemDraft from "./QuizItemDraft";
@@ -33,10 +32,10 @@ export default function YouTubeEmbedDraft({
           placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
           value={youtubeEmbed.text}
           onChange={(e) => {
-            var embedId = ""
+            let embedId = ""
             try {
               embedId = new URL(e.target.value).searchParams.get("v") ?? "";
-            } catch (Exception) {
+            } catch (_exc) {
               embedId = e.target.value;
             }
             updateYoutubeEmbed({ ...youtubeEmbed, text: embedId });

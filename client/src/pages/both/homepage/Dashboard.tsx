@@ -39,7 +39,7 @@ export function Dashboard() {
             {/* Zones */}
             <RequestWrapper2 result={getZonesResult} render={(data) => {
                 const zones: ZoneWithHours[] = data.zones;
-                const filteredZone: ZoneWithHours[] = zones.filter((zone: ZoneWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
+                const filteredZone: ZoneWithHours[] = zones.filter((_zone: ZoneWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
                 const sortedZones = filteredZone.sort((a: ZoneWithHours, b: ZoneWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
 
                 return (
@@ -132,4 +132,4 @@ export function Dashboard() {
 
         </Box>
     );
-};
+}
