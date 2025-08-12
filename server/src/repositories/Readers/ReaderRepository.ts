@@ -51,17 +51,53 @@ export async function getReaders(): Promise<ReaderRow[]> {
         ; 
 }
 
+export interface ReaderRowWithPairings extends ReaderRow{
+    makerspaceID?: number;
+    makerspaceName: string
+
+    equipmentID?: number;
+    equipmentName?: string;
+    equipmentArchived?: boolean;
+    instanceID?: number;
+    instanceName?: number;
+}
+
+/**
+ * Fetch all card Readers with pairings
+ */
+export async function getReadersWithPairings(): Promise<ReaderRowWithPairings[]>{
+ 
+    const res = await knex("Readers as r")
+    .select('r.*', 
+        knex.raw('z.id as "makerspaceID"'), 
+        knex.raw('z.name as "makerspaceName"'), 
+        knex.raw('e.id as "equipmentID"'),
+        knex.raw('e.name as "equipmentName"'),
+        knex.raw('e.archived as "equipmentArchived"'),
+        knex.raw('ei.id as "instanceID"'),
+        knex.raw('ei.name as "instanceName"'),
+        knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
+    .leftOuterJoin("MakerspaceWelcomeReaders as mwr", "mwr.readerID", "r.id")
+    .leftJoin("Zones as z", "z.id", "mwr.makerspaceID")
+    .leftOuterJoin("EquipmentInstances as ei", "ei.readerID", "r.id")
+    .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
+    .orderBy("faultOrder", "asc")
+    .orderBy("id", "asc") as ReaderRowWithPairings[]; 
+        console.log(res);
+    return res;
+}
+
 /**
  * Fetch unpaired card readers
  * @return list of readers that are not already in use as an instance reader or a welcom reader 
  */
 export async function getUnpairedReaders(): Promise<ReaderRow[]> {
-    return await knex("Readers").select("Readers.*")
+    return await knex("Readers").select("Readers.*", "z.id", "z.name")
         .leftJoin("EquipmentInstances", "Readers.id", "EquipmentInstances.readerID")
         .leftJoin("MakerspaceWelcomeReaders as mwr", "Readers.id", "mwr.readerID")
         .whereNotNull("SN").andWhere(function () { this.whereNull("EquipmentInstances.readerID") })
         .andWhere(function () { this.whereNull("mwr.readerID") })
-        .orderBy("Readers.name", "desc").orderBy("Readers.id", "asc")
+        .orderBy("Readers.name", "desc").orderBy("Readers.id", "asc");
 }
 
 export enum PairStatus {

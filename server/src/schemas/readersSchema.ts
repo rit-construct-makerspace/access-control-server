@@ -6,6 +6,16 @@
 import { gql } from "graphql-tag";
 
 export const ReaderTypeDefs = gql`
+  type PairedMakerspace{
+    id: ID!
+    name: String
+  } 
+  type PairedEquipment{
+    equipmentID: ID!
+    equipmentName: String 
+    instanceID: ID!
+    instanceName: String
+  } 
   type Reader {
     id: ID!
     name: String
@@ -24,6 +34,9 @@ export const ReaderTypeDefs = gql`
     readerKeyCycle: Int
     pairTime: DateTime
     targetFirmwareVersion: String
+
+    pairedMakerspace: PairedMakerspace
+    pairedEquipment: PairedEquipment
   }
   type ReaderLog{
     id: ID!

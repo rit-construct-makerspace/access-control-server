@@ -13,7 +13,8 @@ import * as ShlugControl from "../wsapi.js"
 
 import { createCipheriv, randomInt, scryptSync } from "crypto";
 import { generateRandomHumanName } from "../data/humanReadableNames.js";
-import { getInstanceByID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
+import { getInstanceByID, getInstanceByReaderID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
+import { getEquipmentByID } from "../repositories/Equipment/EquipmentRepository.js";
 const serverApiPass = process.env.SERVER_API_PASSWORD ?? 'unsecure_server_password';
 const serverKey = scryptSync(serverApiPass, 'makerspace-salt¯\_(ツ)_/¯', 24);
 const algorithm = 'aes-192-cbc';
@@ -58,6 +59,32 @@ const ReadersResolver = {
       _args: any,
       _context: ApolloContext) => {
       return getUserByCardTagID(parent.currentUID);
+    },
+    pairedMakerspace: async (
+      parent: ReaderRow,
+      _args: any,
+      _context: ApolloContext) => {
+      return ReaderRepo.getMakerspaceOfWelcomeReader(parent.id);
+    },
+
+    pairedEquipment: async (
+      parent: ReaderRow,
+      _args: any,
+      _context: ApolloContext) => {
+      const inst = await getInstanceByReaderID(parent.id);
+      if (!inst) {
+        return undefined;
+      }
+      const equipment = await getEquipmentByID(inst.equipmentID);
+      if (!equipment) {
+        return undefined;
+      }
+      return {
+        equipmentID: equipment.id,
+        equipmentName: equipment.name,
+        instanceID: inst.id,
+        instanceName: inst.name,
+      }
     },
   },
   ReaderLog: {

@@ -1,21 +1,24 @@
 import { useQuery } from "@apollo/client";
-import { GET_READERS, Reader } from "../../../queries/readersQueries";
+import { GET_AVAILABLE_FIRMWARE_VERSIONS, GET_READERS, Reader } from "../../../queries/readersQueries";
 import { Box, Button, Grid, Link, Stack } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import { useNavigate, useParams } from "react-router-dom";
-import RequestWrapper from "../../../common/RequestWrapper";
 import { isValidElement, useEffect, useState } from "react";
 import ReaderCard from "./ReaderCard";
 import AddIcon from '@mui/icons-material/Add';
+import RequestWrapper2 from "../../../common/RequestWrapper2";
 
 export default function ReadersPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
   const getReadersResult = useQuery(GET_READERS, { pollInterval: 2000 });
+  const firmwareVersions = useQuery(GET_AVAILABLE_FIRMWARE_VERSIONS);
+
   const navigate = useNavigate();
 
   const [searchText, setSearchText] = useState("");
 
+  // scroll to designate id
   useEffect(() => {
     const hash = window.location.hash.slice(1); // Remove the '#' character from the hash
     if (hash) {
@@ -40,24 +43,23 @@ export default function ReadersPage() {
         <Link href={import.meta.env.VITE_GRAFANA_READER_STATS_URL}>Reader Stats</Link>
       </Stack>
 
-      <RequestWrapper
-        loading={getReadersResult.loading}
-        error={getReadersResult.error}
-      >
-        <Grid container >
-          {getReadersResult.data?.readers?.map((reader: Reader) => ({
+      <RequestWrapper2 result={getReadersResult} render={(data) => {
+        return <Grid container >
+          {data.readers?.map((reader: Reader) => ({
             reader: reader,
             card: <ReaderCard
               reader={reader}
               makerspaceID={makerspaceID ?? "0"}
+              firmwareVersions={firmwareVersions}
               searchQuery={searchText} />,
-          })).filter((o: { reader: Reader, card: any }) => {return isValidElement(o.card)}).map((o: { reader: Reader, card: any }) => {
+          })).filter((o: { reader: Reader, card: any }) => { return isValidElement(o.card) }).map((o: { reader: Reader, card: any }) => {
             return <Grid key={o.reader.id} alignItems="stretch">
               {o.card}
             </Grid>
           })}
         </Grid>
-      </RequestWrapper>
+      }
+      } />
     </Box>
   );
 }

@@ -17,11 +17,9 @@ import {
 } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { GET_CORRESPONDING_MACHINE_BY_READER_ID } from "../../../queries/equipmentQueries";
-import RequestWrapper from "../../../common/RequestWrapper";
-import { useQuery, useMutation } from "@apollo/client";
+import { useMutation, QueryResult } from "@apollo/client";
 import TimeAgo from 'react-timeago'
-import { DELETE_READER, GET_AVAILABLE_FIRMWARE_VERSIONS, GET_MAKERSPACE_FOR_WELCOME_READER, GET_READERS, IDENTIFY_READER, Reader, REQUEST_OTA_UPDATE, SET_READER_STATE } from "../../../queries/readersQueries";
+import { DELETE_READER, GET_READERS, IDENTIFY_READER, Reader, REQUEST_OTA_UPDATE, SET_READER_STATE } from "../../../queries/readersQueries";
 import LanIcon from '@mui/icons-material/Lan';
 import SaveIcon from '@mui/icons-material/Save';
 import LockIcon from '@mui/icons-material/Lock';
@@ -35,8 +33,15 @@ import { useState } from "react";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import CloseIcon from '@mui/icons-material/Close';
 
+interface ReaderWithPairing extends Reader {
+  pairedMakerspace?: { id: number, name: string };
+  pairedEquipment?: { equipmentID: number, equipmentName: string, equipmentArchived: boolean, instanceID: number, instanceName: string };
+
+}
+
 interface ReaderCardProps {
-  reader: Reader
+  reader: ReaderWithPairing
+  firmwareVersions: QueryResult<any>
   makerspaceID: string,
   searchQuery: string,
 }
@@ -50,19 +55,10 @@ function shouldShowBasedOnSearchTerm(search: string, reader: Reader, pairedThing
   return lowerReader.includes(lowerSearch) || lowerPaired.includes(lowerSearch)
 }
 
-export default function ReaderCard({ reader, makerspaceID, searchQuery }: ReaderCardProps) {
+export default function ReaderCard({ reader, makerspaceID, searchQuery, firmwareVersions }: ReaderCardProps) {
   const theme = useTheme();
 
-  const machineResult = useQuery(GET_CORRESPONDING_MACHINE_BY_READER_ID, {
-    variables: { readerid: reader.id }
-  });
-  const makerspaceResult = useQuery(GET_MAKERSPACE_FOR_WELCOME_READER, {
-    variables: { readerId: reader.id },
-  });
-  const machine = machineResult?.data?.correspondingEquipment;
-  const makerspace = makerspaceResult?.data?.makerspaceForWelcomeReader
-
-  const pairedThing = (machine ? machine.name : makerspace ? makerspace.name : "");
+  const pairedThing = (reader.pairedEquipment ? reader.pairedEquipment.equipmentName : reader.pairedMakerspace ? reader.pairedMakerspace.name : "");
   const shouldShow = shouldShowBasedOnSearchTerm(searchQuery, reader, pairedThing);
 
   const now = new Date();
@@ -88,11 +84,11 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
 
 
   function machineOrMakerspace() {
-    if (machine) {
-      const l = <Link href={"/app/admin/equipment/" + (machine.archived ? "/archived" : "") + (machine.id)}> {machine.name}</Link>
+    if (reader.pairedEquipment) {
+      const l = <Link href={"/app/admin/equipment/" + (reader.pairedEquipment.equipmentArchived ? "/archived" : "") + (reader.pairedEquipment.equipmentID)}> {reader.pairedEquipment.equipmentName}</Link>
       return <span><b>Machine: </b> {l} </span>
-    } else if (makerspace) {
-      const l = <Link href={`/app/makerspace/${makerspace.id}`}>{makerspace.name}</Link>
+    } else if (reader.pairedMakerspace) {
+      const l = <Link href={`/app/makerspace/${reader.pairedMakerspace.id}`}>{reader.pairedMakerspace.name}</Link>
       return <span><b>Welcome For: </b> {l} </span>
     } else {
       return <b>Not Paired with Machine or Makerspace</b>
@@ -142,8 +138,6 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
     </Stack>
   }
 
-  const firmwareVersions = useQuery(GET_AVAILABLE_FIRMWARE_VERSIONS);
-
   function otaOptions(): string[] {
     const options = [];
     options.push("stable");
@@ -166,9 +160,8 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
   }
 
   function OTAControl() {
-
     return <Stack direction={"row"}>
-      {firmwareVersions.loading ? <CircularProgress color="primary" size={"1em"} /> :
+      {firmwareVersions.loading ? <CircularProgress disableShrink color="primary" thickness={3} size={"1em"} /> :
         <Autocomplete
           renderInput={(params: any) => <TextField {...params} label="OTA Target Version" />}
           size="small"
@@ -188,7 +181,6 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
         <IconButton sx={{ color: theme.palette.success.main }} onClick={() => saveOTA(true)}><SendIcon /></IconButton>
       </Tooltip>
     </Stack>
-
   }
 
   function SendStateSpeedDial() {
@@ -222,52 +214,47 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
   }
 
   return shouldShow ? (
-    <RequestWrapper
-      loading={machineResult.loading}
-      error={machineResult.error}
-    >
-      <Card id={`id-${reader.id}`} sx={{ width: 350, margin: "10px", border: '2px solid ' + ((reader.state === "Fault") ? theme.palette.error.main : "#ffffff00") }} >
-        <CardContent id={reader.name}>
-          <Stack direction={"row"} justifyContent={"space-between"} paddingBottom={"5px"}>
-            <Typography variant="h5">{reader.name}</Typography>
+    <Card id={`id-${reader.id}`} sx={{ width: 350, margin: "10px", border: '2px solid ' + ((reader.state === "Fault") ? theme.palette.error.main : "#ffffff00") }} >
+      <CardContent id={reader.name}>
+        <Stack direction={"row"} justifyContent={"space-between"} paddingBottom={"5px"}>
+          <Typography variant="h5">{reader.name}</Typography>
 
-            <Button variant="contained" color="error" size="small" onClick={() => {
-              if (window.confirm(`Are you sure you want to delete ${reader.name}`)) {
-                deleteReader({ variables: { id: reader.id } });
-              }
-            }}><DeleteIcon />
-            </Button>
-          </Stack>
+          <Button variant="contained" color="error" size="small" onClick={() => {
+            if (window.confirm(`Are you sure you want to delete ${reader.name}`)) {
+              deleteReader({ variables: { id: reader.id } });
+            }
+          }}><DeleteIcon />
+          </Button>
+        </Stack>
 
 
-          <Stack direction={"column"} fontSize={".9em"} paddingBottom={"2px"}>
-            <span><b>SN:</b> {reader.SN}</span>
-            <span><b>Reader ID: </b>{reader.id}</span>
-            {machineOrMakerspace()}
-            <span>Last Online: {lastStatusTime()}</span>
-          </Stack>
+        <Stack direction={"column"} fontSize={".9em"} paddingBottom={"2px"}>
+          <span><b>SN:</b> {reader.SN}</span>
+          <span><b>Reader ID: </b>{reader.id}</span>
+          {machineOrMakerspace()}
+          <span>Last Online: {lastStatusTime()}</span>
+        </Stack>
 
-          {stateAndTemp()}
+        {stateAndTemp()}
 
-          {ShowVersions()}
+        {ShowVersions()}
 
-          {OTAControl()}
+        {OTAControl()}
 
 
-          <Stack direction={"row"} justifyContent={"space-between"} justifyItems={"center"} alignItems={"flex-end"}>
-            <Button
-              variant="contained"
-              color="secondary"
-              endIcon={<LanIcon />}
-              onClick={() => alert("Uh, this button doesnt do anything?.....")}
-            >
-              Manage Switch(es)</Button>
+        <Stack direction={"row"} justifyContent={"space-between"} justifyItems={"center"} alignItems={"flex-end"}>
+          <Button
+            variant="contained"
+            color="secondary"
+            endIcon={<LanIcon />}
+            onClick={() => alert("Uh, this button doesnt do anything?.....")}
+          >
+            Manage Switch(es)</Button>
 
-            {SendStateSpeedDial()}
-          </Stack>
+          {SendStateSpeedDial()}
+        </Stack>
 
-        </CardContent>
-      </Card>
-    </RequestWrapper>
+      </CardContent>
+    </Card>
   ) : false;
 }
