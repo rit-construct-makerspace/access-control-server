@@ -194,7 +194,7 @@ export default function LogPage() {
             <CloseIcon />
           </IconButton>
         )}
-        <Button onClick={(e) => setUrlParam("q", searchText)} variant="contained" color="primary">Search</Button>
+        <Button onClick={(_e) => setUrlParam("q", searchText)} variant="contained" color="primary">Search</Button>
       </Stack>
       <Card sx={{ p: "1em", background: 'none', border: 'none' }}>
         <Stack direction={"row"} onClick={handleExpandClick}>

@@ -61,7 +61,7 @@ export default function UsersPage() {
             onClear={() => setSearchText("")}
             onSubmit={() => setUrlParam("q", searchText)}
           />
-          <Button onClick={(e) => setUrlParam("q", searchText)} variant="contained" color="primary">Search</Button>
+          <Button onClick={(_e) => setUrlParam("q", searchText)} variant="contained" color="primary">Search</Button>
         </Stack>
         <Stack direction="row" flexWrap="wrap" justifyContent="center">
           {safeUsers?.map((user: PartialUser) => (

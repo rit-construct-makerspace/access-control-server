@@ -144,7 +144,7 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
   const firmwareVersions = useQuery(GET_AVAILABLE_FIRMWARE_VERSIONS);
 
   function otaOptions(): string[] {
-    var options = [];
+    const options = [];
     options.push("stable");
     options.push("no-ota");
     if (firmwareVersions.data) {

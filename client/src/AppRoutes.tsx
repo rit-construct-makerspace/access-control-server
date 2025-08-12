@@ -55,7 +55,7 @@ function AuthedRoute() {
   } else {
     return <Outlet />
   }
-};
+}
 
 function TrainerRoute() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();

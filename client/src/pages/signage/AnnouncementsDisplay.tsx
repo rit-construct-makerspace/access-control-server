@@ -52,7 +52,7 @@ export default function AnnouncementsDisplay() {
 
       const announcements: Announcement[] = data.getAllAnnouncements;
 
-      const announcementGraphics = announcements.map((announcement: Announcement, loc) => {
+      const announcementGraphics = announcements.map((announcement: Announcement) => {
         return (
           <Stack width="100%" padding="25px" key={announcement.id} spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
             <Typography fontSize={100} textAlign="center" color="primary" fontWeight="bold">{announcement.title}</Typography>
