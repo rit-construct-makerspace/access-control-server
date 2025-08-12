@@ -331,16 +331,16 @@ const ReadersResolver = {
       ) =>
         isManagerFor(Number(args.makerspaceID), async (executingUser: any) => {
           if (isNaN(Number(args.makerspaceID))){
-            return "specify a makerspace";
+            return false;
           }
           try {
             const readers = await ReaderRepo.getReaders(args.makerspaceID);
             readers?.forEach((reader) =>{
               ShlugControl.sendState(executingUser, reader.id, "Restart");
             });
-            return "sent";
+            return true;
           } catch (e) {
-            return `failed to restart all: ${e}`;
+            return false;
           }
         }),
 
