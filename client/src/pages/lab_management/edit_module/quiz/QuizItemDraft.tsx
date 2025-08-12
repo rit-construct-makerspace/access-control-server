@@ -36,7 +36,7 @@ export default function QuizItemDraft({
 }: QuizItemDraftProps) {
   return (
     <Draggable draggableId={itemId} index={index}>
-      {(provided, snapshot) => (
+      {(provided, _snapshot) => (
         <Card
           ref={provided.innerRef}
           {...provided.draggableProps}

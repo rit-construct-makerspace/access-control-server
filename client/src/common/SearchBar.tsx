@@ -1,4 +1,3 @@
-import React from "react";
 import { IconButton, InputAdornment, StandardTextFieldProps, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";

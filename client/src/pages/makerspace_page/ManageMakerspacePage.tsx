@@ -52,7 +52,7 @@ export default function ManageMakerspacePage() {
 
         if (!init) {
           initState(zone);
-        };
+        }
 
         const handleDeleteZone = () => {
           const confirm = window.confirm("Are you sure you want to delete? This cannot be undone.");

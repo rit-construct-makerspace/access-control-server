@@ -124,9 +124,10 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
 
 
   function ShowVersions() {
-    const labels = true ?
-      ["Current SW", "Pending SW", "HW Version"]
-      : ["BEVer", "FEVer", "HWVer"];
+    const isVersion1 = (reader.BEVer ?? "").trim().startsWith("1");
+    const labels = isVersion1 ?
+    ["BEVer", "FEVer", "HWVer"]
+    : ["Current SW", "Pending SW", "HW Version"];
     const values = [reader.BEVer, reader.FEVer, reader.HWVer];
 
 
@@ -144,7 +145,7 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery }: Reader
   const firmwareVersions = useQuery(GET_AVAILABLE_FIRMWARE_VERSIONS);
 
   function otaOptions(): string[] {
-    var options = [];
+    const options = [];
     options.push("stable");
     options.push("no-ota");
     if (firmwareVersions.data) {
