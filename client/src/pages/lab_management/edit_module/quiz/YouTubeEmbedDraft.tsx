@@ -35,7 +35,7 @@ export default function YouTubeEmbedDraft({
             let embedId = ""
             try {
               embedId = new URL(e.target.value).searchParams.get("v") ?? "";
-            } catch (_Exception) {
+            } catch (_exc) {
               embedId = e.target.value;
             }
             updateYoutubeEmbed({ ...youtubeEmbed, text: embedId });
