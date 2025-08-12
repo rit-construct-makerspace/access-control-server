@@ -13,8 +13,8 @@ import * as ModuleRepo from '../Training/ModuleRepository.js';
  * Fetch all Zones
  * @returns all Zones
  */
-export async function getZones(): Promise<ZoneRow[]> {
-  return await knex('Zones').select();
+export async function getZones(archived = false): Promise<ZoneRow[]> {
+  return await knex('Zones').select().where({ archived: archived });
 }
 
 /**
@@ -117,4 +117,13 @@ export async function hasZoneTrainings(
   }
 
   return true;
+}
+
+export async function archiveZone(id: number, archive = true): Promise<ZoneRow | undefined> {
+  const result = await knex("Zones").where("id", id).update("archived", archive).returning("*");
+  if (result.length > 0) {
+    return result[0];
+  } else {
+    return undefined;
+  }
 }

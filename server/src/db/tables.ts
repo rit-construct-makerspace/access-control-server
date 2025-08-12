@@ -303,6 +303,7 @@ export interface ZoneRow {
   id: number;
   name: string;
   imageUrl: string;
+  archived: boolean;
 }
 
 export interface RoomsForZonesRow {
