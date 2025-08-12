@@ -32,7 +32,7 @@ export default function RequestWrapper2({
       minHeight={minHeight}
       p={2}
     >
-      {loading && <CircularProgress />}
+      {loading && <CircularProgress disableShrink />}
       {error && (
         <Alert severity="error" title={error?.name}>
           {error?.message}

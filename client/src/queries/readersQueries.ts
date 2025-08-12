@@ -19,8 +19,8 @@ export interface Reader {
 }
 
 export const GET_READERS = gql`
-  query GetReaders {
-    readers {
+  query GetReaders($makerspaceID: ID) {
+    readers(makerspaceID: $makerspaceID) {
       id
       name
       temp
@@ -45,6 +45,46 @@ export const GET_READERS = gql`
     }
   }
 `;
+
+
+export const GET_READERS_WITH_PAIRINGS = gql`
+  query GetReaders($makerspaceID: ID) {
+    readers(makerspaceID: $makerspaceID) {
+      id
+      name
+      temp
+      state
+      user {
+        id
+        firstName
+        lastName
+      }
+      recentSessionLength
+      lastStatusReason
+      scheduledStatusFreq
+      lastStatusTime
+      BEVer
+      FEVer
+      HWVer
+      sessionStartTime
+      SN
+      readerKeyCycle
+      pairTime
+      targetFirmwareVersion
+      pairedMakerspace {
+        id
+        name
+      }
+      pairedEquipment {
+        equipmentID
+        equipmentName 
+        instanceID
+        instanceName
+      }
+    }
+  }
+`;
+
 export const GET_READER_BY_ID = gql`
   query GetReaderByID($id: ID!) {
     reader(id: $id) {
@@ -272,6 +312,11 @@ export const SET_READER_STATE = gql`
   }
 `;
 
+export const RESTART_ALL_READERS = gql`
+  mutation RestartAllReaders($makerspaceID: ID!) {
+    restartAllReaders(makerspaceID: $makerspaceID)
+  }
+`;
 
 export const GET_AVAILABLE_FIRMWARE_VERSIONS = gql`
   query Query {
