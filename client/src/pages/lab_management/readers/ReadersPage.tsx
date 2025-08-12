@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
-import { GET_AVAILABLE_FIRMWARE_VERSIONS, GET_READERS, Reader } from "../../../queries/readersQueries";
-import { Box, Button, Grid, Link, Stack } from "@mui/material";
+import { GET_AVAILABLE_FIRMWARE_VERSIONS, GET_READERS_WITH_PAIRINGS, Reader } from "../../../queries/readersQueries";
+import { Box, Button, Checkbox, FormControlLabel, Grid, Link, Stack } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import { useNavigate, useParams } from "react-router-dom";
 import { isValidElement, useEffect, useState } from "react";
@@ -11,8 +11,12 @@ import RequestWrapper2 from "../../../common/RequestWrapper2";
 export default function ReadersPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
-  const getReadersResult = useQuery(GET_READERS, { pollInterval: 2000 });
+  const [showAllReaders, setShowAllReaders] = useState<boolean>(false)
+
+  const getReadersResult = useQuery(GET_READERS_WITH_PAIRINGS, { pollInterval: 2000, variables: {makerspaceID: showAllReaders ? null : makerspaceID} });
   const firmwareVersions = useQuery(GET_AVAILABLE_FIRMWARE_VERSIONS);
+
+
 
   const navigate = useNavigate();
 
@@ -40,6 +44,8 @@ export default function ReadersPage() {
           onClear={() => setSearchText("")}
         />
         <Button color="success" variant="contained" onClick={() => { navigate("/admin/newreader") }}><AddIcon />Pair New Reader</Button>
+        <FormControlLabel labelPlacement="start" label = "Show All Readers" control = {<Checkbox onChange={(e)=>setShowAllReaders(e.target.checked)}></Checkbox>} />
+
         <Link href={import.meta.env.VITE_GRAFANA_READER_STATS_URL}>Reader Stats</Link>
       </Stack>
 

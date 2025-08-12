@@ -42,16 +42,35 @@ export async function getReaderBySN(
 /**
  * Fetch all card readers
  */
-export async function getReaders(): Promise<ReaderRow[]> {
+export async function getReaders(makerspaceID: number | null = null): Promise<ReaderRow[]> {
+    console.log("gerReaders", makerspaceID)
     //Order them to prevent random ordering everytime the client polls, also prioritize help
-    return await knex("Readers")
-        .select("*", knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
-        .orderBy("faultOrder", "asc")
-        .orderBy("id", "asc")
-        ; 
+    if (makerspaceID == null) {
+        // don't need to sort by zone, easy mode
+        return await knex("Readers")
+            .select("*", knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
+            .orderBy("faultOrder", "asc")
+            .orderBy("id", "asc")
+            ;
+    }
+
+    const res = await knex("Readers as r")
+    .select('r.*', knex.raw('case when state = \'Fault\' then 0 when (z.id is null and rz.id is null) then 2 else 1 end as "faultOrder"'))
+    .leftOuterJoin("MakerspaceWelcomeReaders as mwr", "mwr.readerID", "r.id")
+    .leftJoin("Zones as z", "z.id", "mwr.makerspaceID")
+    .leftOuterJoin("EquipmentInstances as ei", "ei.readerID", "r.id")
+    .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
+    .leftJoin("Rooms as rs", "rs.id", "e.roomID")
+    .leftJoin("Zones as rz", "rz.id", "rs.zoneID")
+    .where("z.id", "=", makerspaceID).orWhere("rz.id", "=", makerspaceID).orWhere(knex.raw("z.id is null and rz.id is null"))
+    .orderBy("faultOrder", "asc")
+    .orderBy("e.name", "asc")
+    .orderBy("id", "asc") as ReaderRowWithPairings[]; 
+
+    return res;
 }
 
-export interface ReaderRowWithPairings extends ReaderRow{
+export interface ReaderRowWithPairings extends ReaderRow {
     makerspaceID?: number;
     makerspaceName: string
 
@@ -65,25 +84,25 @@ export interface ReaderRowWithPairings extends ReaderRow{
 /**
  * Fetch all card Readers with pairings
  */
-export async function getReadersWithPairings(): Promise<ReaderRowWithPairings[]>{
- 
+export async function getReadersWithPairings(): Promise<ReaderRowWithPairings[]> {
+
     const res = await knex("Readers as r")
-    .select('r.*', 
-        knex.raw('z.id as "makerspaceID"'), 
-        knex.raw('z.name as "makerspaceName"'), 
-        knex.raw('e.id as "equipmentID"'),
-        knex.raw('e.name as "equipmentName"'),
-        knex.raw('e.archived as "equipmentArchived"'),
-        knex.raw('ei.id as "instanceID"'),
-        knex.raw('ei.name as "instanceName"'),
-        knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
-    .leftOuterJoin("MakerspaceWelcomeReaders as mwr", "mwr.readerID", "r.id")
-    .leftJoin("Zones as z", "z.id", "mwr.makerspaceID")
-    .leftOuterJoin("EquipmentInstances as ei", "ei.readerID", "r.id")
-    .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
-    .orderBy("faultOrder", "asc")
-    .orderBy("id", "asc") as ReaderRowWithPairings[]; 
-        console.log(res);
+        .select('r.*',
+            knex.raw('z.id as "makerspaceID"'),
+            knex.raw('z.name as "makerspaceName"'),
+            knex.raw('e.id as "equipmentID"'),
+            knex.raw('e.name as "equipmentName"'),
+            knex.raw('e.archived as "equipmentArchived"'),
+            knex.raw('ei.id as "instanceID"'),
+            knex.raw('ei.name as "instanceName"'),
+            knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
+        .leftOuterJoin("MakerspaceWelcomeReaders as mwr", "mwr.readerID", "r.id")
+        .leftJoin("Zones as z", "z.id", "mwr.makerspaceID")
+        .leftOuterJoin("EquipmentInstances as ei", "ei.readerID", "r.id")
+        .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
+        .orderBy("faultOrder", "asc")
+        .orderBy("id", "asc") as ReaderRowWithPairings[];
+
     return res;
 }
 
@@ -136,7 +155,7 @@ export async function pairReaderAsMakerspaceWelcomer(readerID: number, makerspac
         return true; // or throw if not found
     } catch {
     }
- 
+
     return false;
 }
 
@@ -321,8 +340,8 @@ export async function getMakerspaceOfWelcomeReader(readerID: number): Promise<Zo
  * @param makerspaceId the makerspace to check
  * @returns a list of readers that are acting as welcome readers for the space
  */
-export async function getWelcomeReadersForMakerspace(makerspaceId: number): Promise<ReaderRow[]>{
-    return await knex("MakerspaceWelcomeReaders").where({makerspaceID: makerspaceId}).leftJoin("Readers", "Readers.id", "MakerspaceWelcomeReaders.readerID").select("Readers.*");
+export async function getWelcomeReadersForMakerspace(makerspaceId: number): Promise<ReaderRow[]> {
+    return await knex("MakerspaceWelcomeReaders").where({ makerspaceID: makerspaceId }).leftJoin("Readers", "Readers.id", "MakerspaceWelcomeReaders.readerID").select("Readers.*");
 }
 
 /**
@@ -330,7 +349,7 @@ export async function getWelcomeReadersForMakerspace(makerspaceId: number): Prom
  * @param ids the list of readers to set for
  * @param version the firmware tag to set
  */
-export async function setOTAVersions(ids: number[], version: string){
+export async function setOTAVersions(ids: number[], version: string) {
     await knex("Readers").update("targetFirmwareVersion", version).whereIn("id", ids)
 }
 

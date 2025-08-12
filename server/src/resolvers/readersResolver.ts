@@ -110,10 +110,10 @@ const ReadersResolver = {
      */
     readers: async (
       _parent: any,
-      _args: any,
+      args: {makerspaceID: number},
       { isStaff }: ApolloContext) =>
       isStaff(async (user: CurrentUser) => {
-        return await ReaderRepo.getReaders();
+        return await ReaderRepo.getReaders(args.makerspaceID ? Number(args.makerspaceID) : null);
       }),
 
     /**

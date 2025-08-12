@@ -53,7 +53,7 @@ export const ReaderTypeDefs = gql`
   }
 
   extend type Query {
-    readers: [Reader]
+    readers(makerspaceID: ID): [Reader]
     unpairedReaders: [Reader]
     welcomeReadersForMakerspace(makerspaceId: ID!): [Reader]
     makerspaceForWelcomeReader(readerId: ID): Zone

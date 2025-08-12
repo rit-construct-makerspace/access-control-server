@@ -19,7 +19,7 @@ import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useMutation, QueryResult } from "@apollo/client";
 import TimeAgo from 'react-timeago'
-import { DELETE_READER, GET_READERS, IDENTIFY_READER, Reader, REQUEST_OTA_UPDATE, SET_READER_STATE } from "../../../queries/readersQueries";
+import { DELETE_READER, GET_READERS, GET_READERS_WITH_PAIRINGS, IDENTIFY_READER, Reader, REQUEST_OTA_UPDATE, SET_READER_STATE } from "../../../queries/readersQueries";
 import LanIcon from '@mui/icons-material/Lan';
 import SaveIcon from '@mui/icons-material/Save';
 import LockIcon from '@mui/icons-material/Lock';
@@ -55,7 +55,7 @@ function shouldShowBasedOnSearchTerm(search: string, reader: Reader, pairedThing
   return lowerReader.includes(lowerSearch) || lowerPaired.includes(lowerSearch)
 }
 
-export default function ReaderCard({ reader, makerspaceID, searchQuery, firmwareVersions }: ReaderCardProps) {
+export default function ReaderCard({ reader, searchQuery, firmwareVersions }: ReaderCardProps) {
   const theme = useTheme();
 
   const pairedThing = (reader.pairedEquipment ? reader.pairedEquipment.equipmentName : reader.pairedMakerspace ? reader.pairedMakerspace.name : "");
@@ -77,7 +77,7 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery, firmware
     }
   };
 
-  const [deleteReader] = useMutation(DELETE_READER, { refetchQueries: [{ query: GET_READERS }] })
+  const [deleteReader] = useMutation(DELETE_READER, { refetchQueries: [{ query: GET_READERS_WITH_PAIRINGS }, {query: GET_READERS}] })
 
   const [dialOpen, setDialOpen] = useState(false);
 
@@ -150,7 +150,7 @@ export default function ReaderCard({ reader, makerspaceID, searchQuery, firmware
 
 
   const [otaSelection, setOtaSelection] = useState<string>(reader.targetFirmwareVersion ?? "")
-  const [requestOTA] = useMutation(REQUEST_OTA_UPDATE, { refetchQueries: [{ query: GET_READERS }] });
+  const [requestOTA] = useMutation(REQUEST_OTA_UPDATE, { refetchQueries: [{ query: GET_READERS_WITH_PAIRINGS }] });
 
   function saveOTA(sendNow: boolean) {
     if (otaSelection === "no-ota") {
