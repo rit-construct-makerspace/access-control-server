@@ -220,6 +220,10 @@ export default function ReaderCard({ reader, searchQuery, firmwareVersions }: Re
           <Typography variant="h5">{reader.name}</Typography>
 
           <Button variant="contained" color="error" size="small" onClick={() => {
+            if (reader.pairedEquipment || reader.pairedMakerspace){
+              alert(`You can not delete this reader. it is paired with ${reader.pairedEquipment?.equipmentName ?? reader.pairedMakerspace?.name}. Unpair it before you delete it`)
+              return;
+            }
             if (window.confirm(`Are you sure you want to delete ${reader.name}`)) {
               deleteReader({ variables: { id: reader.id } });
             }
