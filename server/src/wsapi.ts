@@ -15,7 +15,6 @@ import { generateRandomHumanName } from "./data/humanReadableNames.js";
 import { generateShlugKey } from "./resolvers/readersResolver.js";
 import { hasActiveHolds } from "./repositories/Holds/HoldsRepository.js";
 import { hasRestriction } from "./repositories/Restrictions/RestrictionsRepository.js";
-import { isManagerFor } from "./context.js";
 import { getZoneByID, hasZoneTrainings } from "./repositories/Zones/ZonesRespository.js";
 
 
@@ -278,7 +277,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     inResponse.Role = user.privilege;
 
     // Find Machine
-    if (machine === undefined) {
+    if (machineInst === undefined || machine === undefined) {
         wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: readerId, label: reader?.name });
         inResponse.Error = "Reader not paired with a machine instance";
       inResponse.Reason = "unknown-machine";
@@ -341,7 +340,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
       const userManagerPerms = await getUserManagerPerms(user.id);
       if (userManagerPerms.includes(machineMakerspace)) {
         wsApiLog("{user} has activated {access_device} - {equipment} with MANAGER access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
-        createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
+        createEquipmentSession(machine.id, user.id, `${machine.name}:${machineInst.name}`);
         inResponse.Verified = 1;
         return inResponse;
       }
@@ -919,7 +918,7 @@ async function handleStateUpdateMessage(reader: ReaderRow, newState: string, act
   }
   if (newState == "Unlocked") {
     const now = new Date();
-    const then = reader.sessionStartTime ?? new Date(); // if not there, set ot 0
+    const then = reader.sessionStartTime ?? new Date(); // if not there, set to 0
     const elapsedSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
     reader.recentSessionLength = elapsedSeconds;
   }
