@@ -17,12 +17,21 @@ const CREATE_MAKERSPACE = gql`
   }
 `;
 
+const ARCHIVE_MAKERSPACE = gql`
+  mutation ArchiveMakerspace($id: ID!) {
+    archiveZone(id: $id) {
+      id
+    }
+  }
+`;
+
 export default function SiteSettings() {
   const navigate = useNavigate();
 
   const getZonesResult = useQuery(GET_ZONES);
 
-  const [createMakerspace] = useMutation(CREATE_MAKERSPACE, { refetchQueries: ["GetZones"] })
+  const [createMakerspace] = useMutation(CREATE_MAKERSPACE, { refetchQueries: ["GetZones"] });
+  const [archiveMakerspace] = useMutation(ARCHIVE_MAKERSPACE, { refetchQueries: ["GetZones"] });
 
   const [createMakerspaceModal, setCreateMakerspaceModal] = useState(false);
   const [createMakerspaceName, setCreateMakerspaceName] = useState("");
@@ -60,7 +69,12 @@ export default function SiteSettings() {
                       <Stack width={"300px"} padding={"10px"} spacing={1}>
                         <Typography variant="subtitle1">{zone.name}</Typography>
                         <Stack direction={"row"} justifyContent={"space-between"}>
-                          <Button color="error" variant="contained" startIcon={<DeleteIcon />}>
+                          <Button
+                            color="error"
+                            variant="contained"
+                            startIcon={<DeleteIcon />}
+                            onClick={() => archiveMakerspace({ variables: { id: zone.id } })}
+                          >
                             Delete
                           </Button>
                           <Button color="secondary" variant="outlined" onClick={() => navigate(`/makerspace/${zone.id}/edit`)}>
