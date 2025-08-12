@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_AVAILABLE_FIRMWARE_VERSIONS, GET_READERS_WITH_PAIRINGS, Reader, RESTART_ALL_READERS, SET_READER_STATE } from "../../../queries/readersQueries";
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import { GET_AVAILABLE_FIRMWARE_VERSIONS, GET_READERS_WITH_PAIRINGS, Reader, RESTART_ALL_READERS } from "../../../queries/readersQueries";
 import { Box, Button, Checkbox, FormControlLabel, Grid, Link, Stack } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import { useNavigate, useParams } from "react-router-dom";
@@ -34,7 +35,7 @@ export default function ReadersPage() {
   const [restartAllReaders] = useMutation(RESTART_ALL_READERS, {variables: {makerspaceID: Number(makerspaceID)}});
 
   function restartAll(){
-    const warning = "This will restart ALL online card readers. Are you sure you want to do this?"+(showAllReaders ? " THIS INCLUDES READERS IN OTHER MAKERSPACES" : "")
+    const warning = `This will restart ALL online card readers in makerspace ${makerspaceID}. Are you sure you want to do this?`;
     if (confirm(warning)){
       restartAllReaders();
     }
@@ -43,7 +44,7 @@ export default function ReadersPage() {
   return (
     <Box padding="20px">
       <title>Readers | Make @ RIT</title>
-      <Stack direction="row" spacing={2} marginBottom={"10px"}>
+      <Stack direction="row" spacing={2} marginBottom={"10px"} alignItems={"center"}>
         <SearchBar
           placeholder="Search access devices"
           value={searchText}
@@ -55,7 +56,7 @@ export default function ReadersPage() {
 
         <Link href={import.meta.env.VITE_GRAFANA_READER_STATS_URL}>Reader Stats</Link>
 
-        <Button onClick={restartAll}>Restart All</Button>
+        <Button onClick={restartAll} color = "secondary" variant="contained" startIcon={<RestartAltIcon />}>Restart All</Button>
 
       </Stack>
 
