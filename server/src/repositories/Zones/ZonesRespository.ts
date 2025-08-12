@@ -34,13 +34,13 @@ export async function getZoneByID(id: number): Promise<ZoneRow | undefined> {
 export async function createZone(name: string): Promise<ZoneRow> {
   const zoneRow = (await knex('Zones').insert({ name }).returning('*'))[0];
 
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 0, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 1, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 2, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 3, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 4, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 5, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 6, ${zoneRow.id} FROM \"Zones\"`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (0, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (1, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (2, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (3, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (4, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (6, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (5, ${zoneRow.id})`)
 
   return zoneRow;
 }

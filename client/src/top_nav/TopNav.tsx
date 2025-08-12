@@ -17,7 +17,7 @@ import Footer from "./Footer";
 import PersonIcon from '@mui/icons-material/Person';
 import { useIsMobile } from "../common/IsMobileProvider";
 import ArticleIcon from '@mui/icons-material/Article';
-import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications';
+import TuneIcon from '@mui/icons-material/Tune';
 
 const StyledLogo = styled.img`
   padding: 12px;
@@ -158,7 +158,7 @@ export default function TopNav() {
                   currentUser.admin &&
                   <MenuItem onClick={() => { navigate("/admin/settings"); handleUserMenuClose(); setMobileDrawer(false); }}>
                     <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
-                      <SettingsApplicationsIcon sx={{ color: "gray" }} />
+                      <TuneIcon sx={{ color: "gray" }} />
                       <Typography variant="body1">Site Settings</Typography>
                     </Stack>
                   </MenuItem>
@@ -228,6 +228,15 @@ export default function TopNav() {
                     <Typography variant="body1">User Settings</Typography>
                   </Stack>
                 </MenuItem>
+                {
+                  currentUser.admin &&
+                  <MenuItem onClick={() => { navigate("/admin/settings"); handleUserMenuClose(); setMobileDrawer(false); }}>
+                    <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
+                      <TuneIcon sx={{ color: "gray" }} />
+                      <Typography variant="body1">Site Settings</Typography>
+                    </Stack>
+                  </MenuItem>
+                }
               </Menu>
             </Stack>
           </AppBar>
