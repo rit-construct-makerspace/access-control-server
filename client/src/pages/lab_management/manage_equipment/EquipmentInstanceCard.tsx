@@ -69,10 +69,10 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
 
     useEffect(() => {
         function updateOfflineness() {
-            let off = calcIsOffline(currentReader.data?.reader?.lastStatusTime);
+            const off = calcIsOffline(currentReader.data?.reader?.lastStatusTime);
             setIsOffline(off)
         }
-        let interval = setInterval(updateOfflineness, 2000)
+        const interval = setInterval(updateOfflineness, 2000)
 
         return (() => { // cleanup function to stop pollin
             clearInterval(interval)
@@ -84,7 +84,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
     const [commandedState, setCommandedState] = useState<string>("Idle");
 
     function generateDropdownOptions(): { id: number | undefined, name: string }[] {
-        var options: { id: number | undefined, name: string }[] = [];
+        const options: { id: number | undefined, name: string }[] = [];
 
         if (props.instance.reader) {
             options.push({ name: props.instance.reader.name + " (Active)", id: props.instance.reader.id });
@@ -112,7 +112,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
     function handleStateChange(e: any) {
         setCommandedState(e.target.value);
     }
-    function setStateClicked(e: any) {
+    function setStateClicked(_e: any) {
         if (reader != null) {
             if (currentReader.data?.reader?.state === "Unlocked") {
                 if (window.confirm("This machine is currently in use. Continue?")) {
