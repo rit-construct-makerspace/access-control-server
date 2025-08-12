@@ -42,6 +42,7 @@ import HoursDisplay from "./pages/signage/HoursDisplay";
 import EventsDisplay from "./pages/signage/EventsDisplay";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
+import SiteSettings from "./pages/SiteSettings";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -165,7 +166,7 @@ export default function AppRoutes() {
               <Route path="/admin/announcements/new" element={<NewAnnouncementPage />} />
 
               <Route path="/admin/newreader" element={<NewReaderPage />} />
-
+              <Route path="/admin/settings" element={<SiteSettings />} />
             </Route>
 
             <Route path="/maker/training" element={<TrainingPage />} />
