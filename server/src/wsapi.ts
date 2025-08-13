@@ -3,7 +3,7 @@ import * as ws from "ws";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { createReaderFromSN, getMakerspaceOfWelcomeReader, getReaderByID, getReaderByName, getReaderBySN, getReaderPairStatus, PairStatus, submitReaderLog, submitReaderLogWithInstance, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
 import { EquipmentInstancesRow, EquipmentRow, ReaderRow, UserRow, ZoneRow } from "./db/tables.js";
-import { getEquipmentByID, getMissingTrainingModules, hasAccessByID, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
+import { getEquipmentByID, getMissingTrainingModules, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
@@ -340,7 +340,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
       const userManagerPerms = await getUserManagerPerms(user.id);
       if (userManagerPerms.includes(machineMakerspace)) {
         wsApiLog("{user} has activated {access_device} - {equipment} with MANAGER access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
-        createEquipmentSession(machine.id, user.id, `${machine.name}:${machineInst.name}`);
+        createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
         inResponse.Verified = 1;
         return inResponse;
       }
