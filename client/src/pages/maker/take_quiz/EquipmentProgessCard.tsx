@@ -1,19 +1,14 @@
 import {
   Card,
-  CardActionArea,
   CardContent,
   Typography,
   Stack,
-  Grid,
-  CardHeader,
-  Box
-} from "@mui/material";
+  CardHeader} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_ACCESS_PROGRESSES } from "../../../queries/trainingQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { AccessProgress } from "../../../types/TrainingModule";
-import { TrainingModule } from "../../../common/TrainingModuleUtils";
 import MinimalTrainingModuleRow from "../../../common/MinimalTrainingModuleRow";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
@@ -34,7 +29,7 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
 
   const accessProgressResult = useQuery(GET_ACCESS_PROGRESSES, { variables: { sourceTrainingModuleID: props.moduleID } });
 
-  if (!accessProgressResult.data || accessProgressResult.data?.relatedAccessProgress.length == 0) {
+  if (!accessProgressResult.data || accessProgressResult.data?.relatedAccessProgress.length === 0) {
     return (<></>);
   }
 
@@ -59,14 +54,14 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
                     <MinimalTrainingModuleRow module={module} passed={false} />
                   ))}
                 </Stack>
-                <Card sx={{ mt: 5, border: (!accessProgress.accessCheckDone && accessProgress.availableModules.length == 0) ? "2px solid blue" : "inherit" }}>
+                <Card sx={{ mt: 5, border: (!accessProgress.accessCheckDone && accessProgress.availableModules.length === 0) ? "2px solid blue" : "inherit" }}>
                   <Stack direction={"row"} spacing={1} width={"75%"} p={2}>
                     {accessProgress.accessCheckDone
                       ? <CheckCircleIcon color="success" />
                       : <CloseIcon color="error" />}
                     <Typography variant="body2" fontWeight={"bold"} fontSize={"1.1em"}>In-Person Knowledge Check</Typography>
                   </Stack>
-                  {(!accessProgress.accessCheckDone && accessProgress.availableModules.length == 0) &&
+                  {(!accessProgress.accessCheckDone && accessProgress.availableModules.length === 0) &&
                     <Typography variant="body2" fontSize={"1.1em"} px={5}>Almost done! Just speak to a Maker Mentor to finish your training on the {accessProgress.equipment.name}</Typography>}
                 </Card>
               </CardContent>

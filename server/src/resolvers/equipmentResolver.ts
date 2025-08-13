@@ -94,19 +94,12 @@ const EquipmentResolvers = {
      * @argument id ID of equipment, possibly null
      * @returns Equipment
      */
-    correspondingEquipment: async (_parent: any, args: { readerid: number, id: string }, _context: any) => {
-      // Try via equipment ID
-      try {
-        return await EquipmentRepo.getEquipmentByID(Number(args.id));
-      } catch (EntityNotFound) {
-        // try with readerid
-      }
+    correspondingEquipment: async (_parent: any, args: { readerid: number }, _context: any) => {
       const inst = await EquipmentInstanceRepo.getInstanceByReaderID(args.readerid);
       if (!inst) {
         return null;
       }
       return await EquipmentRepo.getEquipmentByID(inst.equipmentID);
-
     },
 
     /**

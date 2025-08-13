@@ -263,17 +263,19 @@ const ToolItemResolver = {
       isStaff(async (user) => {
         const orig = await getToolItemInstanceByID(args.id);
         if (!orig) throw new GraphQLError("Instance does not exist");
+        const makerspace = await getRoomByID(orig.locationRoomID);
+
         if (!(args.toolItemInstance.status == orig.status)
           && (args.toolItemInstance.status == "MISSING"
           || args.toolItemInstance.status == "DO NOT USE")
         ) {
-          await notifyToolItemMarked(args.toolItemInstance.uniqueIdentifier, orig.id, orig.typeID, args.toolItemInstance.status);
+          await notifyToolItemMarked(args.toolItemInstance.uniqueIdentifier, makerspace?.id ?? 0, orig.id, orig.typeID, args.toolItemInstance.status);
         }
         else if (!(args.toolItemInstance.condition == orig.condition)
           && (args.toolItemInstance.condition == "DAMAGED"
           || args.toolItemInstance.condition == "MISSING PARTS")
         ) {
-          await notifyToolItemMarked(args.toolItemInstance.uniqueIdentifier, orig.id, orig.typeID, args.toolItemInstance.condition);
+          await notifyToolItemMarked(args.toolItemInstance.uniqueIdentifier, makerspace?.id ?? 0, orig.id, orig.typeID, args.toolItemInstance.condition);
         }
         await createLog(`{user} updated tool item instance '${orig.uniqueIdentifier}'`, 'admin', {id: user.id, label: getUsersFullName(user)});
         return updateToolItemInstance(args.id, args.toolItemInstance.typeID, args.toolItemInstance.uniqueIdentifier, 

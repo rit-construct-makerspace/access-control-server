@@ -1,6 +1,5 @@
-import React from "react";
 import { QuizItem } from "../../../types/Quiz";
-import { Card, makeStyles, Typography } from "@mui/material";
+import { Card, Typography } from "@mui/material";
 import Option from "./Option";
 import Markdown from "react-markdown";
 

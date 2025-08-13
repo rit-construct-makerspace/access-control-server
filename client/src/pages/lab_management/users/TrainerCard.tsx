@@ -6,11 +6,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useQuery } from "@apollo/client";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import Equipment, { EquipmentWithRoom } from "../../../types/Equipment";
+import { EquipmentWithRoom } from "../../../types/Equipment";
 
 interface TrainerCardProps {
     equipmentID: number;
-    removeTrainerPerms: Function;
+    removeTrainerPerms: (id: number)=>void;
 }
 
 export default function TrainerCard(props: TrainerCardProps) {

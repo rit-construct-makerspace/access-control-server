@@ -1,5 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
-import { Alert, Box, Divider, Grid, IconButton, Stack } from "@mui/material";
+import { Box, Divider, Grid, IconButton, Stack } from "@mui/material";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
@@ -40,7 +39,7 @@ export function Dashboard() {
             {/* Zones */}
             <RequestWrapper2 result={getZonesResult} render={(data) => {
                 const zones: ZoneWithHours[] = data.zones;
-                const filteredZone: ZoneWithHours[] = zones.filter((zone: ZoneWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
+                const filteredZone: ZoneWithHours[] = zones.filter((_zone: ZoneWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
                 const sortedZones = filteredZone.sort((a: ZoneWithHours, b: ZoneWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
 
                 return (
@@ -58,7 +57,7 @@ export function Dashboard() {
                                     id={zone.id}
                                     name={zone.name}
                                     hours={zone.hours}
-                                    imageUrl={zone.imageUrl == undefined || zone.imageUrl == null || zone.imageUrl == "" ? process.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : zone.imageUrl}
+                                    imageUrl={zone.imageUrl === undefined || zone.imageUrl == null || zone.imageUrl === "" ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : zone.imageUrl}
                                     isMobile={isMobile}
                                 />
                             </Grid>
@@ -111,7 +110,7 @@ export function Dashboard() {
                             margin="0px 20px 20px 20px"
                         >
                             {
-                                data.events.length == 0
+                                data.events.length === 0
                                     ? <Typography variant="body1">No Events!</Typography>
                                     : data.events.map((event: MakeEvent) => (
                                         event.ticket_availability.has_available_tickets
@@ -133,4 +132,4 @@ export function Dashboard() {
 
         </Box>
     );
-};
+}

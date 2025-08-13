@@ -236,14 +236,12 @@ export interface UserRow {
   activeHold: boolean;
   admin: boolean;
   accountID: number;
+  forceArchive: boolean | null;
 }
 
 export interface ReaderRow {
   id: number;
-  machineID: number;
-  machineType: string;
   name: string;
-  zone: string;
   temp: number;
   state: string;
   currentUID: string;
@@ -251,12 +249,11 @@ export interface ReaderRow {
   lastStatusReason: string;
   scheduledStatusFreq: number;
   lastStatusTime: Date;
-  helpRequested: boolean;
   BEVer: string;
   FEVer: string;
   HWVer: string;
   sessionStartTime: Date;
-  SN?: string;
+  SN: string;
   readerKeyCycle: number;
   pairTime?: Date
   targetFirmwareVersion?: string
@@ -302,6 +299,7 @@ export interface ZoneRow {
   id: number;
   name: string;
   imageUrl: string;
+  archived: boolean;
 }
 
 export interface RoomsForZonesRow {
@@ -420,7 +418,8 @@ export interface OrganizationsRow {
 export interface CurrencyLedgerRow {
   id: number;
   dateTime: Date;
-  accountID: number;
+  accountID: number | null;
+  owner: string;
   amount: number;
   source: string;
   description: string;

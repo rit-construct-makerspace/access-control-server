@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   Button,
   FormControl,
@@ -14,23 +14,13 @@ import {
 import HistoryIcon from "@mui/icons-material/History";
 import DeleteMaterialButton from "./DeleteMaterialButton";
 import HelpTooltip from "../../../common/HelpTooltip";
-import { LoadingButton } from "@mui/lab";
 import SaveIcon from "@mui/icons-material/Save";
-import styled from "styled-components";
 import InventoryItem from "../../../types/InventoryItem";
-import Page from "../../Page";
 import AdminPage from "../../AdminPage";
 import { useQuery } from "@apollo/client";
 import { GET_ZONES } from "../../../queries/zoneQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { set } from "date-fns";
-
-const StyledMaterialImage = styled.img`
-  width: 200px;
-  height: 200px;
-  border-radius: 4px;
-  object-fit: cover;
-`;
 
 interface InputErrors {
   name?: boolean;
@@ -264,7 +254,7 @@ export default function MaterialModalContents({
           </Stack>
         )}
 
-        <LoadingButton
+        <Button
           loading={loading}
           size="large"
           variant="contained"
@@ -273,7 +263,7 @@ export default function MaterialModalContents({
           onClick={handleSaveClick}
         >
           Save
-        </LoadingButton>
+        </Button>
       </Stack>
     </AdminPage >
   );

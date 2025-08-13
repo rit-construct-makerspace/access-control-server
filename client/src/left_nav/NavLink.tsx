@@ -4,7 +4,6 @@ import {
   LinkProps as RouterLinkProps,
   useLocation,
 } from "react-router-dom";
-import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { Chip, ListItemButton } from "@mui/material";
@@ -35,7 +34,7 @@ export default function NavLink({
           <RouterLink to={to} ref={ref} {...itemProps} role={undefined} target={newTab ? "_blank" : ""} rel={newTab ? "noopener noreferrer" : ""}/>
         )
       ),
-    [to]
+    [to, newTab]
   );
 
   return (

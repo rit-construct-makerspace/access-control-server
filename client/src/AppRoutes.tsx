@@ -16,7 +16,6 @@ import AnnouncementsPage from "./pages/lab_management/announcements/Announcement
 import ManageEquipmentPage from "./pages/lab_management/manage_equipment/ManageEquipmentPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import EditActiveModulePage from "./pages/lab_management/edit_module/EditActiveModulePage";
-import EditArchivedModulePage from "./pages/lab_management/edit_module/EditArchivedModulePage";
 import LogoutPromptPage from "./pages/both/logout/LogoutPromptPage";
 import EditNewModulePage from "./pages/lab_management/edit_module/EditNewModulePage";
 import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnouncementPage";
@@ -43,6 +42,9 @@ import HoursDisplay from "./pages/signage/HoursDisplay";
 import EventsDisplay from "./pages/signage/EventsDisplay";
 import { CartListPage } from "./pages/lab_management/storefront/internal/CartListPage";
 import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
+import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
+import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
+import SiteSettings from "./pages/SiteSettings";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -51,12 +53,12 @@ import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
 function AuthedRoute() {
   const user = useCurrentUser();
   if (user.visitor) {
-    window.location.replace(process.env.REACT_APP_LOGIN_URL ?? "/")
+    window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")
     return <></>;
   } else {
     return <Outlet />
   }
-};
+}
 
 function TrainerRoute() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
@@ -142,13 +144,20 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/training/new" element={<EditNewModulePage />} />
                   <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/type/:typeid" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/type/" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/instance/:instanceid" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/instance/" element={<ToolItemPage />} />
+
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
                   <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
+                  <Route path="/makerspace/:makerspaceID/organizations" element={<OrganizationsPage />} />
 
                   {/* Routes for manager + higher */}
                   <Route element={<ManagerRoute />}>
                     <Route path="/makerspace/:makerspaceID/edit" element={<ManageMakerspacePage />} />
                     <Route path="/makerspace/:makerspaceID/edit/room/:roomID" element={<ManageRoomPage />} />
+                    <Route path="/makerspace/:makerspaceID/currency" element={<CurrencyPage />} />
                   </Route>
                   {/* End manager routes */}
 
@@ -163,7 +172,7 @@ export default function AppRoutes() {
               <Route path="/admin/announcements/new" element={<NewAnnouncementPage />} />
 
               <Route path="/admin/newreader" element={<NewReaderPage />} />
-
+              <Route path="/admin/settings" element={<SiteSettings />} />
             </Route>
 
             <Route path="/maker/training" element={<TrainingPage />} />
@@ -178,17 +187,14 @@ export default function AppRoutes() {
             <Route path="/admin/equipment/logs/:logid" element={<ResolutionLogPage />} />
 
             <Route path="/admin/inventory" element={<InventoryPage />} />
-            <Route path="/admin/tools/type/:typeid" element={<ToolItemPage />} />
-            <Route path="/admin/tools/type" element={<ToolItemPage />} />
-            <Route path="/admin/tools/instance/:instanceid" element={<ToolItemPage />} />
-            <Route path="/admin/tools/instance" element={<ToolItemPage />} />
-            <Route path="/admin/inventory" element={<InventoryPage />} />
 
             <Route path="/admin/statistics" element={<StatisticsPage />} />
 
             <Route path="/admin/terms" element={<EditTermsPage />} />
           </Route>
           {/* END OF PROTECTED ROUTES */}
+
+          <Route path="/storefront" element={<StorefrontPage />} />
 
           <Route path="/logoutprompt" element={<LogoutPromptPage />} />
 

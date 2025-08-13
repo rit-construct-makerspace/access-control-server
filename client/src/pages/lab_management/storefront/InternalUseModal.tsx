@@ -1,24 +1,7 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
-import { Button, Divider, Stack, TextareaAutosize, Typography } from "@mui/material";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import { Button, Stack, TextareaAutosize, Typography } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
-
-function StepNumber({ children }: { children: ReactNode }) {
-  return (
-    <Typography
-      variant="h1"
-      component="div"
-      sx={{
-        color: "primary.main",
-        fontWeight: 700,
-        width: "54px",
-      }}
-    >
-      {children}
-    </Typography>
-  );
-}
 
 interface CheckoutModalProps {
   open: boolean;

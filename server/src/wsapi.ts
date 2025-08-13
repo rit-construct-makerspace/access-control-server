@@ -2,8 +2,8 @@ import { Request } from "express";
 import * as ws from "ws";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { createReaderFromSN, getMakerspaceOfWelcomeReader, getReaderByID, getReaderByName, getReaderBySN, getReaderPairStatus, PairStatus, submitReaderLog, submitReaderLogWithInstance, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
-import { EquipmentRow, ReaderRow, UserRow } from "./db/tables.js";
-import { getEquipmentByID, getMissingTrainingModules, hasAccessByID, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
+import { EquipmentInstancesRow, EquipmentRow, ReaderRow, UserRow, ZoneRow } from "./db/tables.js";
+import { getEquipmentByID, getMissingTrainingModules, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
@@ -15,7 +15,6 @@ import { generateRandomHumanName } from "./data/humanReadableNames.js";
 import { generateShlugKey } from "./resolvers/readersResolver.js";
 import { hasActiveHolds } from "./repositories/Holds/HoldsRepository.js";
 import { hasRestriction } from "./repositories/Restrictions/RestrictionsRepository.js";
-import { isManagerFor } from "./context.js";
 import { getZoneByID, hasZoneTrainings } from "./repositories/Zones/ZonesRespository.js";
 
 
@@ -40,6 +39,22 @@ function stringSlugPool() {
   var entries = Array.from(slugPool.entries());
   var entriesNoWs = entries.map(([_, data]) => ({ "id": data?.readerId, "state": data?.currentState }));
   return JSON.stringify(entriesNoWs)
+}
+
+/**
+ * Generate auditlog tag for a reader for history
+ * @param instance 
+ * @param machine 
+ * @param makerspace 
+ * @returns 
+ */
+function pairedLabel(instance?: EquipmentInstancesRow, machine?: EquipmentRow | null, makerspace?: ZoneRow | null): [boolean, string, { id: number, label: string }] {
+  if (instance && machine) {
+    return [true, `{machine} instance ${instance?.name ?? "unknown instance"}`, { id: machine.id, label: machine.name }];
+  } else if (makerspace) {
+    return [true, "{makerspace}", { id: makerspace.id, label: makerspace.name }]
+  }
+  return [false, "(unpaired)", { id: 0, label: "nothing" }]
 }
 
 /** 
@@ -128,21 +143,21 @@ export async function sendState(executingUser: UserRow, readerId: number, state:
 
   const instance = await getInstanceByReaderID(readerId);
   const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
+  const makerspaceForWhomeIWelcome = await getMakerspaceOfWelcomeReader(reader.id);
+  const [paired, tag, label] = pairedLabel(instance, equipment, makerspaceForWhomeIWelcome);
 
-  if (instance == null || equipment == null) {
+  if (!paired) {
     await createLog(
-      `{user} commanded {access_device}'s state to ${state} (unpaired).`,
+      `{user} commanded unpaired {access_device}'s state to ${state}.`,
       "admin",
       { id: executingUser.id, label: getUsersFullName(executingUser) },
       { id: reader.id, label: reader.name }
     );
   } else {
-    const equipmentLabel = { id: equipment?.id, label: equipment ? equipment?.name : "unknown equipment" }
     await createLog(
-      `{user} commanded {equipment} instance ${instance.name}'s state to ${state}.`,
+      `{user} commanded ${tag}'s state to ${state}.`,
       "admin",
-      { id: executingUser.id, label: getUsersFullName(executingUser) },
-      equipmentLabel
+      { id: executingUser.id, label: getUsersFullName(executingUser) }, label
     );
   }
 
@@ -231,7 +246,8 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
 
     const reader = await getReaderByID(readerId);
     if (reader == null) {
-      wsApiLog(`Failed to retrieve information about reader ${readerId}. Can't authorize`, "auth");
+      submitReaderLog(null, new Date(), { "WsEvent": "CantProcessUnlock", "CantProcessReason": "reader not found" });
+
       inResponse.Verified = 0;
       inResponse.Error = "Failed to retrieve info about reader";
       inResponse.Reason = "server-error";
@@ -242,14 +258,10 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     // Find Machine Instance
     const machineInst = await getInstanceByReaderID(readerId);
 
-    var machine: EquipmentRow | undefined;
+    var machine: EquipmentRow | undefined = undefined;
     if (machineInst) {
       try {
         machine = await getEquipmentByID(machineInst.equipmentID);
-        if (machine == null) {
-          // bizzare error handling bc api getters can be inconsistent
-          throw EntityNotFound;
-        }
       } catch (EntityNotFound) {
         machine = undefined;
       }
@@ -265,14 +277,9 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     inResponse.Role = user.privilege;
 
     // Find Machine
-    if (machine == null) {
-      if (reader?.SN == null) {
-        wsApiLog("{user} failed to swipe into a machine with error '{error}'", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader.machineID, label: `Machine ${reader.machineID} does not exist` });
-        inResponse.Error = "Machine does not exist";
-      } else {
+    if (machineInst === undefined || machine === undefined) {
         wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: readerId, label: reader?.name });
         inResponse.Error = "Reader not paired with a machine instance";
-      }
       inResponse.Reason = "unknown-machine";
       return inResponse;
     }
@@ -282,6 +289,19 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
       wsApiLog("{user} has activated {access_device} - {equipment} with ADMIN access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
       createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
       inResponse.Verified = 1;
+      return inResponse;
+    }
+
+    if (user.archived) {
+      wsApiLog("{user} failed to swipe into {access_device} - {euipment} due to being archived", "auth",
+        { id: user.id, label: getUsersFullName(user) },
+        { id: reader?.id, label: reader?.name },
+        { id: machine.id, label: machine.name }
+      );
+
+      inResponse.Verified = 0;
+      inResponse.Error = "User is archived";
+      inResponse.Reason = "user-archived"
       return inResponse;
     }
 
@@ -432,7 +452,7 @@ async function welcomeUID(uid: string, readerID: number, inResponse: ShlugRespon
 
   const makerspace = await getMakerspaceOfWelcomeReader(readerID);
   if (makerspace == null) {
-    await wsApiLog("failed to welcome {user} with {access_device}. Reader not paired with makerspace", "status", { id: user?.id ?? 0, label: user ? getUsersFullName(user) : "Unknown User" }, { id: readerID, label: reader?.name ?? "unknown reader" });
+    await wsApiLog("failed to welcome {user} with {access_device}. Reader not paired with makerspace. MisconfigurationPossible ?", "status", { id: user?.id ?? 0, label: user ? getUsersFullName(user) : "Unknown User" }, { id: readerID, label: reader?.name ?? "unknown reader" });
     inResponse.Error = "Not paired with makerspace";
     inResponse.Verified = 0;
     return inResponse;
@@ -824,16 +844,12 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
   // update with new info
   await updateReaderStatus({
     id: reader.id,
-    machineID: undefined,
-    machineType: "",
-    zone: "",
     temp: 0,
     state: newState,
     currentUID: "",
     recentSessionLength: reader.recentSessionLength,
     lastStatusReason: reader.lastStatusReason,
     scheduledStatusFreq: reader.scheduledStatusFreq,
-    helpRequested: reader.helpRequested,
     BEVer: message.BEVer ?? message.FWVersion ?? undefined,
     FEVer: message.FEVer ?? message.FWVersion ?? undefined,
     HWVer: message.HWVersion ?? undefined,
@@ -902,7 +918,7 @@ async function handleStateUpdateMessage(reader: ReaderRow, newState: string, act
   }
   if (newState == "Unlocked") {
     const now = new Date();
-    const then = reader.sessionStartTime ?? new Date(); // if not there, set ot 0
+    const then = reader.sessionStartTime ?? new Date(); // if not there, set to 0
     const elapsedSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
     reader.recentSessionLength = elapsedSeconds;
   }
@@ -994,7 +1010,8 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
           }
         }
         if (connData.readerId == null) {
-          wsApiLog("Can not process WSAPI message -> forcing disconnect. Null reader ID: " + ev.data, "status")
+          console.error("WSACS: Can not process WSAPI message -> forcing disconnect. Null reader ID: ")
+          submitReaderLog(null, new Date(), { "WsEvent": "cant process", "CantProcessReason": "NullReaderID", "message": ev.data });
           ws.close(WSAPIError.Protocol, "Server couldnt process due to null reader id");
           return;
         }
@@ -1015,14 +1032,13 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
           response.Connected = true;
         }
         if (shlugMessage.Message) {
-          try {
-            const instance = await getInstanceByReaderID(reader.id);
-            const machine = await getEquipmentByID(instance?.equipmentID ?? 0);
-            if (instance == null || machine == null) {
-              throw EntityNotFound;
-            }
-            wsApiLog(`{access_device} - {machine} instance '${instance.name}' message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: machine.id, label: machine.name })
-          } catch (e) {
+          const instance = await getInstanceByReaderID(reader.id);
+          const machine = instance ? await getEquipmentByID(instance.equipmentID) : undefined;
+          const makerspaceForWhomeIWelcome = await getMakerspaceOfWelcomeReader(reader.id);
+          const [paired, tag, label] = pairedLabel(instance, machine, makerspaceForWhomeIWelcome);
+          if (paired) {
+            wsApiLog(`{access_device} - ${tag} message: ${shlugMessage.Message}`, "message", label, { id: reader.id, label: reader.name })
+          } else {
             wsApiLog(`{access_device} (unpaired) message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: reader.id, label: reader.name })
           }
         }

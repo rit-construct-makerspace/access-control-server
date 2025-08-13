@@ -1,17 +1,10 @@
-import { Alert, CardActionArea, Divider, Grid, Stack, Typography } from "@mui/material";
-import Room, { FullRoom } from "../../types/Room";
+import { Alert, Divider, Grid, Stack, Typography } from "@mui/material";
+import Room from "../../types/Room";
 import Equipment from "../../types/Equipment";
 import EquipmentCard from "../../common/EquipmentCard";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
-import { useState } from "react";
 import { ModuleStatus, moduleStatusMapper } from "../../common/TrainingModuleUtils";
 import { useIsMobile } from "../../common/IsMobileProvider";
-import { useNavigate } from "react-router-dom";
-import WarningIcon from "@mui/icons-material/Warning";
-import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
-import LockClockIcon from '@mui/icons-material/LockClock';
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CloseIcon from "@mui/icons-material/Close";
 import ModuleStatusRow from "../../common/ModuleStatusRow";
 
 interface RoomSectionProps {
@@ -24,7 +17,6 @@ interface RoomSectionProps {
 export default function RoomSection(props: RoomSectionProps) {
     const currentUser = useCurrentUser();
     const isMobile = useIsMobile();
-    const navigate = useNavigate();
     const roomEquipment = props.room.equipment;
 
     const filteredEquipment = roomEquipment.filter((equipment: Equipment) => equipment.name.toLowerCase().includes(props.equipmentSearch.toLowerCase()))
@@ -32,17 +24,7 @@ export default function RoomSection(props: RoomSectionProps) {
     const archivedEquipment = sortedEquipment.filter((equipment: Equipment) => equipment.archived);
     const liveEquipment = sortedEquipment.filter((equipment: Equipment) => !equipment.archived);
 
-    const [manageEquipment, setManageEquipment] = useState(false);
-    const [curEquipID, setCurEquipID] = useState(0);
-
-    function handleOpen(id: number) {
-        setCurEquipID(id);
-        setManageEquipment(true);
-    }
-
-    function handleClose() {
-        setManageEquipment(false);
-    }
+    const roomTrainings = props.room.trainingModules.map(moduleStatusMapper(currentUser.passedModules, currentUser.trainingHolds));
 
     const roomTrainings = props.room.trainingModules.map(moduleStatusMapper(currentUser.passedModules, currentUser.trainingHolds));
 
@@ -55,7 +37,7 @@ export default function RoomSection(props: RoomSectionProps) {
                     <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
                         <Typography variant="h6">Area Trainings</Typography>
                         {
-                            roomTrainings.some((ms) => (ms.status != "Passed" && ms.status != "Expiring Soon"))
+                            roomTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
                                 ? <Alert severity="error">You must pass the area trainings before you can use equipment in the area!</Alert>
                                 : null
                         }

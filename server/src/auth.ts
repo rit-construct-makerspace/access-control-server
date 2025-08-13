@@ -16,6 +16,7 @@ import { v4 as uuidv4 } from "uuid";
 import assert from "assert";
 import express from "express";
 import {
+  archiveUser,
   createUser,
   getUserByRitUsername,
   getUserManagerPerms,
@@ -96,9 +97,9 @@ export function setupSessions(app: express.Application) {
 
 // Unsafe auth -- local development only
 export function setupDevAuth(app: express.Application) {
-  const reactAppUrl = process.env.REACT_APP_URL;
+  const reactAppUrl = process.env.VITE_URL;
 
-  assert(reactAppUrl, "REACT_APP_URL env value is null");
+  assert(reactAppUrl, "VITE_URL env value is null");
 
   const authStrategy = new LocalStrategy(
     async function (username: string, password: string, done: any) {
@@ -112,11 +113,11 @@ export function setupDevAuth(app: express.Application) {
         else {
           console.log("valid login");
           return done(null, devUser);
-        }  
+        }
       }
       catch (err) {
         console.log(err)
-        done(null, false, {message: 'some error'});
+        done(null, false, { message: 'some error' });
       }
     }
   );
@@ -128,14 +129,14 @@ export function setupDevAuth(app: express.Application) {
   app.use(passport.initialize());
   //User Passport for user session definitions
   app.use(passport.session());
-  
+
   //Enable URL parsing for request handling
   app.use(express.urlencoded({ extended: false }));
   //Enable JSON body parsing for request handling
   app.use(express.json());
 
   //Render dev login page (if DEVELOPMENT mode)
-  app.get('/login', function(req, res, next) {
+  app.get('/login', function (req, res, next) {
     res.render('login');
   });
 
@@ -144,7 +145,7 @@ export function setupDevAuth(app: express.Application) {
     successRedirect: reactAppUrl,
     failureRedirect: '/login'
   }));
-  
+
   //Handle logout and session destruction
   //TODO Figure out how to call for the destruction of Shibboleth Session
   app.post("/logout", (req, res) => {
@@ -159,7 +160,7 @@ export function setupDevAuth(app: express.Application) {
         } else {
           res.clearCookie("connect.sid");
 
-          res.redirect(process.env.REACT_APP_LOGGED_OUT_URL ?? "");
+          res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
         }
       });
     } else {
@@ -173,12 +174,12 @@ export function setupStagingAuth(app: express.Application) {
   const issuer = process.env.ISSUER;
   const callbackUrl = process.env.CALLBACK_URL;
   const entryPoint = process.env.ENTRY_POINT;
-  const reactAppUrl = process.env.REACT_APP_URL;
+  const reactAppUrl = process.env.VITE_URL;
 
   assert(issuer, "ISSUER env value is null");
   assert(callbackUrl, "CALLBACK_URL env value is null");
   assert(entryPoint, "ENTRY_POINT env value is null");
-  assert(reactAppUrl, "REACT_APP_URL env value is null");
+  assert(reactAppUrl, "VITE_URL env value is null");
 
   /*
   identifierFormat defaults to urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress.
@@ -220,7 +221,7 @@ export function setupStagingAuth(app: express.Application) {
       signatureAlgorithm: "sha256",
       //wantAssertionsSigned: true,
       digestAlgorithm: "sha256",
-  
+
       // TODO production solution
       acceptedClockSkewMs: 180, // "SAML assertion not yet valid" fix
     },
@@ -238,45 +239,57 @@ export function setupStagingAuth(app: express.Application) {
     const ritUser =
       process.env.SAML_IDP === "TEST" ? mapSamlTestToRit(user) : user.attributes; //user is the full response data. attributes has the things we need
 
+    console.log("Username: " + ritUser["urn:oid:0.9.2342.19200300.100.1.1"] + "\nRoles: " + ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"]);
 
-      // TEMPORARY -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-      try {
-        ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"].forEach(async (element: string) => {
-          try {
-            await insertTempRole(element);
-            //Name is unique, so will fail on duplicates
-          } catch (error) {
-            //nothig
-          }
-        });
-      } catch (error) {
-        console.error("Error iterating temp roles:", error);
-      }
-
-      /*
-        "attributes": {
-          "urn:oid:2.5.4.42": "FirstName",
-          "urn:oid:2.5.4.4": "LastName",
-          "urn:oid:0.9.2342.19200300.100.1.1": "userName",
-          "urn:oid:1.3.6.1.4.1.4447.1.20": "uid",
-          "urn:oid:1.3.6.1.4.1.4447.1.41": ["roles"]
+    // TEMPORARY -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+    try {
+      ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"].forEach(async (element: string) => {
+        try {
+          await insertTempRole(element);
+          //Name is unique, so will fail on duplicates
+        } catch (error) {
+          //nothig
         }
-      */
-     
+      });
+    } catch (error) {
+      console.error("Error iterating temp roles:", error);
+    }
+
+    /*
+      "attributes": {
+        "urn:oid:2.5.4.42": "FirstName",
+        "urn:oid:2.5.4.4": "LastName",
+        "urn:oid:0.9.2342.19200300.100.1.1": "userName",
+        "urn:oid:1.3.6.1.4.1.4447.1.20": "uid",
+        "urn:oid:1.3.6.1.4.1.4447.1.41": ["roles"]
+      }
+    */
 
     // Create user in our database if they don't exist
-    const existingUser = await getUserByRitUsername(ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);
+    var existingUser = await getUserByRitUsername(ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);
     if (!existingUser) {
-      await createUser({
+      existingUser = await createUser({
         firstName: ritUser["urn:oid:2.5.4.42"],
         lastName: ritUser["urn:oid:2.5.4.4"],
         ritUsername: ritUser["urn:oid:0.9.2342.19200300.100.1.1"],
       });
+    } else if (existingUser.firstName !== ritUser["urn:oid:2.5.4.42"] || existingUser.lastName != ritUser["urn:oid:2.5.4.4"]) {
+      //If Shibboleth name does not match, overwrite user's name to Shibboleth provided info
+      await updateUserName(existingUser.id, ritUser["urn:oid:2.5.4.42"], ritUser["urn:oid:2.5.4.4"]);
     }
 
-    //If Shibboleth name does not match, overwrite user's name to Shibboleth provided info
-    else if (existingUser.firstName !== ritUser["urn:oid:2.5.4.42"] || existingUser.lastName != ritUser["urn:oid:2.5.4.4"]) {
-      await updateUserName(existingUser.id, ritUser["urn:oid:2.5.4.42"], ritUser["urn:oid:2.5.4.4"]);
+    // Archive user if they do not have a whitelisted role
+    if (process.env.USER_WHITELIST) { // If the env varaible is not set, skip the check. We don't want to archive everyone
+      const whitelist = process.env.USER_WHITELIST.split(",");
+      const roles: string[] = ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"];
+
+      if (existingUser.forceArchive !== null) {
+        await archiveUser(existingUser.id, existingUser.forceArchive)
+      } else {
+        await archiveUser(existingUser.id, !roles.some((role) => (whitelist.includes(role))));
+      }
+
+
     }
 
     done(null, ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);
@@ -362,7 +375,7 @@ export function setupStagingAuth(app: express.Application) {
           res.status(400).send("Logout failed");
         } else {
           // res.clearCookie("connect.sid");
-          res.redirect(process.env.REACT_APP_LOGGED_OUT_URL ?? "");
+          res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
         }
       });
     } else {

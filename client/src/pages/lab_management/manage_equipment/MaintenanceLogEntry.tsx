@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Chip, IconButton, MenuItem, Select, Stack, SxProps, TableCell, TableRow, Tooltip, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Chip, IconButton, MenuItem, Select, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material";
 import { format, parseISO } from "date-fns";
-import reactStringReplace from "react-string-replace";
-import { ADD_TAG_TO_LOG, DELETE_MAINTENANCE_LOG, DELETE_RESOLUTION_LOG, GET_MAINTENANCE_LOGS, GET_RESOLUTION_LOGS, MaintenanceLogItem, MaintenanceTag, REMOVE_TAG_FROM_LOG } from "../../../queries/maintenanceLogQueries";
+import { ADD_TAG_TO_LOG, DELETE_MAINTENANCE_LOG, GET_MAINTENANCE_LOGS, MaintenanceLogItem, MaintenanceTag, REMOVE_TAG_FROM_LOG } from "../../../queries/maintenanceLogQueries";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
-import ActionButton from "../../../common/ActionButton";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useMutation } from "@apollo/client";
@@ -67,7 +65,7 @@ export default function MaintenanceLogEntry({ logItem, allTags }: { logItem: Mai
   }
 
   function handleForward() {
-    var url = new URL( `https://www.example.com/admin/equipment/logs/${logItem.equipment.id}`);
+    const url = new URL( `https://www.example.com/admin/equipment/logs/${logItem.equipment.id}`);
     if (logItem.instance?.id) url.searchParams.append('instance', logItem.instance.id.toString());
     url.searchParams.append('issue', logItem.content);
     url.searchParams.append('id', logItem.id.toString());
@@ -84,10 +82,10 @@ export default function MaintenanceLogEntry({ logItem, allTags }: { logItem: Mai
       </TableCell>
       <TableCell>
         <Stack direction={isMobile ? "row" : "column"}>
-          <Typography color={localStorage.getItem("themeMode") == "dark" ? "grey.300" : "grey.700"} sx={{ width: 70 }} variant="body2">
+          <Typography color={localStorage.getItem("themeMode") === "dark" ? "grey.300" : "grey.700"} sx={{ width: 70 }} variant="body2">
             {date}
           </Typography>
-          <Typography color={localStorage.getItem("themeMode") == "dark" ? "grey.300" : "grey.700"} sx={{ width: 93 }} variant="body2">
+          <Typography color={localStorage.getItem("themeMode") === "dark" ? "grey.300" : "grey.700"} sx={{ width: 93 }} variant="body2">
             {time}
           </Typography>
         </Stack>

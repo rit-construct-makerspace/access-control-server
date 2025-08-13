@@ -47,7 +47,7 @@ const AccessChecksResolver = {
       isTrainer(async () => {
         return await getAccessCheckByID(args.id)
       }),
-    
+
     /**
      * Fetch all the access checks for a UserID
      * @argument userID userID to get access checks for
@@ -58,8 +58,8 @@ const AccessChecksResolver = {
       _parent: any,
       args: { userID: number },
       { ifAuthenticated }: ApolloContext) =>
-        ifAuthenticated(async () => {
-          return await getAccessChecksByUserID(args.userID)
+      ifAuthenticated(async () => {
+        return await getAccessChecksByUserID(args.userID)
       }),
 
     /**
@@ -103,14 +103,24 @@ const AccessChecksResolver = {
       isTrainer(async (user) => {
         const check = await getAccessCheckByID(args.id);
         if (!check) throw new GraphQLError("Access Check does not exist");
+
         const equipment = await EquipmentRepo.getEquipmentByID(check?.equipmentID);
         if (!equipment) throw new GraphQLError("Equipment does not exist");
+
         const room = await RoomRepo.getRoomByID(equipment.roomID);
         if (!user.trainer.includes(check.equipmentID) && !user.manager.includes(room?.zoneID ?? -1) && !user.staff.includes(room?.zoneID ?? -1) && !user.admin) {
           throw new GraphQLError(`Not an approved trainer for ${check.equipmentID}`)
         }
         const affectedUser = await getUserByID(check.userID);
         if (!affectedUser) throw new GraphQLError("User does not exist");
+
+        if (Number(user.id) === Number(check.userID)) {
+          await createLog(`{user} attempted to self-approve access check for {equipment}`, "admin",
+            { id: user.id, label: getUsersFullName(user) },
+            { id: equipment.id, label: equipment.name }
+          );
+          throw new GraphQLError("Self-approve disallowed");
+        }
         await createLog(`{user} approved the {equipment} access check for {user}`, `admin`,
           { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name }, { id: affectedUser.id, label: getUsersFullName(affectedUser) });
         return await setAccessCheckApproval(args.id, true);

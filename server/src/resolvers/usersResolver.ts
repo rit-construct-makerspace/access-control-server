@@ -10,9 +10,10 @@ import { Privilege } from "../schemas/usersSchema.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { ApolloContext, CurrentUser } from "../context.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
-import { getActiveTrainingHoldsByUser, getTrainingHoldsByUser } from "../repositories/Training/TrainingHoldsRespository.js";
+import { getActiveTrainingHoldsByUser } from "../repositories/Training/TrainingHoldsRespository.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
+import { UserRow } from "../db/tables.js";
 
 const UsersResolvers = {
   User: {
@@ -85,11 +86,11 @@ const UsersResolvers = {
     },
 
     currencyAccount: async (
-      parent: { id: string },
+      parent: UserRow,
       _args: any,
       { ifStaffOrSelf }: ApolloContext
     ) => {
-      return ifStaffOrSelf(Number(parent.id), () => (CurrencyAccountRepo.getAccountByID(Number(parent.id))));
+      return ifStaffOrSelf(Number(parent.id), () => (CurrencyAccountRepo.getAccountByID(Number(parent.accountID))));
     }
 
   },
@@ -306,7 +307,7 @@ const UsersResolvers = {
             { id: args.userID, label: getUsersFullName(userSubject) }
           );
 
-          return await UserRepo.archiveUser(Number(args.userID));
+          return await UserRepo.archiveUser(Number(args.userID), true);
         }
       ),
 
@@ -443,8 +444,20 @@ const UsersResolvers = {
         );
         return await UserRepo.revokeUserTrainer(args.userID, args.equipmentID);
       })
-    }
+    },
 
+    forceArchiveUser: async (
+      _parent: any,
+      args: {
+        userID: number,
+        force: boolean | null
+      },
+      { isManager }: ApolloContext
+    ) => {
+      return await isManager(async () => {
+        return await UserRepo.setForceArchive(args.userID, args.force);
+      })
+    }
 
   }
 };

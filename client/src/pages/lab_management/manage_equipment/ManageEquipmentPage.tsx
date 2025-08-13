@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_EQUIPMENTS, GET_ARCHIVED_EQUIPMENTS } from "../../../queries/equipmentQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import EditableEquipmentCard from "./EditableEquipmentCard";
 import Equipment from "../../../types/Equipment";
-import AdminPage from "../../AdminPage";
 
 export default function ManageEquipmentPage({ showLogs }: { showLogs?: boolean }) {
-  const { id, logid } = useParams<{ id: string, logid: string }>();
   const navigate = useNavigate();
 
   const getEquipmentsResult = useQuery(GET_EQUIPMENTS);
@@ -56,7 +54,7 @@ export default function ManageEquipmentPage({ showLogs }: { showLogs?: boolean }
               )
               .map((e: Equipment) => (
                 <Grid key={e.id}>
-                  <EditableEquipmentCard id={e.id} name={e.name} to={url + e.id} archived={false} sopUrl={e.sopUrl} imageUrl={((e.imageUrl == undefined || e.imageUrl == null || e.imageUrl == "") ? process.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : "" + process.env.REACT_APP_CDN_URL + process.env.REACT_APP_CDN_EQUIPMENT_DIR + "/" + e.imageUrl)} />
+                  <EditableEquipmentCard id={e.id} name={e.name} to={url + e.id} archived={false} sopUrl={e.sopUrl} imageUrl={((e.imageUrl === undefined || e.imageUrl == null || e.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/" + e.imageUrl)} />
                 </Grid>
               ))}
           </Grid>
@@ -79,7 +77,7 @@ export default function ManageEquipmentPage({ showLogs }: { showLogs?: boolean }
               )
               .map((e: Equipment) => (
                 <Grid key={e.id}>
-                  <EditableEquipmentCard id={e.id} name={e.name} to={url + "/archived/" + e.id} archived={true} sopUrl={e.sopUrl} imageUrl={((e.imageUrl == undefined || e.imageUrl == null || e.imageUrl == "") ? process.env.PUBLIC_URL + "/shed_acronym_vert.jpg" : "" + process.env.REACT_APP_CDN_URL + process.env.REACT_APP_CDN_EQUIPMENT_DIR + "/" + e.imageUrl)} />
+                  <EditableEquipmentCard id={e.id} name={e.name} to={url + "/archived/" + e.id} archived={true} sopUrl={e.sopUrl} imageUrl={((e.imageUrl === undefined || e.imageUrl == null || e.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/" + e.imageUrl)} />
                 </Grid>
               ))}
           </Grid>

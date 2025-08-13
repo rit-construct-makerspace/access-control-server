@@ -1,16 +1,11 @@
-import React, { useState } from "react";
-import Page from "../../Page";
+import { useState } from "react";
 import SearchBar from "../../../common/SearchBar";
-import { Box, Divider, Stack, Typography } from "@mui/material";
+import { Button, Divider, Stack, Typography } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client"
-import { LoadingButton } from "@mui/lab";
-import RequestWrapper from "../../../common/RequestWrapper";
 import TrainingModuleRow from "./TrainingModuleRow";
-import { GET_TRAINING_MODULES, GET_ARCHIVED_TRAINING_MODULES } from "../../../queries/trainingQueries";
-import { ObjectSummary } from "../../../types/Common";
-import AdminPage from "../../AdminPage";
+import { GET_TRAINING_MODULES } from "../../../queries/trainingQueries";
 import { TrainingModule } from "../../../common/TrainingModuleUtils";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { useIsMobile } from "../../../common/IsMobileProvider";
@@ -42,7 +37,7 @@ export default function TrainingModulesPage() {
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
-        <LoadingButton
+        <Button
           loading={false}
           variant="outlined"
           startIcon={<CreateIcon />}
@@ -50,7 +45,7 @@ export default function TrainingModulesPage() {
           sx={{ height: 40 }}
         >
           New module
-        </LoadingButton>
+        </Button>
       </Stack>
 
       <RequestWrapper2 result={getModuleResults} render={(data) => {

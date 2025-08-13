@@ -7,7 +7,7 @@ import { isManagerFor } from "../../../common/PrivilegeUtils";
 
 interface TrainerEquipmentSelectProps {
     user: any;
-    setAddTrainerPerms: Function;
+    setAddTrainerPerms: (id: number)=>void;
 }
 
 export default function TrainerEquipmentSelect(props: TrainerEquipmentSelectProps) {

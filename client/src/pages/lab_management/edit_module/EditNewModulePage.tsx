@@ -3,12 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Moduledraft, QuizItem } from "../../../types/Quiz";
 import { GET_TRAINING_MODULES, GET_ARCHIVED_TRAINING_MODULES, CREATE_TRAINING_MODULE } from "../../../queries/trainingQueries";
 import 'react-toastify/dist/ReactToastify.css';
-import Page from "../../Page";
 import {
   Button,
-  CircularProgress,
-  Fab,
-  Grid,
   Stack,
   TextField,
   Typography,
@@ -20,7 +16,6 @@ import { toast } from 'react-toastify';
 import SaveIcon from "@mui/icons-material/Save";
 import { ChangeEventHandler } from "react";
 import { DropResult } from "@hello-pangea/dnd";
-import AdminPage from "../../AdminPage";
 
 
 export default function EditNewModulePage() {
@@ -34,7 +29,7 @@ export default function EditNewModulePage() {
     quiz: [],
   });
 
-  const [updateModule, updateResult] = useMutation(CREATE_TRAINING_MODULE);
+  const [updateModule] = useMutation(CREATE_TRAINING_MODULE);
 
   const executeSave = async (updatedModule: Moduledraft) => {
     await updateModule({

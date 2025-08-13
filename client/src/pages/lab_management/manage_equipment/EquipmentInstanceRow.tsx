@@ -1,8 +1,7 @@
-import { Card, Stack, Typography, Select, MenuItem, TextField, Divider } from "@mui/material";
+import { Card, Stack, Typography, Select, MenuItem, TextField } from "@mui/material";
 import ActionButton from "../../../common/ActionButton";
-import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES, InstanceStatus, SET_INSTANCE_NAME, SET_INSTANCE_STATUS } from "../../../queries/equipmentInstanceQueries";
+import { EquipmentInstance, GET_EQUIPMENT_INSTANCES, InstanceStatus, SET_INSTANCE_NAME, SET_INSTANCE_STATUS } from "../../../queries/equipmentInstanceQueries";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 import { useState } from "react";
@@ -22,8 +21,6 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
 
   const [setInstanceStatus] = useMutation(SET_INSTANCE_STATUS, { refetchQueries: [{ query: GET_EQUIPMENT_INSTANCES, variables: {equipmentID: props.instance.equipment.id} }] });
   const [setInstanceName] = useMutation(SET_INSTANCE_NAME, { refetchQueries: [{ query: GET_EQUIPMENT_INSTANCES, variables: {equipmentID: props.instance.equipment.id} }] });
-  const [deleteInstance] = useMutation(DELETE_EQUIPMENT_INSTANCE, { refetchQueries: [{ query: GET_EQUIPMENT_INSTANCES, variables: {equipmentID: props.instance.equipment.id} }] });
-
 
   function handleStatusChange(e: any) {
     setStatus(e.target.value);

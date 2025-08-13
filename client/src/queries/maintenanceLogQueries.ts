@@ -19,7 +19,7 @@ export interface MaintenanceLogItem {
     tag1: MaintenanceTag,
     tag2: MaintenanceTag,
     tag3: MaintenanceTag
-};
+}
 
 export interface ResolutionLogItem {
   id: number,
@@ -41,7 +41,7 @@ export interface ResolutionLogItem {
   tag1: MaintenanceTag,
   tag2: MaintenanceTag,
   tag3: MaintenanceTag
-};
+}
 
 export interface MaintenanceTag {
   id: number,

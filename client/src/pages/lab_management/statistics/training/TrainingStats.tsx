@@ -1,5 +1,5 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { Badge, Box, Button, Card, Collapse, CollapseProps, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, styled, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Card, Collapse, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import gql from "graphql-tag";
 import { ReactElement, useEffect, useState } from "react";
 import PageSectionHeader from "../../../../common/PageSectionHeader";
@@ -83,12 +83,12 @@ export function TrainingStats() {
 
   function handleStartDateChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setStartDate(e.target.value)
-    if (startDate && startDate != "") setShowClearButton(true);
+    if (startDate && startDate !== "") setShowClearButton(true);
   }
 
   function handleEndDateChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setEndDate(e.target.value)
-    if (endDate && endDate != "") setShowClearButton(true);
+    if (endDate && endDate !== "") setShowClearButton(true);
   }
 
   function handleModuleIDsChange(e: SelectChangeEvent<number[]>) {
@@ -105,8 +105,8 @@ export function TrainingStats() {
 
   function handleSubmit() {
     var variables = {
-      ...(startDate && startDate != "" && { startDate }),
-      ...(endDate && endDate != "" && { endDate }),
+      ...(startDate && startDate !== "" && { startDate }),
+      ...(endDate && endDate !== "" && { endDate }),
       ...(moduleIDs && moduleIDs.length > 0 && { moduleIDs: moduleIDs })
     };
     getTrainingSubmissions({ variables });
@@ -133,7 +133,7 @@ export function TrainingStats() {
 
   function handleCSVExport() {
     let csvContent =
-      Object.keys(getTrainingSubmissionsResult.data.getTrainingSubmissionsWithAttachedEntities[0] as VerboseTrainingSubmission).map((s: string) => s == "__typename" ? '' : `${s},`).join('')
+      Object.keys(getTrainingSubmissionsResult.data.getTrainingSubmissionsWithAttachedEntities[0] as VerboseTrainingSubmission).map((s: string) => s === "__typename" ? '' : `${s},`).join('')
       + '\n' + getTrainingSubmissionsResult.data.getTrainingSubmissionsWithAttachedEntities.map((e: VerboseTrainingSubmission) => joinTrainingSubmission(e)).join("\n");
     download(csvContent, "trainingSubmissions.csv");
   }

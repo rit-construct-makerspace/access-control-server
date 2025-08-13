@@ -1,15 +1,12 @@
 import { useState } from "react";
-import Page from "../../Page";
 import SearchBar from "../../../common/SearchBar";
-import { Box, Divider, Stack, Typography } from "@mui/material";
+import { Button, Divider, Stack, Typography } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
-import { LoadingButton } from "@mui/lab";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_ANNOUNCEMENTS } from "../../../queries/announcementsQueries";
 import AnnouncementModule from "./AnnouncementModule";
-import AdminPage from "../../AdminPage";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 
 
@@ -39,7 +36,7 @@ export default function AnnouncementsPage() {
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
           />
-          <LoadingButton
+          <Button
             loading={false}
             variant="outlined"
             startIcon={<CreateIcon />}
@@ -47,7 +44,7 @@ export default function AnnouncementsPage() {
             sx={{ height: 40 }}
           >
             New announcement
-          </LoadingButton>
+          </Button>
         </Stack>
 
         <Stack

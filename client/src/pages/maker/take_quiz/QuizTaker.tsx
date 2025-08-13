@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Module, QuizItem, QuizItemType } from "../../../types/Quiz";
+import { Module, QuizItemType } from "../../../types/Quiz";
 import { useImmer } from "use-immer";
 import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
 import Question from "./Question";
 import styled, { css } from "styled-components";
 import { gql, useMutation } from "@apollo/client";
-import { LoadingButton } from "@mui/lab";
-import { GET_CURRENT_USER, useCurrentUser } from "../../../common/CurrentUserProvider";
+import { GET_CURRENT_USER } from "../../../common/CurrentUserProvider";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Markdown from 'react-markdown'
@@ -64,8 +63,6 @@ interface QuizTakerProps {
 }
 
 export default function QuizTaker({ module }: QuizTakerProps) {
-
-  const currentUser = useCurrentUser();
 
   const [quizProgressed, setQuizProgressed] = useState<boolean>(false);
 
@@ -235,11 +232,13 @@ export default function QuizTaker({ module }: QuizTakerProps) {
                 </object>
               </StyledDiv>
             );
+          default:
+            return undefined;
         }
       })}
 
       <Stack direction={"row-reverse"} spacing={2}>
-        <LoadingButton
+        <Button
           loading={result.loading}
           variant="contained"
           sx={{ alignSelf: "flex-end" }}
@@ -247,7 +246,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
           onClick={() => submitAndViewResults()}
         >
           Submit
-        </LoadingButton>
+        </Button>
         <Button
           variant="outlined"
           sx={{ alignSelf: "flex-end" }}

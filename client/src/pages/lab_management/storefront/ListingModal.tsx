@@ -2,7 +2,7 @@ import { Box, Stack } from "@mui/system";
 import PrettyModal from "../../../common/PrettyModal";
 import InventoryItem from "../../../types/InventoryItem";
 import { Button, Divider, TextField, Typography } from "@mui/material";
-import { IsMobileProvider, useIsMobile } from "../../../common/IsMobileProvider";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 import { isStaff } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useState } from "react";
@@ -36,7 +36,7 @@ export function ListingModal(props: ListingModalProps) {
     <PrettyModal width={!isMobile ? 1000 : "100%"} open={props.open} onClose={props.onClose}>
       <Stack direction={isMobile ? "column" : "row"} justifyContent={"space-between"} flexWrap={"wrap"} mb={"1em"}>
         <Box sx={{ maxWidth: 400, width: !isMobile ? "50%" : "100%" }}>
-          <img src={(props.item.image && props.item.image != "") ? props.item.image : (process.env.PUBLIC_URL + "/shed_acronym_vert.jpg")} style={{ width: "100%" }} />
+          <img src={(props.item.image && props.item.image !== "") ? props.item.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")} style={{ width: "100%" }} alt="RIT SHED Logo"/>
         </Box>
 
         <Box width={!isMobile ? "50%" : "100%"}>
@@ -45,9 +45,9 @@ export function ListingModal(props: ListingModalProps) {
           </Typography>
           <Box mt={1}>
             <Typography variant="body1">
-              {(props.item.description && props.item.description != "") ? props.item.description : <i>No description.</i>}
+              {(props.item.description && props.item.description !== "") ? props.item.description : <i>No description.</i>}
             </Typography>
-            {isStaff(currentUser) && props.item.notes != "" &&
+            {isStaff(currentUser) && props.item.notes !== "" &&
               <div>
                 <Divider sx={{my: "1em"}} textAlign="left">Internal Details</Divider>
                 <Typography variant="body1">

@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 import { Stack } from "@mui/material";
 
@@ -44,7 +44,7 @@ export default function Page({
         }}
       >
         <Stack direction="row" alignItems="center" mb={4} ml={isMobile ? 4 : ""}>
-          {title != "" &&
+          {title !== "" &&
           <Typography variant={isMobile ? "h5" : "h3"} sx={{pl: isMobile ? 4 : ""}} flexGrow={1} color={'text.primary'}>
           {title}
           </Typography>}

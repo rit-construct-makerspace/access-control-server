@@ -14,7 +14,7 @@ export const theme = createTheme({
         warning: {
             main: '#FFAB00',
         },
-        mode: localStorage.getItem("themeMode") == "dark" ? "dark" : "light"
+        mode: localStorage.getItem("themeMode") === "dark" ? "dark" : "light"
     },
     typography: {
         fontFamily: 'Roboto',

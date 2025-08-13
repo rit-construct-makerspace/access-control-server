@@ -1,8 +1,7 @@
-import { Card, CardActions, Stack, Typography } from "@mui/material";
+import { Button, Card, CardActions, Stack, Typography } from "@mui/material";
 import { GET_USER, Hold } from "./UserModal";
 import { format, parseISO } from "date-fns";
 import { gql, useMutation } from "@apollo/client";
-import { LoadingButton } from "@mui/lab";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManager } from "../../../common/PrivilegeUtils";
 
@@ -32,7 +31,7 @@ export default function HoldCard({ hold, userID }: HoldCardProps) {
   return (
     <Card
       sx={{
-        backgroundColor: removed ? (localStorage.getItem("themeMode") == "dark" ? "grey.900" : "grey.100") : (localStorage.getItem("themeMode") == "dark" ? "#150000" : "#fff8f8"),
+        backgroundColor: removed ? (localStorage.getItem("themeMode") === "dark" ? "grey.900" : "grey.100") : (localStorage.getItem("themeMode") === "dark" ? "#150000" : "#fff8f8"),
         border: `1px solid ${removed ? "grey" : "red"}`,
       }}
     >
@@ -55,7 +54,7 @@ export default function HoldCard({ hold, userID }: HoldCardProps) {
         </Stack>
 
         {!removed && (
-          <LoadingButton
+          <Button
             size="small"
             color="error"
             loading={result.loading}
@@ -63,7 +62,7 @@ export default function HoldCard({ hold, userID }: HoldCardProps) {
             disabled={!isManager(currentUser)}
           >
             Remove hold
-          </LoadingButton>
+          </Button>
         )}
       </CardActions>
     </Card>

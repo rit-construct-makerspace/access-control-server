@@ -1,19 +1,14 @@
 import { ChangeEvent, useState } from "react";
 import {
-  Box,
   Button,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import HistoryIcon from "@mui/icons-material/History";
-import { LoadingButton } from "@mui/lab";
 import SaveIcon from "@mui/icons-material/Save";
 import { Announcement } from "../../../queries/announcementsQueries";
 import { useNavigate } from "react-router-dom";
 import DeleteAnnouncementButton from "./button/DeleteAnnouncementButton";
-import Page from "../../Page";
-import AdminPage from "../../AdminPage";
 
 interface InputErrors {
   title?: boolean;
@@ -107,7 +102,7 @@ export default function AnnouncementModalContents({
           </Stack>
         )}
 
-        <LoadingButton
+        <Button
           loading={loading}
           size="large"
           variant="contained"
@@ -117,7 +112,7 @@ export default function AnnouncementModalContents({
           onClick={handleSaveClick}
         >
           Save
-        </LoadingButton>
+        </Button>
       </Stack>
     </Stack>
   );

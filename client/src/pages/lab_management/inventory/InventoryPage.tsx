@@ -1,29 +1,18 @@
-import React, { useState } from "react";
-import Page from "../../Page";
-import { Box, Button, Divider, IconButton, Stack, Switch, Table, TableCell, TableHead, TableRow, Typography } from "@mui/material";
-import SearchBar from "../../../common/SearchBar";
-import PageSectionHeader from "../../../common/PageSectionHeader";
 import { useNavigate, useParams } from "react-router-dom";
-import InventoryRow from "../../../common/InventoryRow";
+import { useState } from "react";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import SearchBar from "../../../common/SearchBar";
 import CreateIcon from "@mui/icons-material/Create";
 import { useQuery } from "@apollo/client";
 import InventoryItem from "../../../types/InventoryItem";
 import RequestWrapper from "../../../common/RequestWrapper";
 import MaterialModal from "./MaterialModal";
-import { GET_INVENTORY_ITEMS, GET_INVENTORY_TAGS } from "../../../queries/inventoryQueries";
+import { GET_INVENTORY_TAGS } from "../../../queries/inventoryQueries";
 import AdminPage from "../../AdminPage";
 import Ledger from "./Ledger";
 import InventoryTagsModal from "./InventoryTagsModal";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { TagsCell } from "./common/TagsCell";
-import { format } from "date-fns";
-import { isManager } from "../../../common/PrivilegeUtils";
-import { secondsToHumanString } from "../statistics/StatisticsFunctions";
-import { StaffOnlyToggle } from "./common/StaffOnlyToggle";
-import { StorefrontVisibleToggle } from "./common/StorefrontVisibleToggle";
-import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { FullZone, GET_ZONES, GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQueries";
+import { GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQueries";
 import { InventoryForMakerspace } from "./common/InventoryForMakerspace";
 
 
@@ -48,56 +37,6 @@ export default function InventoryPage() {
   const inventoryTagsResult = useQuery(GET_INVENTORY_TAGS);
 
   const zonesWithItemsResult = useQuery(GET_ZONES_WITH_ITEMS);
-
-
-  // const columns: GridColDef<(typeof matchingItems)[number]>[] = [
-  //   {
-  //     field: 'name',
-  //     headerName: 'Item',
-  //     minWidth: 400,
-  //     width: windowWidth > 1550 ? windowWidth*0.425 : windowWidth*0.2,
-  //     maxWidth: 700
-  //   },
-  //   {
-  //     field: 'tags',
-  //     headerName: 'Tags',
-  //     minWidth: 230,
-  //     width: windowWidth > 1550 ? windowWidth*0.35 : windowWidth*0.2,
-  //     maxWidth: 500,
-  //     valueGetter: (value, row) => (row.tags),
-  //     renderCell: (params) => (<TagsCell item={params.row} allTags={inventoryTagsResult.data?.inventoryTags ?? []} />)
-  //   },
-  //   {
-  //     field: 'count',
-  //     headerName: 'Units Available',
-  //     width: 110,
-  //     valueGetter: (value, row) => (row.count),
-  //   },
-  //   {
-  //     field: 'pricePerUnit',
-  //     headerName: 'Price / Unit',
-  //     width: 130,
-  //     valueGetter: (value, row) => (`$${row.pricePerUnit.toFixed(2)}`),
-  //   },
-  //   {
-  //     field: 'staffOnly',
-  //     headerName: 'Staff Only',
-  //     width: 160,
-  //     renderCell: (params) => (<StaffOnlyToggle item={params.row} />)
-  //   },
-  //   {
-  //     field: 'storefrontVisible',
-  //     headerName: 'Available on Storefront',
-  //     width: 170,
-  //     renderCell: (params) => (<StorefrontVisibleToggle item={params.row} />)
-  //   },
-  //   {
-  //     field: 'actions',
-  //     headerName: 'Actions',
-  //     width: 90,
-  //     renderCell: (params) => (<IconButton onClick={() => setModalItemId(params.row.id + "")} disabled={params.row.staffOnly && !isManager(currentUser)} defaultChecked={params.row.storefrontVisible}><ModeEditIcon /></IconButton>)
-  //   },
-  // ];
 
   return (
     <RequestWrapper loading={zonesWithItemsResult.loading} error={zonesWithItemsResult.error}>
