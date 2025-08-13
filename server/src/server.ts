@@ -27,6 +27,8 @@ import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js"
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
+import fileUpload, { UploadedFile } from "express-fileupload";
+import * as S3 from "./integrations/aws/s3.js"
 
 const require = createRequire(import.meta.url);
 
@@ -144,10 +146,6 @@ async function startServer() {
   app.get("/", function (req, res) {
     res.redirect("/app/home");
   });
-
-
-
-
 
   app.get("/app/*apppage", function (req, res) {
     res.header
@@ -432,6 +430,35 @@ async function startServer() {
     }
   });
 
+  /**
+   * File Uploads
+   */
+  app.use(fileUpload({
+    limits: {
+      fileSize: 8 * 1024 * 1024 // Max file size of 8MB
+    },
+  }));
+
+  app.post("/api/uploads/web-content", async function (req, res) {
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).send("No files were uploaded");
+    } else if (Array.isArray(req.files?.upload) && req.files?.upload.length > 1) {
+      return res.status(400).send("Too many files were uploaded");
+    }
+
+    const file: UploadedFile = Array.isArray(req.files?.upload) ? req.files?.upload[0] : req.files?.upload;
+
+    const new_name = (new Date()).getUTCMilliseconds().toString();
+
+    try {
+      await S3.putObject("user-uploads", new_name, file.data);
+    } catch (e) {
+      return res.status(400).send(e);
+    }
+
+    return res.status(201).send(new_name);
+  });
+
 
   /**=================================
    * SCHEDULED ACTIONS
@@ -454,7 +481,7 @@ async function startServer() {
     };
 
     let expiryNotices = await getPassedTrainingsWeeksAgo(52);
-    if (expiryNotices.length > 99){
+    if (expiryNotices.length > 99) {
       // dont overload the emails (100 / hr, 400 / day)
       expiryNotices = expiryNotices.slice(0, 99);
     }
@@ -467,7 +494,7 @@ async function startServer() {
     // const numWarned = expiryWarnings.length;
 
     const numNotified = expiryNotices.length
-    
+
     createLog(`Trainings: Sent ${numNotified} expiry notices, and purged ${numPurged} expired trainings.`, "server")
 
   }
