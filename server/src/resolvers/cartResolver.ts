@@ -58,13 +58,20 @@ export const CartResolver = {
         throw new Error("Quantity must be greater than zero");
       }
 
+      const cart = await getInventoryCartByID(args.cartID);
+      const cartUser = cart ? await getUserByID(cart.userID) : null;
+
+      if (!cartUser) {
+        throw new Error("Cart user not found");
+      }
+
       const item = await getItemById(args.itemID);
       const totalCost = args.quantity * (item?.pricePerUnit || 0);
 
       const transDescription = `Refund for ${args.quantity} of ${item?.name}`;
 
       //Attempt Refund
-      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, Math.floor(totalCost) * 100, "SHED Store", transDescription);
+      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(cartUser.ritUsername, Math.floor(totalCost) * 100, "SHED Store", transDescription);
       if (!atriumTransactionSuccess) {
         throw new Error("Refund failed due to Atrium transaction error");
       }
@@ -82,8 +89,14 @@ export const CartResolver = {
       context: ApolloContext
     ) => context.isTrainer(async (user) => {
       //Restock items
+      const cart = await getInventoryCartByID(args.cartID);
+      const cartUser = cart ? await getUserByID(cart.userID) : null;
       const items = await getItemsInCart(args.cartID);
       const fullItems = await addItemsAmounts(items.map(item => ({ itemId: item.id, amount: item.cartcount })));
+
+      if (!cartUser) {
+        throw new Error("Cart user not found");
+      }
 
       //Refund items
       var totalRefund = 0;
@@ -100,7 +113,7 @@ export const CartResolver = {
       if (totalRefund < 0) {
         throw new Error("Total refund cannot be negative");
       }
-      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, Math.floor(totalRefund * 100), "SHED Store", transDescription);
+      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(cartUser.ritUsername, Math.floor(totalRefund * 100), "SHED Store", transDescription);
       if (!atriumTransactionSuccess) {
         throw new Error("Refund failed due to Atrium transaction error");
       }
