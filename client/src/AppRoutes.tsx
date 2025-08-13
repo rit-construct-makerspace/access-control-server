@@ -105,7 +105,6 @@ export default function AppRoutes() {
 
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/admin/storefront/preview" element={<StorefrontPreviewPage />} />
-        <Route path="/storefront" element={<StorefrontPage />} />
 
         {/* Routes for the sattic displays around the makerspaces */}
         <Route path="/display">
@@ -120,6 +119,7 @@ export default function AppRoutes() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/makerspace/:makerspaceID" element={<MakerspacePage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/storefront" element={<StorefrontPage />} />
 
           {/* Routes that need to be protected by auth */}
           <Route element={<AuthedRoute />}>
