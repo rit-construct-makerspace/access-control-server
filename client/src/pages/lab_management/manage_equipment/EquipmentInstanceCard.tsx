@@ -162,7 +162,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
             return "No User";
         }
         if (!currentReader.user) {
-            if (currentReader.state == "AlwaysOn" || currentReader.state == "Unlocked") {
+            if (currentReader.state === "AlwaysOn" || currentReader.state === "Unlocked") {
                 return "Unlocked with no user";
             } else {
                 return "No User";
