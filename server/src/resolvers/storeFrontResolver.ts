@@ -328,7 +328,7 @@ const StorefrontResolvers = {
         const transDescription = `Purchase of items: ${ledgerItems.map(item => `${item.name} x${item.quantity}`).join(", ")}`;
 
         //Attempt Purchase
-        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, Math.floor(totalCost)*100, "SHED Store", transDescription);
+        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, Math.floor(totalCost) * 100, "SHED Store", transDescription);
 
         if (atriumTransactionSuccess) {
           await getInventoryCartsByUser(user.id).then(async (carts) => {
@@ -350,20 +350,29 @@ const StorefrontResolvers = {
                   await addItemsToCart(newCart.id, items.map(item => ({
                     itemID: item.id,
                     quantity: item.count
-                  })));
+                  }))).then(async () => {
+                    await InventoryRepo.addItemsAmounts(items.map(item => ({
+                      itemId: item.id,
+                      amount: item.count * -1
+                    })));
+                  });
                 });
               } else {
                 // Cart exists, add new items or update the existing items
                 await addOrUpdateItemsInCart(cart.id, items.map(item => ({
                   itemID: item.id,
                   quantity: item.count
-                })));
+                }))).then(async () => {
+                  await InventoryRepo.addItemsAmounts(items.map(item => ({
+                    itemId: item.id,
+                    amount: item.count * -1
+                  })));
+                });
               }
             }
           });
 
-          //await createLedger(user.id, "Purchase", totalCost, user.id, args.notes ?? "", ledgerItems);
-          //Not yet actually
+          await createLedger(user.id, "Purchase", totalCost, user.id, args.notes ?? "", ledgerItems);
         }
         return atriumTransactionSuccess;
       });
