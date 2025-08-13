@@ -1,6 +1,6 @@
 import { ApolloContext } from "../context.js";
 import { InventoryCartsRow } from "../db/tables.js";
-import { adjustAccountBalanceIfAvailableCents } from "../integrations/currency/currency.js";
+import { adjustAccountBalanceIfAvailableCents, Transaction } from "../integrations/currency/currency.js";
 import { clearItemsFromCart, deleteInventoryCart, getInventoryCartByID, getInventoryCarts, getInventoryCartsByMakerspace, getItemsInCart, subtractItemFromCart } from "../repositories/Store/InventoryCartsRepository.js";
 import { addItemAmount, addItemsAmounts, getItemById } from "../repositories/Store/InventoryRepository.js";
 import { getUserByID } from "../repositories/Users/UserRepository.js";
@@ -66,12 +66,24 @@ export const CartResolver = {
       }
 
       const item = await getItemById(args.itemID);
+      if (!item) {
+        throw new Error("Item not found");
+      }
       const totalCost = args.quantity * (item?.pricePerUnit || 0);
+      console.log("args", args)
+      console.log("price", item.pricePerUnit)
+      console.log("totalCost", totalCost)
 
       const transDescription = `Refund for ${args.quantity} of ${item?.name}`;
 
+      const transaction = new Transaction(
+        new Date(),
+        "Makerspace Store",
+        `For user ${user.ritUsername}: '${transDescription}'`,
+        [{ name: item?.name, cents: Math.floor(totalCost * -100) }], false);
+
       //Attempt Refund
-      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(cartUser.ritUsername, Math.floor(totalCost) * 100, "SHED Store", transDescription);
+      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(cartUser.ritUsername, transaction);
       if (!atriumTransactionSuccess) {
         throw new Error("Refund failed due to Atrium transaction error");
       }
@@ -92,6 +104,7 @@ export const CartResolver = {
       const cart = await getInventoryCartByID(args.cartID);
       const cartUser = cart ? await getUserByID(cart.userID) : null;
       const items = await getItemsInCart(args.cartID);
+      console.log("items", items);
       const fullItems = await addItemsAmounts(items.map(item => ({ itemId: item.id, amount: item.cartcount })));
 
       if (!cartUser) {
@@ -100,20 +113,27 @@ export const CartResolver = {
 
       //Refund items
       var totalRefund = 0;
-      var ledgerItems: { name: string, quantity: number }[] = []
+      var ledgerItems: { name: string, quantity: number, pricePerUnit: number }[] = [];
 
       for (var i = 0; i < fullItems.length; i++) {
-        ledgerItems.push({ name: fullItems[i].name, quantity: fullItems[i].count });
+        ledgerItems.push({ name: fullItems[i].name, quantity: fullItems[i].count, pricePerUnit: fullItems[i].pricePerUnit });
         totalRefund += fullItems[i].count * fullItems[i].pricePerUnit;
       }
 
       const transDescription = `Refund of items: ${ledgerItems.map(item => `${item.name} x${item.quantity}`).join(", ")}`;
 
+      const transaction = new Transaction(
+          new Date(),
+          "Makerspace Store",
+          `For user ${user.ritUsername}: '${transDescription}'`,
+          ledgerItems.map(item => { return { name: item.name, cents: Math.floor(item.quantity * item.pricePerUnit * 100) } }), false);
+        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, transaction);
+
       //Attempt Refund
       if (totalRefund < 0) {
         throw new Error("Total refund cannot be negative");
       }
-      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(cartUser.ritUsername, Math.floor(totalRefund * 100), "SHED Store", transDescription);
+      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(cartUser.ritUsername, transaction);
       if (!atriumTransactionSuccess) {
         throw new Error("Refund failed due to Atrium transaction error");
       }

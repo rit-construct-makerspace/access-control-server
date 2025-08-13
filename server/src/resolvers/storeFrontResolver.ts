@@ -9,7 +9,7 @@ import { notifyInventoryItemBelowThreshold } from "../slack/slack.js";
 import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
-import { adjustAccountBalanceIfAvailableCents } from "../integrations/currency/currency.js";
+import { adjustAccountBalanceIfAvailableCents, Transaction } from "../integrations/currency/currency.js";
 import { assert } from "console";
 
 const StorefrontResolvers = {
@@ -314,7 +314,7 @@ const StorefrontResolvers = {
         }
 
         var totalCost = 0;
-        var ledgerItems: { name: string, quantity: number }[] = []
+        var ledgerItems: { name: string, quantity: number, pricePerUnit: number }[] = []
 
         for (var i = 0; i < args.items.length; i++) {
           //Deduct count from each respective item. Fail if item does not exist
@@ -322,7 +322,7 @@ const StorefrontResolvers = {
           if (!item) {
             throw new GraphQLError("Item does not exist")
           }
-          ledgerItems.push({ name: item.name, quantity: args.items[i].count });
+          ledgerItems.push({ name: item.name, quantity: args.items[i].count, pricePerUnit: item.pricePerUnit });
           totalCost -= args.items[i].count * item.pricePerUnit
         }
 
@@ -332,7 +332,12 @@ const StorefrontResolvers = {
         if (totalCost > 0) {
           throw new GraphQLError("Total cost must be negative");
         }
-        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, Math.floor(totalCost * 100), "SHED Store", transDescription);
+        const transaction = new Transaction(
+          new Date(),
+          "Makerspace Store",
+          `For user ${user.ritUsername}: '${transDescription}'`,
+          ledgerItems.map(item => { return { name: item.name, cents: Math.floor(item.quantity * item.pricePerUnit * -100) } }), false);
+        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, transaction);
 
         if (atriumTransactionSuccess) {
           await getInventoryCartsByUser(user.id).then(async (carts) => {

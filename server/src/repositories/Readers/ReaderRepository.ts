@@ -168,55 +168,6 @@ export async function unpairReaderAsMakerspaceWelcomer(readerID: number, makersp
     await knex("MakerspaceWelcomeReaders").delete().where({ readerID: readerID, makerspaceID: makerspaceID });
 }
 
-export enum PairStatus {
-    Unpaired,
-    PairedAsInstance,
-    PairedAsWelcomer
-}
-/**
- * Get how a reader is paired
- * @param readerID the reader to check
- * @returns PairedAsInstance if associated with machine instance
- * @returns PairedAsWelcomer if paired as welcome reader for a makerspace
- * @returns Unpaired if neither
- */
-export async function getReaderPairStatus(readerID: number): Promise<PairStatus> {
-    const instances = await knex("EquipmentInstances").select("*").where("readerID", "=", readerID);
-    if (instances.length > 0) {
-        return PairStatus.PairedAsInstance;
-    }
-    const makerspaces = await knex("MakerspaceWelcomeReaders").where("readerID", "=", readerID);
-    if (makerspaces.length > 0) {
-        return PairStatus.PairedAsWelcomer;
-    }
-    return PairStatus.Unpaired;
-}
-
-/**
- * Pair reader as a welcome reader for a makerspace
- * @param readerID the reader to pair
- * @param makerspaceID the makerspace to pair with
- * @returns true if paired. or throws if either are not found
- */
-export async function pairReaderAsMakerspaceWelcomer(readerID: number, makerspaceID: number): Promise<Boolean> {
-    try {
-        await knex("MakerspaceWelcomeReaders").insert({ makerspaceID: makerspaceID, readerID: readerID });
-        return true; // or throw if not found
-    } catch {
-    }
- 
-    return false;
-}
-
-/**
- * unpair reader as a welcome reader from a makerspace
- * @param readerID the reader to unpair
- * @param makerspaceID the makerspace to unpair from
- * @returns true if paired. or throws if either are not found
- */
-export async function unpairReaderAsMakerspaceWelcomer(readerID: number, makerspaceID: number) {
-    await knex("MakerspaceWelcomeReaders").delete().where({ readerID: readerID, makerspaceID: makerspaceID });
-}
 
 export async function getReaderLogs(searchParams: { makerspaceID?: number, from: Date, to: Date, pageOffset?: number, pageLimit: number }): Promise<ReaderLogRow[]> {
     let query = knex("ReaderLogs as rl");

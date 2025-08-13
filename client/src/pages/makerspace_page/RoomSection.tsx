@@ -26,8 +26,6 @@ export default function RoomSection(props: RoomSectionProps) {
 
     const roomTrainings = props.room.trainingModules.map(moduleStatusMapper(currentUser.passedModules, currentUser.trainingHolds));
 
-    const roomTrainings = props.room.trainingModules.map(moduleStatusMapper(currentUser.passedModules, currentUser.trainingHolds));
-
     return (
         <Stack padding={"10px 0"} spacing={1}>
             <Typography variant="h4" pl={"10px"}>{props.room.name}</Typography>
