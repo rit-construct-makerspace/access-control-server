@@ -104,7 +104,7 @@ export function ListingModal(props: ListingModalProps) {
             {props.item.count > 0 ? <>{props.item.count} available</> : "Out of stock"}
           </Typography>
           {props.item.count > 0
-          ? <Button size="small" variant="contained" color="primary" onClick={() => tryAddToCart()}>Add to Cart</Button>
+          ? <Button size="small" variant="contained" color="primary" disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true"} onClick={() => tryAddToCart()}>Add to Cart {import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" && "(Not yet available)"}</Button>
           : <Button size="small" variant="contained" color="error" disabled>Out of stock</Button>}
         </Stack>
       </Stack>

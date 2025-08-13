@@ -150,7 +150,6 @@ const StorefrontResolvers = {
       _: any,
       args: { itemId: string; item: InventoryItemInput },
       { isStaff, isManager }: ApolloContext) => {
-      console.log(args.itemId, args.item);
       const orig = await InventoryRepo.getItemById(Number(args.itemId))
       //If item is STAFF ONLY, only allow edits by staff
       if (!(orig)?.staffOnly) {
@@ -296,9 +295,11 @@ const StorefrontResolvers = {
       args: { items: { id: number, count: number }[], notes: string | null },
       { ifAuthenticated }: ApolloContext) => {
       return ifAuthenticated(async (user) => {
-        console.log("Items", args.items)
+        if (process.env.VITE_DISABLE_STOREFRONT_CART === "true") {
+          throw new GraphQLError("Functionality is disabled.");
+        }
+
         const allItems = await InventoryRepo.getItemsByID(args.items.map(item => item.id));
-        console.log("All Items", allItems)
         for (var i = 0; i < args.items.length; i++) {
           const item = allItems.find((item) => item.id == args.items[i].id);
           if (!item) {

@@ -27,7 +27,7 @@ export function ListingCard(props: ListingCardProps) {
         <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
           <Button size="small" onClick={() => props.openDetailsModal(props.item)}>Details</Button>
           {props.item.count > 0
-          ? <Button size="small" variant="contained" color="primary" onClick={() => props.setActiveItem(props.item)}>Add to Cart ({props.item.count} {props.item.count > 1 ? props.item.pluralUnit : props.item.unit} available)</Button>
+          ? <Button size="small" variant="contained" color="primary" disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true"} onClick={() => props.setActiveItem(props.item)}>Add to Cart ({props.item.count} {props.item.count > 1 ? props.item.pluralUnit : props.item.unit} available {import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" && "(Not yet available)"})</Button>
           : <Button size="small" variant="contained" color="error" disabled>Out of stock</Button>}
         </Stack>
       </CardActions>

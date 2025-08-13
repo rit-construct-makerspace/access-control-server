@@ -39,7 +39,6 @@ export const CartResolver = {
       _parent: any,
       args: { makerspaceID?: number },
       _context: ApolloContext) => {
-      console.log("args", args);
       if (args.makerspaceID) {
         return await getInventoryCartsByMakerspace(args.makerspaceID);
       }
@@ -70,9 +69,6 @@ export const CartResolver = {
         throw new Error("Item not found");
       }
       const totalCost = args.quantity * (item?.pricePerUnit || 0);
-      console.log("args", args)
-      console.log("price", item.pricePerUnit)
-      console.log("totalCost", totalCost)
 
       const transDescription = `Refund for ${args.quantity} of ${item?.name}`;
 
@@ -104,7 +100,6 @@ export const CartResolver = {
       const cart = await getInventoryCartByID(args.cartID);
       const cartUser = cart ? await getUserByID(cart.userID) : null;
       const items = await getItemsInCart(args.cartID);
-      console.log("items", items);
       const fullItems = await addItemsAmounts(items.map(item => ({ itemId: item.id, amount: item.cartcount })));
 
       if (!cartUser) {
