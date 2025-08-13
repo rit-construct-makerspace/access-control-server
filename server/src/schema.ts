@@ -57,6 +57,7 @@ import { RestrictionResolver } from "./resolvers/restrictionResolver.js";
 import { CurrencyAccountResolvers } from "./resolvers/currencyAccountResolver.js"
 import { CurrencyAccountsTypeDefs } from "./schemas/currencyAccountSchema.js";
 import { CartTypeDefs } from "./schemas/cartSchema.js";
+import { CartResolver } from "./resolvers/cartResolver.js";
 
 // for custom scalars such as Date
 const resolveFunctions = {
@@ -123,5 +124,6 @@ export const schema = makeExecutableSchema({
     ToolItemResolver,
     RestrictionResolver,
     CurrencyAccountResolvers,
+    CartResolver
   ]
 });

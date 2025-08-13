@@ -41,6 +41,8 @@ import NoPrivilegePage from "./pages/NoPrivilegePage";
 import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
 import HoursDisplay from "./pages/signage/HoursDisplay";
 import EventsDisplay from "./pages/signage/EventsDisplay";
+import { CartListPage } from "./pages/lab_management/storefront/internal/CartListPage";
+import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -103,6 +105,7 @@ export default function AppRoutes() {
 
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/admin/storefront/preview" element={<StorefrontPreviewPage />} />
+        <Route path="/storefront" element={<StorefrontPage />} />
 
         {/* Routes for the sattic displays around the makerspaces */}
         <Route path="/display">
@@ -130,6 +133,8 @@ export default function AppRoutes() {
                 <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />} />
                 <Route path="/makerspace/:makerspaceID/people/:userID" element={<UsersPage />} />
                 <Route path="/makerspace/:makerspaceID/inventory" element={<InventoryPage />} />
+                <Route path="/makerspace/:makerspaceID/storefront/carts" element={<CartListPage />} />
+                <Route path="/makerspace/:makerspaceID/storefront/carts/:cartID" element={<CartPage />} />
 
                 {/* Routes for staff + higher */}
                 <Route element={<StaffRoute />}>
@@ -184,8 +189,6 @@ export default function AppRoutes() {
             <Route path="/admin/terms" element={<EditTermsPage />} />
           </Route>
           {/* END OF PROTECTED ROUTES */}
-
-          <Route path="/storefront" element={<StorefrontPage />} />
 
           <Route path="/logoutprompt" element={<LogoutPromptPage />} />
 

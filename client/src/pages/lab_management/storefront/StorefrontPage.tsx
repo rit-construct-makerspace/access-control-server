@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Box, Divider, Snackbar, Stack, Switch, Typography } from "@mui/material";
+import { Box, Button, Divider, Snackbar, Stack, Switch, Typography } from "@mui/material";
 import InventoryRow from "../../../common/InventoryRow";
 import SearchBar from "../../../common/SearchBar";
 import InventoryItem from "../../../types/InventoryItem";
@@ -12,7 +12,7 @@ import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_INVENTORY_ITEMS } from "../../../queries/inventoryQueries";
 import AdminPage from "../../AdminPage";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { isAdmin, isManager, isStaff } from "../../../common/PrivilegeUtils";
+import { isAdmin, isManager, isOnlyTrainer, isStaff } from "../../../common/PrivilegeUtils";
 import Page from "../../Page";
 import Privilege from "../../../types/Privilege";
 import { ListingCard } from "./ListingCard";
@@ -20,6 +20,8 @@ import { ListingModal } from "./ListingModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQueries";
 import CheckoutSuccessModal from "./CheckoutSuccessModal";
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import { useNavigate } from "react-router-dom";
 
 const REMOVE_INVENTORY_ITEM_AMOUNT = gql`
   mutation RemoveInventoryItemAmount($itemID: ID!, $amountToRemove: Int!) {
@@ -48,6 +50,7 @@ function updateLocalStorage(cart: ShoppingCartEntry[] | null) {
 export default function StorefrontPage() {
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   const { loading, error, data } = useQuery(GET_ZONES_WITH_ITEMS, { variables: { storefrontVisible: isStaff(currentUser) ? null : true } });
 
@@ -147,7 +150,13 @@ export default function StorefrontPage() {
 
   return (
     <RequestWrapper loading={loading} error={error}>
-      <Page title={"Store"} noPadding={isMobile}>
+      <Page title={"Store"} noPadding={isMobile} topRightAddons={
+        (isOnlyTrainer(currentUser) || isStaff(currentUser)) ? (
+          <Button variant="contained" color="secondary" startIcon={<ShoppingCartCheckoutIcon />} onClick={() => { navigate(`/makerspace/36/storefront/carts`) }}>
+            View Carts
+          </Button>
+        ) : null
+      }>
         <ShoppingCart
           entries={shoppingCart}
           removeEntry={removeFromShoppingCart}

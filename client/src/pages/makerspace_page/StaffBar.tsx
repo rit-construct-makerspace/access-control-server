@@ -3,7 +3,7 @@ import { useCurrentUser } from "../../common/CurrentUserProvider";
 import NavLink from "../../top_nav/NavLink";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import SchoolIcon from "@mui/icons-material/School";
-import StorefrontIcon from "@mui/icons-material/Storefront";
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import PeopleIcon from "@mui/icons-material/People";
 import HistoryIcon from "@mui/icons-material/History";
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -107,9 +107,9 @@ export default function StaffBar() {
                     icon={<ArchitectureIcon />}
                 />
                 <NavLink
-                    primary={"Storefront"}
-                    to={"/admin/storefront"}
-                    icon={<StorefrontIcon />}
+                    primary={"Orders"}
+                    to={`/makerspace/${makerspaceID}/storefront/carts`}
+                    icon={<ShoppingCartCheckoutIcon />}
                 />
                 <NavLink
                     primary={"People"}

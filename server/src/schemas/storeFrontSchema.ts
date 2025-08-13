@@ -57,7 +57,7 @@ export const StoreFrontTypeDefs = gql`
     description: String
     tags: [InventoryTag]
     makerspace: Zone
-   makerspaceID: ID!
+    makerspaceID: ID!
   }
 
   type InventoryTag {

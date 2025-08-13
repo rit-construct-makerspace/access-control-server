@@ -6,12 +6,15 @@ export const GET_CARTS = gql`
       id
       user {
         id
-        name
+        firstName
+        lastName
+        ritUsername
       }
       makerspace {
         id
         name
       }
+      lastModified
     }
   }
 `;
@@ -22,7 +25,9 @@ export const GET_CART = gql`
       id
       user {
         id
-        name
+        firstName
+        lastName
+        ritUsername
       }
       makerspace {
         id
@@ -30,15 +35,34 @@ export const GET_CART = gql`
       }
       items {
         id
+        image
         name
-        quantity
+        unit
+        pluralUnit
+        count
+        pricePerUnit
+        notes
+        cartcount
       }
+      lastModified
     }
   }
 `;
 
 export const SUBTRACT_ITEM_FROM_CART = gql`
-  mutation SubtractItemFromCart($cartID: ID!, $itemID: ID!, $quantity: Int!) {
-    subtractItemFromCart(cartID: $cartID, itemID: $itemID, quantity: $quantity)
+  mutation SubtractItemFromCart($cartID: ID!, $itemID: ID!, $quantity: Int!, $restock: Boolean!) {
+    subtractItemFromCart(cartID: $cartID, itemID: $itemID, quantity: $quantity, restock: $restock)
+  }
+`;
+
+export const CANCEL_CART = gql`
+  mutation CancelCart($cartID: ID!) {
+    cancelCart(cartID: $cartID)
+  }
+`;
+
+export const COMPLETE_CART = gql`
+  mutation CompleteCart($cartID: ID!) {
+    completeCart(cartID: $cartID)
   }
 `;

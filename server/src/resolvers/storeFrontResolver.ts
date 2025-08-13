@@ -10,6 +10,7 @@ import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
 import { adjustAccountBalanceIfAvailableCents } from "../integrations/currency/currency.js";
+import { assert } from "console";
 
 const StorefrontResolvers = {
   InventoryItem: {
@@ -321,14 +322,17 @@ const StorefrontResolvers = {
           if (!item) {
             throw new GraphQLError("Item does not exist")
           }
-          ledgerItems.push({ name: item.name, quantity: args.items[i].count * -1 });
+          ledgerItems.push({ name: item.name, quantity: args.items[i].count });
           totalCost -= args.items[i].count * item.pricePerUnit
         }
 
         const transDescription = `Purchase of items: ${ledgerItems.map(item => `${item.name} x${item.quantity}`).join(", ")}`;
 
         //Attempt Purchase
-        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, Math.floor(totalCost) * 100, "SHED Store", transDescription);
+        if (totalCost > 0) {
+          throw new GraphQLError("Total cost must be negative");
+        }
+        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, Math.floor(totalCost * 100), "SHED Store", transDescription);
 
         if (atriumTransactionSuccess) {
           await getInventoryCartsByUser(user.id).then(async (carts) => {
