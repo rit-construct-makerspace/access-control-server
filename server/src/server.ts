@@ -11,10 +11,10 @@ import compression from "compression";
 import cors from "cors";
 import { schema } from "./schema.js";
 import { setupSessions, setupDevAuth, setupStagingAuth, setupAuth } from "./auth.js";
-import context from "./context.js";
+import context, { determineUser } from "./context.js";
 import path from "path";
 import * as schedule from "node-schedule";
-import { getUserByCardTagID, getUsersFullName } from "./repositories/Users/UserRepository.js";
+import { getUserByCardTagID, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { getReaderBySN, getReaderCertCA } from "./repositories/Readers/ReaderRepository.js";
 import morgan from "morgan"; //Log provider
@@ -29,6 +29,7 @@ import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./reposit
 import * as Emailer from "./integrations/email/email.js"
 import fileUpload, { UploadedFile } from "express-fileupload";
 import * as S3 from "./integrations/aws/s3.js"
+import { isStaff } from "./privilege.js";
 
 const require = createRequire(import.meta.url);
 
@@ -440,6 +441,11 @@ async function startServer() {
   }));
 
   app.post("/api/uploads/web-content", async function (req, res) {
+
+    if (!req.user || !isStaff(determineUser(req.user))) {
+      return res.status(401).send("Only staff or higher may upload files");
+    }
+
     if (!req.files || Object.keys(req.files).length === 0) {
       return res.status(400).send("No files were uploaded");
     } else if (Array.isArray(req.files?.upload) && req.files?.upload.length > 1) {
