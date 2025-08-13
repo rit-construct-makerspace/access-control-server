@@ -71,7 +71,7 @@ export function CartListPage() {
       ),
     },
     {
-      field: "updatedAt",
+      field: "lastModified",
       headerName: "Last Updated",
       width: 220,
       valueGetter: (value) => new Date(value).toLocaleString(),
