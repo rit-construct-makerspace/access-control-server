@@ -151,7 +151,7 @@ export function CartPage() {
           color="success"
           onClose={() => {
             setPickupSuccessSnackbarOpen(false);
-            navigate(`/makerspace/${makerspaceID}/carts`);
+            navigate(`/makerspace/${makerspaceID}/storefront/carts`);
           }}
           message="Pickup process successful. Redirecting back to Cart List..."
           autoHideDuration={5000}
@@ -187,7 +187,7 @@ export function CartPage() {
           color="success"
           onClose={() => {
             setCancelSuccessSnackbarOpen(false);
-            navigate(`/makerspace/${makerspaceID}/carts`);
+            navigate(`/makerspace/${makerspaceID}/storefront/carts`);
           }}
           message="Cancel process successful. Redirecting back to Cart List..."
           autoHideDuration={5000}
