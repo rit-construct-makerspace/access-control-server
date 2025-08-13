@@ -13,7 +13,8 @@ import * as ShlugControl from "../wsapi.js"
 
 import { createCipheriv, randomInt, scryptSync } from "crypto";
 import { generateRandomHumanName } from "../data/humanReadableNames.js";
-import { getInstanceByID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
+import { getInstanceByID, getInstanceByReaderID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
+import { getEquipmentByID } from "../repositories/Equipment/EquipmentRepository.js";
 const serverApiPass = process.env.SERVER_API_PASSWORD ?? 'unsecure_server_password';
 const serverKey = scryptSync(serverApiPass, 'makerspace-salt¯\_(ツ)_/¯', 24);
 const algorithm = 'aes-192-cbc';
@@ -59,6 +60,32 @@ const ReadersResolver = {
       _context: ApolloContext) => {
       return getUserByCardTagID(parent.currentUID);
     },
+    pairedMakerspace: async (
+      parent: ReaderRow,
+      _args: any,
+      _context: ApolloContext) => {
+      return ReaderRepo.getMakerspaceOfWelcomeReader(parent.id);
+    },
+
+    pairedEquipment: async (
+      parent: ReaderRow,
+      _args: any,
+      _context: ApolloContext) => {
+      const inst = await getInstanceByReaderID(parent.id);
+      if (!inst) {
+        return undefined;
+      }
+      const equipment = await getEquipmentByID(inst.equipmentID);
+      if (!equipment) {
+        return undefined;
+      }
+      return {
+        equipmentID: equipment.id,
+        equipmentName: equipment.name,
+        instanceID: inst.id,
+        instanceName: inst.name,
+      }
+    },
   },
   ReaderLog: {
     reader: async (
@@ -83,10 +110,10 @@ const ReadersResolver = {
      */
     readers: async (
       _parent: any,
-      _args: any,
+      args: {makerspaceID: number},
       { isStaff }: ApolloContext) =>
       isStaff(async (user: CurrentUser) => {
-        return await ReaderRepo.getReaders();
+        return await ReaderRepo.getReaders(args.makerspaceID ? Number(args.makerspaceID) : null);
       }),
 
     /**
@@ -166,16 +193,13 @@ const ReadersResolver = {
   Mutation: {
     /**
      * Create a Reader
-     * @argument machineID ID of Equipment
-     * @argument machineType Type indication string (mostly deprecated)
      * @argument name Reader name
-     * @argument zone comma seperated list of zone IDs the machine resides in (usually just the one)
      * @returns new Reader
-     * @throws GraphQLError if not STAFF or is on hold
+     * @throws GraphQLError if not MANAGER or is on hold
      */
     createReader: async (
       _parent: any,
-      args: { machineID?: number, machineType?: string, name?: string, zone?: string },
+      args: { name?: string },
       { isManager }: ApolloContext) =>
       isManager(async (user: CurrentUser) => {
         return await ReaderRepo.createReader(args);
@@ -299,7 +323,28 @@ const ReadersResolver = {
           return `failed to parse id: ${e}`;
         }
       }),
-    identifyReader: async (
+    
+      restartAllReaders: async (
+        _parent: any,
+        args: { makerspaceID: number },
+        { isManagerFor }: ApolloContext
+      ) =>
+        isManagerFor(Number(args.makerspaceID), async (executingUser: any) => {
+          if (isNaN(Number(args.makerspaceID))){
+            return false;
+          }
+          try {
+            const readers = await ReaderRepo.getReaders(args.makerspaceID);
+            readers?.forEach((reader) =>{
+              ShlugControl.sendState(executingUser, reader.id, "Restart");
+            });
+            return true;
+          } catch (e) {
+            return false;
+          }
+        }),
+
+        identifyReader: async (
       _parent: any,
       args: { id: number, doIdentify: boolean },
       { isStaff }: ApolloContext

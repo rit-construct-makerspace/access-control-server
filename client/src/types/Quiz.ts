@@ -18,13 +18,13 @@ export interface QuizItem {
   type: QuizItemType;
   text: string;
   options?: Option[];
-};
+}
 
 export interface Moduledraft {
   name: string;
   archived: boolean;
   quiz: QuizItem[];
-};
+}
 
 export interface ReservationPrompt {
   promptText?: string;
@@ -39,7 +39,7 @@ export interface Module {
   reservationPrompt: ReservationPrompt;
   isLocked?: boolean;
   makerspaceID: number | null;
-};
+}
 
 export interface Submission {
   id: number;

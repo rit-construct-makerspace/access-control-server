@@ -27,12 +27,20 @@ export default tseslint.config(
       ],
       "@typescript-eslint/no-explicit-any": "off",
       "no-var": "warn",
-      "@typescript-eslint/no-unused-vars": "warn",
       "no-extra-semi": "warn",
       "prefer-const": "warn",
 
       'react/jsx-uses-react': 'warn',
       'react/jsx-uses-vars': 'warn',
+
+      "@typescript-eslint/no-unused-vars": [
+      "warn", // or "error"
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_", // Also useful for unused local variables
+        "caughtErrorsIgnorePattern": "^_" // For unused error variables in catch blocks
+      }
+    ]
 
     },
   },

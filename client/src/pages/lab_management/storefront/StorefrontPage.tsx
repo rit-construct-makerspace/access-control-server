@@ -54,11 +54,11 @@ export default function StorefrontPage() {
   const [showInternalItems, setShowInternalItems] = useState(false);
   const [showStaffItems, setShowStaffItems] = useState(false);
 
-  function handleShowInternalChange(e: any) {
+  function handleShowInternalChange(_e: any) {
     setShowInternalItems(!showInternalItems)
   }
 
-  function handleShowStaffChange(e: any) {
+  function handleShowStaffChange(_e: any) {
     setShowStaffItems(!showStaffItems)
   }
 

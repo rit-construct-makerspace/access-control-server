@@ -65,7 +65,7 @@ export default function MaintenanceLogEntry({ logItem, allTags }: { logItem: Mai
   }
 
   function handleForward() {
-    var url = new URL( `https://www.example.com/admin/equipment/logs/${logItem.equipment.id}`);
+    const url = new URL( `https://www.example.com/admin/equipment/logs/${logItem.equipment.id}`);
     if (logItem.instance?.id) url.searchParams.append('instance', logItem.instance.id.toString());
     url.searchParams.append('issue', logItem.content);
     url.searchParams.append('id', logItem.id.toString());

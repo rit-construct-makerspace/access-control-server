@@ -6,12 +6,19 @@
 import { gql } from "graphql-tag";
 
 export const ReaderTypeDefs = gql`
+  type PairedMakerspace{
+    id: ID!
+    name: String
+  } 
+  type PairedEquipment{
+    equipmentID: ID!
+    equipmentName: String 
+    instanceID: ID!
+    instanceName: String
+  } 
   type Reader {
     id: ID!
-    machineID: String
-    machineType: String
     name: String
-    zone: String
     temp: String
     state: String
     user: User
@@ -19,7 +26,6 @@ export const ReaderTypeDefs = gql`
     lastStatusReason: String
     scheduledStatusFreq: String
     lastStatusTime: DateTime
-    helpRequested: Boolean
     BEVer: String
     FEVer: String
     HWVer: String
@@ -28,6 +34,9 @@ export const ReaderTypeDefs = gql`
     readerKeyCycle: Int
     pairTime: DateTime
     targetFirmwareVersion: String
+
+    pairedMakerspace: PairedMakerspace
+    pairedEquipment: PairedEquipment
   }
   type ReaderLog{
     id: ID!
@@ -44,7 +53,7 @@ export const ReaderTypeDefs = gql`
   }
 
   extend type Query {
-    readers: [Reader]
+    readers(makerspaceID: ID): [Reader]
     unpairedReaders: [Reader]
     welcomeReadersForMakerspace(makerspaceId: ID!): [Reader]
     makerspaceForWelcomeReader(readerId: ID): Zone
@@ -55,10 +64,7 @@ export const ReaderTypeDefs = gql`
 
   extend type Mutation {
     createReader(
-      machineID: ID!
-      machineType: String
       name: String
-      zone: String
     ): Reader
 
     deleteReader(id: ID!): Boolean
@@ -73,9 +79,6 @@ export const ReaderTypeDefs = gql`
 
     updateReader(
       id: ID!
-      machineID: String
-      machineType: String
-      zone: String
       temp: String
       state: String
       currentUID: String
@@ -87,6 +90,7 @@ export const ReaderTypeDefs = gql`
 
     setName(id: ID!, name: String): Reader
     setState(id: ID!, state: String): String
+    restartAllReaders(makerspaceID: ID!): Boolean
     setOTAVersion(ids: [ID!]!, otaTag: String!, updateNow: Boolean!): JSON
     identifyReader(id: ID!, doIdentify: Boolean): Boolean
     }

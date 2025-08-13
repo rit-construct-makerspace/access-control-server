@@ -11,7 +11,7 @@ import { useIsMobile } from "../../../common/IsMobileProvider";
 
 // we're going to bring this back soon probably 
 // eslint-disable-next-line 
-function shuffle(array: any[] | undefined) {
+function _shuffle(array: any[] | undefined) {
   if (array === undefined) return undefined;
   let currentIndex = array.length;
 
@@ -19,7 +19,7 @@ function shuffle(array: any[] | undefined) {
   while (currentIndex !== 0) {
 
     // Pick a remaining element...
-    let randomIndex = Math.floor(Math.random() * currentIndex);
+    const randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
 
     // And swap it with the current element.

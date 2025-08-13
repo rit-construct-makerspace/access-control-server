@@ -61,30 +61,36 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
         return false;
     }
 
-    const currentReader = useQuery(GET_READER_BY_ID, {
+    const currentReaderResult = useQuery(GET_READER_BY_ID, {
         pollInterval: 2000,
         variables: { id: props.instance.reader?.id },
     });
+    const currentReader: Reader | undefined = currentReaderResult.data?.reader;
+
 
 
     useEffect(() => {
         function updateOfflineness() {
-            let off = calcIsOffline(currentReader.data?.reader?.lastStatusTime);
+            if (!currentReader?.lastStatusReason) {
+                setIsOffline(true);
+                return;
+            }
+            const off = calcIsOffline(currentReader?.lastStatusTime);
             setIsOffline(off)
         }
-        let interval = setInterval(updateOfflineness, 2000)
+        const interval = setInterval(updateOfflineness, 2000)
 
         return (() => { // cleanup function to stop pollin
             clearInterval(interval)
         })
-    }, [currentReader.data?.reader?.lastStatusTime])
+    }, [currentReader])
 
 
     const [sendCommandedState] = useMutation(SET_READER_STATE);
     const [commandedState, setCommandedState] = useState<string>("Idle");
 
     function generateDropdownOptions(): { id: number | undefined, name: string }[] {
-        var options: { id: number | undefined, name: string }[] = [];
+        const options: { id: number | undefined, name: string }[] = [];
 
         if (props.instance.reader) {
             options.push({ name: props.instance.reader.name + " (Active)", id: props.instance.reader.id });
@@ -112,9 +118,9 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
     function handleStateChange(e: any) {
         setCommandedState(e.target.value);
     }
-    function setStateClicked(e: any) {
+    function setStateClicked(_e: any) {
         if (reader != null) {
-            if (currentReader.data?.reader?.state === "Unlocked") {
+            if (currentReader?.state === "Unlocked") {
                 if (window.confirm("This machine is currently in use. Continue?")) {
                     sendCommandedState({ variables: { id: reader.id, state: commandedState } });
                 }
@@ -131,7 +137,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
     }
 
     function renderCurrentState() {
-        switch (currentReader.data?.reader?.state) {
+        switch (currentReader?.state) {
             case "Idle":
                 return <Tooltip title="Idle"><HourglassFullIcon color="warning" /></Tooltip>;
             case "Unlocked":
@@ -149,6 +155,23 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
             default:
                 return <Tooltip title="Unknown State"><QuestionMarkIcon color="secondary" /></Tooltip>
         }
+    }
+
+    function activeUserDisplay() {
+        if (!currentReader) {
+            return "No User";
+        }
+        if (!currentReader.user) {
+            if (currentReader.state === "AlwaysOn" || currentReader.state === "Unlocked") {
+                return "Unlocked with no user";
+            } else {
+                return "No User";
+            }
+        }
+        return <Stack direction={"row"}>
+            User:&nbsp;
+            <AuditLogEntity entityCode={`user:${currentReader.user.id}:${currentReader.user.firstName} ${currentReader.user.lastName}`} />
+        </Stack>
     }
 
     return (
@@ -172,6 +195,9 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
                             </>
                     }
                 </Stack>
+                <Stack alignContent={"center"} alignItems={"center"}>
+                    {activeUserDisplay()}
+                </Stack>
                 {
                     allowEdit
                         ? <Autocomplete
@@ -187,7 +213,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
                         />
                         : <Typography variant="body1" align="center">{
                             reader ?
-                                <span>Paired with: <AuditLogEntity entityCode={`access_device:${reader.id}:${reader.name}`}/></span>
+                                <span>Paired with: <AuditLogEntity entityCode={`access_device:${reader.id}:${reader.name}`} /></span>
                                 : <Alert severity="warning" variant="filled">No Reader Paired</Alert>}
                         </Typography>
                 }
@@ -199,7 +225,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
                             {
                                 renderCurrentState()
                             }
-                            <Select disabled={allowEdit || reader == null} size="small" defaultValue={currentReader.data?.reader?.state ?? "Idle"} value={commandedState} onChange={handleStateChange} fullWidth>
+                            <Select disabled={allowEdit || reader == null} size="small" defaultValue={currentReader?.state ?? "Idle"} value={commandedState} onChange={handleStateChange} fullWidth>
                                 <MenuItem value="Idle">Idle</MenuItem>
                                 <MenuItem value="Lockout">Lockout</MenuItem>
                                 <MenuItem value="AlwaysOn">Always On</MenuItem>

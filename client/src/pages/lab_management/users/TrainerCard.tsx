@@ -10,7 +10,7 @@ import { EquipmentWithRoom } from "../../../types/Equipment";
 
 interface TrainerCardProps {
     equipmentID: number;
-    removeTrainerPerms: Function;
+    removeTrainerPerms: (id: number)=>void;
 }
 
 export default function TrainerCard(props: TrainerCardProps) {
