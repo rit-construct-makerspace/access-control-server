@@ -1,13 +1,12 @@
-import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
 import { addTrainingToZone, archiveZone, createZone, deleteZone, getTrainingsByZone, getZoneByID, getZones, removeTrainingFromZone, updateZone } from "../repositories/Zones/ZonesRespository.js";
 import { ZoneRow } from "../db/tables.js";
-import { getRooms, getRoomsByZone } from "../repositories/Rooms/RoomRepository.js";
+import { getRoomsByZone } from "../repositories/Rooms/RoomRepository.js";
 import { ZoneInput } from "../schemas/zonesSchema.js";
 import * as HoursRepo from "../repositories/Zones/ZoneHoursRepository.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
+import { getItems, getItemsWhereStorefront } from "../repositories/Store/InventoryRepository.js";
 
 const ZonesResolver = {
   Zone: {
@@ -32,6 +31,14 @@ const ZonesResolver = {
       _args: any,
     ) => {
       return getTrainingsByZone(parent.id);
+    },
+    items: async (
+      parent: ZoneRow,
+      args: {storefrontVisible?: boolean},
+    ) => {
+      return args.storefrontVisible == undefined
+        ? getItems(parent.id)
+        : getItemsWhereStorefront(args.storefrontVisible, parent.id);
     }
   },
 

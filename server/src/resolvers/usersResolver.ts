@@ -10,7 +10,7 @@ import { Privilege } from "../schemas/usersSchema.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { ApolloContext, CurrentUser } from "../context.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
-import { getActiveTrainingHoldsByUser, getTrainingHoldsByUser } from "../repositories/Training/TrainingHoldsRespository.js";
+import { getActiveTrainingHoldsByUser } from "../repositories/Training/TrainingHoldsRespository.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
 import { UserRow } from "../db/tables.js";

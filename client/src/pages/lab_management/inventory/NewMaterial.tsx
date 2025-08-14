@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import MaterialModalContents, {
   InventoryItemInput,
 } from "./MaterialModalContents";
-import { GET_INVENTORY_ITEMS, CREATE_INVENTORY_ITEM} from "../../../queries/inventoryQueries";
+import { GET_INVENTORY_ITEMS, CREATE_INVENTORY_ITEM } from "../../../queries/inventoryQueries";
+import { GET_ZONES_WITH_ITEMS } from "../../../queries/zoneQueries";
 
 
 interface NewMaterialProps {
@@ -17,7 +18,16 @@ export default function NewMaterial({ onClose }: NewMaterialProps) {
     CREATE_INVENTORY_ITEM,
     {
       variables: { item: itemDraft },
-      refetchQueries: [{ query: GET_INVENTORY_ITEMS }],
+      refetchQueries: [{
+        query: GET_INVENTORY_ITEMS,
+      },
+      {
+        query: GET_ZONES_WITH_ITEMS,
+        variables: { zoneId: itemDraft.makerspaceID },
+      },
+      {
+        query: GET_ZONES_WITH_ITEMS,
+      }],
     }
   );
 

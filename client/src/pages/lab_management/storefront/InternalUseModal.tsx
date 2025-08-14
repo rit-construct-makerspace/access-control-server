@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
 import { Button, Stack, TextareaAutosize, Typography } from "@mui/material";
 import InventoryIcon from "@mui/icons-material/Inventory";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface CheckoutModalProps {
   open: boolean;
@@ -19,18 +20,7 @@ export default function UseModal({
   function handleNotesChanged(e: any) {
     setNotes(e.target.value);
   }
-
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
 
   return (

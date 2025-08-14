@@ -1,4 +1,4 @@
-import { ApolloContext, CurrentUser } from "../context.js";
+import { ApolloContext } from "../context.js";
 import * as InventoryRepo from "../repositories/Store/InventoryRepository.js";
 import { InventoryItem, InventoryItemInput } from "../schemas/storeFrontSchema.js";
 import { deleteInventoryItem } from "../repositories/Store/InventoryRepository.js";
@@ -8,6 +8,8 @@ import { getUserByID, getUserByIDOrUndefined } from "../repositories/Users/UserR
 import { notifyInventoryItemBelowThreshold } from "../slack/slack.js";
 import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
+import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
+import { adjustAccountBalanceIfAvailableCents, Transaction } from "../integrations/currency/currency.js";
 
 const StorefrontResolvers = {
   InventoryItem: {
@@ -42,29 +44,26 @@ const StorefrontResolvers = {
     /**
      * Fetch all InventoryItems
      * @argument storefrontVisible If defined, fetch records of matching storefrontVisible value
+     * @argument makerspaceID If defined, fetch records of matching makerspaceID value
      * @returns array of InventoryItems
      * @throws GraphQLError if not MENTOR or STAFF or is on hold
      */
     InventoryItems: async (
       _: any,
-      args: { storefrontVisible?: boolean },
+      args: { storefrontVisible?: boolean, makerspaceID?: number },
       { isStaff }: ApolloContext) => {
-        console.log(args)
       if (args.storefrontVisible === null || args.storefrontVisible === undefined) {
         return isStaff(async () => {
-          console.log(1)
-          return await InventoryRepo.getItems();
+          return await InventoryRepo.getItems(args.makerspaceID);
         })
       }
       else if (args.storefrontVisible == false) {
         return isStaff(async () => {
-          console.log(2)
-          return await InventoryRepo.getItemsWhereStorefront(false);
+          return await InventoryRepo.getItemsWhereStorefront(false, args.makerspaceID);
         })
       }
       else {
-        console.log(3)
-        return await InventoryRepo.getItemsWhereStorefront(true);
+        return await InventoryRepo.getItemsWhereStorefront(true, args.makerspaceID);
       }
     },
 
@@ -132,8 +131,8 @@ const StorefrontResolvers = {
     createInventoryItem: async (
       _: any,
       args: { item: InventoryItemInput },
-      { isStaff }: ApolloContext) =>
-      isStaff(async (user) => {
+      { isAdmin }: ApolloContext) =>
+      isAdmin(async (user) => {
         const result = await InventoryRepo.addItem(args.item);
         await createLedger(user.id, "Create", Number(args.item.pricePerUnit) * Number(args.item.count), undefined, "", [{ name: args.item.name, quantity: Number(args.item.count) }]);
         return result;
@@ -292,19 +291,30 @@ const StorefrontResolvers = {
      */
     checkoutItems: async (
       _parent: any,
-      args: { items: { id: number, count: number }[], notes: string | null, recievingUserID: number | null },
-      { isStaff }: ApolloContext) => {
-      return isStaff(async (user) => {
-        const allItems = await InventoryRepo.getItems();
+      args: { items: { id: number, count: number }[], notes: string | null },
+      { ifAuthenticated }: ApolloContext) => {
+      return ifAuthenticated(async (user) => {
+        if (process.env.VITE_DISABLE_STOREFRONT_CART === "true") {
+          throw new GraphQLError("Functionality is disabled.");
+        }
+
+        const allItems = await InventoryRepo.getItemsByID(args.items.map(item => item.id));
         for (var i = 0; i < args.items.length; i++) {
-          if (allItems.find((item) => item.id = args.items[i].id)?.staffOnly && user.manager.length <= 0) {
+          const item = allItems.find((item) => item.id == args.items[i].id);
+          if (!item) {
+            throw new GraphQLError("Item with ID " + args.items[i].id + " does not exist");
+          }
+          if (item.staffOnly && user.manager.length <= 0) {
             //Fail if user is trying to checkout a staff item
-            throw new GraphQLError("Unauthorized")
+            throw new GraphQLError("Unauthorized to checkout staff-only item");
+          }
+          if (item.count < args.items[i].count) {
+            throw new GraphQLError("Insufficient stock for item " + item.name);
           }
         }
 
         var totalCost = 0;
-        var ledgerItems: { name: string, quantity: number }[] = []
+        var ledgerItems: { name: string, quantity: number, pricePerUnit: number }[] = []
 
         for (var i = 0; i < args.items.length; i++) {
           //Deduct count from each respective item. Fail if item does not exist
@@ -312,12 +322,68 @@ const StorefrontResolvers = {
           if (!item) {
             throw new GraphQLError("Item does not exist")
           }
-          ledgerItems.push({ name: item.name, quantity: args.items[i].count * -1 });
+          ledgerItems.push({ name: item.name, quantity: args.items[i].count, pricePerUnit: item.pricePerUnit });
           totalCost -= args.items[i].count * item.pricePerUnit
         }
 
-        await createLedger(user.id, (args.recievingUserID ? "Purchase" : "Internal Use"), totalCost, (args.recievingUserID ?? undefined), args.notes ?? "", ledgerItems);
-        return true;
+        const transDescription = `Purchase of items: ${ledgerItems.map(item => `${item.name} x${item.quantity}`).join(", ")}`;
+
+        //Attempt Purchase
+        if (totalCost > 0) {
+          throw new GraphQLError("Total cost must be negative");
+        }
+        const transaction = new Transaction(
+          new Date(),
+          "Makerspace Store",
+          `For user ${user.ritUsername}: '${transDescription}'`,
+          ledgerItems.map(item => { return { name: item.name, cents: Math.floor(item.quantity * item.pricePerUnit * -100) } }), false);
+        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, transaction);
+
+        if (atriumTransactionSuccess) {
+          await getInventoryCartsByUser(user.id).then(async (carts) => {
+            const groupedItems = allItems.reduce((groups: Record<string, InventoryItem[]>, entry: InventoryItem) => {
+              const key: number = entry.makerspaceID;
+              if (!groups[key]) {
+                groups[key] = [];
+              }
+              groups[key].push(entry);
+              return groups;
+            }, {});
+
+            for (const [makerspaceID, items] of Object.entries(groupedItems)) {
+              var cart = carts.find(cart => cart.makerspaceID === Number(makerspaceID));
+              if (!cart) {
+                // Create a new cart if it doesn't exist
+                await createInventoryCart(user.id, Number(makerspaceID)).then(async (newCart) => {
+                  //Then add the items to the cart
+                  await addItemsToCart(newCart.id, items.map(item => ({
+                    itemID: item.id,
+                    quantity: item.count
+                  }))).then(async () => {
+                    await InventoryRepo.addItemsAmounts(items.map(item => ({
+                      itemId: item.id,
+                      amount: item.count * -1
+                    })));
+                  });
+                });
+              } else {
+                // Cart exists, add new items or update the existing items
+                await addOrUpdateItemsInCart(cart.id, items.map(item => ({
+                  itemID: item.id,
+                  quantity: item.count
+                }))).then(async () => {
+                  await InventoryRepo.addItemsAmounts(items.map(item => ({
+                    itemId: item.id,
+                    amount: item.count * -1
+                  })));
+                });
+              }
+            }
+          });
+
+          await createLedger(user.id, "Purchase", totalCost, user.id, args.notes ?? "", ledgerItems);
+        }
+        return atriumTransactionSuccess;
       });
     },
 
@@ -443,6 +509,20 @@ const StorefrontResolvers = {
       args: { itemID: number, tagID: number },
       { isManager }: ApolloContext) => {
       return isManager(() => InventoryRepo.removeTagFromItem(args.itemID, args.tagID));
+    },
+
+    /**
+     * Update the makerspaceID of an InventoryItem
+     * @argument id ID of InventoryItem to modify
+     * @argument makerspaceID new makerspaceID
+     * @returns true
+     * @throws GraphQLError if not admin or is on hold
+     */
+    updateMakerspace: async (
+      _parent: any,
+      args: { id: number, makerspaceID: number },
+      { isAdmin }: ApolloContext) => {
+      return isAdmin(() => InventoryRepo.updateMakerspace(args.id, args.makerspaceID));
     },
   }
 };
