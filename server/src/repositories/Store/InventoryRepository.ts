@@ -3,7 +3,7 @@
  */
 
 import { knex } from "../../db/index.js";
-import { InventoryItemRow, InventoryTagRow } from "../../db/tables.js";
+import { InventoryTagRow } from "../../db/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import {
   inventoryItemsToDomain,
@@ -18,9 +18,23 @@ import {
  * Fetch all Inventory Items
  * @returns all InventoryItems
  */
-export async function getItems(): Promise<InventoryItem[]> {
-  const knexResult = await knex("InventoryItem").select().where('archived', false);
-  return inventoryItemsToDomain(knexResult);
+export async function getItems(makerspaceID?: number): Promise<InventoryItem[]> {
+  const knexResult = knex("InventoryItem").select().where('archived', false);
+  if (makerspaceID) {
+    knexResult.where('makerspaceID', makerspaceID);
+  }
+
+  return inventoryItemsToDomain(await knexResult);
+}
+
+/**
+ * Fetch Inventory Items by Multiple IDs
+ * @param itemIds IDs of Inventory Items to find
+ * @returns matching Inventory Items
+ */
+export async function getItemsByID(itemIds: number[]): Promise<InventoryItem[]> {
+  const knexResult = knex("InventoryItem").select().whereIn("id", itemIds);
+  return inventoryItemsToDomain(await knexResult);
 }
 
 /**
@@ -28,8 +42,12 @@ export async function getItems(): Promise<InventoryItem[]> {
  * @param staffOnly whether to fetch staffOnly items or not staffOnly items
  * @returns matching Inventory Items
  */
-export async function getItemsWhereStaff(staffOnly: boolean): Promise<InventoryItem[]> {
-  return inventoryItemsToDomain(await knex("InventoryItem").select().where({staffOnly}));
+export async function getItemsWhereStaff(staffOnly: boolean, makerspaceID?: number): Promise<InventoryItem[]> {
+  const knexResult = knex("InventoryItem").select().where({ staffOnly });
+  if (makerspaceID) {
+    knexResult.where('makerspaceID', makerspaceID);
+  }
+  return inventoryItemsToDomain(await knexResult);
 }
 
 /**
@@ -37,8 +55,12 @@ export async function getItemsWhereStaff(staffOnly: boolean): Promise<InventoryI
  * @param storefrontVisible 
  * @returns matching Inventory Items
  */
-export async function getItemsWhereStorefront(storefrontVisible: boolean): Promise<InventoryItem[]> {
-  return inventoryItemsToDomain(await knex("InventoryItem").select().where({storefrontVisible}));
+export async function getItemsWhereStorefront(storefrontVisible: boolean, makerspaceID?: number): Promise<InventoryItem[]> {
+  const knexResult = knex("InventoryItem").select().where({ storefrontVisible });
+  if (makerspaceID) {
+    knexResult.where('makerspaceID', makerspaceID);
+  }
+  return inventoryItemsToDomain(await knexResult);
 }
 
 /**
@@ -51,7 +73,7 @@ export async function getItemByIdWhereStorefront(
   id: number,
   storefrontVisible: boolean
 ): Promise<InventoryItem | null> {
-  return singleInventoryItemToDomain(await knex("InventoryItem").select().where({id, storefrontVisible}));
+  return singleInventoryItemToDomain(await knex("InventoryItem").select().where({ id, storefrontVisible }));
 }
 
 /**
@@ -88,7 +110,9 @@ export async function updateItemById(
     count: item.count,
     pricePerUnit: item.pricePerUnit,
     threshold: item.threshold,
-    notes: item.notes
+    notes: item.notes,
+    description: item.description,
+    makerspaceID: item.makerspaceID,
   });
 
   return await getItemById(itemId);
@@ -112,7 +136,9 @@ export async function addItem(
         count: item.count,
         pricePerUnit: item.pricePerUnit,
         threshold: item.threshold,
-        notes: item.notes
+        notes: item.notes,
+        description: item.description,
+        makerspaceID: item.makerspaceID,
       },
       "id"
     )
@@ -142,6 +168,25 @@ export async function addItemAmount(
   )[0];
 
   return await getItemById(updateItem.id);
+}
+
+export async function addItemsAmounts(
+  items: { itemId: number; amount: number }[]
+): Promise<InventoryItem[]> {
+  return knex.transaction(async (trx) => {
+    const updatedItems: InventoryItem[] = [];
+    for (const item of items) {
+      await trx("InventoryItem")
+        .where({ id: item.itemId })
+        .update(
+          {
+            count: knex.raw(`?? + ${item.amount}`, ["count"]),
+          },
+          "id"
+        );
+    }
+    return updatedItems;
+  });
 }
 
 /**
@@ -189,10 +234,10 @@ export async function archiveItem(
  * @returns true
  */
 export async function deleteInventoryItem(
-    itemId: number
+  itemId: number
 ): Promise<boolean> {
-    await knex("InventoryItem").where({ id: itemId}).delete()
-    return true
+  await knex("InventoryItem").where({ id: itemId }).delete()
+  return true
 }
 
 /**
@@ -202,7 +247,7 @@ export async function deleteInventoryItem(
  * @returns true
  */
 export async function setStorefrontVisible(id: number, storefrontVisible: boolean): Promise<boolean> {
-  await knex("InventoryItem").update({storefrontVisible}).where({id});
+  await knex("InventoryItem").update({ storefrontVisible }).where({ id });
   return true;
 }
 
@@ -213,7 +258,7 @@ export async function setStorefrontVisible(id: number, storefrontVisible: boolea
  * @returns true
  */
 export async function setStaffOnly(id: number, staffOnly: boolean): Promise<boolean> {
-  await knex("InventoryItem").update({staffOnly}).where({id});
+  await knex("InventoryItem").update({ staffOnly }).where({ id });
   return true;
 }
 
@@ -231,7 +276,7 @@ export async function getTags(): Promise<InventoryTagRow[]> {
  * @returns Inventory Tag or undefined if not exist
  */
 export async function getTagByID(id: number): Promise<InventoryTagRow | undefined> {
-  return await knex("InventoryTags").select().where({id}).first();
+  return await knex("InventoryTags").select().where({ id }).first();
 }
 
 /**
@@ -241,10 +286,10 @@ export async function getTagByID(id: number): Promise<InventoryTagRow | undefine
  * @returns true or false if max amount of tags already
  */
 export async function addTagToItem(itemID: number, tagID: number): Promise<boolean> {
-  const item = await knex("InventoryItem").select().where({id: itemID}).first();
-  if (!item?.tagID1) await knex("InventoryItem").update({tagID1: tagID}).where({id: itemID});
-  else if (!item?.tagID2) await knex("InventoryItem").update({tagID2: tagID}).where({id: itemID});
-  else if (!item?.tagID3) await knex("InventoryItem").update({tagID3: tagID}).where({id: itemID});
+  const item = await knex("InventoryItem").select().where({ id: itemID }).first();
+  if (!item?.tagID1) await knex("InventoryItem").update({ tagID1: tagID }).where({ id: itemID });
+  else if (!item?.tagID2) await knex("InventoryItem").update({ tagID2: tagID }).where({ id: itemID });
+  else if (!item?.tagID3) await knex("InventoryItem").update({ tagID3: tagID }).where({ id: itemID });
   else return false;
   return true;
 }
@@ -256,10 +301,10 @@ export async function addTagToItem(itemID: number, tagID: number): Promise<boole
  * @returns true
  */
 export async function removeTagFromItem(itemID: number, tagID: number): Promise<boolean> {
-  const item = await knex("InventoryItem").select().where({id: itemID}).first();
-  if (item?.tagID1 == tagID) await knex("InventoryItem").update({tagID1: null}).where({id: itemID});
-  else if (item?.tagID2 == tagID) await knex("InventoryItem").update({tagID2: null}).where({id: itemID});
-  else if (item?.tagID3 == tagID) await knex("InventoryItem").update({tagID3: null}).where({id: itemID});
+  const item = await knex("InventoryItem").select().where({ id: itemID }).first();
+  if (item?.tagID1 == tagID) await knex("InventoryItem").update({ tagID1: null }).where({ id: itemID });
+  else if (item?.tagID2 == tagID) await knex("InventoryItem").update({ tagID2: null }).where({ id: itemID });
+  else if (item?.tagID3 == tagID) await knex("InventoryItem").update({ tagID3: null }).where({ id: itemID });
   return true;
 }
 
@@ -270,7 +315,7 @@ export async function removeTagFromItem(itemID: number, tagID: number): Promise<
  * @returns true
  */
 export async function createTag(label: string, color: string): Promise<boolean> {
-  await knex("InventoryTags").insert({label, color});
+  await knex("InventoryTags").insert({ label, color });
   return true;
 }
 
@@ -281,7 +326,7 @@ export async function createTag(label: string, color: string): Promise<boolean> 
  * @returns true
  */
 export async function updateTag(id: number, label: string, color: string): Promise<boolean> {
-  await knex("InventoryTags").update({label, color}).where({id});
+  await knex("InventoryTags").update({ label, color }).where({ id });
   return true
 }
 
@@ -291,6 +336,11 @@ export async function updateTag(id: number, label: string, color: string): Promi
  * @returns true
  */
 export async function deleteTag(id: number): Promise<boolean> {
-  await knex("InventoryTags").delete().where({id});
+  await knex("InventoryTags").delete().where({ id });
+  return true;
+}
+
+export async function updateMakerspace(id: number, makerspaceID: number): Promise<boolean> {
+  await knex("InventoryItem").update({ makerspaceID }).where({ id });
   return true;
 }

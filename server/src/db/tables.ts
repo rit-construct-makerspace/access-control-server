@@ -98,14 +98,14 @@ export interface InventoryItemRow {
   makerspaceID?: number;
 }
 
-export interface InventoryCarts {
+export interface InventoryCartsRow {
   id: number;
   userID: number;
   makerspaceID: number;
   lastModified: Date;
 }
 
-export interface InventoryItemsForCarts {
+export interface InventoryItemsForCartsRow {
   cartID: number;
   itemID: number;
   count: number;

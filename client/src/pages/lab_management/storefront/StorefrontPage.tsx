@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Divider, Stack, Switch } from "@mui/material";
+import { Box, Button, Divider, Snackbar, Stack, Switch, Typography } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import InventoryItem from "../../../types/InventoryItem";
 import AddToCartModal from "./AddToCartModal";
@@ -10,16 +10,21 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_INVENTORY_ITEMS } from "../../../queries/inventoryQueries";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { isAdmin, isManager, isStaff } from "../../../common/PrivilegeUtils";
+import { isAdmin, isManager, isOnlyTrainer, isStaff } from "../../../common/PrivilegeUtils";
 import Page from "../../Page";
 import { ListingCard } from "./ListingCard";
 import { ListingModal } from "./ListingModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQueries";
+import CheckoutSuccessModal from "./CheckoutSuccessModal";
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import { useNavigate } from "react-router-dom";
+import Privilege from "../../../types/Privilege";
 
 
 const CHECKOUT_ITEMS = gql`
-  mutation CheckoutItems($items: [CartItem], $notes: String, $recievingUserID: ID) {
-    checkoutItems(items: $items, notes: $notes, recievingUserID: $recievingUserID)
+  mutation CheckoutItems($items: [CartItem], $notes: String) {
+    checkoutItems(items: $items, notes: $notes)
   }
 `;
 
@@ -37,8 +42,9 @@ function updateLocalStorage(cart: ShoppingCartEntry[] | null) {
 export default function StorefrontPage() {
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
-  const { loading, error, data } = useQuery(GET_INVENTORY_ITEMS, {variables: {storefrontVisible: isStaff(currentUser) ? null : true}});
+  const { loading, error, data } = useQuery(GET_ZONES_WITH_ITEMS, { variables: { storefrontVisible: isStaff(currentUser) ? null : true } });
 
   const [checkoutItems] = useMutation(CHECKOUT_ITEMS, {
     refetchQueries: [{ query: GET_INVENTORY_ITEMS }],
@@ -50,9 +56,14 @@ export default function StorefrontPage() {
   const [activeItem, setActiveItem] = useState<InventoryItem | undefined>();
   const [addToCartCount, setAddToCartCount] = useState(0);
   const [shoppingCart, setShoppingCart] = useImmer<ShoppingCartEntry[]>([]);
+  const [purchasedItems, setPurchasedItems] = useImmer<ShoppingCartEntry[]>([]);
+
 
   const [showInternalItems, setShowInternalItems] = useState(false);
   const [showStaffItems, setShowStaffItems] = useState(false);
+
+  const [checkoutFailureSnackbarOpen, setCheckoutFailureSnackbarOpen] = useState(false);
+  const [checkoutSuccessModalOpen, setCheckoutSuccessModalOpen] = useState(false);
 
   function handleShowInternalChange(_e: any) {
     setShowInternalItems(!showInternalItems)
@@ -84,7 +95,7 @@ export default function StorefrontPage() {
           id: uuidv4(),
           item,
           count,
-          makerspace: 0
+          makerspace: item.makerspaceID ?? item.makerspace?.id
         });
       } else {
         existing.count += count;
@@ -112,45 +123,54 @@ export default function StorefrontPage() {
       updateLocalStorage(draft);
     });
 
-  const handleCheckout = async (checkoutNotes: string, recievingUserID: number | undefined) => {
+  const handleCheckout = async (checkoutNotes: string, _recievingUserID?: number) => {
     const items: { id: number, count: number }[] = shoppingCart.map((cartItem) => ({ id: cartItem.item.id, count: cartItem.count }));
 
-    await checkoutItems({
+    const success = await checkoutItems({
       variables: {
         items,
         notes: checkoutNotes,
-        recievingUserID
       },
     });
 
-    setShoppingCart(() => []);
-    updateLocalStorage([]);
+    if (success) {
+      setPurchasedItems(shoppingCart);
+      setCheckoutSuccessModalOpen(true);
+      setShoppingCart(() => []);
+      updateLocalStorage([]);
+    }
   };
 
   return (
     <RequestWrapper loading={loading} error={error}>
-      <Page title={"Store"} noPadding={isMobile}>
-        <ShoppingCart
+      <Page title={"Store"} noPadding={isMobile} topRightAddons={
+        (isOnlyTrainer(currentUser) || isStaff(currentUser)) ? (
+          <Button variant="contained" color="secondary" startIcon={<ShoppingCartCheckoutIcon />} onClick={() => { navigate(`/makerspace/36/storefront/carts`) }}>
+            View Carts
+          </Button>
+        ) : null
+      }>
+        {(currentUser.privilege != Privilege.VISITOR && import.meta.env.VITE_DISABLE_STOREFRONT_CART === "false") && <ShoppingCart
           entries={shoppingCart}
           removeEntry={removeFromShoppingCart}
           setEntryCount={setEntryCount}
           emptyCart={handleCheckout}
           internal={showInternalItems || showStaffItems}
-        />
+        />}
 
-        { isAdmin(currentUser) &&
-        <Stack direction={"row"} sx={{ mb: 2, mt: 8, justifyContent: "space-between" }}>
-          <Stack direction={"row"} spacing={2}>
-            <Stack direction={"row"} alignItems={"center"}>
-              <Switch color="warning" onChange={handleShowInternalChange}></Switch><span> Internal Use Items</span>
-            </Stack>
-            <Stack direction={"row"} alignItems={"center"}>
-              <Switch color="warning" onChange={handleShowStaffChange} disabled={!isManager(currentUser)}></Switch><span> Staff Only Items</span>
+        {isAdmin(currentUser) &&
+          <Stack direction={"row"} sx={{ mb: 2, mt: 8, justifyContent: "space-between" }}>
+            <Stack direction={"row"} spacing={2}>
+              <Stack direction={"row"} alignItems={"center"}>
+                <Switch color="warning" onChange={handleShowInternalChange}></Switch><span> Internal Use Items</span>
+              </Stack>
+              <Stack direction={"row"} alignItems={"center"}>
+                <Switch color="warning" onChange={handleShowStaffChange} disabled={!isManager(currentUser)}></Switch><span> Staff Only Items</span>
+              </Stack>
             </Stack>
           </Stack>
-        </Stack>
         }
-        
+
 
         <SearchBar
           placeholder="Search inventory"
@@ -161,12 +181,24 @@ export default function StorefrontPage() {
         />
 
         <Stack direction={"row"} flexWrap={"wrap"} divider={<Divider flexItem />} sx={{ width: "100%" }}>
-          {data?.InventoryItems?.filter((item: InventoryItem) =>
-            item.name.toLowerCase().includes(searchText.toLowerCase())
-            && (!showInternalItems ? item.storefrontVisible : true)
-            && ((!isManager(currentUser) && showStaffItems) ? !item.staffOnly : true)
-          ).map((item: InventoryItem) => (
-            <ListingCard item={item} setActiveItem={(item) => {setActiveItem(item); setShowModal(true)}} openDetailsModal={(item) => {setActiveItem(item); setShowDetailsModal(true)}} />
+          {data?.zones?.map((zone: ZoneWithItems) => (
+            <Box key={zone.id} sx={{ width: "100%", mb: 2 }}>
+              <Typography variant="h4" sx={{ mb: 1 }}>{zone.name}</Typography>
+              <Stack direction={"row"} flexWrap={"wrap"} justifyContent={"flex-start"}>
+                {zone.items.filter((item: InventoryItem) => {
+                  const matchesSearch = item.name.toLowerCase().includes(searchText.toLowerCase());
+                  const isVisible = item.storefrontVisible || (showInternalItems && item.staffOnly) || (showStaffItems && item.staffOnly);
+                  return matchesSearch && isVisible;
+                }).map((item: InventoryItem) => (
+                  <ListingCard
+                    key={item.id}
+                    item={item}
+                    setActiveItem={(item) => { setActiveItem(item); setShowModal(true) }}
+                    openDetailsModal={(item) => { setActiveItem(item); setShowDetailsModal(true) }}
+                  />
+                ))}
+              </Stack>
+            </Box>
           ))}
         </Stack>
 
@@ -181,12 +213,31 @@ export default function StorefrontPage() {
           />
         )}
         {activeItem && showDetailsModal && (
-          <ListingModal 
-            item={activeItem} 
+          <ListingModal
+            item={activeItem}
             open
             addToCart={(activeItem: InventoryItem, addToCartCount: number) => addToShoppingCart(activeItem, addToCartCount)}
             onClose={() => setShowDetailsModal(false)} />
         )}
+
+        <Snackbar
+          open={checkoutFailureSnackbarOpen}
+          autoHideDuration={120000}
+          onClose={() => setCheckoutFailureSnackbarOpen(false)}
+          message="Checkout failed. Please make sure you have sufficient funds and then try again."
+        />
+        <CheckoutSuccessModal
+          open={checkoutSuccessModalOpen}
+          onClose={() => setCheckoutSuccessModalOpen(false)}
+          groupedEntries={purchasedItems.reduce((groups: Record<string, ShoppingCartEntry[]>, entry: ShoppingCartEntry) => {
+            const key: number = entry.item.makerspaceID;
+            if (!groups[key]) {
+              groups[key] = [];
+            }
+            groups[key].push(entry);
+            return groups;
+          }, {})}
+        />
       </Page>
     </RequestWrapper>
   );
