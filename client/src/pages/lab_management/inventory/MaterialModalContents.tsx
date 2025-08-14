@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import {
   Button,
   FormControl,
@@ -20,6 +20,7 @@ import AdminPage from "../../AdminPage";
 import { useQuery } from "@apollo/client";
 import { GET_ZONES } from "../../../queries/zoneQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface InputErrors {
   name?: boolean;
@@ -120,18 +121,7 @@ export default function MaterialModalContents({
     onSave();
   };
 
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
-
+  const isMobile = useIsMobile();
 
   const title = `${isNewItem ? "New" : "Edit"} Material`;
 

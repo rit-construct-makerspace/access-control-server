@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
 import { Button, Divider, Stack, Typography } from "@mui/material";
 import { ShoppingCartEntry } from "./StorefrontPage";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface CheckoutModalProps {
   open: boolean;
@@ -18,17 +18,8 @@ export default function CheckoutModal({
   totalCost,
   onFinalize,
 }: CheckoutModalProps) {
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
+
+  const isMobile = useIsMobile();
 
 
 
