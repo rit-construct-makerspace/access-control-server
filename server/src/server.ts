@@ -27,7 +27,6 @@ import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js"
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
-import fileUpload, { UploadedFile } from "express-fileupload";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 
@@ -429,30 +428,22 @@ async function startServer() {
   /**
    * File Uploads
    */
-  app.use(fileUpload({
-    limits: {
-      fileSize: 8 * 1024 * 1024 // Max file size of 8MB
-    },
-  }));
 
-  app.post("/api/uploads/web-content", async function (req, res) {
-    console.log(req.files);
+  app.post("/api/uploads/web-content", express.raw({ type: "application/octet-stream", limit: 8 * 1024 * 1024 }), async function (req, res) {
     if (!req.user || !isStaff(determineUser(req.user))) {
       return res.status(401).send("Only staff or higher may upload files");
     }
 
-    if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).send("No files were uploaded");
-    } else if (Array.isArray(req.files?.upload) && req.files?.upload.length > 1) {
-      return res.status(400).send("Too many files were uploaded");
+    const file: Buffer = req.body;
+
+    if (!file || file.length < 0) {
+      return res.status(400).send("File not found");
     }
 
-    const file: UploadedFile = Array.isArray(req.files?.upload) ? req.files?.upload[0] : req.files?.upload;
-
-    const new_name = (new Date()).getUTCMilliseconds().toString();
+    const new_name = (new Date()).valueOf().toString();
 
     try {
-      await S3.putObject("user-uploads", new_name, file.data);
+      await S3.putObject("user-uploads", new_name, file);
     } catch (e) {
       return res.status(400).send(e);
     }

@@ -35,7 +35,6 @@
     "dotenv": "^16.0.3",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
-    "express-fileupload": "^1.5.2",
     "express-session": "^1.17.2",
     "express-ws": "^5.0.2",
     "express-xml-bodyparser": "^0.4.1",
