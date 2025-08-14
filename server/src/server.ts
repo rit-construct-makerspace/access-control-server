@@ -518,10 +518,11 @@ async function startServer() {
 
   console.log(process.env.ID_FORMAT);
 
-  app.listen({ port: PORT }, (): void =>
+  app.listen({ port: PORT }, async () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     )
+  }
   );
 }
 
