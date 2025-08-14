@@ -17,6 +17,7 @@ import Footer from "./Footer";
 import PersonIcon from '@mui/icons-material/Person';
 import { useIsMobile } from "../common/IsMobileProvider";
 import ArticleIcon from '@mui/icons-material/Article';
+import TuneIcon from '@mui/icons-material/Tune';
 
 const StyledLogo = styled.img`
   padding: 12px;
@@ -55,7 +56,7 @@ export default function TopNav() {
     return (
       <Stack>
         { // Archived account alert
-          currentUser.isArchived
+          currentUser.archived
             ? <Alert variant="filled" severity="error" sx={{ borderRadius: 0 }}>
               Your account has been archived. You are still able to take trainings and review reference materials, but you won't be able to use any machines. Please speak to a member of staff if you believe this was a mistake.
             </Alert>
@@ -124,7 +125,7 @@ export default function TopNav() {
               />
               {
                 currentUser.visitor
-                  ? <Button sx={{ height: "95%" }} variant="contained" color="secondary" endIcon={<PersonIcon />} onClick={() => window.location.replace(process.env.REACT_APP_LOGIN_URL ?? "/")}>
+                  ? <Button sx={{ height: "95%" }} variant="contained" color="secondary" endIcon={<PersonIcon />} onClick={() => window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")}>
                     LOGIN
                   </Button>
                   : <ButtonBase onClick={handleUserMenuOpen}>
@@ -153,6 +154,15 @@ export default function TopNav() {
                     <Typography variant="body1">User Settings</Typography>
                   </Stack>
                 </MenuItem>
+                {
+                  currentUser.admin &&
+                  <MenuItem onClick={() => { navigate("/admin/settings"); handleUserMenuClose(); setMobileDrawer(false); }}>
+                    <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
+                      <TuneIcon sx={{ color: "gray" }} />
+                      <Typography variant="body1">Site Settings</Typography>
+                    </Stack>
+                  </MenuItem>
+                }
               </Menu>
             </Stack>
           </Drawer>
@@ -189,7 +199,7 @@ export default function TopNav() {
               />
               {
                 currentUser.visitor
-                  ? <Button sx={{ height: "95%", marginRight: "10px" }} variant="contained" color="secondary" endIcon={<PersonIcon />} onClick={() => window.location.replace(process.env.REACT_APP_LOGIN_URL ?? "/")}>
+                  ? <Button sx={{ height: "95%", marginRight: "10px" }} variant="contained" color="secondary" endIcon={<PersonIcon />} onClick={() => window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")}>
                     LOGIN
                   </Button>
                   : <ButtonBase onClick={handleUserMenuOpen} focusRipple>
@@ -218,6 +228,15 @@ export default function TopNav() {
                     <Typography variant="body1">User Settings</Typography>
                   </Stack>
                 </MenuItem>
+                {
+                  currentUser.admin &&
+                  <MenuItem onClick={() => { navigate("/admin/settings"); handleUserMenuClose(); setMobileDrawer(false); }}>
+                    <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
+                      <TuneIcon sx={{ color: "gray" }} />
+                      <Typography variant="body1">Site Settings</Typography>
+                    </Stack>
+                  </MenuItem>
+                }
               </Menu>
             </Stack>
           </AppBar>

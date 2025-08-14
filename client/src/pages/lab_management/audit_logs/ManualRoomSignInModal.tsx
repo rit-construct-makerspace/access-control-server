@@ -37,7 +37,7 @@ export function ManualRoomSignInModal({modalOpen, setModalOpen}: {modalOpen: boo
   }
 
   function handleSubmit () {
-    swipeIn({variables: {roomID: room, id: getUserSafe?.id}}).then((result) => {
+    swipeIn({variables: {roomID: room, id: getUserSafe?.id}}).then((_result) => {
       setModalOpen(false);
       setRoom(undefined);
       setUserSearch("");

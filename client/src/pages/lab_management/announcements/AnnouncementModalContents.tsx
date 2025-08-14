@@ -1,10 +1,10 @@
 import { ChangeEvent, useState } from "react";
 import {
+  Button,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
 import SaveIcon from "@mui/icons-material/Save";
 import { Announcement } from "../../../queries/announcementsQueries";
 import { useNavigate } from "react-router-dom";
@@ -102,7 +102,7 @@ export default function AnnouncementModalContents({
           </Stack>
         )}
 
-        <LoadingButton
+        <Button
           loading={loading}
           size="large"
           variant="contained"
@@ -112,7 +112,7 @@ export default function AnnouncementModalContents({
           onClick={handleSaveClick}
         >
           Save
-        </LoadingButton>
+        </Button>
       </Stack>
     </Stack>
   );

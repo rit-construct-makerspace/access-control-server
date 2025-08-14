@@ -13,8 +13,8 @@ import * as ModuleRepo from '../Training/ModuleRepository.js';
  * Fetch all Zones
  * @returns all Zones
  */
-export async function getZones(): Promise<ZoneRow[]> {
-  return await knex('Zones').select();
+export async function getZones(archived = false): Promise<ZoneRow[]> {
+  return await knex('Zones').select().where({ archived: archived });
 }
 
 /**
@@ -34,13 +34,13 @@ export async function getZoneByID(id: number): Promise<ZoneRow | undefined> {
 export async function createZone(name: string): Promise<ZoneRow> {
   const zoneRow = (await knex('Zones').insert({ name }).returning('*'))[0];
 
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 0, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 1, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 2, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 3, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 4, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 5, ${zoneRow.id} FROM \"Zones\"`)
-  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") SELECT 6, ${zoneRow.id} FROM \"Zones\"`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (0, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (1, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (2, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (3, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (4, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (6, ${zoneRow.id})`)
+  await knex.raw(`INSERT INTO \"DefaultHours\" (\"dayOfWeek\", \"makerspaceID\") VALUES (5, ${zoneRow.id})`)
 
   return zoneRow;
 }
@@ -117,4 +117,13 @@ export async function hasZoneTrainings(
   }
 
   return true;
+}
+
+export async function archiveZone(id: number, archive = true): Promise<ZoneRow | undefined> {
+  const result = await knex("Zones").where("id", id).update("archived", archive).returning("*");
+  if (result.length > 0) {
+    return result[0];
+  } else {
+    return undefined;
+  }
 }

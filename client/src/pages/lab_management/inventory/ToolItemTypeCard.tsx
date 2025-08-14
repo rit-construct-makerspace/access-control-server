@@ -9,7 +9,7 @@ import { useMutation } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { DELETE_TYPE, GET_TOOL_ITEM_TYPES } from "../../../queries/toolItemQueries";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ToolItemInstanceCard } from "./ToolItemInstanceCard";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Markdown from "react-markdown";
@@ -18,6 +18,7 @@ import { isManager } from "../../../common/PrivilegeUtils";
 
 
 export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnInstanceClick }: { type: ToolItemType, handleLoanInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void, handleReturnInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void }) {
+  const {makerspaceID} = useParams<{makerspaceID: string}>()
   const navigate = useNavigate();
 
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -34,7 +35,7 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
   }
 
   function handleEditModalOpen() {
-    navigate(`/admin/tools/type/${type.id}`);
+    navigate(`/makerspace/${makerspaceID}/tools/type/${type.id}`);
   }
 
   const CONTROL_MENU = (
@@ -80,7 +81,7 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
           component="img"
           width={150}
           height={150}
-          image={type.imageUrl ? `${process.env.REACT_APP_CDN_URL}${process.env.REACT_APP_CDN_TOOL_DIR}/${type.imageUrl}` : `${process.env.REACT_APP_CDN_URL}/shed_acronym_vert.jpg`}
+          image={type.imageUrl ? `${import.meta.env.VITE_CDN_URL}${import.meta.env.VITE_CDN_TOOL_DIR}/${type.imageUrl}` : `${import.meta.env.BASE_URL}/shed_acronym_vert.jpg`}
           alt={`${type.name} image`}
           sx={{ width: 150 }} />
         <Box width={"98.5%"} pl={"1.5%"}>
@@ -96,7 +97,7 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
           <Typography variant="h6">Instances ({type.instances.length})</Typography>
           <Stack direction={"row"} alignItems={"center"} spacing={1}>
             {showInstances ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            <ActionButton iconSize={15} color={"success"} appearance={"icon-only"} handleClick={async () => navigate(`/admin/tools/instance?type=${type.id}`)} loading={false}><AddIcon /></ActionButton>
+            <ActionButton iconSize={15} color={"success"} appearance={"icon-only"} handleClick={async () => navigate(`/makerspace/${makerspaceID}/tools/instance?type=${type.id}`)} loading={false}><AddIcon /></ActionButton>
           </Stack>
         </Stack>
         <Collapse in={showInstances}>

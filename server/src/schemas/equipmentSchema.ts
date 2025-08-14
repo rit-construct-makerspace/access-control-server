@@ -54,7 +54,7 @@ export const EquipmentTypeDefs = gql`
     archivedEquipments: [Equipment]
     archivedEquipment(id: ID!): Equipment
     anyEquipment(id: ID!): Equipment
-    correspondingEquipment(readerid: ID, id: ID): Equipment
+    correspondingEquipment(readerid: ID!): Equipment
     allEquipment: [Equipment]
   }
 

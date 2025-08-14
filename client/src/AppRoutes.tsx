@@ -42,6 +42,7 @@ import HoursDisplay from "./pages/signage/HoursDisplay";
 import EventsDisplay from "./pages/signage/EventsDisplay";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
+import SiteSettings from "./pages/SiteSettings";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -50,12 +51,12 @@ import OrganizationsPage from "./pages/lab_management/organizations/Organization
 function AuthedRoute() {
   const user = useCurrentUser();
   if (user.visitor) {
-    window.location.replace(process.env.REACT_APP_LOGIN_URL ?? "/")
+    window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")
     return <></>;
   } else {
     return <Outlet />
   }
-};
+}
 
 function TrainerRoute() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
@@ -137,6 +138,11 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/training/new" element={<EditNewModulePage />} />
                   <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/type/:typeid" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/type/" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/instance/:instanceid" element={<ToolItemPage />} />
+                  <Route path="/makerspace/:makerspaceID/tools/instance/" element={<ToolItemPage />} />
+
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
                   <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
                   <Route path="/makerspace/:makerspaceID/organizations" element={<OrganizationsPage />} />
@@ -160,7 +166,7 @@ export default function AppRoutes() {
               <Route path="/admin/announcements/new" element={<NewAnnouncementPage />} />
 
               <Route path="/admin/newreader" element={<NewReaderPage />} />
-
+              <Route path="/admin/settings" element={<SiteSettings />} />
             </Route>
 
             <Route path="/maker/training" element={<TrainingPage />} />
@@ -175,10 +181,6 @@ export default function AppRoutes() {
             <Route path="/admin/equipment/logs/:logid" element={<ResolutionLogPage />} />
 
             <Route path="/admin/inventory" element={<InventoryPage />} />
-            <Route path="/admin/tools/type/:typeid" element={<ToolItemPage />} />
-            <Route path="/admin/tools/type" element={<ToolItemPage />} />
-            <Route path="/admin/tools/instance/:instanceid" element={<ToolItemPage />} />
-            <Route path="/admin/tools/instance" element={<ToolItemPage />} />
 
             <Route path="/admin/statistics" element={<StatisticsPage />} />
 

@@ -114,6 +114,31 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
   }
 }
 
+
+const print_comment_matcher: RegExp = /(New job|Job Failed \(Refund\)|Job Aborted \(Refund\)) \(jobID #(\d*?)\)/;
+/**
+ * Parse the 3dprinteros provided comment string to figure out what the adjustment was for
+ * @param comment the comment given to us by 3dprinter os
+ * @returns a description or undefined if we don't know how to parse it (havent seen it before)
+ */
+function printCommentParser(comment: string): { operation: "new" | "failed" | "cancelled", jobID: number } | undefined {
+  const res = print_comment_matcher.exec(comment)
+  if (res == null || res.length != 3) {
+    // failed to match
+    return undefined;
+  }
+  const jobID = Number(res[2])
+  switch (res[1]) {
+    case "New job":
+      return { operation: "new", jobID };
+    case "Job Failed (Refund)":
+      return { operation: "failed", jobID };
+    case "Job Aborted (Refund)":
+      return { operation: "cancelled", jobID };
+  }
+  return undefined;
+}
+
 async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCValue[]) {
   // params
   // Username:        string
@@ -160,10 +185,24 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
         { name: "3D Print", cents: changeAmount }
       ], false);
     const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction);
+    const amountAfter = await Currency.getAccountBalance(username);
+    if (amountAfter && typeof amountAfter == "number") {
+      transaction.setCreditsAfter(amountAfter);
+    }
 
-    send_transaction_email(username+"@rit.edu", transaction);
+    let subject = "3D Print";
+    
+    const operation = printCommentParser(comment);
+    if (operation && operation.operation == "new") {
+      subject = `3D Print Job #${operation.jobID}`
+    } else if (operation && (operation.operation == "cancelled" || operation.operation == "failed")) {
+      subject = `3D Print Refund Job ${operation.jobID}`;
+    }
+
+    send_transaction_email(username + "@rit.edu", subject, transaction);
     xmlrpcRespond(res, [success]);
-  } catch {
+  } catch (e) {
+    console.error(e)
     xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)
   }
 }
@@ -249,7 +288,7 @@ function xmlrpcRespondFault(response: any, fault: number, faultString: string) {
  * @param app the express application server to bind to
  */
 export function registerEndpoints(app: express.Application) {
-  if (PAPERCUT_SECURITY_SECRET == null) {
+  if (PAPERCUT_SECURITY_SECRET === undefined) {
     console.error("PAPERCUT: COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK");
     createLog("COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK", "server");
     return;
@@ -263,8 +302,6 @@ export function registerEndpoints(app: express.Application) {
   handlers.set("api.adjustUserAccountBalanceIfAvailable", papercut_adjustUserAccountBalanceIfAvailable);
 
   app.post("/papercut/api/xmlrpc", xmlparser(), (req, res) => {
-    console.log(`XML RPC request over proto ${req.headers['X-Forwarded-Proto'] ?? 'unknown'} from ${req.ip}`);
-    console.log(new xml2js.Builder().buildObject(req.body));
     try {
       const methodU: object | undefined = req.body?.methodcall?.methodname;
       const paramsU: object | undefined = req.body?.methodcall?.params[0].param;
@@ -298,7 +335,7 @@ export function registerEndpoints(app: express.Application) {
         xmlrpcRespondFault(res, 1, `method "${method}" is not supported`);
       }
     } catch (e) {
-      console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", (new xml2js.Builder().buildObject(req.body)), e);
+      console.error("PAPERCUT: Failed to handle Papercut XMLRPC request", e, "\n", (new xml2js.Builder().buildObject(req.body)));
       res.status(500).send();
     }
   });

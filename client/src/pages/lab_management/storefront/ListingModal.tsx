@@ -36,7 +36,7 @@ export function ListingModal(props: ListingModalProps) {
     <PrettyModal width={!isMobile ? 1000 : "100%"} open={props.open} onClose={props.onClose}>
       <Stack direction={isMobile ? "column" : "row"} justifyContent={"space-between"} flexWrap={"wrap"} mb={"1em"}>
         <Box sx={{ maxWidth: 400, width: !isMobile ? "50%" : "100%" }}>
-          <img src={(props.item.image && props.item.image !== "") ? props.item.image : (process.env.PUBLIC_URL + "/shed_acronym_vert.jpg")} style={{ width: "100%" }} alt="RIT SHED Logo"/>
+          <img src={(props.item.image && props.item.image !== "") ? props.item.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")} style={{ width: "100%" }} alt="RIT SHED Logo"/>
         </Box>
 
         <Box width={!isMobile ? "50%" : "100%"}>

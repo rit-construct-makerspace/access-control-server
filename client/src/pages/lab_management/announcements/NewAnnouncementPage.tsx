@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { GET_ANNOUNCEMENTS, CREATE_ANNOUNCEMENT } from "../../../queries/announcementsQueries";
 import { Button, Stack, TextField, Typography } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
 import SaveIcon from "@mui/icons-material/Save";
 import { useNavigate } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
@@ -83,7 +82,7 @@ export default function NewAnnouncementPage() {
                     Cancel
                 </Button>
 
-                <LoadingButton
+                <Button
                     loading={mutation.loading}
                     size="large"
                     variant="contained"
@@ -93,7 +92,7 @@ export default function NewAnnouncementPage() {
                     onClick={handleSaveClick}
                 >
                     Save
-                </LoadingButton>
+                </Button>
             </Stack>
         </Stack>
     );

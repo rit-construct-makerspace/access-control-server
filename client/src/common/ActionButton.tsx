@@ -1,5 +1,4 @@
-import { LoadingButton } from "@mui/lab";
-import { CircularProgress, IconButton, Tooltip } from "@mui/material";
+import { Button, CircularProgress, IconButton, Tooltip } from "@mui/material";
 
 interface ActionButtonProps {
   iconSize: number;
@@ -10,12 +9,11 @@ interface ActionButtonProps {
   handleClick: () => Promise<void>;
   loading: boolean;
   disabled?: boolean
-  variant?: "text" | "outlined" | "filled"
+  variant?: "text" | "outlined" | "filled";
 }
 
 export default function ActionButton(props: React.PropsWithChildren<ActionButtonProps>) {
   let size: "small" | "medium" | "large";
-  props.variant = props.variant ?? "text";
   switch(props.appearance) {
     case "large":
       size = "large"
@@ -71,7 +69,7 @@ export default function ActionButton(props: React.PropsWithChildren<ActionButton
             </IconButton>
             )
           : (
-              <LoadingButton
+              <Button
                 disabled={props.disabled}
                 loading={props.loading}
                 variant="outlined"
@@ -82,7 +80,7 @@ export default function ActionButton(props: React.PropsWithChildren<ActionButton
                 size={size}
               >
                 { props.buttonText }
-              </LoadingButton>
+              </Button>
             )
       }
     </Tooltip>

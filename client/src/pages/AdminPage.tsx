@@ -18,11 +18,7 @@ const IS_MENTOR_OR_HIGHER = gql`
 `;
 
 export default function AdminPage({
-  title,
-  topRightAddons,
-  maxWidth = "100%",
   children,
-  noPadding = false
 }: PageProps) {
   const isMentorOrHigherResult = useQuery(IS_MENTOR_OR_HIGHER);
 

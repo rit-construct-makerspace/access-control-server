@@ -1,12 +1,8 @@
 import { gql } from "@apollo/client";
 
 export interface Reader {
-  helpRequested: boolean;
   id: number,
-  machineID: string,
-  machineType: string,
   name: string,
-  zone: string
   temp: number,
   state: string,
   user: {id: number, firstName: string, lastName: string}
@@ -23,13 +19,10 @@ export interface Reader {
 }
 
 export const GET_READERS = gql`
-  query GetReaders {
-    readers {
+  query GetReaders($makerspaceID: ID) {
+    readers(makerspaceID: $makerspaceID) {
       id
-      machineID
-      machineType
       name
-      zone
       temp
       state
       user {
@@ -41,7 +34,6 @@ export const GET_READERS = gql`
       lastStatusReason
       scheduledStatusFreq
       lastStatusTime
-      helpRequested
       BEVer
       FEVer
       HWVer
@@ -53,14 +45,13 @@ export const GET_READERS = gql`
     }
   }
 `;
-export const GET_READER_BY_ID = gql`
-  query GetReaderByID($id: ID!) {
-    reader(id: $id) {
+
+
+export const GET_READERS_WITH_PAIRINGS = gql`
+  query GetReaders($makerspaceID: ID) {
+    readers(makerspaceID: $makerspaceID) {
       id
-      machineID
-      machineType
       name
-      zone
       temp
       state
       user {
@@ -72,7 +63,44 @@ export const GET_READER_BY_ID = gql`
       lastStatusReason
       scheduledStatusFreq
       lastStatusTime
-      helpRequested
+      BEVer
+      FEVer
+      HWVer
+      sessionStartTime
+      SN
+      readerKeyCycle
+      pairTime
+      targetFirmwareVersion
+      pairedMakerspace {
+        id
+        name
+      }
+      pairedEquipment {
+        equipmentID
+        equipmentName 
+        instanceID
+        instanceName
+      }
+    }
+  }
+`;
+
+export const GET_READER_BY_ID = gql`
+  query GetReaderByID($id: ID!) {
+    reader(id: $id) {
+      id
+      name
+      temp
+      state
+      user {
+        id
+        firstName
+        lastName
+      }
+      recentSessionLength
+      lastStatusReason
+      scheduledStatusFreq
+      lastStatusTime
       BEVer
       FEVer
       HWVer
@@ -118,10 +146,7 @@ export const GET_UNPAIRED_READERS = gql`
   query GetUnpairedReaders {
     unpairedReaders {
       id
-      machineID
-      machineType
       name
-      zone
       temp
       state
       user {
@@ -133,7 +158,6 @@ export const GET_UNPAIRED_READERS = gql`
       lastStatusReason
       scheduledStatusFreq
       lastStatusTime
-      helpRequested
       BEVer
       FEVer
       HWVer
@@ -188,9 +212,6 @@ query GetWelcomeReadersForMakerspace($makerspaceId: ID!) {
   welcomeReadersForMakerspace(makerspaceId: $makerspaceId){
     id
     name
-    machineID
-    machineType
-    zone
     temp
     state
     user {
@@ -202,7 +223,6 @@ query GetWelcomeReadersForMakerspace($makerspaceId: ID!) {
     lastStatusReason
     scheduledStatusFreq
     lastStatusTime
-    helpRequested
     BEVer
     FEVer
     HWVer
@@ -218,23 +238,14 @@ query GetWelcomeReadersForMakerspace($makerspaceId: ID!) {
 export const CREATE_READER = gql`
   mutation CreateReader(
     $id: ID!,
-    $machineID: string,
-    $machineType: string,
     $name: string,
-    $zone: string,
   ) {
     createReader(
       id: $id,
-      machineID: $machineID,
-      machineType: $machineType,
       name: $name,
-      zone: $zone,
     ) {
       id
-      machineID
-      machineType
       name
-      zone
     }
   }
 `;
@@ -277,10 +288,7 @@ export const SET_READER_NAME = gql`
   mutation SetReaderName($id: ID!, $name: string) {
     setName(id: $id, name: $name) {
       id
-      machineID
-      machineType
       name
-      zone
       temp
       state
       currentUID
@@ -304,6 +312,11 @@ export const SET_READER_STATE = gql`
   }
 `;
 
+export const RESTART_ALL_READERS = gql`
+  mutation RestartAllReaders($makerspaceID: ID!) {
+    restartAllReaders(makerspaceID: $makerspaceID)
+  }
+`;
 
 export const GET_AVAILABLE_FIRMWARE_VERSIONS = gql`
   query Query {

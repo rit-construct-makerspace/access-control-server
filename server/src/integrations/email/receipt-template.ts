@@ -29,19 +29,21 @@ const templateSource: string = `
         text-align: left;
     }
 
-    .total-table td {
-        padding-left: 15px;
-        padding-right: 15px;
+
+    .item-table > td,th {
+        padding-left: 50px;
+        padding-right: 50px;
+        margin: 10px;
+        display: block;
     }
 
     .item-table {
+      border-spacing: 30px;
+
         margin: 0px auto;
-        padding: 15px;
     }
     .item-table td{
         text-align: left;
-        padding-left: 15px;
-        padding-right: 15px;
     }
 
     tr.separator {
@@ -99,8 +101,11 @@ const templateSource: string = `
             <td><%= formatCents(transaction.grandTotalIncludingTax()) %></td>
         </tr>
 
-
     </table>
+
+    <br><br>
+    <br><br>
+    You have <%= formatCents(transaction.creditsRemainingAfterTransaction) %> Construct Credits remaining.
 
 </div>
 `
@@ -118,6 +123,10 @@ Subtotal: ${centsToDollarString(r.subtotal())}
 Tax:      ${centsToDollarString(r.taxCents)}
 
 Total:    ${centsToDollarString(r.grandTotalIncludingTax() + r.taxCents)}
+
+
+You have ${centsToDollarString(r.creditsRemainingAfterTransaction)} Construct Credits remaining.
+
 `
 }
 

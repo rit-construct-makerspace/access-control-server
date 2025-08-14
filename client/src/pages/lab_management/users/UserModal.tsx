@@ -90,7 +90,7 @@ export const GET_USER = gql`
       ritUsername
       cardTagID
       notes
-      isArchived
+      archived
       forceArchive
       holds {
         id
@@ -155,7 +155,7 @@ export const GET_USER = gql`
   }
 `;
 
-export const CREATE_HOLD = gql`
+const CREATE_HOLD = gql`
   mutation CreateHold($userID: ID!, $description: String!) {
     createHold(userID: $userID, description: $description) {
       id
@@ -163,7 +163,7 @@ export const CREATE_HOLD = gql`
   }
 `;
 
-export const CREATE_RESTRICTION = gql`
+const CREATE_RESTRICTION = gql`
   mutation CreateRestriction($userID: ID!, $makerspaceID: ID!, $reason: String!) {
     createRestriction(targetID: $userID, makerspaceID: $makerspaceID, reason: $reason) {
       id
@@ -171,17 +171,9 @@ export const CREATE_RESTRICTION = gql`
   }
 `;
 
-export const SET_NOTES = gql`
+const SET_NOTES = gql`
   mutation SetNotes($userID: ID!, $notes: String!) {
     setNotes(userID: $userID, notes: $notes) {
-      id
-    }
-  }
-`;
-
-export const ARCHIVE_USER = gql`
-  mutation ArchiveUser($userID: ID!) {
-    archiveUser(userID: $userID) {
       id
     }
   }
@@ -353,7 +345,9 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                   View logs
                 </Button>
               </Stack>
-
+              {
+                user.archived && <Alert severity="warning" variant="filled">This user is archived!</Alert>
+              }
               <Stack direction={isMobile ? "column" : "row"} width="100%" mt={4} spacing={4} justifyContent="center">
                 <Stack width="50%">
                   <Typography variant="h6" component="div" mb={1}>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  Button,
   Chip,
   Link,
   MenuItem,
@@ -13,7 +14,6 @@ import {
 } from "../../../common/CurrentUserProvider";
 import styled from "styled-components";
 import { gql, useMutation } from "@apollo/client";
-import { LoadingButton } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
 
 const StyledFakeTextField = styled.div`
@@ -195,7 +195,7 @@ export default function SignupPage() {
         ))}
       </TextField>
 
-      <LoadingButton
+      <Button
         loading={result.loading}
         size="large"
         variant="contained"
@@ -203,7 +203,7 @@ export default function SignupPage() {
         sx={{ alignSelf: "flex-end" }}
       >
         Start making!
-      </LoadingButton>
+      </Button>
     </Stack>
   );
 }

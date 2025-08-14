@@ -28,7 +28,7 @@ export function dayToString(day: number) {
 }
 
 export function makeDayArray(rawHours: [{ type: string, dayOfTheWeek: number, time: string }]) {
-    var week = new Array<Day>(7);
+    const week = new Array<Day>(7);
     for (let i = 0; i < 7; i++) {
         week[i] = {
             dayID: i,
@@ -36,7 +36,7 @@ export function makeDayArray(rawHours: [{ type: string, dayOfTheWeek: number, ti
             open: undefined,
             close: undefined
         }
-    };
+    }
     rawHours.forEach((hour) => {
         if (hour.type === "OPEN") {
             week[Number(hour.dayOfTheWeek) - 1].open = hour.time;
@@ -50,9 +50,9 @@ export function makeDayArray(rawHours: [{ type: string, dayOfTheWeek: number, ti
 
 export function reformatTime(time: string) {
     const split = time.split(":");
-    var hours = Number(split[0]);
+    let hours = Number(split[0]);
 
-    var suffix = " AM";
+    let suffix = " AM";
     //Hours in PM
     if (hours > 11) {
         suffix = " PM";
@@ -82,9 +82,9 @@ export function currentStatus(opening: string, closing: string) {
         hour12: false
     })
 
-    var curTimeDate = new Date(Date.parse('01/01/2011 ' + formatter.format(date)));
-    var closingDate = new Date(Date.parse('01/01/2011 ' + closing));
-    var openingDate = new Date(Date.parse('01/01/2011 ' + opening));
+    const curTimeDate = new Date(Date.parse('01/01/2011 ' + formatter.format(date)));
+    const closingDate = new Date(Date.parse('01/01/2011 ' + closing));
+    const openingDate = new Date(Date.parse('01/01/2011 ' + opening));
 
     if (curTimeDate.getTime() < openingDate.getTime()) {
         return "CLOSED";

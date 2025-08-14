@@ -221,7 +221,7 @@ export default function EquipmentEditor({
               />
               <TextField
                 label="Image URL"
-                value={equipment.imageUrl}
+                value={equipment.imageUrl ?? ""}
                 onChange={handleImageChanged}
               />
               <TextField
@@ -277,7 +277,7 @@ export default function EquipmentEditor({
                   </li>
                 )}
                 renderInput={(params: any) => (
-                  <TextField {...params} label="Attach module" key={module.id} />
+                  <TextField {...params} label="Attach module" />
                 )}
                 options={getModuleOptions()}
                 isOptionEqualToValue={(option, value) => option.id === value.id}

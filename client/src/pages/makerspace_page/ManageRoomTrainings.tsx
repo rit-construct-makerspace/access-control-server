@@ -14,7 +14,7 @@ interface ManageRoomTrainingsProps {
     trainings: TrainingModule[];
 }
 
-export const ADD_TRAINING_TO_ROOM = gql`
+const ADD_TRAINING_TO_ROOM = gql`
   mutation AddTrainingToRoom($roomID: ID!, $moduleID: ID!) {
     addTrainingToRoom(roomID: $roomID, moduleID: $moduleID) {
       id
@@ -22,7 +22,7 @@ export const ADD_TRAINING_TO_ROOM = gql`
   }
 `;
 
-export const REMOVE_TRAINING_FROM_ROOM = gql`
+const REMOVE_TRAINING_FROM_ROOM = gql`
   mutation RemoveTrainingFromRoom($roomID: ID!, $moduleID: ID!) {
     removeTrainingFromRoom(roomID: $roomID, moduleID: $moduleID) {
       id
