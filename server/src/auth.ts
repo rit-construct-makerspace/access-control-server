@@ -45,8 +45,6 @@ interface RitSsoUser {
 // Map the test users from samltest.id to match
 // the format that RIT SSO will give us.
 function mapSamlTestToRit(testUser: any): RitSsoUser {
-  console.log("MAP TEST USER: " + testUser.email.split("@")[0]);
-  console.log(testUser);
   return {
     firstName: testUser["urn:oid:2.5.4.42"],
     lastName: testUser["urn:oid:2.5.4.4"],
