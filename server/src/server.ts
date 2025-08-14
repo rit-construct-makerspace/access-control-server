@@ -51,7 +51,7 @@ async function startServer() {
   //Init with Node Express
   var exp = express();
   var wsserver = expressWs(exp);
-  var app = wsserver.app;
+  var app = wsserver.app;  
 
 
   //Configure CORS

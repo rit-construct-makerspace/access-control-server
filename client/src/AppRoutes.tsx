@@ -40,6 +40,8 @@ import NoPrivilegePage from "./pages/NoPrivilegePage";
 import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
 import HoursDisplay from "./pages/signage/HoursDisplay";
 import EventsDisplay from "./pages/signage/EventsDisplay";
+import { CartListPage } from "./pages/lab_management/storefront/internal/CartListPage";
+import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
 import SiteSettings from "./pages/SiteSettings";
@@ -119,6 +121,7 @@ export default function AppRoutes() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/makerspace/:makerspaceID" element={<MakerspacePage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/storefront" element={<StorefrontPage />} />
 
           {/* Routes that need to be protected by auth */}
           <Route element={<AuthedRoute />}>
@@ -131,6 +134,9 @@ export default function AppRoutes() {
 
                 <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />} />
                 <Route path="/makerspace/:makerspaceID/people/:userID" element={<UsersPage />} />
+                <Route path="/makerspace/:makerspaceID/inventory" element={<InventoryPage />} />
+                <Route path="/makerspace/:makerspaceID/storefront/carts" element={<CartListPage />} />
+                <Route path="/makerspace/:makerspaceID/storefront/carts/:cartID" element={<CartPage />} />
 
                 {/* Routes for staff + higher */}
                 <Route element={<StaffRoute />}>

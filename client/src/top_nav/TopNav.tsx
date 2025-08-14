@@ -16,6 +16,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Footer from "./Footer";
 import PersonIcon from '@mui/icons-material/Person';
 import { useIsMobile } from "../common/IsMobileProvider";
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import ArticleIcon from '@mui/icons-material/Article';
 import TuneIcon from '@mui/icons-material/Tune';
 
@@ -123,6 +124,12 @@ export default function TopNav() {
                 icon={<ArticleIcon />}
                 newTab={true}
               />
+              <NavLink
+                to="/storefront"
+                primary="Storefront"
+                icon={<StorefrontIcon />}
+                newTab={false}
+              />
               {
                 currentUser.visitor
                   ? <Button sx={{ height: "95%" }} variant="contained" color="secondary" endIcon={<PersonIcon />} onClick={() => window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")}>
@@ -196,6 +203,12 @@ export default function TopNav() {
                 primary={"Knowledge Base"}
                 icon={<ArticleIcon />}
                 newTab={true}
+              />
+              <NavLink
+                to="/storefront"
+                primary="Storefront"
+                icon={<StorefrontIcon />}
+                newTab={false}
               />
               {
                 currentUser.visitor
