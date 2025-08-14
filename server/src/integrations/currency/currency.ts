@@ -9,17 +9,28 @@ export enum MakeMoneyError {
   SomethingElse = "SomethingElse"
 };
 
-function calculateTax(amountCents: number): number {
-  return Math.round(amountCents * TAX_RATE_PERCENT / 100);
-}
+/**
+ * Split a charge (NON NEGATIVE) into construct credits cents  and atrium cents  
+ * @param amountCents the number of cents to charge
+ * @param constructCreditsAvailable the number of construct credits available to use
+ * @return undefined if illegal value passed in (negative amount cents or constructCreditsAvailable)
+ */
+function splitCost(amountCents: number, constructCreditsAvailable: number): {ccUsed: number, atriumUsed: number} | undefined{
+  if (amountCents < 0 || constructCreditsAvailable < 0 || isNaN(amountCents) || isNaN(constructCreditsAvailable)){
+    return undefined;
+  }
 
-// Split the price of something such that newItemPrice + taxOnItem = amountCents
-function splitTax(amountCents: number): { nonTax: number, tax: number } {
-  const nonTax = Math.round(amountCents / ((1 + TAX_RATE_PERCENT / 100)));
-  const tax = amountCents - nonTax;
-  return { nonTax: nonTax, tax: tax };
-}
+  if (constructCreditsAvailable > amountCents){
+    return {ccUsed: amountCents, atriumUsed: 0};
+  }
 
+  if (constructCreditsAvailable == 0){
+    return {ccUsed: 0, atriumUsed: amountCents};
+  }
+
+  const remaining = amountCents - constructCreditsAvailable;
+  return {ccUsed: constructCreditsAvailable, atriumUsed: remaining};
+}
 
 export class Transaction {
   date: Date
@@ -27,26 +38,21 @@ export class Transaction {
   description?: string;
   items: { name: string, cents: number }[];
   // subtotal is sum(items.cents)
-  taxCents: number;
-  constructor(date: Date, source: string, description: string, items: { name: string, cents: number }[], applyTax: boolean) {
+  constructor(date: Date, source: string, description: string, items: { name: string, cents: number }[], isRefund: boolean) {
     this.date = date;
     this.source = source;
-    this.items = items;
     this.description = description;
-    const subtotalCents = items.reduce((acc, obj) => acc + obj.cents, 0);
-    if (applyTax) {
-      this.taxCents = calculateTax(subtotalCents);
-    } else {
-      this.taxCents = 0
-    }
-
+    const factor = isRefund ? -1 : 1;
+    this.items = items.map(item => ({name: item.name, cents: factor * item.cents}));
   }
+  /**
+   * Calculate the subtotal of the transaction
+   * Will return POSITIVE if this is a charge against an account (a purchase)
+   * Will return NEGATIVE if this is a refund
+   * @returns the amount to charge against an account
+   */
   public subtotal(): number{
     return this.items.reduce((acc, obj) => acc + obj.cents, 0);
-  }
-  public grandTotalIncludingTax(): number {
-    // TODO take into account tigerbucks
-    return this.subtotal() + this.taxCents;
   }
 }
 
@@ -67,7 +73,7 @@ export async function getAccountBalance(username: string): Promise<number | Make
 
 export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction): Promise<boolean> {
   const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
-  const deltaCents = -transaction.grandTotalIncludingTax(); // - if a charge, + if a refund
+  const deltaCents = -transaction.subtotal(); // - if a charge, + if a refund
   if (makeAccountID) { // found make account, use that first
     const success = await CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(makeAccountID, deltaCents, transaction.source, transaction.description);
     return success;
