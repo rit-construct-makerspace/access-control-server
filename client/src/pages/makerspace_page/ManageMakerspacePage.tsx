@@ -16,6 +16,7 @@ import { useIsMobile } from "../../common/IsMobileProvider";
 import ManageWelcomReadersCard from "./ManageWelcomeReadersCard";
 import ManageMakerspaceTrainings from "./ManageMakerspaceTrainings";
 import ManageMakerspaceHours from "./ManageMakerspaceHours";
+import FileUploadButton from "../../common/FileUploadButton";
 
 
 export default function ManageMakerspacePage() {
@@ -88,11 +89,6 @@ export default function ManageMakerspacePage() {
               spacing={isMobile ? 2 : undefined}
             >
               <Typography variant="h4" align="center">{`Manage ${zone.name} [ID: ${zone.id}]`}</Typography>
-              {
-                user.admin
-                  ? <Button color="error" variant="contained" onClick={handleDeleteZone} startIcon={<DeleteIcon />}>Delete Makerspace</Button>
-                  : null
-              }
             </Stack>
             <ManageMakerspaceHours makerspaceID={Number(makerspaceID)} />
             <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"space-between"} width={"100%"}>
@@ -101,6 +97,7 @@ export default function ManageMakerspacePage() {
                   <Typography variant="h5" fontWeight={"bold"}>Makerspace Information</Typography>
                   <TextField label="Name" value={zoneName} onChange={(e) => (setZoneName(e.target.value))} />
                   <TextField label="Image URL" value={imgUrl} onChange={(e) => (setImgUrl(e.target.value))} />
+                  <FileUploadButton />
                   <Button color="primary" variant="contained" startIcon={<SaveIcon />} onClick={handleUpdateZone}>Update</Button>
                 </Stack>
                 <Stack spacing={2} alignItems="center">
