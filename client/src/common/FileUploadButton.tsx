@@ -15,9 +15,9 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 interface FileUploadProps {
-  color: ButtonOwnProps["color"] | undefined;
-  variant: ButtonOwnProps["variant"] | undefined;
-  text: string | undefined
+  color?: ButtonOwnProps["color"];
+  variant?: ButtonOwnProps["variant"];
+  text?: string;
   onUpload: (name: string) => void;
 }
 

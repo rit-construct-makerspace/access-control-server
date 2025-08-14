@@ -50,7 +50,7 @@ export default function ZoneCard(props: ZoneCardProps) {
         <CardMedia
           component="img"
           height={props.isMobile ? "197px" : "281px"}
-          image={props.imageUrl}
+          image={import.meta.env.VITE_CDN_URL + "user-uploads/" + props.imageUrl}
         />
         <CardContent>
           <Stack spacing={0.5} direction="row" alignItems="center">

@@ -17,6 +17,7 @@ import ManageWelcomReadersCard from "./ManageWelcomeReadersCard";
 import ManageMakerspaceTrainings from "./ManageMakerspaceTrainings";
 import ManageMakerspaceHours from "./ManageMakerspaceHours";
 import FileUploadButton from "../../common/FileUploadButton";
+import ManageMakerspaceInformation from "./ManageMakerspaceInformation";
 
 
 export default function ManageMakerspacePage() {
@@ -27,7 +28,7 @@ export default function ManageMakerspacePage() {
 
   const getZone = useQuery(GET_ZONE_BY_ID, { variables: { id: makerspaceID } });
   const [deleteZone] = useMutation(DELETE_ZONE);
-  const [updateZone] = useMutation(UPDATE_ZONE);
+  const [updateZone] = useMutation(UPDATE_ZONE, { refetchQueries: ["GetZoneByID"] });
 
   const [createRoom] = useMutation(CREATE_ROOM);
 
@@ -68,7 +69,6 @@ export default function ManageMakerspacePage() {
           await updateZone({
             variables: { id: makerspaceID, name: zoneName, imageUrl: imgUrl }
           });
-          window.location.reload();
         };
 
         const handleCreateRoom = async () => {
@@ -93,13 +93,15 @@ export default function ManageMakerspacePage() {
             <ManageMakerspaceHours makerspaceID={Number(makerspaceID)} />
             <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"space-between"} width={"100%"}>
               <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />} width={"48%"}>
-                <Stack spacing={2}>
-                  <Typography variant="h5" fontWeight={"bold"}>Makerspace Information</Typography>
-                  <TextField label="Name" value={zoneName} onChange={(e) => (setZoneName(e.target.value))} />
-                  <TextField label="Image URL" value={imgUrl} onChange={(e) => (setImgUrl(e.target.value))} />
-                  <FileUploadButton />
-                  <Button color="primary" variant="contained" startIcon={<SaveIcon />} onClick={handleUpdateZone}>Update</Button>
-                </Stack>
+                <ManageMakerspaceInformation
+                  id={Number(makerspaceID)}
+                  name={zoneName}
+                  setName={setZoneName}
+                  hours={zone.hours}
+                  imageUrl={imgUrl}
+                  setImageUrl={setImgUrl}
+                  updateZone={handleUpdateZone}
+                />
                 <Stack spacing={2} alignItems="center">
                   <Stack
                     direction={"row"}
