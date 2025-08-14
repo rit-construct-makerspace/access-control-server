@@ -83,35 +83,21 @@ const templateSource: string = `
 
     <table class="total-table">
         <tr>
-            <td>Subtotal: </td>
+            <td>Total: </td>
             <td><%= formatCents(transaction.subtotal()) %></td>
-        </tr>
-
-        <% if (transaction.taxCents) {%>
-        <tr>
-            <td> Tax: </td>
-            <td><%= formatCents(transaction.taxCents) %></td>
-        </tr>
-        <% } %>
-
-        <tr class="separator"></tr>
-
-        <tr>
-            <td>Grand Total: </td>
-            <td><%= formatCents(transaction.grandTotalIncludingTax()) %></td>
         </tr>
 
     </table>
 
     <br><br>
     <br><br>
-    You have <%= formatCents(transaction.creditsRemainingAfterTransaction) %> Construct Credits remaining.
+    You have <%= formatCents(constructCreditsRemaining) %> Construct Credits remaining.
 
 </div>
 `
 let template = ejs.compile(templateSource, { async: false })
 
-function generateTextReceipt(r: Transaction): string {
+function generateTextReceipt(r: Transaction, constructCreditsRemaining: number): string {
     return `
 **make.rit.edu receipt**
 -----------------
@@ -119,29 +105,27 @@ Items:
 ${r.items.map(item => `${1}  ${centsToDollarString(item.cents)}\t${item.name}\n`)}
 
 -----------------
-Subtotal: ${centsToDollarString(r.subtotal())}
-Tax:      ${centsToDollarString(r.taxCents)}
-
-Total:    ${centsToDollarString(r.grandTotalIncludingTax() + r.taxCents)}
+Total: ${centsToDollarString(r.subtotal())}
 
 
-You have ${centsToDollarString(r.creditsRemainingAfterTransaction)} Construct Credits remaining.
+You have ${centsToDollarString(constructCreditsRemaining)} Construct Credits remaining.
 
 `
 }
 
 
-function generateHTMLReceipt(r: Transaction) {
+function generateHTMLReceipt(r: Transaction, constructCreditsRemaining: number) {
     let data = {
         transaction: r,
+        constructCreditsRemaining: constructCreditsRemaining,
         formatCents: centsToDollarString,
     };
     return template(data);
 }
 
-export function generateReceiptEmail(r: Transaction): { text: string, html: string } {
-    const text = generateTextReceipt(r);
-    const html = generateHTMLReceipt(r);
+export function generateReceiptEmail(r: Transaction, constructCreditsRemaining: number): { text: string, html: string } {
+    const text = generateTextReceipt(r, constructCreditsRemaining);
+    const html = generateHTMLReceipt(r, constructCreditsRemaining);
     return { text, html }
 }
 

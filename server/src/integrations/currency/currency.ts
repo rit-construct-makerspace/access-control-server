@@ -15,21 +15,22 @@ export enum MakeMoneyError {
  * @param constructCreditsAvailable the number of construct credits available to use
  * @return undefined if illegal value passed in (negative amount cents or constructCreditsAvailable)
  */
-function splitCost(amountCents: number, constructCreditsAvailable: number): {ccUsed: number, atriumUsed: number} | undefined{
+function splitCost(amountCents: number, constructCreditsAvailable: number): {ccUsed: number, atriumUsed: number, ccRemaining: number} | undefined{
   if (amountCents < 0 || constructCreditsAvailable < 0 || isNaN(amountCents) || isNaN(constructCreditsAvailable)){
     return undefined;
   }
 
   if (constructCreditsAvailable > amountCents){
-    return {ccUsed: amountCents, atriumUsed: 0};
+    return {ccUsed: amountCents, atriumUsed: 0, ccRemaining: constructCreditsAvailable - amountCents};
   }
 
   if (constructCreditsAvailable == 0){
-    return {ccUsed: 0, atriumUsed: amountCents};
+    return {ccUsed: 0, atriumUsed: amountCents, ccRemaining: 0};
   }
 
+  // use all CC
   const remaining = amountCents - constructCreditsAvailable;
-  return {ccUsed: constructCreditsAvailable, atriumUsed: remaining};
+  return {ccUsed: constructCreditsAvailable, atriumUsed: remaining, ccRemaining: 0};
 }
 
 export class Transaction {
