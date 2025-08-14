@@ -3,7 +3,7 @@ import * as ws from "ws";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { createReaderFromSN, getMakerspaceOfWelcomeReader, getReaderByID, getReaderByName, getReaderBySN, getReaderPairStatus, PairStatus, submitReaderLog, submitReaderLogWithInstance, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
 import { EquipmentInstancesRow, EquipmentRow, ReaderRow, UserRow, ZoneRow } from "./db/tables.js";
-import { getEquipmentByID, getMissingTrainingModules, hasAccessByID, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
+import { getEquipmentByID, getMissingTrainingModules, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
@@ -15,7 +15,6 @@ import { generateRandomHumanName } from "./data/humanReadableNames.js";
 import { generateShlugKey } from "./resolvers/readersResolver.js";
 import { hasActiveHolds } from "./repositories/Holds/HoldsRepository.js";
 import { hasRestriction } from "./repositories/Restrictions/RestrictionsRepository.js";
-import { isManagerFor } from "./context.js";
 import { getZoneByID, hasZoneTrainings } from "./repositories/Zones/ZonesRespository.js";
 
 
@@ -278,7 +277,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     inResponse.Role = user.privilege;
 
     // Find Machine
-    if (machine === undefined) {
+    if (machineInst === undefined || machine === undefined) {
         wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: readerId, label: reader?.name });
         inResponse.Error = "Reader not paired with a machine instance";
       inResponse.Reason = "unknown-machine";
@@ -919,7 +918,7 @@ async function handleStateUpdateMessage(reader: ReaderRow, newState: string, act
   }
   if (newState == "Unlocked") {
     const now = new Date();
-    const then = reader.sessionStartTime ?? new Date(); // if not there, set ot 0
+    const then = reader.sessionStartTime ?? new Date(); // if not there, set to 0
     const elapsedSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
     reader.recentSessionLength = elapsedSeconds;
   }

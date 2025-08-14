@@ -1,6 +1,9 @@
 import { Button, Card, CardActions, CardContent, CardMedia, Typography } from "@mui/material";
 import InventoryItem from "../../../types/InventoryItem";
 import { Stack } from "@mui/system";
+import { useIsMobile } from "../../../common/IsMobileProvider";
+import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import Privilege from "../../../types/Privilege";
 
 interface ListingCardProps {
   item: InventoryItem
@@ -9,23 +12,26 @@ interface ListingCardProps {
 }
 
 export function ListingCard(props: ListingCardProps) {
+  const currentUser = useCurrentUser();
+  const isMobile = useIsMobile();
 
   return (
-    <Card sx={{width: 400, m: 2}}>
-      <CardMedia
+    <Card sx={{ width: 400, m: 2 }}>
+      {!isMobile && <CardMedia
         sx={{ height: 140 }}
-        image={(props.item.image && props.item.image !== "") ? props.item.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")}
-      />
-      <CardContent sx={{minHeight: 125}}>
+        image={(props.item.image && props.item.image != "") ? props.item.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")}
+      />}
+      <CardContent sx={{ minHeight: 125 }}>
         <Typography gutterBottom variant="h5" component="div">{props.item.name}</Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>Makerspace Name</Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>{props.item.makerspace?.name}</Typography>
+        <Typography variant="body1">${props.item.pricePerUnit.toFixed(2)} / {props.item.unit}</Typography>
       </CardContent>
       <CardActions>
         <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
           <Button size="small" onClick={() => props.openDetailsModal(props.item)}>Details</Button>
           {props.item.count > 0
-          ? <Button size="small" variant="contained" color="primary" onClick={() => props.setActiveItem(props.item)}>Add to Cart ({props.item.count} {props.item.count > 1 ? props.item.pluralUnit : props.item.unit} available)</Button>
-          : <Button size="small" variant="contained" color="error" disabled>Out of stock</Button>}
+            ? <Button size="small" variant="contained" color="primary" disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" || currentUser.privilege === Privilege.VISITOR} onClick={() => props.setActiveItem(props.item)}>Add to Cart ({props.item.count} {props.item.count > 1 ? props.item.pluralUnit : props.item.unit} available {import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" && "(Not yet available)"})</Button>
+            : <Button size="small" variant="contained" color="error" disabled>Out of stock</Button>}
         </Stack>
       </CardActions>
     </Card>

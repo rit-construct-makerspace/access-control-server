@@ -17,6 +17,8 @@ export interface InventoryItem {
   staffOnly: boolean;
   storefrontVisible: boolean;
   notes: string;
+  description: string;
+  makerspaceID: number;
   tagID1: number | null;
   tagID2: number | null;
   tagID3: number | null;
@@ -32,6 +34,8 @@ export interface InventoryItemInput {
   pricePerUnit: number;
   threshold: number;
   notes: string;
+  description: string;
+  makerspaceID: number;
 }
 
 export const StoreFrontTypeDefs = gql`
@@ -73,7 +77,9 @@ export const StoreFrontTypeDefs = gql`
     threshold: Int
     staffOnly: Boolean
     storefrontVisible: Boolean
+    makerspaceID: ID
     notes: String
+    description: String
   }
 
   input CartItem {
@@ -104,7 +110,7 @@ export const StoreFrontTypeDefs = gql`
   }
 
   extend type Query {
-    InventoryItems(storefrontVisible: Boolean): [InventoryItem]
+    InventoryItems(storefrontVisible: Boolean, makerspaceID: ID): [InventoryItem]
     InventoryItem(id: ID!): InventoryItem
     Labels: [String]
     Ledgers(startDate: DateTime, stopDate: DateTime, searchText: String): [InventoryLedger]
@@ -120,7 +126,7 @@ export const StoreFrontTypeDefs = gql`
     createLabel(label: String): String
     archiveLabel(label: String): String
     deleteInventoryItem(id: ID!): Boolean
-    checkoutItems(items: [CartItem], notes: String, recievingUserID: ID): Boolean
+    checkoutItems(items: [CartItem], notes: String): Boolean
     setStaffOnly(id: ID!, staffOnly: Boolean!): InventoryItem
     setStorefrontVisible(id: ID!, storefrontVisible: Boolean!): InventoryItem
     addTagToItem(itemID: ID!, tagID: ID!): Boolean
@@ -129,5 +135,6 @@ export const StoreFrontTypeDefs = gql`
     createTag(label: String!, color: String!): Boolean
     updateTag(id: ID!, label: String!, color: String!): Boolean
     deleteTag(id: ID!): Boolean
+    updateMakerspace(id: ID!, makerspaceID: ID!): Boolean
   }
 `;

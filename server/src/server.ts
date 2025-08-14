@@ -54,7 +54,7 @@ async function startServer() {
   //Init with Node Express
   var exp = express();
   var wsserver = expressWs(exp);
-  var app = wsserver.app;
+  var app = wsserver.app;  
 
 
   //Configure CORS
@@ -74,31 +74,26 @@ async function startServer() {
 
 
   // environment setup
-  /**
-   * mode: DEVELOPMENT
-   * Use local dev login view instead of SAML
-   * !! INSECURE !!
-   */
   if (process.env.NODE_ENV === "development") {
-    // view engine setup
-    app.set('views', path.join(__dirname, 'views'));
-    app.set('view engine', 'ejs');
-
+    /**
+    * mode: DEVELOPMENT
+    * Use local dev login view instead of SAML
+    * !! INSECURE !!
+    */
+    console.log("development active")
     setupDevAuth(app);
-  }
-  /**
-   * mode: STAGING
-   * Use the SAML configuration, but use insecure dev cookie handling
-   */
-  else if (process.env.NODE_ENV === "staging") {
+  } else if (process.env.NODE_ENV === "staging") {
+    /**
+     * mode: STAGING
+     * Use the SAML configuration, but use insecure dev cookie handling
+     */
     console.log("staging active");
     setupStagingAuth(app);
-  }
-  /**
-   * mode: PRODUCTION
-   * Use production SAML settings. Full security
-   */
-  else if (process.env.NODE_ENV === "production") {
+  } else if (process.env.NODE_ENV === "production") {
+    /**
+     * mode: PRODUCTION
+     * Use production SAML settings. Full security
+     */
     app.set("trust proxy", 1); // trust first proxy
     setupAuth(app);
   } else {
@@ -548,12 +543,11 @@ async function startServer() {
 
   const PORT = process.env.PORT || 3000;
 
-  console.log(process.env.ID_FORMAT);
-
-  app.listen({ port: PORT }, (): void =>
+  app.listen({ port: PORT }, () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     )
+  }
   );
 }
 

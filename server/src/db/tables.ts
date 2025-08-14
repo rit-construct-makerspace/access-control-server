@@ -98,14 +98,14 @@ export interface InventoryItemRow {
   makerspaceID?: number;
 }
 
-export interface InventoryCarts {
+export interface InventoryCartsRow {
   id: number;
   userID: number;
   makerspaceID: number;
   lastModified: Date;
 }
 
-export interface InventoryItemsForCarts {
+export interface InventoryItemsForCartsRow {
   cartID: number;
   itemID: number;
   count: number;
@@ -236,6 +236,7 @@ export interface UserRow {
   activeHold: boolean;
   admin: boolean;
   accountID: number;
+  atriumToken: string | null;
   forceArchive: boolean | null;
 }
 
@@ -435,6 +436,11 @@ export interface TempRolesRow {
   name: string;
 }
 
+export interface ExpressSessionRow {
+  sid: string;
+  session: string;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -481,5 +487,6 @@ declare module "knex/types/tables.js" {
     CurrencyLedger: CurrencyLedgerRow;
     RefIDCounter: RefIDCounterRow;
     RolesTemp: TempRolesRow;
+    ExpressSessions: ExpressSessionRow;
   }
 }

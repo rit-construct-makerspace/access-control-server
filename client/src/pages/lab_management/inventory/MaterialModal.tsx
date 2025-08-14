@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
 import EditMaterial from "./EditMaterial";
 import NewMaterial from "./NewMaterial";
 import PrettyModal from "../../../common/PrettyModal";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface MaterialModalProps {
   itemId: string;
@@ -10,18 +10,7 @@ interface MaterialModalProps {
 
 export default function MaterialModal({ onClose, itemId }: MaterialModalProps) {
   const isNewItem = itemId.toLocaleLowerCase() === "new";
-
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
   return (
     <PrettyModal width={isMobile ? 250 : 800} open={!!itemId} onClose={onClose}>

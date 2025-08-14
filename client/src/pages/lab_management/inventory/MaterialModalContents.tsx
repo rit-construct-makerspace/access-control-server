@@ -1,7 +1,11 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import {
   Button,
+  FormControl,
   InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   TextareaAutosize,
   TextField,
@@ -13,6 +17,10 @@ import HelpTooltip from "../../../common/HelpTooltip";
 import SaveIcon from "@mui/icons-material/Save";
 import InventoryItem from "../../../types/InventoryItem";
 import AdminPage from "../../AdminPage";
+import { useQuery } from "@apollo/client";
+import { GET_ZONES } from "../../../queries/zoneQueries";
+import RequestWrapper from "../../../common/RequestWrapper";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface InputErrors {
   name?: boolean;
@@ -20,6 +28,7 @@ interface InputErrors {
   pluralUnit?: boolean;
   pricePerUnit?: boolean;
   count?: boolean;
+  makerspaceID?: boolean;
 }
 
 export interface InventoryItemInput {
@@ -31,7 +40,9 @@ export interface InventoryItemInput {
   count: number;
   pricePerUnit: number;
   threshold: number;
+  makerspaceID: number;
   notes: string;
+  description: string;
 }
 
 interface MaterialPageProps {
@@ -53,38 +64,44 @@ export default function MaterialModalContents({
 }: MaterialPageProps) {
   const [inputErrors, setInputErrors] = useState<InputErrors>({});
 
+  const makerspacesResult = useQuery(GET_ZONES);
+
   const handleStringChange =
     (property: keyof InventoryItemInput) =>
-    (e: ChangeEvent<HTMLInputElement>) =>
-      setItemDraft({ ...itemDraft, [property]: e.target.value });
+      (e: ChangeEvent<HTMLInputElement>) =>
+        setItemDraft({ ...itemDraft, [property]: e.target.value });
 
   const handleIntChange =
     (property: keyof InventoryItemInput) =>
-    (e: ChangeEvent<HTMLInputElement>) => {
-      if (!e.target.value) {
-        setItemDraft({ ...itemDraft, [property]: undefined });
-        return;
-      }
-      const parsed = parseInt(e.target.value);
-      setItemDraft({ ...itemDraft, [property]: Math.max(parsed, 0) });
-    };
+      (e: ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.value) {
+          setItemDraft({ ...itemDraft, [property]: undefined });
+          return;
+        }
+        const parsed = parseInt(e.target.value);
+        setItemDraft({ ...itemDraft, [property]: Math.max(parsed, 0) });
+      };
 
   const handleMoneyChange =
     (property: keyof InventoryItemInput) =>
-    (e: ChangeEvent<HTMLInputElement>) => {
-      if (!e.target.value) {
-        setItemDraft({ ...itemDraft, [property]: undefined });
-        return;
-      }
-      const parsed = parseFloat(e.target.value);
-      const positive = Math.max(parsed, 0);
-      const rounded = Math.round(positive * 100) / 100;
-      setItemDraft({ ...itemDraft, [property]: rounded });
-    };
+      (e: ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.value) {
+          setItemDraft({ ...itemDraft, [property]: undefined });
+          return;
+        }
+        const parsed = parseFloat(e.target.value);
+        const positive = Math.max(parsed, 0);
+        const rounded = Math.round(positive * 100) / 100;
+        setItemDraft({ ...itemDraft, [property]: rounded });
+      };
 
-    const handleNotesChanged = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setItemDraft({...itemDraft, notes: String(event.target.value)})
-    };
+  const handleNotesChanged = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setItemDraft({ ...itemDraft, notes: String(event.target.value) })
+  };
+
+  function handleDescriptionChanged(event: ChangeEvent<HTMLTextAreaElement>): void {
+    setItemDraft({ ...itemDraft, description: event.target.value });
+  }
 
   const handleSaveClick = async () => {
     const updatedInputErrors: InputErrors = {
@@ -93,6 +110,7 @@ export default function MaterialModalContents({
       pluralUnit: !itemDraft.pluralUnit,
       pricePerUnit: itemDraft.pricePerUnit === undefined,
       count: itemDraft.count === undefined,
+      makerspaceID: itemDraft.makerspaceID === undefined,
     };
 
     setInputErrors(updatedInputErrors);
@@ -103,20 +121,10 @@ export default function MaterialModalContents({
     onSave();
   };
 
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 1100;
-
+  const isMobile = useIsMobile();
 
   const title = `${isNewItem ? "New" : "Edit"} Material`;
+
 
   return (
     <AdminPage title={""} maxWidth="1250px">
@@ -188,13 +196,39 @@ export default function MaterialModalContents({
           </Stack>
         </Stack>
       </Stack>
-      <TextareaAutosize 
-        style={{background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em", marginTop: "2em", marginBottom: "2em"}}
-        aria-label="Notes" 
-        defaultValue={itemDraft.notes ?? ""} 
-        placeholder="Notes" 
-        value={itemDraft.notes} 
-        onChange={handleNotesChanged}></TextareaAutosize>
+
+      {(isNewItem || itemDraft.makerspaceID) &&
+        //itemDraft is sometimes empty for a moment during intialization which causes the Select to be empty even after. This prevents such conditions.
+        <RequestWrapper loading={makerspacesResult.loading} error={makerspacesResult.error}>
+          <Stack direction="row" spacing={2} mt={2}>
+            <FormControl sx={{ width: '25em' }}>
+              <InputLabel id="makerspace-select-label">Makerspace</InputLabel>
+              <Select labelId="makerspace-select-label" value={itemDraft.makerspaceID} onChange={(e) => setItemDraft({ ...itemDraft, makerspaceID: e.target.value })} error={inputErrors.makerspaceID} label="Makerspace">
+                {makerspacesResult.data?.zones.map((zone: { id: number, name: string }) => (
+                  <MenuItem key={zone.id} value={zone.id}>{zone.name}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Stack>
+        </RequestWrapper>}
+
+      <TextareaAutosize
+        style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em", marginTop: "2em", marginBottom: "2em" }}
+        aria-label="Notes (Internal)"
+        defaultValue={itemDraft.notes ?? ""}
+        placeholder="Notes (Internal)"
+        value={itemDraft.notes}
+        onChange={handleNotesChanged}>
+      </TextareaAutosize>
+
+      <TextareaAutosize
+        style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em", marginTop: "2em", marginBottom: "2em" }}
+        aria-label="Description (public)"
+        defaultValue={itemDraft.description ?? ""}
+        placeholder="Description (public)"
+        value={itemDraft.description}
+        onChange={handleDescriptionChanged}>
+      </TextareaAutosize>
 
       <Stack direction={isMobile ? "column" : "row"} justifyContent="space-between" mt={4}>
         {!isNewItem && (
@@ -220,6 +254,6 @@ export default function MaterialModalContents({
           Save
         </Button>
       </Stack>
-    </AdminPage>
+    </AdminPage >
   );
 }
