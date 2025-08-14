@@ -168,7 +168,6 @@ export async function unpairReaderAsMakerspaceWelcomer(readerID: number, makersp
     await knex("MakerspaceWelcomeReaders").delete().where({ readerID: readerID, makerspaceID: makerspaceID });
 }
 
-
 export async function getReaderLogs(searchParams: { makerspaceID?: number, from: Date, to: Date, pageOffset?: number, pageLimit: number }): Promise<ReaderLogRow[]> {
     let query = knex("ReaderLogs as rl");
     console.log("Makerspace filter", searchParams.makerspaceID);

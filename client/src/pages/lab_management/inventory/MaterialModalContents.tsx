@@ -20,7 +20,6 @@ import AdminPage from "../../AdminPage";
 import { useQuery } from "@apollo/client";
 import { GET_ZONES } from "../../../queries/zoneQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
-import { set } from "date-fns";
 
 interface InputErrors {
   name?: boolean;
@@ -208,20 +207,20 @@ export default function MaterialModalContents({
         </Stack>
       </Stack>
 
-      {(isNewItem || itemDraft.makerspaceID) && 
-      //itemDraft is sometimes empty for a moment during intialization which causes the Select to be empty even after. This prevents such conditions.
-      <RequestWrapper loading={makerspacesResult.loading} error={makerspacesResult.error}>
-        <Stack direction="row" spacing={2} mt={2}>
-          <FormControl sx={{ width: '25em' }}>
-            <InputLabel id="makerspace-select-label">Makerspace</InputLabel>
-            <Select labelId="makerspace-select-label" value={itemDraft.makerspaceID} onChange={(e) => setItemDraft({ ...itemDraft, makerspaceID: e.target.value })} error={inputErrors.makerspaceID} label="Makerspace">
+      {(isNewItem || itemDraft.makerspaceID) &&
+        //itemDraft is sometimes empty for a moment during intialization which causes the Select to be empty even after. This prevents such conditions.
+        <RequestWrapper loading={makerspacesResult.loading} error={makerspacesResult.error}>
+          <Stack direction="row" spacing={2} mt={2}>
+            <FormControl sx={{ width: '25em' }}>
+              <InputLabel id="makerspace-select-label">Makerspace</InputLabel>
+              <Select labelId="makerspace-select-label" value={itemDraft.makerspaceID} onChange={(e) => setItemDraft({ ...itemDraft, makerspaceID: e.target.value })} error={inputErrors.makerspaceID} label="Makerspace">
                 {makerspacesResult.data?.zones.map((zone: { id: number, name: string }) => (
                   <MenuItem key={zone.id} value={zone.id}>{zone.name}</MenuItem>
                 ))}
-            </Select>
-          </FormControl>
-        </Stack>
-      </RequestWrapper>}
+              </Select>
+            </FormControl>
+          </Stack>
+        </RequestWrapper>}
 
       <TextareaAutosize
         style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em", marginTop: "2em", marginBottom: "2em" }}

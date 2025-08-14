@@ -22,12 +22,10 @@ export function CartPage() {
 
   const cartResult = useQuery(GET_CART, { variables: { id: cartID } });
 
-  const [completeCartMutation, completeCartMutationResult] = useMutation(COMPLETE_CART);
-  const [cancelCartMutation, cancelCartMutationResult] = useMutation(CANCEL_CART);
+  const [completeCartMutation] = useMutation(COMPLETE_CART);
+  const [cancelCartMutation] = useMutation(CANCEL_CART);
 
   const staticRows: CartItem[] = cartResult.data?.cart?.items || [];
-
-  console.log("staticRows", staticRows);
 
   const [rows, setRows] = useState<CartItemCountState[]>(staticRows.map(item => ({ ...item, newCartcount: item.cartcount })));
 

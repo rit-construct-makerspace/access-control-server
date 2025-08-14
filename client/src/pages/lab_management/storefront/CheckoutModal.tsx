@@ -1,26 +1,7 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
-import { Button, Divider, MenuItem, Select, Stack, TextareaAutosize, Typography } from "@mui/material";
-import OpenInNewIcon from "@mui/icons-material/OpenInNew";
-import InventoryIcon from "@mui/icons-material/Inventory";
-import { gql, useQuery } from "@apollo/client";
+import { Button, Divider, Stack, Typography } from "@mui/material";
 import { ShoppingCartEntry } from "./StorefrontPage";
-
-function StepNumber({ children }: { children: ReactNode }) {
-  return (
-    <Typography
-      variant="h1"
-      component="div"
-      sx={{
-        color: "primary.main",
-        fontWeight: 700,
-        width: "54px",
-      }}
-    >
-      {children}
-    </Typography>
-  );
-}
 
 interface CheckoutModalProps {
   open: boolean;

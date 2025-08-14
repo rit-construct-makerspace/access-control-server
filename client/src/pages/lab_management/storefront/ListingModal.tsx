@@ -36,7 +36,7 @@ export function ListingModal(props: ListingModalProps) {
     <PrettyModal width={!isMobile ? 1000 : "100%"} open={props.open} onClose={props.onClose}>
       <Stack direction={isMobile ? "column" : "row"} justifyContent={"space-between"} flexWrap={"wrap"} mb={"1em"}>
         <Box sx={{ maxWidth: 400, width: !isMobile ? "50%" : "100%" }}>
-          <img src={(props.item.image && props.item.image !== "") ? props.item.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")} style={{ width: "100%" }} alt="RIT SHED Logo"/>
+          <img src={(props.item.image && props.item.image !== "") ? props.item.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")} style={{ width: "100%" }} alt="RIT SHED Logo" />
         </Box>
 
         <Box width={!isMobile ? "50%" : "100%"}>
@@ -49,7 +49,7 @@ export function ListingModal(props: ListingModalProps) {
             </Typography>
             {isStaff(currentUser) && props.item.notes !== "" &&
               <div>
-                <Divider sx={{my: "1em"}} textAlign="left">Internal Details</Divider>
+                <Divider sx={{ my: "1em" }} textAlign="left">Internal Details</Divider>
                 <Typography variant="body1">
                   {props.item.notes}
                 </Typography>
@@ -104,8 +104,8 @@ export function ListingModal(props: ListingModalProps) {
             {props.item.count > 0 ? <>{props.item.count} available</> : "Out of stock"}
           </Typography>
           {props.item.count > 0
-          ? <Button size="small" variant="contained" color="primary" disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true"} onClick={() => tryAddToCart()}>Add to Cart {import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" && "(Not yet available)"}</Button>
-          : <Button size="small" variant="contained" color="error" disabled>Out of stock</Button>}
+            ? <Button size="small" variant="contained" color="primary" disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true"} onClick={() => tryAddToCart()}>Add to Cart {import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" && "(Not yet available)"}</Button>
+            : <Button size="small" variant="contained" color="error" disabled>Out of stock</Button>}
         </Stack>
       </Stack>
 

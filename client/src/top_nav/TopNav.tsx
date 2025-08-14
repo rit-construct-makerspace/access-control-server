@@ -16,7 +16,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Footer from "./Footer";
 import PersonIcon from '@mui/icons-material/Person';
 import { useIsMobile } from "../common/IsMobileProvider";
-import { isStaff } from "../common/PrivilegeUtils";
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import ArticleIcon from '@mui/icons-material/Article';
 import TuneIcon from '@mui/icons-material/Tune';

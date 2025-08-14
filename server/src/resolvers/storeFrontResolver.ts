@@ -1,4 +1,4 @@
-import { ApolloContext, CurrentUser, isAdmin } from "../context.js";
+import { ApolloContext } from "../context.js";
 import * as InventoryRepo from "../repositories/Store/InventoryRepository.js";
 import { InventoryItem, InventoryItemInput } from "../schemas/storeFrontSchema.js";
 import { deleteInventoryItem } from "../repositories/Store/InventoryRepository.js";
@@ -10,7 +10,6 @@ import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
 import { adjustAccountBalanceIfAvailableCents, Transaction } from "../integrations/currency/currency.js";
-import { assert } from "console";
 
 const StorefrontResolvers = {
   InventoryItem: {

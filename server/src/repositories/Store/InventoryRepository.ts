@@ -3,7 +3,7 @@
  */
 
 import { knex } from "../../db/index.js";
-import { InventoryItemRow, InventoryTagRow } from "../../db/tables.js";
+import { InventoryTagRow } from "../../db/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import {
   inventoryItemsToDomain,

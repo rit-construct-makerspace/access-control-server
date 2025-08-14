@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Card, CardActions } from "@mui/material";
+import { Button, Card, CardActions  } from "@mui/material";
 import { AccessCheckExtraInfo, GET_USER } from "./UserModal";
 import { gql, useMutation } from "@apollo/client";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
@@ -48,8 +48,6 @@ export default function AccessCheckCard({ accessCheck, userID }: AccessCheckCard
     }
   }, []);
   const isMobile = width <= 1100;
-
-  const theme = useTheme();
 
   return (
     <Card

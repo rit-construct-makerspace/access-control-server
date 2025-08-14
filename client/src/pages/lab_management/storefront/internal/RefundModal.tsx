@@ -1,7 +1,6 @@
 import { Box, Button, Checkbox, FormControlLabel, Typography } from "@mui/material";
 import PrettyModal from "../../../../common/PrettyModal";
 import { CartItemCountState } from "./CartPage";
-import { stat } from "fs";
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { GET_CART, SUBTRACT_ITEM_FROM_CART } from "../../../../queries/cartQueries";
@@ -16,7 +15,7 @@ interface PrettyModalProps {
 export function RefundModal({ open, onClose, statedItem, cartId }: PrettyModalProps) {
   const [restock, setRestock] = useState(false);
 
-  const [subtractItemFromCart, subtractItemFromCartResult] = useMutation(SUBTRACT_ITEM_FROM_CART, {refetchQueries: [{query: GET_CART, variables: {id: cartId}}]});
+  const [subtractItemFromCart, subtractItemFromCartResult] = useMutation(SUBTRACT_ITEM_FROM_CART, { refetchQueries: [{ query: GET_CART, variables: { id: cartId } }] });
 
   if (!statedItem) {
     return null; // If no item is selected, do not render the modal
@@ -44,7 +43,7 @@ export function RefundModal({ open, onClose, statedItem, cartId }: PrettyModalPr
           }
         }).then(() => {
           onClose();
-        }).catch((error) => {
+        }).catch(() => {
           onClose(true);
         });
       }}>

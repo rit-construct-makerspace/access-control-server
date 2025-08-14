@@ -19,6 +19,7 @@ import { GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQuerie
 import CheckoutSuccessModal from "./CheckoutSuccessModal";
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { useNavigate } from "react-router-dom";
+import Privilege from "../../../types/Privilege";
 
 
 const CHECKOUT_ITEMS = gql`
@@ -64,7 +65,7 @@ export default function StorefrontPage() {
   const [checkoutFailureSnackbarOpen, setCheckoutFailureSnackbarOpen] = useState(false);
   const [checkoutSuccessModalOpen, setCheckoutSuccessModalOpen] = useState(false);
 
-  function handleShowInternalChange(e: any) {
+  function handleShowInternalChange(_e: any) {
     setShowInternalItems(!showInternalItems)
   }
 
@@ -122,7 +123,7 @@ export default function StorefrontPage() {
       updateLocalStorage(draft);
     });
 
-  const handleCheckout = async (checkoutNotes: string, recievingUserID?: number) => {
+  const handleCheckout = async (checkoutNotes: string, _recievingUserID?: number) => {
     const items: { id: number, count: number }[] = shoppingCart.map((cartItem) => ({ id: cartItem.item.id, count: cartItem.count }));
 
     const success = await checkoutItems({
@@ -149,13 +150,13 @@ export default function StorefrontPage() {
           </Button>
         ) : null
       }>
-        <ShoppingCart
+        {(currentUser.privilege != Privilege.VISITOR && import.meta.env.VITE_DISABLE_STOREFRONT_CART === "false") && <ShoppingCart
           entries={shoppingCart}
           removeEntry={removeFromShoppingCart}
           setEntryCount={setEntryCount}
           emptyCart={handleCheckout}
           internal={showInternalItems || showStaffItems}
-        />
+        />}
 
         {isAdmin(currentUser) &&
           <Stack direction={"row"} sx={{ mb: 2, mt: 8, justifyContent: "space-between" }}>

@@ -4,7 +4,7 @@
  */
 
 import { knex } from "../../db/index.js";
-import { InventoryCartsRow, InventoryItemRow, InventoryItemsForCartsRow } from "../../db/tables.js";
+import { InventoryCartsRow, InventoryItemRow } from "../../db/tables.js";
 
 export async function getInventoryCarts(): Promise<InventoryCartsRow[]> {
   return await knex("InventoryCarts").select();

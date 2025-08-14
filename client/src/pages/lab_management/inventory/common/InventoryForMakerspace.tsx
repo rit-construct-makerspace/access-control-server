@@ -25,14 +25,10 @@ interface InventoryForMakerspaceProps {
 
 export function InventoryForMakerspace(props: InventoryForMakerspaceProps) {
   const currentUser = useCurrentUser();
-  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWindowWidth(window.innerWidth);
-  }
+  const [windowWidth] = useState<number>(window.innerWidth);
 
   const safeData = props.makerspace.items ?? [];
   const sortedItems = sortItemsByName(safeData);
-  const lowItems = sortedItems.filter((i: any) => i.count < i.threshold);
   const matchingItems = sortedItems.filter((i: any) => i.name.toLowerCase().includes(props.searchText.toLowerCase()));
 
   const columns: GridColDef<(typeof matchingItems)[number]>[] = [

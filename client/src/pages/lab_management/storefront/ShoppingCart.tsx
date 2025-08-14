@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ShoppingCartEntry } from "./StorefrontPage";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Button, Divider, Stack, Typography } from "@mui/material";
