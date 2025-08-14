@@ -436,6 +436,11 @@ export interface TempRolesRow {
   name: string;
 }
 
+export interface ExpressSessionRow {
+  sid: string;
+  session: string;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -482,5 +487,6 @@ declare module "knex/types/tables.js" {
     CurrencyLedger: CurrencyLedgerRow;
     RefIDCounter: RefIDCounterRow;
     RolesTemp: TempRolesRow;
+    ExpressSessions: ExpressSessionRow;
   }
 }
