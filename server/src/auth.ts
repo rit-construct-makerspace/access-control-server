@@ -11,10 +11,10 @@ import {
 } from "@node-saml/passport-saml";
 
 import { Strategy as LocalStrategy } from 'passport-local';
-import session from "express-session";
+import session, { Store } from "express-session";
 import { v4 as uuidv4 } from "uuid";
 import assert from "assert";
-import express from "express";
+import express, { json } from "express";
 import {
   archiveUser,
   createUser,
@@ -29,6 +29,7 @@ import { CurrentUser } from "./context.js";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import path from "path";
 import { insertTempRole } from './repositories/tempRolesRepo.js';
+import * as SessionRepo from "./repositories/Users/SessionRepository.js";
 
 const __dirname = import.meta.dirname;
 
@@ -41,25 +42,6 @@ interface RitSsoUser {
   ritUsername: string;
 }
 
-/**
- * DEV ONLY
- * Map devUsers file to users
- */
-function mapToDevUser(userID: string, password: string) {
-  var obj = JSON.parse(fs.readFileSync(path.join(__dirname, "/data/devUsers.json"), 'utf8'));
-  const devUser = obj[userID];
-  if (devUser === undefined || devUser["password"] !== password) {
-    return undefined;
-  }
-  else {
-    return {
-      firstName: devUser.firstName,
-      lastName: devUser.lastName,
-      ritUsername: devUser.ritUsername
-    };
-  }
-}
-
 // Map the test users from samltest.id to match
 // the format that RIT SSO will give us.
 function mapSamlTestToRit(testUser: any): RitSsoUser {
@@ -70,6 +52,54 @@ function mapSamlTestToRit(testUser: any): RitSsoUser {
     lastName: testUser["urn:oid:2.5.4.4"],
     ritUsername: testUser.email.split("@")[0], // samltest format
   };
+}
+
+class PostgresStore extends Store {
+  async get(sid: string, callback: (err: any, session?: session.SessionData | null) => void) {
+    try {
+      const sesh_result = await SessionRepo.getSession(sid);
+      if (!sesh_result) {
+        return callback(null, null);
+      }
+
+      const session_data: session.SessionData = {
+        cookie: JSON.parse(sesh_result.session)
+      };
+
+      return callback(null, session_data);
+
+
+    } catch (e) {
+      return callback(e, null);
+    }
+  }
+
+  async set(sid: string, session: session.SessionData, callback?: (err?: any) => void) {
+    try {
+      await SessionRepo.setSession(sid, JSON.stringify(session.cookie));
+      if (callback) {
+        return callback(null);
+      }
+    } catch (e) {
+
+      if (callback) {
+        return callback(e);
+      }
+    }
+  }
+
+  async destroy(sid: string, callback?: (err?: any) => void) {
+    try {
+      await SessionRepo.deleteSession(sid);
+      if (callback) {
+        return callback(null);
+      }
+    } catch (e) {
+      if (callback) {
+        return callback(e);
+      }
+    }
+  }
 }
 
 /**
@@ -92,6 +122,7 @@ export function setupSessions(app: express.Application) {
         maxAge: 86400000, // 24 hours in milliseconds
         sameSite: process.env.NODE_ENV === "development" ? "lax" : "strict" // allow cookies to send between local ports in development
       },
+      store: new PostgresStore,
     })
   );
 }
