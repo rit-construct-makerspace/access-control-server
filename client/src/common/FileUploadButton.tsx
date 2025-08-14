@@ -1,4 +1,4 @@
-import { Button, Input, styled, Typography } from "@mui/material";
+import { Button, ButtonOwnProps, Input, styled, Typography } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { height } from "@mui/system";
 
@@ -15,7 +15,10 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 interface FileUploadProps {
-
+  color: ButtonOwnProps["color"] | undefined;
+  variant: ButtonOwnProps["variant"] | undefined;
+  text: string | undefined
+  onUpload: (name: string) => void;
 }
 
 export default function FileUploadButton(props: FileUploadProps) {
@@ -31,18 +34,20 @@ export default function FileUploadButton(props: FileUploadProps) {
       },
       body: await files[0].bytes()
     });
-    console.log(response);
+
+    props.onUpload(await response.text());
   }
 
   return (
     <Button
+      color={props.color}
       component="label"
       role={undefined}
-      variant="contained"
+      variant={props.variant}
       tabIndex={-1}
       startIcon={<CloudUploadIcon />}
     >
-      Upload files
+      {props.text ?? "Upload files"}
       <VisuallyHiddenInput
         type="file"
         onChange={(event) => handleUpload(event.target.files)}

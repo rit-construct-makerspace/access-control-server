@@ -448,7 +448,7 @@ async function startServer() {
       return res.status(400).send(e);
     }
 
-    return res.status(201).send(new_name);
+    return res.status(201).contentType("application/text").send(new_name);
   });
 
 
