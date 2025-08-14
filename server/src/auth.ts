@@ -62,9 +62,7 @@ class PostgresStore extends Store {
         return callback(null, null);
       }
 
-      const session_data: session.SessionData = {
-        cookie: JSON.parse(sesh_result.session)
-      };
+      const session_data: session.SessionData = JSON.parse(sesh_result.session);
 
       return callback(null, session_data);
 
@@ -76,7 +74,7 @@ class PostgresStore extends Store {
 
   async set(sid: string, session: session.SessionData, callback?: (err?: any) => void) {
     try {
-      await SessionRepo.setSession(sid, JSON.stringify(session.cookie));
+      await SessionRepo.setSession(sid, JSON.stringify(session));
       if (callback) {
         return callback(null);
       }
@@ -139,25 +137,24 @@ export function setupDevAuth(app: express.Application) {
   assert(entryPoint, "ENTRY_POINT env value is null");
   assert(vite_url, "VITE_URL env value is null");
 
-  const authStrategy = new SamlStrategy(
-    {
-      issuer: issuer,
-      //path: "/login/callback",
-      callbackUrl: callbackUrl,
-      entryPoint: entryPoint,
-      identifierFormat: process.env.ID_FORMAT ?? "",
-      decryptionPvk: process.env.SSL_PVKEY ?? "",
-      //privateKey: process.env.SSL_PVKEY ?? "",
-      idpCert: (process.env.IDP_PUBKEY ?? "").replace(' ', '').replace('\n', '').replace('\r', ''),
-      //validateInResponseTo: ValidateInResponseTo.never,
-      disableRequestedAuthnContext: true,
-      signatureAlgorithm: "sha256",
-      //wantAssertionsSigned: true,
-      digestAlgorithm: "sha256",
+  const authStrategy = new SamlStrategy({
+    issuer: issuer,
+    //path: "/login/callback",
+    callbackUrl: callbackUrl,
+    entryPoint: entryPoint,
+    identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+    decryptionPvk: process.env.SSL_PVKEY ?? "",
+    //privateKey: process.env.SSL_PVKEY ?? "",
+    idpCert: (process.env.IDP_PUBKEY ?? "").replace(' ', '').replace('\n', '').replace('\r', ''),
+    //validateInResponseTo: ValidateInResponseTo.never,
+    disableRequestedAuthnContext: true,
+    signatureAlgorithm: "sha256",
+    //wantAssertionsSigned: true,
+    digestAlgorithm: "sha256",
 
-      // TODO production solution
-      acceptedClockSkewMs: 180, // "SAML assertion not yet valid" fix
-    },
+    // TODO production solution
+    acceptedClockSkewMs: 180, // "SAML assertion not yet valid" fix
+  },
     (profile: any, done: any) => {
       // your body implementation on success, this is where we get attributes from the idp
       return done(null, profile);
