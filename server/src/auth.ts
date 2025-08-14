@@ -3,11 +3,11 @@
  * Authentication procedures for SAML2
  */
 
+import serverConfig from './server-config.js';
 import fs from 'fs';
 import passport from "passport";
 import {
   Strategy as SamlStrategy,
-  ValidateInResponseTo,
 } from "@node-saml/passport-saml";
 
 import { Strategy as LocalStrategy } from 'passport-local';
@@ -76,8 +76,7 @@ function mapSamlTestToRit(testUser: any): RitSsoUser {
  * @param app NodeJS application context
  */
 export function setupSessions(app: express.Application) {
-  const secret = process.env.SESSION_SECRET;
-  assert(secret, "SESSION_SECRET env value is null");
+  const secret = serverConfig.AUTH.SESSION_SECRET;
 
   app.use(
     session({
@@ -86,10 +85,10 @@ export function setupSessions(app: express.Application) {
       resave: false,
       saveUninitialized: false,
       cookie: {
-        secure: process.env.NODE_ENV === "production" ? true : false, // this will make cookies send only over https
+        secure: serverConfig.NODE_ENV === "production" ? true : false, // this will make cookies send only over https
         httpOnly: true, // cookies are sent in requests, but not accessible to client-side JS
         maxAge: 7200000, // 40 minutes in milliseconds
-        sameSite: process.env.NODE_ENV === "development" ? "lax" : "strict" // allow cookies to send between local ports in development
+        sameSite: serverConfig.NODE_ENV === "development" ? "lax" : "strict" // allow cookies to send between local ports in development
       },
     })
   );
@@ -97,9 +96,7 @@ export function setupSessions(app: express.Application) {
 
 // Unsafe auth -- local development only
 export function setupDevAuth(app: express.Application) {
-  const reactAppUrl = process.env.VITE_URL;
-
-  assert(reactAppUrl, "VITE_URL env value is null");
+  const reactAppUrl = serverConfig.VITE.URL;
 
   const authStrategy = new LocalStrategy(
     async function (username: string, password: string, done: any) {
@@ -160,7 +157,7 @@ export function setupDevAuth(app: express.Application) {
         } else {
           res.clearCookie("connect.sid");
 
-          res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
+          res.redirect(serverConfig.VITE.LOGGED_OUT_URL);
         }
       });
     } else {
@@ -171,15 +168,10 @@ export function setupDevAuth(app: express.Application) {
 
 //Setup Passport SAML configuration
 export function setupStagingAuth(app: express.Application) {
-  const issuer = process.env.ISSUER;
-  const callbackUrl = process.env.CALLBACK_URL;
-  const entryPoint = process.env.ENTRY_POINT;
-  const reactAppUrl = process.env.VITE_URL;
-
-  assert(issuer, "ISSUER env value is null");
-  assert(callbackUrl, "CALLBACK_URL env value is null");
-  assert(entryPoint, "ENTRY_POINT env value is null");
-  assert(reactAppUrl, "VITE_URL env value is null");
+  const issuer = serverConfig.AUTH.SAML.ISSUER;
+  const callbackUrl = serverConfig.AUTH.SAML.CALLBACK_URL;
+  const entryPoint = serverConfig.AUTH.SAML.ENTRY_POINT;
+  const reactAppUrl = serverConfig.VITE.URL;
 
   /*
   identifierFormat defaults to urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress.
@@ -212,7 +204,7 @@ export function setupStagingAuth(app: express.Application) {
       //path: "/login/callback",
       callbackUrl: callbackUrl,
       entryPoint: entryPoint,
-      identifierFormat: process.env.ID_FORMAT ?? "",
+      identifierFormat: serverConfig.AUTH.SAML.ID_FORMAT ?? "",
       decryptionPvk: process.env.SSL_PVKEY ?? "",
       //privateKey: process.env.SSL_PVKEY ?? "",
       idpCert: (process.env.IDP_PUBKEY ?? "").replace(' ', '').replace('\n', '').replace('\r', ''),
