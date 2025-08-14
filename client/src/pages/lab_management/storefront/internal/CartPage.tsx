@@ -50,7 +50,7 @@ export function CartPage() {
   const columns: GridColDef<(typeof rows)[number]>[] = [
     {
       field: "image", headerName: "Image", width: 160,
-      renderCell: (params) => (<img src={(params.row.image && params.row.image != "") ? params.row.image : (process.env.PUBLIC_URL + "/shed_acronym_vert.jpg")} alt="Product" style={{width: "100%"}} />),
+      renderCell: (params) => (<img src={(params.row.image && params.row.image != "") ? params.row.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")} alt="Product" style={{width: "100%"}} />),
     },
     { field: "name", headerName: "Name", width: 300 },
     {
