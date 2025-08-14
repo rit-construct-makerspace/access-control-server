@@ -150,6 +150,8 @@ export default function StorefrontPage() {
           </Button>
         ) : null
       }>
+        <title>Storefront | Make @ RIT</title>
+
         {(currentUser.privilege != Privilege.VISITOR && import.meta.env.VITE_DISABLE_STOREFRONT_CART === "false") && <ShoppingCart
           entries={shoppingCart}
           removeEntry={removeFromShoppingCart}
