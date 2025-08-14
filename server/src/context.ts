@@ -15,34 +15,6 @@ export interface CurrentUser extends UserRow {
   trainer: number[];
 }
 
-//const testuser = undefined;
-const testuser: CurrentUser = {
-  id: 16,
-  firstName: "Test",
-  lastName: "User",
-  pronouns: "They / Them",
-  isStudent: true,
-  privilege: Privilege.STAFF,
-  registrationDate: new Date(),
-  expectedGraduation: "June 2077",
-  college: "GCCIS",
-  setupComplete: true,
-  ritUsername: "tu1000",
-  archived: false,
-  manager: [],
-  staff: [],
-  trainer: [],
-  cardTagID: "12345",
-  notes: "",
-  activeHold: false,
-  admin: true,
-  hasHolds: false,
-  hasCardTag: true,
-  accountID: 1,
-  forceArchive: false,
-  atriumToken: null,
-};
-
 export interface ApolloContext {
   user: CurrentUser | undefined;
   logout: () => void;
@@ -58,17 +30,13 @@ export interface ApolloContext {
 }
 
 function authenticated(expressUser: Express.User | undefined) {
-  if (process.env.USE_TEST_DEV_USER_DANGER != "TRUE" && !expressUser) {
+  if (!expressUser) {
     throw new GraphQLError("Unauthenticated");
   }
 }
 
 function determineUser(expressUser: Express.User | undefined) {
-  if (process.env.USE_TEST_DEV_USER_DANGER == "TRUE") {
-    return testuser;
-  } else {
-    return expressUser as CurrentUser;
-  }
+  return expressUser as CurrentUser;
 }
 
 // Checks if a user is an admin
@@ -224,16 +192,16 @@ export const ifStaffOrSelf =
 export const ifAuthenticated =
   (expressUser: Express.User | undefined) =>
     (callback: (user: CurrentUser) => any) => {
-      if (process.env.USE_TEST_DEV_USER_DANGER != "TRUE" && !expressUser) {
+      if (!expressUser) {
         throw new GraphQLError("Unauthenticated");
       }
 
       const user = expressUser as CurrentUser;
-      return callback(process.env.USE_TEST_DEV_USER_DANGER != "TRUE" ? user : testuser);
+      return callback(user);
     };
 
 const context = async ({ req }: { req: any }) => ({
-  user: process.env.USE_TEST_DEV_USER_DANGER != "TRUE" ? req.user : testuser,
+  user: req.user,
   logout: () => req.logout(),
   isAdmin: isAdmin(req.user),
   isManager: isManager(req.user),
