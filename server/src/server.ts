@@ -54,7 +54,7 @@ async function startServer() {
   //Init with Node Express
   var exp = express();
   var wsserver = expressWs(exp);
-  var app = wsserver.app;  
+  var app = wsserver.app;
 
 
   //Configure CORS
@@ -436,7 +436,7 @@ async function startServer() {
   }));
 
   app.post("/api/uploads/web-content", async function (req, res) {
-
+    console.log(req.files);
     if (!req.user || !isStaff(determineUser(req.user))) {
       return res.status(401).send("Only staff or higher may upload files");
     }
