@@ -39,8 +39,8 @@ const OVERRIDE_RECEIPT_EMAIL = process.env.OVERRIDE_RECEIPT_EMAIL;
  * @param subjectInfo info for the subject line. will appear as "RIT SHED Receipt - ${subjectInfo} - Date"
  * @param transaction the transaction information to generate a receipt for
  */
-export async function send_transaction_email(emailAddress: string, subjectInfo: string, transaction: Transaction) {
-    const content = generateReceiptEmail(transaction);
+export async function send_transaction_email(emailAddress: string, subjectInfo: string, transaction: Transaction, constructCreditsRemaining: number) {
+    const content = generateReceiptEmail(transaction, constructCreditsRemaining);
 
     if (OVERRIDE_RECEIPT_EMAIL) {
         emailAddress = OVERRIDE_RECEIPT_EMAIL;

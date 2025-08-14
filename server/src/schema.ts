@@ -56,6 +56,8 @@ import { RestrictionTypeDefs } from "./schemas/restrictionSchema.js";
 import { RestrictionResolver } from "./resolvers/restrictionResolver.js";
 import { CurrencyAccountResolvers } from "./resolvers/currencyAccountResolver.js"
 import { CurrencyAccountsTypeDefs } from "./schemas/currencyAccountSchema.js";
+import { CartTypeDefs } from "./schemas/cartSchema.js";
+import { CartResolver } from "./resolvers/cartResolver.js";
 import { CurrencyLedgerResolvers } from "./resolvers/currencyLedgerResolver.js";
 import { CurrencyLedgerTypeDefs } from "./schemas/currencyLedgerSchema.js";
 import { OrganizationTypeDefs } from "./schemas/organizationsSchema.js";
@@ -97,6 +99,7 @@ export const schema = makeExecutableSchema({
     MaintenanceLogsTypeDefs,
     ToolItemTypeDefs,
     CurrencyAccountsTypeDefs,
+    CartTypeDefs,
     CurrencyLedgerTypeDefs,
     OrganizationTypeDefs,
   ],
@@ -127,6 +130,7 @@ export const schema = makeExecutableSchema({
     ToolItemResolver,
     RestrictionResolver,
     CurrencyAccountResolvers,
+    CartResolver,
     CurrencyLedgerResolvers,
     OrganizationResolver,
   ]

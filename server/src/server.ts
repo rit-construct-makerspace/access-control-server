@@ -51,7 +51,7 @@ async function startServer() {
   //Init with Node Express
   var exp = express();
   var wsserver = expressWs(exp);
-  var app = wsserver.app;
+  var app = wsserver.app;  
 
 
   //Configure CORS
@@ -517,10 +517,11 @@ async function startServer() {
 
   console.log(process.env.ID_FORMAT);
 
-  app.listen({ port: PORT }, (): void =>
+  app.listen({ port: PORT }, () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     )
+  }
   );
 }
 

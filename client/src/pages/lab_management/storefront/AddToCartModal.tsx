@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import {
   Alert,
   Avatar,
@@ -11,6 +10,7 @@ import {
 } from "@mui/material";
 import InventoryItem from "../../../types/InventoryItem";
 import PrettyModal from "../../../common/PrettyModal";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface AddToCartModalProps {
   open: boolean;
@@ -41,17 +41,7 @@ export default function AddToCartModal({
     onClose();
   };
 
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
   return (
     <PrettyModal open={open} onClose={onClose} width={isMobile ? 250 : 400}>
