@@ -517,19 +517,12 @@ async function startServer() {
 
   console.log(process.env.ID_FORMAT);
 
-
-
-
   app.listen({ port: PORT }, async () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     )
-    const res = await Atrium.generateAtriumToken("123456");
-    console.log("RESP", res);
   }
   );
-
-
 }
 
 startServer();
