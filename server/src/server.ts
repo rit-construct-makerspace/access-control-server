@@ -71,31 +71,26 @@ async function startServer() {
 
 
   // environment setup
-  /**
-   * mode: DEVELOPMENT
-   * Use local dev login view instead of SAML
-   * !! INSECURE !!
-   */
   if (process.env.NODE_ENV === "development") {
-    // view engine setup
-    app.set('views', path.join(__dirname, 'views'));
-    app.set('view engine', 'ejs');
-
+    /**
+    * mode: DEVELOPMENT
+    * Use local dev login view instead of SAML
+    * !! INSECURE !!
+    */
+    console.log("development active")
     setupDevAuth(app);
-  }
-  /**
-   * mode: STAGING
-   * Use the SAML configuration, but use insecure dev cookie handling
-   */
-  else if (process.env.NODE_ENV === "staging") {
+  } else if (process.env.NODE_ENV === "staging") {
+    /**
+     * mode: STAGING
+     * Use the SAML configuration, but use insecure dev cookie handling
+     */
     console.log("staging active");
     setupStagingAuth(app);
-  }
-  /**
-   * mode: PRODUCTION
-   * Use production SAML settings. Full security
-   */
-  else if (process.env.NODE_ENV === "production") {
+  } else if (process.env.NODE_ENV === "production") {
+    /**
+     * mode: PRODUCTION
+     * Use production SAML settings. Full security
+     */
     app.set("trust proxy", 1); // trust first proxy
     setupAuth(app);
   } else {
@@ -454,7 +449,7 @@ async function startServer() {
     };
 
     let expiryNotices = await getPassedTrainingsWeeksAgo(52);
-    if (expiryNotices.length > 99){
+    if (expiryNotices.length > 99) {
       // dont overload the emails (100 / hr, 400 / day)
       expiryNotices = expiryNotices.slice(0, 99);
     }
@@ -467,7 +462,7 @@ async function startServer() {
     // const numWarned = expiryWarnings.length;
 
     const numNotified = expiryNotices.length
-    
+
     createLog(`Trainings: Sent ${numNotified} expiry notices, and purged ${numPurged} expired trainings.`, "server")
 
   }
@@ -514,8 +509,6 @@ async function startServer() {
   );
 
   const PORT = process.env.PORT || 3000;
-
-  console.log(process.env.ID_FORMAT);
 
   app.listen({ port: PORT }, () => {
     console.log(
