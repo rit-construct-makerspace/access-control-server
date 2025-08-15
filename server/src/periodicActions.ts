@@ -22,10 +22,14 @@ export async function purge_images() {
 		console.log(inUseArr);
 		const inUse = new Set(inUseArr);
 		const storedArr = await listObjects("user-uploads");
+		if (!storedArr){
+			console.error("Couldn't list user-uploads to prune");
+			return;
+		}
 		console.log("stored", storedArr);
 		// All that is stored minus all that is in use
-		// const toDelete = storedArr.filter(key => inUse.has(key));
-		// console.log(`Deleting ${toDelete.length} unused objects`, toDelete);
+		const toDelete = storedArr.filter(key => !inUse.has(key));
+		console.log(`Deleting ${toDelete.length} unused objects`, toDelete);
 
 		// const deleted = await deleteObjects(toDelete)
 		// console.log(`Purged ${deleted.length} images. ${inUseArr.length} remain`)

@@ -37,8 +37,16 @@ export async function listObjects(path: string): Promise<string[] | undefined> {
 
   });
   const response = await client.send(cmd);
-  // return response?.Contents?.map(o => o.Key?.substring(path.length)).filter(n => n && n.length > 0)
-  return [];
+  const parts = response?.Contents?.map(o => o.Key?.substring(path.length)).filter(n => n && n.length > 0);
+  if (!parts){
+    // an error happened
+    return undefined;
+  }
+  if (parts?.some(o => o === undefined)){
+    // if any failed, fail it all (if this is happening, the programmer misunderstood the AWS docs)
+    return undefined;
+  }
+  return parts as string[];
 }
 
 
