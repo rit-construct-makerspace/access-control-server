@@ -35,7 +35,7 @@ export const GET_ALL_EQUIPMENTS = gql`
 `;
 
 export const GET_EQUIPMENT_BY_ID = gql`
-  query GetEquipment($id: ID!) {
+  query GetEquipmentByID($id: ID!) {
     equipment(id: $id) {
       id
       name
@@ -53,12 +53,14 @@ export const GET_EQUIPMENT_BY_ID = gql`
       trainingModules {
         id
         name
+        archived
       }
       notes
       numAvailable
       numInUse
       byReservationOnly
       needsWelcome
+      requiresTrainerApproval
     }
   }
 `;
