@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
-import { Grid, Typography } from "@mui/material";
+import { Alert, Grid, Typography } from "@mui/material";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import EquipmentInstanceCard from "./EquipmentInstanceCard";
 
@@ -19,7 +19,7 @@ export default function InstanceGrid(props: InstanceGridProps) {
 
       return (
         instances.length === 0
-          ? <Typography variant="h6">No Instances!</Typography>
+          ? <Alert severity="info" variant="filled" sx={{ width: "max-content" }}>No Instances!</Alert>
           : <Grid container>
             {
               instances.map((instance: EquipmentInstance) => (

@@ -80,8 +80,8 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   }, [moduleIDs]);
 
   return (
-    <Stack direction={isMobile ? "column-reverse" : "row"} width={"100%"} justifyContent={"center"} spacing={2}>
-      <Stack width={isMobile ? "100%" : "48%"} spacing={2}>
+    <Stack direction={isMobile ? "column-reverse" : "row"} width={"100%"} justifyContent={"space-between"}>
+      <Stack width={isMobile ? "100%" : "49%"} spacing={2}>
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
           <Typography variant="h5" fontWeight={"bold"}>Machine Information</Typography>
           <Stack direction={"row"} spacing={2}>
@@ -193,7 +193,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
           }}
         />
       </Stack>
-      <Stack justifyContent={"center"} alignItems={"center"} width={isMobile ? "100%" : "48%"}>
+      <Stack justifyContent={"center"} alignItems={"center"} width={isMobile ? "100%" : "49%"}>
         <Box width={"100%"} height={"min-content"} justifyContent={"center"} display={"grid"}>
           <EquipmentCard
             equipment={{

@@ -74,11 +74,11 @@ export default function EditEquipmentPage() {
 
       return (
 
-        <Stack padding={"0 15px 10px"}>
+        <Stack padding={"0 20px 15px"} spacing={3}>
           <title>{`Edit ${equipment.name} | Make @ RIT`}</title>
           <Stack>
             <Stack direction="row" spacing={2} alignItems="center" padding="10px">
-              <Typography variant="h5">Instances</Typography>
+              <Typography variant="h5" fontWeight={"bold"}>Instances</Typography>
               <Button variant="contained" startIcon={<AddIcon />} color="success" onClick={() => { setNewInstanceModal(true) }}>
                 Create New Instance
               </Button>
