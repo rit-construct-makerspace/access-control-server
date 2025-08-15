@@ -31,8 +31,8 @@ export async function purge_images() {
 		const toDelete = storedArr.filter(key => !inUse.has(key));
 		console.log(`Deleting ${toDelete.length} unused objects`, toDelete);
 
-		// const deleted = await deleteObjects(toDelete)
-		// console.log(`Purged ${deleted.length} images. ${inUseArr.length} remain`)
+		const deleted = await deleteObjects(toDelete)
+		console.log(`Purged ${deleted.length} images. ${inUseArr.length} remain`)
 	} catch (e) {
 		console.error("Could not purge images: ", e);
 	}

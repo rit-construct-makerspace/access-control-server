@@ -1,12 +1,12 @@
-import { PutObjectCommand, S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client, ListObjectsCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 
 
 const client = new S3Client({
   region: "us-east-1",
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? "",
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? ""
-  }
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "",
+  },
 });
 
 /**
@@ -28,8 +28,8 @@ export async function putObject(path: string, name: string, file: Buffer) {
 
 
 export async function listObjects(path: string): Promise<string[] | undefined> {
-  if (!path.endsWith("/")){
-    path+="/";
+  if (!path.endsWith("/")) {
+    path += "/";
   }
   const cmd = new ListObjectsCommand({
     Bucket: "make-static",
@@ -38,11 +38,11 @@ export async function listObjects(path: string): Promise<string[] | undefined> {
   });
   const response = await client.send(cmd);
   const parts = response?.Contents?.map(o => o.Key?.substring(path.length)).filter(n => n && n.length > 0);
-  if (!parts){
+  if (!parts) {
     // an error happened
     return undefined;
   }
-  if (parts?.some(o => o === undefined)){
+  if (parts?.some(o => o === undefined)) {
     // if any failed, fail it all (if this is happening, the programmer misunderstood the AWS docs)
     return undefined;
   }
@@ -55,6 +55,18 @@ export async function listObjects(path: string): Promise<string[] | undefined> {
  * @param keys list of keys to delete
  * @return a list of successfully delete objects
  */
-export async function deleteObjects(keys: string[]): Promise<string[]>{
-  return [];
+export async function deleteObjects(keys: string[]): Promise<string[] | undefined> {
+  const cmd = new DeleteObjectsCommand({
+    Bucket: "make-images",
+    Delete: {
+      Objects: keys.slice(1, 3).map(k => { return { Key: k } }),
+    }
+  })
+  const result = await client.send(cmd);
+  console.log(result);
+  console.log(result?.Deleted)
+  if (!result.Deleted) {
+    return undefined;
+  }
+  return result?.Deleted?.map(v => v.Key ?? "")
 }
