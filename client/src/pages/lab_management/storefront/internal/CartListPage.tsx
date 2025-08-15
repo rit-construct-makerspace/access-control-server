@@ -35,11 +35,6 @@ export function CartListPage() {
     return makerspaceMatch && userMatch;
   });
 
-  console.log("rows", rows)
-  console.log("filteredMakerspaces", filteredMakerspaces)
-  console.log("userSearch", userSearch)
-  console.log("filteredRows", filteredRows)
-
   const columns: GridColDef<(typeof rows)[number]>[] = [
     {
       field: "id",
@@ -80,6 +75,7 @@ export function CartListPage() {
 
   return (
     <AdminPage>
+      <title>Carts | Make @ RIT</title>
       <PageSectionHeader>Active Carts</PageSectionHeader>
 
       <Stack direction="row" spacing={4} mb={2} alignItems="center">

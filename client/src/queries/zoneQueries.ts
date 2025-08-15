@@ -94,6 +94,7 @@ export const GET_ZONES_WITH_ITEMS = gql`
     name
     items {
       id
+      image
       name
       labels
       unit

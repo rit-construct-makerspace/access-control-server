@@ -91,6 +91,7 @@ export function CartPage() {
           </Button>
         </Stack>
       }>
+        <title>Carts | Make @ RIT</title>
         <DataGrid
           rows={rows}
           columns={columns}
