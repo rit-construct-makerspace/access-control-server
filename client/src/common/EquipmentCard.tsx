@@ -113,7 +113,12 @@ export default function EquipmentCard(props: EquipmentCardProps) {
           {/* Desc && learn more */}
           <Stack justifyContent={"space-between"} height={"inherit"}>
             <Typography>
-              <ReactMarkdown>{props.equipment.notes}</ReactMarkdown>
+              <ReactMarkdown components={{
+                a({ children, ...props }) {
+                  return <a target="_blank" rel="noopener noreferrer"{...props}>{children}</a>;
+                },
+              }}
+              >{props.equipment.notes}</ReactMarkdown>
             </Typography>
             <Button
               size="small"
