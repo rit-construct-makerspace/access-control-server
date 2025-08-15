@@ -21,11 +21,29 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
   return (
     <Stack spacing={3} alignItems={"center"}>
       <Typography variant="h5" fontWeight={"bold"} alignSelf={"flex-start"}>Makerspace Information</Typography>
-      <ZoneCard id={props.id} name={props.name} hours={props.hours} imageUrl={props.imageUrl} isMobile={isMobile} />
+      <ZoneCard
+        id={props.id}
+        name={props.name}
+        hours={props.hours}
+        imageUrl={props.imageUrl}
+        isMobile={isMobile}
+      />
       <Stack direction={"row"} spacing={2} width={"100%"} alignItems={"center"} justifyContent={"center"}>
         <TextField label="Name" value={props.name} onChange={(e) => (props.setName(e.target.value))} sx={{ width: "50%" }} />
-        <FileUploadButton variant="contained" text="Upload Image" color="info" onUpload={(fileName: string) => { props.setImageUrl(fileName); props.updateZone(); }} />
-        <Button color="primary" variant="contained" startIcon={<SaveIcon />} onClick={props.updateZone}>Save</Button>
+        <FileUploadButton
+          variant="contained"
+          text="Upload Image"
+          color="info"
+          onUpload={(fileName: string) => { props.setImageUrl(fileName); props.updateZone(); }}
+        />
+        <Button
+          color="primary"
+          variant="contained"
+          startIcon={<SaveIcon />}
+          onClick={props.updateZone}
+        >
+          Save
+        </Button>
       </Stack>
     </Stack>
   );
