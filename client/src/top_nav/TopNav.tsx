@@ -171,7 +171,7 @@ export default function TopNav() {
                     </Stack>
                   </MenuItem>
                 }
-                <MenuItem onClick={() => { navigate(import.meta.env.VITE_LOGOUT_URL) }}>
+                <MenuItem onClick={() => { window.location.href = import.meta.env.VITE_LOGOUT_URL}}>
                   <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
                     <LogoutIcon sx={{ color: "gray" }} />
                     <Typography variant="body1">Logout</Typography>
