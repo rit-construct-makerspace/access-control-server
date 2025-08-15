@@ -287,15 +287,6 @@ export interface AccessCheckRow {
   approved: boolean;
 }
 
-export interface ZoneHoursRow {
-  id: number;
-  zoneID: number | null;
-  type: string;
-  dayOfTheWeek: number;
-  time: string;
-  imageUrl: string;
-}
-
 export interface ZoneRow {
   id: number;
   name: string;
@@ -464,7 +455,6 @@ declare module "knex/types/tables.js" {
     AccessChecks: AccessCheckRow;
     Zones: ZoneRow;
     RoomsForZones: RoomsForZonesRow
-    ZoneHours: ZoneHoursRow;
     DataPoints: DataPointsRow;
     EquipmentSessions: EquipmentSessionRow;
     InventoryLedger: InventoryLedgerRow;
