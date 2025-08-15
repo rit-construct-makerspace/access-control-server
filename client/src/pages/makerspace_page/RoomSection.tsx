@@ -12,6 +12,7 @@ interface RoomSectionProps {
     equipmentSearch: string;
     isMobile: boolean;
     staffMode: boolean;
+    showHidden: boolean;
 }
 
 export default function RoomSection(props: RoomSectionProps) {
@@ -59,7 +60,7 @@ export default function RoomSection(props: RoomSectionProps) {
                     ))
                 }
                 {
-                    props.staffMode
+                    (props.staffMode && props.showHidden)
                         ? archivedEquipment.map((equipment: Equipment) => (
                             <Grid key={equipment.id}>
                                 <EquipmentCard equipment={equipment} isMobile={props.isMobile} staffMode={props.staffMode} />
