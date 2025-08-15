@@ -51,13 +51,7 @@ export default function EditEquipmentPage() {
   });
 
   const [createInstance] = useMutation(CREATE_EQUIPMENT_INSTANCE, {
-    refetchQueries: ["EquipmentInstances"],
-    onCompleted() {
-      toast.success("Created new instance");
-    },
-    onError(error) {
-      toast.error(`Failed to create instance: ${error.message}`);
-    }
+    refetchQueries: ["EquipmentInstances"]
   });
 
   const [newInstanceName, setNewInstanceName] = useState("");
