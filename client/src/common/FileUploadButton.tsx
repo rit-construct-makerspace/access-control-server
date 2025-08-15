@@ -1,6 +1,7 @@
 import { Button, ButtonOwnProps, Input, styled, Typography } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { height } from "@mui/system";
+import { toast, ToastContainer } from "react-toastify";
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
@@ -35,6 +36,16 @@ export default function FileUploadButton(props: FileUploadProps) {
       body: await files[0].bytes()
     });
 
+    if (response.status !== 201) {
+      toast.error(`Failed to upload image: Code ${response.status}`, {
+        position: "bottom-left",
+      });
+    } else {
+      toast.success("Image Uploaded", {
+        position: "bottom-left",
+      });
+    }
+
     props.onUpload(await response.text());
   }
 
@@ -52,6 +63,9 @@ export default function FileUploadButton(props: FileUploadProps) {
         type="file"
         onChange={(event) => handleUpload(event.target.files)}
         multiple={false}
+      />
+      <ToastContainer
+        position="bottom-left"
       />
     </Button>
   )
