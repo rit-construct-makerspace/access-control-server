@@ -113,7 +113,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
           {/* Desc && learn more */}
           <Stack justifyContent={"space-between"} height={"inherit"}>
             <Typography>
-              <ReactMarkdown>{props.equipment.notes}</ReactMarkdown>
+              <ReactMarkdown linkTarget={"_blank"}>{props.equipment.notes}</ReactMarkdown>
             </Typography>
             <Button
               size="small"

@@ -57,7 +57,7 @@ export default function AnnouncementsDisplay() {
           <Stack width="100%" padding="25px" key={announcement.id} spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
             <Typography fontSize={100} textAlign="center" color="primary" fontWeight="bold">{announcement.title}</Typography>
             <Typography variant="h3" textAlign="center">
-              <ReactMarkdown className="">{announcement.description}</ReactMarkdown>
+              <ReactMarkdown linkTarget={"_blank"} className="">{announcement.description}</ReactMarkdown>
             </Typography>
           </Stack>
         );
