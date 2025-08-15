@@ -39,7 +39,8 @@ export default function MakerspacePage() {
       const zoneTrainings = fullZone.trainingModules.map(moduleStatusMapper(user.passedModules, user.trainingHolds));
 
       return (
-        <Stack spacing={"2"} padding="20px" divider={<Divider orientation="horizontal" flexItem />}>
+        <Stack spacing={"2"} padding={"0 20px 20px"} divider={<Divider orientation="horizontal" flexItem />}>
+          <StaffBar />
           <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
             <title>{`${fullZone.name} | Make @ RIT`}</title>
             <Typography variant="h3" align="center">{fullZone.name}</Typography>
@@ -56,7 +57,6 @@ export default function MakerspacePage() {
 
           </Stack>
           <ZoneHoursSection hours={fullZone.hours} isMobile={isMobile} />
-          <StaffBar />
           {
             zoneTrainings.length > 0 &&
             <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
