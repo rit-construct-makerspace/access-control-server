@@ -25,7 +25,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT, {
     refetchQueries: ["GetEquipmentByID"],
     onCompleted() {
-      toast.success("Updaeted equipment");
+      toast.success("Updated equipment");
     },
     onError(error) {
       toast.error(`Failed to update equipment: ${error.message}`);
