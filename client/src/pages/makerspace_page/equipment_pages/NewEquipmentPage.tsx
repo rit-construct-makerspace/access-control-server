@@ -104,7 +104,7 @@ export default function NewEquipmentPage() {
               * uncontrolled prop and throws a console error
               * when we set the value. This is a MUI problem.
               * @ts-ignore */
-              value={props.equipment.room}
+              value={room}
               options={rooms}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               getOptionLabel={(option) => option.name}
