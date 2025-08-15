@@ -20,7 +20,7 @@ export default function NewEquipmentPage() {
 
   const [createEquipment] = useMutation(CREATE_EQUIPMENT, {
     onCompleted(data) {
-      navigate(`/makerspace/${makerspaceID}/equipment/${data.id}`);
+      navigate(`/makerspace/${makerspaceID}/equipment/${data.addEquipment.id}`);
     },
     onError(error) {
       toast.error(`Failed to create equipment: ${error.message}`);
@@ -59,30 +59,24 @@ export default function NewEquipmentPage() {
   }
 
   return (
-    <Stack direction={isMobile ? "column-reverse" : "row"} width={"100%"} justifyContent={"space-between"}>
-      <Stack width={isMobile ? "100%" : "49%"} spacing={2}>
+    <Stack width={"100%"} justifyContent={"center"} padding={"0 20px 15px"} alignItems={"center"}>
+      <title>New Equipment | Make @ RIT</title>
+      <Stack width={isMobile ? "100%" : "50%"} spacing={2}>
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
           <Typography variant="h5" fontWeight={"bold"}>Machine Information</Typography>
-          <Stack direction={"row"} spacing={2}>
-            {/* Upload image button goes here */}
-            <Button
-              variant="contained"
-              color="info"
-            >
-              Upload
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={handleCreateEquipment}
-            >
-              Create
-            </Button>
-          </Stack>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreateEquipment}
+            color="success"
+          >
+            Create
+          </Button>
         </Stack>
 
         <TextField
           label="Name"
+          required
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
@@ -97,7 +91,7 @@ export default function NewEquipmentPage() {
           return (
             <Autocomplete
               renderInput={(params: any) => (
-                <TextField {...params} label="Location" />
+                <TextField {...params} required label="Location" />
               )}
               /* Autocomplete's value prop wants undefined, not null.
               * But if we give it undefined then it thinks it's an
