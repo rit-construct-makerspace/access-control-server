@@ -38,12 +38,12 @@ export default function EquipmentCard(props: EquipmentCardProps) {
           <Stack direction="row" height="200px">
             {props.isMobile ? null :
               <Stack alignItems="center">
-                <Box width="150px" height="175px">
+                <Box width="150px" height="200px">
                   <CardMedia
                     component="img"
                     image={(props.equipment.imageUrl === undefined || props.equipment.imageUrl == null || props.equipment.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + "user-uploads/" + props.equipment.imageUrl}
                     alt={`Picture of ${props.equipment.name}`}
-                    sx={{ width: "150px", height: "175px", backgroundColor: "lightgray" }}
+                    sx={{ width: "150px", height: "200px", backgroundColor: "lightgray" }}
                   />
                 </Box>
                 {isPriviledged ? <Typography variant="body2">ID {props.equipment.id}</Typography> : null}
