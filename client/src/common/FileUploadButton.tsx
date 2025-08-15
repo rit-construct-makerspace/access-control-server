@@ -64,9 +64,6 @@ export default function FileUploadButton(props: FileUploadProps) {
         onChange={(event) => handleUpload(event.target.files)}
         multiple={false}
       />
-      <ToastContainer
-        position="bottom-left"
-      />
     </Button>
   )
 }
