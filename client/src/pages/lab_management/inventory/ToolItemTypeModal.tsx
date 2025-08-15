@@ -85,7 +85,7 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
       <Box mb={5}>
         <Typography variant="h5">{type?.name ? `Edit Type "${type.name}"` : `Create Item Type`}</Typography>
       </Box>
-      <Stack direction={"column"} spacing={3}>
+      <Stack direction={"column"} spacing={2}>
         <Stack direction={"row"} width={"100%"}>
           <Tooltip title={"The name that will be used to refer to this instance in search and log history"}>
             <TextField label="Name" placeholder={`Name`} fullWidth
@@ -116,7 +116,12 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
           </Tooltip>
         </Stack>
         <Divider>Usage Info</Divider>
-        <FormControlLabel control={<Switch value={newType.allowCheckout} onChange={() => setNewType({ allowCheckout: !newType.allowCheckout, ...newType })} />} label={"Allow Instances to be checked out?"} />
+        <FormControlLabel
+          control={<Switch value={newType.allowCheckout} onChange={() => setNewType({ allowCheckout: !newType.allowCheckout, ...newType })} />}
+          label={"Allow Instances to be checked out?"}
+          labelPlacement="start"
+          sx={{ alignSelf: "center" }}
+        />
         <Stack direction={"column"} spacing={3}>
           <Tooltip title={"This note will show when a user attempts to check out an instance of this type"}>
             <TextField label="Check-out Note" placeholder={`Check-out Note`}
