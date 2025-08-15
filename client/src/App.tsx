@@ -16,8 +16,8 @@ export default function App() {
   return (
     <ApolloProvider client={apolloClient}>
       <ThemeProvider theme={theme}>
-        <CssBaseline/>
-        <BrowserRouter basename={ import.meta.env.BASE_URL }>
+        <CssBaseline />
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <CurrentUserProvider>
             <IsMobileProvider>
               <AppRoutes />

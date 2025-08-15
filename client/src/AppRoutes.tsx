@@ -43,6 +43,7 @@ import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
 import SiteSettings from "./pages/SiteSettings";
+import { Slide, ToastContainer } from "react-toastify";
 import EditEquipmentPage from "./pages/makerspace_page/equipment_pages/EditEquipmentPage";
 import NewEquipmentPage from "./pages/makerspace_page/equipment_pages/NewEquipmentPage";
 import EquipmentRedirector from "./pages/makerspace_page/equipment_pages/EquipmentRedirector";
@@ -205,6 +206,10 @@ export default function AppRoutes() {
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
+      <ToastContainer
+        position="bottom-left"
+        transition={Slide}
+      />
     </div>
   );
 }

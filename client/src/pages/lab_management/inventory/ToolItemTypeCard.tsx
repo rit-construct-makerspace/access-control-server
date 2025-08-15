@@ -18,7 +18,7 @@ import { isManager } from "../../../common/PrivilegeUtils";
 
 
 export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnInstanceClick }: { type: ToolItemType, handleLoanInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void, handleReturnInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void }) {
-  const {makerspaceID} = useParams<{makerspaceID: string}>()
+  const { makerspaceID } = useParams<{ makerspaceID: string }>()
   const navigate = useNavigate();
 
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -63,13 +63,13 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
 
   const [width, setWidth] = useState<number>(window.innerWidth);
   function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
+    setWidth(window.innerWidth);
   }
   useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
+    window.addEventListener('resize', handleWindowSizeChange);
+    return () => {
+      window.removeEventListener('resize', handleWindowSizeChange);
+    }
   }, []);
   const isMobile = width <= 1100;
 
@@ -81,7 +81,7 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
           component="img"
           width={150}
           height={150}
-          image={type.imageUrl ? `${import.meta.env.VITE_CDN_URL}${import.meta.env.VITE_CDN_TOOL_DIR}/${type.imageUrl}` : `${import.meta.env.BASE_URL}/shed_acronym_vert.jpg`}
+          image={type.imageUrl ? `${import.meta.env.VITE_CDN_URL}user-uploads/${type.imageUrl}` : `${import.meta.env.BASE_URL}/shed_acronym_vert.jpg`}
           alt={`${type.name} image`}
           sx={{ width: 150 }} />
         <Box width={"98.5%"} pl={"1.5%"}>
