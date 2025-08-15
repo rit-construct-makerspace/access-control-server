@@ -4,6 +4,7 @@ type SamlConfig = {
     readonly CALLBACK_URL: string,
     readonly ENTRY_POINT: string,
     readonly SSL_PVKEY: string,
+    readonly SSL_PUBKEY: string,
     readonly IDP_PUBKEY: string,
 }
 function SamlConfigIsValid(cfg: Partial<SamlConfig>): cfg is SamlConfig {
@@ -12,6 +13,7 @@ function SamlConfigIsValid(cfg: Partial<SamlConfig>): cfg is SamlConfig {
         cfg.CALLBACK_URL !== undefined &&
         cfg.ENTRY_POINT !== undefined &&
         cfg.SSL_PVKEY !== undefined &&
+        cfg.SSL_PUBKEY !== undefined &&
         cfg.IDP_PUBKEY !== undefined;
 }
 
@@ -28,7 +30,9 @@ function AuthConfigIsValid(cfg: Partial<AuthConfig>): cfg is AuthConfig {
 type AppConfig = {
     readonly ORIGIN: string,
     readonly URL: string, // usually origin + base_url
-    readonly LOGGED_OUT_URL: string
+    readonly LOGIN_URL: string; // the url that will use SSO to sign you in
+    readonly LOGOUT_URL: string; // the url that will sign you out
+    readonly LOGGED_OUT_URL: string // the url you will be sent to after logout
 }
 
 type PrinterOSConfig = {
@@ -88,8 +92,12 @@ type SlackConfig = {
 }
 
 type InventoryConfig = {
-    API_KEY: string;
-    DISABLE_CARTS: boolean;
+    API_KEY: string; // API key for inventory devices to connect with
+    DISABLE_CARTS: boolean; // TRUE to disable add to cart buttons so users cant go shopping
+}
+
+type AWSConfig = {
+    readonly AWS_DELETER_EMAIL: string;
 }
 
 type Config = {
@@ -154,8 +162,9 @@ function load_auth(): AuthConfig | undefined {
         ISSUER: required_string("ISSUER", "SAML Auth"),
         CALLBACK_URL: required_string("CALLBACK_URL", "SAML Auth"),
         ENTRY_POINT: required_string("ENTRY_POINT", "(SAML Auth)"),
-        SSL_PVKEY: required_string("ID_FORMAT", "SAML Auth"),
-        IDP_PUBKEY: required_string("ID_FORMAT", "SAML Auth"),
+        SSL_PVKEY: required_string("SSL_PVKEY", "SAML Auth"),
+        SSL_PUBKEY: required_string("SSL_PUBKEY", "SAML Auth"),
+        IDP_PUBKEY: required_string("IDP_PUBKEY", "SAML Auth"),
         ID_FORMAT: required_string("ID_FORMAT", "SAML Auth"),
     }
     if (!SamlConfigIsValid(saml)) {

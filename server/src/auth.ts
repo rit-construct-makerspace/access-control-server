@@ -130,9 +130,9 @@ export function setupDevAuth(app: express.Application) {
     callbackUrl: serverConfig.AUTH.SAML.CALLBACK_URL,
     entryPoint: serverConfig.AUTH.SAML.ENTRY_POINT,
     identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
-    decryptionPvk: process.env.SSL_PVKEY ?? "",
-    //privateKey: process.env.SSL_PVKEY ?? "",
-    idpCert: (process.env.IDP_PUBKEY ?? "").replace(' ', '').replace('\n', '').replace('\r', ''),
+    decryptionPvk: serverConfig.AUTH.SAML.SSL_PVKEY ?? "",
+    //privateKey: serverConfig.AUTH.SAML.SSL_PVKEY ?? "",
+    idpCert: (serverConfig.AUTH.SAML.IDP_PUBKEY ?? "").replace(' ', '').replace('\n', '').replace('\r', ''),
     //validateInResponseTo: ValidateInResponseTo.never,
     disableRequestedAuthnContext: true,
     signatureAlgorithm: "sha256",
@@ -167,8 +167,8 @@ export function setupDevAuth(app: express.Application) {
     }
 
     // Archive user if they do not have a whitelisted role
-    if (process.env.USER_WHITELIST) { // If the env varaible is not set, skip the check. We don't want to archive everyone
-      const whitelist = process.env.USER_WHITELIST.split(",");
+    if (serverConfig.AUTH.USER_WHITELIST) { // If the env varaible is not set, skip the check. We don't want to archive everyone
+      const whitelist = serverConfig.AUTH.USER_WHITELIST;
       const roles: string[] = ["Student", "Employee"];
 
       if (existingUser.forceArchive !== null) {
@@ -213,7 +213,7 @@ export function setupDevAuth(app: express.Application) {
     res.type("application/xml");
     res.status(200).send(
       authStrategy.generateServiceProviderMetadata(
-        process.env.SSL_PUBKEY ?? ""
+        serverConfig.AUTH.SAML.SSL_PUBKEY ?? ""
       )
     );
   });
@@ -258,7 +258,7 @@ export function setupDevAuth(app: express.Application) {
           res.status(400).send("Logout failed");
         } else {
           res.clearCookie("connect.sid");
-          res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
+          res.redirect(serverConfig.VITE.LOGGED_OUT_URL ?? "");
         }
       });
     } else {
@@ -283,10 +283,10 @@ export function setupStagingAuth(app: express.Application) {
   //   path: "/login/callback",
   //   callbackUrl: callbackUrl,
   //   entryPoint: entryPoint,
-  //   identifierFormat: process.env.ID_FORMAT ?? "",
-  //   decryptionPvk: process.env.SSL_PVKEY ?? "",
-  //   privateKey: process.env.SSL_PVKEY ?? "",
-  //   cert: process.env.IDP_PUBKEY ?? "",
+  //   identifierFormat: serverConfig.AUTH.SAML.ID_FORMAT ?? "",
+  //   decryptionPvk: serverConfig.AUTH.SAML.SSL_PVKEY ?? "",
+  //   privateKey: serverConfig.AUTH.SAML.SSL_PVKEY ?? "",
+  //   cert: serverConfig.AUTH.SAML.IDP_PUBKEY ?? "",
   //   validateInResponseTo: ValidateInResponseTo.never,
   //   disableRequestedAuthnContext: true,
   //   signatureAlgorithm: 'sha256',
@@ -367,8 +367,8 @@ export function setupStagingAuth(app: express.Application) {
     }
 
     // Archive user if they do not have a whitelisted role
-    if (process.env.USER_WHITELIST) { // If the env varaible is not set, skip the check. We don't want to archive everyone
-      const whitelist = process.env.USER_WHITELIST.split(",");
+    if (serverConfig.AUTH.USER_WHITELIST) { // If the env varaible is not set, skip the check. We don't want to archive everyone
+      const whitelist = serverConfig.AUTH.USER_WHITELIST.split(",");
       const roles: string[] = ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"];
 
       if (existingUser.forceArchive !== null) {
@@ -417,7 +417,7 @@ export function setupStagingAuth(app: express.Application) {
       .status(200)
       .send(
         authStrategy.generateServiceProviderMetadata(
-          process.env.SSL_PUBKEY ?? ""
+          serverConfig.AUTH.SAML.SSL_PUBKEY ?? ""
         )
       );
   });
@@ -463,7 +463,7 @@ export function setupStagingAuth(app: express.Application) {
           res.status(400).send("Logout failed");
         } else {
           res.clearCookie("connect.sid");
-          res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
+          res.redirect(serverConfig.VITE.LOGGED_OUT_URL ?? "");
         }
       });
     } else {
