@@ -35,12 +35,12 @@ function authenticated(expressUser: Express.User | undefined) {
   }
 }
 
-function determineUser(expressUser: Express.User | undefined) {
+export function determineUser(expressUser: Express.User | undefined) {
   return expressUser as CurrentUser;
 }
 
 // Checks if a user is an admin
-export const isAdmin =
+const isAdmin =
   (expressUser: Express.User | undefined) =>
     (callback: (user: CurrentUser) => any) => {
       authenticated(expressUser);
@@ -58,7 +58,7 @@ export const isAdmin =
  * Admin
  * ^ Manager
  */
-export const isManagerFor =
+const isManagerFor =
   (expressUser: Express.User | undefined) =>
     (makerspaceID: number, callback: (user: CurrentUser) => any) => {
       makerspaceID = Number(makerspaceID);
@@ -78,7 +78,7 @@ export const isManagerFor =
  * ^ Manager
  * ^ Staff
  */
-export const isStaffFor =
+const isStaffFor =
   (expressUser: Express.User | undefined) =>
     (makerspaceID: number, callback: (user: CurrentUser) => any) => {
       makerspaceID = Number(makerspaceID);
@@ -96,7 +96,7 @@ export const isStaffFor =
  * Admin
  * ^ Trainer
  */
-export const isTrainerFor =
+const isTrainerFor =
   (expressUser: Express.User | undefined) =>
     (equipmentID: number, callback: (user: CurrentUser) => any) => {
       equipmentID = Number(equipmentID);
@@ -115,7 +115,7 @@ export const isTrainerFor =
  * Admin
  * ^ Manager
  */
-export const isManager =
+const isManager =
   (expressUser: Express.User | undefined) =>
     (callback: (user: CurrentUser) => any) => {
       authenticated(expressUser);
@@ -134,7 +134,7 @@ export const isManager =
  * ^ Manager
  * ^ Staff
  */
-export const isStaff =
+const isStaff =
   (expressUser: Express.User) =>
     (callback: (user: CurrentUser) => any) => {
       authenticated(expressUser);
@@ -154,7 +154,7 @@ export const isStaff =
  * ^ Staff
  * ^ Trainer
  */
-export const isTrainer =
+const isTrainer =
   (expressUser: Express.User | undefined) =>
     (callback: (user: CurrentUser) => any) => {
       authenticated(expressUser);
@@ -173,7 +173,7 @@ export const isTrainer =
  * ^ Manager
  * ^ Staff
  */
-export const ifStaffOrSelf =
+const ifStaffOrSelf =
   (expressUser: Express.User | undefined) =>
     (targetedUserID: number, callback: (user: CurrentUser) => any) => {
       authenticated(expressUser);
@@ -189,7 +189,7 @@ export const ifStaffOrSelf =
     };
 
 // only checks if user is authenticated (for actions where holds or privileges do not matter)
-export const ifAuthenticated =
+const ifAuthenticated =
   (expressUser: Express.User | undefined) =>
     (callback: (user: CurrentUser) => any) => {
       if (!expressUser) {

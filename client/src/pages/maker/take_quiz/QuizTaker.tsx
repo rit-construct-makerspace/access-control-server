@@ -188,7 +188,16 @@ export default function QuizTaker({ module }: QuizTakerProps) {
 
         switch (quizItem.type) {
           case QuizItemType.Text:
-            return <Typography key={quizItem.id} sx={styles.strongerBolds}><Markdown>{quizItem.text}</Markdown></Typography>;
+            return <Typography key={quizItem.id} sx={styles.strongerBolds}>
+              <Markdown
+                components={{
+                  a({ children, ...props }) {
+                    return <a target="_blank" rel="noopener noreferrer"{...props}>{children}</a>;
+                  },
+                }}>
+                {quizItem.text}
+              </Markdown>
+              </Typography>;
           case QuizItemType.MultipleChoice:
             return (
               <Question

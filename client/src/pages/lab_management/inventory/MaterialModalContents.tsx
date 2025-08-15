@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   Button,
   FormControl,
@@ -16,11 +16,11 @@ import DeleteMaterialButton from "./DeleteMaterialButton";
 import HelpTooltip from "../../../common/HelpTooltip";
 import SaveIcon from "@mui/icons-material/Save";
 import InventoryItem from "../../../types/InventoryItem";
-import AdminPage from "../../AdminPage";
 import { useQuery } from "@apollo/client";
 import { GET_ZONES } from "../../../queries/zoneQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import FileUploadButton from "../../../common/FileUploadButton";
 
 interface InputErrors {
   name?: boolean;
@@ -125,9 +125,8 @@ export default function MaterialModalContents({
 
   const title = `${isNewItem ? "New" : "Edit"} Material`;
 
-
   return (
-    <AdminPage title={""} maxWidth="1250px">
+    <Stack spacing={2}>
       <Typography variant="h5" mb={2}>
         {title}
       </Typography>
@@ -139,7 +138,7 @@ export default function MaterialModalContents({
             error={inputErrors.name}
             onChange={handleStringChange("name")}
           />
-          <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+          <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? "unset" : "space-between"}>
             <TextField
               label="Single unit"
               value={itemDraft.unit ?? ""}
@@ -165,10 +164,10 @@ export default function MaterialModalContents({
               onChange={handleMoneyChange("pricePerUnit")}
             />
           </Stack>
-          <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+          <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? "unset" : "space-between"}>
             <TextField
               label="Count"
-              sx={{ flex: 1 }}
+              sx={{ width: isMobile ? "100%" : "49%" }}
               type="number"
               value={itemDraft.count ?? ""}
               error={inputErrors.count}
@@ -178,7 +177,7 @@ export default function MaterialModalContents({
               direction="row"
               alignItems="center"
               spacing={1}
-              sx={{ flex: 1 }}
+              sx={{ width: isMobile ? "100%" : "49%" }}
             >
               <TextField
                 label="Threshold"
@@ -201,7 +200,7 @@ export default function MaterialModalContents({
         //itemDraft is sometimes empty for a moment during intialization which causes the Select to be empty even after. This prevents such conditions.
         <RequestWrapper loading={makerspacesResult.loading} error={makerspacesResult.error}>
           <Stack direction="row" spacing={2} mt={2}>
-            <FormControl sx={{ width: '25em' }}>
+            <FormControl fullWidth>
               <InputLabel id="makerspace-select-label">Makerspace</InputLabel>
               <Select labelId="makerspace-select-label" value={itemDraft.makerspaceID} onChange={(e) => setItemDraft({ ...itemDraft, makerspaceID: e.target.value })} error={inputErrors.makerspaceID} label="Makerspace">
                 {makerspacesResult.data?.zones.map((zone: { id: number, name: string }) => (
@@ -210,25 +209,24 @@ export default function MaterialModalContents({
               </Select>
             </FormControl>
           </Stack>
-        </RequestWrapper>}
+        </RequestWrapper>
+      }
 
-      <TextareaAutosize
-        style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em", marginTop: "2em", marginBottom: "2em" }}
+      <TextField
         aria-label="Notes (Internal)"
+        label="Notes (Internal)"
         defaultValue={itemDraft.notes ?? ""}
-        placeholder="Notes (Internal)"
         value={itemDraft.notes}
-        onChange={handleNotesChanged}>
-      </TextareaAutosize>
+        onChange={handleNotesChanged}
+      />
 
-      <TextareaAutosize
-        style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em", marginTop: "2em", marginBottom: "2em" }}
-        aria-label="Description (public)"
+      <TextField
+        aria-label="Description (Public)"
+        label="Description (Public)"
         defaultValue={itemDraft.description ?? ""}
-        placeholder="Description (public)"
         value={itemDraft.description}
-        onChange={handleDescriptionChanged}>
-      </TextareaAutosize>
+        onChange={handleDescriptionChanged}
+      />
 
       <Stack direction={isMobile ? "column" : "row"} justifyContent="space-between" mt={4}>
         {!isNewItem && (
@@ -243,17 +241,25 @@ export default function MaterialModalContents({
           </Stack>
         )}
 
-        <Button
-          loading={loading}
-          size="large"
-          variant="contained"
-          startIcon={<SaveIcon />}
-          sx={{ ml: "auto" }}
-          onClick={handleSaveClick}
-        >
-          Save
-        </Button>
+        <Stack direction={"row"} spacing={2}>
+          <FileUploadButton
+            variant="contained"
+            color="info"
+            onUpload={(name: string) => setItemDraft({ ...itemDraft, image: name })}
+          />
+          <Button
+            loading={loading}
+            size="large"
+            variant="contained"
+            color="success"
+            startIcon={<SaveIcon />}
+            sx={{ ml: "auto" }}
+            onClick={handleSaveClick}
+          >
+            Save
+          </Button>
+        </Stack>
       </Stack>
-    </AdminPage >
+    </Stack >
   );
 }

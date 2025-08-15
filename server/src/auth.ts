@@ -46,8 +46,8 @@ interface RitSsoUser {
 // the format that RIT SSO will give us.
 function mapSamlTestToRit(testUser: any): RitSsoUser {
   return {
-    firstName: testUser["urn:oid:2.5.4.42"],
-    lastName: testUser["urn:oid:2.5.4.4"],
+    firstName: testUser.email.split("@")[0],
+    lastName: testUser.email.split("@")[0],
     ritUsername: testUser.email.split("@")[0], // samltest format
   };
 }
@@ -251,15 +251,14 @@ export function setupDevAuth(app: express.Application) {
     res.status(401).send("Login failed");
   });
 
-  app.post("/logout", (req, res) => {
+  app.get("/logout", (req, res) => {
     if (req.session) {
       req.session.destroy((err) => {
         if (err) {
           res.status(400).send("Logout failed");
         } else {
-          // res.clearCookie("connect.sid");
-
-          res.redirect(serverConfig.VITE.LOGGED_OUT_URL);
+          res.clearCookie("connect.sid");
+          res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
         }
       });
     } else {
@@ -457,13 +456,13 @@ export function setupStagingAuth(app: express.Application) {
     res.status(401).send("Login failed");
   });
 
-  app.post("/logout", (req, res) => {
+  app.get("/logout", (req, res) => {
     if (req.session) {
       req.session.destroy((err) => {
         if (err) {
           res.status(400).send("Logout failed");
         } else {
-          // res.clearCookie("connect.sid");
+          res.clearCookie("connect.sid");
           res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
         }
       });
