@@ -45,6 +45,7 @@ import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
 import SiteSettings from "./pages/SiteSettings";
 import EditEquipmentPage from "./pages/makerspace_page/equipment_pages/EditEquipmentPage";
+import NewEquipmentPage from "./pages/makerspace_page/equipment_pages/NewEquipmentPage";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -144,6 +145,7 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/training/new" element={<EditNewModulePage />} />
                   <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
 
+                  <Route path="/makerspace/:makerspaceID/equipment/new" element={<NewEquipmentPage />} />
                   <Route path="/makerspace/:makerspaceID/equipment/:equipmentID" element={<EditEquipmentPage />} />
 
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />

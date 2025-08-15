@@ -215,5 +215,5 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
       </Stack>
 
     </Stack>
-  )
+  );
 }
