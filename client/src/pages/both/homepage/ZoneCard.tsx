@@ -11,6 +11,7 @@ interface ZoneCardProps {
   hours: ZoneHours[];
   imageUrl: string;
   isMobile: boolean;
+  clickable?: boolean;
 }
 
 function getHoursToday(times: ZoneHours[]) {
@@ -46,7 +47,12 @@ export default function ZoneCard(props: ZoneCardProps) {
 
   return (
     <Card sx={{ width: props.isMobile ? "350px" : "500px" }} elevation={isHovered ? undefined : 8} onMouseEnter={() => { setIsHovered(true) }} onMouseLeave={() => { setIsHovered(false) }}>
-      <CardActionArea onClick={() => { navigate(`/makerspace/${props.id}`) }}>
+      <CardActionArea
+        onClick={
+          (props.clickable === true || props.clickable === undefined)
+            ? () => { navigate(`/makerspace/${props.id}`) }
+            : () => { /* Do nothing */ }
+        }>
         <CardMedia
           component="img"
           height={props.isMobile ? "197px" : "281px"}

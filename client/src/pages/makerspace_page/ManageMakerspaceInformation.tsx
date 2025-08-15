@@ -51,6 +51,7 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
         hours={props.hours}
         imageUrl={imgUrl}
         isMobile={isMobile}
+        clickable={false}
       />
       <Stack direction={"row"} spacing={2} width={"100%"} alignItems={"center"} justifyContent={"center"}>
         <TextField label="Name" value={zoneName} onChange={(e) => (setZoneName(e.target.value))} sx={{ width: "50%" }} />
