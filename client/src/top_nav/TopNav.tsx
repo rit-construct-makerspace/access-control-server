@@ -19,6 +19,7 @@ import { useIsMobile } from "../common/IsMobileProvider";
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import ArticleIcon from '@mui/icons-material/Article';
 import TuneIcon from '@mui/icons-material/Tune';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const StyledLogo = styled.img`
   padding: 12px;
@@ -170,6 +171,12 @@ export default function TopNav() {
                     </Stack>
                   </MenuItem>
                 }
+                <MenuItem onClick={() => { navigate(import.meta.env.VITE_LOGOUT_URL) }}>
+                  <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
+                    <LogoutIcon sx={{ color: "gray" }} />
+                    <Typography variant="body1">Logout</Typography>
+                  </Stack>
+                </MenuItem>
               </Menu>
             </Stack>
           </Drawer>
@@ -250,6 +257,12 @@ export default function TopNav() {
                     </Stack>
                   </MenuItem>
                 }
+                <MenuItem onClick={() => { window.location.href = import.meta.env.VITE_LOGOUT_URL}}>
+                  <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
+                    <LogoutIcon sx={{ color: "gray" }} />
+                    <Typography variant="body1" width={"100%"} textAlign={"center"}>Logout</Typography>
+                  </Stack>
+                </MenuItem>
               </Menu>
             </Stack>
           </AppBar>
