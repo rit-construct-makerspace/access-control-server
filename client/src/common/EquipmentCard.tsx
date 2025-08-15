@@ -41,7 +41,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 <Box width="150px" height="175px">
                   <CardMedia
                     component="img"
-                    image={(props.equipment.imageUrl === undefined || props.equipment.imageUrl == null || props.equipment.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/" + props.equipment.imageUrl}
+                    image={(props.equipment.imageUrl === undefined || props.equipment.imageUrl == null || props.equipment.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + "user-uploads" + "/" + props.equipment.imageUrl}
                     alt={`Picture of ${props.equipment.name}`}
                     sx={{ width: "150px", height: "175px", backgroundColor: "lightgray" }}
                   />
@@ -113,7 +113,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
           {/* Desc && learn more */}
           <Stack justifyContent={"space-between"} height={"inherit"}>
             <Typography>
-              <ReactMarkdown>{props.equipment.notes}</ReactMarkdown>
+              <ReactMarkdown linkTarget={"_blank"}>{props.equipment.notes}</ReactMarkdown>
             </Typography>
             <Button
               size="small"

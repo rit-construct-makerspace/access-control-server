@@ -1,4 +1,4 @@
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
 
 
 const client = new S3Client({
@@ -24,4 +24,29 @@ export async function putObject(path: string, name: string, file: Buffer) {
 
   const response = await client.send(command);
   return response;
+}
+
+
+export async function listObjects(path: string): Promise<string[] | undefined> {
+  if (!path.endsWith("/")){
+    path+="/";
+  }
+  const cmd = new ListObjectsCommand({
+    Bucket: "make-static",
+    Prefix: path,
+
+  });
+  const response = await client.send(cmd);
+  // return response?.Contents?.map(o => o.Key?.substring(path.length)).filter(n => n && n.length > 0)
+  return [];
+}
+
+
+/**
+ * 
+ * @param keys list of keys to delete
+ * @return a list of successfully delete objects
+ */
+export async function deleteObjects(keys: string[]): Promise<string[]>{
+  return [];
 }
