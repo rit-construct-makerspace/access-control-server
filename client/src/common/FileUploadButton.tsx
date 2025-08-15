@@ -33,7 +33,7 @@ export default function FileUploadButton(props: FileUploadProps) {
       headers: {
         "Content-Type": "application/octet-stream"
       },
-      body: await files[0].bytes()
+      body: new Uint8Array(await files[0].arrayBuffer())
     });
 
     if (response.status !== 201) {
