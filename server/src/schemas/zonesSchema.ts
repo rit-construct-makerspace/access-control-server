@@ -4,7 +4,6 @@
  */
 
 import { gql } from "graphql-tag";
-import { ZoneHoursRow } from "../db/tables.js";
 
 export interface ZoneInput {
   name: string;

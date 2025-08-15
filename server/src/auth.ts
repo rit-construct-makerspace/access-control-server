@@ -262,13 +262,13 @@ export function setupDevAuth(app: express.Application) {
     res.status(401).send("Login failed");
   });
 
-  app.post("/logout", (req, res) => {
+  app.get("/logout", (req, res) => {
     if (req.session) {
       req.session.destroy((err) => {
         if (err) {
           res.status(400).send("Logout failed");
         } else {
-          // res.clearCookie("connect.sid");
+          res.clearCookie("connect.sid");
           res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
         }
       });
@@ -477,13 +477,13 @@ export function setupStagingAuth(app: express.Application) {
     res.status(401).send("Login failed");
   });
 
-  app.post("/logout", (req, res) => {
+  app.get("/logout", (req, res) => {
     if (req.session) {
       req.session.destroy((err) => {
         if (err) {
           res.status(400).send("Logout failed");
         } else {
-          // res.clearCookie("connect.sid");
+          res.clearCookie("connect.sid");
           res.redirect(process.env.VITE_LOGGED_OUT_URL ?? "");
         }
       });
