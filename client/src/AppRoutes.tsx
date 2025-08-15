@@ -12,7 +12,6 @@ import SignupPage from "./pages/maker/signup/SignupPage";
 import QuizPage from "./pages/maker/take_quiz/QuizPage";
 import QuizResults from "./pages/maker/take_quiz/QuizResults";
 import AnnouncementsPage from "./pages/lab_management/announcements/AnnouncementsPage";
-import ManageEquipmentPage from "./pages/lab_management/manage_equipment/ManageEquipmentPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import EditActiveModulePage from "./pages/lab_management/edit_module/EditActiveModulePage";
 import LogoutPromptPage from "./pages/both/logout/LogoutPromptPage";
@@ -185,9 +184,7 @@ export default function AppRoutes() {
             <Route path="/maker/training/:id/results" element={<QuizResults />} />
 
             <Route path="/maker/materials" element={<InventoryPreviewPage />} />
-            <Route path="/admin/equipment" element={<ManageEquipmentPage />} />
 
-            <Route path="/admin/equipment/issues/:logid" element={<ManageEquipmentPage showLogs={true} />} />
             <Route path="/admin/equipment/logs/:logid" element={<ResolutionLogPage />} />
 
             <Route path="/admin/inventory" element={<InventoryPage />} />
