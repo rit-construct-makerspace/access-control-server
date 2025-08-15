@@ -45,6 +45,7 @@ import OrganizationsPage from "./pages/lab_management/organizations/Organization
 import SiteSettings from "./pages/SiteSettings";
 import EditEquipmentPage from "./pages/makerspace_page/equipment_pages/EditEquipmentPage";
 import NewEquipmentPage from "./pages/makerspace_page/equipment_pages/NewEquipmentPage";
+import EquipmentRedirector from "./pages/makerspace_page/equipment_pages/EquipmentRedirector";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -127,6 +128,8 @@ export default function AppRoutes() {
           <Route element={<AuthedRoute />}>
             <Route path="/user/trainings" element={<UserTraingingsPage />} />
             <Route path="/user/settings" element={<UserSettingsPage />} />
+
+            <Route path="/equipment/:equipmentID" element={<EquipmentRedirector />} />
 
             {/* Routes for trainers + higher */}
             <Route>
