@@ -29,6 +29,7 @@ import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./reposit
 import * as Emailer from "./integrations/email/email.js"
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
+import { purge_images } from "./periodicActions.js";
 
 const require = createRequire(import.meta.url);
 
@@ -513,8 +514,10 @@ async function startServer() {
 
     handleTrainingExpiriesAndEmails();
     //await pruneNullLengthEquipmentSessions().then(async () => await createLog('Unfinished Equipment Sessions pruned.', "server"));;
-  });
 
+    // Find unused images on AWS and 'remove' them
+    await purge_images();
+  });
 
 
   const server = new ApolloServer({
