@@ -8,10 +8,12 @@ import { Box, Button, Divider, InputLabel, FormControl, MenuItem, Select, Stack,
 import GET_ROOMS from "../../../queries/roomQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import Room from "../../../types/Room";
+import { useIsMobile } from "../../../common/IsMobileProvider";
+import FileUploadButton from "../../../common/FileUploadButton";
 
 
 export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
-  const {makerspaceID} = useParams<{makerspaceID: string}>();
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
   const navigate = useNavigate();
 
@@ -51,35 +53,35 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
       return;
     } else setNameAlert(false);
 
-    if (type) editType({ variables: { id: type.id, toolItemType: {
-      name: newType.name,
-      defaultLocationRoomID: newType.defaultLocationRoomID,
-      defaultLocationDescription: newType.defaultLocationDescription,
-      description: newType.description,
-      checkoutNote: newType.checkoutNote,
-      checkinNote: newType.checkinNote,
-      allowCheckout: newType.allowCheckout,
-      imageUrl: newType.imageUrl
-    } } });
+    if (type) editType({
+      variables: {
+        id: type.id, toolItemType: {
+          name: newType.name,
+          defaultLocationRoomID: newType.defaultLocationRoomID,
+          defaultLocationDescription: newType.defaultLocationDescription,
+          description: newType.description,
+          checkoutNote: newType.checkoutNote,
+          checkinNote: newType.checkinNote,
+          allowCheckout: newType.allowCheckout,
+          imageUrl: newType.imageUrl
+        }
+      }
+    });
     else createType({ variables: { toolItemType: newType } })
 
     close();
   }
 
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
   useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 1100;
+    if (newType.imageUrl !== type?.imageUrl && newType !== blankType.imageUrl) {
+      handleEditSubmit();
+    }
+  }, [newType]);
+
+  const isMobile = useIsMobile()
 
   return (
-    <PrettyModal open={true} onClose={close} width={isMobile ? width : 400}>
+    <PrettyModal open={true} onClose={close} width={isMobile ? "100%" : "600px"}>
       <Box mb={5}>
         <Typography variant="h5">{type?.name ? `Edit Type "${type.name}"` : `Create Item Type`}</Typography>
       </Box>
@@ -87,13 +89,13 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
         <Stack direction={"row"} width={"100%"}>
           <Tooltip title={"The name that will be used to refer to this instance in search and log history"}>
             <TextField label="Name" placeholder={`Name`} fullWidth
-              value={newType.name} onChange={(e) => setNewType({  ...newType, name: e.target.value })} />
+              value={newType.name} onChange={(e) => setNewType({ ...newType, name: e.target.value })} />
           </Tooltip>
         </Stack>
         <Divider>Default Location</Divider>
-        <Stack direction={"row"} spacing={3}>
+        <Stack spacing={3}>
           <RequestWrapper loading={getRooms.loading} error={getRooms.error}>
-            <FormControl sx={{width: "50%"}}>
+            <FormControl>
               <InputLabel id="default-room">Room</InputLabel>
               <Tooltip title={"New instances under this type will use this Room by default"} placement="top">
                 <Select id="default-room" value={newType.defaultLocationRoomID} label="Room"
@@ -106,8 +108,11 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
             </FormControl>
           </RequestWrapper>
           <Tooltip title={"New instances under this type will use this location description by default"} placement="top">
-            <TextField label="Description" placeholder={`Description`} sx={{width: "50%"}}
-              value={newType.defaultLocationDescription} onChange={(e) => setNewType({ ...newType, defaultLocationDescription: e.target.value })} />
+            <TextField
+              label="Description" placeholder={`Description`}
+              value={newType.defaultLocationDescription}
+              onChange={(e) => setNewType({ ...newType, defaultLocationDescription: e.target.value })}
+            />
           </Tooltip>
         </Stack>
         <Divider>Usage Info</Divider>
@@ -124,10 +129,18 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
         </Stack>
         <Divider>Type Info</Divider>
         <Stack direction={"column"} spacing={3}>
-          <TextField label="Image Path" placeholder={`Image Path`}
-            value={newType.imageUrl} onChange={(e) => setNewType({ imageUrl: e.target.value, ...newType })} />
-          <TextareaAutosize value={newType.description} placeholder="Description" onChange={(e) => setNewType({ ...newType, description: e.target.value })}
-            style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em" }}></TextareaAutosize>
+          <TextField
+            value={newType.description}
+            label={"Description"}
+            placeholder="description"
+            onChange={(e) => setNewType({ ...newType, description: e.target.value })}
+          />
+          <FileUploadButton
+            color="info"
+            variant="contained"
+            text="Upload Image"
+            onUpload={(name: string) => setNewType({ ...newType, imageUrl: name })}
+          />
         </Stack>
         <Divider></Divider>
         {nameAlert && <Typography color={"error"} variant="body2">Name cannot be blank</Typography>}

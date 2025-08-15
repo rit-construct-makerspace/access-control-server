@@ -19,7 +19,7 @@ export async function getToolItemTypes(): Promise<ToolItemTypesRow[]> {
  * @returns all matching Tool Item Types
  */
 export async function getToolItemTypesWhereAllowCheckout(): Promise<ToolItemTypesRow[]> {
-    return await knex("ToolItemTypes").select().where({allowCheckout: true}).orderBy("id");
+    return await knex("ToolItemTypes").select().where({ allowCheckout: true }).orderBy("id");
 }
 
 /**
@@ -28,7 +28,7 @@ export async function getToolItemTypesWhereAllowCheckout(): Promise<ToolItemType
  * @returns Tool Item Type or undefined is not exist
  */
 export async function getToolItemTypeByID(id: number): Promise<ToolItemTypesRow | undefined> {
-    return await knex("ToolItemTypes").select().where({id}).first();
+    return await knex("ToolItemTypes").select().where({ id }).first();
 }
 
 /**
@@ -43,7 +43,7 @@ export async function getToolItemTypeByID(id: number): Promise<ToolItemTypesRow 
  * @returns 
  */
 export async function createToolItemType(name: string, defaultLocationRoomID: number | undefined, defaultLocationDescription: string | undefined, description: string | undefined, checkoutNote: string | undefined, checkinNote: string | undefined, allowCheckout: boolean): Promise<ToolItemTypesRow> {
-    return await knex("ToolItemTypes").insert({name, defaultLocationRoomID, defaultLocationDescription, description, checkoutNote, checkinNote, allowCheckout});
+    return await knex("ToolItemTypes").insert({ name, defaultLocationRoomID, defaultLocationDescription, description, checkoutNote, checkinNote, allowCheckout });
 }
 
 /**
@@ -58,8 +58,17 @@ export async function createToolItemType(name: string, defaultLocationRoomID: nu
  * @param allowCheckout new allowCheckout
  * @returns updated Tool Item Type or undefined if not exist
  */
-export async function updateToolItemType(id: number, name: string, defaultLocationRoomID: number | undefined, defaultLocationDescription: string | undefined, description: string | undefined, checkoutNote: string | undefined, checkinNote: string | undefined, allowCheckout: boolean): Promise<ToolItemTypesRow | undefined> {
-    return (await knex("ToolItemTypes").update({name, defaultLocationRoomID, defaultLocationDescription, description, checkoutNote, checkinNote, allowCheckout}).where({id}).returning("*"))[0];
+export async function updateToolItemType(id: number, name: string, defaultLocationRoomID: number | undefined, defaultLocationDescription: string | undefined, description: string | undefined, checkoutNote: string | undefined, checkinNote: string | undefined, allowCheckout: boolean, imageUrl: string | undefined): Promise<ToolItemTypesRow | undefined> {
+    return (await knex("ToolItemTypes").update({
+        name,
+        defaultLocationRoomID,
+        defaultLocationDescription,
+        description,
+        checkoutNote,
+        checkinNote,
+        allowCheckout,
+        imageUrl
+    }).where({ id }).returning("*"))[0];
 }
 
 /**
@@ -68,6 +77,6 @@ export async function updateToolItemType(id: number, name: string, defaultLocati
  * @returns true
  */
 export async function deleteToolItemType(id: number): Promise<boolean> {
-    await knex("ToolItemTypes").delete().where({id});
+    await knex("ToolItemTypes").delete().where({ id });
     return true;
 }
