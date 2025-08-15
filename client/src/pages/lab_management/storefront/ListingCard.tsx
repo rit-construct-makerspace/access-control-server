@@ -14,7 +14,7 @@ interface ListingCardProps {
 export function ListingCard(props: ListingCardProps) {
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
-  console.log(props.item.image)
+  
   return (
     <Card sx={{ width: 400, m: 2 }}>
       {!isMobile && <CardMedia
