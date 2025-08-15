@@ -31,7 +31,7 @@ export default function Question({
   return (
     <Card elevation={2} sx={{ p: 2 }}>
       <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}>
-        <Markdown linkTarget={"_blank"}
+        <Markdown
           components={{
             a({ children, ...props }) {
               return <a target="_blank" rel="noopener noreferrer"{...props}>{children}</a>;
