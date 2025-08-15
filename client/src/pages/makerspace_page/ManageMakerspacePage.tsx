@@ -18,6 +18,7 @@ import ManageMakerspaceTrainings from "./ManageMakerspaceTrainings";
 import ManageMakerspaceHours from "./ManageMakerspaceHours";
 import FileUploadButton from "../../common/FileUploadButton";
 import ManageMakerspaceInformation from "./ManageMakerspaceInformation";
+import { toast } from "react-toastify";
 
 
 export default function ManageMakerspacePage() {
@@ -56,18 +57,15 @@ export default function ManageMakerspacePage() {
           initState(zone);
         }
 
-        const handleDeleteZone = () => {
-          const confirm = window.confirm("Are you sure you want to delete? This cannot be undone.");
-          if (confirm)
-            deleteZone({
-              variables: { id: zone.id },
-              refetchQueries: [{ query: GET_ZONE_BY_ID, variables: { id: makerspaceID } }],
-            });
-        };
-
         const handleUpdateZone = async () => {
           await updateZone({
-            variables: { id: makerspaceID, name: zoneName, imageUrl: imgUrl }
+            variables: { id: makerspaceID, name: zoneName, imageUrl: imgUrl },
+            onCompleted() {
+              toast.success("Updated makerspace");
+            },
+            onError(error) {
+              toast.error(`Failed to update zone: ${error.message}`);
+            },
           });
         };
 
