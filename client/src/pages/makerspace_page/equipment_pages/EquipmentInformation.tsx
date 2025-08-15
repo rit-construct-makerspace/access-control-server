@@ -1,6 +1,6 @@
 import { Autocomplete, Box, Button, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
 import { Equipment } from "./EditEquipmentPage";
-import { UPDATE_EQUIPMENT } from "../../../queries/equipmentQueries";
+import { ARCHIVE_EQUIPMENT, PUBLISH_EQUIPMENT, UPDATE_EQUIPMENT } from "../../../queries/equipmentQueries";
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -10,6 +10,8 @@ import GET_ROOMS from "../../../queries/roomQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import SaveIcon from '@mui/icons-material/Save';
 import EquipmentTrainings from "./EquipmentTrainings";
+import ArchiveIcon from '@mui/icons-material/Archive';
+import UnarchiveIcon from '@mui/icons-material/Unarchive';
 
 interface EquipmentInformationProps {
   equipment: Equipment;
@@ -19,6 +21,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const isMobile = useIsMobile();
 
   const getRoomsResult = useQuery(GET_ROOMS);
+
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT, {
     refetchQueries: ["GetEquipmentByID"],
     onCompleted() {
@@ -27,6 +30,14 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
     onError(error) {
       toast.error(`Failed to update equipment: ${error.message}`);
     },
+  });
+  const [publishEquipment] = useMutation(PUBLISH_EQUIPMENT, {
+    variables: { id: props.equipment.id },
+    refetchQueries: ["GetEquipmentByID"]
+  });
+  const [archiveEquipment] = useMutation(ARCHIVE_EQUIPMENT, {
+    variables: { id: props.equipment.id },
+    refetchQueries: ["GetEquipmentByID"]
   });
 
   const [name, setName] = useState(props.equipment.name);
@@ -81,6 +92,25 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             >
               Upload
             </Button>
+            {
+              props.equipment.archived
+                ? <Button
+                  color="success"
+                  variant="contained"
+                  startIcon={<UnarchiveIcon />}
+                  onClick={() => publishEquipment()}
+                >
+                  Publish
+                </Button>
+                : <Button
+                  color="error"
+                  variant="contained"
+                  startIcon={<ArchiveIcon />}
+                  onClick={() => archiveEquipment()}
+                >
+                  Archive
+                </Button>
+            }
             <Button
               variant="contained"
               startIcon={<SaveIcon />}
