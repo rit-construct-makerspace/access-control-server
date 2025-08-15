@@ -98,6 +98,9 @@ export default function MaterialModalContents({
   const handleNotesChanged = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setItemDraft({ ...itemDraft, notes: String(event.target.value) })
   };
+  const handleImageChanged = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setItemDraft({ ...itemDraft, image: String(event.target.value) })
+  };
 
   function handleDescriptionChanged(event: ChangeEvent<HTMLTextAreaElement>): void {
     setItemDraft({ ...itemDraft, description: event.target.value });
@@ -220,6 +223,16 @@ export default function MaterialModalContents({
         value={itemDraft.notes}
         onChange={handleNotesChanged}>
       </TextareaAutosize>
+
+      <TextareaAutosize
+        style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em", marginTop: "2em", marginBottom: "2em" }}
+        aria-label="Notes (Internal)"
+        defaultValue={itemDraft.image ?? ""}
+        placeholder="Image URL"
+        value={itemDraft.image}
+        onChange={handleImageChanged}>
+      </TextareaAutosize>
+
 
       <TextareaAutosize
         style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em", marginTop: "2em", marginBottom: "2em" }}
