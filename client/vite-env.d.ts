@@ -9,6 +9,7 @@ interface ImportMetaEnv {
     readonly VITE_LOGOUT_URL: string;
     readonly VITE_GRAFANA_READER_STATS_URL: string;
     readonly VITE_DISABLE_STOREFRONT_CART: string;
+    readonly VITE_ORIGIN: string;
 }
 
 interface ImportMeta {

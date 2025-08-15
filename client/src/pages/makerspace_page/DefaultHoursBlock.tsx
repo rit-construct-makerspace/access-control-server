@@ -5,6 +5,7 @@ import { useState } from "react";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
+import { toast } from "react-toastify";
 
 export const UPDATE_DEFAULT_HOURS = gql`
   mutation UpdateDefaultHours($hours: DefaultHoursInput!) {
@@ -26,6 +27,12 @@ export default function DefaultHoursBlock(props: DefaultHoursBlockProps) {
   const [updateHours] = useMutation(UPDATE_DEFAULT_HOURS, {
     refetchQueries: ["GetZoneDefaultHours"], // Doesn't work for some reason
     awaitRefetchQueries: true,
+    onCompleted() {
+      toast.success(`Updated ${TimeUtils.dayToString(props.hours.dayOfWeek)} hours`)
+    },
+    onError(error) {
+      toast.error(`Failed to update ${TimeUtils.dayToString(props.hours.dayOfWeek)} hours: ${error.message}`)
+    },
   });
 
   return (

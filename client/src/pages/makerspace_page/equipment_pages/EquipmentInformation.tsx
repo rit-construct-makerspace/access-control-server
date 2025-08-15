@@ -12,6 +12,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import EquipmentTrainings from "./EquipmentTrainings";
 import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import FileUploadButton from "../../../common/FileUploadButton";
 
 interface EquipmentInformationProps {
   equipment: Equipment;
@@ -25,7 +26,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT, {
     refetchQueries: ["GetEquipmentByID"],
     onCompleted() {
-      toast.success("Updaeted equipment");
+      toast.success("Updated equipment");
     },
     onError(error) {
       toast.error(`Failed to update equipment: ${error.message}`);
@@ -86,12 +87,12 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
           <Typography variant="h5" fontWeight={"bold"}>Machine Information</Typography>
           <Stack direction={"row"} spacing={2}>
             {/* Upload image button goes here */}
-            <Button
-              variant="contained"
+            <FileUploadButton
               color="info"
-            >
-              Upload
-            </Button>
+              variant="contained"
+              text="Upload Image"
+              onUpload={(name: string) => setImageUrl(name)}
+            />
             {
               props.equipment.archived
                 ? <Button
