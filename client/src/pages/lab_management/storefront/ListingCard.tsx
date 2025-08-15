@@ -14,7 +14,7 @@ interface ListingCardProps {
 export function ListingCard(props: ListingCardProps) {
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
-
+  
   return (
     <Card sx={{ width: 400, m: 2 }}>
       {!isMobile && <CardMedia
@@ -24,14 +24,30 @@ export function ListingCard(props: ListingCardProps) {
       <CardContent sx={{ minHeight: 125 }}>
         <Typography gutterBottom variant="h5" component="div">{props.item.name}</Typography>
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>{props.item.makerspace?.name}</Typography>
+        <Stack direction={"row"} justifyContent={"space-between"}>
         <Typography variant="body1">${props.item.pricePerUnit.toFixed(2)} / {props.item.unit}</Typography>
+        <Typography variant="body1">{props.item.count} {props.item.count == 1 ? props.item.unit : props.item.pluralUnit}</Typography>
+        </Stack>
       </CardContent>
       <CardActions>
         <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
           <Button size="small" onClick={() => props.openDetailsModal(props.item)}>Details</Button>
           {props.item.count > 0
-            ? <Button size="small" variant="contained" color="primary" disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" || currentUser.privilege === Privilege.VISITOR} onClick={() => props.setActiveItem(props.item)}>Add to Cart ({props.item.count} {props.item.count > 1 ? props.item.pluralUnit : props.item.unit} available {import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" && "(Not yet available)"})</Button>
-            : <Button size="small" variant="contained" color="error" disabled>Out of stock</Button>}
+            ? <Button 
+                size="small" 
+                variant="contained" 
+                color="primary" 
+                disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" || currentUser.privilege === Privilege.VISITOR} 
+                onClick={() => props.setActiveItem(props.item)}>
+                  Add to Cart 
+              </Button>
+            : <Button 
+                size="small" 
+                variant="contained" 
+                color="error" 
+                disabled>
+                  Out of stock
+                </Button>}
         </Stack>
       </CardActions>
     </Card>

@@ -26,6 +26,7 @@ export default function InventoryPage() {
   return (
     <RequestWrapper loading={zonesWithItemsResult.loading} error={zonesWithItemsResult.error}>
       <AdminPage>
+        <title>Inventory | Make @ RIT</title>
         <Box margin="25px">
           <Stack direction="row" justifyContent="space-between" alignItems="baseline">
             <Typography variant="h4">Inventory</Typography>

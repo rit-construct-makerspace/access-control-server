@@ -85,7 +85,7 @@ export default function MakerspacePage() {
             />
             {
               isManagerFor(user, Number(makerspaceID))
-                ? <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={() => (navigate("/admin/equipment/new"))}>
+                ? <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={() => (navigate(`/makerspace/${makerspaceID}/equipment/new`))}>
                   Create New Equipment
                 </Button>
                 : null

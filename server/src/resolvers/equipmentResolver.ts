@@ -51,11 +51,11 @@ const EquipmentResolvers = {
     },
 
     /**
-     * Fetch specific published Equipment
+     * Fetch specific Equipment
      * @returns Equipment
      */
     equipment: async (_parent: any, args: { id: string }, _context: any) => {
-      return await EquipmentRepo.getEquipmentByIDWhereArchived(Number(args.id), false);
+      return await EquipmentRepo.getEquipmentByID(Number(args.id));
     },
 
     /**
@@ -160,7 +160,7 @@ const EquipmentResolvers = {
         }
         console.log(args.equipment)
         return await EquipmentRepo.updateEquipment(Number(args.id), args.equipment);
-    }),
+      }),
 
     /**
      * Set an Equipment as archived/hidden
@@ -172,7 +172,7 @@ const EquipmentResolvers = {
       { isManager }: ApolloContext) =>
       isManager(async (user: CurrentUser) => {
         return await EquipmentRepo.setEquipmentArchived(args.id, true);
-    }),
+      }),
 
     /**
      * Set an Equipment as published
@@ -184,7 +184,7 @@ const EquipmentResolvers = {
       { isManager }: ApolloContext) =>
       isManager(async (user: CurrentUser) => {
         return await EquipmentRepo.setEquipmentArchived(args.id, false);
-    }),
+      }),
   },
 };
 
