@@ -4,7 +4,7 @@ import { useCurrentUser } from "./CurrentUserProvider";
 import { ModuleStatus, moduleStatusMapper } from "./TrainingModuleUtils";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import ConstructionIcon from '@mui/icons-material/Construction';
 import ReactMarkdown from "react-markdown";
 import ModuleStatusRow from "./ModuleStatusRow";
@@ -16,6 +16,7 @@ interface EquipmentCardProps {
 }
 
 export default function EquipmentCard(props: EquipmentCardProps) {
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const user = useCurrentUser();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -56,7 +57,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 {
                   isPriviledged
                     ? <Button
-                      onClick={() => { navigate(`/admin/equipment/${props.equipment.archived ? "archived/" : ""}${props.equipment.id}`) }}
+                      onClick={() => { navigate(`/makerspace/${makerspaceID}/equipment/${props.equipment.id}`) }}
                       aria-label="edit button"
                       sx={{ width: "40px", height: "40px" }}
                       variant="contained"
