@@ -124,13 +124,11 @@ export function setupSessions(app: express.Application) {
 
 // Unsafe auth -- local development only
 export function setupDevAuth(app: express.Application) {
-  const reactAppUrl = serverConfig.VITE.URL;
-
   const authStrategy = new SamlStrategy({
-    issuer: issuer,
+    issuer: serverConfig.AUTH.SAML.ISSUER,
     //path: "/login/callback",
-    callbackUrl: callbackUrl,
-    entryPoint: entryPoint,
+    callbackUrl: serverConfig.AUTH.SAML.CALLBACK_URL,
+    entryPoint: serverConfig.AUTH.SAML.ENTRY_POINT,
     identifierFormat: "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
     decryptionPvk: process.env.SSL_PVKEY ?? "",
     //privateKey: process.env.SSL_PVKEY ?? "",
@@ -230,7 +228,7 @@ export function setupDevAuth(app: express.Application) {
   const authenticate = passport.authenticate("saml", {
     failureFlash: true,
     failureRedirect: "/login/fail",
-    successRedirect: vite_url,
+    successRedirect: serverConfig.VITE.URL,
   });
 
   app.get("/login", authenticate);
@@ -273,11 +271,6 @@ export function setupDevAuth(app: express.Application) {
 
 //Setup Passport SAML configuration
 export function setupStagingAuth(app: express.Application) {
-  const issuer = serverConfig.AUTH.SAML.ISSUER;
-  const callbackUrl = serverConfig.AUTH.SAML.CALLBACK_URL;
-  const entryPoint = serverConfig.AUTH.SAML.ENTRY_POINT;
-  const reactAppUrl = serverConfig.VITE.URL;
-
   /*
   identifierFormat defaults to urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress.
   ITS demanded we use urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified
@@ -305,14 +298,14 @@ export function setupStagingAuth(app: express.Application) {
 
   const authStrategy = new SamlStrategy(
     {
-      issuer: issuer,
+      issuer: serverConfig.AUTH.SAML.ISSUER,
       //path: "/login/callback",
-      callbackUrl: callbackUrl,
-      entryPoint: entryPoint,
-      identifierFormat: serverConfig.AUTH.SAML.ID_FORMAT ?? "",
-      decryptionPvk: process.env.SSL_PVKEY ?? "",
-      //privateKey: process.env.SSL_PVKEY ?? "",
-      idpCert: (process.env.IDP_PUBKEY ?? "").replace(' ', '').replace('\n', '').replace('\r', ''),
+      callbackUrl: serverConfig.AUTH.SAML.CALLBACK_URL,
+      entryPoint: serverConfig.AUTH.SAML.ENTRY_POINT,
+      identifierFormat: serverConfig.AUTH.SAML.ID_FORMAT,
+      decryptionPvk: serverConfig.AUTH.SAML.SSL_PVKEY,
+      //privateKey: serverConfig.AUTH.SAML.SSL_PVKEY ?? "",
+      idpCert: (serverConfig.AUTH.SAML.IDP_PUBKEY ?? "").replace(' ', '').replace('\n', '').replace('\r', ''),
       //validateInResponseTo: ValidateInResponseTo.never,
       disableRequestedAuthnContext: true,
       signatureAlgorithm: "sha256",
@@ -440,7 +433,7 @@ export function setupStagingAuth(app: express.Application) {
   const authenticate = passport.authenticate("saml", {
     failureFlash: true,
     failureRedirect: "/login/fail",
-    successRedirect: reactAppUrl,
+    successRedirect: serverConfig.VITE.URL,
   });
 
   app.get("/login", authenticate);

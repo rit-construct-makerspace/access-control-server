@@ -1,14 +1,28 @@
+type SamlConfig = {
+    readonly ID_FORMAT: string,
+    readonly ISSUER: string,
+    readonly CALLBACK_URL: string,
+    readonly ENTRY_POINT: string,
+    readonly SSL_PVKEY: string,
+    readonly IDP_PUBKEY: string,
+}
+function SamlConfigIsValid(cfg: Partial<SamlConfig>): cfg is SamlConfig {
+    return cfg.ID_FORMAT !== undefined &&
+        cfg.ISSUER !== undefined &&
+        cfg.CALLBACK_URL !== undefined &&
+        cfg.ENTRY_POINT !== undefined &&
+        cfg.SSL_PVKEY !== undefined &&
+        cfg.IDP_PUBKEY !== undefined;
+}
+
 type AuthConfig = {
     // Session secret for express-sessions
     readonly SESSION_SECRET: string,
-    readonly SAML: {
-        readonly ID_FORMAT: string,
-        readonly ISSUER: string,
-        readonly CALLBACK_URL: string,
-        readonly ENTRY_POINT: string,
-        readonly SSL_PVKEY: string,
-        readonly IDP_PUBKEY: string,
-    }
+    readonly USER_WHITELIST: string[]
+    readonly SAML: SamlConfig;
+}
+function AuthConfigIsValid(cfg: Partial<AuthConfig>): cfg is AuthConfig {
+    return cfg.SESSION_SECRET !== undefined && cfg.USER_WHITELIST !== undefined && cfg.SAML !== undefined;
 }
 
 type AppConfig = {
@@ -18,16 +32,30 @@ type AppConfig = {
 }
 
 type PrinterOSConfig = {
-    PAPERCUT: { SECURITY_SECRET: string; }
+    PAPERCUT?: { SECURITY_SECRET: string; }
     FREE_3D_PRINTS: boolean;
 
-    PRINTEROS_QUIZ_ID: number;
-    API_FS_WORKGROUP: number;
-    CLOUDPRINT: {
-        URL: string;
-        PASSWORD: string;
-        WORKGROUP: number;
-    }
+    SELF_SERVE_QUIZ_ID: number;
+    SELF_SERVE_WORKGROUP_ID: number;
+
+    FULL_SERVE_QUIZ_ID: number;
+    FULL_SERVE_WORKGROUP_ID: number;
+
+    API_URL: string;
+    API_USERNAME: string;
+    API_PASSWORD: string;
+}
+
+function PrinterOSConfigIsValid(cfg: Partial<PrinterOSConfig>): cfg is PrinterOSConfig {
+    const invalid = cfg.FREE_3D_PRINTS === undefined
+        || cfg.SELF_SERVE_QUIZ_ID === undefined
+        || cfg.FULL_SERVE_QUIZ_ID == undefined
+        || cfg.SELF_SERVE_WORKGROUP_ID === undefined
+        || cfg.FULL_SERVE_WORKGROUP_ID == undefined
+        || cfg.API_URL === undefined
+        || cfg.API_USERNAME === undefined
+        || cfg.API_PASSWORD === undefined;
+    return !invalid;
 }
 
 type MailgunConfig = {
@@ -61,57 +89,91 @@ type SlackConfig = {
 
 type InventoryConfig = {
     API_KEY: string;
-    DISABLE_CARTS: string;
+    DISABLE_CARTS: boolean;
 }
 
 type Config = {
     readonly NODE_ENV: "development" | "staging" | "production",
     readonly CDN_URL: string;
-    readonly TIMEZONE: string;
+    readonly STATISTICS_TIMEZONE: string;
     readonly INV: InventoryConfig
     readonly VITE: AppConfig
     readonly AUTH: AuthConfig,
-    readonly PRINTER_OS?: PrinterOSConfig
+    readonly PRINTER_OS: PrinterOSConfig
 }
 
+function required_string(key: string, reason: string): string | undefined {
+    const value = process.env[key];
+    if (!value) {
+        console.error(`Missing Required Env Variable '${key}' (${reason})`);
+        return undefined;
+    }
+    return value;
+}
+function defaulted_string(key: string, reason: string, defaultValue: string): string {
+    const value = process.env[key];
+    if (!value) {
+        console.warn(`Missing Suggested Env Variable '${key}' (${reason})`);
+        return defaultValue;
+    }
+    return value;
+}
+
+function defaulted_boolean(key: string, reason: string, defaultValue: boolean): boolean {
+    const value = process.env[key];
+    if (!value) {
+        console.warn(`Missing Suggested Env Variable '${key}' (${reason})  Defaulting to ${defaultValue}`);
+        return defaultValue;
+    }
+    if (value.toLowerCase() === "true") {
+        return true
+    }
+    if (value.toLowerCase() === "false") {
+        return true
+    }
+    console.warn(`Malformed boolean for Suggested Env Variable '${key}' (${reason}) Defaulting to ${defaultValue}`);
+    return defaultValue;
+}
+
+function required_nonnan(key: string, reason: string): number | undefined {
+    const value = process.env[key];
+    if (!value) {
+        console.error(`Missing Numeric Env Variable '${key}' (${reason}). Value: ${value}`);
+        return undefined;
+    }
+    if (isNaN(Number(value))) {
+        console.error(`Invalid Numeric Env Variable '${key}' (${reason}). Value: ${value}`);
+        return undefined;
+    }
+    return Number(value);
+}
+
+
 function load_auth(): AuthConfig | undefined {
-    if (!process.env.SESSION_SECRET) {
-        console.error("Missing Required Env Variable: SESSION_SECRET (Express Sessions)");
+    const saml: Partial<SamlConfig> = {
+        ISSUER: required_string("ISSUER", "SAML Auth"),
+        CALLBACK_URL: required_string("CALLBACK_URL", "SAML Auth"),
+        ENTRY_POINT: required_string("ENTRY_POINT", "(SAML Auth)"),
+        SSL_PVKEY: required_string("ID_FORMAT", "SAML Auth"),
+        IDP_PUBKEY: required_string("ID_FORMAT", "SAML Auth"),
+        ID_FORMAT: required_string("ID_FORMAT", "SAML Auth"),
+    }
+    if (!SamlConfigIsValid(saml)) {
+        console.error("Invalid SAML configuration");
         return undefined;
     }
+    const allowlist = required_string("USER_WHITELIST", "SAML Auth");
+    const cfg: Partial<AuthConfig> = {
+        SESSION_SECRET: required_string("SESSION_SECRET", "Express Sessions"),
+        SAML: saml,
+        USER_WHITELIST: allowlist?.split(","),
+    }
+    if (!AuthConfigIsValid(cfg)) {
+        console.error("Invalid Auth configuration");
+        return undefined;
+    }
+    return cfg;
 
-    if (!process.env.ISSUER) {
-        console.error("Missing Required Env Variable: ISSUER (SAML Auth)");
-        return undefined;
-    }
-    if (!process.env.CALLBACK_URL) {
-        console.error("Missing Required Env Variable: CALLBACK_URL (SAML Auth)");
-        return undefined;
-    }
-    if (!process.env.ENTRY_POINT) {
-        console.error("Missing Required Env Variable: ENTRY_POINT (SAML Auth)");
-        return undefined;
-    }
-    if (!process.env.SSL_PVKEY) {
-        console.error("Missing Required Env Variable: SSL_PVKEY (SAML Auth)");
-        return undefined;
-    }
-    if (!process.env.IDP_PUBKEY) {
-        console.error("Missing Required Env Variable: IDP_PUBKEY (SAML Auth)");
-        return undefined;
-    }
-
-    return {
-        SESSION_SECRET: process.env.SESSION_SECRET,
-        SAML: {
-            ISSUER: process.env.ISSUER,
-            CALLBACK_URL: process.env.CALLBACK_URL,
-            ENTRY_POINT: process.env.ENTRY_POINT,
-            IDP_PUBKEY: process.env.IDP_PUBKEY,
-            SSL_PVKEY: process.env.SSL_PVKEY,
-
-        }
-    };
 }
 
 function load_app(): AppConfig | undefined {
@@ -146,6 +208,25 @@ function load_inventory(): InventoryConfig | undefined {
     };
 }
 
+
+function load_printer_os(): PrinterOSConfig | undefined {
+    const cfg: Partial<PrinterOSConfig> = {
+        FREE_3D_PRINTS: defaulted_boolean("FREE_3D_PRINTS", "3DPrinterOS Payment", false),
+        SELF_SERVE_QUIZ_ID: required_nonnan("ID_3DPRINTEROS_QUIZ", "Printer OS Workgroup Management"),
+        SELF_SERVE_WORKGROUP_ID: required_nonnan("CLOUDPRINT_API_WORKGROUP", "Printer OS Workgroup Management"),
+        FULL_SERVE_QUIZ_ID: required_nonnan("ID_3DPRINTEROS_FS_QUIZ", "Printer OS Workgroup Management"),
+        FULL_SERVE_WORKGROUP_ID: required_nonnan("CLOUDPRINT_API_FS_WORKGROUP", "Printer OS Workgroup Management"),
+        API_URL: required_string("CLOUDPRINT_API_URL", "Printer OS Workgroup Management"),
+        API_USERNAME: required_string("CLOUDPRINT_API_USERNAME", "Printer OS Workgroup Management"),
+        API_PASSWORD: required_string("CLOUDPRINT_API_PASSWORD", "Printer OS Workgroup Management"),
+    };
+
+    if (!PrinterOSConfigIsValid(cfg)) {
+        return undefined;
+    }
+    return cfg
+}
+
 function load_config(): Config {
     const auth = load_auth();
     if (!auth) {
@@ -161,16 +242,34 @@ function load_config(): Config {
         process.exit(1);
     }
 
+    const e = process.env.NODE_ENV;
+    if (!(e == "development" || e === "staging" || e === "production")) {
+        process.exit(1);
+    }
+    if (!process.env.VITE_CDN_URL) {
+        console.warn("Missing Env Variable VITE_CDN_URL (WARN)")
+    }
+    if (!process.env.STAT_TIMEZONE) {
+        console.error("Missing Required Env Variable STAT_TIMEZONE (Statistics Queries)")
+        process.exit(1);
+    }
+    const printer_os = load_printer_os();
+    if (!printer_os) {
+        process.exit(1);
+    }
 
     return {
-        NODE_ENV: "development",
+        NODE_ENV: e,
+        CDN_URL: process.env.VITE_CDN_URL ?? "",
+        STATISTICS_TIMEZONE: process.env.STAT_TIMEZONE,
         VITE: app,
         AUTH: auth,
         INV: inventory,
+        PRINTER_OS: printer_os,
     }
 }
 
 const serverConfig: Config = load_config();
-
+console.log(serverConfig);
 
 export default serverConfig;
