@@ -45,7 +45,7 @@ import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
 import SiteSettings from "./pages/SiteSettings";
-import { ToastContainer } from "react-toastify";
+import { Slide, ToastContainer } from "react-toastify";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -204,6 +204,7 @@ export default function AppRoutes() {
       </Routes>
       <ToastContainer
         position="bottom-left"
+        transition={Slide}
       />
     </div>
   );

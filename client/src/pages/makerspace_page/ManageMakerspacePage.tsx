@@ -28,46 +28,17 @@ export default function ManageMakerspacePage() {
   const isMobile = useIsMobile();
 
   const getZone = useQuery(GET_ZONE_BY_ID, { variables: { id: makerspaceID } });
-  const [deleteZone] = useMutation(DELETE_ZONE);
-  const [updateZone] = useMutation(UPDATE_ZONE, { refetchQueries: ["GetZoneByID"] });
 
   const [createRoom] = useMutation(CREATE_ROOM);
 
-  const [zoneName, setZoneName] = useState("");
-  const [imgUrl, setImgUrl] = useState("");
-
   const [newRoomName, setNewRoomName] = useState("");
   const [newRoomModal, setNewRoomModal] = useState(false);
-
-  const [init, setInit] = useState(false);
-
-  function initState(zone: FullZone) {
-    setZoneName(zone.name);
-    setImgUrl(zone.imageUrl);
-    setInit(true);
-  }
 
   return (
     <Box>
       <RequestWrapper2 result={getZone} render={(data) => {
 
         const zone: FullZone = data.zoneByID;
-
-        if (!init) {
-          initState(zone);
-        }
-
-        const handleUpdateZone = async () => {
-          await updateZone({
-            variables: { id: makerspaceID, name: zoneName, imageUrl: imgUrl },
-            onCompleted() {
-              toast.success("Updated makerspace");
-            },
-            onError(error) {
-              toast.error(`Failed to update zone: ${error.message}`);
-            },
-          });
-        };
 
         const handleCreateRoom = async () => {
           await createRoom({
@@ -93,12 +64,9 @@ export default function ManageMakerspacePage() {
               <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />} width={"48%"}>
                 <ManageMakerspaceInformation
                   id={Number(makerspaceID)}
-                  name={zoneName}
-                  setName={setZoneName}
+                  name={zone.name}
                   hours={zone.hours}
-                  imageUrl={imgUrl}
-                  setImageUrl={setImgUrl}
-                  updateZone={handleUpdateZone}
+                  imageUrl={zone.imageUrl}
                 />
                 <Stack spacing={2} alignItems="center">
                   <Stack
