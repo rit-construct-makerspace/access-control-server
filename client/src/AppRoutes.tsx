@@ -1,6 +1,5 @@
 import { Outlet, Route, Routes, useParams } from "react-router-dom";
 import StorefrontPreviewPage from "./pages/lab_management/storefront_preview/StorefrontPreviewPage";
-import EditEquipmentPage from "./pages/lab_management/manage_equipment/EditEquipmentPage";
 import TrainingModulesPage from "./pages/lab_management/training_modules/TrainingModulesPage";
 import InventoryPage from "./pages/lab_management/inventory/InventoryPage";
 import ManageRoomPage from "./pages/makerspace_page/MonitorRoomPage";
@@ -45,6 +44,7 @@ import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
 import SiteSettings from "./pages/SiteSettings";
+import EditEquipmentPage from "./pages/makerspace_page/equipment_pages/EditEquipmentPage";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -143,6 +143,9 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/trainings" element={<TrainingModulesPage />} />
                   <Route path="/makerspace/:makerspaceID/training/new" element={<EditNewModulePage />} />
                   <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
+
+                  <Route path="/makerspace/:makerspaceID/equipment/:equipmentID" element={<EditEquipmentPage />} />
+
                   <Route path="/makerspace/:makerspaceID/tools" element={<ToolItemPage />} />
                   <Route path="/makerspace/:makerspaceID/tools/type/:typeid" element={<ToolItemPage />} />
                   <Route path="/makerspace/:makerspaceID/tools/type/" element={<ToolItemPage />} />
@@ -181,8 +184,7 @@ export default function AppRoutes() {
 
             <Route path="/maker/materials" element={<InventoryPreviewPage />} />
             <Route path="/admin/equipment" element={<ManageEquipmentPage />} />
-            <Route path="/admin/equipment/:id" element={<EditEquipmentPage archived={false} />} />
-            <Route path="/admin/equipment/archived/:id" element={<EditEquipmentPage archived={true} />} />
+
             <Route path="/admin/equipment/issues/:logid" element={<ManageEquipmentPage showLogs={true} />} />
             <Route path="/admin/equipment/logs/:logid" element={<ResolutionLogPage />} />
 
