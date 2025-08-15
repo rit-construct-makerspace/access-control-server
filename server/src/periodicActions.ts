@@ -1,8 +1,12 @@
 import { knex } from "./db/index.js";
-import { listObjects, deleteObjects } from "./integrations/aws/s3.js"
+import { listObjects } from "./integrations/aws/s3.js"
+import { send_generic_email } from "./integrations/email/email.js";
 
-
-export async function purge_images() {
+/**
+ * If you use the CDN to store user-uploads, make sure you update this query so it knows that those images are in use
+ */
+export async function purge_images(): Promise<void> {
+	// This is so embarassing, S3 configuration is a terrible test that we absolutely failed
 	try {
 		const inUseImages = await knex.raw(`
 	    with images(id) as (
@@ -19,20 +23,30 @@ export async function purge_images() {
 		    select t."imageUrl" as image from "ToolItemTypes" t
 	    ) select id from images where id is not null and length(id) > 0`);
 		const inUseArr = inUseImages?.rows?.map((o: { id: string }) => o.id);
-		console.log(inUseArr);
+
 		const inUse = new Set(inUseArr);
 		const storedArr = await listObjects("user-uploads");
-		if (!storedArr){
+		if (!storedArr) {
 			console.error("Couldn't list user-uploads to prune");
 			return;
 		}
-		console.log("stored", storedArr);
-		// All that is stored minus all that is in use
-		const toDelete = storedArr.filter(key => !inUse.has(key));
-		console.log(`Deleting ${toDelete.length} unused objects`, toDelete);
 
-		const deleted = await deleteObjects(toDelete)
-		console.log(`Purged ${deleted.length} images. ${inUseArr.length} remain`)
+		// All that is stored minus all that are in use
+		const toDelete = storedArr.filter(key => !inUse.has(key));
+		const msg = `Please Delete ${toDelete.length} unused objects in the user-uploads/ folder:\n- ${toDelete.join("\n- ")}`;
+		
+		if (!process.env.AWS_DELETER_EMAIL) {
+			console.log("NO MANAGEMENT RECEIPIENT, TELL SOMEONE THE FOLLOWING\n", msg)
+			return;
+		}
+
+		await send_generic_email({
+			fromAccount: "management",
+			to: [process.env.AWS_DELETER_EMAIL],
+			htmlContent: `<pre>${msg}</pre>`,
+			textContent: msg,
+			subject: "You need to delete some images"
+		})
 	} catch (e) {
 		console.error("Could not purge images: ", e);
 	}

@@ -514,9 +514,11 @@ async function startServer() {
 
     handleTrainingExpiriesAndEmails();
     //await pruneNullLengthEquipmentSessions().then(async () => await createLog('Unfinished Equipment Sessions pruned.', "server"));;
+
+    // Find unused images on AWS and 'remove' them
+    await purge_images();
   });
 
-  purge_images()
 
   const server = new ApolloServer({
     schema,

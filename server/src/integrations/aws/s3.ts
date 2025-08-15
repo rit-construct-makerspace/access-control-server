@@ -1,4 +1,4 @@
-import { PutObjectCommand, S3Client, ListObjectsCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
 
 
 const client = new S3Client({
@@ -49,24 +49,3 @@ export async function listObjects(path: string): Promise<string[] | undefined> {
   return parts as string[];
 }
 
-
-/**
- * 
- * @param keys list of keys to delete
- * @return a list of successfully delete objects
- */
-export async function deleteObjects(keys: string[]): Promise<string[] | undefined> {
-  const cmd = new DeleteObjectsCommand({
-    Bucket: "make-images",
-    Delete: {
-      Objects: keys.slice(1, 3).map(k => { return { Key: k } }),
-    }
-  })
-  const result = await client.send(cmd);
-  console.log(result);
-  console.log(result?.Deleted)
-  if (!result.Deleted) {
-    return undefined;
-  }
-  return result?.Deleted?.map(v => v.Key ?? "")
-}
