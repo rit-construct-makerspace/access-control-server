@@ -1,30 +1,28 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { Button, Card, Grid, Stack, TextField, Typography } from "@mui/material";
+import { Button, Card, Grid, Stack, Typography } from "@mui/material";
 import gql from "graphql-tag";
 import { GET_ZONES } from "../../queries/zoneQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import DeleteIcon from '@mui/icons-material/Delete';
-import PrettyModal from "../../common/PrettyModal";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from "react-router-dom";
 import CreateMakerspaceModal from "./CreateMakerspaceModal";
-
-const ARCHIVE_MAKERSPACE = gql`
-  mutation ArchiveMakerspace($id: ID!) {
-    archiveZone(id: $id) {
-      id
-    }
-  }
-`;
+import DeleteMakerspaceModal from "./DeleteMakerspaceModal";
 
 export default function SiteSettingsPage() {
   const navigate = useNavigate();
 
   const getZonesResult = useQuery(GET_ZONES);
-  const [archiveMakerspace] = useMutation(ARCHIVE_MAKERSPACE, { refetchQueries: ["GetZones"] });
 
   const [createMakerspaceModal, setCreateMakerspaceModal] = useState(false);
+  const [deleteMakerspaceModal, setDeleteMakerspaceModal] = useState(false);
+  const [deletionTarget, setDeletionTarget] = useState({ id: 0, name: "THE JIM SHED: HOME OF THE MAKER MINDSET" });
+
+  function handleArchive(id: number, name: string) {
+    setDeletionTarget({ id: id, name: name });
+    setDeleteMakerspaceModal(true);
+  }
 
   return (
     <Stack padding={"15px"} width={"100%"} spacing={4}>
@@ -52,7 +50,7 @@ export default function SiteSettingsPage() {
                             color="error"
                             variant="contained"
                             startIcon={<DeleteIcon />}
-                            onClick={() => archiveMakerspace({ variables: { id: zone.id } })}
+                            onClick={() => handleArchive(zone.id, zone.name)}
                           >
                             Delete
                           </Button>
@@ -68,6 +66,7 @@ export default function SiteSettingsPage() {
             </Grid>
           );
         }} />
+        <DeleteMakerspaceModal open={deleteMakerspaceModal} onClose={() => setDeleteMakerspaceModal(false)} id={deletionTarget.id} name={deletionTarget.name} />
         <CreateMakerspaceModal open={createMakerspaceModal} onClose={() => setCreateMakerspaceModal(false)} />
       </Stack>
     </Stack >

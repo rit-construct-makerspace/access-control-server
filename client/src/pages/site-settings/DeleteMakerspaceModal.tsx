@@ -1,0 +1,66 @@
+import { Button, Card, CardContent, Stack, TextField, Typography } from "@mui/material";
+import PrettyModal from "../../common/PrettyModal";
+import { useState } from "react";
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
+import gql from "graphql-tag";
+import { useMutation } from "@apollo/client";
+import { useIsMobile } from "../../common/IsMobileProvider";
+
+const ARCHIVE_MAKERSPACE = gql`
+  mutation ArchiveMakerspace($id: ID!) {
+    archiveZone(id: $id) {
+      id
+    }
+  }
+`;
+
+interface DeleteMakerspaceModalProps {
+  open: boolean;
+  onClose: () => void;
+  id: number;
+  name: string;
+}
+
+export default function DeleteMakerspaceModal(props: DeleteMakerspaceModalProps) {
+  const isMobile = useIsMobile();
+
+  const [confirmation, setConfirmation] = useState("");
+
+  const [archiveMakerspace] = useMutation(ARCHIVE_MAKERSPACE, { refetchQueries: ["GetZones"] });
+
+  function handleClose() {
+    setConfirmation("");
+    props.onClose();
+  }
+
+  function handleArchive() {
+    archiveMakerspace({
+      variables: {
+        id: props.id
+      }
+    });
+    handleClose();
+  }
+
+  return (
+    <PrettyModal open={props.open} onClose={handleClose} width={isMobile ? "100%" : "400px"}>
+      <Stack spacing={2}>
+        <Typography variant="h6">Delete Makerspace: {props.name}</Typography>
+        <Typography>This action cannot be undone. To proceed, type the following below:</Typography>
+        <Card variant="outlined" sx={{ padding: "5px" }}>
+          delete {props.name}
+        </Card>
+        <TextField value={confirmation} onChange={(e) => setConfirmation(e.target.value)} placeholder="Type here to confirm" />
+        <Stack direction={"row"} justifyContent={"space-between"}>
+          <Button color="info" startIcon={<CloseIcon />} onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button color="error" startIcon={<DeleteIcon />} disabled={confirmation !== "delete " + props.name} onClick={handleArchive}>
+            Delete
+          </Button>
+        </Stack>
+      </Stack>
+    </PrettyModal>
+  );
+}
