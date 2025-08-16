@@ -1,10 +1,10 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { Button, Card, Grid, Stack, TextField, Typography } from "@mui/material";
 import gql from "graphql-tag";
-import { GET_ZONES } from "../queries/zoneQueries";
-import RequestWrapper2 from "../common/RequestWrapper2";
+import { GET_ZONES } from "../../queries/zoneQueries";
+import RequestWrapper2 from "../../common/RequestWrapper2";
 import DeleteIcon from '@mui/icons-material/Delete';
-import PrettyModal from "../common/PrettyModal";
+import PrettyModal from "../../common/PrettyModal";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from "react-router-dom";
@@ -25,7 +25,7 @@ const ARCHIVE_MAKERSPACE = gql`
   }
 `;
 
-export default function SiteSettings() {
+export default function SiteSettingsPage() {
   const navigate = useNavigate();
 
   const getZonesResult = useQuery(GET_ZONES);
