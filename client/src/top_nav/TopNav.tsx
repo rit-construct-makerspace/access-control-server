@@ -129,7 +129,7 @@ export default function TopNav() {
       LOGIN
     </Button>
     : <ButtonBase onClick={handleUserMenuOpen}>
-      <Stack direction="row" alignItems="center" spacing={2} padding={2}>
+      <Stack direction={isMobile ? "row" : "row-reverse"} alignItems="center" spacing={2} padding={2}>
         {
           isMobile
             ? <Avatar
