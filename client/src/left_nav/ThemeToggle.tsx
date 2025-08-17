@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import CookieIcon from '@mui/icons-material/Cookie';
 import { ThemeController } from "../Theme";
 
 
@@ -24,10 +25,22 @@ export default function ThemeToggle() {
       onChange={handleChange}
     >
       <ToggleButton value={"light"}>
-        <LightModeIcon /> Light
+        <Stack direction={"row"} spacing={1}>
+          <LightModeIcon />
+          <Typography>Light</Typography>
+        </Stack>
       </ToggleButton>
       <ToggleButton value={"dark"}>
-        <DarkModeIcon /> Dark
+        <Stack direction={"row"} spacing={1}>
+          <DarkModeIcon />
+          <Typography>Dark</Typography>
+        </Stack>
+      </ToggleButton>
+      <ToggleButton value={"olive_garden"}>
+        <Stack direction={"row"} spacing={1}>
+          <CookieIcon />
+          <Typography>Olive Garden</Typography>
+        </Stack>
       </ToggleButton>
     </ToggleButtonGroup>
   );

@@ -79,6 +79,43 @@ class DarkTheme implements MakeTheme {
   }
 }
 
+class OliveGarden implements MakeTheme {
+  private static readonly theme = createTheme({
+    palette: {
+      primary: {
+        main: "#9fa83a",
+        dark: "#9fa83a",
+        contrastText: "#FFFFFF",
+      },
+      secondary: {
+        main: "#7D55C7",
+        contrastText: "#FFFFFF",
+      },
+      warning: {
+        main: '#FFAB00',
+      },
+      mode: "light"
+    },
+    typography: {
+      fontFamily: 'Roboto',
+      subtitle1: {
+        fontWeight: "bold",
+      },
+      body1: {
+        fontWeight: undefined,
+      },
+    },
+  });
+
+  getTheme(): Theme {
+    return OliveGarden.theme;
+  }
+
+  getThemeString(): string {
+    return "dark";
+  }
+}
+
 export class ThemeController {
   static activeTheme: MakeTheme = this.evaluateThemeString(localStorage.getItem("themeMode") ?? "light");
   static themeWatchers: ((theme: Theme) => void)[] = [];
@@ -121,6 +158,8 @@ export class ThemeController {
         return new LightTheme();
       case "dark":
         return new DarkTheme();
+      case "olive_garden":
+        return new OliveGarden();
       default:
         return new LightTheme();
     }
