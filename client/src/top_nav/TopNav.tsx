@@ -4,7 +4,7 @@ import LogoSvgWhite from "../assets/shed logo white.png";
 import LogoSvgOrange from "../assets/the shed logo orange white.png";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import PrinterOsIcon from "../common/PrinterOSIcon";
+import LayersIcon from '@mui/icons-material/Layers';
 import SlackIcon from "../common/SlackIcon";
 import EventIcon from "@mui/icons-material/Event";
 import NavLink from "./NavLink";
@@ -88,8 +88,8 @@ export default function TopNav() {
   const navlinks = [
     <NavLink
       to="https://cloud.3dprinteros.com/ssosaml/rit/auth"
-      primary="3DPrinterOS"
-      icon={<PrinterOsIcon />}
+      primary="3D Printing"
+      icon={<LayersIcon />}
       newTab={true}
     />,
     <NavLink
@@ -119,7 +119,13 @@ export default function TopNav() {
   ];
 
   const userProfileButton = currentUser.visitor
-    ? <Button sx={{ height: "95%" }} variant="contained" color="secondary" endIcon={<PersonIcon />} onClick={() => window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")}>
+    ? <Button
+      sx={{ height: "95%", marginRight: isMobile ? undefined : "10px" }}
+      variant="contained"
+      color="secondary"
+      endIcon={<PersonIcon />}
+      onClick={() => window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")}
+    >
       LOGIN
     </Button>
     : <ButtonBase onClick={handleUserMenuOpen}>
