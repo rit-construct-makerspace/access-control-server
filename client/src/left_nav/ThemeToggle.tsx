@@ -4,9 +4,11 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import CookieIcon from '@mui/icons-material/Cookie';
 import { ThemeController } from "../Theme";
+import { useCurrentUser } from "../common/CurrentUserProvider";
 
 
 export default function ThemeToggle() {
+  const currentUser = useCurrentUser();
 
   const [curTheme, setCurTheme] = useState(ThemeController.activeTheme.getThemeString());
 
@@ -36,12 +38,15 @@ export default function ThemeToggle() {
           <Typography>Dark</Typography>
         </Stack>
       </ToggleButton>
-      <ToggleButton value={"olive_garden"}>
-        <Stack direction={"row"} spacing={1}>
-          <CookieIcon />
-          <Typography>Olive Garden</Typography>
-        </Stack>
-      </ToggleButton>
+      {
+        currentUser.admin &&
+        <ToggleButton value={"olive_garden"}>
+          <Stack direction={"row"} spacing={1}>
+            <CookieIcon />
+            <Typography>Olive Garden</Typography>
+          </Stack>
+        </ToggleButton>
+      }
     </ToggleButtonGroup>
   );
 }
