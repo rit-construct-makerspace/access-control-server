@@ -171,7 +171,7 @@ export default function TopNav() {
                     </Stack>
                   </MenuItem>
                 }
-                <MenuItem onClick={() => { window.location.href = import.meta.env.VITE_LOGOUT_URL}}>
+                <MenuItem onClick={() => { window.location.href = import.meta.env.VITE_LOGOUT_URL }}>
                   <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
                     <LogoutIcon sx={{ color: "gray" }} />
                     <Typography variant="body1">Logout</Typography>
@@ -243,7 +243,7 @@ export default function TopNav() {
                   </Stack>
                 </MenuItem>
                 <MenuItem onClick={() => { navigate("/user/settings"); handleUserMenuClose(); }}>
-                  <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
+                  <Stack direction="row" spacing={2} alignItems="center" width="100%">
                     <SettingsIcon />
                     <Typography variant="body1">User Settings</Typography>
                   </Stack>
@@ -251,16 +251,16 @@ export default function TopNav() {
                 {
                   currentUser.admin &&
                   <MenuItem onClick={() => { navigate("/admin/settings"); handleUserMenuClose(); setMobileDrawer(false); }}>
-                    <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
-                      <TuneIcon sx={{ color: "gray" }} />
+                    <Stack direction={"row"} spacing={2} alignItems="center" width={"100%"}>
+                      <TuneIcon />
                       <Typography variant="body1">Site Settings</Typography>
                     </Stack>
                   </MenuItem>
                 }
-                <MenuItem onClick={() => { window.location.href = import.meta.env.VITE_LOGOUT_URL}}>
-                  <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} width={"100%"}>
-                    <LogoutIcon sx={{ color: "gray" }} />
-                    <Typography variant="body1" width={"100%"} textAlign={"center"}>Logout</Typography>
+                <MenuItem onClick={() => { window.location.href = import.meta.env.VITE_LOGOUT_URL }}>
+                  <Stack direction={"row"} spacing={2} alignItems="center" width={"100%"}>
+                    <LogoutIcon />
+                    <Typography variant="body1" width={"100%"}>Logout</Typography>
                   </Stack>
                 </MenuItem>
               </Menu>

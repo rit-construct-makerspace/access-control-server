@@ -112,7 +112,7 @@ class OliveGarden implements MakeTheme {
   }
 
   getThemeString(): string {
-    return "dark";
+    return "olive_garden";
   }
 }
 

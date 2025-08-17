@@ -5,7 +5,7 @@ import AppRoutes from "./AppRoutes";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeController } from "./Theme";
 import { IsMobileProvider } from "./common/IsMobileProvider";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const apolloClient = new ApolloClient({
   uri: import.meta.env.VITE_GRAPHQL_URL ?? "http://localhost:3000/graphql",
