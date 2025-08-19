@@ -3,12 +3,8 @@
  * GraphQL ENdpoint Implementations for various statistical operations
  */
 
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
-import { getDataPointByID, incrementDataPointValue, setDataPointValue } from "../repositories/DataPoints/DataPointsRepository.js";
-import { getEquipmentSessionsByDayOfTheWeek, getCummRoomSwipesByRoomByWeekDayByHour, RoomSwipesByRoomByWeekDayByHour, getNumUsersRegisteredToday, getNumRoomSwipesToday, getNumEquipmentSessionsToday } from "../repositories/StatisticsQuery/StatisticQueryRepository.js";
-import { getModules } from "../repositories/Training/ModuleRepository.js";
-import { getModulePassedandFailedCount, getModulePassedandFailedCountWithModuleName } from "../repositories/Training/SubmissionRepository.js";
+import { getNumUsersRegisteredToday, getNumRoomSwipesToday, getNumEquipmentSessionsToday } from "../repositories/StatisticsQuery/StatisticQueryRepository.js";
 import { getEquipmentSessionsWithAttachedEntities } from "../repositories/StatisticsQuery/EquipmentStatsRepository.js";
 import { getRoomSwipesWithAttachedEntities } from "../repositories/StatisticsQuery/RoomStatsRepository.js";
 import { getTrainingSubmissionsWithAttachedEntities } from "../repositories/StatisticsQuery/TrainingStatsRepository.js";
@@ -43,8 +39,8 @@ const StatisticQueryResolver = {
     getEquipmentSessionsWithAttachedEntities: async (
       _parent: any,
       args: {startDate: string, endDate: string, equipmentIDs: string[]},
-      { isStaff }: ApolloContext) =>
-      isStaff(async () => {
+      { isManager }: ApolloContext) =>
+      isManager(async () => {
         return (await getEquipmentSessionsWithAttachedEntities(args.startDate, args.endDate, args.equipmentIDs)).rows;
       }),
 
@@ -57,8 +53,8 @@ const StatisticQueryResolver = {
     getRoomSwipesWithAttachedEntities: async (
       _parent: any,
       args: {startDate: string, endDate: string, roomIDs: string[]},
-      { isStaff }: ApolloContext) =>
-      isStaff(async () => {
+      { isManager }: ApolloContext) =>
+      isManager(async () => {
         return (await getRoomSwipesWithAttachedEntities(args.startDate, args.endDate, args.roomIDs)).rows;
       }),
 
@@ -72,8 +68,8 @@ const StatisticQueryResolver = {
     getTrainingSubmissionsWithAttachedEntities: async (
       _parent: any,
       args: {startDate: string, endDate: string, moduleIDs: string[]},
-      { isStaff }: ApolloContext) =>
-      isStaff(async () => {
+      { isManager }: ApolloContext) =>
+      isManager(async () => {
         return (await getTrainingSubmissionsWithAttachedEntities(args.startDate, args.endDate, args.moduleIDs)).rows;
       }),
 
@@ -84,8 +80,8 @@ const StatisticQueryResolver = {
     numNewUsersToday: async (
       _parent: any,
       _args: any,
-      { isStaff }: ApolloContext) =>
-      isStaff(async () => {
+      { isManager }: ApolloContext) =>
+      isManager(async () => {
         return await getNumUsersRegisteredToday();
       }),
 
@@ -96,8 +92,8 @@ const StatisticQueryResolver = {
     numRoomSwipesToday: async (
       _parent: any,
       _args: any,
-      { isStaff }: ApolloContext) =>
-      isStaff(async () => {
+      { isManager }: ApolloContext) =>
+      isManager(async () => {
         return await getNumRoomSwipesToday();
       }),
 
@@ -108,8 +104,8 @@ const StatisticQueryResolver = {
     numEquipmentSessionsToday: async (
       _parent: any,
       _args: any,
-      { isStaff }: ApolloContext) =>
-      isStaff(async () => {
+      { isManager }: ApolloContext) =>
+      isManager(async () => {
         return await getNumEquipmentSessionsToday();
       }),
   },
