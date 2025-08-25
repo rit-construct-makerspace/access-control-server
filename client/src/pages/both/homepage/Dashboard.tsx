@@ -103,7 +103,7 @@ export function Dashboard() {
                         >
                             {
                                 filteredEvents.length === 0
-                                    ? <Typography variant="body1" textAlign={"center"}>No Events!</Typography>
+                                    ? <Typography variant="body1" textAlign={"center"}>No available events. Check back soon!</Typography>
                                     : filteredEvents.map((event: MakeEvent) => (
                                              <EventCard
                                                 name={event.name.text}
