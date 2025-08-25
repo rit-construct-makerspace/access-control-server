@@ -1,7 +1,7 @@
 import { Alert, AppBar, Avatar, Box, Button, ButtonBase, Drawer, IconButton, Menu, MenuItem, Stack, Typography } from "@mui/material";
 import styled from "styled-components";
 import LogoSvgWhite from "../assets/shed logo white.png";
-import LogoSvgOrange from "../assets/the shed logo orange white.png";
+import LogoSvgOrange from "../assets/shed logo orange white.png";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import LayersIcon from '@mui/icons-material/Layers';

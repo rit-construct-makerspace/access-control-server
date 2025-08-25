@@ -52,7 +52,7 @@ const templateSource: string = `
 </style>
 <div class="email-body">
     <img src="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange_white_bg.png"
-        alt="RIT The Shed Logo" width="600px">
+        alt="RIT SHED Logo" width="600px">
     <h1>Transaction Receipt - <%= transaction.date.toLocaleString() %></h1>
 
     <h2><%= transaction.source %></h2>
