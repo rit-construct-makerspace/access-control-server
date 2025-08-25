@@ -75,7 +75,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     <ModuleStatusRow ms={ms} />
                   ))}
                   {
-                    !props.equipment.byReservationOnly
+                    (!props.equipment.byReservationOnly && !(props.equipment.id == Number(import.meta.env.VITE_GENERAL_PRINTERS_ID)))
                       ? <Stack direction={"row"} spacing={1} alignItems="center" padding="10px">
                         {
                           hasApprovedAccessCheck
