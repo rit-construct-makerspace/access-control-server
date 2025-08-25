@@ -1,7 +1,7 @@
 import { Alert, AppBar, Avatar, Box, Button, ButtonBase, Drawer, IconButton, Menu, MenuItem, Stack, Typography } from "@mui/material";
 import styled from "styled-components";
 import LogoSvgWhite from "../assets/shed logo white.png";
-import LogoSvgOrange from "../assets/the shed logo orange white.png";
+import LogoSvgOrange from "../assets/shed logo orange white.png";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import LayersIcon from '@mui/icons-material/Layers';
@@ -183,7 +183,7 @@ export default function TopNav() {
       {isMobile
         ? <AppBar position="static">
           <Stack direction="row" justifyContent="space-between">
-            <StyledLogo width="75%" src={(localStorage.getItem("themeMode") === "dark") ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" onClick={() => { navigate(`/`); }} />
+            <StyledLogo width="65%" src={(localStorage.getItem("themeMode") === "dark") ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" onClick={() => { navigate(`/`); }} />
             <IconButton onClick={() => setMobileDrawer(true)}>
               <MenuIcon />
             </IconButton>
