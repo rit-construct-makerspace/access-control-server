@@ -19,7 +19,7 @@ For an example of required server environment variables, see [server/.env.exampl
 
 For an example of required client environment variables, see [client/.env.example](client/.env.example)
 
-## Database
+## Database (WIP)
 This project uses a postgres database. You must use the environment variable `DATABASE_URL` in the server to point the app to your postgres instance. `DATABASE_URL` should be a database URI. See the "Connection URIs" section of [the postgres docs](https://www.postgresql.org/docs/current/libpq-connect.html) for details.
 
 The project also contains a docker-compose definition for a postgres instance exposed on port `5433`. To use this definition you must set the following environment variables in the project root:
