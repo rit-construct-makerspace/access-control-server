@@ -90,31 +90,22 @@ export function Dashboard() {
             </RequestWrapper>
             {/* Upcoming Events */}
             <RequestWrapper2 result={getEvents} render={(data) => {
+                const filteredEvents: MakeEvent[] = data.events.filter((event: MakeEvent) => event.ticket_availability.has_available_tickets);
 
                 return (
                     <Box>
                         <Stack direction="row" margin="30px 30px 10px 30px" justifyContent="space-between" alignItems="center">
                             <Typography variant={isMobile ? "h4" : "h3"}>Upcoming Events</Typography>
-                            <Typography variant="h6">
-                                <a
-                                    href="https://www.eventbrite.com/o/rit-shed-makerspace-92409962123"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    All Events
-                                </a>
-                            </Typography>
                         </Stack>
                         <Stack direction={isMobile ? "column" : "row"} justifyContent="flex-start" alignItems="stretch" spacing={2}
                             divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />}
                             margin="0px 20px 20px 20px"
                         >
                             {
-                                data.events.length === 0
-                                    ? <Typography variant="body1">No Events!</Typography>
-                                    : data.events.map((event: MakeEvent) => (
-                                        event.ticket_availability.has_available_tickets
-                                            ? <EventCard
+                                filteredEvents.length === 0
+                                    ? <Typography variant="body1" textAlign={"center"}>No Events!</Typography>
+                                    : filteredEvents.map((event: MakeEvent) => (
+                                             <EventCard
                                                 name={event.name.text}
                                                 description={event.description.text}
                                                 summary={event.summary}
@@ -123,7 +114,6 @@ export function Dashboard() {
                                                 end={event.end.local}
                                                 logoUrl={null}
                                             />
-                                            : null
                                     ))}
                         </Stack>
                     </Box>
