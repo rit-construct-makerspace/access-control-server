@@ -31,7 +31,7 @@ const templateSource: string = `
 </style>
 <div class="email-body">
     <img src="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange_white_bg.png"
-        alt="RIT The Shed Logo" width="600px">
+        alt="RIT SHED Logo" width="600px">
     <h1>Training Expiry <%= (type == "warning") ? "Warning" : "Notice" %></h1>
 
     <b>If your training lapses, you will be unable to use this equipment. Once you re-take the trainings, your access will be restored. </b>
