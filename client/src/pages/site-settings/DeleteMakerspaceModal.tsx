@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, Stack, TextField, Typography } from "@mui/material";
+import { Button, Card, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../common/PrettyModal";
 import { useState } from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -47,7 +47,7 @@ export default function DeleteMakerspaceModal(props: DeleteMakerspaceModalProps)
     <PrettyModal open={props.open} onClose={handleClose} width={isMobile ? "100%" : "400px"}>
       <Stack spacing={2}>
         <Typography variant="h6">Delete {props.name}</Typography>
-        <Typography>This action cannot be undone. To proceed, type the following below:</Typography>
+        <Typography><b>This action cannot be undone</b>. To proceed, type the following below:</Typography>
         <Card variant="outlined" sx={{ padding: "10px" }}>
           <Typography fontWeight={"bold"}>
             delete {props.name}
