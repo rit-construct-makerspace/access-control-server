@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material";
+import { Stack, Typography, useTheme } from "@mui/material";
 import ZoneHours from "../../types/ZoneHours";
 import * as TimeUtils from "../../common/TimeUtils";
 
@@ -8,6 +8,7 @@ interface ZoneHoursProps {
 }
 
 export default function ZoneHoursSection(props: ZoneHoursProps) {
+  const theme = useTheme();
 
   return (
     <Stack padding="10px 0px" direction={props.isMobile ? "column" : "row"} justifyContent={props.isMobile ? "center" : "space-around"}>
@@ -18,7 +19,7 @@ export default function ZoneHoursSection(props: ZoneHoursProps) {
 
           return (
             <Stack alignItems={"center"}>
-              <Typography color="darkorange" variant="h6">{TimeUtils.dayToString(dayDate.getDay())}</Typography>
+              <Typography color={theme.palette.primary.main} variant="h6">{TimeUtils.dayToString(dayDate.getDay())}</Typography>
               {
                 hour.closed
                   ? <Typography variant="body1">CLOSED</Typography>

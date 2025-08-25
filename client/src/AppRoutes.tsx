@@ -42,7 +42,7 @@ import { CartListPage } from "./pages/lab_management/storefront/internal/CartLis
 import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
-import SiteSettings from "./pages/SiteSettings";
+import SiteSettingsPage from "./pages/site-settings/SiteSettingsPage";
 import { Slide, ToastContainer } from "react-toastify";
 import EditEquipmentPage from "./pages/makerspace_page/equipment_pages/EditEquipmentPage";
 import NewEquipmentPage from "./pages/makerspace_page/equipment_pages/NewEquipmentPage";
@@ -180,7 +180,7 @@ export default function AppRoutes() {
               <Route path="/admin/announcements/new" element={<NewAnnouncementPage />} />
 
               <Route path="/admin/newreader" element={<NewReaderPage />} />
-              <Route path="/admin/settings" element={<SiteSettings />} />
+              <Route path="/admin/settings" element={<SiteSettingsPage />} />
             </Route>
 
             <Route path="/maker/training" element={<TrainingPage />} />
