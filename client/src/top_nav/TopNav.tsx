@@ -183,7 +183,7 @@ export default function TopNav() {
       {isMobile
         ? <AppBar position="static">
           <Stack direction="row" justifyContent="space-between">
-            <StyledLogo width="75%" src={(localStorage.getItem("themeMode") === "dark") ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" onClick={() => { navigate(`/`); }} />
+            <StyledLogo width="65%" src={(localStorage.getItem("themeMode") === "dark") ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" onClick={() => { navigate(`/`); }} />
             <IconButton onClick={() => setMobileDrawer(true)}>
               <MenuIcon />
             </IconButton>
