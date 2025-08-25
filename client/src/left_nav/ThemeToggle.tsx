@@ -40,10 +40,10 @@ export default function ThemeToggle() {
       </ToggleButton>
       {
         currentUser.admin &&
-        <ToggleButton value={"olive_garden"}>
+        <ToggleButton value={"italian_restaurant"}>
           <Stack direction={"row"} spacing={1}>
             <CookieIcon />
-            <Typography>Olive Garden</Typography>
+            <Typography>Italian Restaurant</Typography>
           </Stack>
         </ToggleButton>
       }

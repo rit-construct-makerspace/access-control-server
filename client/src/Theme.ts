@@ -79,7 +79,7 @@ class DarkTheme implements MakeTheme {
   }
 }
 
-class OliveGarden implements MakeTheme {
+class ItalianRestaurant implements MakeTheme {
   private static readonly theme = createTheme({
     palette: {
       primary: {
@@ -93,6 +93,9 @@ class OliveGarden implements MakeTheme {
       },
       warning: {
         main: '#FFAB00',
+      },
+      info: {
+        main: '#54301a'
       },
       mode: "light"
     },
@@ -108,11 +111,11 @@ class OliveGarden implements MakeTheme {
   });
 
   getTheme(): Theme {
-    return OliveGarden.theme;
+    return ItalianRestaurant.theme;
   }
 
   getThemeString(): string {
-    return "olive_garden";
+    return "italian_restaurant";
   }
 }
 
@@ -158,8 +161,8 @@ export class ThemeController {
         return new LightTheme();
       case "dark":
         return new DarkTheme();
-      case "olive_garden":
-        return new OliveGarden();
+      case "italian_restaurant":
+        return new ItalianRestaurant();
       default:
         return new LightTheme();
     }
