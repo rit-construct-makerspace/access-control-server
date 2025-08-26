@@ -27,9 +27,7 @@ import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js"
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
-import { adjustBalanceIfPossible, generateAtriumToken, getBalance, pingAtrium } from "./integrations/atrium-integration/atrium.js";
-import { getAccountBalance } from "./integrations/currency/currency.js";
-import { getAccountBalanceCents } from "./repositories/Currency/CurrencyAccountsRepository.js";
+import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { purge_images } from "./periodicActions.js";
