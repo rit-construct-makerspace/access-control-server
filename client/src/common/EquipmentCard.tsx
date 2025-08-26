@@ -26,7 +26,8 @@ export default function EquipmentCard(props: EquipmentCardProps) {
   const moduleStatuses = props.equipment.trainingModules.map(
     moduleStatusMapper(user.passedModules, user.trainingHolds)
   );
-
+  const equipmentIdsToHideCompetencyFor = (import.meta.env.VITE_EQUIPMENT_IDS_WITHOUT_INPERSON??"").split(",").map(s => Number(s));
+  const shouldHideCompetency = equipmentIdsToHideCompetencyFor.includes(Number(props.equipment.id));
   return (
     <Card sx={{
       width: props.isMobile ? "350px" : "600px",
@@ -75,7 +76,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     <ModuleStatusRow ms={ms} />
                   ))}
                   {
-                    (!props.equipment.byReservationOnly && !(props.equipment.id == Number(import.meta.env.VITE_GENERAL_PRINTERS_ID)))
+                    (!props.equipment.byReservationOnly && !shouldHideCompetency)
                       ? <Stack direction={"row"} spacing={1} alignItems="center" padding="10px">
                         {
                           hasApprovedAccessCheck

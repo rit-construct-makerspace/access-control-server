@@ -10,8 +10,8 @@ interface ImportMetaEnv {
     readonly VITE_GRAFANA_READER_STATS_URL: string;
     readonly VITE_DISABLE_STOREFRONT_CART: string;
     readonly VITE_ORIGIN: string;
-    readonly VITE_GENERAL_PRINTERS_ID: string;
-    readonly VITE_ID_3DPRINTEROS_QUIZ: string;
+    readonly VITE_EQUIPMENT_IDS_WITHOUT_INPERSON: string;
+    readonly VITE_MODULE_IDS_WITHOUT_INPERSON: string;
 }
 
 interface ImportMeta {
