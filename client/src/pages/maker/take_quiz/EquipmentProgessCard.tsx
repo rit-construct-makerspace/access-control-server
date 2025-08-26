@@ -33,6 +33,10 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
     return (<></>);
   }
 
+  const modulesToHideInPersonFor: number[] = (import.meta.env.VITE_MODULE_IDS_WITHOUT_INPERSON ?? "").split(",").map(s => Number(s));
+  const shouldHideCompetency = modulesToHideInPersonFor.includes(Number(props.moduleID));
+  console.log("should hide", props.moduleID, modulesToHideInPersonFor, shouldHideCompetency)
+
   return (
     <Card sx={{ width: isMobile ? "100%" : "50%" }}>
       <CardHeader sx={{ fontWeight: "bold" }} title="Next for you"></CardHeader>
@@ -54,7 +58,7 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
                     <MinimalTrainingModuleRow module={module} passed={false} />
                   ))}
                 </Stack>
-                { (import.meta.env.VITE_ID_3DPRINTEROS_QUIZ !== null && Number(import.meta.env.VITE_ID_3DPRINTEROS_QUIZ)!=props.moduleID) &&
+                { (!shouldHideCompetency) &&
                   <Card sx={{ mt: 5, border: (!accessProgress.accessCheckDone && accessProgress.availableModules.length === 0) ? "2px solid blue" : "inherit" }}>
                     <Stack direction={"row"} spacing={1} width={"75%"} p={2}>
                       {accessProgress.accessCheckDone
