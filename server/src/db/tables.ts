@@ -98,14 +98,14 @@ export interface InventoryItemRow {
   makerspaceID?: number;
 }
 
-export interface InventoryCarts {
+export interface InventoryCartsRow {
   id: number;
   userID: number;
   makerspaceID: number;
   lastModified: Date;
 }
 
-export interface InventoryItemsForCarts {
+export interface InventoryItemsForCartsRow {
   cartID: number;
   itemID: number;
   count: number;
@@ -287,15 +287,6 @@ export interface AccessCheckRow {
   approved: boolean;
 }
 
-export interface ZoneHoursRow {
-  id: number;
-  zoneID: number | null;
-  type: string;
-  dayOfTheWeek: number;
-  time: string;
-  imageUrl: string;
-}
-
 export interface ZoneRow {
   id: number;
   name: string;
@@ -436,6 +427,11 @@ export interface TempRolesRow {
   name: string;
 }
 
+export interface ExpressSessionRow {
+  sid: string;
+  session: string;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -459,7 +455,6 @@ declare module "knex/types/tables.js" {
     AccessChecks: AccessCheckRow;
     Zones: ZoneRow;
     RoomsForZones: RoomsForZonesRow
-    ZoneHours: ZoneHoursRow;
     DataPoints: DataPointsRow;
     EquipmentSessions: EquipmentSessionRow;
     InventoryLedger: InventoryLedgerRow;
@@ -482,5 +477,6 @@ declare module "knex/types/tables.js" {
     CurrencyLedger: CurrencyLedgerRow;
     RefIDCounter: RefIDCounterRow;
     RolesTemp: TempRolesRow;
+    ExpressSessions: ExpressSessionRow;
   }
 }

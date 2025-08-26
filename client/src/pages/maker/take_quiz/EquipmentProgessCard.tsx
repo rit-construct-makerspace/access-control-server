@@ -54,16 +54,18 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
                     <MinimalTrainingModuleRow module={module} passed={false} />
                   ))}
                 </Stack>
-                <Card sx={{ mt: 5, border: (!accessProgress.accessCheckDone && accessProgress.availableModules.length === 0) ? "2px solid blue" : "inherit" }}>
-                  <Stack direction={"row"} spacing={1} width={"75%"} p={2}>
-                    {accessProgress.accessCheckDone
-                      ? <CheckCircleIcon color="success" />
-                      : <CloseIcon color="error" />}
-                    <Typography variant="body2" fontWeight={"bold"} fontSize={"1.1em"}>In-Person Knowledge Check</Typography>
-                  </Stack>
-                  {(!accessProgress.accessCheckDone && accessProgress.availableModules.length === 0) &&
-                    <Typography variant="body2" fontSize={"1.1em"} px={5}>Almost done! Just speak to a Maker Mentor to finish your training on the {accessProgress.equipment.name}</Typography>}
-                </Card>
+                { (import.meta.env.VITE_ID_3DPRINTEROS_QUIZ !== null && Number(import.meta.env.VITE_ID_3DPRINTEROS_QUIZ)!=props.moduleID) &&
+                  <Card sx={{ mt: 5, border: (!accessProgress.accessCheckDone && accessProgress.availableModules.length === 0) ? "2px solid blue" : "inherit" }}>
+                    <Stack direction={"row"} spacing={1} width={"75%"} p={2}>
+                      {accessProgress.accessCheckDone
+                        ? <CheckCircleIcon color="success" />
+                        : <CloseIcon color="error" />}
+                      <Typography variant="body2" fontWeight={"bold"} fontSize={"1.1em"}>In-Person Knowledge Check</Typography>
+                    </Stack>
+                    {(!accessProgress.accessCheckDone && accessProgress.availableModules.length === 0) &&
+                      <Typography variant="body2" fontSize={"1.1em"} px={5}>Almost done! Just speak to a Maker Mentor to finish your training on the {accessProgress.equipment.name}</Typography>}
+                  </Card>
+                }
               </CardContent>
             </Card>
           ))}

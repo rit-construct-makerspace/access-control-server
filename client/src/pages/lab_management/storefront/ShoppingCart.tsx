@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ShoppingCartEntry } from "./StorefrontPage";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import { Button, Divider, Stack, Typography } from "@mui/material";
@@ -7,12 +7,13 @@ import CheckoutModal from "./CheckoutModal";
 import EmptyPageSection from "../../../common/EmptyPageSection";
 import UseModal from "./InternalUseModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { Box } from "@mui/system";
 
 interface ShoppingCartProps {
   entries: ShoppingCartEntry[];
   removeEntry: (id: string) => void;
   setEntryCount: (id: string, newCount: number) => void;
-  emptyCart: (checkoutNotes: string, recievingUserID: number | undefined) => void;
+  emptyCart: (checkoutNotes: string, recievingUserID?: number) => void;
   internal: boolean;
 }
 
@@ -31,6 +32,34 @@ export default function ShoppingCart({
     .reduce((acc, { count, item }) => acc + count * item.pricePerUnit, 0)
     .toFixed(2);
 
+
+  const groupedEntries = entries.reduce((groups: Record<string, ShoppingCartEntry[]>, entry: ShoppingCartEntry) => {
+    const key: number = entry.item.makerspaceID;
+    if (!groups[key]) {
+      groups[key] = [];
+    }
+    groups[key].push(entry);
+    return groups;
+  }, {});
+
+  const groupedEntriesMapping = Object.entries(groupedEntries).map(([makerspaceID, entries]) => (
+    <Box key={makerspaceID} sx={{ mb: 2 }}>
+      <Typography variant="h6" component="div" sx={{ mb: 1 }}>
+        {entries[0].item.makerspace?.name || "Unknown Makerspace"}
+      </Typography>
+      {entries.map((entry) => (
+        <ShoppingCartRow
+          key={entry.id}
+          shoppingCartEntry={entry}
+          removeEntry={() => removeEntry(entry.id)}
+          setEntryCount={(newCount: number) =>
+            setEntryCount(entry.id, newCount)
+          }
+        />
+      ))}
+    </Box>
+  ));
+
   return (
     <>
       <Typography variant="h5" component="div" sx={{ mb: 2 }}>
@@ -45,16 +74,7 @@ export default function ShoppingCart({
       )}
 
       <Stack spacing={1} divider={<Divider flexItem />}>
-        {entries.map((entry) => (
-          <ShoppingCartRow
-            shoppingCartEntry={entry}
-            key={entry.id}
-            removeEntry={() => removeEntry(entry.id)}
-            setEntryCount={(newCount: number) =>
-              setEntryCount(entry.id, newCount)
-            }
-          />
-        ))}
+        {groupedEntriesMapping}
       </Stack>
 
       {entries.length > 0 && (
@@ -70,6 +90,7 @@ export default function ShoppingCart({
             color={internal ? "warning" : "primary"}
             onClick={() => setShowCheckoutModal(true)}
             sx={{minWidth: "150px"}}
+            disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true"}
           >
             {internal ? "Use" : "Checkout"}
           </Button>
@@ -88,10 +109,12 @@ export default function ShoppingCart({
       : <CheckoutModal
         open={showCheckoutModal}
         onClose={() => setShowCheckoutModal(false)}
-        onFinalize={(checkoutNotes: string, recievingUserID: number | undefined) => {
+        onFinalize={(checkoutNotes: string) => {
           setShowCheckoutModal(false);
-          emptyCart(checkoutNotes, recievingUserID);
+          emptyCart(checkoutNotes);
         }}
+        groupedEntries={groupedEntries}
+        totalCost={total}
       />}
     </>
   );

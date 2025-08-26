@@ -4,7 +4,6 @@
  */
 
 import { gql } from "graphql-tag";
-import { ZoneHoursRow } from "../db/tables.js";
 
 export interface ZoneInput {
   name: string;
@@ -17,6 +16,7 @@ export const ZonesTypeDefs = gql`
     name: String!
     rooms: [Room]
     hours: [ZoneHours]
+    items: [InventoryItem]
     imageUrl: String
     trainingModules: [TrainingModule]
   }
@@ -27,7 +27,7 @@ export const ZonesTypeDefs = gql`
   }
 
   extend type Query {
-    zones: [Zone]
+    zones(storefrontVisible: Boolean): [Zone]
     zoneByID(id: ID!): Zone
   }
 

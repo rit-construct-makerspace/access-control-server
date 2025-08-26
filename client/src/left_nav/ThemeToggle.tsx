@@ -1,49 +1,52 @@
 import { useState } from "react";
-import {
-  useLocation,
-} from "react-router-dom";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import { ListItemButton, Stack, Switch, Typography } from "@mui/material";
+import { Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import CookieIcon from '@mui/icons-material/Cookie';
+import { ThemeController } from "../Theme";
+import { useCurrentUser } from "../common/CurrentUserProvider";
 
 
 export default function ThemeToggle() {
-  const url = useLocation();
-  const [mode, setMode] = useState(localStorage.getItem("themeMode") === "dark")
+  const currentUser = useCurrentUser();
+
+  const [curTheme, setCurTheme] = useState(ThemeController.activeTheme.getThemeString());
+
+  ThemeController.addStringWatcher(setCurTheme);
+
+  function handleChange(_event: React.MouseEvent<HTMLElement>, value: string) {
+    if (value !== null && value !== curTheme) {
+      ThemeController.setActiveTheme(value);
+    }
+  }
 
   return (
-    <ListItemButton sx={{height: "4em"}} onClick={(e) => {
-      if (url.pathname.includes("/maker/training/") && !url.pathname.includes("results") && !window.confirm(
-        `Are you sure you want to leave this quiz? Progress will not be saved.`
-      )) {
-        e.preventDefault();
-        return ''
+    <ToggleButtonGroup
+      value={curTheme}
+      exclusive
+      onChange={handleChange}
+    >
+      <ToggleButton value={"light"}>
+        <Stack direction={"row"} spacing={1}>
+          <LightModeIcon />
+          <Typography>Light</Typography>
+        </Stack>
+      </ToggleButton>
+      <ToggleButton value={"dark"}>
+        <Stack direction={"row"} spacing={1}>
+          <DarkModeIcon />
+          <Typography>Dark</Typography>
+        </Stack>
+      </ToggleButton>
+      {
+        currentUser.admin &&
+        <ToggleButton value={"italian_restaurant"}>
+          <Stack direction={"row"} spacing={1}>
+            <CookieIcon />
+            <Typography>Italian Restaurant</Typography>
+          </Stack>
+        </ToggleButton>
       }
-      else {
-        setMode(!mode);
-        localStorage.setItem("themeMode", mode ? "light" : "dark");
-        window.location.reload();
-      }
-    }}>
-    <ListItemIcon><DarkModeIcon /></ListItemIcon>
-      <Stack direction={"row"} alignItems="center">
-        <Typography>
-          Dark Mode (Experimental)
-        </Typography>
-        <Switch id="theme-toggle" aria-label="Dark Mode (Experimental)" checked={mode} onChange={(e) => {
-          if (url.pathname.includes("/maker/training/") && !url.pathname.includes("results") && !window.confirm(
-            `Are you sure you want to leave this quiz? Progress will not be saved.`
-          )) {
-            e.preventDefault();
-            return ''
-          }
-          else {
-            setMode(!mode);
-            localStorage.setItem("themeMode", mode ? "light" : "dark");
-            window.location.reload();
-          }
-        }}/>
-      </Stack>
-    </ListItemButton>
-);
+    </ToggleButtonGroup>
+  );
 }

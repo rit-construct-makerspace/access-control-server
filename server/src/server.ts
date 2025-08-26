@@ -11,10 +11,10 @@ import compression from "compression";
 import cors from "cors";
 import { schema } from "./schema.js";
 import { setupSessions, setupDevAuth, setupStagingAuth, setupAuth } from "./auth.js";
-import context from "./context.js";
+import context, { determineUser } from "./context.js";
 import path from "path";
 import * as schedule from "node-schedule";
-import { getUserByCardTagID, getUsersFullName } from "./repositories/Users/UserRepository.js";
+import { getUserByCardTagID, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { getReaderBySN, getReaderCertCA } from "./repositories/Readers/ReaderRepository.js";
 import morgan from "morgan"; //Log provider
@@ -30,6 +30,9 @@ import * as Emailer from "./integrations/email/email.js"
 import { adjustBalanceIfPossible, generateAtriumToken, getBalance, pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import { getAccountBalance } from "./integrations/currency/currency.js";
 import { getAccountBalanceCents } from "./repositories/Currency/CurrencyAccountsRepository.js";
+import * as S3 from "./integrations/aws/s3.js"
+import { isStaff } from "./privilege.js";
+import { purge_images } from "./periodicActions.js";
 
 const require = createRequire(import.meta.url);
 
@@ -74,31 +77,26 @@ async function startServer() {
 
 
   // environment setup
-  /**
-   * mode: DEVELOPMENT
-   * Use local dev login view instead of SAML
-   * !! INSECURE !!
-   */
   if (process.env.NODE_ENV === "development") {
-    // view engine setup
-    app.set('views', path.join(__dirname, 'views'));
-    app.set('view engine', 'ejs');
-
+    /**
+    * mode: DEVELOPMENT
+    * Use local dev login view instead of SAML
+    * !! INSECURE !!
+    */
+    console.log("development active")
     setupDevAuth(app);
-  }
-  /**
-   * mode: STAGING
-   * Use the SAML configuration, but use insecure dev cookie handling
-   */
-  else if (process.env.NODE_ENV === "staging") {
+  } else if (process.env.NODE_ENV === "staging") {
+    /**
+     * mode: STAGING
+     * Use the SAML configuration, but use insecure dev cookie handling
+     */
     console.log("staging active");
     setupStagingAuth(app);
-  }
-  /**
-   * mode: PRODUCTION
-   * Use production SAML settings. Full security
-   */
-  else if (process.env.NODE_ENV === "production") {
+  } else if (process.env.NODE_ENV === "production") {
+    /**
+     * mode: PRODUCTION
+     * Use production SAML settings. Full security
+     */
     app.set("trust proxy", 1); // trust first proxy
     setupAuth(app);
   } else {
@@ -147,10 +145,6 @@ async function startServer() {
   app.get("/", function (req, res) {
     res.redirect("/app/home");
   });
-
-
-
-
 
   app.get("/app/*apppage", function (req, res) {
     res.header
@@ -435,6 +429,32 @@ async function startServer() {
     }
   });
 
+  /**
+   * File Uploads
+   */
+
+  app.post("/api/uploads/web-content", express.raw({ type: "application/octet-stream", limit: 8 * 1024 * 1024 }), async function (req, res) {
+    if (!req.user || !isStaff(determineUser(req.user))) {
+      return res.status(401).send("Only staff or higher may upload files");
+    }
+
+    const file: Buffer = req.body;
+
+    if (!file || file.length < 0) {
+      return res.status(400).send("File not found");
+    }
+
+    const new_name = (new Date()).valueOf().toString();
+
+    try {
+      await S3.putObject("user-uploads", new_name, file);
+    } catch (e) {
+      return res.status(400).send(e);
+    }
+
+    return res.status(201).contentType("application/text").send(new_name);
+  });
+
 
   /**=================================
    * SCHEDULED ACTIONS
@@ -497,8 +517,10 @@ async function startServer() {
 
     handleTrainingExpiriesAndEmails();
     //await pruneNullLengthEquipmentSessions().then(async () => await createLog('Unfinished Equipment Sessions pruned.', "server"));;
-  });
 
+    // Find unused images on AWS and 'remove' them
+    await purge_images();
+  });
 
 
   const server = new ApolloServer({
@@ -524,7 +546,6 @@ async function startServer() {
   if (typeof pingResponse !== 'boolean' || pingResponse == false) {
     console.error("Unable to contact atrium api. Currency functionality may be limited", pingResponse);
   }
-
 
   app.listen({ port: PORT }, () => {
     console.log(

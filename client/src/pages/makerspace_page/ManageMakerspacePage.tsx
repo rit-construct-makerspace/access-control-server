@@ -16,6 +16,9 @@ import { useIsMobile } from "../../common/IsMobileProvider";
 import ManageWelcomReadersCard from "./ManageWelcomeReadersCard";
 import ManageMakerspaceTrainings from "./ManageMakerspaceTrainings";
 import ManageMakerspaceHours from "./ManageMakerspaceHours";
+import FileUploadButton from "../../common/FileUploadButton";
+import ManageMakerspaceInformation from "./ManageMakerspaceInformation";
+import { toast } from "react-toastify";
 
 
 export default function ManageMakerspacePage() {
@@ -25,50 +28,17 @@ export default function ManageMakerspacePage() {
   const isMobile = useIsMobile();
 
   const getZone = useQuery(GET_ZONE_BY_ID, { variables: { id: makerspaceID } });
-  const [deleteZone] = useMutation(DELETE_ZONE);
-  const [updateZone] = useMutation(UPDATE_ZONE);
 
   const [createRoom] = useMutation(CREATE_ROOM);
 
-  const [zoneName, setZoneName] = useState("");
-  const [imgUrl, setImgUrl] = useState("");
-
   const [newRoomName, setNewRoomName] = useState("");
   const [newRoomModal, setNewRoomModal] = useState(false);
-
-  const [init, setInit] = useState(false);
-
-  function initState(zone: FullZone) {
-    setZoneName(zone.name);
-    setImgUrl(zone.imageUrl);
-    setInit(true);
-  }
 
   return (
     <Box>
       <RequestWrapper2 result={getZone} render={(data) => {
 
         const zone: FullZone = data.zoneByID;
-
-        if (!init) {
-          initState(zone);
-        }
-
-        const handleDeleteZone = () => {
-          const confirm = window.confirm("Are you sure you want to delete? This cannot be undone.");
-          if (confirm)
-            deleteZone({
-              variables: { id: zone.id },
-              refetchQueries: [{ query: GET_ZONE_BY_ID, variables: { id: makerspaceID } }],
-            });
-        };
-
-        const handleUpdateZone = async () => {
-          await updateZone({
-            variables: { id: makerspaceID, name: zoneName, imageUrl: imgUrl }
-          });
-          window.location.reload();
-        };
 
         const handleCreateRoom = async () => {
           await createRoom({
@@ -88,21 +58,16 @@ export default function ManageMakerspacePage() {
               spacing={isMobile ? 2 : undefined}
             >
               <Typography variant="h4" align="center">{`Manage ${zone.name} [ID: ${zone.id}]`}</Typography>
-              {
-                user.admin
-                  ? <Button color="error" variant="contained" onClick={handleDeleteZone} startIcon={<DeleteIcon />}>Delete Makerspace</Button>
-                  : null
-              }
             </Stack>
             <ManageMakerspaceHours makerspaceID={Number(makerspaceID)} />
             <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"space-between"} width={"100%"}>
               <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />} width={"48%"}>
-                <Stack spacing={2}>
-                  <Typography variant="h5" fontWeight={"bold"}>Makerspace Information</Typography>
-                  <TextField label="Name" value={zoneName} onChange={(e) => (setZoneName(e.target.value))} />
-                  <TextField label="Image URL" value={imgUrl} onChange={(e) => (setImgUrl(e.target.value))} />
-                  <Button color="primary" variant="contained" startIcon={<SaveIcon />} onClick={handleUpdateZone}>Update</Button>
-                </Stack>
+                <ManageMakerspaceInformation
+                  id={Number(makerspaceID)}
+                  name={zone.name}
+                  hours={zone.hours}
+                  imageUrl={zone.imageUrl}
+                />
                 <Stack spacing={2} alignItems="center">
                   <Stack
                     direction={"row"}

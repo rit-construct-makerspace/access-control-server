@@ -13,7 +13,7 @@ function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
     case "room":
       return `/makerspace/${makerspaceID}/edit/room/${id}`;
     case "equipment":
-      return "/admin/equipment/" + id;
+      return "/equipment/" + id;
     case "inventory":
       return "/admin/inventory";
     case "module":
@@ -34,7 +34,7 @@ function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
 export default function AuditLogEntity({ entityCode }: AuditLogEntityProps) {
   const navigate = useNavigate();
   // Dangerous!!! Might be undefined. A temporary fix until history/logs can be overhauled
-  const { makerspaceID } = useParams<{makerspaceID: string}>();
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
   const [entityType, id, label] = entityCode.split(":");
 
@@ -43,18 +43,18 @@ export default function AuditLogEntity({ entityCode }: AuditLogEntityProps) {
   const [reveal, setReveal] = useState(entityType !== "conceal");
 
   const toggleConcealment = () => {
-      setReveal(reveal => !reveal)
+    setReveal(reveal => !reveal)
   }
 
   return (
     <span>
       {!reveal
-      ? <Link onClick={toggleConcealment}>
-      Click to Reveal
-      </Link>
-      : <Link onClick={() => navigate(url)} sx={{ cursor: "pointer" }}>
-      {label}
-      </Link>
+        ? <Link onClick={toggleConcealment}>
+          Click to Reveal
+        </Link>
+        : <Link onClick={() => navigate(url)} sx={{ cursor: "pointer" }}>
+          {label}
+        </Link>
       }
     </span>
   );

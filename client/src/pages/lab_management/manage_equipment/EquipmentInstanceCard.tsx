@@ -32,8 +32,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
     const unpairedReaders: Reader[] | null = unpairedReaderResult?.data?.unpairedReaders;
 
     const [deleteInstance] = useMutation(DELETE_EQUIPMENT_INSTANCE, {
-        refetchQueries: [{ query: GET_EQUIPMENT_INSTANCES, variables: { equipmentID: props.instance.equipment.id } },
-        { query: GET_UNPAIRED_READERS }]
+        refetchQueries: ["EquipmentInstances", "GetUnpairedReaders"]
     });
 
     const [updateInstance] = useMutation(UPDATE_INSTANCE, {
@@ -133,7 +132,6 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
 
     async function handleDeleteInstance() {
         await deleteInstance({ variables: { id: props.instance.id } });
-        window.location.reload();
     }
 
     function renderCurrentState() {

@@ -1,4 +1,4 @@
-import { Card, CardActionArea, CardContent, CardMedia, Stack, Typography } from "@mui/material";
+import { Card, CardActionArea, CardContent, CardMedia, Stack, Typography, useTheme } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -11,11 +11,13 @@ interface ZoneCardProps {
   hours: ZoneHours[];
   imageUrl: string;
   isMobile: boolean;
+  clickable?: boolean;
 }
 
 function getHoursToday(times: ZoneHours[]) {
-  const now = new Date();
+  const theme = useTheme();
 
+  const now = new Date();
   const hours_today = times[now.getDay()];
 
   const status = hours_today.closed ? "CLOSED" : TimeUtils.currentStatus(hours_today.open?.substring(0, 5) ?? "12:00", hours_today.close?.substring(0, 5) ?? "12:00");
@@ -24,7 +26,7 @@ function getHoursToday(times: ZoneHours[]) {
     <Stack justifyContent="space-between" direction="row">
       <Typography color={status === "OPEN" ? "success" : "error"} fontWeight="bold">{status}</Typography>
       <Stack direction="row">
-        <Typography color="darkorange" fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
+        <Typography color={theme.palette.primary.main} fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
         <Typography paddingLeft={"10px"}>
           {
             hours_today.closed
@@ -46,11 +48,16 @@ export default function ZoneCard(props: ZoneCardProps) {
 
   return (
     <Card sx={{ width: props.isMobile ? "350px" : "500px" }} elevation={isHovered ? undefined : 8} onMouseEnter={() => { setIsHovered(true) }} onMouseLeave={() => { setIsHovered(false) }}>
-      <CardActionArea onClick={() => { navigate(`/makerspace/${props.id}`) }}>
+      <CardActionArea
+        onClick={
+          (props.clickable === true || props.clickable === undefined)
+            ? () => { navigate(`/makerspace/${props.id}`) }
+            : () => { /* Do nothing */ }
+        }>
         <CardMedia
           component="img"
           height={props.isMobile ? "197px" : "281px"}
-          image={props.imageUrl}
+          image={import.meta.env.VITE_CDN_URL + "user-uploads/" + props.imageUrl}
         />
         <CardContent>
           <Stack spacing={0.5} direction="row" alignItems="center">

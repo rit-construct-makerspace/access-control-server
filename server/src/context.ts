@@ -15,34 +15,6 @@ export interface CurrentUser extends UserRow {
   trainer: number[];
 }
 
-//const testuser = undefined;
-const testuser: CurrentUser = {
-  id: 16,
-  firstName: "Test",
-  lastName: "User",
-  pronouns: "They / Them",
-  isStudent: true,
-  privilege: Privilege.STAFF,
-  registrationDate: new Date(),
-  expectedGraduation: "June 2077",
-  college: "GCCIS",
-  setupComplete: true,
-  ritUsername: "tu1000",
-  archived: false,
-  manager: [],
-  staff: [],
-  trainer: [],
-  cardTagID: "12345",
-  notes: "",
-  activeHold: false,
-  admin: true,
-  hasHolds: false,
-  hasCardTag: true,
-  accountID: 1,
-  forceArchive: false,
-  atriumToken: null,
-};
-
 export interface ApolloContext {
   user: CurrentUser | undefined;
   logout: () => void;
@@ -58,21 +30,17 @@ export interface ApolloContext {
 }
 
 function authenticated(expressUser: Express.User | undefined) {
-  if (process.env.USE_TEST_DEV_USER_DANGER != "TRUE" && !expressUser) {
+  if (!expressUser) {
     throw new GraphQLError("Unauthenticated");
   }
 }
 
-function determineUser(expressUser: Express.User | undefined) {
-  if (process.env.USE_TEST_DEV_USER_DANGER == "TRUE") {
-    return testuser;
-  } else {
-    return expressUser as CurrentUser;
-  }
+export function determineUser(expressUser: Express.User | undefined) {
+  return expressUser as CurrentUser;
 }
 
 // Checks if a user is an admin
-export const isAdmin =
+const isAdmin =
   (expressUser: Express.User | undefined) =>
     (callback: (user: CurrentUser) => any) => {
       authenticated(expressUser);
@@ -90,7 +58,7 @@ export const isAdmin =
  * Admin
  * ^ Manager
  */
-export const isManagerFor =
+const isManagerFor =
   (expressUser: Express.User | undefined) =>
     (makerspaceID: number, callback: (user: CurrentUser) => any) => {
       makerspaceID = Number(makerspaceID);
@@ -110,7 +78,7 @@ export const isManagerFor =
  * ^ Manager
  * ^ Staff
  */
-export const isStaffFor =
+const isStaffFor =
   (expressUser: Express.User | undefined) =>
     (makerspaceID: number, callback: (user: CurrentUser) => any) => {
       makerspaceID = Number(makerspaceID);
@@ -128,7 +96,7 @@ export const isStaffFor =
  * Admin
  * ^ Trainer
  */
-export const isTrainerFor =
+const isTrainerFor =
   (expressUser: Express.User | undefined) =>
     (equipmentID: number, callback: (user: CurrentUser) => any) => {
       equipmentID = Number(equipmentID);
@@ -147,7 +115,7 @@ export const isTrainerFor =
  * Admin
  * ^ Manager
  */
-export const isManager =
+const isManager =
   (expressUser: Express.User | undefined) =>
     (callback: (user: CurrentUser) => any) => {
       authenticated(expressUser);
@@ -166,7 +134,7 @@ export const isManager =
  * ^ Manager
  * ^ Staff
  */
-export const isStaff =
+const isStaff =
   (expressUser: Express.User) =>
     (callback: (user: CurrentUser) => any) => {
       authenticated(expressUser);
@@ -186,7 +154,7 @@ export const isStaff =
  * ^ Staff
  * ^ Trainer
  */
-export const isTrainer =
+const isTrainer =
   (expressUser: Express.User | undefined) =>
     (callback: (user: CurrentUser) => any) => {
       authenticated(expressUser);
@@ -205,7 +173,7 @@ export const isTrainer =
  * ^ Manager
  * ^ Staff
  */
-export const ifStaffOrSelf =
+const ifStaffOrSelf =
   (expressUser: Express.User | undefined) =>
     (targetedUserID: number, callback: (user: CurrentUser) => any) => {
       authenticated(expressUser);
@@ -221,19 +189,19 @@ export const ifStaffOrSelf =
     };
 
 // only checks if user is authenticated (for actions where holds or privileges do not matter)
-export const ifAuthenticated =
+const ifAuthenticated =
   (expressUser: Express.User | undefined) =>
     (callback: (user: CurrentUser) => any) => {
-      if (process.env.USE_TEST_DEV_USER_DANGER != "TRUE" && !expressUser) {
+      if (!expressUser) {
         throw new GraphQLError("Unauthenticated");
       }
 
       const user = expressUser as CurrentUser;
-      return callback(process.env.USE_TEST_DEV_USER_DANGER != "TRUE" ? user : testuser);
+      return callback(user);
     };
 
 const context = async ({ req }: { req: any }) => ({
-  user: process.env.USE_TEST_DEV_USER_DANGER != "TRUE" ? req.user : testuser,
+  user: req.user,
   logout: () => req.logout(),
   isAdmin: isAdmin(req.user),
   isManager: isManager(req.user),

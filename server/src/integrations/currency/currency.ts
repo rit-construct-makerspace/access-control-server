@@ -38,6 +38,7 @@ export class Transaction {
   items: { name: string, cents: number }[];
   // subtotal is sum(items.cents)
   constructor(date: Date, source: string, description: string, items: { name: string, cents: number }[], isRefund: boolean) {
+  constructor(date: Date, source: string, description: string, items: { name: string, cents: number }[], isRefund: boolean) {
     this.date = date;
     this.source = source;
     this.description = description;
@@ -80,6 +81,7 @@ export async function getAccountBalance(username: string): Promise<number | Make
 
 export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction): Promise<boolean> {
   const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
+  const deltaCents = -transaction.subtotal(); // - if a charge, + if a refund
   const deltaCents = -transaction.subtotal(); // - if a charge, + if a refund
   if (makeAccountID) { // found make account, use that first
     const success = await CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(makeAccountID, deltaCents, transaction.source, transaction.description);

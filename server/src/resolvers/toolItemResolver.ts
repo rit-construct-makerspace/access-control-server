@@ -26,7 +26,7 @@ const ToolItemResolver = {
       isStaff(async () => {
         return getToolItemInstancesByType(parent.id);
       }
-    ),
+      ),
 
     //Map defaultLocationRoom field to Room
     defaultLocationRoom: async (
@@ -37,7 +37,7 @@ const ToolItemResolver = {
       isStaff(async () => {
         return getRoomByID(parent.defaultLocationRoomID);
       }
-    ),
+      ),
   },
 
   ToolItemInstance: {
@@ -50,7 +50,7 @@ const ToolItemResolver = {
       isStaff(async () => {
         return getToolItemTypeByID(parent.typeID);
       }
-    ),
+      ),
 
     //Map borrower field to User
     borrower: async (
@@ -62,7 +62,7 @@ const ToolItemResolver = {
         if (!parent.borrowerUserID) return null;
         return getUserByID(parent.borrowerUserID);
       }
-    ),
+      ),
 
     //Map locationRoom field to Room
     locationRoom: async (
@@ -73,7 +73,7 @@ const ToolItemResolver = {
       isStaff(async () => {
         return getRoomByID(parent.locationRoomID);
       }
-    ),
+      ),
   },
 
   Query: {
@@ -90,7 +90,7 @@ const ToolItemResolver = {
       isStaff(async () => {
         return getToolItemTypes();
       }
-    ),
+      ),
 
     /**
      * Fetch all ToolItemTypes where allowCheckout is true
@@ -105,7 +105,7 @@ const ToolItemResolver = {
       isStaff(async () => {
         return getToolItemTypesWhereAllowCheckout();
       }
-    ),
+      ),
 
     /**
      * Fetch ToolItemType by ID
@@ -115,13 +115,13 @@ const ToolItemResolver = {
      */
     toolItemType: async (
       _parent: any,
-      args: {id: number},
+      args: { id: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async () => {
         return getToolItemTypeByID(args.id);
       }
-    ),
+      ),
 
     /**
      * Fetch all ToolItemInstances
@@ -136,7 +136,7 @@ const ToolItemResolver = {
       isStaff(async () => {
         return getToolItemInstances();
       }
-    ),
+      ),
 
     /**
      * Fetch all ToolItemInstances by assocciated ToolItemType
@@ -146,13 +146,13 @@ const ToolItemResolver = {
      */
     toolItemInstancesByType: async (
       _parent: any,
-      args: {id: number},
+      args: { id: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async () => {
         return getToolItemInstancesByType(args.id);
       }
-    ),
+      ),
 
     /**
      * Fetch ToolItemInstance by ID
@@ -162,13 +162,13 @@ const ToolItemResolver = {
      */
     toolItemInstance: async (
       _parent: any,
-      args: {id: number},
+      args: { id: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async () => {
         return getToolItemInstanceByID(args.id);
       }
-    ),
+      ),
 
     /**
      * Fetch all ToolItemInstances by brrowing User
@@ -178,13 +178,13 @@ const ToolItemResolver = {
      */
     toolItemInstancesByBorrower: async (
       _parent: any,
-      args: {id: number},
+      args: { id: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async () => {
         return getToolItemInstancesByBorrower(args.id);
       }
-    ),
+      ),
   },
 
   Mutation: {
@@ -196,16 +196,16 @@ const ToolItemResolver = {
      */
     createToolItemType: async (
       _parent: any,
-      args: {toolItemType: ToolItemTypeInput},
+      args: { toolItemType: ToolItemTypeInput },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user) => {
-        await createLog(`{user} created tool item type '${args.toolItemType.name}'`, 'admin', {id: user.id, label: getUsersFullName(user)});
-        return await createToolItemType(args.toolItemType.name, args.toolItemType.defaultLocationRoomID, 
-          args.toolItemType.defaultLocationDescription, args.toolItemType.description, args.toolItemType.checkoutNote, 
+        await createLog(`{user} created tool item type '${args.toolItemType.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
+        return await createToolItemType(args.toolItemType.name, args.toolItemType.defaultLocationRoomID,
+          args.toolItemType.defaultLocationDescription, args.toolItemType.description, args.toolItemType.checkoutNote,
           args.toolItemType.checkinNote, args.toolItemType.allowCheckout);
       }
-    ),
+      ),
 
     /**
      * Modify a ToolItemType
@@ -216,18 +216,26 @@ const ToolItemResolver = {
      */
     updateToolItemType: async (
       _parent: any,
-      args: {id: number, toolItemType: ToolItemTypeInput},
+      args: { id: number, toolItemType: ToolItemTypeInput },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user) => {
         const orig = await getToolItemTypeByID(args.id);
         if (!orig) throw new GraphQLError("Type does not exist");
-        await createLog(`{user} updated tool item type '${orig.name}'`, 'admin', {id: user.id, label: getUsersFullName(user)});
-        return updateToolItemType(args.id, args.toolItemType.name, args.toolItemType.defaultLocationRoomID, 
-          args.toolItemType.defaultLocationDescription, args.toolItemType.description, args.toolItemType.checkoutNote, 
-          args.toolItemType.checkinNote, args.toolItemType.allowCheckout);
+        await createLog(`{user} updated tool item type '${orig.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
+        return updateToolItemType(
+          args.id,
+          args.toolItemType.name,
+          args.toolItemType.defaultLocationRoomID,
+          args.toolItemType.defaultLocationDescription,
+          args.toolItemType.description,
+          args.toolItemType.checkoutNote,
+          args.toolItemType.checkinNote,
+          args.toolItemType.allowCheckout,
+          args.toolItemType.imageUrl
+        );
       }
-    ),
+      ),
 
     /**
      * Create a ToolItemInstance
@@ -237,16 +245,16 @@ const ToolItemResolver = {
      */
     createToolItemInstance: async (
       _parent: any,
-      args: {toolItemInstance: ToolItemInstanceInput},
+      args: { toolItemInstance: ToolItemInstanceInput },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user) => {
-        await createLog(`{user} created tool item instance '${args.toolItemInstance.uniqueIdentifier}'`, 'admin', {id: user.id, label: getUsersFullName(user)});
-        return createToolItemInstance(Number(args.toolItemInstance.typeID), args.toolItemInstance.uniqueIdentifier, 
-          Number(args.toolItemInstance.locationRoomID), args.toolItemInstance.locationDescription, args.toolItemInstance.condition, 
+        await createLog(`{user} created tool item instance '${args.toolItemInstance.uniqueIdentifier}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
+        return createToolItemInstance(Number(args.toolItemInstance.typeID), args.toolItemInstance.uniqueIdentifier,
+          Number(args.toolItemInstance.locationRoomID), args.toolItemInstance.locationDescription, args.toolItemInstance.condition,
           args.toolItemInstance.status, args.toolItemInstance.notes);
       }
-    ),
+      ),
 
     /**
      * Modify a ToolItemInstance
@@ -257,7 +265,7 @@ const ToolItemResolver = {
      */
     updateToolItemInstance: async (
       _parent: any,
-      args: {id: number, toolItemInstance: ToolItemInstanceInput},
+      args: { id: number, toolItemInstance: ToolItemInstanceInput },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user) => {
@@ -267,22 +275,22 @@ const ToolItemResolver = {
 
         if (!(args.toolItemInstance.status == orig.status)
           && (args.toolItemInstance.status == "MISSING"
-          || args.toolItemInstance.status == "DO NOT USE")
+            || args.toolItemInstance.status == "DO NOT USE")
         ) {
           await notifyToolItemMarked(args.toolItemInstance.uniqueIdentifier, makerspace?.id ?? 0, orig.id, orig.typeID, args.toolItemInstance.status);
         }
         else if (!(args.toolItemInstance.condition == orig.condition)
           && (args.toolItemInstance.condition == "DAMAGED"
-          || args.toolItemInstance.condition == "MISSING PARTS")
+            || args.toolItemInstance.condition == "MISSING PARTS")
         ) {
           await notifyToolItemMarked(args.toolItemInstance.uniqueIdentifier, makerspace?.id ?? 0, orig.id, orig.typeID, args.toolItemInstance.condition);
         }
-        await createLog(`{user} updated tool item instance '${orig.uniqueIdentifier}'`, 'admin', {id: user.id, label: getUsersFullName(user)});
-        return updateToolItemInstance(args.id, args.toolItemInstance.typeID, args.toolItemInstance.uniqueIdentifier, 
-          args.toolItemInstance.locationRoomID, args.toolItemInstance.locationDescription, args.toolItemInstance.condition, 
+        await createLog(`{user} updated tool item instance '${orig.uniqueIdentifier}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
+        return updateToolItemInstance(args.id, args.toolItemInstance.typeID, args.toolItemInstance.uniqueIdentifier,
+          args.toolItemInstance.locationRoomID, args.toolItemInstance.locationDescription, args.toolItemInstance.condition,
           args.toolItemInstance.status, args.toolItemInstance.notes);
       }
-    ),
+      ),
 
     /**
      * Mark a ToolItemInstance as Borrowed
@@ -293,7 +301,7 @@ const ToolItemResolver = {
      */
     borrowInstance: async (
       _parent: any,
-      args: {userID: number, instanceID: number},
+      args: { userID: number, instanceID: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user) => {
@@ -301,10 +309,10 @@ const ToolItemResolver = {
         if (!reciever) throw new GraphQLError("Recieving User does not exist");
         const orig = await getToolItemInstanceByID(args.instanceID);
         if (!orig) throw new GraphQLError("Type does not exist");
-        await createLog(`{user} loaned tool item '${orig.uniqueIdentifier}' to {user}`, 'admin', {id: user.id, label: getUsersFullName(user)}, {id: reciever.id, label: getUsersFullName(reciever)});
+        await createLog(`{user} loaned tool item '${orig.uniqueIdentifier}' to {user}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: reciever.id, label: getUsersFullName(reciever) });
         return borrowItem(args.userID, args.instanceID);
       }
-    ),
+      ),
 
     /**
      * Mark a ToolItemInstance as not borrowed
@@ -314,7 +322,7 @@ const ToolItemResolver = {
      */
     returnInstance: async (
       _parent: any,
-      args: {instanceID: number},
+      args: { instanceID: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user) => {
@@ -322,10 +330,10 @@ const ToolItemResolver = {
         if (!orig) throw new GraphQLError("Type does not exist");
         const reciever = orig.borrowerUserID ? await getUserByID(orig.borrowerUserID) : undefined;
         if (!reciever) throw new GraphQLError("Returning User does not exist");
-        await createLog(`{user} returned tool item '${orig.uniqueIdentifier}' from {user}`, 'admin', {id: user.id, label: getUsersFullName(user)}, {id: reciever.id, label: getUsersFullName(reciever)});
+        await createLog(`{user} returned tool item '${orig.uniqueIdentifier}' from {user}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: reciever.id, label: getUsersFullName(reciever) });
         return returnItem(args.instanceID)
       }
-    ),
+      ),
 
     /**
      * Delete a ToolItemType
@@ -335,16 +343,16 @@ const ToolItemResolver = {
      */
     deleteToolItemType: async (
       _parent: any,
-      args: {id: number},
+      args: { id: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user) => {
         const orig = await getToolItemTypeByID(args.id);
         if (!orig) throw new GraphQLError("Type does not exist");
-        await createLog(`{user} deleted tool item type '${orig.name}'`, 'admin', {id: user.id, label: getUsersFullName(user)});
+        await createLog(`{user} deleted tool item type '${orig.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
         return deleteToolItemType(args.id);
       }
-    ),
+      ),
 
     /**
      * Delete a ToolItemInstance
@@ -354,16 +362,16 @@ const ToolItemResolver = {
      */
     deleteToolItemInstance: async (
       _parent: any,
-      args: {id: number},
+      args: { id: number },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user) => {
         const orig = await getToolItemInstanceByID(args.id);
         if (!orig) throw new GraphQLError("Instance does not exist");
-        await createLog(`{user} deleted tool item instance '${orig.uniqueIdentifier}'`, 'admin', {id: user.id, label: getUsersFullName(user)});
+        await createLog(`{user} deleted tool item instance '${orig.uniqueIdentifier}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
         return deleteToolItemInstance(args.id);
       }
-    ),
+      ),
   }
 };
 

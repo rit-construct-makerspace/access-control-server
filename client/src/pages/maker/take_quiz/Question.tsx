@@ -30,7 +30,15 @@ export default function Question({
 }: QuestionProps) {
   return (
     <Card elevation={2} sx={{ p: 2 }}>
-      <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><Markdown>{quizItem.text}</Markdown></Typography>
+      <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}>
+        <Markdown
+          components={{
+            a({ children, ...props }) {
+              return <a target="_blank" rel="noopener noreferrer"{...props}>{children}</a>;
+            },
+          }}
+        >{quizItem.text}</Markdown>
+      </Typography>
       {quizItem.options?.map((o) => (
         <Option
           key={o.id}

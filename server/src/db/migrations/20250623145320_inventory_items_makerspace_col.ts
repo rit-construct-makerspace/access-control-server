@@ -4,7 +4,7 @@ export async function up(knex: Knex): Promise<void> {
   const makerspaceColExists = await knex.schema.hasColumn("InventoryItem", "makerspaceID");
   if (!makerspaceColExists) {
     return knex.schema.alterTable("InventoryItem", (t) => {
-      t.integer("makerspaceID").references("id").inTable("InventoryCarts").nullable();
+      t.integer("makerspaceID").references("id").inTable("Zones").nullable();
       t.string("description");
     });
   }

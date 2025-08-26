@@ -13,6 +13,7 @@ export interface ToolItemTypeInput {
   checkoutNote: string;
   checkinNote: string;
   allowCheckout: boolean;
+  imageUrl: string;
 }
 
 export interface ToolItemInstanceInput {

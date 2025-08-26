@@ -6,7 +6,12 @@ interface ImportMetaEnv {
     readonly VITE_CDN_EQUIPMENT_DIR: string;
     readonly VITE_CDN_TOOL_DIR: string;
     readonly VITE_LOGIN_URL: string;
+    readonly VITE_LOGOUT_URL: string;
     readonly VITE_GRAFANA_READER_STATS_URL: string;
+    readonly VITE_DISABLE_STOREFRONT_CART: string;
+    readonly VITE_ORIGIN: string;
+    readonly VITE_GENERAL_PRINTERS_ID: string;
+    readonly VITE_ID_3DPRINTEROS_QUIZ: string;
 }
 
 interface ImportMeta {

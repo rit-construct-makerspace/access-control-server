@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
 import InventoryItem from "../types/InventoryItem";
 import { CardActionArea, Chip, Stack, Typography } from "@mui/material";
 import InvItemName from "./InvItemNamePic";
 import InvItemCount from "./InvItemCount";
+import { useIsMobile } from "./IsMobileProvider";
 
 interface InventoryRowProps {
   item: InventoryItem;
@@ -11,17 +11,7 @@ interface InventoryRowProps {
 
 export default function InventoryRow({ item, onClick }: InventoryRowProps) {
 
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile()
 
   return (
     <CardActionArea onClick={onClick} sx={{ py: 2 }}>
