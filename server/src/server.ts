@@ -27,6 +27,7 @@ import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js"
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
+import { adjustBalanceIfPossible, generateAtriumToken, getBalance, pingAtrium } from "./integrations/atrium-integration/atrium.js";
 
 const require = createRequire(import.meta.url);
 
@@ -517,10 +518,18 @@ async function startServer() {
 
   console.log(process.env.ID_FORMAT);
 
-  app.listen({ port: PORT }, () => {
+  app.listen({ port: PORT }, async () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
-    )
+    );
+    
+    await pingAtrium();
+    // const token = await generateAtriumToken("123456789");
+    // console.log("Token", token);
+    // const balance = await getBalance("res3453");
+    // console.log("getBalance", balance);
+    const res = await adjustBalanceIfPossible('res3453', 100);
+    console.log("AdjustRes", res);
   }
   );
 }

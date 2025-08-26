@@ -1,7 +1,4 @@
-import * as Atrium from "../atrium-integration/atrium.js"
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js"
-
-const TAX_RATE_PERCENT: number = process.env.TAX_RATE_PERCENT ? Number(process.env.TAX_RATE_PERCENT) : 0;
 
 export enum MakeMoneyError {
   NoAccount = "NoAccount",
