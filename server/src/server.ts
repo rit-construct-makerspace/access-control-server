@@ -523,13 +523,14 @@ async function startServer() {
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     );
     
-    await pingAtrium();
-    // const token = await generateAtriumToken("123456789");
+    // const p = await pingAtrium();
+    // console.log("Ping", p);
+    // const token = await generateAtriumToken("783002388");
     // console.log("Token", token);
-    // const balance = await getBalance("res3453");
-    // console.log("getBalance", balance);
-    const res = await adjustBalanceIfPossible('res3453', 100);
-    console.log("AdjustRes", res);
+    const balance = await getBalance("res3453");
+    console.log("getBalance", balance);
+    // const res = await adjustBalanceIfPossible('res3453', 100);
+    // console.log("AdjustRes", res);
   }
   );
 }
