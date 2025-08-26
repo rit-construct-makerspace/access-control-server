@@ -1,5 +1,7 @@
+import * as Atrium from "../atrium-integration/atrium.js"
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js"
-import { getBalance } from "../atrium-integration/atrium.js";
+
+const TAX_RATE_PERCENT: number = process.env.TAX_RATE_PERCENT ? Number(process.env.TAX_RATE_PERCENT) : 0;
 
 export enum MakeMoneyError {
   NoAccount = "NoAccount",
@@ -13,22 +15,22 @@ export enum MakeMoneyError {
  * @param constructCreditsAvailable the number of construct credits available to use
  * @return undefined if illegal value passed in (negative amount cents or constructCreditsAvailable)
  */
-function splitCost(amountCents: number, constructCreditsAvailable: number): { ccUsed: number, atriumUsed: number, ccRemaining: number } | undefined {
-  if (amountCents < 0 || constructCreditsAvailable < 0 || isNaN(amountCents) || isNaN(constructCreditsAvailable)) {
+function splitCost(amountCents: number, constructCreditsAvailable: number): {ccUsed: number, atriumUsed: number, ccRemaining: number} | undefined{
+  if (amountCents < 0 || constructCreditsAvailable < 0 || isNaN(amountCents) || isNaN(constructCreditsAvailable)){
     return undefined;
   }
 
-  if (constructCreditsAvailable > amountCents) {
-    return { ccUsed: amountCents, atriumUsed: 0, ccRemaining: constructCreditsAvailable - amountCents };
+  if (constructCreditsAvailable > amountCents){
+    return {ccUsed: amountCents, atriumUsed: 0, ccRemaining: constructCreditsAvailable - amountCents};
   }
 
-  if (constructCreditsAvailable == 0) {
-    return { ccUsed: 0, atriumUsed: amountCents, ccRemaining: 0 };
+  if (constructCreditsAvailable == 0){
+    return {ccUsed: 0, atriumUsed: amountCents, ccRemaining: 0};
   }
 
   // use all CC
   const remaining = amountCents - constructCreditsAvailable;
-  return { ccUsed: constructCreditsAvailable, atriumUsed: remaining, ccRemaining: 0 };
+  return {ccUsed: constructCreditsAvailable, atriumUsed: remaining, ccRemaining: 0};
 }
 
 export class Transaction {
@@ -42,7 +44,7 @@ export class Transaction {
     this.source = source;
     this.description = description;
     const factor = isRefund ? -1 : 1;
-    this.items = items.map(item => ({ name: item.name, cents: factor * item.cents }));
+    this.items = items.map(item => ({name: item.name, cents: factor * item.cents}));
   }
   /**
    * Calculate the subtotal of the transaction
@@ -50,7 +52,7 @@ export class Transaction {
    * Will return NEGATIVE if this is a refund
    * @returns the amount to charge against an account
    */
-  public subtotal(): number {
+  public subtotal(): number{
     return this.items.reduce((acc, obj) => acc + obj.cents, 0);
   }
 }
@@ -69,7 +71,7 @@ export async function getAccountBalance(username: string): Promise<number | Make
   } catch {
     return MakeMoneyError.SomethingElse;
   }
-  let atriumBalance = await getBalance(username);
+  let atriumBalance = await Atrium.getBalance(username);
   if (typeof atriumBalance !== "number"){
     // error retrieving atrium info
     console.log(`Unable to query atrium balance for '${username}'. ${atriumBalance}.\nThis user will only access tigerbucks`)
