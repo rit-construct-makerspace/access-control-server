@@ -28,6 +28,8 @@ import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.j
 import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
 import { adjustBalanceIfPossible, generateAtriumToken, getBalance, pingAtrium } from "./integrations/atrium-integration/atrium.js";
+import { getAccountBalance } from "./integrations/currency/currency.js";
+import { getAccountBalanceCents } from "./repositories/Currency/CurrencyAccountsRepository.js";
 
 const require = createRequire(import.meta.url);
 
@@ -519,18 +521,16 @@ async function startServer() {
   console.log(process.env.ID_FORMAT);
 
   const pingResponse = await pingAtrium();
-  console.log("Ping", pingResponse);
   if (typeof pingResponse !== 'boolean' || pingResponse == false) {
-    console.error("Unable to contact ATRIUM API. Currency functionality may be limited");
+    console.error("Unable to contact atrium api. Currency functionality may be limited", pingResponse);
   }
 
 
-  app.listen({ port: PORT }, async () => {
+  app.listen({ port: PORT }, () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     );
-    
-  }
+   }
   );
 }
 
