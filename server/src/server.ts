@@ -455,7 +455,7 @@ async function startServer() {
     };
 
     let expiryNotices = await getPassedTrainingsWeeksAgo(52);
-    if (expiryNotices.length > 99){
+    if (expiryNotices.length > 99) {
       // dont overload the emails (100 / hr, 400 / day)
       expiryNotices = expiryNotices.slice(0, 99);
     }
@@ -468,7 +468,7 @@ async function startServer() {
     // const numWarned = expiryWarnings.length;
 
     const numNotified = expiryNotices.length
-    
+
     createLog(`Trainings: Sent ${numNotified} expiry notices, and purged ${numPurged} expired trainings.`, "server")
 
   }
@@ -518,19 +518,18 @@ async function startServer() {
 
   console.log(process.env.ID_FORMAT);
 
+  const pingResponse = await pingAtrium();
+  console.log("Ping", pingResponse);
+  if (typeof pingResponse !== 'boolean' || pingResponse == false) {
+    console.error("Unable to contact ATRIUM API. Currency functionality may be limited");
+  }
+
+
   app.listen({ port: PORT }, async () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     );
     
-    // const p = await pingAtrium();
-    // console.log("Ping", p);
-    // const token = await generateAtriumToken("783002388");
-    // console.log("Token", token);
-    const balance = await getBalance("res3453");
-    console.log("getBalance", balance);
-    // const res = await adjustBalanceIfPossible('res3453', 100);
-    // console.log("AdjustRes", res);
   }
   );
 }

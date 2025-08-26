@@ -226,6 +226,18 @@ export async function archiveUser(userID: number, archive: boolean): Promise<Use
 }
 
 /**
+ * 
+ * @param userID 
+ * @param atriumToken 
+ * @returns 
+ */
+export async function updateAtriumToken(userID: number, atriumToken: string | null): Promise<UserRow>{
+  await knex("Users").where({ id: userID }).update({ atriumToken: atriumToken });
+  return await getUserByID(userID);
+
+}
+
+/**
  * Fetch total number of users
  * @returns number of users as JSON with "count" attribute
  * @todo knex.count gives a JSON string that our JSON parser can't recognize for some reason.
