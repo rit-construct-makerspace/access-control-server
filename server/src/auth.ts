@@ -7,7 +7,6 @@ import fs from 'fs';
 import passport from "passport";
 import {
   Strategy as SamlStrategy,
-  ValidateInResponseTo,
 } from "@node-saml/passport-saml";
 
 import { Strategy as LocalStrategy } from 'passport-local';
@@ -22,6 +21,7 @@ import {
   getUserManagerPerms,
   getUserStaffPerms,
   getUserTrainerPerms,
+  updateAtriumToken,
   updateUserName
 } from "./repositories/Users/UserRepository.js";
 import { getHoldsByUser } from "./repositories/Holds/HoldsRepository.js";
@@ -29,6 +29,7 @@ import { CurrentUser } from "./context.js";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import path from "path";
 import { insertTempRole } from './repositories/tempRolesRepo.js';
+import { generateAtriumToken } from './integrations/atrium-integration/atrium.js';
 import * as SessionRepo from "./repositories/Users/SessionRepository.js";
 
 const __dirname = import.meta.dirname;
@@ -397,8 +398,21 @@ export function setupStagingAuth(app: express.Application) {
       } else {
         await archiveUser(existingUser.id, !roles.some((role) => (whitelist.includes(role))));
       }
+    }
 
-
+    try {
+      if (existingUser.atriumToken == null) {
+        // generate atrium token for user
+        const uid = ritUser['"urn:oid:1.3.6.1.4.1.4447.1.20"'];
+        const res = await generateAtriumToken(uid);
+        if (typeof res == "string") {
+          existingUser = await updateAtriumToken(existingUser.id, res);
+        } else {
+          console.error("Failed to generate atrium token for user", res);
+        }
+      }
+    } catch (e) {
+      console.error(`Failed to generate Atrium token for user '${existingUser.ritUsername}': ${e}`)
     }
 
     done(null, ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);
