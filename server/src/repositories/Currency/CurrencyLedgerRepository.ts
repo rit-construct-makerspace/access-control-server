@@ -6,25 +6,29 @@ import * as UserRepo from "../Users/UserRepository.js";
 
 export async function createCurrencyLedgerEntry(
     accountID: number,
-    amount: number,
+    creditAmount: number,
+    atriumAmount: number,
     source: string,
     description?: string,
     atxID?: number,
-    refID?: number
+    refID?: number,
+    printerJobId?: number
 ): Promise<number> {
 
     const org = await OrgRepo.getOrganizationByAccountID(accountID);
 
-    const owner = org ? org.username : (await UserRepo.getUserByAccountID(accountID))?.ritUsername
+    const owner = org ? org.username : (await UserRepo.getUserByAccountID(accountID))?.ritUsername ?? "unknown-owner"
 
     const data = {
         accountID: accountID,
         owner: owner,
-        amount: amount,
+        creditAmount: creditAmount,
+        atriumAmount: atriumAmount,
         source: source,
         description: description,
         atxID: atxID,
         refID: refID,
+        printerJobId: printerJobId
     };
 
     // Remove undefined values to allow DB default values

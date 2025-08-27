@@ -6,11 +6,13 @@ export const CurrencyLedgerTypeDefs = gql`
     dateTime: DateTime!
     accountID: ID
     owner: String!
-    amount: Int!
+    creditAmount: Int!
+    atriumAmount: Int!
     source: String!
     description: String
     atxID: Int
     refID: Int
+    printerJobId: ID
   }
 
   extend type Query {
