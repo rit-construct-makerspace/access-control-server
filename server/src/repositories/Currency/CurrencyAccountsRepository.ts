@@ -70,6 +70,9 @@ export async function deleteAccount(accountID: number): Promise<boolean> {
  * This function adjusts an account by {@link amount}, and sets the balance to 0 if the amount is greater than the balance.
  * @param accountID the account to adjust the balance of
  * @param amount the amount to adjust the account by, + to add credits, - to subtract credits
+ * @param source the source of the transaction to record in the ledger
+ * @param description the description of the transaction to record in the ledger
+ * @param createLedgerEntry specifies if this call should create a ledger entry. IF FALSE, IT IS THE CALLERS RESPONSIBILITY TO CORRECTLY LOG THE TRANSACTION TO THE LEDGER
  * @returns true if successful
  * @throws an error if the account isn't found
  */
@@ -91,9 +94,11 @@ export async function adjustAccountBalanceCents(accountID: number, amount: numbe
 
 /**
  * This function attempts to adjust an account by {@link amount}, and returns false if the amount is greater than the account balance
- * IF YOU USE THIS FUNCTION, IT IS YOUR RESPONSIBILITY TO RECORD TO THE LEDGER
  * @param accountID The account to adjust the balance of
  * @param amount The amount to adjust the account by, + to add credits, - to subtract credits
+ * @param source the source of the transaction to record in the ledger
+ * @param description the description of the transaction to record in the ledger
+ * @param createLedgerEntry specifies if this call should create a ledger entry. IF FALSE, IT IS THE CALLERS RESPONSIBILITY TO CORRECTLY LOG THE TRANSACTION TO THE LEDGER
  * @returns true if successful, false if the amount is greater than the account balance
  * @throws an error if the account can't be found
  */
@@ -124,6 +129,9 @@ export async function adjustAccountBalanceIfAvailableCents(accountID: number, am
  * Ex: For an account with only 200, if you charge it 500 using this function, it will return 300.
  * @param accountID the account to charge
  * @param amount the amount to charge (must be >= 0)
+ * @param source the source of the transaction to record in the ledger
+ * @param description the description of the transaction to record in the ledger
+ * @param createLedgerEntry specifies if this call should create a ledger entry. IF FALSE, IT IS THE CALLERS RESPONSIBILITY TO CORRECTLY LOG THE TRANSACTION TO THE LEDGER
  * @returns the amount remaining that was not able to be charged
  * @throws an error if the account isn't found, or if the {@link amount} is < 0
  */
