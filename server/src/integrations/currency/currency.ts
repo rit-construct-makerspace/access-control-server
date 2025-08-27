@@ -64,12 +64,20 @@ export async function getAccountBalance(username: string): Promise<number | Make
   if (!makeAccountID) {
     return MakeMoneyError.NoAccount;
   }
+
+  let makeBalance = 0;
   try {
-    const make_bal = await CurrencyAccountRepo.getAccountBalanceCents(makeAccountID);
-    return make_bal;
+    makeBalance = await CurrencyAccountRepo.getAccountBalanceCents(makeAccountID);
   } catch {
     return MakeMoneyError.SomethingElse;
   }
+  let atriumBalance = await Atrium.getBalance(username);
+  if (typeof atriumBalance !== "number"){
+    // error retrieving atrium info
+    console.log(`Unable to query atrium balance for '${username}'. ${atriumBalance}.\nThis user will only access tigerbucks`)
+    atriumBalance = 0;
+  }
+  return  makeBalance + atriumBalance;
 }
 
 export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction): Promise<boolean> {
