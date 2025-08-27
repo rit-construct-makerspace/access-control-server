@@ -106,9 +106,9 @@ export default function CurrencyLedger() {
         { field: "atriumAmount", headerName: "$TB", width: 120 },
         { field: "dateTime", headerName: "Date", width: 200 },
         { field: "source", headerName: "Source", width: 200 },
-        { field: "description", headerName: "Description", width: 500 },
-        { field: "atxID", headerName: "ATX ID", width: 150 },
-        { field: "refID", headerName: "REF ID", width: 150 },
+        { field: "description", headerName: "Description", width: 450 },
+        { field: "atxID", headerName: "ATX ID", width: 120 },
+        { field: "refID", headerName: "REF ID", width: 120 },
         { field: "printerJobId", headerName: "Printer Job ID", width: 250 },
       ];
 
