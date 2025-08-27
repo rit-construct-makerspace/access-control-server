@@ -87,7 +87,9 @@ export async function adjustAccountBalanceCents(accountID: number, amount: numbe
 
   await setAccountBalanceCents(accountID, new_balance);
 
-  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, new_balance - balance, 0, source, description);
+  if (createLedgerEntry) {
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, new_balance - balance, 0, source, description);
+  }
 
   return true;
 }
@@ -145,7 +147,9 @@ export async function chargeAccountReturnRemainingCents(accountID: number, amoun
   if (amount > balance) {
     await setAccountBalanceCents(accountID, 0);
     const left = amount - balance;
-    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -balance, 0, source, description);
+    if (createLedgerEntry) {
+      await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -balance, 0, source, description);
+    }
     return left;
   }
 
