@@ -9,10 +9,12 @@ export async function createCurrencyLedgerEntry(
     creditAmount: number,
     atriumAmount: number,
     source: string,
-    description?: string,
-    atxID?: number,
-    refID?: number,
-    printerJobId?: number
+    info: {
+        description?: string,
+        atxID?: number,
+        refID?: number,
+        printerJobId?: number            
+    }
 ): Promise<number> {
 
     const org = await OrgRepo.getOrganizationByAccountID(accountID);
@@ -25,10 +27,10 @@ export async function createCurrencyLedgerEntry(
         creditAmount: creditAmount,
         atriumAmount: atriumAmount,
         source: source,
-        description: description,
-        atxID: atxID,
-        refID: refID,
-        printerJobId: printerJobId
+        description: info.description,
+        atxID: info.atxID,
+        refID: info.refID,
+        printerJobId: info.printerJobId
     };
 
     // Remove undefined values to allow DB default values
@@ -92,6 +94,9 @@ export async function getCurrencyLedgerEntry(id: number): Promise<CurrencyLedger
     } else {
         throw new GraphQLError(`Failed to find CurrencyLedger entry with ID: ${id}`);
     }
+}
+export async function getCurrencyLedgerEntriesByPrinterJobId(printerJobId: number): Promise<CurrencyLedgerRow[]>{
+    return await knex("CurrencyLedger").where({printerJobId: printerJobId}).select("*");
 }
 
 export async function getNextRefID(): Promise<number> {

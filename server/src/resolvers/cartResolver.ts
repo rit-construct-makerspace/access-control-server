@@ -1,5 +1,6 @@
 import { ApolloContext } from "../context.js";
 import { InventoryCartsRow } from "../db/tables.js";
+import { Terminal } from "../integrations/atrium-integration/atrium.js";
 import { adjustAccountBalanceIfAvailableCents, Transaction } from "../integrations/currency/currency.js";
 import { clearItemsFromCart, deleteInventoryCart, getInventoryCartByID, getInventoryCarts, getInventoryCartsByMakerspace, getItemsInCart, subtractItemFromCart } from "../repositories/Store/InventoryCartsRepository.js";
 import { addItemAmount, addItemsAmounts, getItemById } from "../repositories/Store/InventoryRepository.js";
@@ -79,7 +80,7 @@ export const CartResolver = {
         [{ name: item?.name, cents: Math.floor(totalCost * -100) }], false);
 
       //Attempt Refund
-      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(cartUser.ritUsername, transaction);
+      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(cartUser.ritUsername, transaction, Terminal.Store);
       if (!atriumTransactionSuccess) {
         throw new Error("Refund failed due to Atrium transaction error");
       }
@@ -122,13 +123,13 @@ export const CartResolver = {
           "Makerspace Store",
           `For user ${user.ritUsername}: '${transDescription}'`,
           ledgerItems.map(item => { return { name: item.name, cents: Math.floor(item.quantity * item.pricePerUnit * 100) } }), false);
-        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, transaction);
+        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, transaction, Terminal.Store);
 
       //Attempt Refund
       if (totalRefund < 0) {
         throw new Error("Total refund cannot be negative");
       }
-      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(cartUser.ritUsername, transaction);
+      var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(cartUser.ritUsername, transaction, Terminal.Store);
       if (!atriumTransactionSuccess) {
         throw new Error("Refund failed due to Atrium transaction error");
       }

@@ -72,11 +72,12 @@ export async function deleteAccount(accountID: number): Promise<boolean> {
  * @param amount the amount to adjust the account by, + to add credits, - to subtract credits
  * @param source the source of the transaction to record in the ledger
  * @param description the description of the transaction to record in the ledger
- * @param createLedgerEntry specifies if this call should create a ledger entry. IF FALSE, IT IS THE CALLERS RESPONSIBILITY TO CORRECTLY LOG THE TRANSACTION TO THE LEDGER
+* @param printerJobId the optional 3dPrinterOS job id that corresponds with this transaction
+  * @param createLedgerEntry specifies if this call should create a ledger entry. IF FALSE, IT IS THE CALLERS RESPONSIBILITY TO CORRECTLY LOG THE TRANSACTION TO THE LEDGER
  * @returns true if successful
  * @throws an error if the account isn't found
  */
-export async function adjustAccountBalanceCents(accountID: number, amount: number, source: string, description?: string, createLedgerEntry: boolean = true): Promise<boolean> {
+export async function adjustAccountBalanceCents(accountID: number, amount: number, source: string, description?: string, printerJobId?: number, createLedgerEntry: boolean = true): Promise<boolean> {
   const balance = await getAccountBalanceCents(accountID);
 
   const new_balance = amount + balance < 0 ? 0 : balance + amount;
@@ -88,7 +89,7 @@ export async function adjustAccountBalanceCents(accountID: number, amount: numbe
   await setAccountBalanceCents(accountID, new_balance);
 
   if (createLedgerEntry) {
-    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, new_balance - balance, 0, source, description);
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, new_balance - balance, 0, source, { description, printerJobId });
   }
 
   return true;
@@ -100,11 +101,12 @@ export async function adjustAccountBalanceCents(accountID: number, amount: numbe
  * @param amount The amount to adjust the account by, + to add credits, - to subtract credits
  * @param source the source of the transaction to record in the ledger
  * @param description the description of the transaction to record in the ledger
+ * @param printerJobId the optional 3dPrinterOS job id that corresponds with this transaction
  * @param createLedgerEntry specifies if this call should create a ledger entry. IF FALSE, IT IS THE CALLERS RESPONSIBILITY TO CORRECTLY LOG THE TRANSACTION TO THE LEDGER
  * @returns true if successful, false if the amount is greater than the account balance
  * @throws an error if the account can't be found
  */
-export async function adjustAccountBalanceIfAvailableCents(accountID: number, amount: number, source: string, description?: string, createLedgerEntry: boolean = true): Promise<boolean> {
+export async function adjustAccountBalanceIfAvailableCents(accountID: number, amount: number, source: string, description?: string, printerJobId?: number, createLedgerEntry: boolean = true): Promise<boolean> {
   const balance = await getAccountBalanceCents(accountID);
 
   if (amount + balance < 0) {
@@ -120,7 +122,7 @@ export async function adjustAccountBalanceIfAvailableCents(accountID: number, am
   await setAccountBalanceCents(accountID, new_balance);
 
   if (createLedgerEntry) {
-    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, amount, 0, source, description);
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, amount, 0, source, { description, printerJobId });
   }
 
   return true;
@@ -133,16 +135,17 @@ export async function adjustAccountBalanceIfAvailableCents(accountID: number, am
  * @param amount the amount to charge (must be >= 0)
  * @param source the source of the transaction to record in the ledger
  * @param description the description of the transaction to record in the ledger
+ * @param printerJobId the optional 3dPrinterOS job id that corresponds with this transaction
  * @param createLedgerEntry specifies if this call should create a ledger entry. IF FALSE, IT IS THE CALLERS RESPONSIBILITY TO CORRECTLY LOG THE TRANSACTION TO THE LEDGER
  * @returns the amount remaining that was not able to be charged
  * @throws an error if the account isn't found, or if the {@link amount} is < 0
  */
-export async function chargeAccountReturnRemainingCents(accountID: number, amount: number, source: string, description?: string, createLedgerEntry: boolean = true): Promise<number> {
+export async function chargeAccountReturnRemainingCents(accountID: number, amount: number, source: string, description?: string, printerJobId?: number, createLedgerEntry: boolean = true): Promise<number> {
   if (amount < 0) {
     throw new GraphQLError("Cannot charge a negative amount");
   }
   const balance = await getAccountBalanceCents(accountID);
-  if (balance == 0){
+  if (balance == 0) {
     return amount;
   }
 
@@ -150,7 +153,7 @@ export async function chargeAccountReturnRemainingCents(accountID: number, amoun
     await setAccountBalanceCents(accountID, 0);
     const left = amount - balance;
     if (createLedgerEntry) {
-      await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -balance, 0, source, description);
+      await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -balance, 0, source, { description, printerJobId });
     }
     return left;
   }
@@ -158,7 +161,7 @@ export async function chargeAccountReturnRemainingCents(accountID: number, amoun
   await setAccountBalanceCents(accountID, balance - amount);
 
   if (createLedgerEntry) {
-    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -amount, 0, source, description);
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -amount, 0, source, { description, printerJobId });
   }
 
   return 0;

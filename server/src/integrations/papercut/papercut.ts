@@ -5,6 +5,8 @@ import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as Currency from "../currency/currency.js"
 import { send_transaction_email } from "../email/email.js";
 import { getAccountBalanceCents, getAccountIDByUsername } from "../../repositories/Currency/CurrencyAccountsRepository.js";
+import { Terminal } from "../atrium-integration/atrium.js";
+import { getCurrencyLedgerEntriesByPrinterJobId } from "../../repositories/Currency/CurrencyLedgerRepository.js";
 
 const PAPERCUT_SECURITY_SECRET = process.env.PAPERCUT_SECURITY_SECRET;
 const FREE_3D_PRINTS = process.env.FREE_3D_PRINTS === "true";
@@ -176,38 +178,59 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
   }
 
   const amountCents = Math.round(adjustment * 100);
-  try {
-    const changeAmount = -amountCents; // we want negative if refund
-    const transaction = new Currency.Transaction(
-      new Date(),
-      "3DPrinterOS",
-      `For user ${username}: '${comment}'`,
-      [
-        { name: "3D Print", cents: changeAmount }
-      ], false);
+  const changeAmount = -amountCents; // we want negative if refund
+  const transaction = new Currency.Transaction(
+    new Date(),
+    "3DPrinterOS",
+    `For user ${username}: '${comment}'`,
+    [
+      { name: "3D Print", cents: changeAmount }
+    ], false);
 
-    const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction);
-    const accountId = await getAccountIDByUsername(username);
-    let constructCreditsAfter = 0;
-    if (accountId != undefined) {
-      try {
-        constructCreditsAfter = await getAccountBalanceCents(accountId);
-      } catch (e) {
-        // that account was not found, report 0 for construct credits remaining
+  try {
+    const printDetails = printCommentParser(comment);
+    let transactionSuccess = false;
+    if (printDetails?.operation == "new") {
+
+      const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction, Terminal.Printers, printDetails?.jobID);
+      if (success) {
+        transactionSuccess = true;
+      }
+    } else {
+      // find by print job
+      if (printDetails) {
+        const previousEntries = await getCurrencyLedgerEntriesByPrinterJobId(printDetails?.jobID);
+        if (previousEntries.length == 1) {
+          const success: boolean = await Currency.reversePreviousTransaction(previousEntries[0].id, changeAmount);
+          if (success) {
+            transactionSuccess = true;
+          }
+        } else {
+          // multiple transactions have already happened with this print id, possible multiple refund?
+          // figure this out manually to avoid infinite money glitch
+        }
       }
     }
-    if (success) {
+    if (transactionSuccess) {
       let subject = "3D Print";
+      const accountId = await getAccountIDByUsername(username);
+      let constructCreditsAfter = 0;
+      if (accountId != undefined) {
+        try {
+          constructCreditsAfter = await getAccountBalanceCents(accountId);
+        } catch (e) {
+          // that account was not found, report 0 for construct credits remaining
+        }
+      }
 
-      const operation = printCommentParser(comment);
-      if (operation && operation.operation == "new") {
-        subject = `3D Print Job #${operation.jobID}`
-      } else if (operation && (operation.operation == "cancelled" || operation.operation == "failed")) {
-        subject = `3D Print Refund Job ${operation.jobID}`;
+      if (printDetails && printDetails.operation == "new") {
+        subject = `3D Print Job #${printDetails.jobID}`
+      } else if (printDetails && (printDetails.operation == "cancelled" || printDetails.operation == "failed")) {
+        subject = `3D Print Refund Job ${printDetails.jobID}`;
       }
       send_transaction_email(username + "@rit.edu", subject, transaction, constructCreditsAfter);
     }
-    xmlrpcRespond(res, [success]);
+    xmlrpcRespond(res, [transactionSuccess]);
   } catch (e) {
     console.error(e)
     xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)

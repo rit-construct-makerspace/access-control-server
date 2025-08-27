@@ -110,7 +110,8 @@ export async function reversePreviousTransaction(ledgerId: number | undefined, p
     let creditsReturned = 0;
     try {
       if (original.creditAmount != 0) {
-        if (await CurrencyAccountRepo.adjustAccountBalanceCents(original.accountID, -original.creditAmount, original.source, "Refund for " + original.description, false)) {
+        const res = await CurrencyAccountRepo.adjustAccountBalanceCents(original.accountID, -original.creditAmount, original.source, "Refund for " + original.description, original.printerJobId ?? undefined, false);
+        if (res) {
           creditsReturned = -original.creditAmount;
         }
       }
@@ -119,20 +120,31 @@ export async function reversePreviousTransaction(ledgerId: number | undefined, p
     try {
       if (original.atriumTerminal && original.atriumAmount != 0) {
         const res = await Atrium.adjustBalanceIfPossible(original.atriumTerminal, original.owner, original.accountID, -original.atriumAmount, original.source, original.description ?? undefined, false);
-        if (typeof res == "boolean" && res === true) {
+        if ("success" in res && res.success === true) {
           atriumReturned = -original.atriumAmount;
         }
       }
     } catch { }
-    await createCurrencyLedgerEntry(original.accountID, creditsReturned, atriumReturned, original.source, "Refund for: " + original.description, original.atxID ?? undefined, original.refID ?? undefined, original.printerJobId ?? undefined);
-
+    createCurrencyLedgerEntry(
+      original.accountID,
+      creditsReturned,
+      atriumReturned,
+      original.source,
+      {
+        description: "Refund for: " + original.description,
+        atxID: original.atxID ?? undefined,
+        refID: original.refID ?? undefined,
+        printerJobId: original.printerJobId ?? undefined
+      }
+    );
+    return true;
   } catch (e) {
     console.error(`Could not reverse previous transaction (ID: ${ledgerId}) for unknown reason. You should probably talk to an admin`, e);
+    return false;
   }
-
-  return false;
 }
-export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction, terminal: Atrium.Terminal): Promise<boolean> {
+
+export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction, terminal: Atrium.Terminal, printerJobId?: number): Promise<boolean> {
   try {
     const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
     if (makeAccountID === undefined) {
@@ -142,28 +154,36 @@ export async function adjustAccountBalanceIfAvailableCents(username: string, tra
 
 
     const deltaCents = -transaction.subtotal(); // - if a charge, + if a refund if modifying directly, not splitting
-    // All refunds go to CC. If they want to argue, resolve manually
+
+    // Refunds should usually be handled by reversePreviousTransaction. But, if we are trying to charge a negative amount, we don't know if it should go to TB or CC. To be safe, send it to CC and we can manually resolve it
     if (transaction.isRefund()) {
-      const success = CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(makeAccountID, deltaCents, transaction.source, transaction.description);
+      const success = CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(makeAccountID, deltaCents, transaction.source, transaction.description, printerJobId, true);
       return success;
     }
 
     if (!USE_ATRIUM_FOR_CURRENCY) {
       // If Atrium is turned off, we charge only to CC. if that fails, we have nothing to charge the rest to so the transaction fails
-      const success = await CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(makeAccountID, deltaCents, transaction.source, transaction.description);
+      const success = await CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(makeAccountID, deltaCents, transaction.source, transaction.description, printerJobId, true);
       return success;
     }
 
-    const remainingToCharge = await CurrencyAccountRepo.chargeAccountReturnRemainingCents(makeAccountID, transaction.subtotal(), transaction.source, transaction.description);
+    const remainingToCharge = await CurrencyAccountRepo.chargeAccountReturnRemainingCents(makeAccountID, transaction.subtotal(), transaction.source, transaction.description, printerJobId, false);
     if (remainingToCharge == 0) {
       // all was taken care of with CC, don't need to charge atrium
       return true;
     }
 
     const amountAppliedToCC = transaction.subtotal() - remainingToCharge;
-    const atriumRes = await Atrium.adjustBalanceIfPossible(terminal, username, makeAccountID, -remainingToCharge, transaction.source, transaction?.description ?? "");
-    if (typeof atriumRes == "boolean" && atriumRes == true) {
+    const atriumRes = await Atrium.adjustBalanceIfPossible(terminal, username, makeAccountID, -remainingToCharge, transaction.source, transaction?.description ?? "", false);
+    if ("success" in atriumRes && atriumRes.success == true) {
       // total success
+      createCurrencyLedgerEntry(
+        makeAccountID,
+        -amountAppliedToCC,
+        -remainingToCharge,
+        transaction.source,
+        { description: transaction.description, atxID: atriumRes.atxid, refID: atriumRes.refid }
+      );
       return true;
     } else {
       console.log("atriumRes", atriumRes);

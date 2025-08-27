@@ -10,6 +10,7 @@ import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
 import { adjustAccountBalanceIfAvailableCents, Transaction } from "../integrations/currency/currency.js";
+import { Terminal } from "../integrations/atrium-integration/atrium.js";
 
 const StorefrontResolvers = {
   InventoryItem: {
@@ -337,7 +338,7 @@ const StorefrontResolvers = {
           "Makerspace Store",
           `For user ${user.ritUsername}: '${transDescription}'`,
           ledgerItems.map(item => { return { name: item.name, cents: Math.floor(item.quantity * item.pricePerUnit * -100) } }), false);
-        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, transaction);
+        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, transaction, Terminal.Store);
 
         if (atriumTransactionSuccess) {
           await getInventoryCartsByUser(user.id).then(async (carts) => {
