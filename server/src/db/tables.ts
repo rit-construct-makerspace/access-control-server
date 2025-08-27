@@ -419,6 +419,7 @@ export interface CurrencyLedgerRow {
   atxID: number | null;
   refID: number | null
   printerJobId: number | null;
+  atriumTerminal: number | null;
 }
 
 export interface RefIDCounterRow {

@@ -1,6 +1,6 @@
 import * as Atrium from "../atrium-integration/atrium.js"
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js"
-import { getCurrencyLedgerEntry } from "../../repositories/Currency/CurrencyLedgerRepository.js";
+import { createCurrencyLedgerEntry, getCurrencyLedgerEntry } from "../../repositories/Currency/CurrencyLedgerRepository.js";
 
 const USE_ATRIUM_FOR_CURRENCY = process.env.ATRIUM_ENABLED == "true";
 
@@ -73,24 +73,66 @@ export async function getAccountBalance(username: string): Promise<number | Make
 }
 
 /**
- * 
- * @param ledgerId the ledger id of the transaction to reverse
- * @param partialAmount optional: if specified, only specify up that amount biased towards tigerbucks, but not exceeding the original amount of tigerbucks used. If not specefied, the full amount is returned in the original split
+ * Reverse a previously recorded transaction, up to an optional limit
+ * @param ledgerId the ledger id of the transaction to reverse (if undefiend, this always fails)
+ * @param partialAmount optional: if specified, only specify up that amount biased towards tigerbucks, but not exceeding the original amount of tigerbucks used. 
+ * If not specefied, the full amount is returned in the original split
  * @return true if the reversal was successful. False otherwise (couldn't find original, couldn't adjust funds)
  */
-export async function reversePreviousTransaction(ledgerId: number, partialAmount: number | undefined = undefined): Promise<boolean> {
+export async function reversePreviousTransaction(ledgerId: number | undefined, partialAmount: number | undefined = undefined): Promise<boolean> {
+  if (ledgerId == undefined) {
+    return false;
+  }
   const original = await getCurrencyLedgerEntry(ledgerId);
-  if (original == undefined){
+  if (original == undefined) {
     // couldn't find original to refund
     return false;
   }
-  if (partialAmount == undefined || partialAmount > original.amount){
-    partialAmount = original.accountID;
+
+  let toRefund = 0;
+  if (partialAmount == undefined || partialAmount > original.creditAmount + original.atriumAmount) {
+    toRefund = original.creditAmount + original.atriumAmount;
+  } else {
+    toRefund = partialAmount;
+  }
+  const toAtrium = (original.atriumAmount > toRefund) ? original.atriumAmount : toRefund;
+  let toCredits = toRefund - toAtrium;
+  if (toCredits < 0) {
+    toCredits = 0;
   }
 
-  return false; 
+  if (original.accountID == null) {
+    // accoutn has probably been deleted since, dont return
+    return false;
+  }
+
+  try {
+    let creditsReturned = 0;
+    try {
+      if (original.creditAmount != 0) {
+        if (await CurrencyAccountRepo.adjustAccountBalanceCents(original.accountID, -original.creditAmount, original.source, "Refund for " + original.description, false)) {
+          creditsReturned = -original.creditAmount;
+        }
+      }
+    } catch { }
+    let atriumReturned = 0;
+    try {
+      if (original.atriumTerminal && original.atriumAmount != 0) {
+        const res = await Atrium.adjustBalanceIfPossible(original.atriumTerminal, original.owner, original.accountID, -original.atriumAmount, original.source, original.description ?? undefined, false);
+        if (typeof res == "boolean" && res === true) {
+          atriumReturned = -original.atriumAmount;
+        }
+      }
+    } catch { }
+    await createCurrencyLedgerEntry(original.accountID, creditsReturned, atriumReturned, original.source, "Refund for: " + original.description, original.atxID ?? undefined, original.refID ?? undefined, original.printerJobId ?? undefined);
+
+  } catch (e) {
+    console.error(`Could not reverse previous transaction (ID: ${ledgerId}) for unknown reason. You should probably talk to an admin`, e);
+  }
+
+  return false;
 }
-export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction): Promise<boolean> {
+export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction, terminal: Atrium.Terminal): Promise<boolean> {
   try {
     const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
     if (makeAccountID === undefined) {
@@ -119,7 +161,7 @@ export async function adjustAccountBalanceIfAvailableCents(username: string, tra
     }
 
     const amountAppliedToCC = transaction.subtotal() - remainingToCharge;
-    const atriumRes = await Atrium.adjustBalanceIfPossible(Atrium.Terminal.Printers, username, makeAccountID, -remainingToCharge, transaction.source, transaction?.description ?? "");
+    const atriumRes = await Atrium.adjustBalanceIfPossible(terminal, username, makeAccountID, -remainingToCharge, transaction.source, transaction?.description ?? "");
     if (typeof atriumRes == "boolean" && atriumRes == true) {
       // total success
       return true;

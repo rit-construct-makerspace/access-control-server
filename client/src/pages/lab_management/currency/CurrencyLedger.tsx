@@ -21,6 +21,7 @@ const GET_CURRENCY_LEDGER_ENTRIES = gql`
       atxID
       refID
       printerJobId
+      atriumTerminal
     }
   }
 `;
@@ -37,6 +38,7 @@ type CurrencyLedgerEntry = {
   atxID: number | null
   refID: number | null
   printerJobId: number | null
+  atriumTerminal: number | null;
 }
 
 function CustomColumnMenu(props: GridColumnMenuProps) {
@@ -110,6 +112,7 @@ export default function CurrencyLedger() {
         { field: "atxID", headerName: "ATX ID", width: 120 },
         { field: "refID", headerName: "REF ID", width: 120 },
         { field: "printerJobId", headerName: "Printer Job ID", width: 250 },
+        { field: "atriumTerminal", headerName: "Terminal", width: 120 },
       ];
 
       const rows: GridRowsProp = entries.map((entry) => ({
@@ -124,6 +127,7 @@ export default function CurrencyLedger() {
         atxID: entry.atxID,
         refID: entry.refID,
         printerJobId: entry.printerJobId,
+        atriumTerminal: entry.atriumTerminal,
       }))
 
       return (

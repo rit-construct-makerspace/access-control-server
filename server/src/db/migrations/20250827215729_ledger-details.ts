@@ -10,6 +10,7 @@ export async function up(knex: Knex): Promise<void> {
         t.renameColumn("amount", "creditAmount");
         t.integer("atriumAmount").notNullable().defaultTo(0);
         t.bigInteger("printerJobId").nullable();
+        t.text("atriumTerminal").nullable();
     });
 }
 
