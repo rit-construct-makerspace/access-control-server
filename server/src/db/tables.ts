@@ -412,11 +412,13 @@ export interface CurrencyLedgerRow {
   dateTime: Date;
   accountID: number | null;
   owner: string;
-  amount: number;
+  creditAmount: number;
+  atriumAmount: number;
   source: string;
-  description: string;
-  atxID: number;
-  refID: number
+  description: string | null;
+  atxID: number | null;
+  refID: number | null
+  printerJobId: number | null;
 }
 
 export interface RefIDCounterRow {

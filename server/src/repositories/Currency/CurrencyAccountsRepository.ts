@@ -73,7 +73,7 @@ export async function deleteAccount(accountID: number): Promise<boolean> {
  * @returns true if successful
  * @throws an error if the account isn't found
  */
-export async function adjustAccountBalanceCents(accountID: number, amount: number, source: string, description?: string): Promise<boolean> {
+export async function adjustAccountBalanceCents(accountID: number, amount: number, source: string, description?: string, createLedgerEntry: boolean = true): Promise<boolean> {
   const balance = await getAccountBalanceCents(accountID);
 
   const new_balance = amount + balance < 0 ? 0 : balance + amount;
@@ -84,19 +84,20 @@ export async function adjustAccountBalanceCents(accountID: number, amount: numbe
 
   await setAccountBalanceCents(accountID, new_balance);
 
-  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, new_balance - balance, source, description);
+  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, new_balance - balance, 0, source, description);
 
   return true;
 }
 
 /**
  * This function attempts to adjust an account by {@link amount}, and returns false if the amount is greater than the account balance
+ * IF YOU USE THIS FUNCTION, IT IS YOUR RESPONSIBILITY TO RECORD TO THE LEDGER
  * @param accountID The account to adjust the balance of
  * @param amount The amount to adjust the account by, + to add credits, - to subtract credits
  * @returns true if successful, false if the amount is greater than the account balance
  * @throws an error if the account can't be found
  */
-export async function adjustAccountBalanceIfAvailableCents(accountID: number, amount: number, source: string, description?: string): Promise<boolean> {
+export async function adjustAccountBalanceIfAvailableCents(accountID: number, amount: number, source: string, description?: string, createLedgerEntry: boolean = true): Promise<boolean> {
   const balance = await getAccountBalanceCents(accountID);
 
   if (amount + balance < 0) {
@@ -111,7 +112,9 @@ export async function adjustAccountBalanceIfAvailableCents(accountID: number, am
 
   await setAccountBalanceCents(accountID, new_balance);
 
-  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, amount, source, description);
+  if (createLedgerEntry) {
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, amount, 0, source, description);
+  }
 
   return true;
 }
@@ -124,7 +127,7 @@ export async function adjustAccountBalanceIfAvailableCents(accountID: number, am
  * @returns the amount remaining that was not able to be charged
  * @throws an error if the account isn't found, or if the {@link amount} is < 0
  */
-export async function chargeAccountReturnRemainingCents(accountID: number, amount: number, source: string, description?: string): Promise<number> {
+export async function chargeAccountReturnRemainingCents(accountID: number, amount: number, source: string, description?: string, createLedgerEntry: boolean = true): Promise<number> {
   if (amount < 0) {
     throw new GraphQLError("Cannot charge a negative amount");
   }
@@ -134,13 +137,15 @@ export async function chargeAccountReturnRemainingCents(accountID: number, amoun
   if (amount > balance) {
     await setAccountBalanceCents(accountID, 0);
     const left = amount - balance;
-    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -balance, source, description);
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -balance, 0, source, description);
     return left;
   }
 
   await setAccountBalanceCents(accountID, balance - amount);
 
-  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -amount, source, description);
+  if (createLedgerEntry) {
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -amount, 0, source, description);
+  }
 
   return 0;
 }
