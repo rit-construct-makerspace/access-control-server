@@ -184,26 +184,26 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
       [
         { name: "3D Print", cents: changeAmount }
       ], false);
+    // TODO handle errors better here/integrate atrium
+    // rn receipt gets sent even if sucecss is false so long as no exception happens
     const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction);
     const amountAfter = await Currency.getAccountBalance(username);
-    if (amountAfter && typeof amountAfter == "number") {
-      // success
-    } else {
+    if (amountAfter == null || typeof amountAfter != "number") {
       // failed to set balance
       xmlrpcRespondFault(res, 400, `Failed to execute transacion ${amountAfter}`)
       return;
     }
+    if (success) {
+      let subject = "3D Print";
 
-    let subject = "3D Print";
-    
-    const operation = printCommentParser(comment);
-    if (operation && operation.operation == "new") {
-      subject = `3D Print Job #${operation.jobID}`
-    } else if (operation && (operation.operation == "cancelled" || operation.operation == "failed")) {
-      subject = `3D Print Refund Job ${operation.jobID}`;
+      const operation = printCommentParser(comment);
+      if (operation && operation.operation == "new") {
+        subject = `3D Print Job #${operation.jobID}`
+      } else if (operation && (operation.operation == "cancelled" || operation.operation == "failed")) {
+        subject = `3D Print Refund Job ${operation.jobID}`;
+      }
+      send_transaction_email(username + "@rit.edu", subject, transaction, amountAfter);
     }
-
-    send_transaction_email(username + "@rit.edu", subject, transaction, amountAfter);
     xmlrpcRespond(res, [success]);
   } catch (e) {
     console.error(e)
