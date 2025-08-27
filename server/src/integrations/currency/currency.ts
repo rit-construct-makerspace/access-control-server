@@ -1,5 +1,6 @@
 import * as Atrium from "../atrium-integration/atrium.js"
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js"
+import { getCurrencyLedgerEntry } from "../../repositories/Currency/CurrencyLedgerRepository.js";
 
 const USE_ATRIUM_FOR_CURRENCY = process.env.ATRIUM_ENABLED == "true";
 
@@ -71,6 +72,24 @@ export async function getAccountBalance(username: string): Promise<number | Make
   return makeBalance + atriumBalance;
 }
 
+/**
+ * 
+ * @param ledgerId the ledger id of the transaction to reverse
+ * @param partialAmount optional: if specified, only specify up that amount biased towards tigerbucks, but not exceeding the original amount of tigerbucks used. If not specefied, the full amount is returned in the original split
+ * @return true if the reversal was successful. False otherwise (couldn't find original, couldn't adjust funds)
+ */
+export async function reversePreviousTransaction(ledgerId: number, partialAmount: number | undefined = undefined): Promise<boolean> {
+  const original = await getCurrencyLedgerEntry(ledgerId);
+  if (original == undefined){
+    // couldn't find original to refund
+    return false;
+  }
+  if (partialAmount == undefined || partialAmount > original.amount){
+    partialAmount = original.accountID;
+  }
+
+  return false; 
+}
 export async function adjustAccountBalanceIfAvailableCents(username: string, transaction: Transaction): Promise<boolean> {
   try {
     const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
@@ -98,17 +117,17 @@ export async function adjustAccountBalanceIfAvailableCents(username: string, tra
       // all was taken care of with CC, don't need to charge atrium
       return true;
     }
-    
+
     const amountAppliedToCC = transaction.subtotal() - remainingToCharge;
     const atriumRes = await Atrium.adjustBalanceIfPossible(Atrium.Terminal.Printers, username, makeAccountID, -remainingToCharge, transaction.source, transaction?.description ?? "");
-    if (typeof atriumRes == "boolean" && atriumRes == true){
+    if (typeof atriumRes == "boolean" && atriumRes == true) {
       // total success
       return true;
     } else {
       console.log("atriumRes", atriumRes);
     }
     // failure to charge remaining to atrium, need to refund to CC
-    CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(makeAccountID, amountAppliedToCC, transaction.source, "Rectifying refund (atrium failed): "+transaction.description)
+    CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(makeAccountID, amountAppliedToCC, transaction.source, "Rectifying refund (atrium failed): " + transaction.description)
 
     return false;
   } catch (e) {
