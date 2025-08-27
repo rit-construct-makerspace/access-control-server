@@ -4,6 +4,7 @@ import * as xml2js from "xml2js"
 import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as Currency from "../currency/currency.js"
 import { send_transaction_email } from "../email/email.js";
+import { getAccountBalanceCents, getAccountIDByUsername } from "../../repositories/Currency/CurrencyAccountsRepository.js";
 
 const PAPERCUT_SECURITY_SECRET = process.env.PAPERCUT_SECURITY_SECRET;
 const FREE_3D_PRINTS = process.env.FREE_3D_PRINTS === "true";
@@ -184,14 +185,16 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
       [
         { name: "3D Print", cents: changeAmount }
       ], false);
-    // TODO handle errors better here/integrate atrium
-    // rn receipt gets sent even if sucecss is false so long as no exception happens
+
     const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction);
-    const amountAfter = await Currency.getAccountBalance(username);
-    if (amountAfter == null || typeof amountAfter != "number") {
-      // failed to set balance
-      xmlrpcRespondFault(res, 400, `Failed to execute transacion ${amountAfter}`)
-      return;
+    const accountId = await getAccountIDByUsername(username);
+    let constructCreditsAfter = 0;
+    if (accountId != undefined) {
+      try {
+        constructCreditsAfter = await getAccountBalanceCents(accountId);
+      } catch (e) {
+        // that account was not found, report 0 for construct credits remaining
+      }
     }
     if (success) {
       let subject = "3D Print";
@@ -202,7 +205,7 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
       } else if (operation && (operation.operation == "cancelled" || operation.operation == "failed")) {
         subject = `3D Print Refund Job ${operation.jobID}`;
       }
-      send_transaction_email(username + "@rit.edu", subject, transaction, amountAfter);
+      send_transaction_email(username + "@rit.edu", subject, transaction, constructCreditsAfter);
     }
     xmlrpcRespond(res, [success]);
   } catch (e) {

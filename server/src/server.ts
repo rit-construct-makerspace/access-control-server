@@ -35,7 +35,7 @@ import { purge_images } from "./periodicActions.js";
 const require = createRequire(import.meta.url);
 
 const allowed_origins = [process.env.VITE_ORIGIN, "https://studio.apollographql.com", "https://make.rit.edu", "https://shibboleth.main.ad.rit.edu"];
-
+const SECURE_ORIGIN = (process.env.VITE_ORIGIN ?? "");
 const __dirname = import.meta.dirname;
 
 /**
@@ -135,13 +135,13 @@ async function startServer() {
   //it might seem like you should be able to redirect straight to /app/ from / but for some reason it infitely refreshes
   // and this solves the issue
   app.get("/app/home", function (req, res) {
-    res.redirect("/app/")
+    res.redirect(SECURE_ORIGIN+"/app/")
   })
 
 
   //redirects first landing make.rit.edu/ -> make.rit.edu/home
   app.get("/", function (req, res) {
-    res.redirect("/app/home");
+    res.redirect(SECURE_ORIGIN+"/app/home");
   });
 
   app.get("/app/*apppage", function (req, res) {

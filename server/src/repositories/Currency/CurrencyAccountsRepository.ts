@@ -128,8 +128,10 @@ export async function chargeAccountReturnRemainingCents(accountID: number, amoun
   if (amount < 0) {
     throw new GraphQLError("Cannot charge a negative amount");
   }
-
   const balance = await getAccountBalanceCents(accountID);
+  if (balance == 0){
+    return amount;
+  }
 
   if (amount > balance) {
     await setAccountBalanceCents(accountID, 0);
