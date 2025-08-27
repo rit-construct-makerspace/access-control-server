@@ -25,7 +25,7 @@ import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhere
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
-import { getPassedTrainingsWeeksAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
+import { getPassedTrainingsDaysAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
 import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
@@ -35,8 +35,10 @@ import { purge_images } from "./periodicActions.js";
 const require = createRequire(import.meta.url);
 
 const allowed_origins = [process.env.VITE_ORIGIN, "https://studio.apollographql.com", "https://make.rit.edu", "https://shibboleth.main.ad.rit.edu"];
-
+const SECURE_ORIGIN = (process.env.VITE_ORIGIN ?? "");
 const __dirname = import.meta.dirname;
+
+const EXPIRY_EMAIL_LIMIT_AT_ONCE = isNaN(Number(process.env.EXPIRY_EMAIL_LIMIT_AT_ONCE ?? "")) ? 50 : Number(process.env.EXPIRY_EMAIL_LIMIT_AT_ONCE);
 
 /**
  * set up Cross-Origin Request allowances
@@ -135,13 +137,13 @@ async function startServer() {
   //it might seem like you should be able to redirect straight to /app/ from / but for some reason it infitely refreshes
   // and this solves the issue
   app.get("/app/home", function (req, res) {
-    res.redirect("/app/")
+    res.redirect(SECURE_ORIGIN+"/app/")
   })
 
 
   //redirects first landing make.rit.edu/ -> make.rit.edu/home
   app.get("/", function (req, res) {
-    res.redirect("/app/home");
+    res.redirect(SECURE_ORIGIN+"/app/home");
   });
 
   app.get("/app/*apppage", function (req, res) {
@@ -474,10 +476,10 @@ async function startServer() {
       })
     };
 
-    let expiryNotices = await getPassedTrainingsWeeksAgo(52);
-    if (expiryNotices.length > 99) {
-      // dont overload the emails (100 / hr, 400 / day)
-      expiryNotices = expiryNotices.slice(0, 99);
+    let expiryNotices = await getPassedTrainingsDaysAgo(365);
+    if (expiryNotices.length > EXPIRY_EMAIL_LIMIT_AT_ONCE) {
+      // dont overload the emails (100 / hr, 400 / day) 
+      expiryNotices = expiryNotices.slice(0, EXPIRY_EMAIL_LIMIT_AT_ONCE);
     }
     sendEmails("expiry", expiryNotices)
     const numPurged = await purgeExpiredPassedModules();
@@ -511,7 +513,6 @@ async function startServer() {
     console.log('Wiping daily records...');
     if (API_DEBUG_LOGGING) await createLog('It is now 4:00am. Wiping Daily Temp Records...', "server")
     await setDataPointValue(1, 0).then(async () => await createLog('Daily Visits reset.', "server"));
-    await purgeExpiredPassedModules().then(async (result) => await createLog(`Purged ${result} expired trainings.`, "server"));
 
     handleTrainingExpiriesAndEmails();
     //await pruneNullLengthEquipmentSessions().then(async () => await createLog('Unfinished Equipment Sessions pruned.', "server"));;

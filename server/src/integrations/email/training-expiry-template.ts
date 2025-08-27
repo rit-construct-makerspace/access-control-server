@@ -36,7 +36,7 @@ const templateSource: string = `
 
     <b>If your training lapses, you will be unable to use this equipment. Once you re-take the trainings, your access will be restored. </b>
 
-    <% if (type == "notice") { %>
+    <% if (type == "expiry") { %>
     <h2> The following trainings have expired </h2>
     <% } else { %> 
     <h2> The following trainings will expire in 1 week</h2>
