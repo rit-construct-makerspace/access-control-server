@@ -14,11 +14,11 @@ export async function getPassedModuleIDs(userID: number) {
 }
 
 export async function purgeExpiredPassedModules(): Promise<number> {
-  const result = await knex.raw('DELETE FROM "PassedModules" where "passedDate" <= NOW() - INTERVAL \'1 year \' returning *');
+  const result = await knex.raw('DELETE FROM "PassedModules" where "passedDate" <= NOW() - INTERVAL \'365 days \' returning *');
   return result.rows.length;
 }
 
-export async function getPassedTrainingsWeeksAgo(weeks: number): Promise<{email: string, moduleIds: number[], moduleNames: string[]}[]> {
+export async function getPassedTrainingsDaysAgo(days: number): Promise<{email: string, moduleIds: number[], moduleNames: string[]}[]> {
   const result = await knex.raw(`
 select
 	CONCAT(u."ritUsername", '@rit.edu') as email,
@@ -27,7 +27,7 @@ select
 from "PassedModules" pm 
 left join "Users" u on pm."userID" = u.id 
 left join "TrainingModule" tm on pm."moduleID"  = tm.id 
-where "passedDate" <= NOW() - INTERVAL '${weeks} weeks'
+where "passedDate" <= NOW() - INTERVAL '${days} days'
 group by u."ritUsername";`)
 
   return result.rows;
