@@ -14,11 +14,14 @@ const GET_CURRENCY_LEDGER_ENTRIES = gql`
       dateTime
       accountID
       owner
-      amount
+      creditAmount
+      atriumAmount
       source
       description
       atxID
       refID
+      printerJobId
+      atriumTerminal
     }
   }
 `;
@@ -28,11 +31,14 @@ type CurrencyLedgerEntry = {
   dateTime: Date;
   accountID: number;
   owner: string;
-  amount: number;
+  creditAmount: number;
+  atriumAmount: number;
   source: string
   description: string | null
   atxID: number | null
   refID: number | null
+  printerJobId: number | null
+  atriumTerminal: number | null;
 }
 
 function CustomColumnMenu(props: GridColumnMenuProps) {
@@ -74,7 +80,7 @@ export default function CurrencyLedger() {
     });
   }, [location.search, getLedgerEntries]);
 
-  const moneyForamtter = new Intl.NumberFormat("en-US", {
+  const moneyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
   })
@@ -98,24 +104,30 @@ export default function CurrencyLedger() {
         { field: "id", headerName: "ID", width: 100 },
         { field: "accountID", headerName: "Account ID", width: 100 },
         { field: "owner", headerName: "Account Owner", width: 150 },
-        { field: "amount", headerName: "Amount", width: 200 },
+        { field: "creditAmount", headerName: "$CC", width: 120 },
+        { field: "atriumAmount", headerName: "$TB", width: 120 },
         { field: "dateTime", headerName: "Date", width: 200 },
         { field: "source", headerName: "Source", width: 200 },
-        { field: "description", headerName: "Description", width: 550 },
-        { field: "atxID", headerName: "ATX ID", width: 250 },
-        { field: "refID", headerName: "REF ID", width: 250 },
+        { field: "description", headerName: "Description", width: 450 },
+        { field: "atxID", headerName: "ATX ID", width: 120 },
+        { field: "refID", headerName: "REF ID", width: 120 },
+        { field: "printerJobId", headerName: "Printer Job ID", width: 250 },
+        { field: "atriumTerminal", headerName: "Terminal", width: 120 },
       ];
 
       const rows: GridRowsProp = entries.map((entry) => ({
         id: entry.id,
         accountID: entry.accountID,
         owner: entry.owner,
-        amount: moneyForamtter.format(entry.amount / 100),
+        creditAmount: moneyFormatter.format(entry.creditAmount / 100),
+        atriumAmount: moneyFormatter.format(entry.atriumAmount / 100),
         dateTime: dateTimeFormatter.format(new Date(entry.dateTime)),
         source: entry.source,
         description: entry.description,
         atxID: entry.atxID,
         refID: entry.refID,
+        printerJobId: entry.printerJobId,
+        atriumTerminal: entry.atriumTerminal,
       }))
 
       return (

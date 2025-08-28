@@ -6,25 +6,33 @@ import * as UserRepo from "../Users/UserRepository.js";
 
 export async function createCurrencyLedgerEntry(
     accountID: number,
-    amount: number,
+    creditAmount: number,
+    atriumAmount: number,
     source: string,
-    description?: string,
-    atxID?: number,
-    refID?: number
+    info: {
+        description?: string,
+        atxID?: number,
+        refID?: number,
+        printerJobId?: number            
+        atriumTerminal?: string
+    }
 ): Promise<number> {
 
     const org = await OrgRepo.getOrganizationByAccountID(accountID);
 
-    const owner = org ? org.username : (await UserRepo.getUserByAccountID(accountID))?.ritUsername
+    const owner = org ? org.username : (await UserRepo.getUserByAccountID(accountID))?.ritUsername ?? "unknown-owner"
 
     const data = {
         accountID: accountID,
         owner: owner,
-        amount: amount,
+        creditAmount: creditAmount,
+        atriumAmount: atriumAmount,
         source: source,
-        description: description,
-        atxID: atxID,
-        refID: refID,
+        description: info.description,
+        atxID: info.atxID,
+        refID: info.refID,
+        printerJobId: info.printerJobId,
+        atriumTerminal: info.atriumTerminal,
     };
 
     // Remove undefined values to allow DB default values
@@ -88,6 +96,9 @@ export async function getCurrencyLedgerEntry(id: number): Promise<CurrencyLedger
     } else {
         throw new GraphQLError(`Failed to find CurrencyLedger entry with ID: ${id}`);
     }
+}
+export async function getCurrencyLedgerEntriesByPrinterJobId(printerJobId: number): Promise<CurrencyLedgerRow[]>{
+    return await knex("CurrencyLedger").where({printerJobId: printerJobId}).select("*");
 }
 
 export async function getNextRefID(): Promise<number> {
