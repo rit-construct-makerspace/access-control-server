@@ -118,13 +118,27 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
 }
 
 
-const print_comment_matcher: RegExp = /(New job|Job Failed \(Refund\)|Job Aborted \(Refund\)) \(jobID #(\d*?)\)/;
+const print_comment_matcher: RegExp = /(?:3DPrinterOS:)? ?(.*?) ?\(jobID #(\d*)\)/;
+enum PrinterTransactionType {
+  New,
+  Failed,
+  Cancelled,
+  ManualRefund,
+  PriceUpdate,
+  QuoteUpdated,
+  Other,
+}
+type PrinterTransaction = {
+  type: PrinterTransactionType
+  jobID: Number,
+  customMessage?: string
+};
 /**
  * Parse the 3dprinteros provided comment string to figure out what the adjustment was for
  * @param comment the comment given to us by 3dprinter os
  * @returns a description or undefined if we don't know how to parse it (havent seen it before)
  */
-function printCommentParser(comment: string): { operation: "new" | "failed" | "cancelled", jobID: number } | undefined {
+function printCommentParser(comment: string): PrinterTransaction | undefined {
   const res = print_comment_matcher.exec(comment)
   if (res == null || res.length != 3) {
     // failed to match
@@ -133,13 +147,32 @@ function printCommentParser(comment: string): { operation: "new" | "failed" | "c
   const jobID = Number(res[2])
   switch (res[1]) {
     case "New job":
-      return { operation: "new", jobID };
+      return { type: PrinterTransactionType.New, jobID };
     case "Job Failed (Refund)":
-      return { operation: "failed", jobID };
+      return { type: PrinterTransactionType.Failed, jobID };
     case "Job Aborted (Refund)":
-      return { operation: "cancelled", jobID };
+      return { type: PrinterTransactionType.Cancelled, jobID };
+    case "Manual Refund":
+      return { type: PrinterTransactionType.ManualRefund, jobID };
+    case "Price updated":
+      return { type: PrinterTransactionType.PriceUpdate, jobID };
+    case "Quote Updated Price":
+      return { type: PrinterTransactionType.QuoteUpdated, jobID };
+    default:
+      return { type: PrinterTransactionType.Other, jobID, customMessage: res[1] };
   }
-  return undefined;
+}
+
+function process3dprinttransaction(transaction: PrinterTransaction){
+  // get all ledgers related to this
+  // process through ledgers
+  // find outstanding, process outstanding
+  // build up transaction (with marking for 'applied 12/4/25')
+  // calculate amount already applied
+  // calculate amount that needs to be applied
+  // charge amount and send updated receipt amount
+  // subtract 
+  
 }
 
 async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCValue[]) {
@@ -196,7 +229,7 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
       if (success) {
         transactionSuccess = true;
       }
-    } else if (printDetails?.operation == "cancelled" || printDetails?.operation == "failed"){
+    } else if (printDetails?.operation == "cancelled" || printDetails?.operation == "failed") {
       // find by print job
       if (printDetails) {
         const previousEntries = await getCurrencyLedgerEntriesByPrinterJobId(printDetails?.jobID);
