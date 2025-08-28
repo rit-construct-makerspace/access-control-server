@@ -120,7 +120,6 @@ export async function reversePreviousTransaction(ledgerId: number | undefined, p
     let atriumReturned = 0;
     try {
       const term = original.atriumTerminal ? Atrium.TerminalIDToTerminal(original.atriumTerminal) : undefined;
-      console.log("term", term);
       if (term != undefined && original.atriumAmount != 0) {
         const res = await Atrium.adjustBalanceIfPossible(term, original.owner, original.accountID, -original.atriumAmount, original.source, original.description ?? undefined, false);
         console.log("rev res", res);
