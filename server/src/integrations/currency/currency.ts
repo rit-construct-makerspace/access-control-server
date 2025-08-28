@@ -63,7 +63,7 @@ export async function getAccountBalance(username: string): Promise<number | Make
     const res = await Atrium.getBalance(username);
     if (typeof res !== "number") {
       // error retrieving atrium info
-      console.log(`Unable to query atrium balance for '${username}'. ${atriumBalance}.\nThis user will only access tigerbucks`)
+      console.log(`Unable to query atrium balance for '${username}'. ${atriumBalance}.\nThis user will only access tigerbucks`, res)
       atriumBalance = 0;
     } else {
       atriumBalance = res;
