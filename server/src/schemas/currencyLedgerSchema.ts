@@ -13,6 +13,7 @@ export const CurrencyLedgerTypeDefs = gql`
     atxID: Int
     refID: Int
     printerJobId: ID
+    atriumTerminal: String
   }
 
   extend type Query {
