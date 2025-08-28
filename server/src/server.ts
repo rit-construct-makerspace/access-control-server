@@ -27,7 +27,7 @@ import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js"
 import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
 import { getPassedTrainingsDaysAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
-import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
+import { adjustBalanceIfPossible, pingAtrium, Terminal } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { purge_images } from "./periodicActions.js";
@@ -552,6 +552,7 @@ async function startServer() {
     )
   }
   );
+
 }
 
 startServer();

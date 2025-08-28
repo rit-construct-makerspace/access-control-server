@@ -196,7 +196,7 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
       if (success) {
         transactionSuccess = true;
       }
-    } else {
+    } else if (printDetails?.operation == "cancelled" || printDetails?.operation == "failed"){
       // find by print job
       if (printDetails) {
         const previousEntries = await getCurrencyLedgerEntriesByPrinterJobId(printDetails?.jobID);
@@ -210,6 +210,10 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
           // figure this out manually to avoid infinite money glitch
         }
       }
+    } else {
+      xmlrpcRespondFault(res, 400, "Could not parse print comment");
+      console.error("Could not parse print comment to get job id. Did 3d printer os change their format?", params);
+      return;
     }
     if (transactionSuccess) {
       let subject = "3D Print";
@@ -228,7 +232,7 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
       } else if (printDetails && (printDetails.operation == "cancelled" || printDetails.operation == "failed")) {
         subject = `3D Print Refund Job ${printDetails.jobID}`;
       }
-      send_transaction_email(username + "@rit.edu", subject, transaction, constructCreditsAfter);
+      await send_transaction_email(username + "@rit.edu", subject, transaction, constructCreditsAfter);
     }
     xmlrpcRespond(res, [transactionSuccess]);
   } catch (e) {

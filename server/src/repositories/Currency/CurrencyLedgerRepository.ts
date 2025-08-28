@@ -14,6 +14,7 @@ export async function createCurrencyLedgerEntry(
         atxID?: number,
         refID?: number,
         printerJobId?: number            
+        atriumTerminal?: string
     }
 ): Promise<number> {
 
@@ -30,7 +31,8 @@ export async function createCurrencyLedgerEntry(
         description: info.description,
         atxID: info.atxID,
         refID: info.refID,
-        printerJobId: info.printerJobId
+        printerJobId: info.printerJobId,
+        atriumTerminal: info.atriumTerminal,
     };
 
     // Remove undefined values to allow DB default values
