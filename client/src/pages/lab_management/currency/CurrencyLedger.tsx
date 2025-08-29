@@ -1,11 +1,12 @@
 import { useLazyQuery } from "@apollo/client";
-import { Stack } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import gql from "graphql-tag";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import SearchBar from "../../../common/SearchBar";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { DataGrid, GridRowsProp, GridColDef, GridColumnMenuProps, GridColumnMenu } from '@mui/x-data-grid';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const GET_CURRENCY_LEDGER_ENTRIES = gql`
   query CurrencyLedgerEntriesLimit($searchText: String) {
@@ -14,14 +15,11 @@ const GET_CURRENCY_LEDGER_ENTRIES = gql`
       dateTime
       accountID
       owner
-      creditAmount
-      atriumAmount
-      source
+      amount
+      transactionEntryId
       description
       atxID
       refID
-      printerJobId
-      atriumTerminal
     }
   }
 `;
@@ -31,14 +29,11 @@ type CurrencyLedgerEntry = {
   dateTime: Date;
   accountID: number;
   owner: string;
-  creditAmount: number;
-  atriumAmount: number;
-  source: string
+  amount: number;
+  transactionEntryId: number | null;
   description: string | null
   atxID: number | null
   refID: number | null
-  printerJobId: number | null
-  atriumTerminal: number | null;
 }
 
 function CustomColumnMenu(props: GridColumnMenuProps) {
@@ -100,34 +95,38 @@ export default function CurrencyLedger() {
 
       const entries: CurrencyLedgerEntry[] = data.currencyLedgerEntriesLimit;
 
+      function renderTransactionButton(transactionEntryId: number) {
+        return <Button
+          variant="contained"
+          endIcon={<VisibilityIcon />}
+          onClick={() => { alert(`View teid: ${transactionEntryId}`) }}
+        >
+          View Transaction
+        </Button>
+
+      }
       const columns: GridColDef[] = [
         { field: "id", headerName: "ID", width: 100 },
         { field: "accountID", headerName: "Account ID", width: 100 },
         { field: "owner", headerName: "Account Owner", width: 150 },
-        { field: "creditAmount", headerName: "$CC", width: 120 },
-        { field: "atriumAmount", headerName: "$TB", width: 120 },
+        { field: "amount", headerName: "Amount", width: 120 },
         { field: "dateTime", headerName: "Date", width: 200 },
-        { field: "source", headerName: "Source", width: 200 },
+        { field: "transactionEntryId", headerName: "Transaction", width: 200, renderCell: (params) => renderTransactionButton(params.row.transactionEntryId) },
         { field: "description", headerName: "Description", width: 450 },
         { field: "atxID", headerName: "ATX ID", width: 120 },
         { field: "refID", headerName: "REF ID", width: 120 },
-        { field: "printerJobId", headerName: "Printer Job ID", width: 250 },
-        { field: "atriumTerminal", headerName: "Terminal", width: 120 },
       ];
 
       const rows: GridRowsProp = entries.map((entry) => ({
         id: entry.id,
         accountID: entry.accountID,
         owner: entry.owner,
-        creditAmount: moneyFormatter.format(entry.creditAmount / 100),
-        atriumAmount: moneyFormatter.format(entry.atriumAmount / 100),
+        amount: moneyFormatter.format(entry.amount / 100),
         dateTime: dateTimeFormatter.format(new Date(entry.dateTime)),
-        source: entry.source,
+        transactionEntryId: entry.transactionEntryId,
         description: entry.description,
         atxID: entry.atxID,
         refID: entry.refID,
-        printerJobId: entry.printerJobId,
-        atriumTerminal: entry.atriumTerminal,
       }))
 
       return (

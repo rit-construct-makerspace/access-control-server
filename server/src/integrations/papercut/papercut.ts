@@ -3,10 +3,6 @@ import xmlparser from "express-xml-bodyparser";
 import * as xml2js from "xml2js"
 import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as Currency from "../currency/currency.js"
-import { send_transaction_email } from "../email/email.js";
-import { getAccountBalanceCents, getAccountIDByUsername } from "../../repositories/Currency/CurrencyAccountsRepository.js";
-import { Terminal } from "../atrium-integration/atrium.js";
-import { getCurrencyLedgerEntriesByPrinterJobId } from "../../repositories/Currency/CurrencyLedgerRepository.js";
 
 const PAPERCUT_SECURITY_SECRET = process.env.PAPERCUT_SECURITY_SECRET;
 const FREE_3D_PRINTS = process.env.FREE_3D_PRINTS === "true";
@@ -163,7 +159,7 @@ function printCommentParser(comment: string): PrinterTransaction | undefined {
   }
 }
 
-function process3dprinttransaction(transaction: PrinterTransaction){
+function process3dprinttransaction(transaction: PrinterTransaction) {
   // get all ledgers related to this
   // process through ledgers
   // find outstanding, process outstanding
@@ -172,7 +168,7 @@ function process3dprinttransaction(transaction: PrinterTransaction){
   // calculate amount that needs to be applied
   // charge amount and send updated receipt amount
   // subtract 
-  
+
 }
 
 async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCValue[]) {
@@ -212,62 +208,8 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
 
   const amountCents = Math.round(adjustment * 100);
   const changeAmount = -amountCents; // we want negative if refund
-  const transaction = new Currency.Transaction(
-    new Date(),
-    "3DPrinterOS",
-    `For user ${username}: '${comment}'`,
-    [
-      { name: "3D Print", cents: changeAmount }
-    ], false);
-
   try {
-    const printDetails = printCommentParser(comment);
-    let transactionSuccess = false;
-    if (printDetails?.operation == "new") {
-
-      const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction, Terminal.Printers, printDetails?.jobID);
-      if (success) {
-        transactionSuccess = true;
-      }
-    } else if (printDetails?.operation == "cancelled" || printDetails?.operation == "failed") {
-      // find by print job
-      if (printDetails) {
-        const previousEntries = await getCurrencyLedgerEntriesByPrinterJobId(printDetails?.jobID);
-        if (previousEntries.length == 1) {
-          const success: boolean = await Currency.reversePreviousTransaction(previousEntries[0].id, changeAmount);
-          if (success) {
-            transactionSuccess = true;
-          }
-        } else {
-          // multiple transactions have already happened with this print id, possible multiple refund?
-          // figure this out manually to avoid infinite money glitch
-        }
-      }
-    } else {
-      xmlrpcRespondFault(res, 400, "Could not parse print comment");
-      console.error("Could not parse print comment to get job id. Did 3d printer os change their format?", params);
-      return;
-    }
-    if (transactionSuccess) {
-      let subject = "3D Print";
-      const accountId = await getAccountIDByUsername(username);
-      let constructCreditsAfter = 0;
-      if (accountId != undefined) {
-        try {
-          constructCreditsAfter = await getAccountBalanceCents(accountId);
-        } catch (e) {
-          // that account was not found, report 0 for construct credits remaining
-        }
-      }
-
-      if (printDetails && printDetails.operation == "new") {
-        subject = `3D Print Job #${printDetails.jobID}`
-      } else if (printDetails && (printDetails.operation == "cancelled" || printDetails.operation == "failed")) {
-        subject = `3D Print Refund Job ${printDetails.jobID}`;
-      }
-      await send_transaction_email(username + "@rit.edu", subject, transaction, constructCreditsAfter);
-    }
-    xmlrpcRespond(res, [transactionSuccess]);
+    xmlrpcRespond(res, [false]);
   } catch (e) {
     console.error(e)
     xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)

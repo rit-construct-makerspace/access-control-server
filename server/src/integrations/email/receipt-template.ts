@@ -1,5 +1,5 @@
 import ejs from "ejs"
-import { centsToDollarString, Transaction } from "../currency/currency.js"
+import { centsToDollarString } from "../currency/currency.js"
 
 const templateSource: string = `
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
@@ -97,24 +97,16 @@ const templateSource: string = `
 `
 let template = ejs.compile(templateSource, { async: false })
 
-function generateTextReceipt(r: Transaction, constructCreditsRemaining: number): string {
+function generateTextReceipt(r: unknown, constructCreditsRemaining: number): string {
     return `
 **make.rit.edu receipt**
 -----------------
-Items:
-${r.items.map(item => `${1}  ${centsToDollarString(item.cents)}\t${item.name}\n`)}
-
------------------
-Total: ${centsToDollarString(r.subtotal())}
-
-
-You have ${centsToDollarString(constructCreditsRemaining)} Construct Credits remaining.
-
+This should not have been sent!
 `
 }
 
 
-function generateHTMLReceipt(r: Transaction, constructCreditsRemaining: number) {
+function generateHTMLReceipt(r: any, constructCreditsRemaining: number) {
     let data = {
         transaction: r,
         constructCreditsRemaining: constructCreditsRemaining,
@@ -123,7 +115,7 @@ function generateHTMLReceipt(r: Transaction, constructCreditsRemaining: number) 
     return template(data);
 }
 
-export function generateReceiptEmail(r: Transaction, constructCreditsRemaining: number): { text: string, html: string } {
+export function generateReceiptEmail(r: any, constructCreditsRemaining: number): { text: string, html: string } {
     const text = generateTextReceipt(r, constructCreditsRemaining);
     const html = generateHTMLReceipt(r, constructCreditsRemaining);
     return { text, html }

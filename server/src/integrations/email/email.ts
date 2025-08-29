@@ -1,7 +1,6 @@
 import FormData from "form-data";
 import * as Mailgun from "mailgun.js"
 import { generateReceiptEmail } from "./receipt-template.js"
-import { Transaction } from "../currency/currency.js";
 import { generateExpiryEmail, ExpiryDescription } from "./training-expiry-template.js"
 const mailgun = new Mailgun.default(FormData);
 const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere' });
@@ -27,7 +26,7 @@ export async function send_generic_email(args: { fromAccount: string, to: string
         });
     } else {
         console.log("NOT SENDING EMAIL BC DEV ENVIRONMENT: ", args);
-        return {status: 500};
+        return { status: 500 };
     }
 }
 
@@ -39,7 +38,10 @@ const OVERRIDE_RECEIPT_EMAIL = process.env.OVERRIDE_RECEIPT_EMAIL;
  * @param subjectInfo info for the subject line. will appear as "RIT SHED Receipt - ${subjectInfo} - Date"
  * @param transaction the transaction information to generate a receipt for
  */
-export async function send_transaction_email(emailAddress: string, subjectInfo: string, transaction: Transaction, constructCreditsRemaining: number) {
+export async function send_transaction_email(emailAddress: string, subjectInfo: string, transaction: any, constructCreditsRemaining: number) {
+    throw Error("Cant send transaction email bc i cant");
+    return;
+    /*
     const content = generateReceiptEmail(transaction, constructCreditsRemaining);
 
     if (OVERRIDE_RECEIPT_EMAIL) {
@@ -52,6 +54,7 @@ export async function send_transaction_email(emailAddress: string, subjectInfo: 
         textContent: content.text,
         htmlContent: content.html
     }).catch((err: any) => { console.error("Error sending receipt email", err) });
+    */
 }
 
 

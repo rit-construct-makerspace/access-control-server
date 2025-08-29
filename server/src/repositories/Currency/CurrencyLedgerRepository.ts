@@ -97,9 +97,6 @@ export async function getCurrencyLedgerEntry(id: number): Promise<CurrencyLedger
         throw new GraphQLError(`Failed to find CurrencyLedger entry with ID: ${id}`);
     }
 }
-export async function getCurrencyLedgerEntriesByPrinterJobId(printerJobId: number): Promise<CurrencyLedgerRow[]>{
-    return await knex("CurrencyLedger").where({printerJobId: printerJobId}).select("*");
-}
 
 export async function getNextRefID(): Promise<number> {
     const result = await knex.raw("UPDATE \"RefIDCounter\" SET \"refID\" = CASE WHEN \"refID\" = 2147483647 THEN 1 ELSE \"refID\" + 1 END RETURNING \"refID\"");

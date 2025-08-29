@@ -9,7 +9,6 @@ import { notifyInventoryItemBelowThreshold } from "../slack/slack.js";
 import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
-import { adjustAccountBalanceIfAvailableCents, Transaction } from "../integrations/currency/currency.js";
 import { Terminal } from "../integrations/atrium-integration/atrium.js";
 
 const StorefrontResolvers = {
@@ -333,6 +332,7 @@ const StorefrontResolvers = {
         if (totalCost > 0) {
           throw new GraphQLError("Total cost must be negative");
         }
+        /*
         const transaction = new Transaction(
           new Date(),
           "Makerspace Store",
@@ -384,7 +384,8 @@ const StorefrontResolvers = {
 
           await createLedger(user.id, "Purchase", totalCost, user.id, args.notes ?? "", ledgerItems);
         }
-        return atriumTransactionSuccess;
+        */
+        return false;
       });
     },
 
