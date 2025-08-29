@@ -4,7 +4,7 @@
  * This contains the definitions for the objects every knex select operation will map to.
  */
 
-import { CurrencySource } from "../integrations/currency/types.js";
+import { CurrencySource, CurrencyType } from "../integrations/currency/types.js";
 import { Privilege } from "../schemas/usersSchema.js";
 
 export interface AuditLogRow {
@@ -415,6 +415,8 @@ export interface CurrencyLedgerRow {
   dateTime: Date;
   /** Make AcountID this applied against */
   accountID: number | null;
+  /** Type of currency this transaction used */
+  currencyType: CurrencyType;
   /** ritUsername type string that this was applied against */
   owner: string;
   /** the transaction entry that this exchange of money corresponsd to */

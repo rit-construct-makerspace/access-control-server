@@ -1,6 +1,5 @@
 import * as Atrium from "../atrium-integration/atrium.js"
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js"
-import { createCurrencyLedgerEntry, getCurrencyLedgerEntry } from "../../repositories/Currency/CurrencyLedgerRepository.js";
 
 const USE_ATRIUM_FOR_CURRENCY = process.env.ATRIUM_ENABLED == "true";
 

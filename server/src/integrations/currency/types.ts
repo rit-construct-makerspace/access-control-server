@@ -7,5 +7,5 @@ export enum CurrencySource{
 
 export enum CurrencyType{
     Atrium = "atrium",
-    Credit = "credit",
+    Credit = "construct_credit",
 }

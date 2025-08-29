@@ -9,7 +9,6 @@ import { notifyInventoryItemBelowThreshold } from "../slack/slack.js";
 import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
-import { Terminal } from "../integrations/atrium-integration/atrium.js";
 
 const StorefrontResolvers = {
   InventoryItem: {

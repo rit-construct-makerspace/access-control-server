@@ -6,15 +6,12 @@ import * as UserRepo from "../Users/UserRepository.js";
 
 export async function createCurrencyLedgerEntry(
     accountID: number,
-    creditAmount: number,
-    atriumAmount: number,
-    source: string,
+    amount: number,
+    description: string, 
     info: {
-        description?: string,
+        transactionEntryId?: number,
         atxID?: number,
         refID?: number,
-        printerJobId?: number            
-        atriumTerminal?: string
     }
 ): Promise<number> {
 
@@ -25,14 +22,11 @@ export async function createCurrencyLedgerEntry(
     const data = {
         accountID: accountID,
         owner: owner,
-        creditAmount: creditAmount,
-        atriumAmount: atriumAmount,
-        source: source,
-        description: info.description,
+        amount: amount,
+        tranactionEntryId: info.transactionEntryId,
+        description: description,
         atxID: info.atxID,
         refID: info.refID,
-        printerJobId: info.printerJobId,
-        atriumTerminal: info.atriumTerminal,
     };
 
     // Remove undefined values to allow DB default values

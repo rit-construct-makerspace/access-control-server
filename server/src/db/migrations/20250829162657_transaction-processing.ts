@@ -1,6 +1,5 @@
 import type { Knex } from "knex";
-import { CurrencySource } from "../../integrations/currency/types.js";
-import { getCurrencyLedgerEntries } from "../../repositories/Currency/CurrencyLedgerRepository.js";
+import { CurrencySource, CurrencyType } from "../../integrations/currency/types.js";
 
 
 export async function up(knex: Knex): Promise<void> {
@@ -27,9 +26,12 @@ export async function up(knex: Knex): Promise<void> {
     await knex("CurrencyLedger").delete("*");
 
     await knex.schema.alterTable("CurrencyLedger", (t) => {
-        t.dropColumns("atriumAmount", "printerJobId", "atriumTerminal");
+        t.dropColumns("source", "atriumAmount", "printerJobId", "atriumTerminal");
         t.renameColumn("creditAmount", "amount");
         t.integer("transactionEntryId").references("id").inTable("TransactionEntries");
+        t.text("currencyType").notNullable();
+        const allCurrencies = [CurrencyType.Atrium, CurrencyType.Credit].map(s => `'${s}'`);
+        t.check(`"currencyType" in (${allCurrencies.join(",")})`, [], "currencyTypeCheck")
     })
 }
 

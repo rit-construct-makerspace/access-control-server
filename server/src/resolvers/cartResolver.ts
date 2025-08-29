@@ -1,7 +1,6 @@
 import { GraphQLError } from "graphql";
 import { ApolloContext } from "../context.js";
 import { InventoryCartsRow } from "../db/tables.js";
-import { Terminal } from "../integrations/atrium-integration/atrium.js";
 import { clearItemsFromCart, deleteInventoryCart, getInventoryCartByID, getInventoryCarts, getInventoryCartsByMakerspace, getItemsInCart, subtractItemFromCart } from "../repositories/Store/InventoryCartsRepository.js";
 import { addItemAmount, addItemsAmounts, getItemById } from "../repositories/Store/InventoryRepository.js";
 import { getUserByID } from "../repositories/Users/UserRepository.js";

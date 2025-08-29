@@ -7,6 +7,7 @@ export const CurrencyLedgerTypeDefs = gql`
     accountID: ID
     owner: String!
     transactionEntryId: ID!
+    currencyType: String
     amount: Int!
     description: String
     atxID: Int

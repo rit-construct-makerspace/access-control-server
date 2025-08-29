@@ -15,6 +15,7 @@ const GET_CURRENCY_LEDGER_ENTRIES = gql`
       dateTime
       accountID
       owner
+      currencyType
       amount
       transactionEntryId
       description
@@ -29,6 +30,7 @@ type CurrencyLedgerEntry = {
   dateTime: Date;
   accountID: number;
   owner: string;
+  currencyType: string;
   amount: number;
   transactionEntryId: number | null;
   description: string | null
@@ -109,6 +111,7 @@ export default function CurrencyLedger() {
         { field: "id", headerName: "ID", width: 100 },
         { field: "accountID", headerName: "Account ID", width: 100 },
         { field: "owner", headerName: "Account Owner", width: 150 },
+        { field: "currencyType", headerName: "Type", width: 100 },
         { field: "amount", headerName: "Amount", width: 120 },
         { field: "dateTime", headerName: "Date", width: 200 },
         { field: "transactionEntryId", headerName: "Transaction", width: 200, renderCell: (params) => renderTransactionButton(params.row.transactionEntryId) },
@@ -121,6 +124,7 @@ export default function CurrencyLedger() {
         id: entry.id,
         accountID: entry.accountID,
         owner: entry.owner,
+        currencyType: entry.currencyType,
         amount: moneyFormatter.format(entry.amount / 100),
         dateTime: dateTimeFormatter.format(new Date(entry.dateTime)),
         transactionEntryId: entry.transactionEntryId,
