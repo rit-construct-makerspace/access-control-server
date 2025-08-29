@@ -6,33 +6,69 @@
 
 import { Privilege } from "../schemas/usersSchema.js";
 
+/**
+ * Audit logs are automatically made reports of various actions on the server and by machine activations.
+ * @var id *PRIMARY KEY*
+ * @var dateTime the time that the report is for
+ * @var message the description of what occured
+ * @var category the category of the message. Can be anything but there are special checkboxes/visualizations for some values.
+ * Those special categories can be seen in @file(AuditLogRow.tsx)
+ */
 export interface AuditLogRow {
   id: number;
   dateTime: Date;
   message: string;
   category: string;
 }
-
+/**
+ * A description of a piece of equipment.
+ * Equipment is usually large piece of machinery that can be activated by a card reader or reserved
+ * There can be multiple instances of a piece of an equipment per makerspace. (A machine shop has a 3 of the same type of lathe).
+ * The descriptions of an instance are described by an EquipmentInstanceRow which references the equipment
+ */
 export interface EquipmentRow {
+  /**  Primary Key */
   id: number;
+  /** human readable name of the equipment */
   name: string;
+  /** date the equipment was added to the system */
   addedAt: Date;
+  /** *UNUSED. TODO SHOULD BE REMOVED*  */
   inUse: boolean;
+  /** 
+   * what room this type of equipment resides in. 
+   * NOTE: If you have 2 different rooms, you can not share equipment between them. You would need separate entries for the equipment in either room 
+   */
   roomID: number;
+  /** If the equipment is not in use and should not be shown to users */
   archived: boolean;
+  /** image identifier for the CDN */
   imageUrl: string;
+  /** URL to the documentation for how to use this equipment */
   sopUrl: string;
+  /** Brief description of the equipment to inform users */
   notes: string;
+  /** Whether or not you need to make a reservation with the shop supervisors to use this equipment */
   byReservationOnly: boolean;
+  /** Whether or not a user must sign into a makerspace in order to use this equipment */
   needsWelcome?: boolean;
+  /** If a piece of equipment is suffeciently complicated, you can designate trainers to teach people how to use the machine. */
   requiresTrainerApproval: boolean;
 }
 
+/**
+ * A specific instance of an Equipment
+ */
 export interface EquipmentInstancesRow {
+  /** Primary Key */
   id: number;
+  /** FK to the Equipment that this instance is a type of */
   equipmentID: number;
+  /** Human readable description of this instance to distinguish it from other instances */
   name: string;
+  /** The state of the equipment, ACTIVE,RETIRED,NEEDS_REPAIRED, etc. */
   status: string;
+  /** Optional FK of the card reader associated with this instance */
   readerID: number | null
 }
 
@@ -128,19 +164,39 @@ export interface InventoryLedgerRow {
   items: string;
 }
 
+/**
+ * A record of a quiz submission.
+ * Note, this table does not control access to equipment. Rather, the AccessChecks and PassedModules tables record successful In-person checks and Non-expired trainings respectively
+ * PassedModules records trainings that have not expired (It is kept up to date by purging expired trainings)
+ * ModuleSubmissions records all quiz attempts forever
+ * AccessChecks records in person competency checks
+ */
 export interface ModuleSubmissionRow {
+  /** Primary Key */
   id: number;
+  /** Which training module this submission is for */
   moduleID: number;
+  /** FK:User that submitted this training */
   makerID: number;
+  /** When the trainin was submitted */
   submissionDate: Date;
+  /** Whether or not the user passed the training */
   passed: boolean;
+  /** The date that this training will expire and the user will have to retake it */
   expirationDate: Date;
+  /** A JSON description of the quiz answers */
   summary: string;
 }
 
+/**
+ * Join table denoting which modules need to be passed for which equipment
+ */
 export interface ModulesForEquipmentRow {
+  /** Primary Key */
   id: number;
+  /** FK:Equipment */
   equipmentID: number;
+  /** FK:TrainingModules */
   moduleID: number;
 }
 
@@ -178,18 +234,32 @@ export interface RoomRow {
   zoneID: number | null;
 }
 
+/**
+ * Arbitrary data points to keep track of
+ * Should be used sparingly
+ */
 export interface DataPointsRow {
+  /** Primary Key */
   id: number;
   label: string;
   value: number;
 }
 
+/**
+ * A Quiz/TrainingModule for a user to take
+ * Linked to Equipment using ModulesForEquipment join table
+ */
 export interface TrainingModuleRow {
+  /** Primary Key */
   id: number;
+  /** Human readable name describing this training module */
   name: string;
+  /** The quiz questions and answers (Stored as JSON) */
   quiz: TrainingModuleItem[];
   archived: boolean;
+  /** @deprecated, DONT USE */
   reservationPrompt: ReservationPrompt;
+  /** FK:Makerspace this training applies to (optional) */
   makerspaceID: number | null;
 }
 
@@ -279,24 +349,40 @@ export interface AnnouncementRow {
   description: string;
 }
 
+/**
+ * Store of in person competency checks for equipment
+ * This is added on top of TrainingModules
+ * to use equipment, you must complete all trainings
+ * That then generates an AccessCheck which makerspace 
+ * Staff can approve if you pass the in person check
+ */
 export interface AccessCheckRow {
+  /** Primary Key */
   id: number;
+  /** User this applies to */
   userID: number;
+  /** Equipment this applies to */
   equipmentID: number;
+  /** The date that this check became available */
   readyDate: Date;
+  /** Whether or not the user has passed the check */
   approved: boolean;
 }
 
+/**
+ * A Zone (In the process of being renamed to Makerspace)
+ * A specific makerspace within the system
+ * A Makerspace can have multiple Rooms inside of it containing specific equipment
+ */
 export interface ZoneRow {
+  /** Primary Key */
   id: number;
+  /** A human readable name for the makerspace */
   name: string;
+  /** CDN Image Identifier */
   imageUrl: string;
+  /** If true, this makerspace is out of use and can't be visited  */
   archived: boolean;
-}
-
-export interface RoomsForZonesRow {
-  zoneID: number;
-  roomID: number;
 }
 
 export interface EquipmentSessionRow {
@@ -338,18 +424,31 @@ export interface ToolItemInstancesRow {
   borrowedAt: Date | null;
 }
 
+/**
+ * Table describing which users are Managers (of makerspaces)
+ */
 export interface ManagerRow {
   userID: number;
   makerspaceID: number;
 }
 
+/**
+ * Table describing which users are Staff (of makerspaces)
+ */
 export interface StaffRow {
+  /** FK:Users */
   userID: number;
+  /** FK:Makerspace */
   makerspaceID: number;
 }
 
+/** 
+ * Table describing which users are Trainers (for equipment)
+ */
 export interface TrainerRow {
+  /** FK:Users */
   userID: number;
+  /** FK:Equipment */
   equipmentID: number;
 }
 
@@ -362,7 +461,14 @@ export interface RestrictionRow {
   createDate: Date | null;
 }
 
-
+/**
+ * Table recording if a user passed a training and it has not expired
+ * This table is the mechanism by which trainings expire. 
+ * If its not here, that user can't use the machine
+ * PassedModules records trainings that have not expired (It is kept up to date by purging expired trainings)
+ * ModuleSubmissions records all quiz attempts forever
+ * AccessChecks records in person competency checks
+ */
 export interface PassedModulesRow {
   userID: number;
   moduleID: number;
@@ -395,15 +501,29 @@ export interface DefaultHoursRow {
   closed: boolean;
 }
 
+/**
+ * "Bank" Account for a user/organization
+ * This ONLY records ConstructCredits, not any outside currency
+ */
 export interface CurrencyAccountsRow {
+  /** Primary Key */
   id: number;
+  /** Amount of ConstructCredits available IN CENTS*/
   balance: number; // Cents
 }
 
+/**
+ * An organization is a group that can use the makerspace or purchase goods and services
+ * Examples of these are University Clubs or Research Groups 
+ */
 export interface OrganizationsRow {
+  /** Primary Key */
   id: number;
+  /** RIT Username of the organization */
   username: string;
+  /** Human readable name for the organization */
   displayname: string;
+  /** Corresponding account for this groups money */
   accountID: number;
 }
 
@@ -422,6 +542,7 @@ export interface CurrencyLedgerRow {
   atriumTerminal: string | null;
 }
 
+/** 'Fake' Table used to atomically generate IDs for Atrium Transactions */
 export interface RefIDCounterRow {
   refID: number;
 }
@@ -430,6 +551,12 @@ export interface TempRolesRow {
   name: string;
 }
 
+/**
+ * Row to keep track of user sessions across server restarts
+ * See PostgresStore in auth.ts 
+ * and
+ * https://expressjs.com/en/resources/middleware/session.html
+ */
 export interface ExpressSessionRow {
   sid: string;
   session: string;
@@ -457,7 +584,6 @@ declare module "knex/types/tables.js" {
     ReaderLogs: ReaderLogRow;
     AccessChecks: AccessCheckRow;
     Zones: ZoneRow;
-    RoomsForZones: RoomsForZonesRow
     DataPoints: DataPointsRow;
     EquipmentSessions: EquipmentSessionRow;
     InventoryLedger: InventoryLedgerRow;
