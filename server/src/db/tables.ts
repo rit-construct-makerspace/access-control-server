@@ -422,6 +422,30 @@ export interface CurrencyLedgerRow {
   atriumTerminal: string | null;
 }
 
+enum CurrencySource{
+  Atrium = "atrium", // Tigerbucks for RI
+  Credit = "credit", // ConstructCredits
+}
+
+export interface Transaction {
+  id: number,
+  accountID: number,
+  owner: string,
+  source: CurrencySource,
+  description: string,
+  outstandingCharge: number,
+  cartID?: number;
+  printerJobID?: number;
+}
+
+export interface TransactionEntry {
+  id: number,
+  transactionID: number,
+  amount: number,
+  description: string,
+};
+
+
 export interface RefIDCounterRow {
   refID: number;
 }
