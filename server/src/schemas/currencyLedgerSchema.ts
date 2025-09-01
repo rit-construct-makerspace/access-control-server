@@ -6,7 +6,7 @@ export const CurrencyLedgerTypeDefs = gql`
     dateTime: DateTime!
     accountID: ID
     owner: String!
-    transactionEntryId: ID!
+    transactionEntryId: ID
     currencyType: String
     amount: Int!
     description: String
