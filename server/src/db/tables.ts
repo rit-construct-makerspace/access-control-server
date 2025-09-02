@@ -292,7 +292,7 @@ export interface ModuleItemOption {
 
 /**
  * Describes information about a user
- * The current user is a superet of this. See auth.ts/context.ts
+ * The current user is a superset of this. See auth.ts/context.ts
  */
 export interface UserRow {
   /** Primary Key */
