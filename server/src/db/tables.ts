@@ -22,7 +22,7 @@ export interface AuditLogRow {
 }
 /**
  * A description of a piece of equipment.
- * Equipment is usually large piece of machinery that can be activated by a card reader or reserved
+ * Equipment is a piece of machinery that can be activated by a card reader, used, or reserved
  * There can be multiple instances of a piece of an equipment per makerspace. (A machine shop has a 3 of the same type of lathe).
  * The descriptions of an instance are described by an EquipmentInstanceRow which references the equipment
  */
@@ -241,7 +241,9 @@ export interface RoomRow {
 export interface DataPointsRow {
   /** Primary Key */
   id: number;
+  /** Key to identify the data with */
   label: string;
+  /** Value of the data */
   value: number;
 }
 
@@ -288,25 +290,49 @@ export interface ModuleItemOption {
   correct?: boolean;
 }
 
+/**
+ * Describes information about a user
+ * The current user is a superet of this. See auth.ts/context.ts
+ */
 export interface UserRow {
+  /** Primary Key */
   id: number;
+  /** First name of user, returned by shib */
   firstName: string;
+  /** Last name of user, returned by shib */
   lastName: string;
+  /** Pronouns of user, asked by make */
   pronouns: string;
+  /** UNUSED: TODO should be removed */
   isStudent: boolean;
+  /** TODO Phase out in favor of new privelege system */
   privilege: Privilege;
+  /** Date that the user joined make */
   registrationDate: Date;
+  /** Date that the user says they will graduate (self reported, not verified or anything) */
   expectedGraduation: string;
+  /** RIT College Code (GCCIS, CAD, etc.) */
   college: string;
+  /** Whether or not the user has completely gone through setup yet */
   setupComplete: boolean;
+  /** the username used to identify a person through shib/email */
   ritUsername: string;
+  /** An archived user is a user who at one point had access to make/machine shops but has since graduated and lost access*/
   archived: boolean;
+  /** The RFID Unique ID used to identify a user at a card reader */
   cardTagID: string;
+  /** Notes provided by staff to help other staff */
   notes: string;
   activeHold: boolean;
   admin: boolean;
   accountID: number;
+  /** A string defining the atrium token used to charge this user for store purchases, 3d prints and anything else */
   atriumToken: string | null;
+  /** How to handle a user archiving
+   * null: Use role allowlist to archive/unarchive (Staff,Student get access, everything else doesnt)
+   * true: force archive no matter what role the user has
+   * false: never archive no matter what role the user has
+   */
   forceArchive: boolean | null;
 }
 
@@ -381,7 +407,7 @@ export interface ZoneRow {
   name: string;
   /** CDN Image Identifier */
   imageUrl: string;
-  /** If true, this makerspace is out of use and can't be visited  */
+  /** If true, this makerspace is out of use and can't be visited. It is effecively deleted  */
   archived: boolean;
 }
 
