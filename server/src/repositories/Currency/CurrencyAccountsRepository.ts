@@ -4,6 +4,7 @@ import { CurrencyAccountsRow, OrganizationsRow } from "../../db/tables.js";
 import * as OrgRepo from "../Users/OrganizationRepository.js";
 import * as UserRepo from "../Users/UserRepository.js";
 import * as CurrencyLedgerRepo from "./CurrencyLedgerRepository.js";
+import { CurrencyType } from "../../integrations/currency/types.js";
 
 type AccountOwner = {
   displayName: string;
@@ -86,7 +87,7 @@ export async function adjustAccountBalanceCents(accountID: number, amount: numbe
   }
 
   await setAccountBalanceCents(accountID, new_balance);
-  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, new_balance - balance, description, { transactionEntryId: transactionEntryId });
+  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, new_balance - balance, CurrencyType.Credit, description, { transactionEntryId: transactionEntryId });
 
   return true;
 }
@@ -116,7 +117,7 @@ export async function adjustAccountBalanceIfAvailableCents(accountID: number, am
 
   await setAccountBalanceCents(accountID, new_balance);
 
-  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, amount, description, { transactionEntryId });
+  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, amount, CurrencyType.Credit, description, { transactionEntryId });
 
   return true;
 }
@@ -144,13 +145,13 @@ export async function chargeAccountReturnRemainingCents(accountID: number, amoun
   if (amount > balance) {
     await setAccountBalanceCents(accountID, 0);
     const left = amount - balance;
-    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -balance, description, { transactionEntryId });
+    await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -balance, CurrencyType.Credit, description, { transactionEntryId });
     return left;
   }
 
   await setAccountBalanceCents(accountID, balance - amount);
 
-  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -amount, description, { transactionEntryId });
+  await CurrencyLedgerRepo.createCurrencyLedgerEntry(accountID, -amount, CurrencyType.Credit, description, { transactionEntryId });
 
   return 0;
 }

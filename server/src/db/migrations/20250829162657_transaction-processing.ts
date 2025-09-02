@@ -13,7 +13,7 @@ export async function up(knex: Knex): Promise<void> {
         t.text("origin").notNullable();
         t.jsonb("description").notNullable();
         t.integer("outstandingCharge").notNullable();
-        t.integer("printerJobId").nullable();
+        t.integer("printerJobId").nullable().unique();
         const allOrigins = [CurrencySource.Printers, CurrencySource.Store, CurrencySource.Website, CurrencySource.Unknown].map(s => `'${s}'`);
         t.check(`?? in (${allOrigins.join(",")})`, ["origin"])
     });

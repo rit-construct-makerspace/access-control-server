@@ -10,7 +10,9 @@ export enum MakeMoneyError {
   ConnectionError = "ConnectionError",
   SomethingElse = "SomethingElse",
   InvalidSign = "InvalidSign",
-  NoFunds = "NoFunds"
+  NoFunds = "NoFunds",
+  DuplicateTransaction = "DuplicateTransaction",
+  Unimplemented = "Unimplemented",
 };
 
 /**
@@ -29,7 +31,7 @@ export async function getAccountBalance(username: string): Promise<number | Make
   try {
     makeBalance = await CurrencyAccountRepo.getAccountBalanceCents(makeAccountID);
   } catch {
-    return MakeMoneyError.SomethingElse;
+    return MakeMoneyError.NoAccount;
   }
   let atriumBalance = 0;
   if (USE_ATRIUM_FOR_CURRENCY) {
@@ -51,6 +53,7 @@ export function centsToDollarString(cents: number) {
 }
 
 export async function chargeAccount(accountId: number, cents: number, source: CurrencySource, description: string, transactionEntryId: number): Promise<MakeMoneyError | { atrium: number, credit: number }> {
+  console.log("charging account", accountId, cents, source, description)
   if (cents < 0) {
     return MakeMoneyError.InvalidSign;
   }
@@ -61,10 +64,16 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
   let remaining = cents;
   try {
     remaining = await CurrencyAccountRepo.chargeAccountReturnRemainingCents(accountId, cents, source, description, transactionEntryId);
-  } catch {
+  } catch (e) {
+    console.error("Currency: Could not charge to construct credits", e);
     return MakeMoneyError.NoAccount;
   }
   let toCredit = cents - remaining;
+
+  // no atrium needed
+  if (remaining == 0) {
+    return { credit: toCredit, atrium: 0 };
+  }
 
   let atriumSuccess = false;
   try {
@@ -107,9 +116,14 @@ export async function refundCreditAccount(accountId: number, cents: number, sour
  * @param cents 
  * @param split 
  * @param transactionEntryId 
- * @returns 
+ * @returns MakeMoneyError.InvalidSign if atrium or credit values of split are negative or if cents is negative.
+ * @returns NoAccount if no user with that account id can be found
  */
-export async function refundAccountSplitting(accountId: number, cents: number, split: { atrium: number, credit: number }, description: string, transactionEntryId?: number): Promise<MakeMoneyError | { atrium: number, credit: number }> {
+export async function refundAccountSplitting(accountId: number, cents: number, source: CurrencySource, split: { atrium: number, credit: number }, description: string, transactionEntryId: number): Promise<MakeMoneyError | { atrium: number, credit: number }> {
+  console.log("Refunding split");
+  if (split.atrium < 0 || split.credit < 0) {
+    return MakeMoneyError.InvalidSign;
+  }
   if (cents < 0) {
     return MakeMoneyError.InvalidSign;
   }
@@ -118,5 +132,39 @@ export async function refundAccountSplitting(accountId: number, cents: number, s
     return MakeMoneyError.NoAccount;
   }
 
-  return MakeMoneyError.SomethingElse;
+
+  let toAtrium = split.atrium;
+  if (toAtrium > cents) {
+    toAtrium = cents;
+  }
+
+  if (toAtrium > 0) {
+    const res = await Atrium.adjustBalanceIfPossible(source, user.ritUsername, accountId, toAtrium, description, transactionEntryId)
+    if ('success' in res && res.success == true) {
+      // all good on the atrium side
+    } else if ('success' in res && res.success == false) {
+      return MakeMoneyError.NoFunds;
+    } else {
+      console.error("Currency: Couldn't refund to atrium", res);
+      return MakeMoneyError.SomethingElse
+    }
+  }
+  
+  let toCredit = cents - toAtrium;
+  if (toCredit > split.credit) {
+    console.warn(`Currency: At some point keeping track of currency failed. Trying to refund ${toCredit} but only ${split.credit} available`);
+    toCredit = split.credit;
+  }
+  try {
+    const res2 = await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, toCredit, source, description, transactionEntryId);
+    if (res2 == false) {
+      // shouldnt happen, going up
+      return MakeMoneyError.NoFunds;
+    }
+  } catch {
+    return MakeMoneyError.NoAccount;
+  }
+
+
+  return { atrium: toAtrium, credit: toCredit };
 }

@@ -554,8 +554,7 @@ async function startServer() {
     )
   }
   );
-
-  const res = await getChargeSplitForTransactionById(1);
+  const res =await  getChargeSplitForTransactionById(6)
   console.log(res);
 }
 

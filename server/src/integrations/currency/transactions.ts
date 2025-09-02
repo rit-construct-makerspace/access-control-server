@@ -8,22 +8,29 @@ import * as TransactionRepo from "../../repositories/Currency/TransactionReposit
 import * as Currency from "./currency.js"
 
 function isOutstandingCharge(cents: number) {
-    return cents <= 3;
+    return cents >= -3 && cents < 0;
 }
 
-export async function NewTransaction(accountId: number, cents: number, source: CurrencySource, description: { text: string, data: unknown }, options: { printerJobId: number }): Promise<number | undefined> {
-    // await Transaction
+export async function NewTransaction(accountId: number, initialDeltaCents: number, source: CurrencySource, description: { text: string, data: unknown }, options: { printerJobId: number }): Promise<number | Currency.MakeMoneyError> {
     let outstanding = 0;
-    if (isOutstandingCharge(cents)) {
+    if (isOutstandingCharge(initialDeltaCents)) {
         // this is an outstanding one, dont charge yet
-        outstanding = 1;
+        outstanding = initialDeltaCents;
     }
     const tid = await TransactionRepo.createTransaction(accountId, source, description, outstanding, options.printerJobId);
-    if (isOutstandingCharge(cents)) {
-        return;
+    if (tid == undefined) {
+        console.error("Currency: Could not create new transaction");
+        return Currency.MakeMoneyError.SomethingElse;
+    }
+    if (isOutstandingCharge(initialDeltaCents)) {
+        return 0;
     }
     // If this transaction doesnt have outstanding charge, add the original cost as an update to charge
-    await UpdateTransaction(tid, cents, "Initial Charge")
+    const res = await UpdateTransaction(tid, initialDeltaCents, description.text)
+    if (typeof res !== "string") {
+        return res.atrium + res.credit;
+    }
+    return res
 }
 
 /**
@@ -39,24 +46,36 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     if (parent == null) {
         throw Error(`Could not find parent transaction for id: ${transactionID}`);
     }
+
     let centsToCharge = deltaCents;
     if (parent.outstandingCharge) {
-        centsToCharge -= parent.outstandingCharge;
+        centsToCharge += parent.outstandingCharge;
     }
 
+    const entryId = await TransactionRepo.createTransactionUpdate(parent.id, centsToCharge, reason)
+    if (entryId == null) {
+        console.error("Currency: Failed to create transaction ID");
+        return Currency.MakeMoneyError.SomethingElse;
+    }
     let amounts = { atrium: 0, credit: 0 };
 
     if (centsToCharge > 0) {
-        const split = await TransactionRepo.getChargeSplitForTransactionById(transactionID);
+        let split = await TransactionRepo.getChargeSplitForTransactionById(transactionID);
         if (split == null) {
-            const res = await Currency.refundCreditAccount(parent.accountID, centsToCharge, parent.origin, reason)
+            const res = await Currency.refundCreditAccount(parent.accountID, centsToCharge, parent.origin, reason, entryId)
             if (typeof res == "boolean" && res == true) {
                 amounts = { atrium: 0, credit: centsToCharge };
             } else if (typeof res == "string") {
                 return res;
             }
         } else {
-            const res = await Currency.refundAccountSplitting(parent.accountID, centsToCharge, split, reason, transactionID)
+            // modify split so we never refund more than we've taken
+            if (split.atrium >= 0) { split.atrium = 0 };
+            if (split.credit >= 0) { split.credit = 0 };
+            let positiveSplit = { atrium: Math.abs(split.atrium), credit: Math.abs(split.credit) }; // we want the splits positive for the amount we can use
+
+            console.log("Split", split)
+            const res = await Currency.refundAccountSplitting(parent.accountID, centsToCharge, parent.origin, positiveSplit, reason, entryId)
             if (typeof res == "string") {
                 return res;
             } else {
@@ -65,7 +84,7 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
         }
     } else {
         const amt = Math.abs(centsToCharge);
-        const res = await Currency.chargeAccount(parent.accountID, amt, parent.origin, reason, transactionID);
+        const res = await Currency.chargeAccount(parent.accountID, amt, parent.origin, reason, entryId);
         if (typeof res == "string") {
             return res;
         } else {

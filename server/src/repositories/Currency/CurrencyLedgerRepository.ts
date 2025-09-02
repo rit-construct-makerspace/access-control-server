@@ -3,10 +3,12 @@ import { knex } from "../../db/index.js";
 import { CurrencyLedgerRow } from "../../db/tables.js";
 import * as OrgRepo from "../Users/OrganizationRepository.js";
 import * as UserRepo from "../Users/UserRepository.js";
+import { CurrencyType } from "../../integrations/currency/types.js";
 
 export async function createCurrencyLedgerEntry(
     accountID: number,
     amount: number,
+    type: CurrencyType,
     description: string, 
     info: {
         transactionEntryId?: number,
@@ -23,7 +25,8 @@ export async function createCurrencyLedgerEntry(
         accountID: accountID,
         owner: owner,
         amount: amount,
-        tranactionEntryId: info.transactionEntryId,
+        currencyType: type,
+        transactionEntryId: info?.transactionEntryId,
         description: description,
         atxID: info.atxID,
         refID: info.refID,

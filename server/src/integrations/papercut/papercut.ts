@@ -3,6 +3,10 @@ import xmlparser from "express-xml-bodyparser";
 import * as xml2js from "xml2js"
 import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as Currency from "../currency/currency.js"
+import { NewTransaction, UpdateTransaction } from "../currency/transactions.js";
+import { getAccountIDByUsername } from "../../repositories/Currency/CurrencyAccountsRepository.js";
+import { CurrencySource } from "../currency/types.js";
+import { getTransactionByPrinterJobId } from "../../repositories/Currency/TransactionRepository.js";
 
 const PAPERCUT_SECURITY_SECRET = process.env.PAPERCUT_SECURITY_SECRET;
 const FREE_3D_PRINTS = process.env.FREE_3D_PRINTS === "true";
@@ -124,9 +128,30 @@ enum PrinterTransactionType {
   QuoteUpdated,
   Other,
 }
+function typeToString(t: PrinterTransactionType): string {
+  switch (t) {
+    case PrinterTransactionType.New:
+      return "New Job"
+    case PrinterTransactionType.Failed:
+      return "Job Failed"
+    case PrinterTransactionType.Cancelled:
+      return "Job Cancelled";
+    case PrinterTransactionType.ManualRefund:
+      return "Manual Refund";
+    case PrinterTransactionType.PriceUpdate:
+      return "Price Updated";
+    case PrinterTransactionType.QuoteUpdated:
+      return "Quote Updated";
+    case PrinterTransactionType.Other:
+      return "Other";
+    default:
+      return "Unknown Type";
+  }
+}
+
 type PrinterTransaction = {
   type: PrinterTransactionType
-  jobID: Number,
+  jobID: number,
   customMessage?: string
 };
 /**
@@ -159,15 +184,53 @@ function printCommentParser(comment: string): PrinterTransaction | undefined {
   }
 }
 
-function process3dprinttransaction(transaction: PrinterTransaction) {
-  // get all ledgers related to this
-  // process through ledgers
-  // find outstanding, process outstanding
-  // build up transaction (with marking for 'applied 12/4/25')
-  // calculate amount already applied
-  // calculate amount that needs to be applied
-  // charge amount and send updated receipt amount
-  // subtract 
+async function process3dPrintTransaction(username: string, amount: number, transaction: PrinterTransaction): Promise<Currency.MakeMoneyError | boolean> {
+  console.log("3dprint", username, amount, transaction);
+  const account = await getAccountIDByUsername(username);
+  if (account == null) {
+    console.error("no account here");
+    return Currency.MakeMoneyError.NoAccount;
+  }
+  const existing = await getTransactionByPrinterJobId(transaction.jobID);
+  if (transaction.type == PrinterTransactionType.New) {
+    if (existing != null) {
+      return Currency.MakeMoneyError.DuplicateTransaction;
+    }
+
+    const res = await NewTransaction(
+      account,
+      amount,
+      CurrencySource.Printers,
+      { text: `New 3D Printer Job: ${transaction.jobID}`, data: {} },
+      { printerJobId: transaction.jobID }
+    )
+    if (typeof res == "string") {
+      if (res == Currency.MakeMoneyError.NoFunds) {
+        return false;
+      } else {
+        return res;
+      }
+    } else {
+      return true;
+    }
+  }
+
+  // Update
+  if (existing == undefined) {
+    console.error(`3DPrinterOS: Ignoring money charge for job id: ${transaction.jobID}. Couldn't find transaction for it`);
+    return false;
+  }
+  console.info("updating");
+  const res = await UpdateTransaction(existing.id, amount, `${typeToString(transaction.type) + (transaction?.customMessage ? (" - " + transaction?.customMessage) : "")} for jobId:${transaction.jobID}`)
+  if (typeof res == "string") {
+    if (res == Currency.MakeMoneyError.NoFunds) {
+      return false;
+    } else {
+      return res;
+    }
+  } else {
+    return true;
+  }
 
 }
 
@@ -205,14 +268,22 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
     xmlrpcRespond(res, [true]);
     return;
   }
-
-  const amountCents = Math.round(adjustment * 100);
-  const changeAmount = -amountCents; // we want negative if refund
   try {
-    xmlrpcRespond(res, [false]);
+    const transaction = printCommentParser(comment)
+    if (transaction == null) {
+      xmlrpcRespondFault(res, 404, `could not process print comment: ${comment}`);
+      return;
+    }
+    const amountCents = Math.round(adjustment * 100);
+    const result = await process3dPrintTransaction(username, amountCents, transaction);
+    if (typeof result == "string") {
+      xmlrpcRespondFault(res, 500, result);
+    } else {
+      xmlrpcRespond(res, [result]);
+    }
   } catch (e) {
     console.error(e)
-    xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)
+    xmlrpcRespondFault(res, 404, `could not adjust balance for user '${username}': ${e}`)
   }
 }
 
