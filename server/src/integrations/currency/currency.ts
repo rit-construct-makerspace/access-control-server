@@ -1,12 +1,16 @@
 import * as Atrium from "../atrium-integration/atrium.js"
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js"
+import { CurrencySource } from "./types.js";
+import { getUserByAccountID } from "../../repositories/Users/UserRepository.js";
 
 const USE_ATRIUM_FOR_CURRENCY = process.env.ATRIUM_ENABLED == "true";
 
 export enum MakeMoneyError {
   NoAccount = "NoAccount",
   ConnectionError = "ConnectionError",
-  SomethingElse = "SomethingElse"
+  SomethingElse = "SomethingElse",
+  InvalidSign = "InvalidSign",
+  NoFunds = "NoFunds"
 };
 
 /**
@@ -44,4 +48,75 @@ export async function getAccountBalance(username: string): Promise<number | Make
 
 export function centsToDollarString(cents: number) {
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
+}
+
+export async function chargeAccount(accountId: number, cents: number, source: CurrencySource, description: string, transactionEntryId: number): Promise<MakeMoneyError | { atrium: number, credit: number }> {
+  if (cents < 0) {
+    return MakeMoneyError.InvalidSign;
+  }
+  const user = await getUserByAccountID(accountId);
+  if (user == null) {
+    return MakeMoneyError.NoAccount;
+  }
+  let remaining = cents;
+  try {
+    remaining = await CurrencyAccountRepo.chargeAccountReturnRemainingCents(accountId, cents, source, description, transactionEntryId);
+  } catch {
+    return MakeMoneyError.NoAccount;
+  }
+  let toCredit = cents - remaining;
+
+  let atriumSuccess = false;
+  try {
+    let res: Atrium.Error | { success: boolean, atxid: number, refid: number } = await Atrium.adjustBalanceIfPossible(source, user.ritUsername, accountId, -remaining, description, transactionEntryId);
+    if ('type' in res) {
+      // Failed
+      console.error(`Currency: Failed to charge atrium for ${user.ritUsername} for ${cents} cents`, res);
+    } else {
+      atriumSuccess = true;
+    }
+  } catch (e) {
+    console.error(`Currency: Failed to charge atrium for ${user.ritUsername} for ${cents} cents, ${e}`)
+  }
+
+  if (!atriumSuccess) {
+    await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, toCredit, source, "rectification for: " + description, transactionEntryId);
+    return MakeMoneyError.NoFunds;
+  }
+
+
+  return { credit: toCredit, atrium: remaining }
+}
+
+/**
+ * "Safe" way to refund money. Will never go to atrium money, only ever to credit
+ * @param accountId the account to give money to
+ * @param cents the number of cents to give to that account
+ */
+export async function refundCreditAccount(accountId: number, cents: number, source: CurrencySource, description: string, transactionEntryId?: number): Promise<boolean | MakeMoneyError> {
+  try {
+    return await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, cents, source, description, transactionEntryId)
+  } catch {
+    return MakeMoneyError.NoAccount;
+  }
+}
+
+/**
+ * Return money to a user without ever transferring more to them in atrium money than they originally put in
+ * @param accountId the account to refund to
+ * @param cents 
+ * @param split 
+ * @param transactionEntryId 
+ * @returns 
+ */
+export async function refundAccountSplitting(accountId: number, cents: number, split: { atrium: number, credit: number }, description: string, transactionEntryId?: number): Promise<MakeMoneyError | { atrium: number, credit: number }> {
+  if (cents < 0) {
+    return MakeMoneyError.InvalidSign;
+  }
+  const user = await getUserByAccountID(accountId);
+  if (user == null) {
+    return MakeMoneyError.NoAccount;
+  }
+
+  return MakeMoneyError.SomethingElse;
 }

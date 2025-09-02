@@ -31,6 +31,8 @@ import { getBalance, pingAtrium } from "./integrations/atrium-integration/atrium
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { purge_images } from "./periodicActions.js";
+import { getCurrencyLedgerEntries } from "./repositories/Currency/CurrencyLedgerRepository.js";
+import { getChargeSplitForTransactionById, getCurrencyLedgerEntriesForTransactionById, getTransactionEntriesByTransactionId } from "./repositories/Currency/TransactionRepository.js";
 
 const require = createRequire(import.meta.url);
 
@@ -552,7 +554,8 @@ async function startServer() {
     )
   }
   );
-  const res = await getBalance('jehshed');
+
+  const res = await getChargeSplitForTransactionById(1);
   console.log(res);
 }
 

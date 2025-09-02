@@ -19,6 +19,7 @@ export async function up(knex: Knex): Promise<void> {
     });
     await knex.schema.createTable("TransactionEntries", (t)=>{
         t.increments("id").primary();
+        t.datetime("dateTime").notNullable();
         t.integer("transactionID").references("id").inTable("Transactions");
         t.integer("amount").notNullable();
         t.text("description").notNullable();

@@ -421,6 +421,7 @@ export interface CurrencyLedgerRow {
   owner: string;
   /** the transaction entry that this exchange of money corresponsd to */
   transactionEntryId: number;
+  /** Human readable description of the transaction */
   description: string;
   /** 
    * The amount exchanged 
@@ -448,16 +449,18 @@ export interface TransactionRow {
   /** Origin of the transaction */
   origin: CurrencySource,
   /** description of the transaction */
-  description: object,
+  description: {text: string, data: unknown},
   /** Original outstanding charge. This should be taken into account and charged accordingly on the first exchange of money. Then it is set to 0 */
   outstandingCharge: number,
   /** Printer Job that this transaction will be applied for */
-  printerJobID: number | null;
+  printerJobId: number | null;
 }
 
 export interface TransactionEntryRow {
   /** Primary Key */
   id: number,
+  /** Date that this was processed */
+  dateTime: Date;
   /** Transaction that this entry corresponds to */
   transactionID: number,
   /** 
