@@ -17,7 +17,7 @@ function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
     case "inventory":
       return "/admin/inventory";
     case "module":
-      return "/admin/training/" + id;
+      return `/makerspace/${makerspaceID}/training/${id}`;
     case "conceal":
       return "#";
     case "access_device":
