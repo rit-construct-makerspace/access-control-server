@@ -91,7 +91,7 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
         const res = await Currency.chargeAccount(parent.accountID, amt, parent.origin, reason, entryId);
         if (typeof res == "string") {
             return res;
-        } 
+        }
     }
 
     await TransactionRepo.removeOutstandingChargeOnTransactionIfAvailable(transactionID);

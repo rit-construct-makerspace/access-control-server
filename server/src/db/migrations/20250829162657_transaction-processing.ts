@@ -3,11 +3,11 @@ import { CurrencySource, CurrencyType } from "../../integrations/currency/types.
 
 
 export async function up(knex: Knex): Promise<void> {
-    if (await knex.schema.hasTable("Transactions")){
+    if (await knex.schema.hasTable("Transactions")) {
         // table already exists
         return;
     }
-    await knex.schema.createTable("Transactions", (t)=>{
+    await knex.schema.createTable("Transactions", (t) => {
         t.increments("id").primary();
         t.datetime("dateTime").notNullable().defaultTo(knex.fn.now());
         t.integer("accountID").references("id").inTable("CurrencyAccounts").notNullable();
@@ -18,7 +18,7 @@ export async function up(knex: Knex): Promise<void> {
         const allOrigins = [CurrencySource.Printers, CurrencySource.Store, CurrencySource.Website, CurrencySource.Unknown].map(s => `'${s}'`);
         t.check(`?? in (${allOrigins.join(",")})`, ["origin"])
     });
-    await knex.schema.createTable("TransactionEntries", (t)=>{
+    await knex.schema.createTable("TransactionEntries", (t) => {
         t.increments("id").primary();
         t.datetime("dateTime").notNullable();
         t.integer("transactionID").references("id").inTable("Transactions");

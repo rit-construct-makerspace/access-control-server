@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
-import { CurrencyAccountsRow, OrganizationsRow } from "../../db/tables.js";
+import { CurrencyAccountsRow } from "../../db/tables.js";
 import * as OrgRepo from "../Users/OrganizationRepository.js";
 import * as UserRepo from "../Users/UserRepository.js";
 import * as CurrencyLedgerRepo from "./CurrencyLedgerRepository.js";

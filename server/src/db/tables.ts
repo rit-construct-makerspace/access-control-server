@@ -597,7 +597,7 @@ export interface TransactionRow {
   /** Origin of the transaction */
   origin: CurrencySource,
   /** description of the transaction */
-  description: {text: string, data: unknown},
+  description: { text: string, data: unknown },
   /** Original outstanding charge. This should be taken into account and charged accordingly on the first exchange of money. Then it is set to 0 */
   outstandingCharge: number,
   /** Printer Job that this transaction will be applied for */

@@ -146,7 +146,9 @@ export async function refundAccountSplitting(accountId: number, cents: number, s
   if (toAtrium > cents) {
     toAtrium = cents;
   }
-
+  if (!USE_ATRIUM_FOR_CURRENCY) {
+    toAtrium = 0;
+  }
   if (toAtrium > 0) {
     const res = await Atrium.adjustBalanceIfPossible(source, user.ritUsername, accountId, toAtrium, description, transactionEntryId)
     // handle errors here, if fine, continue to credit side 

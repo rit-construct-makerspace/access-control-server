@@ -131,16 +131,16 @@ export async function generateReceiptEmail(transactionId: number): Promise<{ sub
     } catch {
         // account not found. shouldnt happen since we're generating a receipt for it
     }
-    
+
     const accountOwner = await getAccountOwner(transaction.accountID);
-    if (accountOwner == undefined){
+    if (accountOwner == undefined) {
         return undefined;
     }
 
     const totalCents = entriesAndSplits.reduce((acc, val) => (acc + val.atrium + val.credit), 0);
     const subject = `SHED Makerspace Receipt: 3D Printer OS Job #${transaction.printerJobId} - ${transaction.dateTime.toLocaleString()}`;
     const html = generateHTMLReceipt({ title: subject, transaction: transaction, transactionEntries: entriesAndSplits, creditCentsRemaining: creditsRemaining, totalCents: totalCents });
-    return { subject: subject, to: accountOwner.username+"@rit.edu", text: html, html }
+    return { subject: subject, to: accountOwner.username + "@rit.edu", text: html, html }
 }
 
 

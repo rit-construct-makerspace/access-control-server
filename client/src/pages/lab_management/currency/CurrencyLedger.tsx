@@ -98,7 +98,7 @@ export default function CurrencyLedger() {
       const entries: CurrencyLedgerEntry[] = data.currencyLedgerEntriesLimit;
 
       function renderTransactionButton(transactionEntryId: number | null) {
-        if (transactionEntryId == null){
+        if (transactionEntryId == null) {
           return null
         }
         return <Button

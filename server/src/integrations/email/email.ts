@@ -41,7 +41,7 @@ const OVERRIDE_RECEIPT_EMAIL = process.env.OVERRIDE_RECEIPT_EMAIL;
  */
 export async function send_transaction_email(transactionId: number) {
     const content = await generateReceiptEmail(transactionId);
-    if (content == undefined){
+    if (content == undefined) {
         console.error("Failed to create transaction receipt, id =", transactionId);
         return;
     }

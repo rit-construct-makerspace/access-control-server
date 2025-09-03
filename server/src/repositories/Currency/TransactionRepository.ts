@@ -78,12 +78,12 @@ export async function getCurrencyLedgerEntriesForTransactionEntryByEntryId(id: n
 
 export async function getChargeSplitForTransactionById(id: number): Promise<{ target: number, credit: number, atrium: number } | undefined> {
     const entries = await getTransactionEntriesByTransactionId(id);
-    if (entries.length == 0){
+    if (entries.length == 0) {
         return undefined;
     }
     const sum = entries.reduce((acc, row) => row.amount + acc, 0);
     const charges = await getCurrencyLedgerEntriesForTransactionById(id);
-    if (charges.length == 0){
+    if (charges.length == 0) {
         return undefined;
     }
 

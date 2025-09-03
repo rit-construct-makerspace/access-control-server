@@ -1,11 +1,11 @@
-export enum CurrencySource{
+export enum CurrencySource {
     Printers = "printers",
     Store = "store",
     Website = "website",
     Unknown = "unknown",
 };
 
-export enum CurrencyType{
+export enum CurrencyType {
     Atrium = "atrium",
     Credit = "construct_credit",
 }
@@ -18,5 +18,4 @@ export enum MakeMoneyError {
     DuplicateTransaction = "duplicate_transaction",
     RefundTooLarge = "refund_too_large",
     Unimplemented = "unimplemented",
-  };
-  
+};

@@ -9,7 +9,7 @@ export async function createCurrencyLedgerEntry(
     accountID: number,
     amount: number,
     type: CurrencyType,
-    description: string, 
+    description: string,
     info: {
         transactionEntryId?: number,
         atxID?: number,
