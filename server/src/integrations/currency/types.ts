@@ -11,12 +11,12 @@ export enum CurrencyType{
 }
 
 export enum MakeMoneyError {
-    NoAccount = "NoAccount",
-    ConnectionError = "ConnectionError",
-    SomethingElse = "SomethingElse",
-    InvalidSign = "InvalidSign",
-    DuplicateTransaction = "DuplicateTransaction",
-    RefundTooLarge = "RefundTooLarge",
-    Unimplemented = "Unimplemented",
+    NoAccount = "no_account",
+    ConnectionError = "connection_error",
+    SomethingElse = "something_else",
+    InvalidSign = "invalid_sign",
+    DuplicateTransaction = "duplicate_transaction",
+    RefundTooLarge = "refund_too_large",
+    Unimplemented = "unimplemented",
   };
   

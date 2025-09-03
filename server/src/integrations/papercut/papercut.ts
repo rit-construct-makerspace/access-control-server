@@ -184,14 +184,14 @@ function printCommentParser(comment: string): PrinterTransaction | undefined {
   }
 }
 
-async function process3dPrintTransaction(username: string, amount: number, transaction: PrinterTransaction): Promise<MakeMoneyError | boolean> {
+async function process3dPrintTransaction(username: string, amount: number, transaction: PrinterTransaction): Promise<boolean | MakeMoneyError> {
   const account = await getAccountIDByUsername(username);
-  if (account == null) {
+  if (account === undefined) {
     console.error("no account here");
     return MakeMoneyError.NoAccount;
   }
   const existing = await getTransactionByPrinterJobId(transaction.jobID);
-  if (transaction.type == PrinterTransactionType.New) {
+  if (transaction.type === PrinterTransactionType.New) {
     if (existing != null) {
       return MakeMoneyError.DuplicateTransaction;
     }
@@ -207,7 +207,7 @@ async function process3dPrintTransaction(username: string, amount: number, trans
   }
 
   // Update
-  if (existing == undefined) {
+  if (existing === undefined) {
     console.error(`3DPrinterOS: Ignoring money charge for job id: ${transaction.jobID}. Couldn't find transaction for it`);
     return false;
   }
@@ -252,13 +252,13 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
   }
   try {
     const transaction = printCommentParser(comment)
-    if (transaction == null) {
+    if (transaction === undefined) {
       xmlrpcRespondFault(res, 404, `could not process print comment: ${comment}`);
       return;
     }
     const amountCents = Math.round(adjustment * 100);
     const result = await process3dPrintTransaction(username, amountCents, transaction);
-    if (typeof result == "string") {
+    if (typeof result === "string") {
       xmlrpcRespondFault(res, 500, result);
     } else {
       xmlrpcRespond(res, [result]);
