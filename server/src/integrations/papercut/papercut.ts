@@ -185,7 +185,6 @@ function printCommentParser(comment: string): PrinterTransaction | undefined {
 }
 
 async function process3dPrintTransaction(username: string, amount: number, transaction: PrinterTransaction): Promise<Currency.MakeMoneyError | boolean> {
-  console.log("3dprint", username, amount, transaction);
   const account = await getAccountIDByUsername(username);
   if (account == null) {
     console.error("no account here");

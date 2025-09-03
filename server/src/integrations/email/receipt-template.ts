@@ -3,7 +3,7 @@ import { centsToDollarString } from "../currency/currency.js"
 import { TransactionEntryRow, TransactionRow } from "../../db/tables.js"
 import { getCurrencyLedgerEntriesForTransactionEntryByEntryId, getTransactionById, getTransactionEntriesByTransactionId } from "../../repositories/Currency/TransactionRepository.js"
 import { CurrencyType } from "../currency/types.js"
-import { getAccountBalanceCents } from "../../repositories/Currency/CurrencyAccountsRepository.js"
+import { getAccountBalanceCents, getAccountOwner } from "../../repositories/Currency/CurrencyAccountsRepository.js"
 
 const templateSource: string = `
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
@@ -25,32 +25,18 @@ const templateSource: string = `
         margin: 0px auto;
         width: 90%;
     }
-
-
-    .total-table {
+    table{
         margin: 0px auto;
         border-collapse: collapse;
         text-align: left;
     }
-
-
-    .item-table > td,th {
+    td, th {
+        text-align: center;
         padding-left: 50px;
         padding-right: 50px;
         margin: 10px;
-        display: block;
     }
-
-    .item-table {
-      border-spacing: 30px;
-
-        margin: 0px auto;
-    }
-    .item-table td{
-        text-align: left;
-    }
-
-    tr.separator {
+    tr {
         border-bottom: 1px solid gray;
     }    
 </style>
@@ -62,11 +48,13 @@ const templateSource: string = `
     <% if (typeof info.transaction.description !== 'undefined') { %>
     <h4><%= info.transaction.description?.text ?? "" %></h4>
     <% } %>
-    
+
+    <br>
+
     <table class="item-table">
         <tr>
             <th>Date</th>
-            <th>Item</th>
+            <th>Update</th>
             <th>CC*</th>
             <th>TB*</th>
             <th>Combined ($)</th>
@@ -83,9 +71,14 @@ const templateSource: string = `
         
     </table>
 
-    Net Charge: <%= formatCents(-info.totalCents)%>
+    <br><br>
 
-    *CC = Construct Credits, *TB = Tiger Bucks
+
+    Net Charge: <%= formatCents(-info.totalCents)%>
+    <br>
+    <br>
+    *<b>CC</b> = Construct Credits, *<b>TB</b> = Tiger Bucks
+    <br>
     <br>
     You have <%= formatCents(info.creditCentsRemaining) %> Construct Credits remaining.
 
@@ -111,7 +104,7 @@ export type ReceiptInfo = {
     creditCentsRemaining: number
 }
 
-export async function generateReceiptEmail(transactionId: number): Promise<{ subject: string, text: string, html: string } | undefined> {
+export async function generateReceiptEmail(transactionId: number): Promise<{ subject: string, to: string, text: string, html: string } | undefined> {
     const transaction = await getTransactionById(transactionId);
     if (transaction == null) {
         return undefined;
@@ -138,10 +131,16 @@ export async function generateReceiptEmail(transactionId: number): Promise<{ sub
     } catch {
         // account not found. shouldnt happen since we're generating a receipt for it
     }
+    
+    const accountOwner = await getAccountOwner(transaction.accountID);
+    if (accountOwner == undefined){
+        return undefined;
+    }
+
     const totalCents = entriesAndSplits.reduce((acc, val) => (acc + val.atrium + val.credit), 0);
     const subject = `SHED Makerspace Receipt: 3D Printer OS Job #${transaction.printerJobId} - ${transaction.dateTime.toLocaleString()}`;
     const html = generateHTMLReceipt({ title: subject, transaction: transaction, transactionEntries: entriesAndSplits, creditCentsRemaining: creditsRemaining, totalCents: totalCents });
-    return { subject: subject, text: html, html }
+    return { subject: subject, to: accountOwner.username+"@rit.edu", text: html, html }
 }
 
 

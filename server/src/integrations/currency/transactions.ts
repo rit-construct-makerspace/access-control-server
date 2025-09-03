@@ -6,6 +6,8 @@
 import { CurrencySource } from "./types.js"
 import * as TransactionRepo from "../../repositories/Currency/TransactionRepository.js"
 import * as Currency from "./currency.js"
+import { send_transaction_email } from "../email/email.js";
+import { getAccountOwner } from "../../repositories/Currency/CurrencyAccountsRepository.js";
 
 function isOutstandingCharge(cents: number) {
     return cents >= -3 && cents < 0;
@@ -93,5 +95,6 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     }
 
     await TransactionRepo.removeOutstandingChargeOnTransactionIfAvailable(transactionID);
+    send_transaction_email()
     return amounts;
 }

@@ -554,7 +554,6 @@ async function startServer() {
     )
   }
   );
-  Emailer.send_transaction_email('res3453@rit.edu', 1);
 }
 
 startServer();

@@ -50,6 +50,9 @@ export async function getAccountBalance(username: string): Promise<number | Make
 
 
 export function centsToDollarString(cents: number) {
+  if (cents == -0){
+    cents = 0;
+  }
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 }
 

@@ -36,16 +36,16 @@ const OVERRIDE_RECEIPT_EMAIL = process.env.OVERRIDE_RECEIPT_EMAIL;
 
 /**
  * Send an email describing a transaction of tigerbucks and or construct credits
- * @param emailAddress the email address to send to
  * @param subjectInfo info for the subject line. will appear as "RIT SHED Receipt - ${subjectInfo} - Date"
  * @param transaction the transaction information to generate a receipt for
  */
-export async function send_transaction_email(emailAddress: string, transactionId: number) {
+export async function send_transaction_email(transactionId: number) {
     const content = await generateReceiptEmail(transactionId);
     if (content == undefined){
         console.error("Failed to create transaction receipt, id =", transactionId);
         return;
     }
+    let emailAddress = content.to;
     if (OVERRIDE_RECEIPT_EMAIL) {
         emailAddress = OVERRIDE_RECEIPT_EMAIL;
     }
