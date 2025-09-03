@@ -72,9 +72,9 @@ export async function getCurrencyLedgerEntriesLimit(searchText?: string, limit =
         // searchText can't be compared to the number fields
         return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
             .whereILike("description", `%${searchText}%`)
-            .orWhereILike("type", `%${searchText}%`)
+            .orWhereILike("currencyType", `%${searchText}%`)
             .orWhereILike("owner", `%${searchText}%`)
-            .limit(limit);
+            .limit(limit).debug(true);
     }
 
     return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
