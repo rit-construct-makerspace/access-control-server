@@ -34,7 +34,7 @@ export async function NewTransaction(accountId: number, initialDeltaCents: numbe
         outstanding = initialDeltaCents;
     }
     const tid = await TransactionRepo.createTransaction(accountId, source, description, outstanding, options.printerJobId);
-    if (tid == undefined) {
+    if (tid === undefined) {
         console.error("Currency: Could not create new transaction");
         return MakeMoneyError.SomethingElse;
     }
@@ -74,12 +74,7 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
 
     if (centsToCharge > 0) {
         if (split == null) {
-            const res = await Currency.refundCreditAccount(parent.accountID, centsToCharge, parent.origin, reason, entryId)
-            if (typeof res == "boolean") {
-                return res;
-            } else if (typeof res == "string") {
-                return res;
-            }
+            return await Currency.refundCreditAccount(parent.accountID, centsToCharge, parent.origin, reason, entryId)
         } else {
             // modify split so we never refund more than we've taken
             if (split.atrium >= 0) { split.atrium = 0 };

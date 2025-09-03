@@ -7,8 +7,8 @@ const USE_ATRIUM_FOR_CURRENCY = process.env.ATRIUM_ENABLED == "true";
 
 /**
  * get the balance of a users total funds (construct credits + tiger bucks)
- * @param username the rit username for the accoun to query
- * @returns 
+ * @param username the rit username for the account to query
+ * @returns the balance of the users account or MakeMoneyError if problem executing
  */
 export async function getAccountBalance(username: string): Promise<number | MakeMoneyError> {
   const makeAccountID = await CurrencyAccountRepo.getAccountIDByUsername(username);
@@ -50,7 +50,7 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
     return MakeMoneyError.InvalidSign;
   }
   const user = await getUserByAccountID(accountId);
-  if (user == null) {
+  if (user === undefined) {
     return MakeMoneyError.NoAccount;
   }
   if (!USE_ATRIUM_FOR_CURRENCY) {
@@ -65,13 +65,12 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
   try {
     remaining = await CurrencyAccountRepo.chargeAccountReturnRemainingCents(accountId, cents, source, description, transactionEntryId);
   } catch (e) {
-    console.error("Currency: Could not charge to construct credits", e);
     return MakeMoneyError.NoAccount;
   }
   let toCredit = cents - remaining;
 
   // no atrium needed
-  if (remaining == 0) {
+  if (remaining === 0) {
     return true;
   }
 
@@ -133,7 +132,7 @@ export async function refundAccountSplitting(accountId: number, cents: number, s
     return MakeMoneyError.InvalidSign;
   }
   const user = await getUserByAccountID(accountId);
-  if (user == null) {
+  if (user === undefined) {
     return MakeMoneyError.NoAccount;
   }
 
