@@ -12,6 +12,7 @@ interface ZoneCardProps {
   imageUrl: string;
   isMobile: boolean;
   clickable?: boolean;
+  continueText: string;
 }
 
 function getHoursToday(times: ZoneHours[], primaryColor: string) {
@@ -41,7 +42,6 @@ function getHoursToday(times: ZoneHours[], primaryColor: string) {
 
 export default function ZoneCard(props: ZoneCardProps) {
   const theme = useTheme();
-
   const navigate = useNavigate();
 
   const [isHovered, setIsHovered] = useState(false);
@@ -59,12 +59,14 @@ export default function ZoneCard(props: ZoneCardProps) {
           height={props.isMobile ? "197px" : "281px"}
           image={import.meta.env.VITE_CDN_URL + "user-uploads/" + props.imageUrl}
         />
-        <CardContent>
+        <CardContent sx={{justifyContent: "center", display: "flex", flexDirection: "column"}}>
           <Typography variant="h4" >{props.name}</Typography>
           <Stack direction={"row"} justifyContent={"space-between"}>
             {getHoursToday(props.hours, theme.palette.primary.main)}
-            <Button variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>
+            {!props.isMobile && <Button variant="outlined" endIcon={<ChevronRightIcon />}>{props.continueText}</Button>}
           </Stack>
+          {props.isMobile && <Button  variant="outlined" endIcon={<ChevronRightIcon />}>{props.continueText}</Button>}
+
         </CardContent>
       </CardActionArea>
     </Card>

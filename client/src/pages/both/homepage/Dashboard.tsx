@@ -32,6 +32,9 @@ export function Dashboard() {
     const getAnnouncementsResult = useQuery(GET_ANNOUNCEMENTS);
     const getEvents = useQuery(GET_EVENTS);
 
+    const continueTextOptions = ["Explore", "Create", "Make", "Learn", "Imagine", "Design", "Construct"];
+    const continueText = continueTextOptions[Math.floor(Date.now()/(2*1000)) % continueTextOptions.length];
+    
     return (
         <Box>
             <title>Make @ RIT</title>
@@ -59,6 +62,7 @@ export function Dashboard() {
                                     hours={zone.hours}
                                     imageUrl={zone.imageUrl === undefined || zone.imageUrl == null || zone.imageUrl === "" ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : zone.imageUrl}
                                     isMobile={isMobile}
+                                    continueText={continueText}
                                 />
                             </Grid>
                         ))}
