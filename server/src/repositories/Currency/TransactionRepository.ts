@@ -54,6 +54,13 @@ export async function getCurrencyLedgerEntriesForTransactionById(id: number): Pr
         .select("cl.*");
 }
 
+export async function getCurrencyLedgerEntriesForTransactionEntryByEntryId(id: number): Promise<CurrencyLedgerRow[]> {
+    return await knex("TransactionEntries as te")
+        .leftJoin("CurrencyLedger as cl", "te.id", 'cl.transactionEntryId')
+        .where("te.id", "=", id)
+        .select("cl.*");
+}
+
 export async function getChargeSplitForTransactionById(id: number): Promise<{ target: number, credit: number, atrium: number } | undefined> {
     const entries = await getTransactionEntriesByTransactionId(id);
     const sum = entries.reduce((acc, row) => row.amount + acc, 0);

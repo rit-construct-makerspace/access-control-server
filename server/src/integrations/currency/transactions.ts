@@ -51,6 +51,7 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     if (parent.outstandingCharge) {
         centsToCharge += parent.outstandingCharge;
     }
+    let split = await TransactionRepo.getChargeSplitForTransactionById(transactionID);
 
     const entryId = await TransactionRepo.createTransactionUpdate(parent.id, centsToCharge, reason)
     if (entryId == null) {
@@ -60,7 +61,6 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     let amounts = { atrium: 0, credit: 0 };
 
     if (centsToCharge > 0) {
-        let split = await TransactionRepo.getChargeSplitForTransactionById(transactionID);
         if (split == null) {
             const res = await Currency.refundCreditAccount(parent.accountID, centsToCharge, parent.origin, reason, entryId)
             if (typeof res == "boolean" && res == true) {
@@ -74,7 +74,6 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
             if (split.credit >= 0) { split.credit = 0 };
             let positiveSplit = { atrium: Math.abs(split.atrium), credit: Math.abs(split.credit) }; // we want the splits positive for the amount we can use
 
-            console.log("Split", split)
             const res = await Currency.refundAccountSplitting(parent.accountID, centsToCharge, parent.origin, positiveSplit, reason, entryId)
             if (typeof res == "string") {
                 return res;

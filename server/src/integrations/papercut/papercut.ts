@@ -221,7 +221,7 @@ async function process3dPrintTransaction(username: string, amount: number, trans
     return false;
   }
   console.info("updating");
-  const res = await UpdateTransaction(existing.id, amount, `${typeToString(transaction.type) + (transaction?.customMessage ? (" - " + transaction?.customMessage) : "")} for jobId:${transaction.jobID}`)
+  const res = await UpdateTransaction(existing.id, amount, `${typeToString(transaction.type) + (transaction?.customMessage ? (" - " + transaction?.customMessage) : "")}`)
   if (typeof res == "string") {
     if (res == Currency.MakeMoneyError.NoFunds) {
       return false;

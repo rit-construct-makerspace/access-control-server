@@ -12,6 +12,7 @@ export enum MakeMoneyError {
   InvalidSign = "InvalidSign",
   NoFunds = "NoFunds",
   DuplicateTransaction = "DuplicateTransaction",
+  RefundTooLarge = "RefundTooLarge",
   Unimplemented = "Unimplemented",
 };
 
@@ -130,6 +131,11 @@ export async function refundAccountSplitting(accountId: number, cents: number, s
   const user = await getUserByAccountID(accountId);
   if (user == null) {
     return MakeMoneyError.NoAccount;
+  }
+
+  const availToRefund = split.atrium + split.credit;
+  if (cents > availToRefund){
+    return MakeMoneyError.RefundTooLarge;
   }
 
 

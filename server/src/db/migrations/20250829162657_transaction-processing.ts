@@ -9,6 +9,7 @@ export async function up(knex: Knex): Promise<void> {
     }
     await knex.schema.createTable("Transactions", (t)=>{
         t.increments("id").primary();
+        t.datetime("dateTime").notNullable().defaultTo(knex.fn.now());
         t.integer("accountID").references("id").inTable("CurrencyAccounts").notNullable();
         t.text("origin").notNullable();
         t.jsonb("description").notNullable();

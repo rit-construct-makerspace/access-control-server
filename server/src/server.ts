@@ -554,8 +554,7 @@ async function startServer() {
     )
   }
   );
-  const res =await  getChargeSplitForTransactionById(6)
-  console.log(res);
+  Emailer.send_transaction_email('res3453@rit.edu', 1);
 }
 
 startServer();

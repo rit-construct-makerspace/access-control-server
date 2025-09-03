@@ -444,6 +444,8 @@ export interface CurrencyLedgerRow {
 export interface TransactionRow {
   /** Primary Key */
   id: number,
+  /** The time that the transaction was begun */
+  dateTime: Date;
   /** Account that this transaction is against */
   accountID: number,
   /** Origin of the transaction */

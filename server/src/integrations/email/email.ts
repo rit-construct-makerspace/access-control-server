@@ -26,6 +26,8 @@ export async function send_generic_email(args: { fromAccount: string, to: string
         });
     } else {
         console.log("NOT SENDING EMAIL BC DEV ENVIRONMENT: ", args);
+        console.log(args.htmlContent);
+
         return { status: 500 };
     }
 }
@@ -38,23 +40,22 @@ const OVERRIDE_RECEIPT_EMAIL = process.env.OVERRIDE_RECEIPT_EMAIL;
  * @param subjectInfo info for the subject line. will appear as "RIT SHED Receipt - ${subjectInfo} - Date"
  * @param transaction the transaction information to generate a receipt for
  */
-export async function send_transaction_email(emailAddress: string, subjectInfo: string, transaction: any, constructCreditsRemaining: number) {
-    throw Error("Cant send transaction email bc i cant");
-    return;
-    /*
-    const content = generateReceiptEmail(transaction, constructCreditsRemaining);
-
+export async function send_transaction_email(emailAddress: string, transactionId: number) {
+    const content = await generateReceiptEmail(transactionId);
+    if (content == undefined){
+        console.error("Failed to create transaction receipt, id =", transactionId);
+        return;
+    }
     if (OVERRIDE_RECEIPT_EMAIL) {
         emailAddress = OVERRIDE_RECEIPT_EMAIL;
     }
     await send_generic_email({
         fromAccount: 'receipts',
         to: [emailAddress],
-        subject: `RIT SHED Receipt - ${subjectInfo} - ${transaction.date.toLocaleString()}`,
+        subject: content.subject,
         textContent: content.text,
         htmlContent: content.html
     }).catch((err: any) => { console.error("Error sending receipt email", err) });
-    */
 }
 
 
