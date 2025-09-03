@@ -8,10 +8,23 @@ import * as TransactionRepo from "../../repositories/Currency/TransactionReposit
 import * as Currency from "./currency.js"
 import { send_transaction_email } from "../email/email.js";
 
+/**
+ * Check if a charge qualifies for the outstanding charge exception
+ * @param cents the amount to charge (delta where + is refund to account, - is take from account)
+ * @returns true if this transaction counts for the outstanding charge exception
+ */
 function isOutstandingCharge(cents: number) {
     return cents >= -3 && cents < 0;
 }
-
+/**
+ * Create a new transaction
+ * @param accountId the account that this transaction is working against
+ * @param initialDeltaCents the initial price (subject to outstanding charge expception)
+ * @param source the source of the transaction (printers, store, website)
+ * @param description a description of this transaction
+ * @param options general options detailing what this transction is for
+ * @returns the amount of money charged to accountId
+ */
 export async function NewTransaction(accountId: number, initialDeltaCents: number, source: CurrencySource, description: { text: string, data: unknown }, options: { printerJobId: number }): Promise<number | MakeMoneyError> {
     let outstanding = 0;
     if (isOutstandingCharge(initialDeltaCents)) {
@@ -35,11 +48,11 @@ export async function NewTransaction(accountId: number, initialDeltaCents: numbe
 }
 
 /**
- * 
- * @param transactionID 
- * @param deltaCents 
- * @param reason 
- * @returns undefined if the amounts were charged
+ * Add/Subtract to the total price
+ * @param transactionID the transaction to modify
+ * @param deltaCents the amount to add/subtract to the total price (+ is give money to user (refund/less expensive), - is take money from user (charge/more expensive))
+ * @param reason why this adjustment is happening
+ * @returns the split of money if charge. or MakeMoneyError if there was an issue
  */
 export async function UpdateTransaction(transactionID: number, deltaCents: number, reason: string): Promise<MakeMoneyError | { atrium: number, credit: number }> {
     // check if there is outstanding charges
