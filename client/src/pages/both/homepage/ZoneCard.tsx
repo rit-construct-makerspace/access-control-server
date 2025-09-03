@@ -14,8 +14,7 @@ interface ZoneCardProps {
   clickable?: boolean;
 }
 
-function getHoursToday(times: ZoneHours[]) {
-  const theme = useTheme();
+function getHoursToday(times: ZoneHours[], primaryColor: string) {
 
   const now = new Date();
   const hours_today = times[now.getDay()];
@@ -26,7 +25,7 @@ function getHoursToday(times: ZoneHours[]) {
     <Stack justifyContent="space-between" spacing={"20px"} direction="row" alignItems={"center"}>
       <Typography color={status === "OPEN" ? "success" : "error"} fontWeight="bold">{status}</Typography>
       <Stack direction="row" >
-        <Typography color={theme.palette.primary.main} fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
+        <Typography color={primaryColor} fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
         <Typography paddingLeft={"10px"} >
           {
             hours_today.closed
@@ -41,6 +40,7 @@ function getHoursToday(times: ZoneHours[]) {
 }
 
 export default function ZoneCard(props: ZoneCardProps) {
+  const theme = useTheme();
 
   const navigate = useNavigate();
 
@@ -62,7 +62,7 @@ export default function ZoneCard(props: ZoneCardProps) {
         <CardContent>
           <Typography variant="h4" >{props.name}</Typography>
           <Stack direction={"row"} justifyContent={"space-between"}>
-            {getHoursToday(props.hours)}
+            {getHoursToday(props.hours, theme.palette.primary.main)}
             <Button variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>
           </Stack>
         </CardContent>
