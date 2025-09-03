@@ -1,20 +1,9 @@
 import * as Atrium from "../atrium-integration/atrium.js"
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js"
-import { CurrencySource } from "./types.js";
+import { CurrencySource, MakeMoneyError } from "./types.js";
 import { getUserByAccountID } from "../../repositories/Users/UserRepository.js";
 
 const USE_ATRIUM_FOR_CURRENCY = process.env.ATRIUM_ENABLED == "true";
-
-export enum MakeMoneyError {
-  NoAccount = "NoAccount",
-  ConnectionError = "ConnectionError",
-  SomethingElse = "SomethingElse",
-  InvalidSign = "InvalidSign",
-  NoFunds = "NoFunds",
-  DuplicateTransaction = "DuplicateTransaction",
-  RefundTooLarge = "RefundTooLarge",
-  Unimplemented = "Unimplemented",
-};
 
 /**
  * get the balance of a users total funds (construct credits + tiger bucks)

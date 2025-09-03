@@ -5,7 +5,7 @@ import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as Currency from "../currency/currency.js"
 import { NewTransaction, UpdateTransaction } from "../currency/transactions.js";
 import { getAccountIDByUsername } from "../../repositories/Currency/CurrencyAccountsRepository.js";
-import { CurrencySource } from "../currency/types.js";
+import { CurrencySource, MakeMoneyError } from "../currency/types.js";
 import { getTransactionByPrinterJobId } from "../../repositories/Currency/TransactionRepository.js";
 
 const PAPERCUT_SECURITY_SECRET = process.env.PAPERCUT_SECURITY_SECRET;
@@ -184,16 +184,16 @@ function printCommentParser(comment: string): PrinterTransaction | undefined {
   }
 }
 
-async function process3dPrintTransaction(username: string, amount: number, transaction: PrinterTransaction): Promise<Currency.MakeMoneyError | boolean> {
+async function process3dPrintTransaction(username: string, amount: number, transaction: PrinterTransaction): Promise<MakeMoneyError | boolean> {
   const account = await getAccountIDByUsername(username);
   if (account == null) {
     console.error("no account here");
-    return Currency.MakeMoneyError.NoAccount;
+    return MakeMoneyError.NoAccount;
   }
   const existing = await getTransactionByPrinterJobId(transaction.jobID);
   if (transaction.type == PrinterTransactionType.New) {
     if (existing != null) {
-      return Currency.MakeMoneyError.DuplicateTransaction;
+      return MakeMoneyError.DuplicateTransaction;
     }
 
     const res = await NewTransaction(
@@ -204,7 +204,7 @@ async function process3dPrintTransaction(username: string, amount: number, trans
       { printerJobId: transaction.jobID }
     )
     if (typeof res == "string") {
-      if (res == Currency.MakeMoneyError.NoFunds) {
+      if (res == MakeMoneyError.NoFunds) {
         return false;
       } else {
         return res;
@@ -222,7 +222,7 @@ async function process3dPrintTransaction(username: string, amount: number, trans
   console.info("updating");
   const res = await UpdateTransaction(existing.id, amount, `${typeToString(transaction.type) + (transaction?.customMessage ? (" - " + transaction?.customMessage) : "")}`)
   if (typeof res == "string") {
-    if (res == Currency.MakeMoneyError.NoFunds) {
+    if (res == MakeMoneyError.NoFunds) {
       return false;
     } else {
       return res;

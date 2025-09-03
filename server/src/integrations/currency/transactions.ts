@@ -3,17 +3,16 @@
  * 
  */
 
-import { CurrencySource } from "./types.js"
+import { CurrencySource, MakeMoneyError } from "./types.js"
 import * as TransactionRepo from "../../repositories/Currency/TransactionRepository.js"
 import * as Currency from "./currency.js"
 import { send_transaction_email } from "../email/email.js";
-import { getAccountOwner } from "../../repositories/Currency/CurrencyAccountsRepository.js";
 
 function isOutstandingCharge(cents: number) {
     return cents >= -3 && cents < 0;
 }
 
-export async function NewTransaction(accountId: number, initialDeltaCents: number, source: CurrencySource, description: { text: string, data: unknown }, options: { printerJobId: number }): Promise<number | Currency.MakeMoneyError> {
+export async function NewTransaction(accountId: number, initialDeltaCents: number, source: CurrencySource, description: { text: string, data: unknown }, options: { printerJobId: number }): Promise<number | MakeMoneyError> {
     let outstanding = 0;
     if (isOutstandingCharge(initialDeltaCents)) {
         // this is an outstanding one, dont charge yet
@@ -22,7 +21,7 @@ export async function NewTransaction(accountId: number, initialDeltaCents: numbe
     const tid = await TransactionRepo.createTransaction(accountId, source, description, outstanding, options.printerJobId);
     if (tid == undefined) {
         console.error("Currency: Could not create new transaction");
-        return Currency.MakeMoneyError.SomethingElse;
+        return MakeMoneyError.SomethingElse;
     }
     if (isOutstandingCharge(initialDeltaCents)) {
         return 0;
@@ -42,7 +41,7 @@ export async function NewTransaction(accountId: number, initialDeltaCents: numbe
  * @param reason 
  * @returns undefined if the amounts were charged
  */
-export async function UpdateTransaction(transactionID: number, deltaCents: number, reason: string): Promise<Currency.MakeMoneyError | { atrium: number, credit: number }> {
+export async function UpdateTransaction(transactionID: number, deltaCents: number, reason: string): Promise<MakeMoneyError | { atrium: number, credit: number }> {
     // check if there is outstanding charges
     const parent = await TransactionRepo.getTransactionById(transactionID);
     if (parent == null) {
@@ -58,7 +57,7 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     const entryId = await TransactionRepo.createTransactionUpdate(parent.id, centsToCharge, reason)
     if (entryId == null) {
         console.error("Currency: Failed to create transaction ID");
-        return Currency.MakeMoneyError.SomethingElse;
+        return MakeMoneyError.SomethingElse;
     }
     let amounts = { atrium: 0, credit: 0 };
 
