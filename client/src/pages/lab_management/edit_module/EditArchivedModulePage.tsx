@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import EditModulePage from "./EditModulePage";
 
 export default function EditArchivedModulePage() {
-  const { id } = useParams<{ id: string }>();
+  const { makerspaceID, id } = useParams<{ makerspaceID: string, id: string }>();
   const navigate = useNavigate();
 
   const queryResult = useQuery(GET_ARCHIVED_MODULE, {
@@ -19,7 +19,7 @@ export default function EditArchivedModulePage() {
   const [publishModule] = useMutation(PUBLISH_MODULE, {
     variables: { id },
     refetchQueries: [{ query: GET_TRAINING_MODULES }],
-    onCompleted: () => navigate("/admin/training"),
+    onCompleted: () => navigate(`/makerspace/${makerspaceID}/trainings`),
   });
 
   const executeUpdate = async (updatedModule: Module) => {

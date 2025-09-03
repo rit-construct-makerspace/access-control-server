@@ -1,7 +1,6 @@
+import { GraphQLError } from "graphql";
 import { ApolloContext } from "../context.js";
 import { InventoryCartsRow } from "../db/tables.js";
-import { Terminal } from "../integrations/atrium-integration/atrium.js";
-import { adjustAccountBalanceIfAvailableCents, Transaction } from "../integrations/currency/currency.js";
 import { clearItemsFromCart, deleteInventoryCart, getInventoryCartByID, getInventoryCarts, getInventoryCartsByMakerspace, getItemsInCart, subtractItemFromCart } from "../repositories/Store/InventoryCartsRepository.js";
 import { addItemAmount, addItemsAmounts, getItemById } from "../repositories/Store/InventoryRepository.js";
 import { getUserByID } from "../repositories/Users/UserRepository.js";
@@ -72,7 +71,8 @@ export const CartResolver = {
       const totalCost = args.quantity * (item?.pricePerUnit || 0);
 
       const transDescription = `Refund for ${args.quantity} of ${item?.name}`;
-
+      throw new GraphQLError("Store charging not implemented yet");
+      /*
       const transaction = new Transaction(
         new Date(),
         "Makerspace Store",
@@ -84,6 +84,7 @@ export const CartResolver = {
       if (!atriumTransactionSuccess) {
         throw new Error("Refund failed due to Atrium transaction error");
       }
+      */
 
       //Restock
       if (args.restock) {
@@ -117,7 +118,8 @@ export const CartResolver = {
       }
 
       const transDescription = `Refund of items: ${ledgerItems.map(item => `${item.name} x${item.quantity}`).join(", ")}`;
-
+      throw new GraphQLError("Storefront charging not implemented yet");
+      /*
       const transaction = new Transaction(
           new Date(),
           "Makerspace Store",
@@ -140,6 +142,8 @@ export const CartResolver = {
           return true;
         });
       }
+      */
+     return false;
     }),
     completeCart: async (
       _parent: any,

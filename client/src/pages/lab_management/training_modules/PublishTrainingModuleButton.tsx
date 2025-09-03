@@ -1,5 +1,4 @@
 import { useMutation } from "@apollo/client";
-import { useNavigate } from "react-router-dom";
 import PublishButton from "../../../common/PublishButton";
 import GET_TRAINING_MODULES, { GET_ARCHIVED_TRAINING_MODULES, GET_MODULE, PUBLISH_MODULE } from "../../../queries/trainingQueries";
 
@@ -9,8 +8,6 @@ interface PublishTrainingModuleButtonProps {
 }
 
 export default function PublishTrainingModuleButton(props: PublishTrainingModuleButtonProps) {
-  const navigate = useNavigate();
-
   const [publishTrainingModule, { loading }] = useMutation(PUBLISH_MODULE, {
     variables: { id: props.moduleID },
     refetchQueries: [
@@ -22,7 +19,6 @@ export default function PublishTrainingModuleButton(props: PublishTrainingModule
 
   const handleClick = async () => {
     await publishTrainingModule();
-    navigate("/admin/training");
   };
 
   return (

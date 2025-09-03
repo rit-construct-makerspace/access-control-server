@@ -1,5 +1,4 @@
 import { useMutation } from "@apollo/client";
-import { useNavigate } from "react-router-dom";
 import ArchiveButton from "../../../common/ArchiveButton";
 import { ARCHIVE_MODULE, GET_ARCHIVED_MODULE, GET_ARCHIVED_TRAINING_MODULES, GET_TRAINING_MODULES } from "../../../queries/trainingQueries";
 
@@ -9,8 +8,6 @@ interface ArchiveTrainingModuleButtonProps {
 }
 
 export default function ArchiveTrainingModuleButton(props: ArchiveTrainingModuleButtonProps) {
-  const navigate = useNavigate();
-
   const [archiveTrainingModule, { loading }] = useMutation(ARCHIVE_MODULE, {
     variables: { id: props.moduleID },
     refetchQueries: [
@@ -22,7 +19,6 @@ export default function ArchiveTrainingModuleButton(props: ArchiveTrainingModule
 
   const handleClick = async () => {
     await archiveTrainingModule();
-    navigate("/admin/training");
   };
 
   return (

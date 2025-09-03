@@ -3,18 +3,17 @@ import { knex } from "../../db/index.js";
 import { CurrencyLedgerRow } from "../../db/tables.js";
 import * as OrgRepo from "../Users/OrganizationRepository.js";
 import * as UserRepo from "../Users/UserRepository.js";
+import { CurrencyType } from "../../integrations/currency/types.js";
 
 export async function createCurrencyLedgerEntry(
     accountID: number,
-    creditAmount: number,
-    atriumAmount: number,
-    source: string,
+    amount: number,
+    type: CurrencyType,
+    description: string,
     info: {
-        description?: string,
+        transactionEntryId?: number,
         atxID?: number,
         refID?: number,
-        printerJobId?: number            
-        atriumTerminal?: string
     }
 ): Promise<number> {
 
@@ -25,14 +24,12 @@ export async function createCurrencyLedgerEntry(
     const data = {
         accountID: accountID,
         owner: owner,
-        creditAmount: creditAmount,
-        atriumAmount: atriumAmount,
-        source: source,
-        description: info.description,
+        amount: amount,
+        currencyType: type,
+        transactionEntryId: info?.transactionEntryId,
+        description: description,
         atxID: info.atxID,
         refID: info.refID,
-        printerJobId: info.printerJobId,
-        atriumTerminal: info.atriumTerminal,
     };
 
     // Remove undefined values to allow DB default values
@@ -75,7 +72,7 @@ export async function getCurrencyLedgerEntriesLimit(searchText?: string, limit =
         // searchText can't be compared to the number fields
         return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
             .whereILike("description", `%${searchText}%`)
-            .orWhereILike("source", `%${searchText}%`)
+            .orWhereILike("currencyType", `%${searchText}%`)
             .orWhereILike("owner", `%${searchText}%`)
             .limit(limit);
     }
@@ -96,9 +93,6 @@ export async function getCurrencyLedgerEntry(id: number): Promise<CurrencyLedger
     } else {
         throw new GraphQLError(`Failed to find CurrencyLedger entry with ID: ${id}`);
     }
-}
-export async function getCurrencyLedgerEntriesByPrinterJobId(printerJobId: number): Promise<CurrencyLedgerRow[]>{
-    return await knex("CurrencyLedger").where({printerJobId: printerJobId}).select("*");
 }
 
 export async function getNextRefID(): Promise<number> {

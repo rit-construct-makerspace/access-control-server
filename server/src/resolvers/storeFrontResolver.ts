@@ -9,8 +9,6 @@ import { notifyInventoryItemBelowThreshold } from "../slack/slack.js";
 import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
 import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
-import { adjustAccountBalanceIfAvailableCents, Transaction } from "../integrations/currency/currency.js";
-import { Terminal } from "../integrations/atrium-integration/atrium.js";
 
 const StorefrontResolvers = {
   InventoryItem: {
@@ -327,64 +325,12 @@ const StorefrontResolvers = {
           totalCost -= args.items[i].count * item.pricePerUnit
         }
 
-        const transDescription = `Purchase of items: ${ledgerItems.map(item => `${item.name} x${item.quantity}`).join(", ")}`;
 
         //Attempt Purchase
         if (totalCost > 0) {
           throw new GraphQLError("Total cost must be negative");
         }
-        const transaction = new Transaction(
-          new Date(),
-          "Makerspace Store",
-          `For user ${user.ritUsername}: '${transDescription}'`,
-          ledgerItems.map(item => { return { name: item.name, cents: Math.floor(item.quantity * item.pricePerUnit * -100) } }), false);
-        var atriumTransactionSuccess = await adjustAccountBalanceIfAvailableCents(user.ritUsername, transaction, Terminal.Store);
-
-        if (atriumTransactionSuccess) {
-          await getInventoryCartsByUser(user.id).then(async (carts) => {
-            const groupedItems = allItems.reduce((groups: Record<string, InventoryItem[]>, entry: InventoryItem) => {
-              const key: number = entry.makerspaceID;
-              if (!groups[key]) {
-                groups[key] = [];
-              }
-              groups[key].push(entry);
-              return groups;
-            }, {});
-
-            for (const [makerspaceID, items] of Object.entries(groupedItems)) {
-              var cart = carts.find(cart => cart.makerspaceID === Number(makerspaceID));
-              if (!cart) {
-                // Create a new cart if it doesn't exist
-                await createInventoryCart(user.id, Number(makerspaceID)).then(async (newCart) => {
-                  //Then add the items to the cart
-                  await addItemsToCart(newCart.id, items.map(item => ({
-                    itemID: item.id,
-                    quantity: item.count
-                  }))).then(async () => {
-                    await InventoryRepo.addItemsAmounts(items.map(item => ({
-                      itemId: item.id,
-                      amount: item.count * -1
-                    })));
-                  });
-                });
-              } else {
-                // Cart exists, add new items or update the existing items
-                await addOrUpdateItemsInCart(cart.id, items.map(item => ({
-                  itemID: item.id,
-                  quantity: item.count
-                }))).then(async () => {
-                  await InventoryRepo.addItemsAmounts(items.map(item => ({
-                    itemId: item.id,
-                    amount: item.count * -1
-                  })));
-                });
-              }
-            }
-          });
-
-          await createLedger(user.id, "Purchase", totalCost, user.id, args.notes ?? "", ledgerItems);
-        }
-        return atriumTransactionSuccess;
+        return false;
       });
     },
 
