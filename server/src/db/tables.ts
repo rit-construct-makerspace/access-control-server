@@ -4,6 +4,7 @@
  * This contains the definitions for the objects every knex select operation will map to.
  */
 
+import { CurrencySource, CurrencyType } from "../integrations/currency/types.js";
 import { Privilege } from "../schemas/usersSchema.js";
 
 /**
@@ -554,19 +555,72 @@ export interface OrganizationsRow {
 }
 
 export interface CurrencyLedgerRow {
+  /** Primary Key */
   id: number;
+  /** Transaction Time */
   dateTime: Date;
+  /** Make AcountID this applied against */
   accountID: number | null;
+  /** Type of currency this transaction used */
+  currencyType: CurrencyType;
+  /** ritUsername type string that this was applied against */
   owner: string;
-  creditAmount: number;
-  atriumAmount: number;
-  source: string;
-  description: string | null;
+  /** the transaction entry that this exchange of money corresponsd to */
+  transactionEntryId: number;
+  /** Human readable description of the transaction */
+  description: string;
+  /** 
+   * The amount exchanged 
+   * Positive: Add money to the users account (refund)
+   * Negative: Remove money from the users account (charge)
+   */
+  amount: number;
+  /** Atrium Transaction ID (only for Atrium transactions) */
   atxID: number | null;
+  /** Atrium Ref ID (only for Atrium transactions) */
   refID: number | null
-  printerJobId: number | null;
-  atriumTerminal: string | null;
 }
+
+/**
+ * Top level holder for transactions
+ * Describes what/why/for who the transaction exists
+ * TransactionEntries describe the individual exchanges of money that make up the transaction
+ * CurrencyLedger records money changing hands
+ */
+export interface TransactionRow {
+  /** Primary Key */
+  id: number,
+  /** The time that the transaction was begun */
+  dateTime: Date;
+  /** Account that this transaction is against */
+  accountID: number,
+  /** Origin of the transaction */
+  origin: CurrencySource,
+  /** description of the transaction */
+  description: { text: string, data: unknown },
+  /** Original outstanding charge. This should be taken into account and charged accordingly on the first exchange of money. Then it is set to 0 */
+  outstandingCharge: number,
+  /** Printer Job that this transaction will be applied for */
+  printerJobId: number | null;
+}
+
+export interface TransactionEntryRow {
+  /** Primary Key */
+  id: number,
+  /** Date that this was processed */
+  dateTime: Date;
+  /** Transaction that this entry corresponds to */
+  transactionID: number,
+  /** 
+   * The change in price to the transaction
+   * sum(transaction->entries.amount) = the amount already charged to the account
+   * sum(transactionEntry->ledgerEntries.amount) = transactionEntry.amount
+   */
+  amount: number,
+  /** Description of the entry. Why did the price change */
+  description: string,
+};
+
 
 /** 'Fake' Table used to atomically generate IDs for Atrium Transactions */
 export interface RefIDCounterRow {
@@ -630,6 +684,8 @@ declare module "knex/types/tables.js" {
     CurrencyAccounts: CurrencyAccountsRow;
     Organizations: OrganizationsRow;
     CurrencyLedger: CurrencyLedgerRow;
+    Transactions: TransactionRow;
+    TransactionEntries: TransactionEntryRow;
     RefIDCounter: RefIDCounterRow;
     RolesTemp: TempRolesRow;
     ExpressSessions: ExpressSessionRow;

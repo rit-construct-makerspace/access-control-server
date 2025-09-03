@@ -1,7 +1,6 @@
 import FormData from "form-data";
 import * as Mailgun from "mailgun.js"
 import { generateReceiptEmail } from "./receipt-template.js"
-import { Transaction } from "../currency/currency.js";
 import { generateExpiryEmail, ExpiryDescription } from "./training-expiry-template.js"
 const mailgun = new Mailgun.default(FormData);
 const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere' });
@@ -27,7 +26,9 @@ export async function send_generic_email(args: { fromAccount: string, to: string
         });
     } else {
         console.log("NOT SENDING EMAIL BC DEV ENVIRONMENT: ", args);
-        return {status: 500};
+        console.log(args.htmlContent);
+
+        return { status: 500 };
     }
 }
 
@@ -35,20 +36,23 @@ const OVERRIDE_RECEIPT_EMAIL = process.env.OVERRIDE_RECEIPT_EMAIL;
 
 /**
  * Send an email describing a transaction of tigerbucks and or construct credits
- * @param emailAddress the email address to send to
  * @param subjectInfo info for the subject line. will appear as "RIT SHED Receipt - ${subjectInfo} - Date"
  * @param transaction the transaction information to generate a receipt for
  */
-export async function send_transaction_email(emailAddress: string, subjectInfo: string, transaction: Transaction, constructCreditsRemaining: number) {
-    const content = generateReceiptEmail(transaction, constructCreditsRemaining);
-
+export async function send_transaction_email(transactionId: number) {
+    const content = await generateReceiptEmail(transactionId);
+    if (content == undefined) {
+        console.error("Failed to create transaction receipt, id =", transactionId);
+        return;
+    }
+    let emailAddress = content.to;
     if (OVERRIDE_RECEIPT_EMAIL) {
         emailAddress = OVERRIDE_RECEIPT_EMAIL;
     }
     await send_generic_email({
         fromAccount: 'receipts',
         to: [emailAddress],
-        subject: `RIT SHED Receipt - ${subjectInfo} - ${transaction.date.toLocaleString()}`,
+        subject: content.subject,
         textContent: content.text,
         htmlContent: content.html
     }).catch((err: any) => { console.error("Error sending receipt email", err) });
