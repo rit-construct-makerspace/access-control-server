@@ -56,7 +56,7 @@ export async function NewTransaction(accountId: number, initialDeltaCents: numbe
 export async function UpdateTransaction(transactionID: number, deltaCents: number, reason: string): Promise<MakeMoneyError | boolean> {
     // check if there is outstanding charges
     const parent = await TransactionRepo.getTransactionById(transactionID);
-    if (parent == null) {
+    if (parent === undefined) {
         throw Error(`Could not find parent transaction for id: ${transactionID}`);
     }
 
@@ -67,13 +67,13 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     let split = await TransactionRepo.getChargeSplitForTransactionById(transactionID);
 
     const entryId = await TransactionRepo.createTransactionUpdate(parent.id, centsToCharge, reason)
-    if (entryId == null) {
+    if (entryId === undefined) {
         console.error("Currency: Failed to create transaction ID");
         return MakeMoneyError.SomethingElse;
     }
 
     if (centsToCharge > 0) {
-        if (split == null) {
+        if (split === undefined) {
             return await Currency.refundCreditAccount(parent.accountID, centsToCharge, parent.origin, reason, entryId)
         } else {
             // modify split so we never refund more than we've taken
