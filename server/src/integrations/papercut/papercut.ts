@@ -3,10 +3,10 @@ import xmlparser from "express-xml-bodyparser";
 import * as xml2js from "xml2js"
 import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as Currency from "../currency/currency.js"
-import { send_transaction_email } from "../email/email.js";
-import { getAccountBalanceCents, getAccountIDByUsername } from "../../repositories/Currency/CurrencyAccountsRepository.js";
-import { Terminal } from "../atrium-integration/atrium.js";
-import { getCurrencyLedgerEntriesByPrinterJobId } from "../../repositories/Currency/CurrencyLedgerRepository.js";
+import { NewTransaction, UpdateTransaction } from "../currency/transactions.js";
+import { getAccountIDByUsername } from "../../repositories/Currency/CurrencyAccountsRepository.js";
+import { CurrencySource, MakeMoneyError } from "../currency/types.js";
+import { getTransactionByPrinterJobId } from "../../repositories/Currency/TransactionRepository.js";
 
 const PAPERCUT_SECURITY_SECRET = process.env.PAPERCUT_SECURITY_SECRET;
 const FREE_3D_PRINTS = process.env.FREE_3D_PRINTS === "true";
@@ -118,13 +118,48 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
 }
 
 
-const print_comment_matcher: RegExp = /(New job|Job Failed \(Refund\)|Job Aborted \(Refund\)) \(jobID #(\d*?)\)/;
+const print_comment_matcher: RegExp = /(?:3DPrinterOS:)? ?(.*?) ?\(jobID #(\d*)\)/;
+enum PrinterTransactionType {
+  New,
+  Failed,
+  Cancelled,
+  ManualRefund,
+  PriceUpdate,
+  QuoteUpdated,
+  Other,
+}
+function typeToString(t: PrinterTransactionType): string {
+  switch (t) {
+    case PrinterTransactionType.New:
+      return "New Job"
+    case PrinterTransactionType.Failed:
+      return "Job Failed"
+    case PrinterTransactionType.Cancelled:
+      return "Job Cancelled";
+    case PrinterTransactionType.ManualRefund:
+      return "Manual Refund";
+    case PrinterTransactionType.PriceUpdate:
+      return "Price Updated";
+    case PrinterTransactionType.QuoteUpdated:
+      return "Quote Updated";
+    case PrinterTransactionType.Other:
+      return "Other";
+    default:
+      return "Unknown Type";
+  }
+}
+
+type PrinterTransaction = {
+  type: PrinterTransactionType
+  jobID: number,
+  customMessage?: string
+};
 /**
  * Parse the 3dprinteros provided comment string to figure out what the adjustment was for
  * @param comment the comment given to us by 3dprinter os
  * @returns a description or undefined if we don't know how to parse it (havent seen it before)
  */
-function printCommentParser(comment: string): { operation: "new" | "failed" | "cancelled", jobID: number } | undefined {
+function printCommentParser(comment: string): PrinterTransaction | undefined {
   const res = print_comment_matcher.exec(comment)
   if (res == null || res.length != 3) {
     // failed to match
@@ -133,13 +168,52 @@ function printCommentParser(comment: string): { operation: "new" | "failed" | "c
   const jobID = Number(res[2])
   switch (res[1]) {
     case "New job":
-      return { operation: "new", jobID };
+      return { type: PrinterTransactionType.New, jobID };
     case "Job Failed (Refund)":
-      return { operation: "failed", jobID };
+      return { type: PrinterTransactionType.Failed, jobID };
     case "Job Aborted (Refund)":
-      return { operation: "cancelled", jobID };
+      return { type: PrinterTransactionType.Cancelled, jobID };
+    case "Manual Refund":
+      return { type: PrinterTransactionType.ManualRefund, jobID };
+    case "Price updated":
+      return { type: PrinterTransactionType.PriceUpdate, jobID };
+    case "Quote Updated Price":
+      return { type: PrinterTransactionType.QuoteUpdated, jobID };
+    default:
+      return { type: PrinterTransactionType.Other, jobID, customMessage: res[1] };
   }
-  return undefined;
+}
+
+async function process3dPrintTransaction(username: string, amount: number, transaction: PrinterTransaction): Promise<boolean | MakeMoneyError> {
+  const account = await getAccountIDByUsername(username);
+  if (account === undefined) {
+    console.error("no account here");
+    return MakeMoneyError.NoAccount;
+  }
+  const existing = await getTransactionByPrinterJobId(transaction.jobID);
+  if (transaction.type === PrinterTransactionType.New) {
+    if (existing != null) {
+      return MakeMoneyError.DuplicateTransaction;
+    }
+
+    const res = await NewTransaction(
+      account,
+      amount,
+      CurrencySource.Printers,
+      { text: `New 3D Printer Job: ${transaction.jobID}`, data: {} },
+      { printerJobId: transaction.jobID }
+    )
+    return res;
+  }
+
+  // Update
+  if (existing === undefined) {
+    console.error(`3DPrinterOS: Ignoring money charge for job id: ${transaction.jobID}. Couldn't find transaction for it`);
+    return false;
+  }
+
+  const res = await UpdateTransaction(existing.id, amount, `${typeToString(transaction.type) + (transaction?.customMessage ? (" - " + transaction?.customMessage) : "")}`)
+  return res;
 }
 
 async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCValue[]) {
@@ -176,68 +250,22 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
     xmlrpcRespond(res, [true]);
     return;
   }
-
-  const amountCents = Math.round(adjustment * 100);
-  const changeAmount = -amountCents; // we want negative if refund
-  const transaction = new Currency.Transaction(
-    new Date(),
-    "3DPrinterOS",
-    `For user ${username}: '${comment}'`,
-    [
-      { name: "3D Print", cents: changeAmount }
-    ], false);
-
   try {
-    const printDetails = printCommentParser(comment);
-    let transactionSuccess = false;
-    if (printDetails?.operation == "new") {
-
-      const success: boolean = await Currency.adjustAccountBalanceIfAvailableCents(username, transaction, Terminal.Printers, printDetails?.jobID);
-      if (success) {
-        transactionSuccess = true;
-      }
-    } else if (printDetails?.operation == "cancelled" || printDetails?.operation == "failed"){
-      // find by print job
-      if (printDetails) {
-        const previousEntries = await getCurrencyLedgerEntriesByPrinterJobId(printDetails?.jobID);
-        if (previousEntries.length == 1) {
-          const success: boolean = await Currency.reversePreviousTransaction(previousEntries[0].id, changeAmount);
-          if (success) {
-            transactionSuccess = true;
-          }
-        } else {
-          // multiple transactions have already happened with this print id, possible multiple refund?
-          // figure this out manually to avoid infinite money glitch
-        }
-      }
-    } else {
-      xmlrpcRespondFault(res, 400, "Could not parse print comment");
-      console.error("Could not parse print comment to get job id. Did 3d printer os change their format?", params);
+    const transaction = printCommentParser(comment)
+    if (transaction === undefined) {
+      xmlrpcRespondFault(res, 404, `could not process print comment: ${comment}`);
       return;
     }
-    if (transactionSuccess) {
-      let subject = "3D Print";
-      const accountId = await getAccountIDByUsername(username);
-      let constructCreditsAfter = 0;
-      if (accountId != undefined) {
-        try {
-          constructCreditsAfter = await getAccountBalanceCents(accountId);
-        } catch (e) {
-          // that account was not found, report 0 for construct credits remaining
-        }
-      }
-
-      if (printDetails && printDetails.operation == "new") {
-        subject = `3D Print Job #${printDetails.jobID}`
-      } else if (printDetails && (printDetails.operation == "cancelled" || printDetails.operation == "failed")) {
-        subject = `3D Print Refund Job ${printDetails.jobID}`;
-      }
-      await send_transaction_email(username + "@rit.edu", subject, transaction, constructCreditsAfter);
+    const amountCents = Math.round(adjustment * 100);
+    const result = await process3dPrintTransaction(username, amountCents, transaction);
+    if (typeof result === "string") {
+      xmlrpcRespondFault(res, 500, result);
+    } else {
+      xmlrpcRespond(res, [result]);
     }
-    xmlrpcRespond(res, [transactionSuccess]);
   } catch (e) {
     console.error(e)
-    xmlrpcRespondFault(res, 404, `could not query balance for user '${username}'`)
+    xmlrpcRespondFault(res, 404, `could not adjust balance for user '${username}': ${e}`)
   }
 }
 
