@@ -112,10 +112,14 @@ export async function refundCreditAccount(accountId: number, cents: number, sour
 
 /**
  * Return money to a user without ever transferring more to them in atrium money than they originally put in
+ * User of this function passes in the amount of money sent to credits or to atrium so far for this transaction
+ * This function will make sure the amount refunded to atrium does not exceed the amount taken from atrium
+ * This function will make sure the amount refunded to credit does not exceed the amount taken from credit
+ * However, this function will bias refunds towards atrium if they are not complete.
  * @param accountId the account to refund to
- * @param cents 
- * @param split 
- * @param transactionEntryId 
+ * @param cents a positive amount of cents to give to thi account
+ * @param split the amount of sents per currency type split of a refund into. Both parameters must be > 0. 
+ * @param transactionEntryId the transaction this refund is a part of
  * @returns true if transfer was successful
  * @returns MakeMoneyError.InvalidSign if atrium or credit values of split are negative or if cents is negative.
  * @returns NoAccount if no user with that account id can be found
