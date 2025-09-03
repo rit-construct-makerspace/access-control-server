@@ -57,7 +57,6 @@ export function centsToDollarString(cents: number) {
 }
 
 export async function chargeAccount(accountId: number, cents: number, source: CurrencySource, description: string, transactionEntryId: number): Promise<MakeMoneyError | { atrium: number, credit: number }> {
-  console.log("charging account", accountId, cents, source, description)
   if (cents < 0) {
     return MakeMoneyError.InvalidSign;
   }

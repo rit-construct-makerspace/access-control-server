@@ -95,6 +95,6 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     }
 
     await TransactionRepo.removeOutstandingChargeOnTransactionIfAvailable(transactionID);
-    send_transaction_email()
+    send_transaction_email(transactionID);
     return amounts;
 }
