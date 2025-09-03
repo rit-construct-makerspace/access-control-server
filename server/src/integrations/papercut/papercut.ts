@@ -203,15 +203,7 @@ async function process3dPrintTransaction(username: string, amount: number, trans
       { text: `New 3D Printer Job: ${transaction.jobID}`, data: {} },
       { printerJobId: transaction.jobID }
     )
-    if (typeof res == "string") {
-      if (res == MakeMoneyError.NoFunds) {
-        return false;
-      } else {
-        return res;
-      }
-    } else {
-      return true;
-    }
+    return res;
   }
 
   // Update
@@ -219,18 +211,9 @@ async function process3dPrintTransaction(username: string, amount: number, trans
     console.error(`3DPrinterOS: Ignoring money charge for job id: ${transaction.jobID}. Couldn't find transaction for it`);
     return false;
   }
-  console.info("updating");
-  const res = await UpdateTransaction(existing.id, amount, `${typeToString(transaction.type) + (transaction?.customMessage ? (" - " + transaction?.customMessage) : "")}`)
-  if (typeof res == "string") {
-    if (res == MakeMoneyError.NoFunds) {
-      return false;
-    } else {
-      return res;
-    }
-  } else {
-    return true;
-  }
 
+  const res = await UpdateTransaction(existing.id, amount, `${typeToString(transaction.type) + (transaction?.customMessage ? (" - " + transaction?.customMessage) : "")}`)
+  return res;
 }
 
 async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XMLRPCValue[]) {

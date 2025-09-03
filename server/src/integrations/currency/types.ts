@@ -15,7 +15,6 @@ export enum MakeMoneyError {
     ConnectionError = "ConnectionError",
     SomethingElse = "SomethingElse",
     InvalidSign = "InvalidSign",
-    NoFunds = "NoFunds",
     DuplicateTransaction = "DuplicateTransaction",
     RefundTooLarge = "RefundTooLarge",
     Unimplemented = "Unimplemented",

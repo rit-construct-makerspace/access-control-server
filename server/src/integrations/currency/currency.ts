@@ -39,13 +39,13 @@ export async function getAccountBalance(username: string): Promise<number | Make
 
 
 export function centsToDollarString(cents: number) {
-  if (cents == -0){
+  if (cents == -0) {
     cents = 0;
   }
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 }
 
-export async function chargeAccount(accountId: number, cents: number, source: CurrencySource, description: string, transactionEntryId: number): Promise<MakeMoneyError | { atrium: number, credit: number }> {
+export async function chargeAccount(accountId: number, cents: number, source: CurrencySource, description: string, transactionEntryId: number): Promise<boolean | MakeMoneyError> {
   if (cents < 0) {
     return MakeMoneyError.InvalidSign;
   }
@@ -53,6 +53,14 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
   if (user == null) {
     return MakeMoneyError.NoAccount;
   }
+  if (!USE_ATRIUM_FOR_CURRENCY) {
+    try {
+      return await CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(accountId, -cents, description, transactionEntryId);
+    } catch {
+      return MakeMoneyError.NoAccount;
+    }
+  }
+
   let remaining = cents;
   try {
     remaining = await CurrencyAccountRepo.chargeAccountReturnRemainingCents(accountId, cents, source, description, transactionEntryId);
@@ -64,7 +72,7 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
 
   // no atrium needed
   if (remaining == 0) {
-    return { credit: toCredit, atrium: 0 };
+    return true;
   }
 
   let atriumSuccess = false;
@@ -82,17 +90,17 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
 
   if (!atriumSuccess) {
     await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, toCredit, source, "rectification for: " + description, transactionEntryId);
-    return MakeMoneyError.NoFunds;
+    return false;
   }
 
-
-  return { credit: toCredit, atrium: remaining }
+  return true
 }
 
 /**
  * "Safe" way to refund money. Will never go to atrium money, only ever to credit
  * @param accountId the account to give money to
  * @param cents the number of cents to give to that account
+ * @returns true/false for success changing account amount, MakeMoneyError if failure operating
  */
 export async function refundCreditAccount(accountId: number, cents: number, source: CurrencySource, description: string, transactionEntryId?: number): Promise<boolean | MakeMoneyError> {
   try {
@@ -108,11 +116,11 @@ export async function refundCreditAccount(accountId: number, cents: number, sour
  * @param cents 
  * @param split 
  * @param transactionEntryId 
+ * @returns true if transfer was successful
  * @returns MakeMoneyError.InvalidSign if atrium or credit values of split are negative or if cents is negative.
  * @returns NoAccount if no user with that account id can be found
  */
-export async function refundAccountSplitting(accountId: number, cents: number, source: CurrencySource, split: { atrium: number, credit: number }, description: string, transactionEntryId: number): Promise<MakeMoneyError | { atrium: number, credit: number }> {
-  console.log("Refunding split");
+export async function refundAccountSplitting(accountId: number, cents: number, source: CurrencySource, split: { atrium: number, credit: number }, description: string, transactionEntryId: number): Promise<boolean | MakeMoneyError> {
   if (split.atrium < 0 || split.credit < 0) {
     return MakeMoneyError.InvalidSign;
   }
@@ -125,7 +133,7 @@ export async function refundAccountSplitting(accountId: number, cents: number, s
   }
 
   const availToRefund = split.atrium + split.credit;
-  if (cents > availToRefund){
+  if (cents > availToRefund) {
     return MakeMoneyError.RefundTooLarge;
   }
 
@@ -137,31 +145,29 @@ export async function refundAccountSplitting(accountId: number, cents: number, s
 
   if (toAtrium > 0) {
     const res = await Atrium.adjustBalanceIfPossible(source, user.ritUsername, accountId, toAtrium, description, transactionEntryId)
-    if ('success' in res && res.success == true) {
-      // all good on the atrium side
-    } else if ('success' in res && res.success == false) {
-      return MakeMoneyError.NoFunds;
+    // handle errors here, if fine, continue to credit side 
+    if ('success' in res && res.success == false) {
+      return false;
     } else {
       console.error("Currency: Couldn't refund to atrium", res);
       return MakeMoneyError.SomethingElse
     }
   }
-  
+
   let toCredit = cents - toAtrium;
   if (toCredit > split.credit) {
     console.warn(`Currency: At some point keeping track of currency failed. Trying to refund ${toCredit} but only ${split.credit} available`);
     toCredit = split.credit;
   }
-  try {
-    const res2 = await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, toCredit, source, description, transactionEntryId);
-    if (res2 == false) {
-      // shouldnt happen, going up
-      return MakeMoneyError.NoFunds;
+  if (toCredit != 0) {
+    try {
+      const creditRes = await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, toCredit, source, description, transactionEntryId);
+      return creditRes;
+    } catch {
+      return MakeMoneyError.NoAccount;
     }
-  } catch {
-    return MakeMoneyError.NoAccount;
   }
 
-
-  return { atrium: toAtrium, credit: toCredit };
+  // case where it all went to atrium
+  return true;
 }

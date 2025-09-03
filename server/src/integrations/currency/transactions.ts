@@ -19,13 +19,13 @@ function isOutstandingCharge(cents: number) {
 /**
  * Create a new transaction
  * @param accountId the account that this transaction is working against
- * @param initialDeltaCents the initial price (subject to outstanding charge expception)
+ * @param initialDeltaCents the initial price (subject to outstanding charge exception)
  * @param source the source of the transaction (printers, store, website)
  * @param description a description of this transaction
  * @param options general options detailing what this transction is for
- * @returns the amount of money charged to accountId
+ * @returns true if the transaction was created successfully and charged (or the outstanding charge exception applied)
  */
-export async function NewTransaction(accountId: number, initialDeltaCents: number, source: CurrencySource, description: { text: string, data: unknown }, options: { printerJobId: number }): Promise<number | MakeMoneyError> {
+export async function NewTransaction(accountId: number, initialDeltaCents: number, source: CurrencySource, description: { text: string, data: unknown }, options: { printerJobId: number }): Promise<boolean | MakeMoneyError> {
     let outstanding = 0;
     if (isOutstandingCharge(initialDeltaCents)) {
         // this is an outstanding one, dont charge yet
@@ -37,13 +37,10 @@ export async function NewTransaction(accountId: number, initialDeltaCents: numbe
         return MakeMoneyError.SomethingElse;
     }
     if (isOutstandingCharge(initialDeltaCents)) {
-        return 0;
+        return true;
     }
     // If this transaction doesnt have outstanding charge, add the original cost as an update to charge
     const res = await UpdateTransaction(tid, initialDeltaCents, description.text)
-    if (typeof res !== "string") {
-        return res.atrium + res.credit;
-    }
     return res
 }
 
@@ -52,9 +49,9 @@ export async function NewTransaction(accountId: number, initialDeltaCents: numbe
  * @param transactionID the transaction to modify
  * @param deltaCents the amount to add/subtract to the total price (+ is give money to user (refund/less expensive), - is take money from user (charge/more expensive))
  * @param reason why this adjustment is happening
- * @returns the split of money if charge. or MakeMoneyError if there was an issue
+ * @returns true/false for success or MakeMoneyError if there was an issue operating
  */
-export async function UpdateTransaction(transactionID: number, deltaCents: number, reason: string): Promise<MakeMoneyError | { atrium: number, credit: number }> {
+export async function UpdateTransaction(transactionID: number, deltaCents: number, reason: string): Promise<MakeMoneyError | boolean> {
     // check if there is outstanding charges
     const parent = await TransactionRepo.getTransactionById(transactionID);
     if (parent == null) {
@@ -72,13 +69,12 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
         console.error("Currency: Failed to create transaction ID");
         return MakeMoneyError.SomethingElse;
     }
-    let amounts = { atrium: 0, credit: 0 };
 
     if (centsToCharge > 0) {
         if (split == null) {
             const res = await Currency.refundCreditAccount(parent.accountID, centsToCharge, parent.origin, reason, entryId)
-            if (typeof res == "boolean" && res == true) {
-                amounts = { atrium: 0, credit: centsToCharge };
+            if (typeof res == "boolean") {
+                return res;
             } else if (typeof res == "string") {
                 return res;
             }
@@ -91,8 +87,6 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
             const res = await Currency.refundAccountSplitting(parent.accountID, centsToCharge, parent.origin, positiveSplit, reason, entryId)
             if (typeof res == "string") {
                 return res;
-            } else {
-                amounts = res;
             }
         }
     } else {
@@ -100,13 +94,10 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
         const res = await Currency.chargeAccount(parent.accountID, amt, parent.origin, reason, entryId);
         if (typeof res == "string") {
             return res;
-        } else {
-            // negate amounts since we are charging
-            amounts = { atrium: -res.atrium, credit: -res.credit };
-        }
+        } 
     }
 
     await TransactionRepo.removeOutstandingChargeOnTransactionIfAvailable(transactionID);
     send_transaction_email(transactionID);
-    return amounts;
+    return true;
 }
