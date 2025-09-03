@@ -121,7 +121,8 @@ export async function refundCreditAccount(accountId: number, cents: number, sour
  * @param split the amount of sents per currency type split of a refund into. Both parameters must be > 0. 
  * @param transactionEntryId the transaction this refund is a part of
  * @returns true if transfer was successful
- * @returns MakeMoneyError.InvalidSign if atrium or credit values of split are negative or if cents is negative.
+ * @returns RefundTooBig if the requested amount of refund exceeds the amount we are willing to give (the amount we have already taken)
+ * @returns InvalidSign if atrium or credit values of split are negative or if cents is negative.
  * @returns NoAccount if no user with that account id can be found
  */
 export async function refundAccountSplitting(accountId: number, cents: number, source: CurrencySource, split: { atrium: number, credit: number }, description: string, transactionEntryId: number): Promise<boolean | MakeMoneyError> {

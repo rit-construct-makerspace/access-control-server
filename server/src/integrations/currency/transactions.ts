@@ -10,6 +10,8 @@ import { send_transaction_email } from "../email/email.js";
 
 /**
  * Check if a charge qualifies for the outstanding charge exception
+ * A full serve 3d print gets charged as a tiny price until a skilled operator can quote the job.
+ * Once the skilled operator quotes the job, the price is adjusted to the actual price that the user will be charged
  * @param cents the amount to charge (delta where + is refund to account, - is take from account)
  * @returns true if this transaction counts for the outstanding charge exception
  */
