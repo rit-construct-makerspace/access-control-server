@@ -75,7 +75,7 @@ export default function ManageRoomTrainings(props: ManageRoomTrainingsProps) {
                 const rawModules: [TrainingModule] = data.modules;
                 const possibleModuels = rawModules.filter((possible) =>
                 (
-                    (possible.makerspaceID == null || possible.makerspaceID === Number(makerspaceID)) && // Has permission to use this training
+                    (possible.makerspaceID == null || Number(possible.makerspaceID) === Number(makerspaceID)) && // Has permission to use this training
                     !props.trainings.some((existing) => existing.id === possible.id) // This training is not already assigned to the makerspace
                 ))
 
