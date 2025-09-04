@@ -208,7 +208,7 @@ async function process3dPrintTransaction(username: string, amount: number, trans
 
   // Update
   if (existing === undefined) {
-    console.error(`3DPrinterOS: Ignoring money charge for job id: ${transaction.jobID}. Couldn't find transaction for it`);
+    console.error(`3DPrinterOS: Ignoring money charge for job id: ${transaction.jobID} from ${username} for amount ${amount}. Couldn't find transaction for it: ${typeToString(transaction.type)}:${transaction.customMessage}`);
     return false;
   }
 
