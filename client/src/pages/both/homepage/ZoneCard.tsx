@@ -1,4 +1,4 @@
-import { Card, CardActionArea, CardContent, CardMedia, Stack, Typography, useTheme } from "@mui/material";
+import { Button, Card, CardActionArea, CardContent, CardMedia, Stack, Typography, useTheme } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -14,8 +14,7 @@ interface ZoneCardProps {
   clickable?: boolean;
 }
 
-function getHoursToday(times: ZoneHours[]) {
-  const theme = useTheme();
+function getHoursToday(times: ZoneHours[], primaryColor: string) {
 
   const now = new Date();
   const hours_today = times[now.getDay()];
@@ -23,11 +22,11 @@ function getHoursToday(times: ZoneHours[]) {
   const status = hours_today.closed ? "CLOSED" : TimeUtils.currentStatus(hours_today.open?.substring(0, 5) ?? "12:00", hours_today.close?.substring(0, 5) ?? "12:00");
 
   return (
-    <Stack justifyContent="space-between" direction="row">
+    <Stack justifyContent="space-between" spacing={"20px"} direction="row" alignItems={"center"}>
       <Typography color={status === "OPEN" ? "success" : "error"} fontWeight="bold">{status}</Typography>
-      <Stack direction="row">
-        <Typography color={theme.palette.primary.main} fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
-        <Typography paddingLeft={"10px"}>
+      <Stack direction="row" >
+        <Typography color={primaryColor} fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
+        <Typography paddingLeft={"10px"} >
           {
             hours_today.closed
               ? ""
@@ -41,7 +40,7 @@ function getHoursToday(times: ZoneHours[]) {
 }
 
 export default function ZoneCard(props: ZoneCardProps) {
-
+  const theme = useTheme();
   const navigate = useNavigate();
 
   const [isHovered, setIsHovered] = useState(false);
@@ -59,12 +58,14 @@ export default function ZoneCard(props: ZoneCardProps) {
           height={props.isMobile ? "197px" : "281px"}
           image={import.meta.env.VITE_CDN_URL + "user-uploads/" + props.imageUrl}
         />
-        <CardContent>
-          <Stack spacing={0.5} direction="row" alignItems="center">
-            <Typography variant="h4">{props.name}</Typography>
-            <ChevronRightIcon color="primary" fontSize="large" />
+        <CardContent sx={{justifyContent: "center", display: "flex", flexDirection: "column"}}>
+          <Typography variant="h4" >{props.name}</Typography>
+          <Stack direction={"row"} justifyContent={"space-between"}>
+            {getHoursToday(props.hours, theme.palette.primary.main)}
+            {!props.isMobile && <Button variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
           </Stack>
-          {getHoursToday(props.hours)}
+          {props.isMobile && <Button  variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
+
         </CardContent>
       </CardActionArea>
     </Card>
