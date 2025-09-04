@@ -154,8 +154,8 @@ export async function refundAccountSplitting(accountId: number, cents: number, s
     // handle errors here, if fine, continue to credit side 
     if ('success' in res && res.success == false) {
       return false;
-    } else {
-      console.error("Currency: Couldn't refund to atrium", res);
+    } else if (!('success' in res)){
+      console.error("Currency: Couldn't refund to atrium due to error", res);
       return MakeMoneyError.SomethingElse
     }
   }
