@@ -27,7 +27,6 @@ export async function createTransaction(accountID: number, origin: CurrencySourc
  * @returns a transaction corresponding to that id, or undefined if not found
  */
 export async function getTransactionById(id: number): Promise<TransactionRow | undefined> {
-    console.log("Transaction id", id, typeof (id));
     const rows = await knex("Transactions").select("*").where({ id: id });
     if (rows.length > 0) {
         return rows[0];
