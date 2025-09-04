@@ -18,7 +18,7 @@ export default function ZoneHoursSection(props: ZoneHoursProps) {
           const dayDate = new Date(hour.day);
 
           return (
-            <Stack alignItems={"center"}>
+            <Stack alignItems={"center"} direction={props.isMobile ? "row" : "column"} justifyContent={props.isMobile ? "space-between" : "unset"}>
               <Typography color={theme.palette.primary.main} variant="h6">{TimeUtils.dayToString(dayDate.getDay())}</Typography>
               {
                 hour.closed
