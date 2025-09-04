@@ -12,7 +12,6 @@ interface ZoneCardProps {
   imageUrl: string;
   isMobile: boolean;
   clickable?: boolean;
-  continueText: string;
 }
 
 function getHoursToday(times: ZoneHours[], primaryColor: string) {
@@ -63,9 +62,9 @@ export default function ZoneCard(props: ZoneCardProps) {
           <Typography variant="h4" >{props.name}</Typography>
           <Stack direction={"row"} justifyContent={"space-between"}>
             {getHoursToday(props.hours, theme.palette.primary.main)}
-            {!props.isMobile && <Button variant="outlined" endIcon={<ChevronRightIcon />}>{props.continueText}</Button>}
+            {!props.isMobile && <Button variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
           </Stack>
-          {props.isMobile && <Button  variant="outlined" endIcon={<ChevronRightIcon />}>{props.continueText}</Button>}
+          {props.isMobile && <Button  variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
 
         </CardContent>
       </CardActionArea>
