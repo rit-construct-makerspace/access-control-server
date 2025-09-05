@@ -3,8 +3,7 @@ import { Button, Checkbox, FormControlLabel, InputAdornment, Stack, TextField, T
 import { ZoneDefaultHours } from "../../types/ZoneHours";
 import { useState } from "react";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
-import gql from "graphql-tag";
-import { useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 
 export const UPDATE_DEFAULT_HOURS = gql`

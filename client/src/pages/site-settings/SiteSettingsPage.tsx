@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Button, Card, Grid, Stack, Typography } from "@mui/material";
-import gql from "graphql-tag";
 import { GET_ZONES } from "../../queries/zoneQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import DeleteIcon from '@mui/icons-material/Delete';

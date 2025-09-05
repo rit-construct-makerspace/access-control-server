@@ -1,8 +1,7 @@
 import { Checkbox, FormControlLabel, IconButton, InputAdornment, Stack, TextField, Typography } from "@mui/material";
 import ZoneHours from "../../types/ZoneHours";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
-import gql from "graphql-tag";
-import { useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import DeleteIcon from '@mui/icons-material/Delete';
 
 export const DELETE_SPECIAL_HOURS = gql`

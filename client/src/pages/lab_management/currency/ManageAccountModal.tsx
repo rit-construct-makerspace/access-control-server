@@ -4,7 +4,7 @@ import { useState } from "react";
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { CurrencyAccount } from "./CurrencyAccounts";
 import CloseIcon from '@mui/icons-material/Close';
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";;
 import { useMutation } from "@apollo/client";
 
 interface ManageAccountModalProps {

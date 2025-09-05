@@ -3,8 +3,7 @@ import PrettyModal from "../../common/PrettyModal";
 import { useState } from "react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
-import gql from "graphql-tag";
-import { useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { useIsMobile } from "../../common/IsMobileProvider";
 
 const ARCHIVE_MAKERSPACE = gql`

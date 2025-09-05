@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { Button } from "@mui/material";

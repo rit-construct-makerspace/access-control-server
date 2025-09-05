@@ -1,6 +1,5 @@
 import { Divider, Stack, Typography } from "@mui/material";
-import gql from "graphql-tag";
-import { useQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import ZoneHours, { ZoneDefaultHours } from "../../types/ZoneHours";
 import DefaultHoursBlock from "./DefaultHoursBlock";

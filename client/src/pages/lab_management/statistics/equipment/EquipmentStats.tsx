@@ -1,6 +1,5 @@
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import { Box, Button, Collapse, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Tooltip } from "@mui/material";
-import gql from "graphql-tag";
 import { ReactElement, useEffect, useState } from "react";
 import PageSectionHeader from "../../../../common/PageSectionHeader";
 import GET_EQUIPMENTS from "../../../../queries/equipmentQueries";

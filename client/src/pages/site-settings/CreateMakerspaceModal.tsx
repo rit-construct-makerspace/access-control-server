@@ -1,8 +1,7 @@
 import { Button, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../common/PrettyModal";
 import AddIcon from '@mui/icons-material/Add';
-import { useMutation } from "@apollo/client";
-import gql from "graphql-tag";
+import { gql, useMutation } from "@apollo/client";
 import { useState } from "react";
 
 const CREATE_MAKERSPACE = gql`

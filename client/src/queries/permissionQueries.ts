@@ -1,4 +1,4 @@
-import { gql } from "graphql-tag";
+import { gql } from "@apollo/client";
 
 /**
  * @param userID id of user to change

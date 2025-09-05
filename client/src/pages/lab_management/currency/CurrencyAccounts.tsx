@@ -1,5 +1,5 @@
 import { Button, Card, Grid, Stack, Typography } from "@mui/material";
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";;
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { useLazyQuery } from "@apollo/client";
 import SearchBar from "../../../common/SearchBar";

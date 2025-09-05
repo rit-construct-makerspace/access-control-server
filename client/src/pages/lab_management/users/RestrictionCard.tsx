@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";;
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { GET_USER, Restriction } from "./UserModal";
 import { Button, Card, CardActions, CardContent, CardHeader, Stack, Typography, useTheme } from "@mui/material";
