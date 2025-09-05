@@ -1,7 +1,6 @@
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js"
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
 import { EquipmentInstancesRow } from "../db/tables.js";
 import { createInstance, deleteInstance, getInstanceByID, getInstancesByEquipment, setInstanceName, setInstanceStatus } from "../repositories/Equipment/EquipmentInstancesRepository.js";

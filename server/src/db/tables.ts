@@ -5,7 +5,6 @@
  */
 
 import { CurrencySource, CurrencyType } from "../integrations/currency/types.js";
-import { Privilege } from "../schemas/usersSchema.js";
 
 /**
  * Audit logs are automatically made reports of various actions on the server and by machine activations.
@@ -306,8 +305,6 @@ export interface UserRow {
   pronouns: string;
   /** UNUSED: TODO should be removed */
   isStudent: boolean;
-  /** TODO Phase out in favor of new privelege system */
-  privilege: Privilege;
   /** Date that the user joined make */
   registrationDate: Date;
   /** Date that the user says they will graduate (self reported, not verified or anything) */

@@ -2,7 +2,6 @@ import { createContext, ReactElement, useContext } from "react";
 import { gql, useQuery } from "@apollo/client";
 import RequestWrapper2 from "./RequestWrapper2";
 import { Navigate, useLocation } from "react-router-dom";
-import Privilege from "../types/Privilege";
 import { AccessCheck } from "../pages/lab_management/users/UserModal";
 
 export const GET_CURRENT_USER = gql`
@@ -12,7 +11,6 @@ export const GET_CURRENT_USER = gql`
       ritUsername
       firstName
       lastName
-      privilege
       setupComplete
       archived
       admin
@@ -56,11 +54,11 @@ export interface TrainingHold {
 }
 
 export interface CurrentUser {
+  visitor: boolean; // frontend addition. routes.ts should make it so that this is only true on visitor pages and the current user is a real user in all other places
   id: string;
   ritUsername: string;
   firstName: string;
   lastName: string;
-  privilege: Privilege;
   setupComplete: boolean;
   balance: string;
   hasHolds: boolean;
@@ -69,7 +67,6 @@ export interface CurrentUser {
   accessChecks: AccessCheck[];
   cardTagID: string;
   trainingHolds: TrainingHold[];
-  visitor: boolean;
   admin: boolean;
   manager: number[];
   staff: number[];
@@ -99,11 +96,11 @@ interface CurrentUserProviderProps {
 }
 
 const visitor: CurrentUser = {
+  visitor: true,
   id: "-1",
   ritUsername: "",
   firstName: "",
   lastName: "",
-  privilege: Privilege.VISITOR,
   setupComplete: true,
   balance: "",
   hasHolds: false,
@@ -111,7 +108,6 @@ const visitor: CurrentUser = {
   accessChecks: [],
   cardTagID: "nothing",
   trainingHolds: [],
-  visitor: true,
   admin: false,
   archived: false,
   manager: [],
@@ -150,7 +146,7 @@ export function CurrentUserProvider({ children }: CurrentUserProviderProps) {
   );
 }
 
-export function useCurrentUser() {
+export function useCurrentUser(): CurrentUser {
   const context = useContext(CurrentUserContext);
 
   if (context === undefined) {

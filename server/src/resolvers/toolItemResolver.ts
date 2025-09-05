@@ -3,7 +3,6 @@
  * GraphQL Endpoint Implementations for ToolItemInstances and ToolItemTypes
  */
 
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
 import { ToolItemInstancesRow, ToolItemTypesRow } from "../db/tables.js";
 import { borrowItem, createToolItemInstance, deleteToolItemInstance, getToolItemInstanceByID, getToolItemInstances, getToolItemInstancesByBorrower, getToolItemInstancesByType, returnItem, updateToolItemInstance } from "../repositories/Store/ToolItemInstancesRepository.js";
