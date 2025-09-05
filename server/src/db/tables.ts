@@ -303,8 +303,6 @@ export interface UserRow {
   lastName: string;
   /** Pronouns of user, asked by make */
   pronouns: string;
-  /** UNUSED: TODO should be removed */
-  isStudent: boolean;
   /** Date that the user joined make */
   registrationDate: Date;
   /** Date that the user says they will graduate (self reported, not verified or anything) */
