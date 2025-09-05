@@ -9,7 +9,11 @@ docker - [install](https://www.docker.com/)
 dependencies - run `npm install` in the root of the repository 
 
 ## Environment
+This project uses env files to hold secrets. Examples are provided but must be moved from their .env.example to just .env in their respective directories.
+
 For an example of required server environment variables, see [server/.env.example](server/.env.example)
+
+There are some environment variables that must be changed for the server to function in server/.env. They are marked as such
 
 For an example of required client environment variables, see [client/.env.example](client/.env.example)
 
