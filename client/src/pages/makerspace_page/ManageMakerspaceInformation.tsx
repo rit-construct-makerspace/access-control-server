@@ -24,8 +24,8 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
   const [updateMakerspace] = useMutation(UPDATE_MAKERSPACE, { refetchQueries: ["GetMakerspaceByID"] });
 
   const [makerspaceName, setMakerspaceName] = useState(props.name);
-  const [makerspaceSubtitle, setMakerspaceSubtitle] = useState(props.subtitle ?? "");
-  const [makerspaceLocation, setMakerspaceLocation] = useState(props.location ?? "");
+  const [makerspaceSubtitle, setMakerspaceSubtitle] = useState(props.subtitle);
+  const [makerspaceLocation, setMakerspaceLocation] = useState(props.location);
   const [imgUrl, setImgUrl] = useState(props.imageUrl);
 
   const handleUpdateMakerspace = async () => {
@@ -52,6 +52,7 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
       <MakerspaceCard
         id={props.id}
         name={makerspaceName}
+
         subtitle={makerspaceSubtitle}
         location={makerspaceLocation}
         hours={props.hours}
