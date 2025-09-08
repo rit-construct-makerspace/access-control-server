@@ -1,11 +1,11 @@
-import { Box, Button, Card, CardContent, CardMedia, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Button, Card, CardContent, CardMedia, Link, Stack, Typography, useTheme } from "@mui/material";
 import Equipment from "../types/Equipment";
 import { useCurrentUser } from "./CurrentUserProvider";
 import { ModuleStatus, moduleStatusMapper } from "./TrainingModuleUtils";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import ConstructionIcon from "@mui/icons-material/Construction";
+import { useNavigate, useParams } from "react-router-dom";
+import ConstructionIcon from '@mui/icons-material/Construction';
 import ReactMarkdown from "react-markdown";
 import ModuleStatusRow from "./ModuleStatusRow";
 
@@ -107,8 +107,8 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                 <Stack width="120px" height="100%" justifyContent={"center"} alignItems={"center"}>
                   {props.equipment.byReservationOnly
                     ? <Typography variant="subtitle1" ml={1}>
-                      Reservation only. Email <Link to={"mailto:make@rit.edu"} target={"_blank"}>make@rit.edu</Link> to schedule.
-										</Typography>
+                      Reservation only. Email <Link href={"mailto:make@rit.edu"} target={"_blank"}>make@rit.edu</Link> to schedule.
+                    </Typography>
                     : props.equipment.numAvailable + props.equipment.numInUse > 0 ?
                       <Stack height="100%" justifyContent="center" alignItems="center">
                         <Typography variant="subtitle1" align="center" fontWeight="bold">

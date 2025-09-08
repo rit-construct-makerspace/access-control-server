@@ -47,6 +47,7 @@ import { Slide, ToastContainer } from "react-toastify";
 import EditEquipmentPage from "./pages/makerspace_page/equipment_pages/EditEquipmentPage";
 import NewEquipmentPage from "./pages/makerspace_page/equipment_pages/NewEquipmentPage";
 import EquipmentRedirector from "./pages/makerspace_page/equipment_pages/EquipmentRedirector";
+import HelpPage from "./pages/maker/signup/HelpPage";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -123,6 +124,7 @@ export default function AppRoutes() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/makerspace/:makerspaceID" element={<MakerspacePage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/help" element={<HelpPage />} />
           <Route path="/storefront" element={<StorefrontPage />} />
 
           {/* Routes that need to be protected by auth */}
