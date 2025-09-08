@@ -1,5 +1,4 @@
 import { ApolloContext, CurrentUser } from "../context.js";
-import { Privilege } from "../schemas/usersSchema.js";
 import * as HoldsRepo from "../repositories/Holds/HoldsRepository.js";
 import * as UsersRepo from "../repositories/Users/UserRepository.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";

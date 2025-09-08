@@ -1,12 +1,10 @@
 import { gql } from "@apollo/client";
-import Privilege from "../types/Privilege";
 
 export interface PartialUser {
   id: number;
   ritUsername: string;
   firstName: string;
   lastName: string;
-  privilege: Privilege;
   setupComplete?: boolean;
   activeHold: boolean;
   restrictions: any[];
@@ -19,7 +17,6 @@ const GET_USERS = gql`
       ritUsername
       firstName
       lastName
-      privilege
     }
   }
 `;
@@ -57,7 +54,6 @@ export const GET_USER_BY_USERNAME_OR_UID = gql`
       id
       firstName
       lastName
-      privilege
       activeHold
     }
   }

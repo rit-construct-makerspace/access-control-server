@@ -4,12 +4,10 @@
  */
 
 import { ApolloContext, CurrentUser } from "../context.js";
-import { Privilege } from "../schemas/usersSchema.js";
-import * as HoldsRepo from "../repositories/Holds/HoldsRepository.js";
 import * as UsersRepo from "../repositories/Users/UserRepository.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
-import { HoldRow, MaintenanceLogRow, MaintenanceTagRow } from "../db/tables.js";
+import { MaintenanceLogRow, MaintenanceTagRow } from "../db/tables.js";
 import { getEquipmentByID } from "../repositories/Equipment/EquipmentRepository.js";
 import { createMaintenanceLog, createMaintenanceTag, createResolutionLog, deleteMaintenanceLog, deleteMaintenanceTag, deleteResolutionLog, getMaintenanceLogByID, getMaintenanceLogsByEquipment, getMaintenanceTagByID, getMaintenanceTags, getMaintenanceTagsByEquipmentOrGlobal, getResolutionLogByID, getResolutionLogsByEquipment, updateMaintenanceLog, updateMaintenanceTag, updateResolutionLog } from "../repositories/Equipment/MaintenanceLogRepository.js";
 import { GraphQLError } from "graphql";

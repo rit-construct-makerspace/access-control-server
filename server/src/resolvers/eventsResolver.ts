@@ -1,6 +1,3 @@
-import { ApolloContext } from "../context.js";
-import { Privilege } from "../schemas/usersSchema.js";
-
 /**
  * Fetch 1st page of eventss from EventBrite
  * @returns event listing JSON

@@ -5,7 +5,6 @@
 
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
 import { accessCheckExists, createAccessCheck, getAccessCheckByID, getAccessChecks, getAccessChecksByApproved, getAccessChecksByUserID, purgeUnapprovedAccessChecks, setAccessCheckApproval } from "../repositories/Equipment/AccessChecksRepository.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";

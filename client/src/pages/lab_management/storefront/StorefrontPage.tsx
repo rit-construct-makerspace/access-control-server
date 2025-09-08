@@ -19,7 +19,6 @@ import { GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQuerie
 import CheckoutSuccessModal from "./CheckoutSuccessModal";
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { useNavigate } from "react-router-dom";
-import Privilege from "../../../types/Privilege";
 
 
 const CHECKOUT_ITEMS = gql`
@@ -152,7 +151,7 @@ export default function StorefrontPage() {
       }>
         <title>Storefront | Make @ RIT</title>
 
-        {(currentUser.privilege != Privilege.VISITOR && import.meta.env.VITE_DISABLE_STOREFRONT_CART === "false") && <ShoppingCart
+        {(currentUser.visitor==false && import.meta.env.VITE_DISABLE_STOREFRONT_CART === "false") && <ShoppingCart
           entries={shoppingCart}
           removeEntry={removeFromShoppingCart}
           setEntryCount={setEntryCount}

@@ -4,7 +4,6 @@
  */
 
 import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js";
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
 
 const AuditLogResolvers = {

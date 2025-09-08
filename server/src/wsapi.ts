@@ -274,18 +274,28 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
       inResponse.Reason = "unknown-uid";
       return inResponse;
     }
-    inResponse.Role = user.privilege;
 
     // Find Machine
     if (machineInst === undefined || machine === undefined) {
-        wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: readerId, label: reader?.name });
-        inResponse.Error = "Reader not paired with a machine instance";
+      wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: readerId, label: reader?.name });
+      inResponse.Error = "Reader not paired with a machine instance";
       inResponse.Reason = "unknown-machine";
       return inResponse;
     }
 
+    const room = (await getRoomByID(machine.roomID));
+    const makerspaceID =room?.zoneID ?? -1;
+
+    const canUnlockBcAdmin = user.admin;
+    const canUnlockBcManager = makerspaceID ? (await getUserManagerPerms(user.id)).includes(makerspaceID) : false;
+    const canUnlockBcStaff = makerspaceID ? (await getUserStaffPerms(user.id)).includes(makerspaceID) : false
+    const canUnlock = canUnlockBcAdmin || canUnlockBcManager || canUnlockBcStaff;
+    inResponse.Role = canUnlockBcAdmin ? "ADMIN" : (canUnlockBcManager ? "MANAGER" : (canUnlockBcStaff ? "STAFF" : (canUnlock ? "MAKER" : "UNKNOWN")));
+  
+
+
     //Admin bypass. Skip Welcome and training check.
-    if (user.admin) {
+    if (canUnlockBcAdmin) {
       wsApiLog("{user} has activated {access_device} - {equipment} with ADMIN access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
       createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
       inResponse.Verified = 1;
@@ -306,8 +316,6 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     }
 
     // Find Makerspace
-    const machineMakerspace = (await getRoomByID(machine.roomID))?.zoneID
-
     // Hold Check
     if (await hasActiveHolds(user.id)) {
       wsApiLog("{user} failed to swipe into {access_device} - {equipment} due to an active hold", "auth",
@@ -323,7 +331,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     }
 
     // Restriction Check
-    if (await hasRestriction(user.id, machineMakerspace ?? -1)) {
+    if (await hasRestriction(user.id, makerspaceID)) {
       wsApiLog("{user} failed to swipe into {access_device} - {equipment} due to an active restriction", "auth",
         { id: user.id, label: getUsersFullName(user) },
         { id: reader?.id, label: reader?.name },
@@ -336,14 +344,11 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     }
 
     // Manager bypass. Skip welcome and training check.
-    if (typeof (machineMakerspace) === "number") {
-      const userManagerPerms = await getUserManagerPerms(user.id);
-      if (userManagerPerms.includes(machineMakerspace)) {
+      if (canUnlockBcManager) {
         wsApiLog("{user} has activated {access_device} - {equipment} with MANAGER access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
         createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
         inResponse.Verified = 1;
         return inResponse;
-      }
     }
 
     //If needs welcome, check that room swipe has occured in the zone today
@@ -364,7 +369,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     }
 
     //Check all makerspace trainings
-    if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasZoneTrainings(machineMakerspace ?? -1, user.id))) {
+    if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasZoneTrainings(makerspaceID, user.id))) {
       wsApiLog(`{user} failed to swipe into {machine} - {equipment} due to incomplete makerspace trainings`, "auth",
         { id: user.id, label: getUsersFullName(user) },
         { id: machine.id, label: reader.name ?? "undefined" },
@@ -534,11 +539,11 @@ async function authorizeUidToStateChange(uid: string, toState: string, readerId:
   const canUnlockBcManager = makerspace?.id ? (await getUserManagerPerms(user.id)).includes(makerspace.id) : false;
   const canUnlockBcStaff = makerspace?.id ? (await getUserStaffPerms(user.id)).includes(makerspace.id) : false
   const canUnlock = canUnlockBcAdmin || canUnlockBcManager || canUnlockBcStaff;
+  inResponse.Role = canUnlockBcAdmin ? "ADMIN" : (canUnlockBcManager ? "MANAGER" : (canUnlockBcStaff ? "STAFF" : (canUnlock ? "MAKER" : "UNKNOWN")));
 
 
   if (canUnlock) {
-    const level = canUnlockBcAdmin ? "ADMIN" : (canUnlockBcManager ? "MANAGER" : "STAFF");
-    await wsApiLog(`{user} set {equipment}-:{reader} with ${level} priveleges`, "status", ulabel, elabel, rlabel)
+    await wsApiLog(`{user} set {equipment}-:{reader} with ${inResponse.Role} privileges`, "status", ulabel, elabel, rlabel)
     inResponse.Verified = 1;
     inResponse.AuthTo = toState;
     return inResponse;
