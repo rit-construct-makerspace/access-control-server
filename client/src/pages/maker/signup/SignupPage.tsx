@@ -116,7 +116,7 @@ export default function SignupPage() {
 
   // Redirect to home page if setupComplete
   useEffect(() => {
-    if (currentUser?.setupComplete) navigate("/");
+    if (currentUser?.setupComplete) navigate("/help");
   }, [currentUser, navigate]);
 
   return (
