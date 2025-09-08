@@ -1,13 +1,13 @@
 /**
- * ZoneHoursRepository.ts
- * DB Operations for Zone Hours / Open Hours
+ * MakerspaceHoursRepository.ts
+ * DB Operations for Makerspace Hours / Open Hours
  */
 
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
 import { DefaultHoursRow, SpecialHoursRow } from "../../db/tables.js";
 
-export async function getZoneHoursOnDay(day: Date, makerspaceID: number): Promise<SpecialHoursRow> {
+export async function getMakerspaceHoursOnDay(day: Date, makerspaceID: number): Promise<SpecialHoursRow> {
     const special = await knex("SpecialHours").where({ makerspaceID: makerspaceID }).andWhereRaw(`CAST(day as DATE) = CAST('${day.toISOString()}' as DATE)`).select("*");
     if (special.length > 0) {
         return special[0];
@@ -30,7 +30,7 @@ export async function getZoneHoursOnDay(day: Date, makerspaceID: number): Promis
     return result;
 }
 
-export async function getZoneHoursNextWeek(makerspaceID: number): Promise<SpecialHoursRow[]> {
+export async function getMakerspaceHoursNextWeek(makerspaceID: number): Promise<SpecialHoursRow[]> {
     const temp: SpecialHoursRow = {
         day: new Date(),
         makerspaceID: 0,
@@ -42,7 +42,7 @@ export async function getZoneHoursNextWeek(makerspaceID: number): Promise<Specia
 
     var target = new Date();
     for (let i = 0; i < 7; i++) {
-        await getZoneHoursOnDay(target, makerspaceID).then((result) => {
+        await getMakerspaceHoursOnDay(target, makerspaceID).then((result) => {
             week[result.day.getDay()] = { ...result, day: new Date(result.day) };
             target.setDate(target.getDate() + 1);
         });
@@ -51,11 +51,11 @@ export async function getZoneHoursNextWeek(makerspaceID: number): Promise<Specia
     return week;
 }
 
-export async function getZoneSpecialHours(makerspaceID: number): Promise<SpecialHoursRow[]> {
+export async function getMakerspaceSpecialHours(makerspaceID: number): Promise<SpecialHoursRow[]> {
     return await knex("SpecialHours").where({ makerspaceID: makerspaceID }).select("*").orderBy("day", "asc");
 };
 
-export async function getZoneDefaultHours(makerspaceID: number): Promise<DefaultHoursRow[]> {
+export async function getMakerspaceDefaultHours(makerspaceID: number): Promise<DefaultHoursRow[]> {
     return await knex("DefaultHours").where({ makerspaceID: makerspaceID }).select("*").orderBy("dayOfWeek", "asc");
 }
 

@@ -8,7 +8,7 @@ import { useQuery } from "@apollo/client";
 import { GET_CARTS } from "../../../../queries/cartQueries";
 import { InventoryCart } from "../../../../types/InventoryCart";
 import { useState } from "react";
-import { GET_ZONES } from "../../../../queries/zoneQueries";
+import { GET_MAKERSPACES } from "../../../../queries/makerspaceQueries";
 import { Checkbox, FormControlLabel, FormGroup, TextField, CircularProgress } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -17,12 +17,12 @@ export function CartListPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
   const getCartsResult = useQuery(GET_CARTS, { pollInterval: 10000 });
-  const getMakerspacesResult = useQuery(GET_ZONES);
+  const getMakerspacesResult = useQuery(GET_MAKERSPACES);
 
   const [filteredMakerspaces, setFilteredMakerspaces] = useState<number[]>(makerspaceID ? [parseInt(makerspaceID)] : []);
   const [userSearch, setUserSearch] = useState<string>("");
 
-  const makerspaces = getMakerspacesResult.data?.zones || [];
+  const makerspaces = getMakerspacesResult.data?.makerspaces || [];
   const rows: InventoryCart[] = getCartsResult.data?.carts || [];
 
   // Filtering logic
@@ -81,22 +81,22 @@ export function CartListPage() {
       <Stack direction="row" spacing={4} mb={2} alignItems="center">
         {/* Makerspace Filter */}
         <FormGroup row>
-          {getMakerspacesResult.loading ? <CircularProgress size={24} /> : makerspaces.map((zone: { id: number, name: string }) => (
+          {getMakerspacesResult.loading ? <CircularProgress size={24} /> : makerspaces.map((space: { id: number, name: string }) => (
             <FormControlLabel
-              key={zone.id}
+              key={space.id}
               control={
                 <Checkbox
-                  checked={filteredMakerspaces.includes(Number(zone.id))}
+                  checked={filteredMakerspaces.includes(Number(space.id))}
                   onChange={(e) => {
                     setFilteredMakerspaces((prev) =>
                       e.target.checked
-                        ? [...prev, Number(zone.id)]
-                        : prev.filter((id) => id !== Number(zone.id))
+                        ? [...prev, Number(space.id)]
+                        : prev.filter((id) => id !== Number(space.id))
                     );
                   }}
                 />
               }
-              label={zone.name}
+              label={space.name}
             />
           ))}
         </FormGroup>

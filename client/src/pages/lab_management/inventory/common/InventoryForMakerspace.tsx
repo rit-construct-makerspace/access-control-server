@@ -6,7 +6,7 @@ import { isManager } from "../../../../common/PrivilegeUtils";
 import { StaffOnlyToggle } from "./StaffOnlyToggle";
 import { StorefrontVisibleToggle } from "./StorefrontVisibleToggle";
 import { TagsCell } from "./TagsCell";
-import { ZoneWithItems } from "../../../../queries/zoneQueries";
+import { MakerspaceWithItems } from "../../../../queries/makerspaceQueries";
 import InventoryItem, { InventoryTag } from "../../../../types/InventoryItem";
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
@@ -18,7 +18,7 @@ function sortItemsByName(items: InventoryItem[]): InventoryItem[] {
 
 interface InventoryForMakerspaceProps {
   searchText: string;
-  makerspace: ZoneWithItems;
+  makerspace: MakerspaceWithItems;
   tags: InventoryTag[];
   setModalItemId: React.Dispatch<React.SetStateAction<string>>;
 }

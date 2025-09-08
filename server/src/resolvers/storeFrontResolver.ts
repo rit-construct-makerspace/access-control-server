@@ -7,7 +7,7 @@ import { GraphQLError } from "graphql";
 import { getUserByID, getUserByIDOrUndefined } from "../repositories/Users/UserRepository.js";
 import { notifyInventoryItemBelowThreshold } from "../slack/slack.js";
 import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
-import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
+import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
 import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
 
 const StorefrontResolvers = {
@@ -23,7 +23,7 @@ const StorefrontResolvers = {
     },
     //Map field makerspace to corresponding makerspace row, if any
     makerspace: async (parent: InventoryItemRow) => {
-      return parent.makerspaceID ? await getZoneByID(parent.makerspaceID) : undefined;
+      return parent.makerspaceID ? await getMakerspaceByID(parent.makerspaceID) : undefined;
     }
   },
 

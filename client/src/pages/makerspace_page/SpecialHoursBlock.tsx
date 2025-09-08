@@ -1,5 +1,5 @@
 import { Checkbox, FormControlLabel, IconButton, InputAdornment, Stack, TextField, Typography } from "@mui/material";
-import ZoneHours from "../../types/ZoneHours";
+import MakerspaceHours from "../../types/MakerspaceHours";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
@@ -12,7 +12,7 @@ export const DELETE_SPECIAL_HOURS = gql`
 `;
 
 interface SpecialHoursBlockProps {
-  hours: ZoneHours;
+  hours: MakerspaceHours;
 }
 
 export default function SpecialHoursBlock(props: SpecialHoursBlockProps) {
@@ -29,7 +29,7 @@ export default function SpecialHoursBlock(props: SpecialHoursBlockProps) {
   const close = props.hours.close?.substring(0, 5);
 
   const [deleteHours] = useMutation(DELETE_SPECIAL_HOURS, {
-    refetchQueries: ["GetZoneSpecialHours"],
+    refetchQueries: ["GetMakerspaceSpecialHours"],
     variables: { day: props.hours.day, makerspaceID: props.hours.makerspaceID },
     awaitRefetchQueries: true,
   })

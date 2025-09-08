@@ -5,7 +5,7 @@ import MaterialModalContents, {
 import { useMutation, useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_INVENTORY_ITEMS, GET_INVENTORY_ITEM, UPDATE_INVENTORY_ITEM, DELETE_INVENTORY_ITEM } from "../../../queries/inventoryQueries";
-import { GET_ZONES_WITH_ITEMS } from "../../../queries/zoneQueries";
+import { GET_MAKERSPACES_WITH_ITEMS } from "../../../queries/makerspaceQueries";
 
 
 interface EditMaterialProps {
@@ -25,8 +25,8 @@ export default function EditMaterial({ itemId, onClose }: EditMaterialProps) {
     refetchQueries: [
       { query: GET_INVENTORY_ITEMS },
       { query: GET_INVENTORY_ITEM, variables: { id: itemId } },
-      { query: GET_ZONES_WITH_ITEMS, variables: { zoneId: itemDraft.makerspaceID } },
-      { query: GET_ZONES_WITH_ITEMS },
+      { query: GET_MAKERSPACES_WITH_ITEMS, variables: { makerspaceId: itemDraft.makerspaceID } },
+      { query: GET_MAKERSPACES_WITH_ITEMS },
     ],
   });
 

@@ -1,8 +1,8 @@
 import { ApolloContext } from "../context.js";
-import * as HoursRepo from "../repositories/Zones/ZoneHoursRepository.js";
+import * as HoursRepo from "../repositories/Makerspaces/MakerspaceHoursRepository.js";
 import { DefaultHoursRow, SpecialHoursRow } from "../db/tables.js";
 
-const ZoneHoursResolver = {
+const MakerspaceHoursResolver = {
 
   Query: {
     zoneHoursNextWeek: async (
@@ -12,7 +12,7 @@ const ZoneHoursResolver = {
       },
       { }: ApolloContext
     ) => {
-      return await HoursRepo.getZoneHoursNextWeek(args.makerspaceID);
+      return await HoursRepo.getMakerspaceHoursNextWeek(args.makerspaceID);
     },
 
     zoneHoursOnDay: async (
@@ -23,7 +23,7 @@ const ZoneHoursResolver = {
       },
       { }: ApolloContext
     ) => {
-      return await HoursRepo.getZoneHoursOnDay(args.day, args.makerspaceID);
+      return await HoursRepo.getMakerspaceHoursOnDay(args.day, args.makerspaceID);
     },
 
     zoneDefaultHours: async (
@@ -33,7 +33,7 @@ const ZoneHoursResolver = {
       },
       { }: ApolloContext
     ) => {
-      return await HoursRepo.getZoneDefaultHours(args.makerspaceID);
+      return await HoursRepo.getMakerspaceDefaultHours(args.makerspaceID);
     },
 
     zoneSpecialHours: async (
@@ -43,7 +43,7 @@ const ZoneHoursResolver = {
       },
       { }: ApolloContext
     ) => {
-      return await HoursRepo.getZoneSpecialHours(args.makerspaceID);
+      return await HoursRepo.getMakerspaceSpecialHours(args.makerspaceID);
     }
   },
 
@@ -87,4 +87,4 @@ const ZoneHoursResolver = {
   }
 };
 
-export default ZoneHoursResolver;
+export default MakerspaceHoursResolver;

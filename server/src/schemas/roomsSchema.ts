@@ -22,7 +22,7 @@ export const RoomTypeDefs = gql`
   type Room {
     id: ID!
     name: String!
-    zone: Zone
+    makerspace: Makerspace
     equipment: [Equipment]
     recentSwipes: [Swipe]
     mentors: [User]
@@ -31,7 +31,7 @@ export const RoomTypeDefs = gql`
 
   input RoomInput {
     name: String!
-    zoneID: ID!
+    makerspaceID: ID!
   }
 
   extend type Query {
@@ -45,7 +45,7 @@ export const RoomTypeDefs = gql`
     deleteRoom(roomID: ID!): Room
 
     updateRoomName(roomID: ID!, name: String): Room
-    setZone(roomID: ID!, zoneID: ID!): Room
+    setMakerspace(roomID: ID!, makerspaceID: ID!): Room
 
     swipeIntoRoomWithID(roomID: ID!, id: ID!): User
 

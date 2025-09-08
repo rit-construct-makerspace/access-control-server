@@ -29,8 +29,8 @@ const GET_VERBOSE_EQUIPMENT_SESSIONS = gql`
       equipmentName
       roomID
       roomName
-      zoneID
-      zoneName
+      makerspaceID
+      makerspaceName
     }
   }
 `;
@@ -46,14 +46,14 @@ export interface VerboseEquipmentSession {
   equipmentName: string;
   roomID: number;
   roomName: string;
-  zoneID: number;
-  zoneName: string;
+  makerspaceID: number;
+  makerspaceName: string;
 };
 
 
 function joinEquipmentSession(obj: VerboseEquipmentSession) {
   return (obj.id + ', ' + obj.start + ', ' + obj.equipmentID + ', ' + obj.equipmentName + ', ' + obj.userID + ', ' + obj.userName + ', '
-    + obj.sessionLength + ', ' + obj.readerSlug + ', ' + obj.roomID + ', ' + obj.roomName + ', ' + obj.zoneID + ', ' + obj.zoneName + ', ');
+    + obj.sessionLength + ', ' + obj.readerSlug + ', ' + obj.roomID + ', ' + obj.roomName + ', ' + obj.makerspaceID + ', ' + obj.makerspaceName + ', ');
 }
 
 
@@ -202,7 +202,7 @@ export function EquipmentStats() {
 
         <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ width: '10em' }}>Fetch</Button>
 
-        <Tooltip title={getEquipmentSessionsResult.data ? "User, Equipment, Room, and Zone columns will be split into Names and IDs" : "Must Fetch data before exporting"}>
+        <Tooltip title={getEquipmentSessionsResult.data ? "User, Equipment, Room, and Makerspace columns will be split into Names and IDs" : "Must Fetch data before exporting"}>
           <Button onClick={handleCSVExport} startIcon={<DownloadIcon />} variant="outlined" color="secondary" sx={{ width: '10em' }} disabled={!getEquipmentSessionsResult.data}>Export as CSV</Button>
         </Tooltip>
 
@@ -250,10 +250,10 @@ export function EquipmentStats() {
               renderCell: (params) => (<AuditLogEntity entityCode={`room:${params.row.roomID}:${params.row.roomName}`} />),
             },
             {
-              field: 'zone',
-              headerName: 'Zone',
+              field: 'makerspace',
+              headerName: 'Makerspace',
               width: 160,
-              valueGetter: (value, row) => `${row.zoneName} (${row.zoneID})`
+              valueGetter: (value, row) => `${row.makerspaceName} (${row.makerspaceID})`
             },
             {
               field: 'start',

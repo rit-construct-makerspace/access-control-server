@@ -1,60 +1,60 @@
 import { Button, Stack, TextField, Typography } from "@mui/material";
 import FileUploadButton from "../../common/FileUploadButton";
-import ZoneCard from "../both/homepage/ZoneCard";
+import MakerspaceCard from "../both/homepage/MakerspaceCard";
 import { useIsMobile } from "../../common/IsMobileProvider";
-import ZoneHours from "../../types/ZoneHours";
+import MakerspaceHours from "../../types/MakerspaceHours";
 import SaveIcon from '@mui/icons-material/Save';
 import { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
-import { UPDATE_ZONE } from "../../queries/zoneQueries";
+import { UPDATE_MAKERSPACE } from "../../queries/makerspaceQueries";
 import { toast } from "react-toastify";
 
 interface MakerspaceInforamtionProps {
   id: number;
   name: string;
-  hours: ZoneHours[];
+  hours: MakerspaceHours[];
   imageUrl: string;
 }
 
 export default function ManageMakerspaceInformation(props: MakerspaceInforamtionProps) {
   const isMobile = useIsMobile();
 
-  const [updateZone] = useMutation(UPDATE_ZONE, { refetchQueries: ["GetZoneByID"] });
+  const [updateMakerspace] = useMutation(UPDATE_MAKERSPACE, { refetchQueries: ["GetMakerspaceByID"] });
 
-  const [zoneName, setZoneName] = useState(props.name);
+  const [makerspaceName, setMakerspaceName] = useState(props.name);
   const [imgUrl, setImgUrl] = useState(props.imageUrl);
 
-  const handleUpdateZone = async () => {
-    await updateZone({
-      variables: { id: props.id, name: zoneName, imageUrl: imgUrl },
+  const handleUpdateMakerspace = async () => {
+    await updateMakerspace({
+      variables: { id: props.id, name: makerspaceName, imageUrl: imgUrl },
       onCompleted() {
         toast.success("Updated makerspace");
       },
       onError(error) {
-        toast.error(`Failed to update zone: ${error.message}`);
+        toast.error(`Failed to update makerspace: ${error.message}`);
       },
     });
   };
 
   useEffect(() => {
     if (imgUrl !== props.imageUrl) {
-      handleUpdateZone();
+      handleUpdateMakerspace();
     }
   }, [imgUrl])
 
   return (
     <Stack spacing={3} alignItems={"center"}>
       <Typography variant="h5" fontWeight={"bold"} alignSelf={"flex-start"}>Makerspace Information</Typography>
-      <ZoneCard
+      <MakerspaceCard
         id={props.id}
-        name={zoneName}
+        name={makerspaceName}
         hours={props.hours}
         imageUrl={imgUrl}
         isMobile={isMobile}
         clickable={false}
       />
       <Stack direction={"row"} spacing={2} width={"100%"} alignItems={"center"} justifyContent={"center"}>
-        <TextField label="Name" value={zoneName} onChange={(e) => (setZoneName(e.target.value))} sx={{ width: "50%" }} />
+        <TextField label="Name" value={makerspaceName} onChange={(e) => (setMakerspaceName(e.target.value))} sx={{ width: "50%" }} />
         <FileUploadButton
           variant="contained"
           text="Upload Image"
@@ -65,7 +65,7 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
           color="primary"
           variant="contained"
           startIcon={<SaveIcon />}
-          onClick={() => { if (zoneName !== props.name) handleUpdateZone(); }}
+          onClick={() => { if (makerspaceName !== props.name) handleUpdateMakerspace(); }}
         >
           Save
         </Button>

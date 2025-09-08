@@ -3,7 +3,7 @@ import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { ChangeEvent, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { MAKE_USER_MANAGER, MAKE_USER_STAFF, MAKE_USER_TRAINER, REVOKE_USER_MANAGER, REVOKE_USER_STAFF, REVOKE_USER_TRAINER, SET_USER_ADMIN } from "../../../queries/permissionQueries";
-import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
+import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isManagerFor } from "../../../common/PrivilegeUtils";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -29,7 +29,7 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
         setAdmin({ variables: { userID: props.user.id, admin: checked } })
     }
 
-    const getZonesResult = useQuery(GET_FULL_ZONES);
+    const getMakerspacesResult = useQuery(GET_FULL_MAKERSPACES);
 
     const [makeUserManager] = useMutation(MAKE_USER_MANAGER, { refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
     const [revokeUserManager] = useMutation(REVOKE_USER_MANAGER, { refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
@@ -101,14 +101,14 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                     sx={{ margin: "0" }}
                 />
             </FormGroup>
-            <RequestWrapper2 result={getZonesResult} render={(data) => {
+            <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
 
-                const fullZones: FullZone[] = data.zones;
+                const fullSpaces: FullMakerspace[] = data.makerspaces;
 
-                const managerZones = fullZones.filter((zone: FullZone) => props.user.manager.includes(Number(zone.id)));
-                const potentialManagerZones = fullZones.filter((zone: FullZone) => !props.user.manager.includes(Number(zone.id)) && isManagerFor(currentUser, zone.id));
-                const staffZones = fullZones.filter((zone: FullZone) => props.user.staff.includes(Number(zone.id)));
-                const potentialStaffZones = fullZones.filter((zone: FullZone) => !props.user.staff.includes(Number(zone.id)) && isManagerFor(currentUser, zone.id));
+                const managerSpaces = fullSpaces.filter((space: FullMakerspace) => props.user.manager.includes(Number(space.id)));
+                const potentialManagerSpaces = fullSpaces.filter((space: FullMakerspace) => !props.user.manager.includes(Number(space.id)) && isManagerFor(currentUser, space.id));
+                const staffSpaces = fullSpaces.filter((space: FullMakerspace) => props.user.staff.includes(Number(space.id)));
+                const potentialStaffSpaces = fullSpaces.filter((space: FullMakerspace) => !props.user.staff.includes(Number(space.id)) && isManagerFor(currentUser, space.id));
 
                 return (
                     <Stack spacing={2}>
@@ -116,16 +116,16 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                             <Typography variant="subtitle1" fontWeight="bold">Manager</Typography>
                             <Stack direction="row" spacing={1}>
                                 {
-                                    managerZones.length === 0
+                                    managerSpaces.length === 0
                                         ? <Alert severity="info">Not a Manager!</Alert>
-                                        : managerZones.map((zone: FullZone) => {
+                                        : managerSpaces.map((space: FullMakerspace) => {
                                             return (
                                                 <Card sx={{ maxWidth: "200px", padding: "10px" }}>
                                                     <Stack direction={props.isMobile ? "column" : "row"} justifyContent="space-between">
-                                                        <Typography variant="body2">{zone.name} ID: {zone.id}</Typography>
+                                                        <Typography variant="body2">{space.name} ID: {space.id}</Typography>
                                                         {
-                                                            isManagerFor(currentUser, zone.id) && !(currentUser.id === props.user.id)
-                                                                ? <IconButton color="error" onClick={() => { removeManagerPerms(zone.id) }}>
+                                                            isManagerFor(currentUser, space.id) && !(currentUser.id === props.user.id)
+                                                                ? <IconButton color="error" onClick={() => { removeManagerPerms(space.id) }}>
                                                                     <DeleteIcon />
                                                                 </IconButton>
                                                                 : null
@@ -146,8 +146,8 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                                         fullWidth
                                     >
                                         {
-                                            potentialManagerZones.map((zone: FullZone) => {
-                                                return <MenuItem value={zone.id}>{zone.name} ID: {zone.id}</MenuItem>
+                                            potentialManagerSpaces.map((space: FullMakerspace) => {
+                                                return <MenuItem value={space.id}>{space.name} ID: {space.id}</MenuItem>
                                             })
                                         }
                                     </Select>
@@ -161,16 +161,16 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                             <Typography variant="subtitle1" fontWeight="bold">Staff</Typography>
                             <Stack direction="row" spacing={1}>
                                 {
-                                    staffZones.length === 0
+                                    staffSpaces.length === 0
                                         ? <Alert severity="info">Not Staff!</Alert>
-                                        : staffZones.map((zone: FullZone) => {
+                                        : staffSpaces.map((space: FullMakerspace) => {
                                             return (
                                                 <Card sx={{ maxWidth: "200px", padding: "10px" }}>
                                                     <Stack direction={props.isMobile ? "column" : "row"} justifyContent="space-between">
-                                                        <Typography variant="body2">{zone.name} ID: {zone.id}</Typography>
+                                                        <Typography variant="body2">{space.name} ID: {space.id}</Typography>
                                                         {
-                                                            isManagerFor(currentUser, zone.id)
-                                                                ? <IconButton color="error" onClick={() => { removeStaffPerms(zone.id) }}>
+                                                            isManagerFor(currentUser, space.id)
+                                                                ? <IconButton color="error" onClick={() => { removeStaffPerms(space.id) }}>
                                                                     <DeleteIcon />
                                                                 </IconButton>
                                                                 : null
@@ -191,8 +191,8 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                                         fullWidth
                                     >
                                         {
-                                            potentialStaffZones.map((zone: FullZone) => {
-                                                return <MenuItem value={zone.id}>{zone.name} ID: {zone.id}</MenuItem>
+                                            potentialStaffSpaces.map((space: FullMakerspace) => {
+                                                return <MenuItem value={space.id}>{space.name} ID: {space.id}</MenuItem>
                                             })
                                         }
                                     </Select>

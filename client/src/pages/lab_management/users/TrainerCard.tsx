@@ -28,7 +28,7 @@ export default function TrainerCard(props: TrainerCardProps) {
                     <Stack direction={isMobile ? "column" : "row"} justifyContent="space-between">
                         <Typography variant="body2">{equipment.name} ID: {equipment.id}</Typography>
                         {
-                            isManagerFor(currentUser, equipment.room.zone.id)
+                            isManagerFor(currentUser, equipment.room.makerspace.id)
                             ? <IconButton color="error" onClick={() => {props.removeTrainerPerms(equipment.id)}}>
                                 <DeleteIcon/>
                             </IconButton>

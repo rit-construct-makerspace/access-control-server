@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { Alert, Button, Divider, FormControlLabel, IconButton, Stack, Switch, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { FullZone, GET_ZONE_BY_ID } from "../../queries/zoneQueries";
+import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { useState } from "react";
 import RoomSection from "./RoomSection";
@@ -14,7 +14,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useIsMobile } from "../../common/IsMobileProvider";
 import { isManagerFor, isStaffFor } from "../../common/PrivilegeUtils";
 import { ModuleStatus, moduleStatusMapper } from "../../common/TrainingModuleUtils";
-import ZoneHoursSection from "./ZoneHours";
+import MakerspaceHoursSection from "./MakerspaceHours";
 import ModuleStatusRow from "../../common/ModuleStatusRow";
 
 export default function MakerspacePage() {
@@ -24,7 +24,7 @@ export default function MakerspacePage() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  const getZone = useQuery(GET_ZONE_BY_ID, { variables: { id: makerspaceID } });
+  const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
   const [equipmentSearch, setEquipmentSearch] = useState("");
 
@@ -32,18 +32,18 @@ export default function MakerspacePage() {
   const [showHidden, setShowHidden] = useState(false);
 
   return (
-    <RequestWrapper2 result={getZone} render={(data) => {
+    <RequestWrapper2 result={getMakerspace} render={(data) => {
 
-      const fullZone: FullZone = data.zoneByID;
+      const fullSpace: FullMakerspace = data.makerspaceByID;
 
-      const zoneTrainings = fullZone.trainingModules.map(moduleStatusMapper(user.passedModules, user.trainingHolds));
+      const makerspaceTrainings = fullSpace.trainingModules.map(moduleStatusMapper(user.passedModules, user.trainingHolds));
 
       return (
         <Stack spacing={"2"} padding={"0 20px 20px"} divider={<Divider orientation="horizontal" flexItem />}>
           <StaffBar />
           <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
-            <title>{`${fullZone.name} | Make @ RIT`}</title>
-            <Typography variant="h3" align="center">{fullZone.name}</Typography>
+            <title>{`${fullSpace.name} | Make @ RIT`}</title>
+            <Typography variant="h3" align="center">{fullSpace.name}</Typography>
             {
               isManagerFor(user, Number(makerspaceID))
                 ? <IconButton
@@ -56,21 +56,21 @@ export default function MakerspacePage() {
             }
 
           </Stack>
-          <ZoneHoursSection hours={fullZone.hours} isMobile={isMobile} />
+          <MakerspaceHoursSection hours={fullSpace.hours} isMobile={isMobile} />
           {
-            zoneTrainings.length > 0 &&
+            makerspaceTrainings.length > 0 &&
             <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
               <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
                 <Typography variant="h6">Makerspace Trainings</Typography>
                 {
-                  zoneTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
+                  makerspaceTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
                     ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
                     : null
                 }
               </Stack>
               <Stack direction={isMobile ? "column" : "row"} spacing={1} alignItems={"center"}>
                 {
-                  zoneTrainings.map((ms: ModuleStatus) => (
+                  makerspaceTrainings.map((ms: ModuleStatus) => (
                     <ModuleStatusRow ms={ms} />
                   ))
                 }
@@ -99,7 +99,7 @@ export default function MakerspacePage() {
             }
           </Stack>
 
-          {fullZone.rooms.map((room: Room) => (
+          {fullSpace.rooms.map((room: Room) => (
             <RoomSection room={room} equipmentSearch={equipmentSearch} isMobile={isMobile} staffMode={staffMode} showHidden={showHidden} />
           ))}
         </Stack>

@@ -16,6 +16,6 @@ export function singleRoomToDomain(raw: any): Room | null {
   return {
     id: raw.id,
     name: raw.name,
-    zoneID: raw.zoneID
+    makerspaceID: raw.makerspaceID
   };
 }

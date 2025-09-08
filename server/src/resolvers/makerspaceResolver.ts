@@ -1,39 +1,39 @@
 import { ApolloContext } from "../context.js";
-import { addTrainingToZone, archiveZone, createZone, deleteZone, getTrainingsByZone, getZoneByID, getZones, removeTrainingFromZone, updateZone } from "../repositories/Zones/ZonesRespository.js";
-import { ZoneRow } from "../db/tables.js";
-import { getRoomsByZone } from "../repositories/Rooms/RoomRepository.js";
-import { ZoneInput } from "../schemas/zonesSchema.js";
-import * as HoursRepo from "../repositories/Zones/ZoneHoursRepository.js";
+import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getTrainingsByMakerspace, getZoneByID, getZones, removeTrainingFromMakerspace, updateMakerspace } from "../repositories/Makerspaces/MakerspaceRespository.js";
+import { MakerspaceRow } from "../db/tables.js";
+import { getRoomsByMakerspace } from "../repositories/Rooms/RoomRepository.js";
+import { MakerspaceInput } from "../schemas/makerspacesSchema.js";
+import * as HoursRepo from "../repositories/Makerspaces/MakerspaceHoursRepository.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { getItems, getItemsWhereStorefront } from "../repositories/Store/InventoryRepository.js";
 
-const ZonesResolver = {
-  Zone: {
+const MakerspacesResolver = {
+  Makerspace: {
     //Map rooms field to array of Rooms
     rooms: async (
-      parent: ZoneRow,
+      parent: MakerspaceRow,
       _args: any,
     ) => {
-      return getRoomsByZone(parent.id);
+      return getRoomsByMakerspace(parent.id);
     },
 
     //Map hours field to array of ZoneHours
     hours: async (
-      parent: ZoneRow,
+      parent: MakerspaceRow,
       _args: any,
     ) => {
-      return HoursRepo.getZoneHoursNextWeek(parent.id);
+      return HoursRepo.getMakerspaceHoursNextWeek(parent.id);
     },
 
     trainingModules: async (
-      parent: ZoneRow,
+      parent: MakerspaceRow,
       _args: any,
     ) => {
-      return getTrainingsByZone(parent.id);
+      return getTrainingsByMakerspace(parent.id);
     },
     items: async (
-      parent: ZoneRow,
+      parent: MakerspaceRow,
       args: {storefrontVisible?: boolean},
     ) => {
       return args.storefrontVisible == undefined
@@ -80,16 +80,16 @@ const ZonesResolver = {
       args: { name: string },
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
-        const res = await createZone(args.name);
+        const res = await createMakerspace(args.name);
         return res
       }),
 
     updateZone: async (
       _parent: any,
-      args: { id: number, newZone: ZoneInput },
+      args: { id: number, newZone: MakerspaceInput },
       { isManagerFor }: ApolloContext) =>
       isManagerFor(args.id, async () => {
-        const res = await updateZone(args.id, args.newZone);
+        const res = await updateMakerspace(args.id, args.newZone);
         return res
       }),
 
@@ -104,7 +104,7 @@ const ZonesResolver = {
       args: { id: number },
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
-        await deleteZone(args.id);
+        await deleteMakerspace(args.id);
         return (await getZones())[0];
       }),
 
@@ -116,7 +116,7 @@ const ZonesResolver = {
       },
       { isManagerFor }: ApolloContext
     ) => isManagerFor(args.zoneID, async () => {
-      return await addTrainingToZone(args.zoneID, args.moduleID);
+      return await addTrainingToMakerspace(args.zoneID, args.moduleID);
     }),
 
     removeTrainingFromZone: async (
@@ -127,7 +127,7 @@ const ZonesResolver = {
       },
       { isManagerFor }: ApolloContext
     ) => isManagerFor(args.zoneID, async () => {
-      return await removeTrainingFromZone(args.zoneID, args.moduleID);
+      return await removeTrainingFromMakerspace(args.zoneID, args.moduleID);
     }),
 
     archiveZone: async (
@@ -140,10 +140,10 @@ const ZonesResolver = {
       createLog(`{user} archived makerspace ${args.id}`, "admin",
         { id: user.id, label: getUsersFullName(user) }
       )
-      return await archiveZone(args.id);
+      return await archiveMakerspace(args.id);
     })
 
   }
 };
 
-export default ZonesResolver;
+export default MakerspacesResolver;

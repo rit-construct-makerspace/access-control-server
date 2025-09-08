@@ -107,7 +107,7 @@ const AccessChecksResolver = {
         if (!equipment) throw new GraphQLError("Equipment does not exist");
 
         const room = await RoomRepo.getRoomByID(equipment.roomID);
-        if (!user.trainer.includes(check.equipmentID) && !user.manager.includes(room?.zoneID ?? -1) && !user.staff.includes(room?.zoneID ?? -1) && !user.admin) {
+        if (!user.trainer.includes(check.equipmentID) && !user.manager.includes(room?.makerspaceID ?? -1) && !user.staff.includes(room?.makerspaceID ?? -1) && !user.admin) {
           throw new GraphQLError(`Not an approved trainer for ${check.equipmentID}`)
         }
         const affectedUser = await getUserByID(check.userID);
@@ -141,7 +141,7 @@ const AccessChecksResolver = {
         const equipment = await EquipmentRepo.getEquipmentByID(check?.equipmentID);
         if (!equipment) throw new GraphQLError("Equipment does not exist");
         const room = await RoomRepo.getRoomByID(equipment.roomID);
-        if (!user.trainer.includes(check.equipmentID) && !user.manager.includes(room?.zoneID ?? -1) && !user.staff.includes(room?.zoneID ?? -1) && !user.admin) {
+        if (!user.trainer.includes(check.equipmentID) && !user.manager.includes(room?.makerspaceID ?? -1) && !user.staff.includes(room?.makerspaceID ?? -1) && !user.admin) {
           throw new GraphQLError(`Not an approved trainer for ${check.equipmentID}`)
         }
         const affectedUser = await getUserByID(check.userID);

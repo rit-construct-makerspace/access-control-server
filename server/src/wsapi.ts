@@ -2,12 +2,12 @@ import { Request } from "express";
 import * as ws from "ws";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { createReaderFromSN, getMakerspaceOfWelcomeReader, getReaderByID, getReaderByName, getReaderBySN, getReaderPairStatus, PairStatus, submitReaderLog, submitReaderLogWithInstance, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
-import { EquipmentInstancesRow, EquipmentRow, ReaderRow, UserRow, ZoneRow } from "./db/tables.js";
+import { EquipmentInstancesRow, EquipmentRow, ReaderRow, UserRow, MakerspaceRow } from "./db/tables.js";
 import { getEquipmentByID, getMissingTrainingModules, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
 import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
-import { getRoomByID, getRoomsByZone, hasRoomTrainings, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
+import { getRoomByID, getRoomsByMakerspace, hasRoomTrainings, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import { getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstancesRepository.js";
 import { randomInt } from "crypto";
@@ -15,7 +15,7 @@ import { generateRandomHumanName } from "./data/humanReadableNames.js";
 import { generateShlugKey } from "./resolvers/readersResolver.js";
 import { hasActiveHolds } from "./repositories/Holds/HoldsRepository.js";
 import { hasRestriction } from "./repositories/Restrictions/RestrictionsRepository.js";
-import { getZoneByID, hasZoneTrainings } from "./repositories/Zones/ZonesRespository.js";
+import { getMakerspaceByID, hasMakerspaceTrainings } from "./repositories/Makerspaces/MakerspaceRespository.js";
 
 
 const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
@@ -48,7 +48,7 @@ function stringSlugPool() {
  * @param makerspace 
  * @returns 
  */
-function pairedLabel(instance?: EquipmentInstancesRow, machine?: EquipmentRow | null, makerspace?: ZoneRow | null): [boolean, string, { id: number, label: string }] {
+function pairedLabel(instance?: EquipmentInstancesRow, machine?: EquipmentRow | null, makerspace?: MakerspaceRow | null): [boolean, string, { id: number, label: string }] {
   if (instance && machine) {
     return [true, `{machine} instance ${instance?.name ?? "unknown instance"}`, { id: machine.id, label: machine.name }];
   } else if (makerspace) {
@@ -284,7 +284,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     }
 
     const room = (await getRoomByID(machine.roomID));
-    const makerspaceID =room?.zoneID ?? -1;
+    const makerspaceID =room?.makerspaceID ?? -1;
 
     const canUnlockBcAdmin = user.admin;
     const canUnlockBcManager = makerspaceID ? (await getUserManagerPerms(user.id)).includes(makerspaceID) : false;
@@ -351,7 +351,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
         return inResponse;
     }
 
-    //If needs welcome, check that room swipe has occured in the zone today
+    //If needs welcome, check that room swipe has occured in the makerspace today
     if (machine.needsWelcome && !(process.env.GLOBAL_WELCOME_BYPASS == "TRUE")) {
       const welcomed = await hasSwipedToday(machine.roomID, user.id);
       if (!welcomed) {
@@ -369,7 +369,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     }
 
     //Check all makerspace trainings
-    if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasZoneTrainings(makerspaceID, user.id))) {
+    if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasMakerspaceTrainings(makerspaceID, user.id))) {
       wsApiLog(`{user} failed to swipe into {machine} - {equipment} due to incomplete makerspace trainings`, "auth",
         { id: user.id, label: getUsersFullName(user) },
         { id: machine.id, label: reader.name ?? "undefined" },
@@ -471,7 +471,7 @@ async function welcomeUID(uid: string, readerID: number, inResponse: ShlugRespon
     return inResponse;
   }
   try {
-    const rooms = await getRoomsByZone(makerspace.id);
+    const rooms = await getRoomsByMakerspace(makerspace.id);
     for (let i = 0; i < rooms.length; i++) {
       // TODO: MakerspaceSwipes not RoomSwipes
       await swipeIntoRoom(rooms[i].id, user.id);
@@ -525,7 +525,7 @@ async function authorizeUidToStateChange(uid: string, toState: string, readerId:
 
   const equipment = await getEquipmentByID(instance.equipmentID);
   const room = await getRoomByID(equipment.roomID);
-  const makerspace = await getZoneByID(room?.zoneID ?? 0);
+  const makerspace = await getMakerspaceByID(room?.makerspaceID ?? 0);
 
   if (equipment == null || room == null || makerspace == null) {
     inResponse.Error = "Programmer Error";

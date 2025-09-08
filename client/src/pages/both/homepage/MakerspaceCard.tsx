@@ -3,18 +3,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import * as TimeUtils from "../../../common/TimeUtils";
-import ZoneHours from "../../../types/ZoneHours";
+import MakerspaceHours from "../../../types/MakerspaceHours";
 
-interface ZoneCardProps {
+interface MakerspaceCardProps {
   id: number;
   name: string;
-  hours: ZoneHours[];
+  hours: MakerspaceHours[];
   imageUrl: string;
   isMobile: boolean;
   clickable?: boolean;
 }
 
-function getHoursToday(times: ZoneHours[], primaryColor: string) {
+function getHoursToday(times: MakerspaceHours[], primaryColor: string) {
 
   const now = new Date();
   const hours_today = times[now.getDay()];
@@ -39,7 +39,7 @@ function getHoursToday(times: ZoneHours[], primaryColor: string) {
   )
 }
 
-export default function ZoneCard(props: ZoneCardProps) {
+export default function MakerspaceCard(props: MakerspaceCardProps) {
   const theme = useTheme();
   const navigate = useNavigate();
 

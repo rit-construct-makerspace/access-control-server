@@ -4,8 +4,8 @@ import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
-import { GET_ZONES_WITH_HOURS, ZoneWithHours } from "../../../queries/zoneQueries";
-import ZoneCard from "./ZoneCard";
+import { GET_MAKERSPACES_WITH_HOURS, MakerspacesWithHours } from "../../../queries/makerspaceQueries";
+import MakerspaceCard from "./MakerspaceCard";
 import { Announcement, GET_ANNOUNCEMENTS } from "../../../queries/announcementsQueries";
 import AnnouncementCard from "./AnnouncementCard";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
@@ -28,7 +28,7 @@ export function Dashboard() {
     const isMobile = useIsMobile();
 
     const incrementSiteVisits = useQuery(INCREMENT_SITE_VISITS);
-    const getZonesResult = useQuery(GET_ZONES_WITH_HOURS);
+    const getMakerspacesResult = useQuery(GET_MAKERSPACES_WITH_HOURS);
     const getAnnouncementsResult = useQuery(GET_ANNOUNCEMENTS);
     const getEvents = useQuery(GET_EVENTS);
 
@@ -36,11 +36,11 @@ export function Dashboard() {
         <Box>
             <title>Make @ RIT</title>
             <RequestWrapper loading={incrementSiteVisits.loading} error={incrementSiteVisits.error}><></></RequestWrapper>
-            {/* Zones */}
-            <RequestWrapper2 result={getZonesResult} render={(data) => {
-                const zones: ZoneWithHours[] = data.zones;
-                const filteredZone: ZoneWithHours[] = zones.filter((_zone: ZoneWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
-                const sortedZones = filteredZone.sort((a: ZoneWithHours, b: ZoneWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
+            {/* Makerspaces */}
+            <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
+                const makerspaces: MakerspacesWithHours[] = data.makerspaces;
+                const filteredSpaces: MakerspacesWithHours[] = makerspaces.filter((_makerspace: MakerspacesWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
+                const sortedSpaces = filteredSpaces.sort((a: MakerspacesWithHours, b: MakerspacesWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
 
                 return (
                     <Grid
@@ -51,13 +51,13 @@ export function Dashboard() {
                         width="auto"
                         marginLeft="0px"
                     >
-                        {sortedZones.map((zone: ZoneWithHours) => (
+                        {sortedSpaces.map((space: MakerspacesWithHours) => (
                             <Grid gap={2}>
-                                <ZoneCard
-                                    id={zone.id}
-                                    name={zone.name}
-                                    hours={zone.hours}
-                                    imageUrl={zone.imageUrl === undefined || zone.imageUrl == null || zone.imageUrl === "" ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : zone.imageUrl}
+                                <MakerspaceCard
+                                    id={space.id}
+                                    name={space.name}
+                                    hours={space.hours}
+                                    imageUrl={space.imageUrl === undefined || space.imageUrl == null || space.imageUrl === "" ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : space.imageUrl}
                                     isMobile={isMobile}
                                 />
                             </Grid>

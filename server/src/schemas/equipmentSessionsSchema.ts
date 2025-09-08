@@ -14,7 +14,7 @@ export const EquipmentSessionTypeDefs = gql`
         readerSlug: String
         equipment: Equipment
         room: Room
-        zone: Zone
+        makerspace: Makerspace
     }
 
     type User {
@@ -33,7 +33,7 @@ export const EquipmentSessionTypeDefs = gql`
         name: String
     }
 
-    type Zone {
+    type Makerspace {
         id: ID!
         name: String
     }

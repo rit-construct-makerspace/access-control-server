@@ -12,7 +12,7 @@ import { useState } from "react";
 import { LoanToolItemModal } from "./LoanToolItemModal";
 import { ReturnToolItemModal } from "./ReturnToolItemModal";
 import { CreateToolItemInstanceModal, EditToolItemInstanceModal } from "./EditCreateToolItemInstanceModal";
-import { GET_ZONE_BY_ID } from "../../../queries/zoneQueries";
+import { GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
 import Room from "../../../types/Room";
 import { isManager } from "../../../common/PrivilegeUtils";
 
@@ -27,7 +27,7 @@ export function ToolItemPage() {
   const currentUser = useCurrentUser();
 
   const getToolItemTypes = useQuery(GET_TOOL_ITEM_TYPES_WITH_INSTANCES);
-  const getZone = useQuery(GET_ZONE_BY_ID, {variables: {id: makerspaceID}});
+  const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, {variables: {id: makerspaceID}});
 
   const [currentType, setCurrentType] = useState<ToolItemType>();
 
@@ -52,9 +52,9 @@ export function ToolItemPage() {
         {isManager(currentUser) && <Button startIcon={<AddIcon />} variant="outlined" color="primary" onClick={() => navigate(`/makerspace/${makerspaceID}/tools/type`)}>Create Type</Button>}
       </Stack>
 
-      <RequestWrapper loading={getToolItemTypes.loading || getZone.loading} error={getToolItemTypes.error || getZone.error}>
+      <RequestWrapper loading={getToolItemTypes.loading || getMakerspace.loading} error={getToolItemTypes.error || getMakerspace.error}>
         <Stack direction={"column"} spacing={4}>
-          {getToolItemTypes.data?.toolItemTypes.filter((type: ToolItemType) => getZone.data?.zoneByID.rooms.find((room: Room) => Number(room.id) === Number(type.defaultLocationRoom.id))).map((type: ToolItemType) => (
+          {getToolItemTypes.data?.toolItemTypes.filter((type: ToolItemType) => getMakerspace.data?.makerspaceByID.rooms.find((room: Room) => Number(room.id) === Number(type.defaultLocationRoom.id))).map((type: ToolItemType) => (
             <ToolItemTypeCard type={type} handleLoanInstanceClick={handleLoanInstanceClick} handleReturnInstanceClick={handleReturnInstanceClick} />
           ))}
 
