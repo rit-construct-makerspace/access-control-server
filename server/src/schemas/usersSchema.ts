@@ -6,11 +6,6 @@
 import { gql } from "graphql-tag";
 import { UserRow } from "../db/tables.js";
 
-export enum Privilege {
-  MAKER = "MAKER",    // Maker
-  MENTOR = "MENTOR",  // Mentor
-  STAFF = "STAFF",    // Staff
-}
 
 export interface PassedModule {
   moduleID: number;
@@ -24,12 +19,6 @@ export interface User extends UserRow {
 }
 
 export const UsersTypeDefs = gql`
-  enum Privilege {
-    MAKER
-    MENTOR
-    STAFF
-  }
-
   type PassedModule {
     moduleID: ID!
     moduleName: String!
@@ -43,7 +32,6 @@ export const UsersTypeDefs = gql`
     lastName: String!
     pronouns: String
     isStudent: Boolean!
-    privilege: Privilege!
     registrationDate: DateTime!
     admin: Boolean!
     holds: [Hold]
@@ -122,8 +110,6 @@ export const UsersTypeDefs = gql`
       college: String
       expectedGraduation: String
     ): User
-
-    setPrivilege(userID: ID!, privilege: Privilege): User
 
     archiveUser(userID: ID!): User
 

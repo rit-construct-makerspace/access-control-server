@@ -4,9 +4,7 @@
  */
 
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext, CurrentUser } from "../context.js";
-import { getAccessCheckByID, getAccessChecks, getAccessChecksByApproved, setAccessCheckApproval } from "../repositories/Equipment/AccessChecksRepository.js";
 import { getUserByID } from "../repositories/Users/UserRepository.js";
 import { getEquipmentSessions } from "../repositories/Equipment/EquipmentSessionsRepository.js";
 import { getRoomByID } from "../repositories/Rooms/RoomRepository.js";

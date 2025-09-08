@@ -86,7 +86,6 @@ export const GET_USER = gql`
       college
       expectedGraduation
       registrationDate
-      privilege
       ritUsername
       cardTagID
       notes

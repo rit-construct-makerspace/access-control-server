@@ -1,5 +1,4 @@
 import {Knex} from "knex";
-import {Privilege} from "../../schemas/usersSchema.js";
 
 
 exports.seed = function(knex: Knex) {
@@ -64,7 +63,7 @@ exports.seed = function(knex: Knex) {
             .then(function() {
                 //insert seed users
                 return knex('Users').insert([
-                    {firstName: 'Heinz', lastName: 'Doofenshmirtz', privilege: Privilege.STAFF,
+                    {firstName: 'Heinz', lastName: 'Doofenshmirtz',
                         expectedGraduation: "Spring 2025", college: 'GCCIS', pronouns: "he/him", ritUsername: 'dhd5555'}
                 ])
             })

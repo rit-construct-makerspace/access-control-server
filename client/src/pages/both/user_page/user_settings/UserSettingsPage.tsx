@@ -110,9 +110,6 @@ export default function UserSettingsPage() {
                                 <InfoBlob label="Pronous" value={pronouns}/>
                             </Grid>
                             <Grid minWidth="155px">
-                                <InfoBlob label="Role" value={user.privilege}/>
-                            </Grid>
-                            <Grid minWidth="155px">
                                 <InfoBlob label="College" value={user.college}/>
                             </Grid>
                             <Grid minWidth="155px">
