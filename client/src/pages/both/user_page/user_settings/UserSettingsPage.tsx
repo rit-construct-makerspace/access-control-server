@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { UPDATE_STUDENT_PROFILE } from "../../../maker/signup/SignupPage";
 import RequestWrapper2 from "../../../../common/RequestWrapper2";
 import { stringAvatar } from "../../../../common/avatarGenerator";
-import ThemeToggle from "../../../../left_nav/ThemeToggle";
+import ThemeToggle from "../../../../common/ThemeToggle";
 
 export default function UserSettingsPage() {
     const currentUser = useCurrentUser();
