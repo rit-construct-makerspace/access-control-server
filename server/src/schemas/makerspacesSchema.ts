@@ -7,6 +7,8 @@ import { gql } from "graphql-tag";
 
 export interface MakerspaceInput {
   name: string;
+  subtitle: string | null;
+  location: string | null;
   imageUrl: string;
 }
 
@@ -14,6 +16,8 @@ export const MakerspacesTypeDefs = gql`
   type Makerspace {
     id: ID!
     name: String!
+    subtitle: String
+    location: String
     rooms: [Room]
     hours: [MakerspaceHours]
     items: [InventoryItem]
@@ -23,6 +27,8 @@ export const MakerspacesTypeDefs = gql`
 
   input MakerspaceInput {
     name: String!
+    subtitle: String
+    location: String
     imageUrl: String
   }
 

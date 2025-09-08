@@ -8,6 +8,8 @@ import MakerspaceHours from "../../../types/MakerspaceHours";
 interface MakerspaceCardProps {
   id: number;
   name: string;
+  subtitle: string | null;
+  location: string | null;
   hours: MakerspaceHours[];
   imageUrl: string;
   isMobile: boolean;

@@ -402,9 +402,9 @@ export interface MakerspaceRow {
   /** A human readable name for the makerspace */
   name: string;
   /** Quick blurb explaining what happens in this makerspace */
-  subtitle: string;
+  subtitle: string | null;
   /** Room code for the makerspace */
-  location: string;
+  location: string | null;
   /** CDN Image Identifier */
   imageUrl: string;
   /** If true, this makerspace is out of use and can't be visited. It is effecively deleted  */

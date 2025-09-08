@@ -56,6 +56,8 @@ export function Dashboard() {
                                 <MakerspaceCard
                                     id={space.id}
                                     name={space.name}
+                                    subtitle={space.subtitle}
+                                    location={space.location}
                                     hours={space.hours}
                                     imageUrl={space.imageUrl === undefined || space.imageUrl == null || space.imageUrl === "" ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : space.imageUrl}
                                     isMobile={isMobile}

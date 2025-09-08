@@ -45,6 +45,8 @@ export default function HelpPage() {
                             <MakerspaceCard
                                 id={zone.id}
                                 name={zone.name}
+                                subtitle={zone.subtitle}
+                                location={zone.location}
                                 hours={zone.hours}
                                 imageUrl={zone.imageUrl === undefined || zone.imageUrl == null || zone.imageUrl === "" ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : zone.imageUrl}
                                 isMobile={isMobile}
