@@ -1,15 +1,15 @@
 import { Link, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/system";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import { GET_ZONES_WITH_HOURS, ZoneWithHours } from "../../../queries/zoneQueries";
+import { GET_MAKERSPACES_WITH_HOURS, MakerspaceWithHours } from "../../../queries/makerspaceQueries";
 import { useQuery } from "@apollo/client";
-import ZoneCard from "../../both/homepage/ZoneCard";
+import MakerspaceCard from "../../both/homepage/MakerspaceCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 export default function HelpPage() {
     const isMobile = useIsMobile();
-    const getZonesResult = useQuery(GET_ZONES_WITH_HOURS);
+    const getZonesResult = useQuery(GET_MAKERSPACES_WITH_HOURS);
 
     return <Stack direction={"column"} alignItems={"center"} padding={"10px"} textAlign={"center"}>
         <title>Help | Make @ RIT</title>
@@ -27,9 +27,9 @@ export default function HelpPage() {
 
         {/* Display makerspace cards */}
         <RequestWrapper2 result={getZonesResult} render={(data) => {
-            const zones: ZoneWithHours[] = data.zones;
-            const filteredZone: ZoneWithHours[] = zones.filter((_zone: ZoneWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
-            const sortedZones = filteredZone.sort((a: ZoneWithHours, b: ZoneWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
+            const zones: MakerspaceWithHours[] = data.zones;
+            const filteredZone: MakerspaceWithHours[] = zones.filter((_zone: MakerspaceWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
+            const sortedZones = filteredZone.sort((a: MakerspaceWithHours, b: MakerspaceWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
 
             return (
                 <Grid
@@ -40,9 +40,9 @@ export default function HelpPage() {
                     width="auto"
                     marginLeft="0px"
                 >
-                    {sortedZones.map((zone: ZoneWithHours) => (
+                    {sortedZones.map((zone: MakerspaceWithHours) => (
                         <Grid gap={2}>
-                            <ZoneCard
+                            <MakerspaceCard
                                 id={zone.id}
                                 name={zone.name}
                                 hours={zone.hours}

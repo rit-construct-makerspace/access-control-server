@@ -14,7 +14,7 @@ export const GET_MAKERSPACES = gql`
  }
 `;
 
-export interface MakerspacesWithHours {
+export interface MakerspaceWithHours {
   id: number;
   name: string;
   hours: MakerspaceHours[];

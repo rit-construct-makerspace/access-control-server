@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
-import { GET_MAKERSPACES_WITH_HOURS, MakerspacesWithHours } from "../../../queries/makerspaceQueries";
+import { GET_MAKERSPACES_WITH_HOURS, MakerspaceWithHours } from "../../../queries/makerspaceQueries";
 import MakerspaceCard from "./MakerspaceCard";
 import { Announcement, GET_ANNOUNCEMENTS } from "../../../queries/announcementsQueries";
 import AnnouncementCard from "./AnnouncementCard";
@@ -38,9 +38,9 @@ export function Dashboard() {
             <RequestWrapper loading={incrementSiteVisits.loading} error={incrementSiteVisits.error}><></></RequestWrapper>
             {/* Makerspaces */}
             <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
-                const makerspaces: MakerspacesWithHours[] = data.makerspaces;
-                const filteredSpaces: MakerspacesWithHours[] = makerspaces.filter((_makerspace: MakerspacesWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
-                const sortedSpaces = filteredSpaces.sort((a: MakerspacesWithHours, b: MakerspacesWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
+                const makerspaces: MakerspaceWithHours[] = data.makerspaces;
+                const filteredSpaces: MakerspaceWithHours[] = makerspaces.filter((_makerspace: MakerspaceWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
+                const sortedSpaces = filteredSpaces.sort((a: MakerspaceWithHours, b: MakerspaceWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
 
                 return (
                     <Grid
@@ -51,7 +51,7 @@ export function Dashboard() {
                         width="auto"
                         marginLeft="0px"
                     >
-                        {sortedSpaces.map((space: MakerspacesWithHours) => (
+                        {sortedSpaces.map((space: MakerspaceWithHours) => (
                             <Grid gap={2}>
                                 <MakerspaceCard
                                     id={space.id}
