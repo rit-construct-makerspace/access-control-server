@@ -465,11 +465,11 @@ const StorefrontResolvers = {
      * @returns true
      * @throws GraphQLError if not admin or is on hold
      */
-    updateMakerspace: async (
+    updateMakerspaceForItem: async (
       _parent: any,
       args: { id: number, makerspaceID: number },
       { isAdmin }: ApolloContext) => {
-      return isAdmin(() => InventoryRepo.updateMakerspace(args.id, args.makerspaceID));
+      return isAdmin(() => InventoryRepo.updateMakerspaceForItem(args.id, args.makerspaceID));
     },
   }
 };

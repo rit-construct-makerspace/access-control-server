@@ -135,6 +135,6 @@ export const StoreFrontTypeDefs = gql`
     createTag(label: String!, color: String!): Boolean
     updateTag(id: ID!, label: String!, color: String!): Boolean
     deleteTag(id: ID!): Boolean
-    updateMakerspace(id: ID!, makerspaceID: ID!): Boolean
+    updateMakerspaceForItem(id: ID!, makerspaceID: ID!): Boolean
   }
 `;

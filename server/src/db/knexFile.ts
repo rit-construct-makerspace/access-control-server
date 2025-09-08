@@ -28,7 +28,7 @@ const config: any = { //remove ': any' if using --esm
     },
     migrations: {
       tableName: "knex_migrations",
-      directory: "migrations",
+      directory: "server/dist/db/migrations",
     },
     asyncStackTraces: true,
   },

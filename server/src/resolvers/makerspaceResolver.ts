@@ -1,5 +1,5 @@
 import { ApolloContext } from "../context.js";
-import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getTrainingsByMakerspace, getZoneByID, getZones, removeTrainingFromMakerspace, updateMakerspace } from "../repositories/Makerspaces/MakerspaceRespository.js";
+import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getMakerspaceByID, getMakerspaces, getTrainingsByMakerspace, removeTrainingFromMakerspace, updateMakerspace } from "../repositories/Makerspaces/MakerspaceRespository.js";
 import { MakerspaceRow } from "../db/tables.js";
 import { getRoomsByMakerspace } from "../repositories/Rooms/RoomRepository.js";
 import { MakerspaceInput } from "../schemas/makerspacesSchema.js";
@@ -18,7 +18,7 @@ const MakerspacesResolver = {
       return getRoomsByMakerspace(parent.id);
     },
 
-    //Map hours field to array of ZoneHours
+    //Map hours field to array of MakerspaceHours
     hours: async (
       parent: MakerspaceRow,
       _args: any,
@@ -44,38 +44,38 @@ const MakerspacesResolver = {
 
   Query: {
     /**
-     * Fetch all Zones
-     * @returns array of Zones
+     * Fetch all Makerspaces
+     * @returns array of Makerspaces
      * @throws GraphQLError if not MAKER, MENTOR, or STAFF or is on hold
      */
-    zones: async (
+    makerspaces: async (
       _parent: any,
       _args: any,
     ) => {
-      return await getZones();
+      return await getMakerspaces();
     },
 
     /**
-     * Fetch a single Zone by ID
-     * @param id the id of the Zone to get
-     * @returns a single Zone
+     * Fetch a single Makerspace by ID
+     * @param id the id of the Makerspace to get
+     * @returns a single Makerspace
      */
-    zoneByID: async (
+    makerspaceByID: async (
       _parent: any,
       args: { id: number },
     ) => {
-      return await getZoneByID(args.id);
+      return await getMakerspaceByID(args.id);
     },
   },
 
   Mutation: {
     /**
-     * Create a Zone
-     * @argument name Name of the new Zone
-     * @returns new Zone
+     * Create a Makerspace
+     * @argument name Name of the new Makerspace
+     * @returns new Makerspace
      * @throws GraphQLError if not STAFF or is on hold
      */
-    addZone: async (
+    addMakerspace: async (
       _parent: any,
       args: { name: string },
       { isAdmin }: ApolloContext) =>
@@ -84,53 +84,53 @@ const MakerspacesResolver = {
         return res
       }),
 
-    updateZone: async (
+    updateMakerspace: async (
       _parent: any,
-      args: { id: number, newZone: MakerspaceInput },
+      args: { id: number, newMakerspace: MakerspaceInput },
       { isManagerFor }: ApolloContext) =>
       isManagerFor(args.id, async () => {
-        const res = await updateMakerspace(args.id, args.newZone);
+        const res = await updateMakerspace(args.id, args.newMakerspace);
         return res
       }),
 
     /**
-     * Delete a Zone
-     * @argument id ID of the ZOne to delete
+     * Delete a Makerspace
+     * @argument id ID of the Makerspace to delete
      * @returns true
      * @throws GraphQLError if not STAFF or is on hold
      */
-    deleteZone: async (
+    deleteMakerspace: async (
       _parent: any,
       args: { id: number },
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
         await deleteMakerspace(args.id);
-        return (await getZones())[0];
+        return (await getMakerspaces())[0];
       }),
 
-    addTrainingToZone: async (
+    addTrainingToMakerspace: async (
       _parent: any,
       args: {
-        zoneID: number,
+        makerspaceID: number,
         moduleID: number,
       },
       { isManagerFor }: ApolloContext
-    ) => isManagerFor(args.zoneID, async () => {
-      return await addTrainingToMakerspace(args.zoneID, args.moduleID);
+    ) => isManagerFor(args.makerspaceID, async () => {
+      return await addTrainingToMakerspace(args.makerspaceID, args.moduleID);
     }),
 
-    removeTrainingFromZone: async (
+    removeTrainingFromMakerspace: async (
       _parent: any,
       args: {
-        zoneID: number,
+        makerspaceID: number,
         moduleID: number,
       },
       { isManagerFor }: ApolloContext
-    ) => isManagerFor(args.zoneID, async () => {
-      return await removeTrainingFromMakerspace(args.zoneID, args.moduleID);
+    ) => isManagerFor(args.makerspaceID, async () => {
+      return await removeTrainingFromMakerspace(args.makerspaceID, args.moduleID);
     }),
 
-    archiveZone: async (
+    archiveMakerspace: async (
       _parent: any,
       args: {
         id: number

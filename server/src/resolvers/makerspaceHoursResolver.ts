@@ -5,7 +5,7 @@ import { DefaultHoursRow, SpecialHoursRow } from "../db/tables.js";
 const MakerspaceHoursResolver = {
 
   Query: {
-    zoneHoursNextWeek: async (
+    makerspaceHoursNextWeek: async (
       _parent: any,
       args: {
         makerspaceID: number
@@ -15,7 +15,7 @@ const MakerspaceHoursResolver = {
       return await HoursRepo.getMakerspaceHoursNextWeek(args.makerspaceID);
     },
 
-    zoneHoursOnDay: async (
+    makerspaceHoursOnDay: async (
       _parent: any,
       args: {
         day: Date,
@@ -26,7 +26,7 @@ const MakerspaceHoursResolver = {
       return await HoursRepo.getMakerspaceHoursOnDay(args.day, args.makerspaceID);
     },
 
-    zoneDefaultHours: async (
+    makerspaceDefaultHours: async (
       _parent: any,
       args: {
         makerspaceID: number
@@ -36,7 +36,7 @@ const MakerspaceHoursResolver = {
       return await HoursRepo.getMakerspaceDefaultHours(args.makerspaceID);
     },
 
-    zoneSpecialHours: async (
+    makerspaceSpecialHours: async (
       _parent: any,
       args: {
         makerspaceID: number
