@@ -9,7 +9,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 export default function HelpPage() {
     const isMobile = useIsMobile();
-    const getZonesResult = useQuery(GET_MAKERSPACES_WITH_HOURS);
+    const getMakerspacesResult = useQuery(GET_MAKERSPACES_WITH_HOURS);
 
     return <Stack direction={"column"} alignItems={"center"} padding={"10px"} textAlign={"center"}>
         <title>Help | Make @ RIT</title>
@@ -26,9 +26,9 @@ export default function HelpPage() {
         </Typography>
 
         {/* Display makerspace cards */}
-        <RequestWrapper2 result={getZonesResult} render={(data) => {
-            const zones: MakerspaceWithHours[] = data.zones;
-            const filteredZone: MakerspaceWithHours[] = zones.filter((_zone: MakerspaceWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
+        <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
+            const spaces: MakerspaceWithHours[] = data.makerspaces;
+            const filteredZone: MakerspaceWithHours[] = spaces.filter((_zone: MakerspaceWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
             const sortedZones = filteredZone.sort((a: MakerspaceWithHours, b: MakerspaceWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
 
             return (
