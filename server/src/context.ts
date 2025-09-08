@@ -1,4 +1,3 @@
-import { Privilege } from "./schemas/usersSchema.js";
 import { UserRow } from "./db/tables.js";
 import { GraphQLError } from "graphql/error/GraphQLError.js";
 import { knex } from "./db/index.js";

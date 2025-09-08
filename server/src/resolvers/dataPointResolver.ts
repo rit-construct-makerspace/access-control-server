@@ -3,7 +3,6 @@
  * GraphQL Endpoint Implementations for Data Points (misc integer data)
  */
 
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
 import { getDataPointByID, incrementDataPointValue, setDataPointValue } from "../repositories/DataPoints/DataPointsRepository.js";
 

@@ -1,5 +1,3 @@
-import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
 import * as HoursRepo from "../repositories/Zones/ZoneHoursRepository.js";
 import { DefaultHoursRow, SpecialHoursRow } from "../db/tables.js";

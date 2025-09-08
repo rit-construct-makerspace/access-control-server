@@ -3,7 +3,6 @@ import InventoryItem from "../../../types/InventoryItem";
 import { Stack } from "@mui/system";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import Privilege from "../../../types/Privilege";
 
 interface ListingCardProps {
   item: InventoryItem
@@ -37,7 +36,7 @@ export function ListingCard(props: ListingCardProps) {
               size="small"
               variant="contained"
               color="primary"
-              disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" || currentUser.privilege === Privilege.VISITOR}
+              disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" || currentUser.visitor}
               onClick={() => props.setActiveItem(props.item)}>
               Add to Cart
             </Button>

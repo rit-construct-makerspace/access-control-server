@@ -6,7 +6,6 @@ import { useIsMobile } from "../../../common/IsMobileProvider";
 import { isStaff } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useState } from "react";
-import Privilege from "../../../types/Privilege";
 
 interface ListingModalProps {
   item: InventoryItem;
@@ -105,7 +104,7 @@ export function ListingModal(props: ListingModalProps) {
             {props.item.count > 0 ? <>{props.item.count} available</> : "Out of stock"}
           </Typography>
           {props.item.count > 0
-            ? <Button size="small" variant="contained" color="primary" disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" || currentUser.privilege == Privilege.VISITOR } onClick={() => tryAddToCart()}>Add to Cart</Button>
+            ? <Button size="small" variant="contained" color="primary" disabled={import.meta.env.VITE_DISABLE_STOREFRONT_CART === "true" || currentUser.visitor } onClick={() => tryAddToCart()}>Add to Cart</Button>
             : <Button size="small" variant="contained" color="error" disabled>Out of stock</Button>}
         </Stack>
       </Stack>

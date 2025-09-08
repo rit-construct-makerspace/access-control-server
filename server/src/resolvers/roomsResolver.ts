@@ -6,7 +6,6 @@ import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import assert from "assert";
 import { Room } from "../models/rooms/room.js";
 import { ApolloContext, CurrentUser } from "../context.js";
-import { Privilege } from "../schemas/usersSchema.js";
 import * as ZoneRepo from "../repositories/Zones/ZonesRespository.js";
 import { GraphQLError } from "graphql";
 

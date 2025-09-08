@@ -24,7 +24,7 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
     const [adminState, setAdminState] = useState(props.user.admin);
     const [setAdmin] = useMutation(SET_USER_ADMIN, { refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
 
-    function handleAdminChange(e: ChangeEvent<{}>, checked: boolean) {
+    function handleAdminChange(e: ChangeEvent<object>, checked: boolean) {
         setAdminState(checked);
         setAdmin({ variables: { userID: props.user.id, admin: checked } })
     }

@@ -2,12 +2,10 @@
  * DB operations endpoint for Users table
  */
 
-import { Privilege } from "../../schemas/usersSchema.js";
 import { knex } from "../../db/index.js";
 import { createLog } from "../AuditLogs/AuditLogRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import { UserRow } from "../../db/tables.js";
-import { GraphQLError } from "graphql";
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js";
 
 
@@ -161,20 +159,6 @@ export async function updateStudentProfile(args: {
 export async function updateUserName(id: number, firstName: string, lastName: string) {
   await knex("Users").update({ firstName, lastName }).where({ id });
   await createLog("{user}'s profile info has been automatically updated", "server", { id: id, label: (firstName + " " + lastName) });
-}
-
-/**
- * Update the privlege value of a user
- * @param userID the ID of the user to update
- * @param privilege the privlege to set
- * @returns updated user
- */
-export async function setPrivilege(
-  userID: number,
-  privilege: Privilege
-): Promise<UserRow> {
-  await knex("Users").where({ id: userID }).update({ privilege });
-  return await getUserByID(userID);
 }
 
 /**
