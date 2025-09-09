@@ -35,8 +35,14 @@ export async function getUsers(searchText?: string): Promise<UserRow[]> {
  * @returns {UserRow[]} users
  */
 export async function getUsersLimit(searchText?: string): Promise<UserRow[]> {
+  if (!searchText || searchText.trim().length === 0) {
+    return knex("Users").select().orderBy("activeHold", "DESC").orderBy("ritUsername", "ASC").limit(100);
+  }
+  const expandedSearchText = `%${searchText}%`;
   return knex("Users").select()
-    .whereRaw(searchText && searchText != "" ? `("ritUsername" || "firstName" || ' ' || "lastName") ilike '%${searchText}%'` : ``)
+    .whereILike("firstName", expandedSearchText)
+    .orWhereILike("lastName", expandedSearchText)
+    .orWhereILike("ritUsername", expandedSearchText)
     .orderBy("activeHold", "DESC").orderBy("ritUsername", "ASC").limit(100);
 }
 
@@ -215,7 +221,7 @@ export async function archiveUser(userID: number, archive: boolean): Promise<Use
  * @param atriumToken 
  * @returns 
  */
-export async function updateAtriumToken(userID: number, atriumToken: string | null): Promise<UserRow>{
+export async function updateAtriumToken(userID: number, atriumToken: string | null): Promise<UserRow> {
   await knex("Users").where({ id: userID }).update({ atriumToken: atriumToken });
   return await getUserByID(userID);
 
