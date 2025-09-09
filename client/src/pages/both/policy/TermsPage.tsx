@@ -3,9 +3,9 @@ import Page from "../../Page";
 import {Button} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import RequestWrapper from "../../../common/RequestWrapper";
-import Markdown from "react-markdown";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isAdmin } from "../../../common/PrivilegeUtils";
+import ThemedMarkdown from "../../../common/RITMarkdown";
 
 const GET_TERMS_TEXT = gql`
     query GetTermsText {
@@ -24,7 +24,7 @@ export default function TermsPage() {
             <Button variant="outlined" onClick={() => navigate('/admin/terms') }>Edit</Button>
         }>
             <RequestWrapper loading={text.loading} error={text.error}>
-                <Markdown>{text.data?.getTerms}</Markdown>
+                <ThemedMarkdown>{text.data?.getTerms}</ThemedMarkdown>
             </RequestWrapper>
         </Page>
     );
