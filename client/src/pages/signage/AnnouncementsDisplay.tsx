@@ -6,7 +6,7 @@ import { Stack } from "@mui/system";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import MakeQRCode from "../../assets/make-qr-code.png";
-import ThemedMarkdown from "../../common/RITMarkdown";
+import ThemedMarkdown from "../../common/ThemedMarkdown";
 
 const StyledQRCode = styled.img`
     padding: 10px;

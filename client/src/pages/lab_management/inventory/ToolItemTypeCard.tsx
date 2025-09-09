@@ -14,7 +14,7 @@ import { ToolItemInstanceCard } from "./ToolItemInstanceCard";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddIcon from '@mui/icons-material/Add';
 import { isManager } from "../../../common/PrivilegeUtils";
-import ThemedMarkdown from "../../../common/RITMarkdown";
+import ThemedMarkdown from "../../../common/ThemedMarkdown";
 
 
 export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnInstanceClick }: { type: ToolItemType, handleLoanInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void, handleReturnInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void }) {

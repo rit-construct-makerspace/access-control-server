@@ -1,6 +1,6 @@
 import { Card, CardContent, Typography, useTheme } from "@mui/material";
 import { Announcement } from "../../../queries/announcementsQueries";
-import ThemedMarkdown from "../../../common/RITMarkdown";
+import ThemedMarkdown from "../../../common/ThemedMarkdown";
 
 interface AnnouncementCardProps {
     announcement: Announcement;

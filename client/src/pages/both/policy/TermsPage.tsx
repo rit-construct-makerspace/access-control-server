@@ -5,7 +5,7 @@ import {useNavigate} from "react-router-dom";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isAdmin } from "../../../common/PrivilegeUtils";
-import ThemedMarkdown from "../../../common/RITMarkdown";
+import ThemedMarkdown from "../../../common/ThemedMarkdown";
 
 const GET_TERMS_TEXT = gql`
     query GetTermsText {

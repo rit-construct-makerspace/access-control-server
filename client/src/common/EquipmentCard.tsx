@@ -7,7 +7,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate, useParams } from "react-router-dom";
 import ConstructionIcon from '@mui/icons-material/Construction';
 import ModuleStatusRow from "./ModuleStatusRow";
-import ThemedMarkdown from "./RITMarkdown";
+import ThemedMarkdown from "./ThemedMarkdown";
 
 interface EquipmentCardProps {
   equipment: Equipment;

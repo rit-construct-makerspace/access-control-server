@@ -8,7 +8,7 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect, useState } from "react";
-import ThemedMarkdown from "../../../common/RITMarkdown";
+import ThemedMarkdown from "../../../common/ThemedMarkdown";
 
 interface ResultsCardProps {
     summary: Array<ChoiceSummary>
