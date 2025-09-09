@@ -27,7 +27,9 @@ export default function EquipmentCard(props: EquipmentCardProps) {
 		moduleStatusMapper(user.passedModules, user.trainingHolds)
 	);
 	/**
-	 * This const is for checking if any of the training for an equipment card have not been taken by a user.
+	 * This const is for checking if any of the trainings for an equipment card have not been taken by a user.
+	 * 
+	 * @return {boolean} True if a module has not been taken; False if all modules have been taken.
 	 */
 	const hasNotTakenModule = moduleStatuses.some(
 		(ms: { status: string; }) => ms.status === "Not taken"
