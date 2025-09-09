@@ -34,8 +34,8 @@ export default function ModuleStatusRow(props: ModuleStatusRowProps) {
         <Stack direction="column" width="100%">
           <Link variant="body2" color="primary" width={"stretch"}>{props.ms.moduleName}</Link>
           {
-            props.ms.status === "Passed"
-              ? (<Typography variant="body2">Expires: {format(new Date(props.ms.expirationDate), "MMM d, yyyy")}</Typography>)
+            props.ms.status === "Passed" || props.ms.status === "Expiring Soon"
+              ? <Typography variant="body2">Expires: {format(new Date(props.ms.expirationDate), "MMM d, yyyy")}</Typography>
               : null
           }
         </Stack>
