@@ -26,11 +26,25 @@ export default function EquipmentCard(props: EquipmentCardProps) {
   const moduleStatuses = props.equipment.trainingModules.map(
     moduleStatusMapper(user.passedModules, user.trainingHolds)
   );
-  const equipmentIdsToHideCompetencyFor = (import.meta.env.VITE_EQUIPMENT_IDS_WITHOUT_INPERSON??"").split(",").map(s => Number(s));
-  const shouldHideCompetency = equipmentIdsToHideCompetencyFor.includes(Number(props.equipment.id));
+  /**
+   * This const is for checking if any of the trainings for an equipment card have not been taken by a user.
+   * 
+   * @return {boolean} True if a module has not been taken; False if all modules have been taken.
+   */
+  const hasNotTakenModule = moduleStatuses.some(
+    (ms: { status: string; }) => ms.status === "Not taken"
+  );
+  const equipmentIdsToHideCompetencyFor = (
+    import.meta.env.VITE_EQUIPMENT_IDS_WITHOUT_INPERSON ?? ""
+  )
+    .split(",")
+    .map((s) => Number(s));
+  const shouldHideCompetency = equipmentIdsToHideCompetencyFor.includes(
+    Number(props.equipment.id)
+  );
   return (
     <Card sx={{
-      width: props.isMobile ? "350px" : "600px",
+        width: props.isMobile ? "350px" : "600px",
       backgroundColor: props.equipment.archived ? theme.palette.error.light : undefined,
       height: "100%"
     }}>
@@ -47,7 +61,6 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     sx={{ width: "150px", height: "200px", backgroundColor: "lightgray" }}
                   />
                 </Box>
-                {isPriviledged ? <Typography variant="body2">ID {props.equipment.id}</Typography> : null}
               </Stack>
             }
 
@@ -59,19 +72,22 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                   isPriviledged
                     ? <Button
                       onClick={() => { navigate(`/makerspace/${makerspaceID}/equipment/${props.equipment.id}`) }}
-                      aria-label="edit button"
-                      sx={{ width: "40px", height: "40px" }}
-                      variant="contained"
-                      color="primary"
-                    >
-                      <ConstructionIcon />
-                    </Button>
+                    aria-label="edit button"
+                    sx={{ width: "40px", height: "40px" }}
+                    variant="contained"
+                    color="primary"
+                  >
+                    <ConstructionIcon />
+                  </Button>
                     : null
                 }
               </Stack>
               <Stack direction="row" justifyContent="space-between" height="100%">
                 {/* Trainings & Access Check */}
                 <Stack width="100%">
+                  {hasNotTakenModule || (!hasApprovedAccessCheck && !props.equipment.byReservationOnly ) ? (
+                    <Typography paddingLeft={"10px"}>To access, complete:</Typography>
+                  ) : null}
                   {moduleStatuses.map((ms: ModuleStatus) => (
                     <ModuleStatusRow ms={ms} />
                   ))}
@@ -84,7 +100,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                             : <CloseIcon color="error" />
                         }
                         <Typography variant="body2">In-Person Competency Check</Typography>
-                      </Stack>
+                    </Stack>
                       : null
                   }
                 </Stack>
@@ -97,14 +113,14 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     : props.equipment.numAvailable + props.equipment.numInUse > 0 ?
                       <Stack height="100%" justifyContent="center" alignItems="center">
                         <Typography variant="subtitle1" align="center" fontWeight="bold">
-                          Machines Available
-                        </Typography>
-                        <Typography variant="subtitle1" align="center">
+                        Machines Available
+                      </Typography>
+                      <Typography variant="subtitle1" align="center">
                           {`${props.equipment.numAvailable} / ${props.equipment.numAvailable + props.equipment.numInUse}`}
-                        </Typography>
-                      </Stack>
+                      </Typography>
+                    </Stack>
                       :
-                      <></>
+                    <></>
                   }
                 </Stack>
               </Stack>
@@ -115,10 +131,10 @@ export default function EquipmentCard(props: EquipmentCardProps) {
           <Stack justifyContent={"space-between"} height={"inherit"}>
             <Typography>
               <ReactMarkdown components={{
-                a({ children, ...props }) {
+                  a({ children, ...props }) {
                   return <a target="_blank" rel="noopener noreferrer"{...props}>{children}</a>;
-                },
-              }}
+                  },
+                }}
               >{props.equipment.notes}</ReactMarkdown>
             </Typography>
             <Button

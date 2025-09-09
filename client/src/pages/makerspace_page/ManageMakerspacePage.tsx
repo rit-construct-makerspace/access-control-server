@@ -22,6 +22,7 @@ export default function ManageMakerspacePage() {
   const isMobile = useIsMobile();
 
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
+  const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
   const [createRoom] = useMutation(CREATE_ROOM);
 
@@ -31,11 +32,14 @@ export default function ManageMakerspacePage() {
   return (
     <Box>
       <RequestWrapper2 result={getMakerspace} render={(data) => {
+      <RequestWrapper2 result={getMakerspace} render={(data) => {
 
+        const space: FullMakerspace = data.makerspaceByID;
         const space: FullMakerspace = data.makerspaceByID;
 
         const handleCreateRoom = async () => {
           await createRoom({
+            variables: { name: newRoomName, makerspaceID: makerspaceID },
             variables: { name: newRoomName, makerspaceID: makerspaceID },
             //refetchQueries: [{ }],
           });
@@ -45,12 +49,14 @@ export default function ManageMakerspacePage() {
         return (
           <Stack spacing={3} padding="0 20px 10px">
             <title>{`Manage ${space.name} | Make @ RIT`}</title>
+            <title>{`Manage ${space.name} | Make @ RIT`}</title>
             <Stack
               direction={isMobile ? "column" : "row"}
               justifyContent={isMobile ? undefined : "space-between"}
               alignItems="center"
               spacing={isMobile ? 2 : undefined}
             >
+              <Typography variant="h4" align="center">{`Manage ${space.name} [ID: ${space.id}]`}</Typography>
               <Typography variant="h4" align="center">{`Manage ${space.name} [ID: ${space.id}]`}</Typography>
             </Stack>
             <ManageMakerspaceHours makerspaceID={Number(makerspaceID)} />
@@ -77,6 +83,7 @@ export default function ManageMakerspacePage() {
                     <PrettyModal open={newRoomModal} onClose={() => { setNewRoomModal(false) }}>
                       <Stack spacing={2}>
                         <Typography variant="h5">Creating a new room in {space.name} Makerspace</Typography>
+                        <Typography variant="h5">Creating a new room in {space.name} Makerspace</Typography>
                         <TextField label="Name" value={newRoomName} onChange={(e) => (setNewRoomName(e.target.value))} />
                         <Stack direction="row" justifyContent="flex-end" spacing={2}>
                           <Button color="error" variant="contained" onClick={() => { setNewRoomModal(false); setNewRoomName(""); }}>Cancel</Button>
@@ -88,12 +95,15 @@ export default function ManageMakerspacePage() {
                   {
                     space.rooms.map((room: Room) => (
                       <RoomCard key={room.id} makerspaceID={space.id} room={room} />
+                    space.rooms.map((room: Room) => (
+                      <RoomCard key={room.id} makerspaceID={space.id} room={room} />
                     ))
                   }
                 </Stack>
               </Stack>
               <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />} width={"48%"}>
                 <ManageWelcomReadersCard makerspaceId={Number(makerspaceID)} />
+                <ManageMakerspaceTrainings makerspaceID={Number(makerspaceID)} trainings={space.trainingModules} />
                 <ManageMakerspaceTrainings makerspaceID={Number(makerspaceID)} trainings={space.trainingModules} />
               </Stack>
             </Stack>
