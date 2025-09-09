@@ -54,7 +54,7 @@ export async function createMakerspace(name: string): Promise<MakerspaceRow> {
 export async function updateMakerspace(
   id: number, newMakerspace: MakerspaceInput): Promise<MakerspaceRow | undefined> {
   await knex('Makerspaces').where('id', id).update(
-    { name: newMakerspace.name, imageUrl: newMakerspace.imageUrl });
+    { name: newMakerspace.name, subtitle: newMakerspace.subtitle, location: newMakerspace.location, imageUrl: newMakerspace.imageUrl });
 
   return getMakerspaceByID(id);
 }
