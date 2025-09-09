@@ -17,7 +17,7 @@ import HelpTooltip from "../../../common/HelpTooltip";
 import SaveIcon from "@mui/icons-material/Save";
 import InventoryItem from "../../../types/InventoryItem";
 import { useQuery } from "@apollo/client";
-import { GET_ZONES } from "../../../queries/zoneQueries";
+import { GET_MAKERSPACES } from "../../../queries/makerspaceQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import FileUploadButton from "../../../common/FileUploadButton";
@@ -64,7 +64,7 @@ export default function MaterialModalContents({
 }: MaterialPageProps) {
   const [inputErrors, setInputErrors] = useState<InputErrors>({});
 
-  const makerspacesResult = useQuery(GET_ZONES);
+  const makerspacesResult = useQuery(GET_MAKERSPACES);
 
   const handleStringChange =
     (property: keyof InventoryItemInput) =>
@@ -203,8 +203,8 @@ export default function MaterialModalContents({
             <FormControl fullWidth>
               <InputLabel id="makerspace-select-label">Makerspace</InputLabel>
               <Select labelId="makerspace-select-label" value={itemDraft.makerspaceID} onChange={(e) => setItemDraft({ ...itemDraft, makerspaceID: e.target.value })} error={inputErrors.makerspaceID} label="Makerspace">
-                {makerspacesResult.data?.zones.map((zone: { id: number, name: string }) => (
-                  <MenuItem key={zone.id} value={zone.id}>{zone.name}</MenuItem>
+                {makerspacesResult.data?.makerspaces.map((space: { id: number, name: string }) => (
+                  <MenuItem key={space.id} value={space.id}>{space.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>

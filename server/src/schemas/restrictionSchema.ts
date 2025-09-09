@@ -5,7 +5,7 @@ export const RestrictionTypeDefs = gql`
         id: ID!
         creator: User
         user: User!
-        makerspace: Zone!
+        makerspace: Makerspace!
         reason: String!
         createDate: DateTime!
     }

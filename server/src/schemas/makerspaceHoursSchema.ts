@@ -1,12 +1,12 @@
 /**
- * zoneHoursSchema.ts
- * GraphQL declarations for ZoneHours
+ * makerspaceHoursSchema.ts
+ * GraphQL declarations for MakerspaceHours
  */
 
 import { gql } from "graphql-tag";
 
-export const ZoneHoursTypeDefs = gql`
-  type ZoneHours {
+export const MakerspaceHoursTypeDefs = gql`
+  type MakerspaceHours {
     day: DateTime!
     makerspaceID: ID!
     open: String
@@ -14,7 +14,7 @@ export const ZoneHoursTypeDefs = gql`
     closed: Boolean!
   }
 
-  type ZoneDefaultHours {
+  type MakerspaceDefaultHours {
     dayOfWeek: Int!
     makerspaceID: ID!
     open: String
@@ -23,10 +23,10 @@ export const ZoneHoursTypeDefs = gql`
   }
 
   extend type Query {
-    zoneHoursNextWeek: [ZoneHours]
-    zoneHoursOnDay(day: DateTime!, makerspaceID: ID!): ZoneHours
-    zoneDefaultHours(makerspaceID: ID!): [ZoneDefaultHours]
-    zoneSpecialHours(makerspaceID: ID!): [ZoneHours]
+    makerspaceHoursNextWeek: [Makerspace]
+    makerspaceHoursOnDay(day: DateTime!, makerspaceID: ID!): MakerspaceHours
+    makerspaceDefaultHours(makerspaceID: ID!): [MakerspaceDefaultHours]
+    makerspaceSpecialHours(makerspaceID: ID!): [MakerspaceHours]
   }
 
   input DefaultHoursInput {

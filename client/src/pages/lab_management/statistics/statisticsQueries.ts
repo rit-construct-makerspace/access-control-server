@@ -59,7 +59,7 @@ export const GET_EQUIPMENT_SESSIONS = gql`
         id
         name
       }
-      zone {
+      makerspace {
         id
         name
       }
@@ -67,11 +67,11 @@ export const GET_EQUIPMENT_SESSIONS = gql`
   }
 `;
 
-export const GET_ZONE_HOURS = gql`
-  query GetZoneHours {
-    zoneHours {
+export const GET_MAKERSPACE_HOURS = gql`
+  query GetMakerspaceHours {
+    makerspaceHours {
       id
-      zoneID
+      makerspaceID
       type
       dayOfTheWeek
       time

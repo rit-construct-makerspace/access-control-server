@@ -340,7 +340,7 @@ export async function deleteTag(id: number): Promise<boolean> {
   return true;
 }
 
-export async function updateMakerspace(id: number, makerspaceID: number): Promise<boolean> {
+export async function updateMakerspaceForItem(id: number, makerspaceID: number): Promise<boolean> {
   await knex("InventoryItem").update({ makerspaceID }).where({ id });
   return true;
 }

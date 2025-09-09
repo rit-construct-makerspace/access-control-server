@@ -16,7 +16,7 @@ export const GET_EQUIPMENTS = gql`
       numInUse
       byReservationOnly
       room {
-        zone {
+        makerspace {
           id
         }
       }
@@ -45,7 +45,7 @@ export const GET_EQUIPMENT_BY_ID = gql`
       room {
         id
         name
-        zone {
+        makerspace {
           id
           name
         }

@@ -4,7 +4,7 @@ import { InventoryCartsRow } from "../db/tables.js";
 import { clearItemsFromCart, deleteInventoryCart, getInventoryCartByID, getInventoryCarts, getInventoryCartsByMakerspace, getItemsInCart, subtractItemFromCart } from "../repositories/Store/InventoryCartsRepository.js";
 import { addItemAmount, addItemsAmounts, getItemById } from "../repositories/Store/InventoryRepository.js";
 import { getUserByID } from "../repositories/Users/UserRepository.js";
-import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
+import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
 
 export const CartResolver = {
   InventoryCart: {
@@ -18,7 +18,7 @@ export const CartResolver = {
       parent: InventoryCartsRow,
       _args: any,
       _context: ApolloContext) => {
-      return await getZoneByID(parent.makerspaceID)
+      return await getMakerspaceByID(parent.makerspaceID)
     },
     items: async (
       parent: InventoryCartsRow,

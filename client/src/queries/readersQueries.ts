@@ -130,7 +130,7 @@ query GetReaderLogs($makerspaceID: ID, $from: DateTime, $to: DateTime, $offset: 
         id
         name
         room {
-          zone {
+          makerspace {
             id
             name
           }

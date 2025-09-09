@@ -5,7 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useMutation, useQuery } from "@apollo/client";
 import GET_TRAINING_MODULES from "../../queries/trainingQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
-import { ADD_TRAINING_TO_ZONE, GET_ZONE_BY_ID, REMOVE_TRAINING_FROM_ZONE } from "../../queries/zoneQueries";
+import { ADD_TRAINING_TO_MAKERSPACE, GET_MAKERSPACE_BY_ID, REMOVE_TRAINING_FROM_MAKERSPACE } from "../../queries/makerspaceQueries";
 import { useState } from "react";
 
 interface ManageMakerspaceTrainingsProps {
@@ -16,8 +16,8 @@ interface ManageMakerspaceTrainingsProps {
 export default function ManageMakerspaceTrainings(props: ManageMakerspaceTrainingsProps) {
   const getModuleResults = useQuery(GET_TRAINING_MODULES);
 
-  const [addTraining] = useMutation(ADD_TRAINING_TO_ZONE, { refetchQueries: [{ query: GET_ZONE_BY_ID, variables: { id: props.makerspaceID } }] });
-  const [removeTraining] = useMutation(REMOVE_TRAINING_FROM_ZONE, { refetchQueries: [{ query: GET_ZONE_BY_ID, variables: { id: props.makerspaceID } }] });
+  const [addTraining] = useMutation(ADD_TRAINING_TO_MAKERSPACE, { refetchQueries: [{ query: GET_MAKERSPACE_BY_ID, variables: { id: props.makerspaceID } }] });
+  const [removeTraining] = useMutation(REMOVE_TRAINING_FROM_MAKERSPACE, { refetchQueries: [{ query: GET_MAKERSPACE_BY_ID, variables: { id: props.makerspaceID } }] });
 
   const [newTraining, setNewTraining] = useState(0);
 
@@ -27,7 +27,7 @@ export default function ManageMakerspaceTrainings(props: ManageMakerspaceTrainin
       return;
     }
 
-    addTraining({ variables: { zoneID: props.makerspaceID, moduleID: newTraining } });
+    addTraining({ variables: { makerspaceID: props.makerspaceID, moduleID: newTraining } });
   }
 
   return (
@@ -38,7 +38,7 @@ export default function ManageMakerspaceTrainings(props: ManageMakerspaceTrainin
           <Card>
             <Stack direction={"row"} justifyContent={"space-between"} padding={"10px"} alignItems={"center"}>
               <Typography>{training.name} ID: {training.id}</Typography>
-              <IconButton color="error" onClick={() => removeTraining({ variables: { zoneID: props.makerspaceID, moduleID: training.id } })}>
+              <IconButton color="error" onClick={() => removeTraining({ variables: { makerspaceID: props.makerspaceID, moduleID: training.id } })}>
                 <DeleteIcon />
               </IconButton>
             </Stack>

@@ -4,7 +4,7 @@ export const CartTypeDefs = gql`
   type InventoryCart {
     id: ID!
     user: User!
-    makerspace: Zone!
+    makerspace: Makerspace!
     items: [PurchasedItem!]!
     lastModified: DateTime
   }

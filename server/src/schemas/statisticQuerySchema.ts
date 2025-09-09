@@ -40,8 +40,8 @@ export const StatisticQueryTypeDefs = gql`
         equipmentName: String!
         roomID: ID!
         roomName: String!
-        zoneID: ID!
-        zoneName: String!
+        makerspaceID: ID!
+        makerspaceName: String!
     }
 
     type VerboseRoomSwipe {
