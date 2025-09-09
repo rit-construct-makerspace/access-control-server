@@ -47,7 +47,6 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
 
   const [isHovered, setIsHovered] = useState(false);
 
-
   return (
     <Card sx={{ width: props.isMobile ? "350px" : "500px" }} elevation={isHovered ? undefined : 8} onMouseEnter={() => { setIsHovered(true) }} onMouseLeave={() => { setIsHovered(false) }}>
       <CardActionArea
@@ -58,7 +57,7 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
         }>
         <CardMedia
           component="img"
-          height={props.isMobile ? "196" : "281px"}
+          height={props.isMobile ? "197px" : "281px"}
           image={import.meta.env.VITE_CDN_URL + "user-uploads/" + props.imageUrl}
         />
         <CardContent sx={{ justifyContent: "center", display: "flex", flexDirection: "column" }}>

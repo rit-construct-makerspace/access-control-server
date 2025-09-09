@@ -44,7 +44,6 @@ export default function ManageMakerspacePage() {
         return (
           <Stack spacing={3} padding="0 20px 10px">
             <title>{`Manage ${space.name} | Make @ RIT`}</title>
-            <title>{`Manage ${space.name} | Make @ RIT`}</title>
             <Stack
               direction={isMobile ? "column" : "row"}
               justifyContent={isMobile ? undefined : "space-between"}
