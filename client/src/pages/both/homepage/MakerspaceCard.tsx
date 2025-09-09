@@ -47,6 +47,7 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
 
   const [isHovered, setIsHovered] = useState(false);
 
+
   return (
     <Card sx={{ width: props.isMobile ? "350px" : "500px" }} elevation={isHovered ? undefined : 8} onMouseEnter={() => { setIsHovered(true) }} onMouseLeave={() => { setIsHovered(false) }}>
       <CardActionArea
@@ -57,16 +58,23 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
         }>
         <CardMedia
           component="img"
-          height={props.isMobile ? "197px" : "281px"}
+          height={props.isMobile ? "196" : "281px"}
           image={import.meta.env.VITE_CDN_URL + "user-uploads/" + props.imageUrl}
         />
-        <CardContent sx={{justifyContent: "center", display: "flex", flexDirection: "column"}}>
-          <Typography variant="h4" >{props.name}</Typography>
+        <CardContent sx={{ justifyContent: "center", display: "flex", flexDirection: "column" }}>
+          <Stack direction={"row"} justifyContent={"space-between"} alignItems={"end"}>
+            <Typography variant="h4" >{props.name}</Typography>
+            {!props.isMobile && <Button variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
+
+          </Stack>
+
+          <Typography variant="h5" color="textSecondary">{props.subtitle}</Typography>
+
           <Stack direction={"row"} justifyContent={"space-between"}>
             {getHoursToday(props.hours, theme.palette.primary.main)}
-            {!props.isMobile && <Button variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
+            <Typography variant="h6" color="textSecondary" >{props.location}</Typography>
           </Stack>
-          {props.isMobile && <Button  variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
+          {props.isMobile && <Button variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
 
         </CardContent>
       </CardActionArea>

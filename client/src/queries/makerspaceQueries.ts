@@ -190,7 +190,7 @@ export const UPDATE_MAKERSPACE = gql`
   ) {
     updateMakerspace(
       id: $id
-      newMakerspace: { name: $name, imageUrl: $imageUrl }
+      newMakerspace: { name: $name, subtitle: $subtitle, location: $location, imageUrl: $imageUrl }
     ) {
       id
     }

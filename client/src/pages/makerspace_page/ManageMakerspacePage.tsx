@@ -1,30 +1,24 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
-import { FullMakerspace, GET_MAKERSPACE_BY_ID, DELETE_MAKERSPACE, UPDATE_MAKERSPACE } from "../../queries/makerspaceQueries";
+import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../queries/makerspaceQueries";
 import { Box, Button, Divider, Stack, TextField, Typography } from "@mui/material";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { useState } from "react";
-import SaveIcon from '@mui/icons-material/Save';
-import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from '@mui/icons-material/Add';
 import { CREATE_ROOM } from "../../queries/roomQueries";
 import Room from "../../types/Room";
 import RoomCard from "./RoomCard";
 import PrettyModal from "../../common/PrettyModal";
-import { useCurrentUser } from "../../common/CurrentUserProvider";
 import { useIsMobile } from "../../common/IsMobileProvider";
 import ManageWelcomReadersCard from "./ManageWelcomeReadersCard";
 import ManageMakerspaceTrainings from "./ManageMakerspaceTrainings";
 import ManageMakerspaceHours from "./ManageMakerspaceHours";
-import FileUploadButton from "../../common/FileUploadButton";
 import ManageMakerspaceInformation from "./ManageMakerspaceInformation";
-import { toast } from "react-toastify";
 
 
 export default function ManageMakerspacePage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
-  const user = useCurrentUser();
   const isMobile = useIsMobile();
 
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
@@ -65,6 +59,8 @@ export default function ManageMakerspacePage() {
                 <ManageMakerspaceInformation
                   id={Number(makerspaceID)}
                   name={space.name}
+                  subtitle={space.subtitle}
+                  location={space.location}
                   hours={space.hours}
                   imageUrl={space.imageUrl}
                 />

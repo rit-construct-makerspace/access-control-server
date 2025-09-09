@@ -24,13 +24,13 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
   const [updateMakerspace] = useMutation(UPDATE_MAKERSPACE, { refetchQueries: ["GetMakerspaceByID"] });
 
   const [makerspaceName, setMakerspaceName] = useState(props.name);
-  const [makerspaceSubtitle, setMakerspaceSubtitle] = useState(props.subtitle);
-  const [makerspaceLocation, setMakerspaceLocation] = useState(props.location);
+  const [makerspaceSubtitle, setMakerspaceSubtitle] = useState(props.subtitle ?? "");
+  const [makerspaceLocation, setMakerspaceLocation] = useState(props.location ?? "");
   const [imgUrl, setImgUrl] = useState(props.imageUrl);
 
   const handleUpdateMakerspace = async () => {
     await updateMakerspace({
-      variables: { id: props.id, name: makerspaceName, imageUrl: imgUrl },
+      variables: { id: props.id, name: makerspaceName, subtitle: makerspaceSubtitle, location: makerspaceLocation, imageUrl: imgUrl },
       onCompleted() {
         toast.success("Updated makerspace");
       },
@@ -52,7 +52,8 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
       <MakerspaceCard
         id={props.id}
         name={makerspaceName}
-
+        subtitle={makerspaceSubtitle}
+        location={makerspaceLocation}
         hours={props.hours}
         imageUrl={imgUrl}
         isMobile={isMobile}
@@ -70,11 +71,17 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
           color="primary"
           variant="contained"
           startIcon={<SaveIcon />}
-          onClick={() => { if (makerspaceName !== props.name) handleUpdateMakerspace(); }}
+          onClick={() => {
+            const changed = makerspaceName !== props.name || makerspaceLocation !== props.location || makerspaceSubtitle !== props.subtitle;
+            if (changed) handleUpdateMakerspace();
+          }}
         >
           Save
         </Button>
       </Stack>
+      <TextField label="Subtitle" value={makerspaceSubtitle} onChange={(e) => (setMakerspaceSubtitle(e.target.value))} sx={{ width: "90%" }} />
+      <TextField label="Location" value={makerspaceLocation} onChange={(e) => (setMakerspaceLocation(e.target.value))} sx={{ width: "90%" }} />
+
     </Stack>
   );
 }
