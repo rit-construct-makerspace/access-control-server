@@ -47,7 +47,6 @@ export default function EquipmentCard(props: EquipmentCardProps) {
                     sx={{ width: "150px", height: "200px", backgroundColor: "lightgray" }}
                   />
                 </Box>
-                {isPriviledged ? <Typography variant="body2">ID {props.equipment.id}</Typography> : null}
               </Stack>
             }
 
