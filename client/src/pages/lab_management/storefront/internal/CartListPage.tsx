@@ -76,45 +76,47 @@ export function CartListPage() {
   return (
     <AdminPage>
       <title>Carts | Make @ RIT</title>
-      <PageSectionHeader>Active Carts</PageSectionHeader>
+      <Box m={"20px"}>
+        <PageSectionHeader>Active Carts</PageSectionHeader>
 
-      <Stack direction="row" spacing={4} mb={2} alignItems="center">
-        {/* Makerspace Filter */}
-        <FormGroup row>
-          {getMakerspacesResult.loading ? <CircularProgress size={24} /> : makerspaces.map((zone: { id: number, name: string }) => (
-            <FormControlLabel
-              key={zone.id}
-              control={
-                <Checkbox
-                  checked={filteredMakerspaces.includes(Number(zone.id))}
-                  onChange={(e) => {
-                    setFilteredMakerspaces((prev) =>
-                      e.target.checked
-                        ? [...prev, Number(zone.id)]
-                        : prev.filter((id) => id !== Number(zone.id))
-                    );
-                  }}
-                />
-              }
-              label={zone.name}
-            />
-          ))}
-        </FormGroup>
-        {/* User Search Filter */}
-        <TextField
-          label="Search User"
-          value={userSearch}
-          onChange={(e) => setUserSearch(e.target.value)}
-          size="small"
-        />
-      </Stack>
+        <Stack direction="row" spacing={4} mb={2} alignItems="center">
+          {/* Makerspace Filter */}
+          <FormGroup row>
+            {getMakerspacesResult.loading ? <CircularProgress size={24} /> : makerspaces.map((zone: { id: number, name: string }) => (
+              <FormControlLabel
+                key={zone.id}
+                control={
+                  <Checkbox
+                    checked={filteredMakerspaces.includes(Number(zone.id))}
+                    onChange={(e) => {
+                      setFilteredMakerspaces((prev) =>
+                        e.target.checked
+                          ? [...prev, Number(zone.id)]
+                          : prev.filter((id) => id !== Number(zone.id))
+                      );
+                    }}
+                  />
+                }
+                label={zone.name}
+              />
+            ))}
+          </FormGroup>
+          {/* User Search Filter */}
+          <TextField
+            label="Search User"
+            value={userSearch}
+            onChange={(e) => setUserSearch(e.target.value)}
+            size="small"
+          />
+        </Stack>
 
-      <Box>
-        <DataGrid
-          rows={filteredRows}
-          columns={columns}
-          autoHeight
-        />
+        <Box>
+          <DataGrid
+            rows={filteredRows}
+            columns={columns}
+            autoHeight
+          />
+        </Box>
       </Box>
     </AdminPage>
   );
