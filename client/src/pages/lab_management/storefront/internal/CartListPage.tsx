@@ -82,22 +82,22 @@ export function CartListPage() {
         <Stack direction="row" spacing={4} mb={2} alignItems="center">
           {/* Makerspace Filter */}
           <FormGroup row>
-            {getMakerspacesResult.loading ? <CircularProgress size={24} /> : makerspaces.map((zone: { id: number, name: string }) => (
+            {getMakerspacesResult.loading ? <CircularProgress size={24} /> : makerspaces.map((space: { id: number, name: string }) => (
               <FormControlLabel
-                key={zone.id}
+                key={space.id}
                 control={
                   <Checkbox
-                    checked={filteredMakerspaces.includes(Number(zone.id))}
+                    checked={filteredMakerspaces.includes(Number(space.id))}
                     onChange={(e) => {
                       setFilteredMakerspaces((prev) =>
                         e.target.checked
-                          ? [...prev, Number(zone.id)]
-                          : prev.filter((id) => id !== Number(zone.id))
+                          ? [...prev, Number(space.id)]
+                          : prev.filter((id) => id !== Number(space.id))
                       );
                     }}
                   />
                 }
-                label={zone.name}
+                label={space.name}
               />
             ))}
           </FormGroup>

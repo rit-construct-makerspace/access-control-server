@@ -28,8 +28,8 @@ export default function HelpPage() {
         {/* Display makerspace cards */}
         <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
             const spaces: MakerspaceWithHours[] = data.makerspaces;
-            const filteredZone: MakerspaceWithHours[] = spaces.filter((_zone: MakerspaceWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
-            const sortedZones = filteredZone.sort((a: MakerspaceWithHours, b: MakerspaceWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
+            const filteredSpaces: MakerspaceWithHours[] = spaces.filter((_space: MakerspaceWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
+            const sortedSpaces = filteredSpaces.sort((a: MakerspaceWithHours, b: MakerspaceWithHours) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
 
             return (
                 <Grid
@@ -40,13 +40,13 @@ export default function HelpPage() {
                     width="auto"
                     marginLeft="0px"
                 >
-                    {sortedZones.map((zone: MakerspaceWithHours) => (
+                    {sortedSpaces.map((space: MakerspaceWithHours) => (
                         <Grid gap={2}>
                             <MakerspaceCard
-                                id={zone.id}
-                                name={zone.name}
-                                hours={zone.hours}
-                                imageUrl={zone.imageUrl === undefined || zone.imageUrl == null || zone.imageUrl === "" ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : zone.imageUrl}
+                                id={space.id}
+                                name={space.name}
+                                hours={space.hours}
+                                imageUrl={space.imageUrl === undefined || space.imageUrl == null || space.imageUrl === "" ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : space.imageUrl}
                                 isMobile={isMobile}
                             />
                         </Grid>
