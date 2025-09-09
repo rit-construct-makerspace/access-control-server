@@ -19,18 +19,24 @@ export function getUsersFullName(user: UserRow) {
 }
 
 /**
- * Fetch all users in the table
+ * Fetch all users in the table matching search text
  * @param searchText text to narrow by user name
  * @returns {UserRow[]} users
  */
 export async function getUsers(searchText?: string): Promise<UserRow[]> {
+  if (!searchText || searchText.trim().length === 0) {
+    return knex("Users").select().orderBy("activeHold", "DESC").orderBy("ritUsername", "ASC");
+  }
+  const expandedSearchText = `%${searchText}%`;
   return knex("Users").select()
-    .whereRaw(searchText && searchText != "" ? `("ritUsername" || "firstName" || ' ' || "lastName") ilike '%${searchText}%'` : ``)
-    .orderBy("ritUsername", "ASC");
+    .whereILike("firstName", expandedSearchText)
+    .orWhereILike("lastName", expandedSearchText)
+    .orWhereILike("ritUsername", expandedSearchText)
+    .orderBy("activeHold", "DESC").orderBy("ritUsername", "ASC");
 }
 
 /**
- * Fetch all users in the table
+ * Fetch users in the table matching search text up to 100 entries
  * @param searchText text to narrow by user name
  * @returns {UserRow[]} users
  */
