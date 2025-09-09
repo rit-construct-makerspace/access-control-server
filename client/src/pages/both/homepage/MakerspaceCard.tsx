@@ -24,9 +24,9 @@ function getHoursToday(times: MakerspaceHours[], primaryColor: string) {
   const status = hours_today.closed ? "CLOSED" : TimeUtils.currentStatus(hours_today.open?.substring(0, 5) ?? "12:00", hours_today.close?.substring(0, 5) ?? "12:00");
 
   return (
-    <Stack justifyContent="space-between" spacing={"20px"} direction="row" alignItems={"center"}>
+    <Stack width={"100%"} justifyContent="space-between" spacing={"20px"} direction="row" alignItems={"center"}>
       <Typography color={status === "OPEN" ? "success" : "error"} fontWeight="bold">{status}</Typography>
-      <Stack direction="row" >
+      <Stack justifyContent="space-between" direction="row" >
         <Typography color={primaryColor} fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
         <Typography paddingLeft={"10px"} >
           {
@@ -64,17 +64,21 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
         <CardContent sx={{ justifyContent: "center", display: "flex", flexDirection: "column" }}>
           <Stack direction={"row"} justifyContent={"space-between"} alignItems={"end"}>
             <Typography variant="h4" >{props.name}</Typography>
-            {!props.isMobile && <Button variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
-
+            {!props.isMobile && <Typography variant="h6" color="textSecondary" alignSelf={"center"} >{props.location}</Typography>}
           </Stack>
 
           <Typography variant="h5" color="textSecondary">{props.subtitle}</Typography>
 
-          <Stack direction={"row"} justifyContent={"space-between"}>
+          <Stack direction={"row"} justifyContent={"space-between"} spacing={"20px"}>
             {getHoursToday(props.hours, theme.palette.primary.main)}
-            <Typography variant="h6" color="textSecondary" >{props.location}</Typography>
+            {!props.isMobile && <Button variant="contained" endIcon={<ChevronRightIcon />}>Explore</Button>}
           </Stack>
-          {props.isMobile && <Button variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
+          {props.isMobile &&
+            <Stack direction="row" justifyContent={"space-between"} paddingTop={"10px"}>
+              <Typography variant="h6" color="textSecondary" alignSelf={"center"} >{props.location}</Typography>  
+              <Button variant="contained" endIcon={<ChevronRightIcon />}>Explore</Button> 
+            </Stack>
+          }
 
         </CardContent>
       </CardActionArea>
