@@ -18,6 +18,7 @@ interface ChoiceSummary {
   questionNum: string;
   questionText: string;
   correct: boolean;
+  comment: string;
 }
 
 const styles = {
@@ -59,7 +60,7 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
               {choiceSummary.correct 
               ? <CheckCircleIcon color="success" />
               : <CloseIcon color="error" />}
-              <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><Markdown>{choiceSummary.questionText}</Markdown></Typography>
+              <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><Markdown>{choiceSummary.questionText}</Markdown><Markdown>{choiceSummary.comment}</Markdown></Typography>
             </Stack>
           </Card>
         ))}
