@@ -9,7 +9,7 @@ import {
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper2 from "../../common/RequestWrapper2";
-import RoomZoneAssociation from "./RoomZoneAssociation";
+import RoomMakerspaceAssociation from "./RoomMakerspaceAssociation";
 import { DELETE_ROOM, UPDATE_ROOM_NAME } from "../../queries/roomQueries";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCurrentUser } from "../../common/CurrentUserProvider";
@@ -23,7 +23,7 @@ export const GET_ROOM = gql`
   query GetRoom($id: ID!) {
     room(id: $id) {
       name
-      zone {
+      makerspace {
         id
         name
       }
@@ -137,7 +137,7 @@ export default function ManageRoomPage() {
                   <ManageRoomTrainings roomID={Number(roomID)} trainings={roomTrainings} />
                 </Stack>
                 <Stack spacing={2} width={isMobile ? "auto" : "50%"}>
-                  <RoomZoneAssociation zoneID={room.zone?.id} roomID={Number(roomID)}></RoomZoneAssociation>
+                  <RoomMakerspaceAssociation makerspaceID={room.makerspace?.id} roomID={Number(roomID)}></RoomMakerspaceAssociation>
                 </Stack>
               </Stack>
             </Stack>

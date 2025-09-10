@@ -8,14 +8,14 @@ export default interface Room {
   trainingModules: TrainingModule[];
 }
 
-export default interface Zone {
+export default interface Makerspace {
   id: number;
   name: string;
 }
 
-export default interface ZoneHour {
+export default interface MakerspaceHour {
   id: number;
-  zoneID: number;
+  makerspaceID: number;
   type: string;
   dayOfTheWeek: number;
   time: string;

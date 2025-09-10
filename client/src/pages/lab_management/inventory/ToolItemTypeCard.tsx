@@ -12,9 +12,9 @@ import { DELETE_TYPE, GET_TOOL_ITEM_TYPES } from "../../../queries/toolItemQueri
 import { useNavigate, useParams } from "react-router-dom";
 import { ToolItemInstanceCard } from "./ToolItemInstanceCard";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Markdown from "react-markdown";
 import AddIcon from '@mui/icons-material/Add';
 import { isManager } from "../../../common/PrivilegeUtils";
+import ThemedMarkdown from "../../../common/ThemedMarkdown";
 
 
 export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnInstanceClick }: { type: ToolItemType, handleLoanInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void, handleReturnInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void }) {
@@ -87,7 +87,7 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
         <Box width={"98.5%"} pl={"1.5%"}>
           <CardHeader title={<Typography variant="h4" pt={"2%"}>{type.name}</Typography>} action={isManager(currentUser) && CONTROL_MENU} sx={{ height: 15, pb: 3, pl: 1 }}></CardHeader>
           <Box my={2} mx={2} py={1} px={1} border={`1px solid ${localStorage.getItem("themeMode") === "dark" ? "#000000" : "#fafafa"}`}>
-            <Markdown>{type.description}</Markdown>
+            <ThemedMarkdown>{type.description}</ThemedMarkdown>
           </Box>
         </Box>
       </Stack>

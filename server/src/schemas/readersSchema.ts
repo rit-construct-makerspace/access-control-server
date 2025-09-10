@@ -56,7 +56,7 @@ export const ReaderTypeDefs = gql`
     readers(makerspaceID: ID): [Reader]
     unpairedReaders: [Reader]
     welcomeReadersForMakerspace(makerspaceId: ID!): [Reader]
-    makerspaceForWelcomeReader(readerId: ID): Zone
+    makerspaceForWelcomeReader(readerId: ID): Makerspace
     reader(id: ID!): Reader
     readerLogs(makerspaceID: ID, from: DateTime, to: DateTime, pageOffset: Int, pageLimit: Int): [ReaderLog]
     availableFirmwareVersions: [String]

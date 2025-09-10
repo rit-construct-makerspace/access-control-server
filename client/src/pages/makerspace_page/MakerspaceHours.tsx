@@ -1,19 +1,19 @@
 import { Stack, Typography, useTheme } from "@mui/material";
-import ZoneHours from "../../types/ZoneHours";
+import MakerspaceHours from "../../types/MakerspaceHours";
 import * as TimeUtils from "../../common/TimeUtils";
 
-interface ZoneHoursProps {
-  hours: ZoneHours[];
+interface MakerspaceHoursProps {
+  hours: MakerspaceHours[];
   isMobile: boolean;
 }
 
-export default function ZoneHoursSection(props: ZoneHoursProps) {
+export default function MakerspaceHoursSection(props: MakerspaceHoursProps) {
   const theme = useTheme();
 
   return (
     <Stack padding="10px 0px" direction={props.isMobile ? "column" : "row"} justifyContent={props.isMobile ? "center" : "space-around"}>
       {
-        props.hours.map((hour: ZoneHours) => {
+        props.hours.map((hour: MakerspaceHours) => {
 
           const dayDate = new Date(hour.day);
 

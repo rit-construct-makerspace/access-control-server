@@ -15,7 +15,7 @@ import Page from "../../Page";
 import { ListingCard } from "./ListingCard";
 import { ListingModal } from "./ListingModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
-import { GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQueries";
+import { GET_MAKERSPACES_WITH_ITEMS, MakerspaceWithItems } from "../../../queries/makerspaceQueries";
 import CheckoutSuccessModal from "./CheckoutSuccessModal";
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { useNavigate } from "react-router-dom";
@@ -43,7 +43,7 @@ export default function StorefrontPage() {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
 
-  const { loading, error, data } = useQuery(GET_ZONES_WITH_ITEMS, { variables: { storefrontVisible: isStaff(currentUser) ? null : true } });
+  const { loading, error, data } = useQuery(GET_MAKERSPACES_WITH_ITEMS, { variables: { storefrontVisible: isStaff(currentUser) ? null : true } });
 
   const [checkoutItems] = useMutation(CHECKOUT_ITEMS, {
     refetchQueries: [{ query: GET_INVENTORY_ITEMS }],
@@ -182,11 +182,11 @@ export default function StorefrontPage() {
         />
 
         <Stack direction={"row"} flexWrap={"wrap"} divider={<Divider flexItem />} sx={{ width: "100%" }}>
-          {data?.zones?.map((zone: ZoneWithItems) => (
-            <Box key={zone.id} sx={{ width: "100%", mb: 2 }}>
-              <Typography variant="h4" sx={{ mb: 1 }}>{zone.name}</Typography>
+          {data?.makerspaces?.map((space: MakerspaceWithItems) => (
+            <Box key={space.id} sx={{ width: "100%", mb: 2 }}>
+              <Typography variant="h4" sx={{ mb: 1 }}>{space.name}</Typography>
               <Stack direction={"row"} flexWrap={"wrap"} justifyContent={"flex-start"}>
-                {zone.items.filter((item: InventoryItem) => {
+                {space.items.filter((item: InventoryItem) => {
                   const matchesSearch = item.name.toLowerCase().includes(searchText.toLowerCase());
                   const isVisible = item.storefrontVisible || (showInternalItems && item.staffOnly) || (showStaffItems && item.staffOnly);
                   return matchesSearch && isVisible;

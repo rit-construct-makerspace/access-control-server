@@ -20,7 +20,7 @@ export default function TrainerEquipmentSelect(props: TrainerEquipmentSelectProp
 
             const equipments: any[] = data.equipments;
 
-            const possibleEquipments = equipments.filter((equipment) => isManagerFor(currentUser, Number(equipment.room.zone.id)) && !props.user.trainer.includes(Number(equipment.id)));
+            const possibleEquipments = equipments.filter((equipment) => isManagerFor(currentUser, Number(equipment.room.makerspace.id)) && !props.user.trainer.includes(Number(equipment.id)));
             const sortedEquipment = possibleEquipments.sort((a, b) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
 
             return (

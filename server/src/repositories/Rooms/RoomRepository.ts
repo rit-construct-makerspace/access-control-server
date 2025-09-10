@@ -21,7 +21,7 @@ import * as ModuleRepo from "../Training/ModuleRepository.js";
  */
 export async function getRoomByID(roomID: number): Promise<Room | null> {
   const knexResult = await knex
-    .first("id", "name", "zoneID")
+    .first("id", "name", "makerspaceID")
     .from("Rooms")
     .where("id", roomID);
 
@@ -38,12 +38,12 @@ export async function getRooms(): Promise<Room[]> {
 }
 
 /**
- * Fetch all rooms in the table associated with zone
- * @param zone zone id
+ * Fetch all rooms in the table associated with makerspace
+ * @param makerspace makerspace id
  * @returns {Room[]} rooms
  */
-export async function getRoomsByZone(zoneID: number): Promise<Room[]> {
-  const knexResult = await knex("Rooms").select().where({zoneID});
+export async function getRoomsByMakerspace(makerspaceID: number): Promise<Room[]> {
+  const knexResult = await knex("Rooms").select().where({makerspaceID: makerspaceID});
   return roomsToDomain(knexResult);
 }
 
@@ -57,7 +57,7 @@ export async function addRoom(room: Room): Promise<Room> {
     await knex("Rooms").insert(
       {
         name: room.name,
-        zoneID: room.zoneID,
+        makerspaceID: room.makerspaceID,
       },
       "id"
     )
@@ -108,18 +108,18 @@ export async function updateRoomName(
 }
 
 /**
- * Update the zone of an existing room
+ * Update the makerspace of an existing room
  * @param roomID the ID of the room to update
- * @param zoneID the new zone
+ * @param makerspaceID the new makerspace
  * @returns the updated room
  */
-export async function updateZone(
+export async function updateMakerspace(
   roomID: number,
-  zoneID: number
+  makerspaceID: number
 ): Promise<Room | null> {
-  console.log(roomID + " " + zoneID)
+  console.log(roomID + " " + makerspaceID)
   await knex("Rooms").where({ id: roomID }).update({
-    zoneID
+    makerspaceID: makerspaceID
   });
 
   return await getRoomByID(roomID);

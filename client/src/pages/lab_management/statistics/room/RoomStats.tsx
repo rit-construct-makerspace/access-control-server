@@ -187,7 +187,7 @@ export function RoomStats() {
 
         <Button onClick={handleSubmit} variant="contained" color="primary" sx={{ width: '10em' }}>Fetch</Button>
 
-        <Tooltip title={getRoomSwipesResult.data ? "User, Room, and Zone columns will be split into Names and IDs" : "Must Fetch data before exporting"}>
+        <Tooltip title={getRoomSwipesResult.data ? "User, Room, and Makerspace columns will be split into Names and IDs" : "Must Fetch data before exporting"}>
           <Button onClick={handleCSVExport} startIcon={<DownloadIcon />} variant="outlined" color="secondary" sx={{ width: '10em' }} disabled={!getRoomSwipesResult.data}>Export as CSV</Button>
         </Tooltip>
 

@@ -10,7 +10,6 @@ import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import { CREATE_EQUIPMENT_INSTANCE } from "../../../queries/equipmentInstanceQueries";
-import { toast } from "react-toastify";
 
 export interface Equipment {
   id: number;
@@ -27,7 +26,7 @@ export interface Equipment {
   room: {
     id: number;
     name: string;
-    zone: {
+    makerspace: {
       id: number;
       name: string;
     };

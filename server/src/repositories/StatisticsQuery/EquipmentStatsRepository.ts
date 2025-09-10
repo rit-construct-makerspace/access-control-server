@@ -19,8 +19,8 @@ export interface VerboseEquipmentSession {
   equipmentName: string;
   roomID: number;
   roomName: string;
-  zoneID: number;
-  zoneName: string;
+  makerspaceID: number;
+  makerspaceName: string;
 }
 
 export async function getEquipmentSessionsWithAttachedEntities(startDate?: string, endDate?: string, equipmentIDs?: string[]): Promise<{rows: VerboseEquipmentSession[]}> {
@@ -46,12 +46,12 @@ export async function getEquipmentSessionsWithAttachedEntities(startDate?: strin
   }
 
   return await knex.raw(`
-    SELECT es.*, concat(substr(u."firstName", 0, 2), '. ', u."lastName") AS "userName", e."name" AS "equipmentName", r.id AS "roomID", r."name" AS "roomName", z.id AS "zoneID", z."name" AS "zoneName"
+    SELECT es.*, concat(substr(u."firstName", 0, 2), '. ', u."lastName") AS "userName", e."name" AS "equipmentName", r.id AS "roomID", r."name" AS "roomName", z.id AS "makerspaceID", z."name" AS "makerspaceName"
     FROM "EquipmentSessions" es 
     INNER JOIN "Users" u ON es."userID" = u.id
     INNER JOIN "Equipment" e ON es."equipmentID" = e.id
     INNER JOIN "Rooms" r ON e."roomID" = r.id
-    INNER JOIN "Zones" z ON r."zoneID" = z.id
+    INNER JOIN "Makerspaces" z ON r."makerspaceID" = z.id
     WHERE es."sessionLength" != 0
     ${numWhereCaluses > 0 ? "AND " : ""}
     ${startDateSearchString}

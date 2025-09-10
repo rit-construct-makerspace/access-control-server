@@ -3,18 +3,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import * as TimeUtils from "../../../common/TimeUtils";
-import ZoneHours from "../../../types/ZoneHours";
+import MakerspaceHours from "../../../types/MakerspaceHours";
 
-interface ZoneCardProps {
+interface MakerspaceCardProps {
   id: number;
   name: string;
-  hours: ZoneHours[];
+  subtitle: string | null;
+  location: string | null;
+  hours: MakerspaceHours[];
   imageUrl: string;
   isMobile: boolean;
   clickable?: boolean;
 }
 
-function getHoursToday(times: ZoneHours[], primaryColor: string) {
+function getHoursToday(times: MakerspaceHours[], primaryColor: string) {
 
   const now = new Date();
   const hours_today = times[now.getDay()];
@@ -22,9 +24,9 @@ function getHoursToday(times: ZoneHours[], primaryColor: string) {
   const status = hours_today.closed ? "CLOSED" : TimeUtils.currentStatus(hours_today.open?.substring(0, 5) ?? "12:00", hours_today.close?.substring(0, 5) ?? "12:00");
 
   return (
-    <Stack justifyContent="space-between" spacing={"20px"} direction="row" alignItems={"center"}>
+    <Stack width={"100%"} justifyContent="space-between" spacing={"20px"} direction="row" alignItems={"center"}>
       <Typography color={status === "OPEN" ? "success" : "error"} fontWeight="bold">{status}</Typography>
-      <Stack direction="row" >
+      <Stack justifyContent="space-between" direction="row" >
         <Typography color={primaryColor} fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
         <Typography paddingLeft={"10px"} >
           {
@@ -39,7 +41,7 @@ function getHoursToday(times: ZoneHours[], primaryColor: string) {
   )
 }
 
-export default function ZoneCard(props: ZoneCardProps) {
+export default function MakerspaceCard(props: MakerspaceCardProps) {
   const theme = useTheme();
   const navigate = useNavigate();
 
@@ -58,13 +60,24 @@ export default function ZoneCard(props: ZoneCardProps) {
           height={props.isMobile ? "197px" : "281px"}
           image={import.meta.env.VITE_CDN_URL + "user-uploads/" + props.imageUrl}
         />
-        <CardContent sx={{justifyContent: "center", display: "flex", flexDirection: "column"}}>
-          <Typography variant="h4" >{props.name}</Typography>
-          <Stack direction={"row"} justifyContent={"space-between"}>
-            {getHoursToday(props.hours, theme.palette.primary.main)}
-            {!props.isMobile && <Button variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
+        <CardContent sx={{ justifyContent: "center", display: "flex", flexDirection: "column" }}>
+          <Stack direction={"row"} justifyContent={"space-between"} alignItems={"end"}>
+            <Typography variant="h4" >{props.name}</Typography>
+            {!props.isMobile && <Typography variant="h6" color="textSecondary" alignSelf={"center"} >{props.location}</Typography>}
           </Stack>
-          {props.isMobile && <Button  variant="outlined" endIcon={<ChevronRightIcon />}>Explore</Button>}
+
+          <Typography variant="h5" color="textSecondary">{props.subtitle}</Typography>
+
+          <Stack direction={"row"} justifyContent={"space-between"} spacing={"20px"}>
+            {getHoursToday(props.hours, theme.palette.primary.main)}
+            {!props.isMobile && <Button variant="contained" endIcon={<ChevronRightIcon />}>Explore</Button>}
+          </Stack>
+          {props.isMobile &&
+            <Stack direction="row" justifyContent={"space-between"} paddingTop={"10px"}>
+              <Typography variant="h6" color="textSecondary" alignSelf={"center"} >{props.location}</Typography>  
+              <Button variant="contained" endIcon={<ChevronRightIcon />}>Explore</Button> 
+            </Stack>
+          }
 
         </CardContent>
       </CardActionArea>

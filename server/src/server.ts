@@ -24,7 +24,7 @@ import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
 import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
-import { getZoneHoursNextWeek } from "./repositories/Zones/ZoneHoursRepository.js";
+import { getMakerspaceHoursNextWeek } from "./repositories/Makerspaces/MakerspaceHoursRepository.js";
 import { getPassedTrainingsDaysAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
 import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
@@ -234,11 +234,11 @@ async function startServer() {
 
   /**
    * HOURS--
-   * Fetch the hours associated with a zone string
+   * Fetch the hours associated with a makerspace string
    */
-  app.get("/api/hours/:zone", async function (req, res) {
+  app.get("/api/hours/:makerspace", async function (req, res) {
     try {
-      const hourRows = await getZoneHoursNextWeek(Number(req.params.zone));
+      const hourRows = await getMakerspaceHoursNextWeek(Number(req.params.makerspace));
 
       return res.status(200).json({
         obj: hourRows

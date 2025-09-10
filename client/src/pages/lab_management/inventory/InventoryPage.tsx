@@ -9,7 +9,7 @@ import { GET_INVENTORY_TAGS } from "../../../queries/inventoryQueries";
 import AdminPage from "../../AdminPage";
 import Ledger from "./Ledger";
 import InventoryTagsModal from "./InventoryTagsModal";
-import { GET_ZONES_WITH_ITEMS, ZoneWithItems } from "../../../queries/zoneQueries";
+import { GET_MAKERSPACES_WITH_ITEMS, MakerspaceWithItems } from "../../../queries/makerspaceQueries";
 import { InventoryForMakerspace } from "./common/InventoryForMakerspace";
 
 
@@ -21,10 +21,10 @@ export default function InventoryPage() {
 
   const inventoryTagsResult = useQuery(GET_INVENTORY_TAGS);
 
-  const zonesWithItemsResult = useQuery(GET_ZONES_WITH_ITEMS);
+  const makerspacesWithItemsResult = useQuery(GET_MAKERSPACES_WITH_ITEMS);
 
   return (
-    <RequestWrapper loading={zonesWithItemsResult.loading} error={zonesWithItemsResult.error}>
+    <RequestWrapper loading={makerspacesWithItemsResult.loading} error={makerspacesWithItemsResult.error}>
       <AdminPage>
         <title>Inventory | Make @ RIT</title>
         <Box margin="25px">
@@ -51,8 +51,8 @@ export default function InventoryPage() {
           </Stack>
 
           <Box sx={{ width: "100%", overflowX: "scroll" }}>
-            {zonesWithItemsResult.data?.zones.map((zone: ZoneWithItems) => (
-              <InventoryForMakerspace key={zone.id} makerspace={zone} searchText={searchText} tags={inventoryTagsResult.data?.inventoryTags || []} setModalItemId={setModalItemId} />
+            {makerspacesWithItemsResult.data?.makerspaces.map((space: MakerspaceWithItems) => (
+              <InventoryForMakerspace key={space.id} makerspace={space} searchText={searchText} tags={inventoryTagsResult.data?.inventoryTags || []} setModalItemId={setModalItemId} />
             ))}
           </Box>
 
