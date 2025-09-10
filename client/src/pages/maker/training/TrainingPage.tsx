@@ -30,7 +30,9 @@ export default function TrainingPage() {
 		<RequestWrapper2
 			result={result}
 			render={({ modules }) => {
-        const moduleStatuses = modules.map(moduleStatusMapper(passedModules, trainingHolds));
+				const moduleStatuses = modules.map(
+					moduleStatusMapper(passedModules, trainingHolds)
+				);
 
 				const matching = searchFilter<ModuleStatus>(
 					searchText,
