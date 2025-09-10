@@ -18,6 +18,10 @@ export interface TrainingModule {
 	makerspaceID: number | null;
 }
 
+/**
+ * This constant returns a function that maps a TrainingModule to a ModuleStatus based on the user's passed modules and
+ * training holds.
+ */
 export const moduleStatusMapper =
 	(passedModules: PassedModule[], trainingHolds: TrainingHold[]) =>
 	(module: TrainingModule): ModuleStatus => {

@@ -21,6 +21,13 @@ export const GET_ALL_TRAINING_MODULES = gql`
 	}
 `;
 
+/**
+ * This function returns a page that displays all training modules with their statuses for the current user, along with
+ * a search bar to filter the modules.
+ *
+ * @returns A page that displays all training modules with their statuses for the current user, along with a search bar
+ * to filter the modules.
+ */
 export default function TrainingPage() {
 	const { passedModules, trainingHolds } = useCurrentUser();
 	const result = useQuery(GET_ALL_TRAINING_MODULES);
