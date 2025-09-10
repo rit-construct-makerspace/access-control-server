@@ -6,8 +6,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate, useParams } from "react-router-dom";
 import ConstructionIcon from '@mui/icons-material/Construction';
-import ReactMarkdown from "react-markdown";
 import ModuleStatusRow from "./ModuleStatusRow";
+import ThemedMarkdown from "./ThemedMarkdown";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -130,12 +130,7 @@ export default function EquipmentCard(props: EquipmentCardProps) {
           {/* Desc && learn more */}
           <Stack justifyContent={"space-between"} height={"inherit"}>
             <Typography>
-              <ReactMarkdown components={{
-                  a({ children, ...props }) {
-                  return <a target="_blank" rel="noopener noreferrer"{...props}>{children}</a>;
-                  },
-                }}
-              >{props.equipment.notes}</ReactMarkdown>
+              <ThemedMarkdown>{props.equipment.notes}</ThemedMarkdown>
             </Typography>
             <Button
               size="small"
