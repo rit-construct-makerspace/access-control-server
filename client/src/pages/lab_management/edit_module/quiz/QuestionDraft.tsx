@@ -157,7 +157,6 @@ export default function QuestionDraft({
         </Button>
 
         <Stack spacing={1} px={1}>
-          <CardContent>
             <TextField
               id="outlined-basic"
               label="Hint"
@@ -168,8 +167,6 @@ export default function QuestionDraft({
                 updateQuestion({ ...question, hint: e.target.value })
               }
             />
-          </CardContent>
-          <CardContent>
             <TextField
               id="outlined-basic"
               label="Affirmation"
@@ -180,7 +177,6 @@ export default function QuestionDraft({
                 updateQuestion({ ...question, affirmation: e.target.value })
               }
             />
-          </CardContent>
         </Stack>
 
 
