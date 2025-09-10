@@ -17,6 +17,8 @@ export const GET_MAKERSPACES = gql`
 export interface MakerspaceWithHours {
   id: number;
   name: string;
+  subtitle: string | null;
+  location: string | null;
   hours: MakerspaceHours[];
   imageUrl: string;
 }
@@ -24,6 +26,8 @@ export interface MakerspaceWithHours {
 export interface FullMakerspace {
   id: number;
   name: string;
+  subtitle: string | null;
+  location: string | null;
   hours: MakerspaceHours[];
   rooms: Room[]
   imageUrl: string;
@@ -33,6 +37,8 @@ export interface FullMakerspace {
 export interface MakerspaceWithItems {
   id: number;
   name: string;
+  subtitle: string | null;
+  location: string | null;
   items: InventoryItem[];
 }
 
@@ -41,6 +47,8 @@ export const GET_MAKERSPACES_WITH_HOURS = gql`
   makerspaces {
     id
     name
+    subtitle
+    location
     hours {
         day
         makerspaceID
@@ -58,6 +66,8 @@ export const GET_FULL_MAKERSPACES = gql`
     makerspaces {
       id
       name
+      subtitle
+      location
       hours {
         day
         makerspaceID
@@ -92,6 +102,9 @@ export const GET_MAKERSPACES_WITH_ITEMS = gql`
   makerspaces(storefrontVisible: $storefrontVisible) {
     id
     name
+    name
+    subtitle
+    location
     items {
       id
       image
@@ -126,6 +139,8 @@ export const GET_MAKERSPACE_BY_ID = gql`
     makerspaceByID(id: $id) {
       id
       name
+      subtitle
+      location
       hours {
         day
         makerspaceID
@@ -169,11 +184,13 @@ export const UPDATE_MAKERSPACE = gql`
   mutation UpdateMakerspace(
     $id: ID!
     $name: String!
+    $subtitle: String
+    $location: String
     $imageUrl: String
   ) {
     updateMakerspace(
       id: $id
-      newMakerspace: { name: $name, imageUrl: $imageUrl }
+      newMakerspace: { name: $name, subtitle: $subtitle, location: $location, imageUrl: $imageUrl }
     ) {
       id
     }
