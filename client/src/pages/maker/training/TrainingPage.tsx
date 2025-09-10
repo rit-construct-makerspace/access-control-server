@@ -5,70 +5,71 @@ import { gql, useQuery } from "@apollo/client";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import {
-  ModuleStatus,
-  moduleStatusMapper,
+	ModuleStatus,
+	moduleStatusMapper,
 } from "../../../common/TrainingModuleUtils";
 import TrainingModuleRow from "../../../common/TrainingModuleRow";
 import SearchBar, { searchFilter } from "../../../common/SearchBar";
 
 export const GET_ALL_TRAINING_MODULES = gql`
-  query GetAllTrainingModules {
-    modules {
-      id
-      name
-    }
-  }
+	query GetAllTrainingModules {
+		modules {
+			id
+			name
+			archived
+		}
+	}
 `;
 
 export default function TrainingPage() {
-  const { passedModules, trainingHolds } = useCurrentUser();
-  const result = useQuery(GET_ALL_TRAINING_MODULES);
-  const [searchText, setSearchText] = useState("");
+	const { passedModules, trainingHolds } = useCurrentUser();
+	const result = useQuery(GET_ALL_TRAINING_MODULES);
+	const [searchText, setSearchText] = useState("");
 
-  return (
-    <RequestWrapper2
-      result={result}
-      render={({ modules }) => {
+	return (
+		<RequestWrapper2
+			result={result}
+			render={({ modules }) => {
         const moduleStatuses = modules.map(moduleStatusMapper(passedModules, trainingHolds));
 
-        const matching = searchFilter<ModuleStatus>(
-          searchText,
-          moduleStatuses,
-          (ms: ModuleStatus) => ms.moduleName
-        );
+				const matching = searchFilter<ModuleStatus>(
+					searchText,
+					moduleStatuses,
+					(ms: ModuleStatus) => ms.moduleName
+				);
 
-        const expired = matching.filter(
-          (ms: ModuleStatus) => ms.status === "Expired"
-        );
-        const passed = matching.filter(
-          (ms: ModuleStatus) => ms.status === "Passed"
-        );
-        const notTaken = matching.filter(
-          (ms: ModuleStatus) => ms.status === "Not taken"
-        );
-        const locked = matching.filter(
-          (ms: ModuleStatus) => ms.status === "Locked"
-        );
+				const expired = matching.filter(
+					(ms: ModuleStatus) => ms.status === "Expired"
+				);
+				const passed = matching.filter(
+					(ms: ModuleStatus) => ms.status === "Passed"
+				);
+				const notTaken = matching.filter(
+					(ms: ModuleStatus) => ms.status === "Not taken"
+				);
+				const locked = matching.filter(
+					(ms: ModuleStatus) => ms.status === "Locked"
+				);
 
-        const reordered = [...expired, ...passed, ...locked, ...notTaken];
+				const reordered = [...expired, ...passed, ...locked, ...notTaken];
 
-        return (
-          <Page title="Training" maxWidth="1250px">
-            <Explainer />
+				return (
+					<Page title="Training" maxWidth="1250px">
+						<Explainer />
 
-            <SearchBar
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              onClear={() => setSearchText("")}
-              sx={{ mt: 8, mb: 1 }}
-            />
+						<SearchBar
+							value={searchText}
+							onChange={(e) => setSearchText(e.target.value)}
+							onClear={() => setSearchText("")}
+							sx={{ mt: 8, mb: 1 }}
+						/>
 
-            {reordered.map((ms: ModuleStatus) => (
-              <TrainingModuleRow key={ms.moduleID} moduleStatus={ms} />
-            ))}
-          </Page>
-        );
-      }}
-    />
-  );
+						{reordered.map((ms: ModuleStatus) => (
+							<TrainingModuleRow key={ms.moduleID} moduleStatus={ms} />
+						))}
+					</Page>
+				);
+			}}
+		/>
+	);
 }
