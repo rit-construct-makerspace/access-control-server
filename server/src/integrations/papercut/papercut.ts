@@ -102,8 +102,13 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
     xmlrpcRespond(res, [9999.49]);
     return;
   }
-
-
+  // 0$ if you don't exist
+  if ((await getAccountIDByUsername(username)) === undefined){
+    xmlrpcRespond(res, [0]);
+    return;
+  } else {
+    console.log("ASDSADSADSADSA");
+  }
   try {
     const result = await Currency.getAccountBalance(username);
     if (typeof result === "number") { // number result
@@ -250,6 +255,11 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
     xmlrpcRespond(res, [true]);
     return;
   }
+  // Blindly accecpt changes of $0 (won't even be recorded)
+  if (adjustment == 0){
+    xmlrpcRespond(res, [true]);
+  }
+
   try {
     const transaction = printCommentParser(comment)
     if (transaction === undefined) {
