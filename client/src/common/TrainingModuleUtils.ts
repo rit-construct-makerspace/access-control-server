@@ -20,7 +20,7 @@ export interface TrainingModule {
 
 /**
  * This constant returns a function that maps a TrainingModule to a ModuleStatus based on the user's passed modules and
- * training holds. 
+ * training holds.
  */
 export const moduleStatusMapper =
 	(passedModules: PassedModule[], trainingHolds: TrainingHold[]) =>
@@ -50,7 +50,7 @@ export const moduleStatusMapper =
 		const submissionDate = parseISO(passedModule.passedDate);
 		const expirationDate = new Date(submissionDate);
 		expirationDate.setFullYear(submissionDate.getFullYear() + 1);
-		const expiringSoon = differenceInMonths(expirationDate, new Date()) <= 1; //differenceInMonths(new Date(), submissionDate) > 11 && differenceInMonths(new Date(), submissionDate) < 12;
+		const expiringSoon = differenceInMonths(expirationDate, new Date()) <= 1; // differenceInMonths(new Date(), submissionDate) > 11 && differenceInMonths(new Date(), submissionDate) < 12;
 		const expired = differenceInYears(submissionDate, new Date()) > 0;
 
 		if (expiringSoon)
