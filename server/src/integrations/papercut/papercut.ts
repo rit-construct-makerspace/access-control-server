@@ -288,7 +288,7 @@ function XMLRPCValueToXMLObject(val: XMLRPCValue): object {
     case "string":
       return { 'string': val };
     case "number":
-      return { 'double': val };
+      return { 'double': val.toFixed(2) };
     case "boolean":
       return { 'boolean': val ? 1 : 0 };
     default:
