@@ -12,6 +12,7 @@ import { AccessProgress } from "../../../types/TrainingModule";
 import MinimalTrainingModuleRow from "../../../common/MinimalTrainingModuleRow";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import { GET_FAILED_SUBMISSIONS } from "../../../queries/getSubmissions";
 
 
 export default function EquipmentProgressCard(props: { moduleID: number }) {
@@ -28,6 +29,12 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
   const isMobile = width <= 768;
 
   const accessProgressResult = useQuery(GET_ACCESS_PROGRESSES, { variables: { sourceTrainingModuleID: props.moduleID } });
+  const failedSubmissions = useQuery(GET_FAILED_SUBMISSIONS,
+    {
+      variables: { moduleID: props.moduleID },
+      fetchPolicy: 'network-only',
+    }
+  );
 
   if (!accessProgressResult.data || accessProgressResult.data?.relatedAccessProgress.length === 0) {
     return (<></>);
@@ -53,12 +60,13 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
                   ))}
                 </Stack>
                 {accessProgress.availableModules.length > 0 && <Typography variant="h5">To-Do</Typography>}
+                <Typography>{failedSubmissions.data?.failedSubmissions.length}</Typography>
                 <Stack direction={"column"}>
                   {accessProgress.availableModules.map((module) => (
                     <MinimalTrainingModuleRow module={module} passed={false} />
                   ))}
                 </Stack>
-                { (!shouldHideCompetency) &&
+                {(!shouldHideCompetency) &&
                   <Card sx={{ mt: 5, border: (!accessProgress.accessCheckDone && accessProgress.availableModules.length === 0) ? "2px solid blue" : "inherit" }}>
                     <Stack direction={"row"} spacing={1} width={"75%"} p={2}>
                       {accessProgress.accessCheckDone

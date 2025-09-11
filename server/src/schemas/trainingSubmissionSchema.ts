@@ -30,5 +30,6 @@ export const TrainingSubmissionTypeDefs = gql`
     submission(submissionID: ID): [Submission]
     submissions(moduleID: ID): [Submission]
     latestSubmission(moduleID: ID): Submission
+    failedSubmissions(moduleID: ID): [Submission]
   }
 `;
