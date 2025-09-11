@@ -20,7 +20,7 @@ export interface TrainingModule {
 
 /**
  * This constant returns a function that maps a TrainingModule to a ModuleStatus based on the user's passed modules and
- * training holds.
+ * training holds. 
  */
 export const moduleStatusMapper =
 	(passedModules: PassedModule[], trainingHolds: TrainingHold[]) =>
