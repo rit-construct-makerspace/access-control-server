@@ -92,63 +92,62 @@ export default function CurrencyLedger() {
     second: "2-digit",
   });
 
+  function renderTransactionButton(transactionEntryId: number | null) {
+    if (transactionEntryId == null) {
+      return null
+    }
+    return <Button
+      variant="contained"
+      endIcon={<VisibilityIcon />}
+      onClick={() => { alert(`View teid: ${transactionEntryId}`) }}
+    >
+      View Transaction
+    </Button>
+  }
+
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 100 },
+    { field: "accountID", headerName: "Account ID", width: 100 },
+    { field: "owner", headerName: "Account Owner", width: 150 },
+    { field: "currencyType", headerName: "Type", width: 150 },
+    { field: "amount", headerName: "Amount", width: 120 },
+    { field: "dateTime", headerName: "Date", width: 200 },
+    { field: "transactionEntryId", headerName: "Transaction", width: 250, renderCell: (params) => renderTransactionButton(params.row.transactionEntryId) },
+    { field: "description", headerName: "Description", width: 500 },
+    { field: "atxID", headerName: "ATX ID", width: 120 },
+    { field: "refID", headerName: "REF ID", width: 120 },
+  ];
   return (
-    <RequestWrapper2 result={ledgerEntriesResults} render={(data) => {
+    <Stack spacing={2}>
+      <SearchBar
+        placeholder="Search Ledger"
+        sx={{ maxWidth: 300 }}
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        onClear={() => setUrlParam("l", "")}
+        onSubmit={() => setUrlParam("l", searchText)}
+      />
+      <RequestWrapper2 result={ledgerEntriesResults} render={(data) => {
 
-      const entries: CurrencyLedgerEntry[] = data.currencyLedgerEntriesLimit;
+        const entries: CurrencyLedgerEntry[] = data.currencyLedgerEntriesLimit;
 
-      function renderTransactionButton(transactionEntryId: number | null) {
-        if (transactionEntryId == null) {
-          return null
-        }
-        return <Button
-          variant="contained"
-          endIcon={<VisibilityIcon />}
-          onClick={() => { alert(`View teid: ${transactionEntryId}`) }}
-        >
-          View Transaction
-        </Button>
+        const rows: GridRowsProp = entries.map((entry) => ({
+          id: entry.id,
+          accountID: entry.accountID,
+          owner: entry.owner,
+          currencyType: entry.currencyType,
+          amount: moneyFormatter.format(entry.amount / 100),
+          dateTime: dateTimeFormatter.format(new Date(entry.dateTime)),
+          transactionEntryId: entry.transactionEntryId,
+          description: entry.description,
+          atxID: entry.atxID,
+          refID: entry.refID,
+        }))
 
-      }
-      const columns: GridColDef[] = [
-        { field: "id", headerName: "ID", width: 100 },
-        { field: "accountID", headerName: "Account ID", width: 100 },
-        { field: "owner", headerName: "Account Owner", width: 150 },
-        { field: "currencyType", headerName: "Type", width: 150 },
-        { field: "amount", headerName: "Amount", width: 120 },
-        { field: "dateTime", headerName: "Date", width: 200 },
-        { field: "transactionEntryId", headerName: "Transaction", width: 250, renderCell: (params) => renderTransactionButton(params.row.transactionEntryId) },
-        { field: "description", headerName: "Description", width: 500 },
-        { field: "atxID", headerName: "ATX ID", width: 120 },
-        { field: "refID", headerName: "REF ID", width: 120 },
-      ];
-
-      const rows: GridRowsProp = entries.map((entry) => ({
-        id: entry.id,
-        accountID: entry.accountID,
-        owner: entry.owner,
-        currencyType: entry.currencyType,
-        amount: moneyFormatter.format(entry.amount / 100),
-        dateTime: dateTimeFormatter.format(new Date(entry.dateTime)),
-        transactionEntryId: entry.transactionEntryId,
-        description: entry.description,
-        atxID: entry.atxID,
-        refID: entry.refID,
-      }))
-
-      return (
-        <Stack spacing={2}>
-          <SearchBar
-            placeholder="Search Ledger"
-            sx={{ maxWidth: 300 }}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            onClear={() => setUrlParam("l", "")}
-            onSubmit={() => setUrlParam("l", searchText)}
-          />
+        return (
           <DataGrid rows={rows} columns={columns} slots={{ columnMenu: CustomColumnMenu }} />
-        </Stack>
-      );
-    }} />
+        );
+      }} />
+    </Stack>
   );
 }

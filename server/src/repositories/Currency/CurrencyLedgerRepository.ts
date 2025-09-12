@@ -70,20 +70,23 @@ export async function getCurrencyLedgerEntriesLimit(searchText?: string, limit =
 
     if (Number.isNaN(Number(searchText))) {
         // searchText can't be compared to the number fields
-        return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
+        return await knex("CurrencyLedger").select("*")
             .whereILike("description", `%${searchText}%`)
             .orWhereILike("currencyType", `%${searchText}%`)
             .orWhereILike("owner", `%${searchText}%`)
-            .limit(limit);
+            .orderBy("dateTime", "desc").limit(limit);
     }
 
-    return await knex("CurrencyLedger").select("*").orderBy("dateTime", "desc")
+    return await knex("CurrencyLedger").select("*")
         .where("id", searchText)
         .orWhere("accountID", searchText)
         .orWhere("amount", searchText)
         .orWhere("atxID", searchText)
         .orWhere("refID", searchText)
-        .limit(limit);
+        .orWhereILike("description", `%${searchText}%`)
+        .orWhereILike("currencyType", `%${searchText}%`)
+        .orWhereILike("owner", `%${searchText}%`)
+        .orderBy("dateTime", "desc").limit(limit);
 }
 
 export async function getCurrencyLedgerEntry(id: number): Promise<CurrencyLedgerRow> {
