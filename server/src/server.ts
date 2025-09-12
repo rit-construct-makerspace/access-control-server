@@ -31,6 +31,7 @@ import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { purge_images } from "./periodicActions.js";
+import { getAccountBalance } from "./integrations/currency/currency.js";
 
 const require = createRequire(import.meta.url);
 
@@ -552,6 +553,12 @@ async function startServer() {
     )
   }
   );
+
+  const res = await getAccountBalance("jehshed");
+  console.log("res", res);
+
+  // const res2 = await adjustBalanceIfPossible(CurrencySource.Printers, 'jehshed', 2341, 1, 'test for 2 accounts', 67);
+  // console.log("res2", res2);
 }
 
 startServer();
