@@ -16,7 +16,6 @@ export const GET_ALL_TRAINING_MODULES = gql`
 		modules {
 			id
 			name
-			archived
 		}
 	}
 `;
