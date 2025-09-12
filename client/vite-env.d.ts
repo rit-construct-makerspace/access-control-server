@@ -13,6 +13,7 @@ interface ImportMetaEnv {
     readonly VITE_EQUIPMENT_IDS_WITHOUT_INPERSON: string;
     readonly VITE_MODULE_IDS_WITHOUT_INPERSON: string;
     readonly VITE_HELP_PAGE_URL: string;
+    readonly VITE_TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK: string;
 }
 
 interface ImportMeta {

@@ -9,6 +9,7 @@ import Page from "../../Page";
 import SubmissionCard from "./SubmissionCard";
 import ResultsCard from "./ResultsCard";
 import EquipmentProgressCard from "./EquipmentProgessCard";
+import RetakeQuiz from "./RetakeQuiz";
 import { useState, useEffect } from "react";
 
 export default function QuizResults() {
@@ -45,17 +46,21 @@ export default function QuizResults() {
       error={ submissionResult.error }
     >
       <RequestWrapper
-          loading={ moduleResult.loading || moduleResult.data === undefined }
-          error={ moduleResult.error }
-        >
+        loading={moduleResult.loading || moduleResult.data === undefined}
+        error={moduleResult.error}
+      >
         <Page title="Quiz Results">
           <Stack direction={"row"} justifyContent={"flex-start"} width={"100%"}>
             <Stack direction="column" width={isMobile ? "100%" : "50%"}>
-              <SubmissionCard module={moduleResult.data?.module!} submission={submissionResult.data?.latestSubmission}/>
+              <SubmissionCard module={moduleResult.data?.module!} submission={submissionResult.data?.latestSubmission} />
+              {isMobile && moduleResult.data && !submissionResult.data?.latestSubmission.passed ? <RetakeQuiz moduleID={moduleResult.data?.module.id}></RetakeQuiz> : <></>}
               {isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
               <ResultsCard summary={submissionResult.data?.latestSubmission.summary}></ResultsCard>
             </Stack>
-            {!isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
+            <Stack direction="column" width={isMobile ? "100%" : "50%"}>
+              {!isMobile && !submissionResult.data?.latestSubmission.passed && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id}></RetakeQuiz> : <></>}
+              {!isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
+            </Stack>
           </Stack>
         </Page>
       </RequestWrapper>
