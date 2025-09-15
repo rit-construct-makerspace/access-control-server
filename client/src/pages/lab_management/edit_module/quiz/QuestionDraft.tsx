@@ -155,6 +155,31 @@ export default function QuestionDraft({
         >
           + Add option
         </Button>
+
+        <Stack spacing={1} px={1}>
+            <TextField
+              id="outlined-basic"
+              label="Hint"
+              fullWidth
+              variant="outlined"
+              value={question.hint}
+              onChange={(e) =>
+                updateQuestion({ ...question, hint: e.target.value })
+              }
+            />
+            <TextField
+              id="outlined-basic"
+              label="Affirmation"
+              fullWidth
+              variant="outlined"
+              value={question.affirmation}
+              onChange={(e) =>
+                updateQuestion({ ...question, affirmation: e.target.value })
+              }
+            />
+        </Stack>
+
+
       </Stack>
     </QuizItemDraft>
   );

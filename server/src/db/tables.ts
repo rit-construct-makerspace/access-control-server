@@ -271,6 +271,8 @@ export interface TrainingModuleItem {
   type: string;
   text: string;
   options?: ModuleItemOption[];
+  hint: string;
+  affirmation: string;
 }
 
 export interface TrainingHoldsRow {
