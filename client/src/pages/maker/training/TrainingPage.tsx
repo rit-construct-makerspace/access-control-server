@@ -12,14 +12,22 @@ import TrainingModuleRow from "../../../common/TrainingModuleRow";
 import SearchBar, { searchFilter } from "../../../common/SearchBar";
 
 export const GET_ALL_TRAINING_MODULES = gql`
-  query GetAllTrainingModules {
-    modules {
-      id
-      name
-    }
-  }
+	query GetAllTrainingModules {
+		modules {
+			id
+			name
+			archived
+		}
+	}
 `;
 
+/**
+ * This function returns a page that displays all training modules with their statuses for the current user, along with
+ * a search bar to filter the modules.
+ *
+ * @returns A page that displays all training modules with their statuses for the current user, along with a search bar
+ * to filter the modules.
+ */
 export default function TrainingPage() {
   const { passedModules, trainingHolds } = useCurrentUser();
   const result = useQuery(GET_ALL_TRAINING_MODULES);
@@ -29,7 +37,9 @@ export default function TrainingPage() {
     <RequestWrapper2
       result={result}
       render={({ modules }) => {
-        const moduleStatuses = modules.map(moduleStatusMapper(passedModules, trainingHolds));
+        const moduleStatuses = modules.map(
+          moduleStatusMapper(passedModules, trainingHolds)
+        );
 
         const matching = searchFilter<ModuleStatus>(
           searchText,
