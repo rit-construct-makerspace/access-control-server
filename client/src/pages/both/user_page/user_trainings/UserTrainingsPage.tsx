@@ -13,12 +13,6 @@ import EquipmentCard from "../../../../common/EquipmentCard";
 import ModuleStatusRow from "../../../../common/ModuleStatusRow";
 import { useIsMobile } from "../../../../common/IsMobileProvider";
 
-/**
- * This function returns a user page that displays the user's passed trainings, trainings expiring soon, approved
- * equipment, and equipment awaiting in-person knowledge checks.
- *
- * @returns The UserTrainingsPage component that displays the user's trainings and equipment.
- */
 export default function UserTraingingsPage() {
   const user = useCurrentUser();
   const isMobile = useIsMobile();
