@@ -16,7 +16,7 @@ interface MakerspaceCardProps {
   clickable?: boolean;
 }
 
-function getHoursToday(times: MakerspaceHours[], primaryColor: string) {
+function getHoursToday(times: MakerspaceHours[], primaryColor: string, isMobile: boolean) {
 
   const now = new Date();
   const hours_today = times[now.getDay()];
@@ -24,7 +24,7 @@ function getHoursToday(times: MakerspaceHours[], primaryColor: string) {
   const status = hours_today.closed ? "CLOSED" : TimeUtils.currentStatus(hours_today.open?.substring(0, 5) ?? "12:00", hours_today.close?.substring(0, 5) ?? "12:00");
 
   return (
-    <Stack width={"100%"} justifyContent="space-between" spacing={"20px"} direction="row" alignItems={"center"}>
+    <Stack width={"100%"} justifyContent={isMobile ? "space-between" : "flex-start"} spacing={"20px"} direction="row" alignItems={"center"}>
       <Typography color={status === "OPEN" ? "success" : "error"} fontWeight="bold">{status}</Typography>
       <Stack justifyContent="space-between" direction="row" >
         <Typography color={primaryColor} fontWeight="bold">{TimeUtils.dayToString(now.getDay())}</Typography>
@@ -69,7 +69,7 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
           <Typography variant="h5" color="textSecondary">{props.subtitle}</Typography>
 
           <Stack direction={"row"} justifyContent={"space-between"} spacing={"20px"}>
-            {getHoursToday(props.hours, theme.palette.primary.main)}
+            {getHoursToday(props.hours, theme.palette.primary.main, props.isMobile)}
             {!props.isMobile && <Button variant="contained" endIcon={<ChevronRightIcon />}>Explore</Button>}
           </Stack>
           {props.isMobile &&
