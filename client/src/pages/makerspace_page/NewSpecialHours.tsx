@@ -22,7 +22,7 @@ export default function NewSpecialHoursBlock() {
   const splitDate = date.split("-");
 
   const [createHours] = useMutation(ADD_SPECIAL_HOURS, {
-    refetchQueries: ["GetZoneSpecialHours"],
+    refetchQueries: ["GetMakerspaceSpecialHours"],
     awaitRefetchQueries: true,
   });
 

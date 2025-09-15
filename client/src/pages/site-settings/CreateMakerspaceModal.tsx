@@ -7,7 +7,7 @@ import { useState } from "react";
 
 const CREATE_MAKERSPACE = gql`
   mutation CreateMakerspace($name: String!) {
-    addZone(name: $name) {
+    addMakerspace(name: $name) {
       id
     }
   }
@@ -20,7 +20,7 @@ interface CreateMakerspaceModalProps {
 
 export default function CreateMakerspaceModal(props: CreateMakerspaceModalProps) {
 
-  const [createMakerspace] = useMutation(CREATE_MAKERSPACE, { refetchQueries: ["GetZones"] });
+  const [createMakerspace] = useMutation(CREATE_MAKERSPACE, { refetchQueries: ["GetMakerspaces"] });
 
   async function handleCreateMakerspace() {
     await createMakerspace({ variables: { name: createMakerspaceName } });

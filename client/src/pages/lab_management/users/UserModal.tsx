@@ -20,7 +20,7 @@ import { stringAvatar } from "../../../common/avatarGenerator";
 import { isManager, isStaff, isStaffFor, isTrainerFor } from "../../../common/PrivilegeUtils";
 import RestrictionCard from "./RestrictionCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
-import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
+import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../queries/makerspaceQueries";
 import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -69,7 +69,7 @@ export interface AccessCheckExtraInfo {
     name: string;
     requiresTrainerApproval: boolean;
     room: {
-      zone: {
+      makerspace: {
         id: number;
       }
     }
@@ -86,7 +86,6 @@ export const GET_USER = gql`
       college
       expectedGraduation
       registrationDate
-      privilege
       ritUsername
       cardTagID
       notes
@@ -126,7 +125,7 @@ export const GET_USER = gql`
           name
           requiresTrainerApproval
           room {
-            zone {
+            makerspace {
               id
             }
           }
@@ -228,7 +227,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
   const [createCheck] = useMutation(CREATE_CHECK, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const [deleteTrainingHold] = useMutation(DELETE_TRAINING_HOLD, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const [deletePassedModule] = useMutation(DELETE_PASSED_MODULE, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
-  const getZonesResult = useQuery(GET_FULL_ZONES);
+  const getMakerspacesResult = useQuery(GET_FULL_MAKERSPACES);
 
   useEffect(() => {
     if (selectedUserID) getUser({ variables: { id: selectedUserID } });
@@ -292,8 +291,8 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
           const filteredACs: AccessCheckExtraInfo[] = user.accessChecks.filter(
             (ac: AccessCheckExtraInfo) => (
               ac.equipment.requiresTrainerApproval
-                ? isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id))
-                : (isStaffFor(currentUser, Number(ac.equipment.room.zone.id)) || isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id)))
+                ? isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.makerspace.id))
+                : (isStaffFor(currentUser, Number(ac.equipment.room.makerspace.id)) || isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.makerspace.id)))
             )
           );
 
@@ -477,11 +476,11 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
                   {
                     isStaff(currentUser)
-                      ? <RequestWrapper2 result={getZonesResult} render={(data) => {
+                      ? <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
 
-                        const fullZones: FullZone[] = data.zones;
+                        const fullSpaces: FullMakerspace[] = data.makerspaces;
                         // I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript 
-                        const potentialRestrictions = fullZones.filter((zone: FullZone) => isStaffFor(currentUser, Number(zone.id)))
+                        const potentialRestrictions = fullSpaces.filter((space: FullMakerspace) => isStaffFor(currentUser, Number(space.id)))
 
                         return (
                           <Stack direction="row" spacing={1} mt={2} alignItems={"center"}>
@@ -493,8 +492,8 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                                 fullWidth
                               >
                                 {
-                                  potentialRestrictions.map((zone: FullZone) => (
-                                    <MenuItem value={zone.id}>{zone.name} ID: {zone.id}</MenuItem>
+                                  potentialRestrictions.map((space: FullMakerspace) => (
+                                    <MenuItem value={space.id}>{space.name} ID: {space.id}</MenuItem>
                                   ))
                                 }
                               </Select>

@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { Button, Card, Grid, Stack, Typography } from "@mui/material";
 import gql from "graphql-tag";
-import { GET_ZONES } from "../../queries/zoneQueries";
+import { GET_MAKERSPACES } from "../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from "react";
@@ -13,7 +13,7 @@ import DeleteMakerspaceModal from "./DeleteMakerspaceModal";
 export default function SiteSettingsPage() {
   const navigate = useNavigate();
 
-  const getZonesResult = useQuery(GET_ZONES);
+  const getMakerspacesResult = useQuery(GET_MAKERSPACES);
 
   const [createMakerspaceModal, setCreateMakerspaceModal] = useState(false);
   const [deleteMakerspaceModal, setDeleteMakerspaceModal] = useState(false);
@@ -35,26 +35,26 @@ export default function SiteSettingsPage() {
             Create Makerspace
           </Button>
         </Stack>
-        <RequestWrapper2 result={getZonesResult} render={(data) => {
+        <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
 
           return (
             <Grid container spacing={3}>
               {
-                data.zones.map((zone: { id: number, name: string }) => (
+                data.makerspaces.map((space: { id: number, name: string }) => (
                   <Grid>
                     <Card variant="outlined">
                       <Stack width={"300px"} padding={"10px"} spacing={1}>
-                        <Typography variant="subtitle1">{zone.name}</Typography>
+                        <Typography variant="subtitle1">{space.name}</Typography>
                         <Stack direction={"row"} justifyContent={"space-between"}>
                           <Button
                             color="error"
                             variant="contained"
                             startIcon={<DeleteIcon />}
-                            onClick={() => handleArchive(zone.id, zone.name)}
+                            onClick={() => handleArchive(space.id, space.name)}
                           >
                             Delete
                           </Button>
-                          <Button color="secondary" variant="outlined" onClick={() => navigate(`/makerspace/${zone.id}/edit`)}>
+                          <Button color="secondary" variant="outlined" onClick={() => navigate(`/makerspace/${space.id}/edit`)}>
                             Manage
                           </Button>
                         </Stack>

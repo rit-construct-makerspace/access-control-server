@@ -2,11 +2,11 @@ import { gql } from "@apollo/client";
 import Room from "../types/Room";
 import InventoryItem from "../types/InventoryItem";
 import { TrainingModule } from "../common/TrainingModuleUtils";
-import ZoneHours from "../types/ZoneHours";
+import MakerspaceHours from "../types/MakerspaceHours";
 
-export const GET_ZONES = gql`
- query GetZones {
-  zones {
+export const GET_MAKERSPACES = gql`
+ query GetMakerspaces {
+  makerspaces {
     id
     name
     imageUrl
@@ -14,33 +14,41 @@ export const GET_ZONES = gql`
  }
 `;
 
-export interface ZoneWithHours {
+export interface MakerspaceWithHours {
   id: number;
   name: string;
-  hours: ZoneHours[];
+  subtitle: string | null;
+  location: string | null;
+  hours: MakerspaceHours[];
   imageUrl: string;
 }
 
-export interface FullZone {
+export interface FullMakerspace {
   id: number;
   name: string;
-  hours: ZoneHours[];
+  subtitle: string | null;
+  location: string | null;
+  hours: MakerspaceHours[];
   rooms: Room[]
   imageUrl: string;
   trainingModules: TrainingModule[];
 }
 
-export interface ZoneWithItems {
+export interface MakerspaceWithItems {
   id: number;
   name: string;
+  subtitle: string | null;
+  location: string | null;
   items: InventoryItem[];
 }
 
-export const GET_ZONES_WITH_HOURS = gql`
- query GetZonesWithHours {
-  zones {
+export const GET_MAKERSPACES_WITH_HOURS = gql`
+ query GetMakerspacesWithHours {
+  makerspaces {
     id
     name
+    subtitle
+    location
     hours {
         day
         makerspaceID
@@ -53,11 +61,13 @@ export const GET_ZONES_WITH_HOURS = gql`
  }
 `;
 
-export const GET_FULL_ZONES = gql`
-  query GetZones {
-    zones {
+export const GET_FULL_MAKERSPACES = gql`
+  query GetMakerspaces {
+    makerspaces {
       id
       name
+      subtitle
+      location
       hours {
         day
         makerspaceID
@@ -87,11 +97,14 @@ export const GET_FULL_ZONES = gql`
   }
 `;
 
-export const GET_ZONES_WITH_ITEMS = gql`
- query GetZonesWithItems($storefrontVisible: Boolean) {
-  zones(storefrontVisible: $storefrontVisible) {
+export const GET_MAKERSPACES_WITH_ITEMS = gql`
+ query GetMakerspacesWithItems($storefrontVisible: Boolean) {
+  makerspaces(storefrontVisible: $storefrontVisible) {
     id
     name
+    name
+    subtitle
+    location
     items {
       id
       image
@@ -121,11 +134,13 @@ export const GET_ZONES_WITH_ITEMS = gql`
  }
 `;
 
-export const GET_ZONE_BY_ID = gql`
-  query GetZoneByID($id: ID!) {
-    zoneByID(id: $id) {
+export const GET_MAKERSPACE_BY_ID = gql`
+  query GetMakerspaceByID($id: ID!) {
+    makerspaceByID(id: $id) {
       id
       name
+      subtitle
+      location
       hours {
         day
         makerspaceID
@@ -165,40 +180,42 @@ export const GET_ZONE_BY_ID = gql`
   }
 `;
 
-export const UPDATE_ZONE = gql`
-  mutation UpdateZone(
+export const UPDATE_MAKERSPACE = gql`
+  mutation UpdateMakerspace(
     $id: ID!
     $name: String!
+    $subtitle: String
+    $location: String
     $imageUrl: String
   ) {
-    updateZone(
+    updateMakerspace(
       id: $id
-      newZone: { name: $name, imageUrl: $imageUrl }
+      newMakerspace: { name: $name, subtitle: $subtitle, location: $location, imageUrl: $imageUrl }
     ) {
       id
     }
   }
 `;
 
-export const DELETE_ZONE = gql`
-  mutation DeleteZone($id: ID!) {
-    deleteZone(id: $id) {
+export const DELETE_MAKERSPACE = gql`
+  mutation DeleteMakerspace($id: ID!) {
+    deleteMakerspace(id: $id) {
       id
     }
   }
 `;
 
-export const ADD_TRAINING_TO_ZONE = gql`
-  mutation AddTrainingToZone($zoneID: ID!, $moduleID: ID!) {
-    addTrainingToZone(zoneID: $zoneID, moduleID: $moduleID) {
+export const ADD_TRAINING_TO_MAKERSPACE = gql`
+  mutation AddTrainingToMakerspace($makerspaceID: ID!, $moduleID: ID!) {
+    addTrainingToMakerspace(makerspaceID: $makerspaceID, moduleID: $moduleID) {
       id
     }
   }
 `;
 
-export const REMOVE_TRAINING_FROM_ZONE = gql`
-  mutation RemoveTrainingFromZone($zoneID: ID!, $moduleID: ID!) {
-    removeTrainingFromZone(zoneID: $zoneID, moduleID: $moduleID) {
+export const REMOVE_TRAINING_FROM_MAKERSPACE = gql`
+  mutation RemoveTrainingFromMakerspace($makerspaceID: ID!, $moduleID: ID!) {
+    removeTrainingFromMakerspace(makerspaceID: $makerspaceID, moduleID: $moduleID) {
       id
     }
   }

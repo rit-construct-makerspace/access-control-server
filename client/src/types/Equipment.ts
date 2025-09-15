@@ -27,6 +27,6 @@ export interface EquipmentWithRoom {
   room: {
     name: string;
     id: number;
-    zone: any;
+    makerspace: any;
   };
 }

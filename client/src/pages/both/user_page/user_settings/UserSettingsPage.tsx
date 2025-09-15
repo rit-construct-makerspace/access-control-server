@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { UPDATE_STUDENT_PROFILE } from "../../../maker/signup/SignupPage";
 import RequestWrapper2 from "../../../../common/RequestWrapper2";
 import { stringAvatar } from "../../../../common/avatarGenerator";
-import ThemeToggle from "../../../../left_nav/ThemeToggle";
+import ThemeToggle from "../../../../common/ThemeToggle";
 
 export default function UserSettingsPage() {
     const currentUser = useCurrentUser();
@@ -108,9 +108,6 @@ export default function UserSettingsPage() {
                         <Grid container justifyContent="space-around" maxWidth={isMobile ? undefined : "750px"}>
                             <Grid minWidth="155px">
                                 <InfoBlob label="Pronous" value={pronouns}/>
-                            </Grid>
-                            <Grid minWidth="155px">
-                                <InfoBlob label="Role" value={user.privilege}/>
                             </Grid>
                             <Grid minWidth="155px">
                                 <InfoBlob label="College" value={user.college}/>

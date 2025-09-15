@@ -3,7 +3,6 @@
  * GraphQL Endpoint Implementations for Announcements
  */
 
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
 import { getAnnouncements, getAnnouncementByID, createAnnouncement, updateAnnouncement, deleteAnnouncement } from "../repositories/Announcements/AnnouncementsRepository.js";
 

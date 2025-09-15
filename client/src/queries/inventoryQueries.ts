@@ -173,7 +173,7 @@ export const UPDATE_INVENTORY_TAG = gql`
 `;
 
 export const UPDATE_MAKERSPACE = gql`
-  mutation UpdateMakerspace($id: ID!, $makerspaceID: ID!) {
-    updateMakerspace(id: $id, makerspaceID: $makerspaceID)
+  mutation UpdateMakerspaceForItem($id: ID!, $makerspaceID: ID!) {
+    updateMakerspaceForItem(id: $id, makerspaceID: $makerspaceID)
   }
 `;

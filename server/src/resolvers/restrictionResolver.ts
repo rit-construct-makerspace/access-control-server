@@ -2,7 +2,7 @@ import { ApolloContext, CurrentUser } from "../context.js";
 import { RestrictionRow } from "../db/tables.js";
 import * as UsersRepo from "../repositories/Users/UserRepository.js";
 import * as RestrictionRepository from "../repositories/Restrictions/RestrictionsRepository.js";
-import * as MakerspaceRepo from "../repositories/Zones/ZonesRespository.js";
+import * as MakerspaceRepo from "../repositories/Makerspaces/MakerspaceRespository.js";
 
 export const RestrictionResolver = {
     Restriction: {
@@ -19,7 +19,7 @@ export const RestrictionResolver = {
             _args: any,
             { isStaff }: ApolloContext
         ) => isStaff (async (user: CurrentUser) => {
-            return parent.makerspaceID ? MakerspaceRepo.getZoneByID(parent.makerspaceID) : null
+            return parent.makerspaceID ? MakerspaceRepo.getMakerspaceByID(parent.makerspaceID) : null
         }),
     },
 

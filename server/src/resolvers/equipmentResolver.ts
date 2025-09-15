@@ -7,7 +7,6 @@ import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js
 import * as EquipmentInstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
 import { ApolloContext, CurrentUser } from "../context.js";
-import { Privilege } from "../schemas/usersSchema.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { EquipmentRow } from "../db/tables.js";
@@ -126,8 +125,8 @@ const EquipmentResolvers = {
     ) =>
       isManager(async (user: CurrentUser) => {
         const room = await RoomRepo.getRoomByID(args.equipment.roomID);
-        if (!user.manager.includes(room?.zoneID ?? -1) && !user.admin) {
-          throw new GraphQLError(`No Privilege for Makerspace ${room?.zoneID ?? -1}`);
+        if (!user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
+          throw new GraphQLError(`No Privilege for Makerspace ${room?.makerspaceID ?? -1}`);
         }
 
         const equipment = await EquipmentRepo.addEquipment(args.equipment);
@@ -155,8 +154,8 @@ const EquipmentResolvers = {
       { isManager }: ApolloContext) =>
       isManager(async (user: CurrentUser) => {
         const room = await RoomRepo.getRoomByID(args.equipment.roomID);
-        if (!user.manager.includes(room?.zoneID ?? -1) && !user.admin) {
-          throw new GraphQLError(`Insufficent Privilege for Makerspace ${room?.zoneID}`)
+        if (!user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
+          throw new GraphQLError(`Insufficent Privilege for Makerspace ${room?.makerspaceID}`)
         }
         console.log(args.equipment)
         return await EquipmentRepo.updateEquipment(Number(args.id), args.equipment);

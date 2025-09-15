@@ -9,7 +9,6 @@ import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getModuleByID } from "../repositories/Training/ModuleRepository.js";
 import { deleteTrainingHold, getTrainingHoldByID } from "../repositories/Training/TrainingHoldsRespository.js";
 import { getUserByID, getUsersFullName } from "../repositories/Users/UserRepository.js";
-import { Privilege } from "../schemas/usersSchema.js";
 
 export const TrainingHoldResolver = {
   TrainingHold: {

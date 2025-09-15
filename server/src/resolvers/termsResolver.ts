@@ -3,9 +3,7 @@
  * GraphQL Endpoint Implementations for the Terms value of the TextFields table
  */
 
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
-import { getDataPointByID, incrementDataPointValue, setDataPointValue } from "../repositories/DataPoints/DataPointsRepository.js";
 import { getTerms, setTerms } from "../repositories/TextItems/TermsRepository.js";
 
 const TermsResolver = {

@@ -6,7 +6,6 @@
 import * as ModuleRepo from "../repositories/Training/ModuleRepository.js";
 import { AccessProgress, AnswerInput } from "../schemas/trainingModuleSchema.js";
 import { ApolloContext } from "../context.js";
-import { Privilege } from "../schemas/usersSchema.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import * as SubmissionRepo from "../repositories/Training/SubmissionRepository.js";
@@ -70,6 +69,7 @@ interface ChoiceSummary {
   questionNum: string;
   questionText: string;
   correct: boolean;
+  comment: string;
 }
 
 /**
@@ -423,7 +423,6 @@ const TrainingModuleResolvers = {
           );
 
           for (let question of questions) {
-
             //Stop if question has no options (invalid format)
             if (!question.options)
               throw Error(
@@ -439,15 +438,16 @@ const TrainingModuleResolvers = {
             const submittedOptionIDs = args.answerSheet.find(
               (item) => item.itemID === question.id
             )?.optionIDs;
+           
 
             //Increment correcct if submitted options match correct options (order doesn't matter)
             //Increment incorrect otherwise
             if (submittedOptionIDsCorrect(correctOptionIDs, submittedOptionIDs)) {
               correct++;
-              choiceSummary.push({ questionNum: question.id, questionText: question.text, correct: true });
+              choiceSummary.push({ questionNum: question.id, questionText: question.text, correct: true, comment: question.affirmation});
             } else {
               incorrect++;
-              choiceSummary.push({ questionNum: question.id, questionText: question.text, correct: false });
+              choiceSummary.push({ questionNum: question.id, questionText: question.text, correct: false, comment: question.hint });
             }
 
           }

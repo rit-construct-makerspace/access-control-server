@@ -4,7 +4,7 @@ import MaterialModalContents, {
   InventoryItemInput,
 } from "./MaterialModalContents";
 import { GET_INVENTORY_ITEMS, CREATE_INVENTORY_ITEM } from "../../../queries/inventoryQueries";
-import { GET_ZONES_WITH_ITEMS } from "../../../queries/zoneQueries";
+import { GET_MAKERSPACES_WITH_ITEMS } from "../../../queries/makerspaceQueries";
 
 
 interface NewMaterialProps {
@@ -22,11 +22,11 @@ export default function NewMaterial({ onClose }: NewMaterialProps) {
         query: GET_INVENTORY_ITEMS,
       },
       {
-        query: GET_ZONES_WITH_ITEMS,
-        variables: { zoneId: itemDraft.makerspaceID },
+        query: GET_MAKERSPACES_WITH_ITEMS,
+        variables: { makerspaceId: itemDraft.makerspaceID },
       },
       {
-        query: GET_ZONES_WITH_ITEMS,
+        query: GET_MAKERSPACES_WITH_ITEMS,
       }],
     }
   );

@@ -2,7 +2,7 @@ import { Divider, Stack, Typography } from "@mui/material";
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/client";
 import RequestWrapper2 from "../../common/RequestWrapper2";
-import ZoneHours, { ZoneDefaultHours } from "../../types/ZoneHours";
+import MakerspaceHours, { MakerspaceDefaultHours } from "../../types/MakerspaceHours";
 import DefaultHoursBlock from "./DefaultHoursBlock";
 import SpecialHoursBlock from "./SpecialHoursBlock";
 import NewSpecialHoursBlock from "./NewSpecialHours";
@@ -11,9 +11,9 @@ interface ManageMakerspaceHoursProps {
   makerspaceID: number;
 }
 
-export const GET_ZONE_DEFAULT_HOURS = gql`
-  query GetZoneDefaultHours($makerspaceID: ID!) {
-    zoneDefaultHours(makerspaceID: $makerspaceID) {
+export const GET_MAKERSPACE_DEFAULT_HOURS = gql`
+  query GetMakerspaceDefaultHours($makerspaceID: ID!) {
+    makerspaceDefaultHours(makerspaceID: $makerspaceID) {
       dayOfWeek
       makerspaceID
       open
@@ -23,9 +23,9 @@ export const GET_ZONE_DEFAULT_HOURS = gql`
   }
 `;
 
-export const GET_ZONE_SPECIAL_HOURS = gql`
-  query GetZoneSpecialHours($makerspaceID: ID!) {
-    zoneSpecialHours(makerspaceID: $makerspaceID) {
+export const GET_MAKERSPACE_SPECIAL_HOURS = gql`
+  query GetMakerspaceSpecialHours($makerspaceID: ID!) {
+    makerspaceSpecialHours(makerspaceID: $makerspaceID) {
       day
       makerspaceID
       open
@@ -36,15 +36,15 @@ export const GET_ZONE_SPECIAL_HOURS = gql`
 `;
 
 export default function ManageMakerspaceHours(props: ManageMakerspaceHoursProps) {
-  const defaultHoursResult = useQuery(GET_ZONE_DEFAULT_HOURS, { variables: { makerspaceID: props.makerspaceID } });
-  const specialHoursResult = useQuery(GET_ZONE_SPECIAL_HOURS, { variables: { makerspaceID: props.makerspaceID } });
+  const defaultHoursResult = useQuery(GET_MAKERSPACE_DEFAULT_HOURS, { variables: { makerspaceID: props.makerspaceID } });
+  const specialHoursResult = useQuery(GET_MAKERSPACE_SPECIAL_HOURS, { variables: { makerspaceID: props.makerspaceID } });
 
   return (
     <Stack>
       <Typography variant="h5" fontWeight={"bold"}>Makerspace Hours</Typography>
       <RequestWrapper2 result={defaultHoursResult} render={(data) => {
 
-        const defaultHours: ZoneDefaultHours[] = data.zoneDefaultHours;
+        const defaultHours: MakerspaceDefaultHours[] = data.makerspaceDefaultHours;
 
         return (
           <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"center"}>
@@ -62,7 +62,7 @@ export default function ManageMakerspaceHours(props: ManageMakerspaceHoursProps)
       <Typography variant="h5" fontWeight={"bold"}>Special Hours</Typography>
       <RequestWrapper2 result={specialHoursResult} render={(data) => {
 
-        const specialHours: ZoneHours[] = data.zoneSpecialHours;
+        const specialHours: MakerspaceHours[] = data.makerspaceSpecialHours;
 
         return (
           <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"center"} sx={{ flexWrap: "wrap" }}>

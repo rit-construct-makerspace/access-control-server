@@ -14,7 +14,7 @@ export async function purge_images(): Promise<void> {
 		    	select  json_array_elements("quiz"::json) as item from "TrainingModule" tm 
 		    ) select replace(cast(item::json->'text' as text), '"', '') as image from entries where cast(item::json->'type' as text) = '"IMAGE_EMBED"'
 		    union
-		    select z."imageUrl" as image from "Zones" z 
+		    select z."imageUrl" as image from "Makerspaces" z 
 		    union 
 		    select e."imageUrl" as image from "Equipment" e 
 		    union 

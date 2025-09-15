@@ -9,7 +9,7 @@ import { useIsMobile } from "../../common/IsMobileProvider";
 
 const ARCHIVE_MAKERSPACE = gql`
   mutation ArchiveMakerspace($id: ID!) {
-    archiveZone(id: $id) {
+    archiveMakerspace(id: $id) {
       id
     }
   }
@@ -27,7 +27,7 @@ export default function DeleteMakerspaceModal(props: DeleteMakerspaceModalProps)
 
   const [confirmation, setConfirmation] = useState("");
 
-  const [archiveMakerspace] = useMutation(ARCHIVE_MAKERSPACE, { refetchQueries: ["GetZones"] });
+  const [archiveMakerspace] = useMutation(ARCHIVE_MAKERSPACE, { refetchQueries: ["GetMakerspaces"] });
 
   function handleClose() {
     setConfirmation("");

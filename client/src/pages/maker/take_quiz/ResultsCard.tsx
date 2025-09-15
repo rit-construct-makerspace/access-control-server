@@ -5,10 +5,10 @@ import {
   Stack,
   CardHeader
 } from "@mui/material";
-import Markdown from "react-markdown";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect, useState } from "react";
+import ThemedMarkdown from "../../../common/ThemedMarkdown";
 
 interface ResultsCardProps {
     summary: Array<ChoiceSummary>
@@ -18,6 +18,7 @@ interface ChoiceSummary {
   questionNum: string;
   questionText: string;
   correct: boolean;
+  comment: string;
 }
 
 const styles = {
@@ -59,7 +60,10 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
               {choiceSummary.correct 
               ? <CheckCircleIcon color="success" />
               : <CloseIcon color="error" />}
-              <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><Markdown>{choiceSummary.questionText}</Markdown></Typography>
+              <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><ThemedMarkdown>{choiceSummary.questionText}</ThemedMarkdown></Typography>
+            </Stack>
+            <Stack direction={"row"} spacing={2} alignItems="center" >
+              <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><ThemedMarkdown>{choiceSummary.comment}</ThemedMarkdown></Typography>
             </Stack>
           </Card>
         ))}

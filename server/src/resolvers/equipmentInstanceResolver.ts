@@ -1,7 +1,6 @@
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js"
-import { Privilege } from "../schemas/usersSchema.js";
 import { ApolloContext } from "../context.js";
 import { EquipmentInstancesRow } from "../db/tables.js";
 import { createInstance, deleteInstance, getInstanceByID, getInstancesByEquipment, setInstanceName, setInstanceStatus } from "../repositories/Equipment/EquipmentInstancesRepository.js";
@@ -151,8 +150,8 @@ const EquipmentInstanceResolver = {
         const equipment = await EquipmentRepo.getEquipmentByID(orig.equipmentID);
         if (!equipment) throw new GraphQLError("Equipment does not exist");
         const room = await RoomRepo.getRoomByID(equipment.roomID);
-        if (!user.staff.includes(room?.zoneID ?? -1) && !user.manager.includes(room?.zoneID ?? -1) && !user.admin) {
-          throw new GraphQLError(`Not Privileged for Makerspace ${room?.zoneID}`);
+        if (!user.staff.includes(room?.makerspaceID ?? -1) && !user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
+          throw new GraphQLError(`Not Privileged for Makerspace ${room?.makerspaceID}`);
         }
         await createLog(`{user} changed instance "${orig.name}" status to "${args.status}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
         return await setInstanceStatus(args.id, args.status)
@@ -175,8 +174,8 @@ const EquipmentInstanceResolver = {
         const equipment = await EquipmentRepo.getEquipmentByID(orig.equipmentID);
         if (!equipment) throw new GraphQLError("Equipment does not exist");
         const room = await RoomRepo.getRoomByID(equipment.roomID);
-        if (!user.manager.includes(room?.zoneID ?? -1) && !user.admin) {
-          throw new GraphQLError(`Not Privileged for Makerspace ${room?.zoneID}`);
+        if (!user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
+          throw new GraphQLError(`Not Privileged for Makerspace ${room?.makerspaceID}`);
         }
         await createLog(`{user} changed instance "${orig.name}" name to "${args.name}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
         return await setInstanceName(args.id, args.name)
@@ -198,8 +197,8 @@ const EquipmentInstanceResolver = {
         const equipment = await EquipmentRepo.getEquipmentByID(orig.equipmentID);
         if (!equipment) throw new GraphQLError("Equipment does not exist");
         const room = await RoomRepo.getRoomByID(equipment.roomID);
-        if (!user.manager.includes(room?.zoneID ?? -1) && !user.admin) {
-          throw new GraphQLError(`Not Privileged for Makerspace ${room?.zoneID}`);
+        if (!user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
+          throw new GraphQLError(`Not Privileged for Makerspace ${room?.makerspaceID}`);
         }
         await createLog(`{user} deleted instance "${orig.name}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
         return await deleteInstance(args.id)

@@ -1,66 +1,70 @@
 # Developing Locally
 
+
 ## Prerequisites
 NodeJS latest - [install](https://nodejs.org/en/download/package-manager)
 
-postgres - [install](https://www.postgresql.org/download/)
+docker - [install](https://www.docker.com/)
 
-typescript - use "npm install typescript"
-
-knex - use "npm install knex"
-
-ejs - use "npm install ejs"
-
-### Optional
-Docker Desktop - [install](https://docs.docker.com/get-docker/)
+dependencies - run `npm install` in the root of the repository 
 
 ## Environment
+This project uses env files to hold secrets. Examples are provided but must be moved from their .env.example to just .env in their respective directories.
+
 For an example of required server environment variables, see [server/.env.example](server/.env.example)
+
+There are some environment variables that must be changed for the server to function in server/.env. They are marked as such
 
 For an example of required client environment variables, see [client/.env.example](client/.env.example)
 
-## Database (WIP)
-This project uses a postgres database. You must use the environment variable `DATABASE_URL` in the server to point the app to your postgres instance. `DATABASE_URL` should be a database URI. See the "Connection URIs" section of [the postgres docs](https://www.postgresql.org/docs/current/libpq-connect.html) for details.
+## Database
+This project uses a postgres database. The easiest way to get this up and running is through docker. 
 
-The project also contains a docker-compose definition for a postgres instance exposed on port `5433`. To use this definition you must set the following environment variables in the project root:
-```
-POSTGRES_USER
-POSTGRES_PASSWORD
-POSTGRES_DB
-```
-The docker definition will automatically configure the database to use these values.
+You must use the environment variable `DATABASE_URL` in the server to point the app to your postgres instance. `DATABASE_URL` should be a database URI. See the "Connection URIs" section of [the postgres docs](https://www.postgresql.org/docs/current/libpq-connect.html) for details.
 
-To build and start the postgres container from the project root, run the following commands:
+### Creating the Database Container
+This can also be done through docker desktop, instructions for that may come later. 
 
-```
-docker-compose build db
-docker-compose up -d db
-```
+To create a container for your database, run the following command (creating your own password for it)
 
-Once you have a dedicated postgres instance, and you have configured your environment, run the following commands from the project root in order to migrate the database:
+```sh
+docker run -p 5432:5432 --name devdb -e POSTGRES_PASSWORD=YOUR_OWN_DB_PASSWORD -d postgres:15
 ```
-npm run build:server
-npm run knex:migrate:latest
-```
+If you restart your computer, you may have to run `docker start devdb` to restart the server container.
 
-## Client
-The client/frontend consists of a React app. To start the app in with hot reloads from the project root, run the following commands:
+### Creating/Restoring Data
 
-```
-cd client
-npm run start:dev
-```
+The easiest way to get up and running is to restore a backup of a real server that. Postgres supports dumping and restoring databases to files
 
-To test the app, start the server and then go to `http://localhost:3001/app`. The development environment has a mock-up authentication with test users, whose credentials can be found in [server/src/data/devUsers.json](server/src/data/devUsers.json).
+To restore from a backup, execute
+```sh
+pg_restore --no-owner -d postgresql://postgres:YOUR_OWN_PASSWORD@localhost:5432/postgres FOLDER_OF_FILES_THAT_YOU_WERE_SENT -v 
+```
 
 ## Server
 The server/backend consists of an Express server with a GraphQL API.
 
 To run the server in development mode with hot reloads run the following commands from the project root:
+*IF THE SERVER IS SETUP TO RUN WITH HOT RELOADING, THIS WILL BE UNHELPFUL UNLESS THE CLIENT DEV SERVER IS RUNNING (see below)*
 
-```
+```sh
 npm run start:dev
 ```
+
+For more in depth (but not necessary for getting started) info, see server/README.md
+
+## Client
+The client/frontend consists of a React app. To start the app in with hot reloads from the project root, run the following command from the root of the repository:
+
+*THE SERVER MUST BE RUNNING AS WELL OR THIS WILL BE MOSTLY USELESS*
+
+```
+cd client
+npm run start:client
+```
+
+To test the app, start the server and then go to `http://localhost:3001/app`. 
+
 
 ## Debugging
 The `start:debug` script in the root project can be used to start the server in debug mode. This will expose a debug listener on port `9229`. Follow [this tutorial](https://nodejs.org/en/docs/guides/debugging-getting-started) for debugging using this process. We have found that Chrome dev tools are the most effective for this purpose.

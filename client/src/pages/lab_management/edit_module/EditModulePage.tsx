@@ -21,7 +21,7 @@ import ArchiveTrainingModuleButton from "../training_modules/ArchiveTrainingModu
 import { DropResult } from "@hello-pangea/dnd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
-import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
+import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isAdmin, isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
@@ -45,7 +45,7 @@ export default function EditModulePage({
 
   const [module, setModule] = useImmer<Module>(moduleInitialValue);
 
-  const getZonesResult = useQuery(GET_FULL_ZONES);
+  const getMakerspacesResult = useQuery(GET_FULL_MAKERSPACES);
 
   const trainingModSavedAnimation = () => {
     toast.success('Training Module Saved', {
@@ -145,9 +145,9 @@ export default function EditModulePage({
           })}
           sx={{ width: "600px" }}
         />
-        <RequestWrapper2 result={getZonesResult} render={(data) => {
-          const zones = data.zones;
-          const possibleZones = zones.filter((zone: FullZone) => (isManagerFor(currentUser, zone.id)))
+        <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
+          const makerspaces = data.makerspaces;
+          const possibleMakerspaces = makerspaces.filter((space: FullMakerspace) => (isManagerFor(currentUser, space.id)))
           return (
             <FormControl>
               <InputLabel id="associated-makerspace">Associated Makerspace</InputLabel>
@@ -160,8 +160,8 @@ export default function EditModulePage({
                   draft.makerspaceID = e.target.value != null ? Number(e.target.value) : null;
                 })}>
                 {
-                  possibleZones.map((zone: FullZone) => (
-                    <MenuItem value={zone.id}>{zone.name}</MenuItem>
+                  possibleMakerspaces.map((space: FullMakerspace) => (
+                    <MenuItem value={space.id}>{space.name}</MenuItem>
                   ))
                 }
                 {
