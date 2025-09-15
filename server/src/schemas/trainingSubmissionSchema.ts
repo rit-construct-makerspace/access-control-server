@@ -26,10 +26,15 @@ export const TrainingSubmissionTypeDefs = gql`
     summary: JSON
   }
 
+  type remainingSubmissions{
+    submissions : String
+    submissionLimit : String
+  }
+
   extend type Query {
     submission(submissionID: ID): [Submission]
     submissions(moduleID: ID): [Submission]
     latestSubmission(moduleID: ID): Submission
-    failedSubmissions(moduleID: ID): [Submission]
+    remainingSubmissions(moduleID: ID): remainingSubmissions
   }
 `;

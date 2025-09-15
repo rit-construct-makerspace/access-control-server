@@ -1,24 +1,12 @@
 import { useQuery } from "@apollo/client";
-import { Button, Card, CardActionArea, CardContent, CardHeader, Grid, Link, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { GET_FAILED_SUBMISSIONS } from "../../../queries/getSubmissions";
-import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, Grid, Link, Typography } from "@mui/material";
+import { GET_REMAINING_SUBMISSIONS } from "../../../queries/getSubmissions";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 export default function RetakeQuiz(props: { moduleID: number }) {
-    const [width, setWidth] = useState<number>(window.innerWidth);
-    function handleWindowSizeChange() {
-        setWidth(window.innerWidth);
-      }
-      useEffect(() => {
-        window.addEventListener('resize', handleWindowSizeChange);
-        return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-        }
-      }, []);
-    const isMobile = width <= 768;
+    const isMobile = useIsMobile();
 
-    const navigate = useNavigate();
-    const failedSubmissions = useQuery(GET_FAILED_SUBMISSIONS,
+    const submissions = useQuery(GET_REMAINING_SUBMISSIONS,
         {
             variables: { moduleID: props.moduleID },
             fetchPolicy: 'network-only',
@@ -32,7 +20,7 @@ export default function RetakeQuiz(props: { moduleID: number }) {
           <Card>
             <CardContent>
               <Grid container direction={isMobile ? "column" : "row"} >
-                    {Number(failedSubmissions.data?.failedSubmissions.length) >= Number(import.meta.env.VITE_TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK) ?
+                    {Number(submissions.data?.remainingSubmissions.submissions) >= Number(submissions.data?.remainingSubmissions.submissionLimit) ? // TO-DO 9/15: find way to get remaining attempts here
                       <Grid>
                       <Typography><b>This training has been locked due to too many attempts. </b></Typography>
                       <Typography>You will be unable to progress and submit this quiz until <b>tomorrow</b>.</Typography>
@@ -40,7 +28,8 @@ export default function RetakeQuiz(props: { moduleID: number }) {
                       </Grid>
                       : <Grid>
                         <Typography>Click <Link href = {`/app/maker/training/${props.moduleID}`}>here</Link> to retake this quiz.</Typography>
-                        <Typography component="div">You have {Number(import.meta.env.VITE_TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK) - Number(failedSubmissions.data?.failedSubmissions.length)} attempts remaining today.</Typography>
+                        <Typography component="div">You have {Number(submissions.data?.remainingSubmissions.submissionLimit) - Number(submissions.data?.remainingSubmissions.submissions)} attempts remaining today.</Typography> 
+                        {/* TO-DO 9/15: the line above as well */}
                         </Grid>
                     }
               </Grid>
