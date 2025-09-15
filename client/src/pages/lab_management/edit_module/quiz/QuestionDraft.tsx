@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   Button,
   CardContent,
@@ -51,7 +51,7 @@ interface QuestionDraftProps {
   duplicateQuestion: () => void;
 }
 
-export default function QuestionDraft({
+const QuestionDraft = memo(function QuestionDraft({
   index,
   item,
   updateQuestion,
@@ -62,7 +62,7 @@ export default function QuestionDraft({
     console.error("Tried to render question with undefined options");
     return null;
   }
-
+  console.log("Rerendering qdraft", index);
   const question = item as Required<QuizItem>;
 
   return (
@@ -183,4 +183,6 @@ export default function QuestionDraft({
       </Stack>
     </QuizItemDraft>
   );
-}
+});
+
+export default QuestionDraft;

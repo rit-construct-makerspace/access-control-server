@@ -288,6 +288,7 @@ const TrainingModuleResolvers = {
           args.name,
           args.quiz,
           args.makerspaceID,
+          true, // default to archived to avoid pollution
         );
 
         await createLog(

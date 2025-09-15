@@ -103,7 +103,7 @@ export async function setModuleArchived(id: number, archived: boolean): Promise<
  * @param quiz {TrainingModuleItem} the attached quiz
  * @returns the added module
  */
-export async function addModule(name: string, quiz: object, makerspaceID: number | null): Promise<TrainingModuleRow> {
+export async function addModule(name: string, quiz: object, makerspaceID: number | null, archived: boolean): Promise<TrainingModuleRow> {
 
 
   const addedModule: TrainingModuleRow[] = await knex("TrainingModule")

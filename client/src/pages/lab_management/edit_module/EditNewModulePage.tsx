@@ -1,7 +1,6 @@
 import { useMutation } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
-import { Moduledraft, QuizItem } from "../../../types/Quiz";
-import { GET_TRAINING_MODULES, GET_ARCHIVED_TRAINING_MODULES, CREATE_TRAINING_MODULE } from "../../../queries/trainingQueries";
+import { GET_TRAINING_MODULES, GET_ARCHIVED_TRAINING_MODULES, CREATE_TRAINING_MODULE, GET_MODULE } from "../../../queries/trainingQueries";
 import 'react-toastify/dist/ReactToastify.css';
 import {
   Button,
@@ -10,105 +9,40 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useImmer } from "use-immer";
-import QuizBuilder from "./quiz/QuizBuilder";
-import { toast } from 'react-toastify';
 import SaveIcon from "@mui/icons-material/Save";
-import { ChangeEventHandler } from "react";
-import { DropResult } from "@hello-pangea/dnd";
+import { useState } from "react";
 
 
-export default function EditNewModulePage() {
+export default function NewModulePage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const navigate = useNavigate();
   const theme = useTheme();
 
-  const [moduleDraft, setModuleDraft] = useImmer<Moduledraft>({
-    name: "",
-    archived: true,
-    quiz: [],
-  });
+  const [title, setTitle] = useState("New Module");
 
-  const [updateModule] = useMutation(CREATE_TRAINING_MODULE);
+  const [createModule] = useMutation(CREATE_TRAINING_MODULE);
 
-  const executeSave = async (updatedModule: Moduledraft) => {
-    await updateModule({
+  const executeCreate = async () => {
+    await createModule({
       variables: {
-        name: updatedModule.name,
-        quiz: updatedModule.quiz,
+        name: title,
+        quiz: [],
         makerspaceID: makerspaceID,
       },
       refetchQueries: [
         { query: GET_ARCHIVED_TRAINING_MODULES },
         { query: GET_TRAINING_MODULES },
+        { query: GET_MODULE },
       ],
-      onCompleted: () => navigate(`/makerspace/${makerspaceID}/trainings`),
+      onCompleted: (data) => {const id = data.createModule.id; navigate(`/makerspace/${makerspaceID}/training/${id}`) },
+      onError: () => {alert("Failed to create new module. Try again?"); navigate(`/makerspace/${makerspaceID}/trainings`);}
     });
   }
 
-  const trainingModSavedAnimation = () => {
-    toast.success('Training Module Saved', {
-      position: "bottom-left",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+  function handleNameChanged(e: React.ChangeEvent<HTMLInputElement>) {
+    setTitle(e.target.value)
   }
 
-
-  const handleSaveClicked = async () => {
-    if (!moduleDraft.name) {
-      window.alert("Please specify a name.");
-      return;
-    }
-
-    if (moduleDraft.quiz.length === 0) {
-      window.alert("Please add content to the training.");
-      return;
-    }
-
-    await executeSave(moduleDraft);
-
-    trainingModSavedAnimation();
-  }
-
-
-  const handleNameChanged: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setModuleDraft({ ...moduleDraft, name: e.target.value });
-  };
-
-  const handleAddQuizItem = (item: QuizItem) => {
-    setModuleDraft((draft) => {
-      draft?.quiz.push(item);
-    });
-  };
-
-  const handleRemoveQuizItem = (itemId: string) => {
-    setModuleDraft((draft) => {
-      const index = draft!.quiz.findIndex((i) => i.id === itemId);
-      draft?.quiz.splice(index, 1);
-    });
-  };
-
-  const handleUpdateQuizItem = (itemId: string, updatedItem: QuizItem) => {
-    setModuleDraft((draft) => {
-      const index = draft!.quiz.findIndex((i) => i.id === itemId);
-      draft!.quiz[index] = updatedItem;
-    });
-  };
-
-  const handleOnDragEnd = (result: DropResult) => {
-    setModuleDraft((draft) => {
-      if (!result.destination) return;
-
-      const [removed] = draft!.quiz.splice(result.source.index, 1);
-      draft!.quiz.splice(result.destination.index, 0, removed);
-    });
-  };
 
   return (
     <Stack padding="0 20px 20px" spacing={2}>
@@ -125,13 +59,12 @@ export default function EditNewModulePage() {
       >
         <TextField
           label="Module title"
-          value={moduleDraft.name}
+          value={title}
           onChange={handleNameChanged}
           sx={{ width: "600px" }}
         />
-        <Button startIcon={<SaveIcon />} color="secondary" variant="contained" onClick={handleSaveClicked} size="large">Save</Button>
+        <Button startIcon={<SaveIcon />} color="secondary" variant="contained" onClick={executeCreate} size="large">Create</Button>
       </Stack>
-      <QuizBuilder quiz={moduleDraft.quiz ? moduleDraft.quiz : []} handleAdd={handleAddQuizItem} handleRemove={handleRemoveQuizItem} handleUpdate={handleUpdateQuizItem} handleOnDragEnd={handleOnDragEnd} />
     </Stack>
   );
 }
