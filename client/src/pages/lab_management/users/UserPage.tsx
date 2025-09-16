@@ -1,5 +1,4 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import PrettyModal from "../../../common/PrettyModal";
 import { Alert, Avatar, Box, Button, Card, Chip, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import InfoBlob from "./InfoBlob";
@@ -25,57 +24,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ManageUserArchive from "./ManageUserArchive";
-import { GET_USER } from "../../../queries/userQueries";
-
-export interface Hold {
-  id: string;
-  description: string;
-  creator: {
-    firstName: string;
-    lastName: string;
-  };
-  remover?: {
-    firstName: string;
-    lastName: string;
-  };
-  createDate: string;
-  removeDate?: string;
-}
-
-export interface Restriction {
-  id: number;
-  reason: string;
-  creator: {
-    firstName: string;
-    lastName: string;
-  };
-  makerspace: {
-    id: number;
-    name: string;
-  };
-  createDate: string;
-}
-
-export interface AccessCheck {
-  id: string;
-  equipmentID: string;
-  approved: boolean;
-}
-
-export interface AccessCheckExtraInfo {
-  id: number;
-  approved: boolean;
-  equipment: {
-    id: number;
-    name: string;
-    requiresTrainerApproval: boolean;
-    room: {
-      makerspace: {
-        id: number;
-      }
-    }
-  }
-}
+import { AccessCheckExtraInfo, GET_USER, Hold, Restriction } from "../../../queries/userQueries";
 
 const CREATE_HOLD = gql`
   mutation CreateHold($userID: ID!, $description: String!) {
