@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import QuizItemDraft from "./QuizItemDraft";
 import { TextField } from "@mui/material";
 import { QuizItem } from "../../../../types/Quiz";
@@ -18,15 +18,18 @@ export default function TextDraft({
   onRemove,
   onDuplicate,
 }: TextDraftProps) {
+  
+  const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    updateText({ ...item, text: e.target.value });
+  }, [updateText, item]);
+
   return (
     <QuizItemDraft onRemove={onRemove} onDuplicate={onDuplicate} index={index} itemId={item.id}>
       <TextField
         multiline
         sx={{ m: 2 }}
         label="Text"
-        onChange={(e) => {
-          updateText({ ...item, text: e.target.value });
-        }}
+        onChange={onChange}
         value={item.text}
       />
     </QuizItemDraft>

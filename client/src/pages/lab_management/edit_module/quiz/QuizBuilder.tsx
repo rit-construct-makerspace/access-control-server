@@ -25,7 +25,7 @@ interface QuizBuilderProps {
 
 
 function MakeBox(item: QuizItem, index: number, duplicateItem: (item: QuizItem) => void, updateItem: (itemId: string, updatedItem: QuizItem) => void, handleRemove: (itemId: string) => void) {
-  const update = useCallback((newItem: QuizItem) => updateItem(item.id, newItem), [updateItem]);
+  const update = useCallback((newItem: QuizItem) => updateItem(item.id, newItem), [updateItem, item]);
   const remove = useCallback(() => handleRemove(item.id), [handleRemove, item]);
   const duplicate = useCallback(() => duplicateItem(item), [duplicateItem, item]);
 
@@ -37,7 +37,7 @@ function MakeBox(item: QuizItem, index: number, duplicateItem: (item: QuizItem) 
           key={item.id}
           index={index}
           item={item}
-          updateQuestion={updateItem}
+          updateQuestion={update}
           removeQuestion={remove}
           duplicateQuestion={duplicate}
         />
@@ -95,14 +95,14 @@ function MakeBox(item: QuizItem, index: number, duplicateItem: (item: QuizItem) 
 
 export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdate, handleOnDragEnd }: QuizBuilderProps) {
 
-  const duplicateItem = (item: QuizItem) => {
+  const duplicateItem = useCallback((item: QuizItem) => {
     handleAdd({
       id: uuidv4(),
       type: item.type,
       text: item.text,
       options: item.options,
-    });
-  }
+    })}, [handleAdd]);
+  
 
   const createQuestion = () =>
     handleAdd({

@@ -46,7 +46,7 @@ function adjustOptionsToQuestionType(draft: Draft<Required<QuizItem>>) {
 interface QuestionDraftProps {
   index: number;
   item: QuizItem;
-  updateQuestion: (itemId: string, updatedQuestion: QuizItem) => void;
+  updateQuestion: (updatedQuestion: QuizItem) => void;
   removeQuestion: () => void;
   duplicateQuestion: () => void;
 }
@@ -55,8 +55,10 @@ function eqQD(before: QuestionDraftProps, after: QuestionDraftProps): boolean{
   const indexEq = before.index == after.index
   const itemEq = before.item == after.item;
   const updateEq = before.updateQuestion == after.updateQuestion;
-  console.log("eq", indexEq, itemEq, updateEq);
-  return indexEq && itemEq && updateEq;
+  const removeEq = before.removeQuestion == after.removeQuestion;
+  const duplicateEq = before.duplicateQuestion == after.duplicateQuestion;
+  console.log("eq", indexEq, itemEq, updateEq, removeEq, duplicateEq);
+  return indexEq && itemEq && updateEq && removeEq && duplicateEq;
 }
 
 
@@ -91,7 +93,7 @@ const QuestionDraft = memo(function QuestionDraft({
               adjustOptionsToQuestionType(draft);
             });
 
-            updateQuestion(question.id, updatedQuestion);
+            updateQuestion(updatedQuestion);
           }}
         >
           <MenuItem value={QuizItemType.MultipleChoice}>
@@ -109,7 +111,7 @@ const QuestionDraft = memo(function QuestionDraft({
           variant="outlined"
           value={question.text}
           onChange={(e) =>
-            updateQuestion(question.id, { ...question, text: e.target.value })
+            updateQuestion({ ...question, text: e.target.value })
           }
         />
       </CardContent>
@@ -126,7 +128,7 @@ const QuestionDraft = memo(function QuestionDraft({
                 draft.options.splice(i, 1);
               });
 
-              updateQuestion(question.id, updatedQuestion);
+              updateQuestion(updatedQuestion);
             }}
             onTextChange={(e) => {
               const updatedQuestion = produce(question, (draft) => {
@@ -134,14 +136,14 @@ const QuestionDraft = memo(function QuestionDraft({
                 draft.options[i].text = e.target.value;
               });
 
-              updateQuestion(question.id, updatedQuestion);
+              updateQuestion(updatedQuestion);
             }}
             onToggleCorrect={() => {
               const updatedQuestion = produce(question, (draft) => {
                 updateOptions(draft, option.id);
               });
 
-              updateQuestion(question.id, updatedQuestion);
+              updateQuestion(updatedQuestion);
             }}
           />
         ))}
@@ -159,7 +161,7 @@ const QuestionDraft = memo(function QuestionDraft({
               draft.options.push(newOption);
             });
 
-            updateQuestion(question.id, updatedQuestion);
+            updateQuestion(updatedQuestion);
           }}
         >
           + Add option
@@ -173,7 +175,7 @@ const QuestionDraft = memo(function QuestionDraft({
               variant="outlined"
               value={question.hint}
               onChange={(e) =>
-                updateQuestion(question.id, { ...question, hint: e.target.value })
+                updateQuestion({ ...question, hint: e.target.value })
               }
             />
             <TextField
@@ -183,7 +185,7 @@ const QuestionDraft = memo(function QuestionDraft({
               variant="outlined"
               value={question.affirmation}
               onChange={(e) =>
-                updateQuestion(question.id, { ...question, affirmation: e.target.value })
+                updateQuestion({ ...question, affirmation: e.target.value })
               }
             />
         </Stack>
