@@ -1,8 +1,8 @@
 import { gql, useMutation } from "@apollo/client";
 import { Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import { GET_USER } from "./UserPage";
 import { isManager } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import { GET_USER } from "../../../queries/userQueries";
 
 const SET_USER_FORCE = gql`
   mutation ForceArchiveUser($userID: ID!, $force: Boolean) {

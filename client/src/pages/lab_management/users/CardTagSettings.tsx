@@ -9,8 +9,7 @@ import {
 } from "@mui/material";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { gql, useMutation } from "@apollo/client";
-import GET_USERS from "../../../queries/getUsers";
-import { GET_USER } from "./UserPage";
+import GET_USERS, { GET_USER } from "../../../queries/userQueries";
 import { toast } from "react-toastify";
 import { isStaff } from "../../../common/PrivilegeUtils";
 import AddCardIcon from '@mui/icons-material/AddCard';

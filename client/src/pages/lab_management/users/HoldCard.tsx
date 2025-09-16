@@ -1,9 +1,10 @@
 import { Button, Card, CardActions, Stack, Typography } from "@mui/material";
-import { GET_USER, Hold } from "./UserPage";
+import { Hold } from "./UserPage";
 import { format, parseISO } from "date-fns";
 import { gql, useMutation } from "@apollo/client";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManager } from "../../../common/PrivilegeUtils";
+import { GET_USER } from "../../../queries/userQueries";
 
 const REMOVE_HOLD = gql`
   mutation RemoveHold($holdID: ID!) {
