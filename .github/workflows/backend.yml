@@ -57,7 +57,9 @@ jobs:
 
       - name: Install Node modules
         run: npm ci
-
+      - name: Lint Server
+        run: npm run lint
+        continue-on-error: true
       - name: Run Knex migrations
         run: npm run build:server && npm run knex:migrate:latest DEBUG=knex:tx
         env:
