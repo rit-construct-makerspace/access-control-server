@@ -202,7 +202,7 @@ const DELETE_PASSED_MODULE = gql`
   }
 `;
 
-export default function UserModal() {
+export default function UserPage() {
   const { makerspaceID, userID} = useParams<{ makerspaceID: string, userID: string }>();
   const navigate = useNavigate();
   const currentUser = useCurrentUser();

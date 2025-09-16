@@ -48,7 +48,7 @@ import EditEquipmentPage from "./pages/makerspace_page/equipment_pages/EditEquip
 import NewEquipmentPage from "./pages/makerspace_page/equipment_pages/NewEquipmentPage";
 import EquipmentRedirector from "./pages/makerspace_page/equipment_pages/EquipmentRedirector";
 import HelpPage from "./pages/maker/signup/HelpPage";
-import UserModal from "./pages/lab_management/users/UserPage";
+import UserPage from "./pages/lab_management/users/UserPage";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -140,7 +140,7 @@ export default function AppRoutes() {
               <Route path="/makerspace/:makerspaceID" element={<StaffBar />}>
 
                 <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />} />
-                <Route path="/makerspace/:makerspaceID/people/:userID" element={<UserModal/>} />
+                <Route path="/makerspace/:makerspaceID/people/:userID" element={<UserPage/>} />
                 <Route path="/makerspace/:makerspaceID/inventory" element={<InventoryPage />} />
                 <Route path="/makerspace/:makerspaceID/storefront/carts" element={<CartListPage />} />
                 <Route path="/makerspace/:makerspaceID/storefront/carts/:cartID" element={<CartPage />} />
