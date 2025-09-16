@@ -59,4 +59,23 @@ export const GET_USER_BY_USERNAME_OR_UID = gql`
   }
 `;
 
+export const UPDATE_STUDENT_PROFILE = gql`
+  mutation UpdateStudentProfile(
+    $userID: ID!
+    $pronouns: String
+    $college: String
+    $expectedGraduation: String
+  ) {
+    updateStudentProfile(
+      userID: $userID
+      pronouns: $pronouns
+      college: $college
+      expectedGraduation: $expectedGraduation
+    ) {
+      id
+    }
+  }
+`;
+
+
 export default GET_USERS;

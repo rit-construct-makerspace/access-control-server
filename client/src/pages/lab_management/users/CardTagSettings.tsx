@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { gql, useMutation } from "@apollo/client";
-import GET_USERS from "../../../queries/getUsers";
+import GET_USERS from "../../../queries/userQueries";
 import { GET_USER } from "./UserModal";
 import { toast } from "react-toastify";
 import { isStaff } from "../../../common/PrivilegeUtils";
