@@ -1,5 +1,5 @@
 import { Button, Card, CardActions, Stack, Typography } from "@mui/material";
-import { GET_USER, Hold } from "./UserModal";
+import { GET_USER, Hold } from "./UserPage";
 import { format, parseISO } from "date-fns";
 import { gql, useMutation } from "@apollo/client";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";

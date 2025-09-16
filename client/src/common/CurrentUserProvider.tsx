@@ -2,7 +2,7 @@ import { createContext, ReactElement, useContext } from "react";
 import { gql, useQuery } from "@apollo/client";
 import RequestWrapper2 from "./RequestWrapper2";
 import { Navigate, useLocation } from "react-router-dom";
-import { AccessCheck } from "../pages/lab_management/users/UserModal";
+import { AccessCheck } from "../pages/lab_management/users/UserPage";
 
 export const GET_CURRENT_USER = gql`
   query GetCurrentUser {

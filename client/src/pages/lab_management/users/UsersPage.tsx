@@ -5,11 +5,10 @@ import UserCard from "./UserCard";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { GET_NUM_USERS, GET_USERS_LIMIT, PartialUser } from "../../../queries/getUsers";
 import RequestWrapper from "../../../common/RequestWrapper";
-import UserModal from "./UserModal";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 export default function UsersPage() {
-  const { makerspaceID, userID } = useParams<{ makerspaceID: string, userID: string }>();
+  const { makerspaceID} = useParams<{ makerspaceID: string}>();
   const { search } = useLocation();
   const navigate = useNavigate();
   const [query, queryResult] = useLazyQuery(GET_USERS_LIMIT);
@@ -36,11 +35,6 @@ export default function UsersPage() {
       },
     });
   }, [search, query]);
-
-
-  const handleUserModalClosed = () => {
-    navigate(`/makerspace/${makerspaceID}/people`);
-  };
 
   const safeUsers = queryResult.data?.usersLimit.slice() ?? [];
 
@@ -73,7 +67,6 @@ export default function UsersPage() {
           ))}
         </Stack>
         <p>This page is limited to 100 users. Consider narrowing your search.</p>
-        <UserModal selectedUserID={userID ?? ""} onClose={handleUserModalClosed} />
       </Box>
     </RequestWrapper>
   );

@@ -10,7 +10,7 @@ import {
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { gql, useMutation } from "@apollo/client";
 import GET_USERS from "../../../queries/getUsers";
-import { GET_USER } from "./UserModal";
+import { GET_USER } from "./UserPage";
 import { toast } from "react-toastify";
 import { isStaff } from "../../../common/PrivilegeUtils";
 import AddCardIcon from '@mui/icons-material/AddCard';

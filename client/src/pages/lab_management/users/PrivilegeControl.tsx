@@ -7,7 +7,7 @@ import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../queries/makerspac
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isManagerFor } from "../../../common/PrivilegeUtils";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { GET_USER } from "./UserModal";
+import { GET_USER } from "./UserPage";
 import TrainerCard from "./TrainerCard";
 import TrainerEquipmentSelect from "./TrainerEquipmentSelect";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';

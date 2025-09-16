@@ -1,7 +1,7 @@
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
 import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_USER } from "../../../lab_management/users/UserModal";
+import { GET_USER } from "../../../lab_management/users/UserPage";
 import InfoBlob from "../../../lab_management/users/InfoBlob";
 import EditIcon from '@mui/icons-material/Edit';
 import { useEffect, useState } from "react";
