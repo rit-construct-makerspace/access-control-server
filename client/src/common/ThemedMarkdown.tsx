@@ -9,7 +9,7 @@ import ReactMarkdown from "react-markdown";
  * @returns ReactElement that ReactMarkdown gives
  */
 export default function ThemedMarkdown(props: { children: string }): ReactElement {
-    return <ReactMarkdown  components={{
+    return <ReactMarkdown components={{
         a({ children, ...props }) {
             return <Link target="_blank" rel="noopener noreferrer"{...props}>{children}</Link>;
         },
