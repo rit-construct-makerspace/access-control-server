@@ -15,7 +15,7 @@ import AnnouncementsPage from "./pages/lab_management/announcements/Announcement
 import NotFoundPage from "./pages/NotFoundPage";
 import EditActiveModulePage from "./pages/lab_management/edit_module/EditActiveModulePage";
 import LogoutPromptPage from "./pages/both/logout/LogoutPromptPage";
-import NewModulePage from "./pages/lab_management/edit_module/EditNewModulePage";
+import NewModulePage from "./pages/lab_management/edit_module/NewModulePage";
 import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnouncementPage";
 import EditAnnouncement from "./pages/lab_management/announcements/EditAnnouncement";
 import ReadersPage from "./pages/lab_management/readers/ReadersPage";

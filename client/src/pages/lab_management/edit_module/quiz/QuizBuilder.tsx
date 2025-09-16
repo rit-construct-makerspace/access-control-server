@@ -13,34 +13,32 @@ import { QuizItem, QuizItemType } from "../../../../types/Quiz";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import EmptyPageSection from "../../../../common/EmptyPageSection";
 import PdfEmbedDraft from "./PdfEmbedDraft";
+import { useCallback } from "react";
 
 interface QuizBuilderProps {
   quiz: QuizItem[];
-  handleAdd: any
-  handleRemove: any
-  handleUpdate: any
-  handleOnDragEnd: any
+  handleAdd: (item: QuizItem) => void;
+  handleRemove: (itemId: string) => void;
+  handleUpdate: (itemId: string, updatedItem: QuizItem) => void;
+  handleOnDragEnd: (result: DropResult) => void;
 }
 
 export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdate, handleOnDragEnd }: QuizBuilderProps) {
 
-  const addItem = (item: QuizItem) =>
-    handleAdd(item)
+  const addItem = useCallback(handleAdd, [handleAdd])
 
-  const removeItem = (itemId: string) =>
-    handleRemove(itemId)
+  const removeItem = useCallback(handleRemove, [handleRemove]);
 
-  const duplicateItem = (item: QuizItem) => {
+  const duplicateItem = useCallback((item: QuizItem) => {
     addItem({
       id: uuidv4(),
       type: item.type,
       text: item.text,
       options: item.options,
     });
-  }
+  }, [addItem]);
 
-  const updateItem = (itemId: string, updatedItem: QuizItem) =>
-    handleUpdate(itemId, updatedItem)
+  const updateItem = useCallback(handleUpdate, [handleUpdate]);
 
   const createQuestion = () =>
     addItem({
@@ -96,9 +94,7 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
                         key={item.id}
                         index={index}
                         item={item}
-                        updateQuestion={(updatedQuestion) =>
-                          updateItem(item.id, updatedQuestion)
-                        }
+                        updateQuestion={updateItem}
                         removeQuestion={() => removeItem(item.id)}
                         duplicateQuestion={() => duplicateItem(item)}
                       />

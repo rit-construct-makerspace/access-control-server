@@ -1,4 +1,4 @@
-import React, { memo, ReactNode } from "react";
+import React, { ReactNode } from "react";
 import styled from "styled-components";
 import { Card, CardActions, IconButton } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -26,7 +26,7 @@ interface QuizItemDraftProps {
   extraActions?: ReactNode;
 }
 
-const QuizItemDraft = memo(function QuizItemDraft({
+export default function QuizItemDraft({
   itemId,
   index,
   children,
@@ -64,5 +64,4 @@ const QuizItemDraft = memo(function QuizItemDraft({
       )}
     </Draggable>
   );
-});
-export default QuizItemDraft;
+}
