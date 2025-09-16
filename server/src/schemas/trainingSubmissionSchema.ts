@@ -27,8 +27,8 @@ export const TrainingSubmissionTypeDefs = gql`
   }
 
   type remainingSubmissions{
-    submissions : String
-    submissionLimit : String
+    submissions : Int
+    submissionLimit : Int
   }
 
   extend type Query {

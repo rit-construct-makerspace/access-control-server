@@ -68,8 +68,8 @@ const TrainingSubmissionResolvers = {
       { ifAuthenticated }: ApolloContext
     ) => 
       ifAuthenticated (async (user: any) => {
-        var attempts = (await SubmissionRepo.getFailedSubmissionsTodayByModuleAndUser(Number(args.moduleID), user.id)).length
-        return {"submissions" : attempts, "submissionLimit" : Number(process.env.TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK)};
+        var failedSubmissions = (await SubmissionRepo.getFailedSubmissionsTodayByModuleAndUser(Number(args.moduleID), user.id)).length
+        return {"submissions" : failedSubmissions, "submissionLimit" : Number(process.env.TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK)};
     }),
 
   }
