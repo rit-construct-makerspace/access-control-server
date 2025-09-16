@@ -1,14 +1,13 @@
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
 import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_USER } from "../../../lab_management/users/UserModal";
 import InfoBlob from "../../../lab_management/users/InfoBlob";
 import EditIcon from '@mui/icons-material/Edit';
 import { useEffect, useState } from "react";
 import RequestWrapper2 from "../../../../common/RequestWrapper2";
 import { stringAvatar } from "../../../../common/avatarGenerator";
 import ThemeToggle from "../../../../common/ThemeToggle";
-import { UPDATE_STUDENT_PROFILE } from "../../../../queries/userQueries";
+import { GET_USER, UPDATE_STUDENT_PROFILE } from "../../../../queries/userQueries";
 
 export default function UserSettingsPage() {
     const currentUser = useCurrentUser();
@@ -28,7 +27,7 @@ export default function UserSettingsPage() {
                 college: userResult.data?.user.college,
                 expectedGraduation: userResult.data?.user.expectedGraduation
             },
-            refetchQueries: [{ query: GET_USER }],
+            refetchQueries: [{ query: GET_USER, variables: {id: currentUser.id} }],
         });
     }
 

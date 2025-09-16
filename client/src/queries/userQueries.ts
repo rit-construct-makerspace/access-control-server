@@ -59,6 +59,84 @@ export const GET_USER_BY_USERNAME_OR_UID = gql`
   }
 `;
 
+export const GET_USER = gql`
+  query GetUser($id: ID!) {
+    user(id: $id) {
+      id
+      firstName
+      lastName
+      pronouns      
+      college
+      expectedGraduation
+      registrationDate
+      ritUsername
+      cardTagID
+      notes
+      archived
+      forceArchive
+      holds {
+        id
+        creator {
+          firstName
+          lastName
+        }
+        remover {
+          firstName
+          lastName
+        }
+        createDate
+        removeDate
+        description
+      }
+      restrictions {
+        id
+        creator {
+          firstName
+          lastName
+        }
+        makerspace {
+          id
+          name
+        }
+        reason
+        createDate
+      }
+      accessChecks {
+        id
+        equipment {
+          id
+          name
+          requiresTrainerApproval
+          room {
+            makerspace {
+              id
+            }
+          }
+        }
+        approved
+      }
+      passedModules {
+        moduleID
+        moduleName
+        passedDate
+        makerspaceID
+      }
+      trainingHolds {
+        id
+        module {
+          id
+          name
+        }
+        expires
+      }
+      admin
+      manager
+      staff
+      trainer
+    }
+  }
+`;
+
 export const UPDATE_STUDENT_PROFILE = gql`
   mutation UpdateStudentProfile(
     $userID: ID!
