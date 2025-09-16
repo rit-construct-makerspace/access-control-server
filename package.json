@@ -16,7 +16,9 @@
     "knex:migrate:make": "knex --migrations-directory server/src/db/migrations migrate:make -x ts",
     "knex:migrate:latest": "knex --knexfile server/dist/db/knexFile.js migrate:latest",
     "knex:migrate:rollback": "knex --knexfile server/dist/db/knexFile.js migrate:rollback",
-    "knex:migrate:unlock": "knex --knexfile server/dist/db/knexFile.js migrate:unlock"
+    "knex:migrate:unlock": "knex --knexfile server/dist/db/knexFile.js migrate:unlock",
+    "lint": "cd server/ && eslint -c eslint.config.js src/**/*.ts",
+    "lint-fix": "cd server/ && eslint -c eslint.config.js --fix src/**/*.ts"
   },
   "keywords": [],
   "author": "",
@@ -89,10 +91,12 @@
     "@types/styled-components": "^5.1.26",
     "@types/uuid": "^8.3.4",
     "cross-env": "^7.0.3",
+    "eslint": "^9.35.0",
     "node": "^22.6.0",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
-    "tsx": "^4.16.5"
+    "tsx": "^4.16.5",
+    "typescript-eslint": "^8.44.0"
   },
   "engines": {
     "node": ">=20.x"
