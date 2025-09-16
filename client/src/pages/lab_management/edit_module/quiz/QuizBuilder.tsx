@@ -13,7 +13,6 @@ import { QuizItem, QuizItemType } from "../../../../types/Quiz";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import EmptyPageSection from "../../../../common/EmptyPageSection";
 import PdfEmbedDraft from "./PdfEmbedDraft";
-import { useCallback } from "react";
 
 interface QuizBuilderProps {
   quiz: QuizItem[];
@@ -25,20 +24,23 @@ interface QuizBuilderProps {
 
 export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdate, handleOnDragEnd }: QuizBuilderProps) {
 
-  const addItem = useCallback(handleAdd, [handleAdd])
+  const addItem = (item: QuizItem) =>
+    handleAdd(item)
 
-  const removeItem = useCallback(handleRemove, [handleRemove]);
+  const removeItem = (itemId: string) =>
+    handleRemove(itemId)
 
-  const duplicateItem = useCallback((item: QuizItem) => {
+  const duplicateItem = (item: QuizItem) => {
     addItem({
       id: uuidv4(),
       type: item.type,
       text: item.text,
       options: item.options,
     });
-  }, [addItem]);
+  }
 
-  const updateItem = useCallback(handleUpdate, [handleUpdate]);
+  const updateItem = (itemId: string, updatedItem: QuizItem) =>
+    handleUpdate(itemId, updatedItem)
 
   const createQuestion = () =>
     addItem({
@@ -94,7 +96,9 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
                         key={item.id}
                         index={index}
                         item={item}
-                        updateQuestion={updateItem}
+                        updateQuestion={(updatedQuestion) =>
+                          updateItem(item.id, updatedQuestion)
+                        }
                         removeQuestion={() => removeItem(item.id)}
                         duplicateQuestion={() => duplicateItem(item)}
                       />
