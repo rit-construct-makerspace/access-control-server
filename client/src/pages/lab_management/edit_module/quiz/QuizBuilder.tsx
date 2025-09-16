@@ -13,6 +13,7 @@ import { QuizItem, QuizItemType } from "../../../../types/Quiz";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import EmptyPageSection from "../../../../common/EmptyPageSection";
 import PdfEmbedDraft from "./PdfEmbedDraft";
+import { useCallback } from "react";
 
 interface QuizBuilderProps {
   quiz: QuizItem[];
@@ -22,16 +23,80 @@ interface QuizBuilderProps {
   handleOnDragEnd: (result: DropResult) => void;
 }
 
+
+function MakeBox(item: QuizItem, index: number, duplicateItem: (item: QuizItem) => void, updateItem: (itemId: string, updatedItem: QuizItem) => void, handleRemove: (itemId: string) => void) {
+  const update = useCallback((newItem: QuizItem) => updateItem(item.id, newItem), [updateItem]);
+  const remove = useCallback(() => handleRemove(item.id), [handleRemove, item]);
+  const duplicate = useCallback(() => duplicateItem(item), [duplicateItem, item]);
+
+  switch (item.type) {
+    case QuizItemType.MultipleChoice:
+    case QuizItemType.Checkboxes:
+      return (
+        <QuestionDraft
+          key={item.id}
+          index={index}
+          item={item}
+          updateQuestion={updateItem}
+          removeQuestion={remove}
+          duplicateQuestion={duplicate}
+        />
+      );
+    case QuizItemType.Text:
+      return (
+        <TextDraft
+          key={item.id}
+          index={index}
+          item={item}
+          updateText={update}
+          onRemove={remove}
+          onDuplicate={duplicate}
+        />
+      );
+    case QuizItemType.YoutubeEmbed:
+      return (
+        <YouTubeEmbedDraft
+          key={item.id}
+          index={index}
+          youtubeEmbed={item}
+          updateYoutubeEmbed={update}
+          onRemove={remove}
+          onDuplicate={duplicate}
+        />
+      );
+    case QuizItemType.ImageEmbed:
+      return (
+        <ImageEmbedDraft
+          key={item.id}
+          index={index}
+          imageEmbed={item}
+          updateImageEmbed={update}
+          onRemove={remove}
+          onDuplicate={duplicate}
+        />
+      );
+    case QuizItemType.PdfEmbed:
+      return (
+        <PdfEmbedDraft
+          key={item.id}
+          index={index}
+          pdfEmbed={item}
+          updatepdfEmbed={update}
+          onRemove={remove}
+          onDuplicate={duplicate}
+        />
+      );
+    default:
+      return null;
+  }
+}
+
+
+
 export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdate, handleOnDragEnd }: QuizBuilderProps) {
 
-  const addItem = (item: QuizItem) =>
-    handleAdd(item)
-
-  const removeItem = (itemId: string) =>
-    handleRemove(itemId)
-
   const duplicateItem = (item: QuizItem) => {
-    addItem({
+    handleAdd({
       id: uuidv4(),
       type: item.type,
       text: item.text,
@@ -39,11 +104,8 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
     });
   }
 
-  const updateItem = (itemId: string, updatedItem: QuizItem) =>
-    handleUpdate(itemId, updatedItem)
-
   const createQuestion = () =>
-    addItem({
+    handleAdd({
       id: uuidv4(),
       type: QuizItemType.MultipleChoice,
       text: "",
@@ -51,28 +113,28 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
     });
 
   const createText = () =>
-    addItem({
+    handleAdd({
       id: uuidv4(),
       type: QuizItemType.Text,
       text: "",
     });
 
   const createYoutubeEmbed = () =>
-    addItem({
+    handleAdd({
       id: uuidv4(),
       type: QuizItemType.YoutubeEmbed,
       text: "",
     });
 
   const createImageEmbed = () =>
-    addItem({
+    handleAdd({
       id: uuidv4(),
       type: QuizItemType.ImageEmbed,
       text: "",
     });
 
   const createPdfEmbed = () =>
-    addItem({
+    handleAdd({
       id: uuidv4(),
       type: QuizItemType.PdfEmbed,
       text: "",
@@ -87,78 +149,7 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
         <Droppable droppableId="droppable">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
-              {quiz.map((item, index) => {
-                switch (item.type) {
-                  case QuizItemType.MultipleChoice:
-                  case QuizItemType.Checkboxes:
-                    return (
-                      <QuestionDraft
-                        key={item.id}
-                        index={index}
-                        item={item}
-                        updateQuestion={(updatedQuestion) =>
-                          updateItem(item.id, updatedQuestion)
-                        }
-                        removeQuestion={() => removeItem(item.id)}
-                        duplicateQuestion={() => duplicateItem(item)}
-                      />
-                    );
-                  case QuizItemType.Text:
-                    return (
-                      <TextDraft
-                        key={item.id}
-                        index={index}
-                        item={item}
-                        updateText={(updatedText) => {
-                          updateItem(item.id, updatedText);
-                        }}
-                        onRemove={() => removeItem(item.id)}
-                        onDuplicate={() => duplicateItem(item)}
-                      />
-                    );
-                  case QuizItemType.YoutubeEmbed:
-                    return (
-                      <YouTubeEmbedDraft
-                        key={item.id}
-                        index={index}
-                        youtubeEmbed={item}
-                        updateYoutubeEmbed={(updatedYoutubeEmbed) => {
-                          updateItem(item.id, updatedYoutubeEmbed);
-                        }}
-                        onRemove={() => removeItem(item.id)}
-                        onDuplicate={() => duplicateItem(item)}
-                      />
-                    );
-                  case QuizItemType.ImageEmbed:
-                    return (
-                      <ImageEmbedDraft
-                        key={item.id}
-                        index={index}
-                        imageEmbed={item}
-                        updateImageEmbed={(updatedImageEmbed) => {
-                          updateItem(item.id, updatedImageEmbed);
-                        }}
-                        onRemove={() => removeItem(item.id)}
-                        onDuplicate={() => duplicateItem(item)}
-                      />
-                    );
-                  case QuizItemType.PdfEmbed:
-                    return (
-                      <PdfEmbedDraft
-                        key={item.id}
-                        index={index}
-                        pdfEmbed={item}
-                        updatepdfEmbed={(updatedPdfEmbed) => {
-                          updateItem(item.id, updatedPdfEmbed);
-                        }}
-                        onRemove={() => removeItem(item.id)}
-                        onDuplicate={() => duplicateItem(item)}
-                      />
-                    );
-                  default:
-                    return null;
-                }
-              })}
+              {quiz.map((item, index) => MakeBox(item, index, duplicateItem, handleUpdate, handleRemove))}
               {provided.placeholder}
             </div>
           )}

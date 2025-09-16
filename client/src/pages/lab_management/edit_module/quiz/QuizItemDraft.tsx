@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { memo, ReactNode } from "react";
 import styled from "styled-components";
 import { Card, CardActions, IconButton } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -26,7 +26,7 @@ interface QuizItemDraftProps {
   extraActions?: ReactNode;
 }
 
-export default function QuizItemDraft({
+const QuizItemDraft = memo(function QuizItemDraft({
   itemId,
   index,
   children,
@@ -34,8 +34,7 @@ export default function QuizItemDraft({
   onDuplicate,
   extraActions,
 }: QuizItemDraftProps) {
-  console.log("Rerendering q item draft", index);
-
+  console.log("quiz item draft render", index);
   return (
     <Draggable draggableId={itemId} index={index}>
       {(provided, _snapshot) => (
@@ -64,4 +63,6 @@ export default function QuizItemDraft({
       )}
     </Draggable>
   );
-}
+});
+
+export default QuizItemDraft;
