@@ -347,75 +347,79 @@ export function setupStagingAuth(app: express.Application) {
   );
 
   passport.serializeUser(async (user: any, done) => {
-    const ritUser = user.attributes; //user is the full response data. attributes has the things we need
-
-    console.log("Username: " + ritUser["urn:oid:0.9.2342.19200300.100.1.1"] + "\nRoles: " + ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"]);
-
-    // TEMPORARY -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     try {
-      ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"].forEach(async (element: string) => {
-        try {
-          await insertTempRole(element);
-          //Name is unique, so will fail on duplicates
-        } catch (error) {
-          //nothig
+      const ritUser = user.attributes; //user is the full response data. attributes has the things we need
+
+      console.log("Username: " + ritUser["urn:oid:0.9.2342.19200300.100.1.1"] + "\nRoles: " + ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"]);
+
+      // TEMPORARY -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+      try {
+        ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"].forEach(async (element: string) => {
+          try {
+            await insertTempRole(element);
+            //Name is unique, so will fail on duplicates
+          } catch (error) {
+            //nothig
+          }
+        });
+      } catch (error) {
+        console.error("Error iterating temp roles:", error);
+      }
+
+      /*
+        "attributes": {
+          "urn:oid:2.5.4.42": "FirstName",
+          "urn:oid:2.5.4.4": "LastName",
+          "urn:oid:0.9.2342.19200300.100.1.1": "userName",
+          "urn:oid:1.3.6.1.4.1.4447.1.20": "uid",
+          "urn:oid:1.3.6.1.4.1.4447.1.41": ["roles"]
         }
-      });
-    } catch (error) {
-      console.error("Error iterating temp roles:", error);
-    }
+      */
 
-    /*
-      "attributes": {
-        "urn:oid:2.5.4.42": "FirstName",
-        "urn:oid:2.5.4.4": "LastName",
-        "urn:oid:0.9.2342.19200300.100.1.1": "userName",
-        "urn:oid:1.3.6.1.4.1.4447.1.20": "uid",
-        "urn:oid:1.3.6.1.4.1.4447.1.41": ["roles"]
+      // Create user in our database if they don't exist
+      var existingUser = await getUserByRitUsername(ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);
+      if (!existingUser) {
+        existingUser = await createUser({
+          firstName: ritUser["urn:oid:2.5.4.42"],
+          lastName: ritUser["urn:oid:2.5.4.4"],
+          ritUsername: ritUser["urn:oid:0.9.2342.19200300.100.1.1"],
+        });
+      } else if (existingUser.firstName !== ritUser["urn:oid:2.5.4.42"] || existingUser.lastName != ritUser["urn:oid:2.5.4.4"]) {
+        //If Shibboleth name does not match, overwrite user's name to Shibboleth provided info
+        await updateUserName(existingUser.id, ritUser["urn:oid:2.5.4.42"], ritUser["urn:oid:2.5.4.4"]);
       }
-    */
 
-    // Create user in our database if they don't exist
-    var existingUser = await getUserByRitUsername(ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);
-    if (!existingUser) {
-      existingUser = await createUser({
-        firstName: ritUser["urn:oid:2.5.4.42"],
-        lastName: ritUser["urn:oid:2.5.4.4"],
-        ritUsername: ritUser["urn:oid:0.9.2342.19200300.100.1.1"],
-      });
-    } else if (existingUser.firstName !== ritUser["urn:oid:2.5.4.42"] || existingUser.lastName != ritUser["urn:oid:2.5.4.4"]) {
-      //If Shibboleth name does not match, overwrite user's name to Shibboleth provided info
-      await updateUserName(existingUser.id, ritUser["urn:oid:2.5.4.42"], ritUser["urn:oid:2.5.4.4"]);
-    }
+      // Archive user if they do not have a whitelisted role
+      if (process.env.USER_WHITELIST) { // If the env varaible is not set, skip the check. We don't want to archive everyone
+        const whitelist = process.env.USER_WHITELIST.split(",");
+        const roles: string[] = Array.isArray(ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"]) ? ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"] : [ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"]];
 
-    // Archive user if they do not have a whitelisted role
-    if (process.env.USER_WHITELIST) { // If the env varaible is not set, skip the check. We don't want to archive everyone
-      const whitelist = process.env.USER_WHITELIST.split(",");
-      const roles: string[] = ritUser["urn:oid:1.3.6.1.4.1.4447.1.41"];
-
-      if (existingUser.forceArchive !== null) {
-        await archiveUser(existingUser.id, existingUser.forceArchive)
-      } else {
-        await archiveUser(existingUser.id, !roles.some((role) => (whitelist.includes(role))));
-      }
-    }
-
-    try {
-      if (existingUser.atriumToken == null) {
-        // generate atrium token for user
-        const uid = ritUser["urn:oid:1.3.6.1.4.1.4447.1.20"];
-        const res = await generateAtriumToken(uid);
-        if (typeof res == "string") {
-          existingUser = await updateAtriumToken(existingUser.id, res);
+        if (existingUser.forceArchive !== null) {
+          await archiveUser(existingUser.id, existingUser.forceArchive)
         } else {
-          console.error("Failed to generate atrium token for user", res, ritUser);
+          await archiveUser(existingUser.id, !roles.some((role) => (whitelist.includes(role))));
         }
       }
-    } catch (e) {
-      console.error(`Failed to generate Atrium token for user '${existingUser.ritUsername}': ${e}`)
-    }
 
-    done(null, ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);
+      try {
+        if (existingUser.atriumToken == null) {
+          // generate atrium token for user
+          const uid = ritUser["urn:oid:1.3.6.1.4.1.4447.1.20"];
+          const res = await generateAtriumToken(uid);
+          if (typeof res == "string") {
+            existingUser = await updateAtriumToken(existingUser.id, res);
+          } else {
+            console.error("Failed to generate atrium token for user", res, ritUser);
+          }
+        }
+      } catch (e) {
+        console.error(`Failed to generate Atrium token for user '${existingUser.ritUsername}': ${e}`)
+      }
+
+      done(null, ritUser["urn:oid:0.9.2342.19200300.100.1.1"]);
+    } catch (e) {
+      done(e, undefined);
+    }
   });
 
   passport.deserializeUser(async (user: any, done) => {
