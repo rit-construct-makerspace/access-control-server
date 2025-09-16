@@ -5,10 +5,10 @@ import { GET_USER } from "../../../lab_management/users/UserModal";
 import InfoBlob from "../../../lab_management/users/InfoBlob";
 import EditIcon from '@mui/icons-material/Edit';
 import { useEffect, useState } from "react";
-import { UPDATE_STUDENT_PROFILE } from "../../../maker/signup/SignupPage";
 import RequestWrapper2 from "../../../../common/RequestWrapper2";
 import { stringAvatar } from "../../../../common/avatarGenerator";
 import ThemeToggle from "../../../../common/ThemeToggle";
+import { UPDATE_STUDENT_PROFILE } from "../../../../queries/userQueries";
 
 export default function UserSettingsPage() {
     const currentUser = useCurrentUser();
