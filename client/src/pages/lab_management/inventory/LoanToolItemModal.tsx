@@ -4,7 +4,7 @@ import { BORROW_INSTANCE, GET_TOOL_ITEM_INSTANCES_BY_BORROWER, GET_TOOL_ITEM_INS
 import PrettyModal from "../../../common/PrettyModal";
 import { Box, Button, Card, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
-import { GET_USER_BY_USERNAME_OR_UID, PartialUser } from "../../../queries/getUsers";
+import { GET_USER_BY_USERNAME_OR_UID, PartialUser } from "../../../queries/userQueries";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';

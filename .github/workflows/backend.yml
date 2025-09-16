@@ -50,14 +50,18 @@ jobs:
           
       - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "20"
           cache: npm
-          cache-dependency-path: client/package-lock.json
+          cache-dependency-path: package-lock.json
           
 
       - name: Install Node modules
         run: npm ci
-
+      - name: Lint Server
+        run: npm run lint
+        # Don't fail build on errors (bc the entire build would fail rn)
+        # if its 2026 and this is still here you should feel bad  
+        continue-on-error: true
       - name: Run Knex migrations
         run: npm run build:server && npm run knex:migrate:latest DEBUG=knex:tx
         env:

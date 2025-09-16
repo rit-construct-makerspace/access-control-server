@@ -13,8 +13,9 @@ import {
   useCurrentUser,
 } from "../../../common/CurrentUserProvider";
 import styled from "styled-components";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
+import { UPDATE_STUDENT_PROFILE } from "../../../queries/userQueries";
 
 const StyledFakeTextField = styled.div`
   border-radius: 4px;
@@ -37,24 +38,6 @@ const COLLEGES = [
   "SCB - Saunders College of Business",
   "SOIS - School of Individualized Study",
 ];
-
-export const UPDATE_STUDENT_PROFILE = gql`
-  mutation UpdateStudentProfile(
-    $userID: ID!
-    $pronouns: String
-    $college: String
-    $expectedGraduation: String
-  ) {
-    updateStudentProfile(
-      userID: $userID
-      pronouns: $pronouns
-      college: $college
-      expectedGraduation: $expectedGraduation
-    ) {
-      id
-    }
-  }
-`;
 
 const IS_FACULTY_REGEX = /^[a-z]+$/;
 
@@ -101,17 +84,17 @@ export default function SignupPage() {
         },
         refetchQueries: [{ query: GET_CURRENT_USER }],
       });
+    } else {
+      updateStudentProfile({
+        variables: {
+          userID: currentUser.id,
+          pronouns,
+          college,
+          expectedGraduation
+        },
+        refetchQueries: [{ query: GET_CURRENT_USER }],
+      });
     }
-
-    updateStudentProfile({
-      variables: {
-        userID: currentUser.id,
-        pronouns,
-        college,
-        expectedGraduation
-      },
-      refetchQueries: [{ query: GET_CURRENT_USER }],
-    });
   };
 
   // Redirect to home page if setupComplete
