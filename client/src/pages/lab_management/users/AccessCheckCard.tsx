@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Button, Card, CardActions  } from "@mui/material";
-import { AccessCheckExtraInfo, GET_USER } from "./UserPage";
+import { AccessCheckExtraInfo } from "./UserPage";
 import { gql, useMutation } from "@apollo/client";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
+import { GET_USER } from "../../../queries/userQueries";
 
 const APPROVE_CHECK = gql`
   mutation ApproveAccessCheck($id: ID!) {

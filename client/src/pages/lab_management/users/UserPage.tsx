@@ -25,6 +25,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ManageUserArchive from "./ManageUserArchive";
+import { GET_USER } from "../../../queries/userQueries";
 
 export interface Hold {
   id: string;
@@ -75,84 +76,6 @@ export interface AccessCheckExtraInfo {
     }
   }
 }
-
-export const GET_USER = gql`
-  query GetUser($id: ID!) {
-    user(id: $id) {
-      id
-      firstName
-      lastName
-      pronouns      
-      college
-      expectedGraduation
-      registrationDate
-      ritUsername
-      cardTagID
-      notes
-      archived
-      forceArchive
-      holds {
-        id
-        creator {
-          firstName
-          lastName
-        }
-        remover {
-          firstName
-          lastName
-        }
-        createDate
-        removeDate
-        description
-      }
-      restrictions {
-        id
-        creator {
-          firstName
-          lastName
-        }
-        makerspace {
-          id
-          name
-        }
-        reason
-        createDate
-      }
-      accessChecks {
-        id
-        equipment {
-          id
-          name
-          requiresTrainerApproval
-          room {
-            makerspace {
-              id
-            }
-          }
-        }
-        approved
-      }
-      passedModules {
-        moduleID
-        moduleName
-        passedDate
-        makerspaceID
-      }
-      trainingHolds {
-        id
-        module {
-          id
-          name
-        }
-        expires
-      }
-      admin
-      manager
-      staff
-      trainer
-    }
-  }
-`;
 
 const CREATE_HOLD = gql`
   mutation CreateHold($userID: ID!, $description: String!) {
