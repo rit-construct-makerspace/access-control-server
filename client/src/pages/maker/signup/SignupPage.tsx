@@ -101,17 +101,17 @@ export default function SignupPage() {
         },
         refetchQueries: [{ query: GET_CURRENT_USER }],
       });
+    } else {
+      updateStudentProfile({
+        variables: {
+          userID: currentUser.id,
+          pronouns,
+          college,
+          expectedGraduation
+        },
+        refetchQueries: [{ query: GET_CURRENT_USER }],
+      });
     }
-
-    updateStudentProfile({
-      variables: {
-        userID: currentUser.id,
-        pronouns,
-        college,
-        expectedGraduation
-      },
-      refetchQueries: [{ query: GET_CURRENT_USER }],
-    });
   };
 
   // Redirect to home page if setupComplete
