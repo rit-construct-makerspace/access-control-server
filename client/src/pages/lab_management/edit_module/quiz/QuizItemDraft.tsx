@@ -5,10 +5,11 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { Draggable } from "@hello-pangea/dnd";
+import { Stack } from "@mui/system";
 
 const StyledDragHandle = styled.div`
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: row nowrap;
   align-items: center;
   background: #eaeaea;
 
@@ -44,21 +45,26 @@ const QuizItemDraft = memo(function QuizItemDraft({
           elevation={4}
           sx={{ width: 1200, display: "flex", mb: 4, flexFlow: "column nowrap" }}
         >
-          <StyledDragHandle {...provided.dragHandleProps}>
-            <DragIndicatorIcon />
-          </StyledDragHandle>
+          <Stack direction="row">
+            <StyledDragHandle {...provided.dragHandleProps}>
+              <DragIndicatorIcon />
+            </StyledDragHandle>
 
-          {children}
+            <Stack direction="column" width={"100%"}>
+              {children}
 
-          <CardActions>
-            <IconButton aria-label="Delete" onClick={()=>onRemove(itemId)}>
-              <DeleteOutlineIcon />
-            </IconButton>
-            <IconButton aria-label="Duplicate" onClick={()=>onDuplicate(itemId)}>
-              <ContentCopyIcon />
-            </IconButton>
-            {extraActions}
-          </CardActions>
+              <CardActions>
+                <IconButton aria-label="Delete" onClick={() => onRemove(itemId)}>
+                  <DeleteOutlineIcon />
+                </IconButton>
+                <IconButton aria-label="Duplicate" onClick={() => onDuplicate(itemId)}>
+                  <ContentCopyIcon />
+                </IconButton>
+                {extraActions}
+              </CardActions>
+
+            </Stack>
+          </Stack>
         </Card>
       )}
     </Draggable>
