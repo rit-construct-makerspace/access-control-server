@@ -3,11 +3,12 @@ import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText
 import { useMutation, useQuery } from "@apollo/client";
 import InfoBlob from "../../../lab_management/users/InfoBlob";
 import EditIcon from '@mui/icons-material/Edit';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import RequestWrapper2 from "../../../../common/RequestWrapper2";
 import { stringAvatar } from "../../../../common/avatarGenerator";
 import ThemeToggle from "../../../../common/ThemeToggle";
 import { GET_USER, UPDATE_STUDENT_PROFILE } from "../../../../queries/userQueries";
+import { useIsMobile } from "../../../../common/IsMobileProvider";
 
 export default function UserSettingsPage() {
     const currentUser = useCurrentUser();
@@ -31,18 +32,7 @@ export default function UserSettingsPage() {
         });
     }
 
-    const [width, setWidth] = useState<number>(window.innerWidth);
-    function handleWindowSizeChange() {
-        setWidth(window.innerWidth);
-    }
-    useEffect(() => {
-        window.addEventListener('resize', handleWindowSizeChange);
-        return () => {
-            window.removeEventListener('resize', handleWindowSizeChange);
-        }
-    }, []);
-
-    const isMobile = width <= 1100;
+    const isMobile = useIsMobile();
 
     return (
         <Stack margin={isMobile ? "10px" : "30px"} width={isMobile ? "fit-content" : "auto"} spacing={2} divider={<Divider orientation="horizontal" flexItem/>}>
