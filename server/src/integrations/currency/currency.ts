@@ -49,11 +49,12 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
   if (cents < 0) {
     return MakeMoneyError.InvalidSign;
   }
-  const user = await getUserByAccountID(accountId);
-  if (user === undefined) {
+  const owner = await CurrencyAccountRepo.getAccountOwner(accountId);
+  if (owner === undefined) {
     return MakeMoneyError.NoAccount;
   }
-  if (!USE_ATRIUM_FOR_CURRENCY) {
+  // if we cant use atrium bc its turned off or we're an org, just use CC
+  if (!USE_ATRIUM_FOR_CURRENCY || owner.orgID != null) {
     try {
       return await CurrencyAccountRepo.adjustAccountBalanceIfAvailableCents(accountId, -cents, description, transactionEntryId);
     } catch {
@@ -61,13 +62,16 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
     }
   }
 
+
+  
   let remaining = cents;
   try {
     remaining = await CurrencyAccountRepo.chargeAccountReturnRemainingCents(accountId, cents, source, description, transactionEntryId);
   } catch (e) {
+    console.log(`Failed to charge account: ${owner.username}`, e)
     return MakeMoneyError.NoAccount;
   }
-  let toCredit = cents - remaining;
+  const toCredit = cents - remaining;
 
   // no atrium needed
   if (remaining === 0) {
@@ -76,15 +80,15 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
 
   let atriumSuccess = false;
   try {
-    let res: Atrium.Error | { success: boolean, atxid: number, refid: number } = await Atrium.adjustBalanceIfPossible(source, user.ritUsername, accountId, -remaining, description, transactionEntryId);
+    const res: Atrium.Error | { success: boolean, atxid: number, refid: number } = await Atrium.adjustBalanceIfPossible(source, owner.username, accountId, -remaining, description, transactionEntryId);
     if ('type' in res) {
       // Failed
-      console.error(`Currency: Failed to charge atrium for ${user.ritUsername} for ${cents} cents`, res);
+      console.error(`Currency: Failed to charge atrium for ${owner.username} for ${cents} cents`, res);
     } else {
       atriumSuccess = true;
     }
   } catch (e) {
-    console.error(`Currency: Failed to charge atrium for ${user.ritUsername} for ${cents} cents, ${e}`)
+    console.error(`Currency: Failed to charge atrium for ${owner.username} for ${cents} cents, ${e}`)
   }
 
   if (!atriumSuccess) {
