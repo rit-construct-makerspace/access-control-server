@@ -6,6 +6,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { Draggable } from "@hello-pangea/dnd";
 import { Stack } from "@mui/system";
+import { QuizItem } from "../../../../types/Quiz";
 
 const StyledDragHandle = styled.div`
   display: flex;
@@ -23,7 +24,7 @@ interface QuizItemDraftProps {
   index: number;
   children: ReactNode;
   onRemove: (itemId: string) => void;
-  onDuplicate: (itemId: string) => void;
+  onDuplicate: () => void;
   extraActions?: ReactNode;
 }
 
@@ -56,7 +57,7 @@ const QuizItemDraft = memo(function QuizItemDraft({
                 <IconButton aria-label="Delete" onClick={() => onRemove(itemId)}>
                   <DeleteOutlineIcon />
                 </IconButton>
-                <IconButton aria-label="Duplicate" onClick={() => onDuplicate(itemId)}>
+                <IconButton aria-label="Duplicate" onClick={onDuplicate}>
                   <ContentCopyIcon />
                 </IconButton>
                 {extraActions}

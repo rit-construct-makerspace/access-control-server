@@ -48,7 +48,7 @@ interface QuestionDraftProps {
   item: QuizItem;
   updateQuestion: (updatedQuestion: QuizItem) => void;
   removeQuestion: (itemId: string) => void;
-  duplicateQuestion: (itemId: string) => void;
+  duplicateQuestion: (item: QuizItem) => void;
 }
 
 
@@ -71,7 +71,7 @@ const QuestionDraft = memo(function QuestionDraft({
       index={index}
       itemId={question.id}
       onRemove={removeQuestion}
-      onDuplicate={duplicateQuestion}
+      onDuplicate={() => duplicateQuestion(question)}
       extraActions={
         <Select
           value={question.type}

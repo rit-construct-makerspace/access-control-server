@@ -8,7 +8,7 @@ interface TextDraftProps {
   item: QuizItem;
   updateText: (updatedText: QuizItem) => void;
   onRemove: (itemId: string) => void;
-  onDuplicate: (itemId: string) => void;
+  onDuplicate: (item: QuizItem) => void;
 }
 
 const TextDraft = memo(function TextDraft({
@@ -20,7 +20,7 @@ const TextDraft = memo(function TextDraft({
 }: TextDraftProps) {
 
   return (
-    <QuizItemDraft onRemove={onRemove} onDuplicate={onDuplicate} index={index} itemId={item.id}>
+    <QuizItemDraft onRemove={onRemove} onDuplicate={()=>onDuplicate(item)} index={index} itemId={item.id}>
       <TextField
         multiline
         sx={{ m: 2 }}

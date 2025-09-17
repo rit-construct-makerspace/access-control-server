@@ -8,7 +8,7 @@ import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import { QuizItem, QuizItemType } from "../../../../types/Quiz";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import EmptyPageSection from "../../../../common/EmptyPageSection";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import QuestionBox from "./QuestionBox";
 
 interface QuizBuilderProps {
@@ -25,17 +25,14 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
   const remove = useCallback((itemId: string) => handleRemove(itemId), [handleRemove]);
 
 
-  const duplicateItem = useCallback((itemId: string) => {
-    const item = quiz.find(q => q.id == itemId);
-    if (item) {
-      handleAdd({
-        id: uuidv4(),
-        type: item.type,
-        text: item.text,
-        options: item.options,
-      })
-    }
-  }, [handleAdd, quiz]);
+  const duplicateItem = useCallback((item: QuizItem) => {
+    handleAdd({
+      id: uuidv4(),
+      type: item.type,
+      text: item.text,
+      options: item.options,
+    });
+  }, [handleAdd]);
 
 
   const createQuestion = () =>
@@ -81,15 +78,15 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
   // const remove = useCallback(() => handleRemove(item.id), [handleRemove, item]);
   // const duplicate = useCallback(() => duplicateItem(item), [duplicateItem, item]);
 
-
-
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Stack alignItems="center">
         <Droppable droppableId="droppable">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
-              {quiz.map((item, index) => QuestionBox({item, index, duplicateItem, updateItem: update, handleRemove: remove}))}
+              {quiz.map(
+                (item, index) => <QuestionBox item={item} index={index} handleRemove={remove} updateItem={update} duplicateItem={duplicateItem} />)
+              }
               {provided.placeholder}
             </div>
           )}

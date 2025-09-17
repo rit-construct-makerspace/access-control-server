@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { memo, ReactElement } from "react";
 import { QuizItem, QuizItemType } from "../../../../types/Quiz";
 import ImageEmbedDraft from "./ImageEmbedDraft";
 import PdfEmbedDraft from "./PdfEmbedDraft";
@@ -8,12 +8,22 @@ import YouTubeEmbedDraft from "./YouTubeEmbedDraft";
 
 interface QuestionBoxProps {
     item: QuizItem, index: number,
-    duplicateItem: (itemId: string) => void,
+    duplicateItem: (item: QuizItem) => void,
     updateItem: (updatedItem: QuizItem) => void,
     handleRemove: (itemId: string) => void
 }
 
-function QuestionBox(
+// function eq(before: QuestionBoxProps, after: QuestionBoxProps): boolean{
+    // const ieq = before.item == after.item;
+    // const ineq = before.index == after.index;
+    // const dupEq = before.duplicateItem == after.duplicateItem;
+    // const upEq = before.updateItem == after.updateItem;
+    // const remEq = before.handleRemove == after.handleRemove;
+    // console.log("qb eq", ieq, ineq, dupEq, upEq, remEq);
+    // return ieq && ineq && dupEq && upEq && remEq;
+// }
+
+const QuestionBox = memo(function QuestionBox(
     { item,
         index,
         duplicateItem,
@@ -81,7 +91,7 @@ function QuestionBox(
         default:
             return <div></div>;
     }
-}
+});
 
 
 export default QuestionBox;
