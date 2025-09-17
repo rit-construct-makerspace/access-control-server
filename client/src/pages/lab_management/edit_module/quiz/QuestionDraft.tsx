@@ -47,18 +47,8 @@ interface QuestionDraftProps {
   index: number;
   item: QuizItem;
   updateQuestion: (updatedQuestion: QuizItem) => void;
-  removeQuestion: () => void;
-  duplicateQuestion: () => void;
-}
-
-function eqQD(before: QuestionDraftProps, after: QuestionDraftProps): boolean{
-  const indexEq = before.index == after.index
-  const itemEq = before.item == after.item;
-  const updateEq = before.updateQuestion == after.updateQuestion;
-  const removeEq = before.removeQuestion == after.removeQuestion;
-  const duplicateEq = before.duplicateQuestion == after.duplicateQuestion;
-  console.log("eq", indexEq, itemEq, updateEq, removeEq, duplicateEq);
-  return indexEq && itemEq && updateEq && removeEq && duplicateEq;
+  removeQuestion: (itemId: string) => void;
+  duplicateQuestion: (itemId: string) => void;
 }
 
 
@@ -194,6 +184,6 @@ const QuestionDraft = memo(function QuestionDraft({
       </Stack>
     </QuizItemDraft>
   );
-}, eqQD);
+});
 
 export default QuestionDraft;

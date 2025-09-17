@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import { memo } from "react";
 import QuizItemDraft from "./QuizItemDraft";
 import { TextField } from "@mui/material";
 import { QuizItem } from "../../../../types/Quiz";
@@ -7,21 +7,17 @@ interface TextDraftProps {
   index: number;
   item: QuizItem;
   updateText: (updatedText: QuizItem) => void;
-  onRemove: () => void;
-  onDuplicate: () => void;
+  onRemove: (itemId: string) => void;
+  onDuplicate: (itemId: string) => void;
 }
 
-export default function TextDraft({
+const TextDraft = memo(function TextDraft({
   index,
   item,
   updateText,
   onRemove,
   onDuplicate,
 }: TextDraftProps) {
-  
-  const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    updateText({ ...item, text: e.target.value });
-  }, [updateText, item]);
 
   return (
     <QuizItemDraft onRemove={onRemove} onDuplicate={onDuplicate} index={index} itemId={item.id}>
@@ -29,9 +25,11 @@ export default function TextDraft({
         multiline
         sx={{ m: 2 }}
         label="Text"
-        onChange={onChange}
-        value={item.text}
+        onChange={(e) => updateText({ ...item, text: e.target.value })}
+      value={item.text}
       />
     </QuizItemDraft>
   );
-}
+});
+
+export default TextDraft;

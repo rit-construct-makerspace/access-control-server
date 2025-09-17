@@ -1,108 +1,42 @@
 import { v4 as uuidv4 } from "uuid";
-import QuestionDraft from "./QuestionDraft";
 import { Button, ButtonGroup, Stack } from "@mui/material";
 import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import ImageIcon from "@mui/icons-material/Image";
 import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
-import YouTubeEmbedDraft from "./YouTubeEmbedDraft";
-import ImageEmbedDraft from "./ImageEmbedDraft";
-import TextDraft from "./TextDraft";
 import { QuizItem, QuizItemType } from "../../../../types/Quiz";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import EmptyPageSection from "../../../../common/EmptyPageSection";
-import PdfEmbedDraft from "./PdfEmbedDraft";
 import { useCallback } from "react";
+import QuestionBox from "./QuestionBox";
 
 interface QuizBuilderProps {
   quiz: QuizItem[];
   handleAdd: (item: QuizItem) => void;
   handleRemove: (itemId: string) => void;
-  handleUpdate: (itemId: string, updatedItem: QuizItem) => void;
+  handleUpdate: (updatedItem: QuizItem) => void;
   handleOnDragEnd: (result: DropResult) => void;
 }
 
-
-function MakeBox(item: QuizItem, index: number, duplicateItem: (item: QuizItem) => void, updateItem: (itemId: string, updatedItem: QuizItem) => void, handleRemove: (itemId: string) => void) {
-  const update = useCallback((newItem: QuizItem) => updateItem(item.id, newItem), [updateItem, item]);
-  const remove = useCallback(() => handleRemove(item.id), [handleRemove, item]);
-  const duplicate = useCallback(() => duplicateItem(item), [duplicateItem, item]);
-
-  switch (item.type) {
-    case QuizItemType.MultipleChoice:
-    case QuizItemType.Checkboxes:
-      return (
-        <QuestionDraft
-          key={item.id}
-          index={index}
-          item={item}
-          updateQuestion={update}
-          removeQuestion={remove}
-          duplicateQuestion={duplicate}
-        />
-      );
-    case QuizItemType.Text:
-      return (
-        <TextDraft
-          key={item.id}
-          index={index}
-          item={item}
-          updateText={update}
-          onRemove={remove}
-          onDuplicate={duplicate}
-        />
-      );
-    case QuizItemType.YoutubeEmbed:
-      return (
-        <YouTubeEmbedDraft
-          key={item.id}
-          index={index}
-          youtubeEmbed={item}
-          updateYoutubeEmbed={update}
-          onRemove={remove}
-          onDuplicate={duplicate}
-        />
-      );
-    case QuizItemType.ImageEmbed:
-      return (
-        <ImageEmbedDraft
-          key={item.id}
-          index={index}
-          imageEmbed={item}
-          updateImageEmbed={update}
-          onRemove={remove}
-          onDuplicate={duplicate}
-        />
-      );
-    case QuizItemType.PdfEmbed:
-      return (
-        <PdfEmbedDraft
-          key={item.id}
-          index={index}
-          pdfEmbed={item}
-          updatepdfEmbed={update}
-          onRemove={remove}
-          onDuplicate={duplicate}
-        />
-      );
-    default:
-      return null;
-  }
-}
-
-
-
 export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdate, handleOnDragEnd }: QuizBuilderProps) {
 
-  const duplicateItem = useCallback((item: QuizItem) => {
-    handleAdd({
-      id: uuidv4(),
-      type: item.type,
-      text: item.text,
-      options: item.options,
-    })}, [handleAdd]);
-  
+  const update = useCallback((newItem: QuizItem) => handleUpdate(newItem), [handleUpdate]);
+  const remove = useCallback((itemId: string) => handleRemove(itemId), [handleRemove]);
+
+
+  const duplicateItem = useCallback((itemId: string) => {
+    const item = quiz.find(q => q.id == itemId);
+    if (item) {
+      handleAdd({
+        id: uuidv4(),
+        type: item.type,
+        text: item.text,
+        options: item.options,
+      })
+    }
+  }, [handleAdd, quiz]);
+
 
   const createQuestion = () =>
     handleAdd({
@@ -143,13 +77,19 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
   const onDragEnd = (result: DropResult) =>
     handleOnDragEnd(result)
 
+  // const update = useCallback((newItem: QuizItem) => updateItem(item.id, newItem), [updateItem, item]);
+  // const remove = useCallback(() => handleRemove(item.id), [handleRemove, item]);
+  // const duplicate = useCallback(() => duplicateItem(item), [duplicateItem, item]);
+
+
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Stack alignItems="center">
         <Droppable droppableId="droppable">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
-              {quiz.map((item, index) => MakeBox(item, index, duplicateItem, handleUpdate, handleRemove))}
+              {quiz.map((item, index) => QuestionBox({item, index, duplicateItem, updateItem: update, handleRemove: remove}))}
               {provided.placeholder}
             </div>
           )}

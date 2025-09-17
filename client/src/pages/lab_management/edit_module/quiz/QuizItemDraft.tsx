@@ -21,8 +21,8 @@ interface QuizItemDraftProps {
   itemId: string;
   index: number;
   children: ReactNode;
-  onRemove: () => void;
-  onDuplicate: () => void;
+  onRemove: (itemId: string) => void;
+  onDuplicate: (itemId: string) => void;
   extraActions?: ReactNode;
 }
 
@@ -51,10 +51,10 @@ const QuizItemDraft = memo(function QuizItemDraft({
           {children}
 
           <CardActions>
-            <IconButton aria-label="Delete" onClick={onRemove}>
+            <IconButton aria-label="Delete" onClick={()=>onRemove(itemId)}>
               <DeleteOutlineIcon />
             </IconButton>
-            <IconButton aria-label="Duplicate" onClick={onDuplicate}>
+            <IconButton aria-label="Duplicate" onClick={()=>onDuplicate(itemId)}>
               <ContentCopyIcon />
             </IconButton>
             {extraActions}

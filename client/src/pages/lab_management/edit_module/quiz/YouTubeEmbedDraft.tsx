@@ -13,8 +13,8 @@ interface YouTubeEmbedProps {
   index: number;
   youtubeEmbed: QuizItem;
   updateYoutubeEmbed: (updatedYoutubeEmbed: QuizItem) => void;
-  onRemove: () => void;
-  onDuplicate: () => void;
+  onRemove: (itemId: string) => void;
+  onDuplicate: (itemId: string) => void;
 }
 
 export default function YouTubeEmbedDraft({

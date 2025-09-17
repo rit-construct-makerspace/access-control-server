@@ -1,7 +1,6 @@
-import React from "react";
 import styled from "styled-components";
 import QuizItemDraft from "./QuizItemDraft";
-import { Stack, TextField } from "@mui/material";
+import { Stack } from "@mui/material";
 import { QuizItem } from "../../../../types/Quiz";
 import FileUploadButton from "../../../../common/FileUploadButton";
 
@@ -13,8 +12,8 @@ interface ImageEmbedDraftProps {
   index: number;
   imageEmbed: QuizItem;
   updateImageEmbed: (updatedImageEmbed: QuizItem) => void;
-  onRemove: () => void;
-  onDuplicate: () => void;
+  onRemove: (itemId: string) => void;
+  onDuplicate: (itemId: string) => void;
 }
 
 export default function ImageEmbedDraft({

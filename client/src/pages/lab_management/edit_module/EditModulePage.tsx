@@ -106,9 +106,9 @@ export default function EditModulePage({
     });
   }, [setModule]);
 
-  const handleUpdateQuizItem = useCallback((itemId: string, updatedItem: QuizItem) => {
+  const handleUpdateQuizItem = useCallback((updatedItem: QuizItem) => {
     setModule((draft) => {
-      const index = draft!.quiz.findIndex((i) => i.id === itemId);
+      const index = draft!.quiz.findIndex((i) => i.id === updatedItem.id);
       draft!.quiz[index] = updatedItem;
     });
   }, [setModule]);
