@@ -69,7 +69,7 @@ const TrainingSubmissionResolvers = {
     ) => 
       ifAuthenticated (async (user: any) => {
         var failedSubmissions = (await SubmissionRepo.getFailedSubmissionsTodayByModuleAndUser(Number(args.moduleID), user.id)).length
-        return {"submissions" : failedSubmissions, "submissionLimit" : Number(process.env.TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK)};
+        return {"failedSubmissions" : failedSubmissions, "submissionLimit" : Number(process.env.TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK)};
     }),
 
   }

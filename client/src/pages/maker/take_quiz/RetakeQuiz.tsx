@@ -23,7 +23,7 @@ export default function RetakeQuiz(props: { moduleID: number }) {
       <CardContent>
         <Card>
           <CardContent>
-            {submissions.data?.remainingSubmissions.submissions >= submissions.data?.remainingSubmissions.submissionLimit ?
+            {submissions.data?.remainingSubmissions.failedSubmissions >= submissions.data?.remainingSubmissions.submissionLimit ?
               <Stack>
                 <Typography><b>This training has been locked due to too many attempts. </b></Typography>
                 <Typography>You will be unable to progress and submit this quiz until <b>tomorrow</b>.</Typography>
@@ -31,7 +31,7 @@ export default function RetakeQuiz(props: { moduleID: number }) {
               </Stack>
               : <Stack>
                 <Typography>Click <Link href={`/app/maker/training/${props.moduleID}`}>here</Link> to retake this quiz.</Typography>
-                <Typography component="div">You have {submissions.data?.remainingSubmissions.submissionLimit - submissions.data?.remainingSubmissions.submissions} attempts remaining today.</Typography>
+                <Typography component="div">You have {submissions.data?.remainingSubmissions.submissionLimit - submissions.data?.remainingSubmissions.failedSubmissions} attempts remaining today.</Typography>
               </Stack>
             }
           </CardContent>

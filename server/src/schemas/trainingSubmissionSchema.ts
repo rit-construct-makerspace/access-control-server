@@ -27,7 +27,7 @@ export const TrainingSubmissionTypeDefs = gql`
   }
 
   type remainingSubmissions{
-    submissions : Int
+    failedSubmissions : Int
     submissionLimit : Int
   }
 
