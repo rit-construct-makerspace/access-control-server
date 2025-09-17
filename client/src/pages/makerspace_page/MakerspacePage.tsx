@@ -48,21 +48,55 @@ export default function MakerspacePage() {
         return (
           <Stack spacing={"2"} padding={"0 20px 20px"} divider={<Divider orientation="horizontal" flexItem />}>
             <StaffBar />
-            <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
-              <title>{`${fullSpace.name} | Make @ RIT`}</title>
-              <Typography variant="h3" align="center">
-                {fullSpace.name}
-              </Typography>
-              {isManagerFor(user, Number(makerspaceID)) ? (
-                <IconButton
-                  onClick={() => {
-                    navigate(`/makerspace/${makerspaceID}/edit`);
-                  }}
-                  sx={{ color: "gray" }}
+            <Stack
+              direction={isMobile ? "column" : "row"}
+              spacing={2}
+              justifyContent="center"
+              alignItems="center"
+              width="auto"
+              height="auto"
+            >
+              <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
+                <title>{`${fullSpace.name} | Make @ RIT`}</title>
+                <Typography variant="h3" align="center">
+                  {fullSpace.name}
+                </Typography>
+                {isManagerFor(user, Number(makerspaceID)) ? (
+                  <IconButton
+                    onClick={() => {
+                      navigate(`/makerspace/${makerspaceID}/edit`);
+                    }}
+                    sx={{ color: "gray" }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                ) : null}
+              </Stack>
+
+              <Divider
+                orientation={isMobile ? "horizontal" : "vertical"}
+                variant="middle"
+                sx={isMobile ? { width: "60%", alignSelf: "center" } : { height: "75px", alignSelf: "center" }}
+                flexItem
+              />
+
+              {/* Location & Description Section */}
+              <Stack spacing={2}>
+                <Typography typography="h6" align={isMobile ? "center" : "left"}>
+                  Location: {fullSpace.location}
+                </Typography>
+                <Typography variant="body1" align={isMobile ? "center" : "left"}>
+                  This is a description. It's longer than the subtitle but not too long. Just 1-2 sentences.
+                </Typography>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="info"
+                  sx={{ alignSelf: isMobile ? "center" : "flex-start" }}
                 >
-                  <EditIcon />
-                </IconButton>
-              ) : null}
+                  Learn More
+                </Button>
+              </Stack>
             </Stack>
 
             {/* Hours Section */}
@@ -73,20 +107,14 @@ export default function MakerspacePage() {
               <MakerspaceHoursSection hours={fullSpace.hours} isMobile={isMobile} />
             </Stack>
 
-            {/* Location & Description; Trainings & Equipment Doc Link; Makerspace Trainings */}
+            {/* Trainings & Equipment Doc Link; Makerspace Trainings */}
             <Stack
               direction={isMobile ? "column" : "row"}
-              divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />}
-              spacing={4}
+              alignItems={"center"}
+              justifyContent={"center"}
+              // divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />}
+              spacing={2}
             >
-              {/* Location & Description Section */}
-              <Stack>
-                <Typography typography="h6">Location: {fullSpace.location}</Typography>
-                <Typography variant="body1">
-                  This is a description. It's longer then the subtitle but not too long. Just 1-2 sentences.
-                </Typography>
-              </Stack>
-
               {/* Trainings & Equipment Doc Link Section */}
               <Stack>
                 <Typography variant="h3" align="center">
@@ -100,6 +128,13 @@ export default function MakerspacePage() {
                   .
                 </Typography>
               </Stack>
+
+              <Divider
+                orientation={isMobile ? "horizontal" : "vertical"}
+                variant="middle"
+                sx={isMobile ? { width: "60%", alignSelf: "center" } : { height: "75px", alignSelf: "center" }}
+                flexItem
+              />
 
               {/* Trainings Section */}
               {makerspaceTrainings.length > 0 && (
