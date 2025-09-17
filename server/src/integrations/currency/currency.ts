@@ -61,7 +61,7 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
       return MakeMoneyError.NoAccount;
     }
   }
-  
+
   let remaining = cents;
   try {
     remaining = await CurrencyAccountRepo.chargeAccountReturnRemainingCents(accountId, cents, source, description, transactionEntryId);
