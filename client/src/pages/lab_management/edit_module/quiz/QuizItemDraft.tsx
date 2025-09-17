@@ -43,9 +43,8 @@ const QuizItemDraft = memo(function QuizItemDraft({
           ref={provided.innerRef}
           {...provided.draggableProps}
           elevation={4}
-          sx={{ width: 1200, display: "flex", mb: 4, flexFlow: "column nowrap" }}
+          sx={{ width: 1200, display: "flex", mb: 4, flexFlow: "row nowrap" }}
         >
-          <Stack direction="row">
             <StyledDragHandle {...provided.dragHandleProps}>
               <DragIndicatorIcon />
             </StyledDragHandle>
@@ -64,7 +63,6 @@ const QuizItemDraft = memo(function QuizItemDraft({
               </CardActions>
 
             </Stack>
-          </Stack>
         </Card>
       )}
     </Draggable>
