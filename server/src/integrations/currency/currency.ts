@@ -61,8 +61,6 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
       return MakeMoneyError.NoAccount;
     }
   }
-
-
   
   let remaining = cents;
   try {
