@@ -1,6 +1,6 @@
 import React from "react";
 import { Avatar, Card, CardActionArea, Stack, Typography, useTheme } from "@mui/material";
-import { PartialUser } from "../../../queries/getUsers";
+import { PartialUser } from "../../../queries/userQueries";
 import PrivilegeChip from "./PrivilegeChip";
 import { stringAvatar } from "../../../common/avatarGenerator";
 
