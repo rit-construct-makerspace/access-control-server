@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, Link, Typography } from "@mui/material";
 import { GET_REMAINING_SUBMISSIONS } from "../../../queries/getSubmissions";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { Stack } from "@mui/system";
+import RequestWrapper from "../../../common/RequestWrapper";
 
 export default function RetakeQuiz(props: { moduleID: number }) {
     const isMobile = useIsMobile();
@@ -15,6 +16,8 @@ export default function RetakeQuiz(props: { moduleID: number }) {
     );
 
   return (
+    <RequestWrapper loading={ submissions.loading || submissions.data === undefined }
+      error={ submissions.error } >
     <Card sx={{ width: isMobile ? "100%" : "50%" }}>
       <CardHeader sx={{ fontWeight: "bold" }} title="Retake This Quiz"></CardHeader>
       <CardContent>
@@ -35,6 +38,7 @@ export default function RetakeQuiz(props: { moduleID: number }) {
         </Card>
       </CardContent>
     </Card>
+    </RequestWrapper>
     )
 
 }
