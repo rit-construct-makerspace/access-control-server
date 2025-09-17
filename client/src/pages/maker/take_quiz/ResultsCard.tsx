@@ -7,8 +7,8 @@ import {
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
-import { useEffect, useState } from "react";
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface ResultsCardProps {
     summary: Array<ChoiceSummary>
@@ -33,17 +33,7 @@ const styles = {
 
 
 export default function SubmissionCard({ summary }: ResultsCardProps) {
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 768;
+  const isMobile = useIsMobile();
 
   //const summaryObj: Array<ChoiceSummary> = JSON.parse(summary);
 

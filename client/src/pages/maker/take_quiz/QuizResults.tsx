@@ -5,12 +5,12 @@ import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_LATEST_SUBMISSION } from "../../../queries/getSubmissions";
 import { GET_MODULE } from "../../../queries/trainingQueries";
 import { Module } from "../../../types/Quiz";
-import Page from "../../Page";
 import SubmissionCard from "./SubmissionCard";
 import ResultsCard from "./ResultsCard";
 import EquipmentProgressCard from "./EquipmentProgessCard";
 import RetakeQuiz from "./RetakeQuiz";
 import { useState, useEffect } from "react";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 export default function QuizResults() {
   const { id } = useParams<{ id: string }>();
@@ -38,7 +38,7 @@ export default function QuizResults() {
           window.removeEventListener('resize', handleWindowSizeChange);
       }
   }, []);
-  const isMobile = width <= 768;
+  const isMobile = useIsMobile();
 
   return (
     <RequestWrapper
@@ -49,20 +49,18 @@ export default function QuizResults() {
         loading={moduleResult.loading || moduleResult.data === undefined}
         error={moduleResult.error}
       >
-        <Page title="Quiz Results">
-          <Stack direction={"row"} justifyContent={"flex-start"} width={"100%"}>
-            <Stack direction="column" width={isMobile ? "100%" : "50%"}>
+          <Stack direction={"row"} justifyContent={"space-around"} alignItems={"flex-start"} width={"100%"} margin={"30px 45px"}>
+            <Stack direction="column"  alignItems ={"flex-start"} width={isMobile ? "100%" : "50%"}>
               <SubmissionCard module={moduleResult.data?.module!} submission={submissionResult.data?.latestSubmission} />
               {isMobile && moduleResult.data && !submissionResult.data?.latestSubmission.passed ? <RetakeQuiz moduleID={moduleResult.data?.module.id}></RetakeQuiz> : <></>}
               {isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
               <ResultsCard summary={submissionResult.data?.latestSubmission.summary}></ResultsCard>
             </Stack>
-            <Stack direction="column" width={isMobile ? "100%" : "50%"}>
+            <Stack direction="column"  width={isMobile ? "100%" : "50%"}>
               {!isMobile && !submissionResult.data?.latestSubmission.passed && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id}></RetakeQuiz> : <></>}
               {!isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
             </Stack>
           </Stack>
-        </Page>
       </RequestWrapper>
     </RequestWrapper>
   );
