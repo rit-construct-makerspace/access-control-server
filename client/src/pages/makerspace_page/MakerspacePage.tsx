@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Alert, Button, Divider, FormControlLabel, IconButton, Stack, Switch, Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Alert, AlertTitle, Button, Card, CardContent, CardHeader, Divider, FormControlLabel, IconButton, Link, Stack, Switch, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
@@ -16,6 +16,10 @@ import { isManagerFor, isStaffFor } from "../../common/PrivilegeUtils";
 import { ModuleStatus, moduleStatusMapper } from "../../common/TrainingModuleUtils";
 import MakerspaceHoursSection from "./MakerspaceHours";
 import ModuleStatusRow from "../../common/ModuleStatusRow";
+import { TrainingModule } from "../../types/TrainingModule";
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import { Grid } from "@mui/system";
 
 export default function MakerspacePage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
@@ -31,6 +35,79 @@ export default function MakerspacePage() {
   const staffMode = isStaffFor(user, Number(makerspaceID))
   const [showHidden, setShowHidden] = useState(false);
 
+  function AboutCard(subtitle: string, location: string, docsLink: string){
+    return <Card sx={{width: "600px", height: "100%"}}>
+          <CardContent>
+            <Typography variant="h6">About</Typography>
+          <Typography variant="body1" color="textSecondary">Visit Us: {location}</Typography>
+          <Typography variant="body2" color="textSecondary">{subtitle}</Typography>
+          Visit our <Link href={docsLink}>Docs Page</Link> to learn more
+
+          </CardContent>
+    </Card>
+  }
+
+  function MakerspaceTrainingCard(makerspaceTrainings: ModuleStatus[]) {
+    return <Card sx={{width: "600px", height: "100%"}}>
+      <CardContent>
+      <Typography variant="h6">Makerspace Trainings</Typography>
+      {/* <Typography variant="body1" color="textSecondary">You must complete these trainings before using any equipment in the makerspace</Typography> */}
+    
+        <Stack direction={"column"} spacing={2} alignItems={"center"}>
+          {
+            makerspaceTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
+              ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
+              : null
+          }
+        </Stack>
+        <Stack direction={"column"} spacing={1} alignItems={"center"}>
+          {
+            makerspaceTrainings.map((ms: ModuleStatus) => (
+              <ModuleStatusRow ms={ms} />
+            ))
+          }
+        </Stack>
+      </CardContent>
+    </Card>
+
+  }
+
+
+  function SpaceAccordion(name: string, subtitle: string, location: string, docsLink: string, makerspaceTrainings: ModuleStatus[]) {
+    const hasIncompleteSpaceTrainings = makerspaceTrainings.some(ms => ms.status !== "Passed");
+    return <Accordion defaultExpanded={hasIncompleteSpaceTrainings}>
+      <AccordionSummary expandIcon={<KeyboardArrowDownIcon />}>
+        <Stack direction={"row"} alignItems={"center"}>
+          <Typography variant="h3">{name}</Typography>
+          {
+            isManagerFor(user, Number(makerspaceID))
+              ? <IconButton
+                onClick={() => { navigate(`/makerspace/${makerspaceID}/edit`) }}
+                sx={{ color: "gray" }}
+              ><EditIcon /></IconButton>
+              : null
+          }
+          {hasIncompleteSpaceTrainings &&
+            <Alert color="error">
+              You have incomplete makerspace trainings. You will not be able to access any equipment
+            </Alert>
+          }
+        </Stack>
+      </AccordionSummary>
+
+      <AccordionDetails>
+        {
+          makerspaceTrainings.length > 0 &&
+          <Grid container spacing={3} justifyContent="center">
+            {AboutCard(subtitle, location, docsLink)}
+            {MakerspaceTrainingCard(makerspaceTrainings)}
+          </Grid>
+        }
+      </AccordionDetails>
+    </Accordion>
+
+  }
+
   return (
     <RequestWrapper2 result={getMakerspace} render={(data) => {
 
@@ -40,43 +117,10 @@ export default function MakerspacePage() {
 
       return (
         <Stack spacing={"2"} padding={"0 20px 20px"} divider={<Divider orientation="horizontal" flexItem />}>
+          <title>{`${fullSpace.name} | Make @ RIT`}</title>
           <StaffBar />
-          <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
-            <title>{`${fullSpace.name} | Make @ RIT`}</title>
-            <Typography variant="h3" align="center">{fullSpace.name}</Typography>
-            {
-              isManagerFor(user, Number(makerspaceID))
-                ? <IconButton
-                  onClick={() => { navigate(`/makerspace/${makerspaceID}/edit`) }}
-                  sx={{ color: "gray" }}
-                >
-                  <EditIcon />
-                </IconButton>
-                : null
-            }
-
-          </Stack>
-          <MakerspaceHoursSection hours={fullSpace.hours} isMobile={isMobile} />
-          {
-            makerspaceTrainings.length > 0 &&
-            <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
-              <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
-                <Typography variant="h6">Makerspace Trainings</Typography>
-                {
-                  makerspaceTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
-                    ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
-                    : null
-                }
-              </Stack>
-              <Stack direction={isMobile ? "column" : "row"} spacing={1} alignItems={"center"}>
-                {
-                  makerspaceTrainings.map((ms: ModuleStatus) => (
-                    <ModuleStatusRow ms={ms} />
-                  ))
-                }
-              </Stack>
-            </Stack>
-          }
+          {!staffMode && <MakerspaceHoursSection hours={fullSpace.hours} isMobile={isMobile} />}
+          {SpaceAccordion(fullSpace.name, fullSpace.subtitle ?? "", fullSpace.location ?? "", "http://http.cat/404", makerspaceTrainings)}
           <Stack padding={"10px"} direction="row" spacing={2}>
             <SearchBar
               placeholder="Search Equipment"
