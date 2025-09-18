@@ -18,6 +18,8 @@ export interface QuizItem {
   type: QuizItemType;
   text: string;
   options?: Option[];
+  hint?: string;
+  affirmation?: string;
 }
 
 export interface Moduledraft {

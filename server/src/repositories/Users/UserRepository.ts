@@ -29,8 +29,7 @@ export async function getUsers(searchText?: string): Promise<UserRow[]> {
   }
   const expandedSearchText = `%${searchText}%`;
   return knex("Users").select()
-    .whereILike("firstName", expandedSearchText)
-    .orWhereILike("lastName", expandedSearchText)
+    .whereRaw(`"firstName" || ' ' || "lastName" ilike ?`, expandedSearchText)
     .orWhereILike("ritUsername", expandedSearchText)
     .orderBy("activeHold", "DESC").orderBy("ritUsername", "ASC");
 }
@@ -46,8 +45,7 @@ export async function getUsersLimit(searchText?: string): Promise<UserRow[]> {
   }
   const expandedSearchText = `%${searchText}%`;
   return knex("Users").select()
-    .whereILike("firstName", expandedSearchText)
-    .orWhereILike("lastName", expandedSearchText)
+    .whereRaw(`"firstName" || ' ' || "lastName" ilike ?`, expandedSearchText)
     .orWhereILike("ritUsername", expandedSearchText)
     .orderBy("activeHold", "DESC").orderBy("ritUsername", "ASC").limit(100);
 }
