@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Chip, IconButton, MenuItem, Select, Stack, TableCell, TableRow, Tooltip, Typography } from "@mui/material";
 import { format, parseISO } from "date-fns";
 import { ADD_TAG_TO_LOG, DELETE_MAINTENANCE_LOG, GET_MAINTENANCE_LOGS, MaintenanceLogItem, MaintenanceTag, REMOVE_TAG_FROM_LOG } from "../../../queries/maintenanceLogQueries";
@@ -12,6 +12,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useNavigate } from "react-router-dom";
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { isManager } from "../../../common/PrivilegeUtils";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 
 function formatDateTime(dateTime: string) {
@@ -21,18 +22,7 @@ function formatDateTime(dateTime: string) {
 export default function MaintenanceLogEntry({ logItem, allTags }: { logItem: MaintenanceLogItem, allTags: MaintenanceTag[] }) {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
-
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
   const tags = [logItem.tag1, logItem.tag2, logItem.tag3];
 
