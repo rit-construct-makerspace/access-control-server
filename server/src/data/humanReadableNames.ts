@@ -10,7 +10,7 @@ export function generateRandomHumanName(): string {
 
 
 
-var adjectives = ["abandoned",
+const adjectives = ["abandoned",
     "abhorrent",
     "ablaze",
     "abnormal",
