@@ -63,7 +63,7 @@ async function add3DPrinterOSUser(username: string, workgroupId: string) {
 }
 
 /**
- * 
+ * Get the workgroup ID associated with a module ID (if available)
  * @param moduleID the module ID to check for
  * @return id of 3dprinteros workgroup to add the user to
  * @return undefined if no associated workgroup
