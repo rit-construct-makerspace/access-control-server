@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import { Avatar, Box, Button, Card, Divider, Icon, Stack, Typography } from "@mui/material";
-import EventIcon from "@mui/icons-material/Event";
+import { Avatar, Box, Card, Divider, Stack, Typography } from "@mui/material";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import TrainingModuleRow from "../../../common/TrainingModuleRow";
 import {
@@ -20,25 +19,15 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
 import LockClockIcon from '@mui/icons-material/LockClock';
 
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface EquipmentModalProps {
   equipmentID: string;
 }
 
 export default function EquipmentModal({ equipmentID }: EquipmentModalProps) {
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
   const navigate = useNavigate();
   const user = useCurrentUser();

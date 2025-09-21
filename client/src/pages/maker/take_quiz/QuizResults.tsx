@@ -10,6 +10,7 @@ import SubmissionCard from "./SubmissionCard";
 import ResultsCard from "./ResultsCard";
 import EquipmentProgressCard from "./EquipmentProgessCard";
 import { useState, useEffect } from "react";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 export default function QuizResults() {
   const { id } = useParams<{ id: string }>();
@@ -27,17 +28,7 @@ export default function QuizResults() {
     }
   );
 
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 768;
+  const isMobile = useIsMobile();
 
   return (
     <RequestWrapper
