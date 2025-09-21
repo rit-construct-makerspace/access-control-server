@@ -12,20 +12,11 @@ import { AccessProgress } from "../../../types/TrainingModule";
 import MinimalTrainingModuleRow from "../../../common/MinimalTrainingModuleRow";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 
 export default function EquipmentProgressCard(props: { moduleID: number }) {
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 768;
+  const isMobile = useIsMobile();
 
   const accessProgressResult = useQuery(GET_ACCESS_PROGRESSES, { variables: { sourceTrainingModuleID: props.moduleID } });
 
