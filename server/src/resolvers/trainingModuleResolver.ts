@@ -10,22 +10,22 @@ import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import * as SubmissionRepo from "../repositories/Training/SubmissionRepository.js";
 import { MODULE_PASSING_THRESHOLD } from "../constants.js";
-import { EquipmentRow, TrainingModuleItem, TrainingModuleRow } from "../db/tables.js";
-import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
+import { TrainingModuleItem, TrainingModuleRow } from "../db/tables.js";
 import { accessCheckExists, createAccessCheck, hasApprovedAccessCheck } from "../repositories/Equipment/AccessChecksRepository.js";
 import { createTrainingHold, getTrainingHoldByUserForModule } from "../repositories/Training/TrainingHoldsRespository.js";
 import * as PassedModuleRepo from "../repositories/Training/PassedRepository.js";
 import * as TrainingModuleReo from "../repositories/Training/ModuleRepository.js";
 
 /**
- * The ID of the quiz that, on pass, will grant 3DPrinterOS Self-Service access
+ * IDs of quizzes that will grant access to 3DPrinterOS Workgroups
+ * Corresponds 1 to 1 with ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_WORKGROUPS
  */
-const ID_3DPRINTEROS_QUIZ = Number(process.env.ID_3DPRINTEROS_QUIZ);
-
+const ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_QUIZZES: number[] | undefined = process.env.ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_QUIZZES?.split(",")?.map(nstr => Number(nstr))
 /**
- * The ID of the quiz that, on pass, will grant 3DPrinterOS Full-Service access
+ * IDs of workgroups that users can be added to
+ * Corresponds 1 to 1 with ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_QUIZZES
  */
-const ID_3DPRINTEROS_FS_QUIZ = Number(process.env.ID_3DPRINTEROS_FS_QUIZ);
+const ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_WORKGROUPS: number[] | undefined = process.env.ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_WORKGROUPS?.split(",")?.map(nstr => Number(nstr))
 
 /**
  * Add an RIT 3DPrinterOS user to a workgroup
@@ -35,7 +35,7 @@ const ID_3DPRINTEROS_FS_QUIZ = Number(process.env.ID_3DPRINTEROS_FS_QUIZ);
  */
 async function add3DPrinterOSUser(username: string, workgroupId: string) {
   //Login API User
-  var options = {
+  const options = {
     body: "username=" + process.env.CLOUDPRINT_API_USERNAME + "&password=" + process.env.CLOUDPRINT_API_PASSWORD,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     method: "POST"
@@ -47,7 +47,7 @@ async function add3DPrinterOSUser(username: string, workgroupId: string) {
     return await res.json() as any;
   }).then(async function (json) {
     //Add user to workgroups
-    var options = {
+    const options = {
       body: "session=" + json.message.session + "&workgroup_id=" + workgroupId + "&email=" + username + "@rit.edu",
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       method: "POST"
@@ -60,6 +60,25 @@ async function add3DPrinterOSUser(username: string, workgroupId: string) {
       });
   });
   return addRequestBody.result;
+}
+
+/**
+ * Get the workgroup ID associated with a module ID (if available)
+ * @param moduleID the module ID to check for
+ * @return id of 3dprinteros workgroup to add the user to
+ * @return undefined if no associated workgroup
+ */
+function printerWorkgroupForModule(moduleID: number): number | undefined {
+  if (!ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_QUIZZES || !ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_WORKGROUPS) {
+    console.warn(`3DPrinterOS-API: No configured mappings of modules to workgroups. Quizzes:'${process.env.ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_QUIZZES}', WGs:'${process.env.ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_WORKGROUPS}'`)
+    return undefined
+  }
+  if (ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_QUIZZES.length != ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_WORKGROUPS.length) {
+    console.warn(`3DPrinterOS-API: Length mismatch between quizzes and worgroups. Cant proceed. Quizzes: ${ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_QUIZZES}, WGs: ${ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_WORKGROUPS}`);
+    return undefined;
+  }
+  const index = ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_QUIZZES.indexOf(moduleID);
+  return ID_3DPRINTEROS_QUIZ_WG_MAPPINGS_WORKGROUPS[index];
 }
 
 /**
@@ -77,9 +96,9 @@ interface ChoiceSummary {
  * @param quiz array of TrainingModuleItems involved in a quiz
  */
 const removeAnswersFromQuiz = (quiz: TrainingModuleItem[]) => {
-  for (let item of quiz) {
+  for (const item of quiz) {
     if (item.options) {
-      for (let option of item.options) {
+      for (const option of item.options) {
         delete option.correct;
       }
     }
@@ -113,7 +132,7 @@ const TrainingModuleResolvers = {
       _: any,
       { ifAuthenticated }: ApolloContext
     ) =>
-      ifAuthenticated(async (user) => {
+      ifAuthenticated(async (_user) => {
         return ModuleRepo.getEquipmentsByModuleID(parent.id);
       }),
 
@@ -136,7 +155,7 @@ const TrainingModuleResolvers = {
       _: any,
       { ifAuthenticated }: ApolloContext
     ) =>
-      ifAuthenticated(async (user) => {
+      ifAuthenticated(async (_user) => {
         return parent.equipment;
       })
   },
@@ -152,10 +171,10 @@ const TrainingModuleResolvers = {
       _args: any,
       { ifAuthenticated }: ApolloContext
     ) => {
-      return ifAuthenticated(async (user: any) => {
-        let modules = await ModuleRepo.getModules();
+      return ifAuthenticated(async (_user: any) => {
+        const modules = await ModuleRepo.getModules();
 
-        for (let module of modules) removeAnswersFromQuiz(module.quiz);
+        for (const module of modules) removeAnswersFromQuiz(module.quiz);
 
         return modules;
       })
@@ -166,8 +185,8 @@ const TrainingModuleResolvers = {
       _args: any,
       { isStaff }: ApolloContext
     ) => {
-      return isStaff(async (user: any) => {
-        let modules = await ModuleRepo.getModules();
+      return isStaff(async (_user: any) => {
+        const modules = await ModuleRepo.getModules();
         return modules;
       })
     },
@@ -183,8 +202,8 @@ const TrainingModuleResolvers = {
       args: { id: number },
       { ifAuthenticated }: ApolloContext
     ) => {
-      return ifAuthenticated(async (user: any) => {
-        let module = await ModuleRepo.getModuleByIDWhereArchived(args.id, false);
+      return ifAuthenticated(async (_user: any) => {
+        const module = await ModuleRepo.getModuleByIDWhereArchived(args.id, false);
         removeAnswersFromQuiz(module.quiz);
         return module;
       })
@@ -195,8 +214,8 @@ const TrainingModuleResolvers = {
       args: { id: number },
       { isStaff }: ApolloContext
     ) => {
-      return isStaff(async (user: any) => {
-        let module = await ModuleRepo.getModuleByID(args.id);
+      return isStaff(async (_user: any) => {
+        const module = await ModuleRepo.getModuleByID(args.id);
         return module;
       })
     },
@@ -212,7 +231,7 @@ const TrainingModuleResolvers = {
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (_user) => {
-        let modules = await ModuleRepo.getModulesWhereArchived(true);
+        const modules = await ModuleRepo.getModulesWhereArchived(true);
 
         return modules;
       }),
@@ -229,7 +248,7 @@ const TrainingModuleResolvers = {
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (_user) => {
-        let module = await ModuleRepo.getModuleByIDWhereArchived(args.id, true);
+        const module = await ModuleRepo.getModuleByIDWhereArchived(args.id, true);
 
         return module;
       }),
@@ -246,15 +265,15 @@ const TrainingModuleResolvers = {
       { ifAuthenticated }: ApolloContext
     ) =>
       ifAuthenticated(async (user) => {
-        var relatedEquipments = await ModuleRepo.getEquipmentsByModuleID(args.sourceTrainingModuleID);
-        var accessProgresses: AccessProgress[] = [];
+        const relatedEquipments = await ModuleRepo.getEquipmentsByModuleID(args.sourceTrainingModuleID);
+        const accessProgresses: AccessProgress[] = [];
 
         //asyncs don't work right in .forEach. Use fori
-        for (var i = 0; i < relatedEquipments.length; i++) {
+        for (let i = 0; i < relatedEquipments.length; i++) {
           const modules = await ModuleRepo.getModulesByEquipmentID(relatedEquipments[i].id);
           const passedModules: TrainingModuleRow[] = [];
           const availableModules: TrainingModuleRow[] = [];
-          for (var x = 0; x < modules.length; x++) {
+          for (let x = 0; x < modules.length; x++) {
             if (await ModuleRepo.hasPassedModule(user.id, modules[x].id)) {
               passedModules.push(modules[x]);
             } else {
@@ -415,14 +434,14 @@ const TrainingModuleResolvers = {
           let incorrect = 0;
 
           //Summary of options chosen
-          var choiceSummary: ChoiceSummary[] = [];
+          const choiceSummary: ChoiceSummary[] = [];
 
           //Get Questions from quiz
           const questions = module.quiz.filter((i: any) =>
             ["CHECKBOXES", "MULTIPLE_CHOICE"].includes(i.type)
           );
 
-          for (let question of questions) {
+          for (const question of questions) {
             //Stop if question has no options (invalid format)
             if (!question.options)
               throw Error(
@@ -438,13 +457,13 @@ const TrainingModuleResolvers = {
             const submittedOptionIDs = args.answerSheet.find(
               (item) => item.itemID === question.id
             )?.optionIDs;
-           
+
 
             //Increment correcct if submitted options match correct options (order doesn't matter)
             //Increment incorrect otherwise
             if (submittedOptionIDsCorrect(correctOptionIDs, submittedOptionIDs)) {
               correct++;
-              choiceSummary.push({ questionNum: question.id, questionText: question.text, correct: true, comment: question.affirmation});
+              choiceSummary.push({ questionNum: question.id, questionText: question.text, correct: true, comment: question.affirmation });
             } else {
               incorrect++;
               choiceSummary.push({ questionNum: question.id, questionText: question.text, correct: false, comment: question.hint });
@@ -471,48 +490,30 @@ const TrainingModuleResolvers = {
 
             //If all trainings for equipment done, add access check for all passed equipment
             if (grade >= MODULE_PASSING_THRESHOLD) {
-              if (Number(args.moduleID) === ID_3DPRINTEROS_QUIZ) {
-                //If 3D Printer Training, add them to the workgroup instead of using an access check
-                add3DPrinterOSUser(user.ritUsername, process.env.CLOUDPRINT_API_WORKGROUP ?? "").then(async function (result) {
+              const associatedWorgroup = printerWorkgroupForModule(Number(args.moduleID));
+              if (associatedWorgroup) {
+                  add3DPrinterOSUser(user.ritUsername, String(associatedWorgroup)).then(async function (result) {
                   if (result) {
                     await createLog(
-                      `{user} has been automatically added to 3DPrinterOS Workgroup ${process.env.CLOUDPRINT_API_WORKGROUP}.`,
+                      `{user} has been automatically added to 3DPrinterOS Workgroup ${associatedWorgroup}.`,
                       "server",
                       { id: user.id, label: getUsersFullName(user) }
                     );
                   } else {
                     await createLog(
-                      `{user} has failed to be added to 3DPrinterOS Workgroup ${process.env.CLOUDPRINT_API_WORKGROUP}. Check server logs.`,
+                      `{user} has failed to be added to 3DPrinterOS Workgroup ${associatedWorgroup}. Check server logs.`,
                       "server",
                       { id: user.id, label: getUsersFullName(user) }
                     );
                   }
                 });
-              }
-              else if (Number(args.moduleID) === ID_3DPRINTEROS_FS_QUIZ) {
-                //If 3D Printer Full Service Training, add them to the workgroup instead of using an access check
-                add3DPrinterOSUser(user.ritUsername, process.env.CLOUDPRINT_API_FS_WORKGROUP ?? "").then(async function (result) {
-                  if (result) {
-                    await createLog(
-                      `{user} has been automatically added to 3DPrinterOS Workgroup ${process.env.CLOUDPRINT_API_FS_WORKGROUP}.`,
-                      "server",
-                      { id: user.id, label: getUsersFullName(user) }
-                    );
-                  } else {
-                    await createLog(
-                      `{user} has failed to be added to 3DPrinterOS Workgroup ${process.env.CLOUDPRINT_API_FS_WORKGROUP}. Check server logs.`,
-                      "server",
-                      { id: user.id, label: getUsersFullName(user) }
-                    );
-                  }
-                });
-              }
-              else {
+
+              } else {
                 const equipmentIDsToCheck = await ModuleRepo.getPassedEquipmentIDsByModuleID(Number(args.moduleID), user.id);
                 equipmentIDsToCheck.forEach(async equipmentID => {
                   //check if access check does not already exists
                   if (!(await accessCheckExists(user.id, equipmentID))) {
-                    await createAccessCheck(user.id, equipmentID).then(async result => {
+                    await createAccessCheck(user.id, equipmentID).then(async (_result) => {
                       //await createLog(`[DEBUG] access check automatically created for User ${user.id}, Equipment ${equipmentID}`, "server", { id: module.id, label: module.name }, { id: user.id, label: getUsersFullName(user) });
                     });
                   }
@@ -534,12 +535,12 @@ const TrainingModuleResolvers = {
 
     deletePassedModule: async (
       _parent: any,
-      args: {userID: number, moduleID: number},
+      args: { userID: number, moduleID: number },
       { isStaffFor }: ApolloContext
     ) => {
       const module = await TrainingModuleReo.getModuleByID(args.moduleID);
 
-      return isStaffFor(module.makerspaceID ?? -1, (user) => {
+      return isStaffFor(module.makerspaceID ?? -1, (_user) => {
         return PassedModuleRepo.deletePassedModule(args.userID, args.moduleID);
       });
     }
