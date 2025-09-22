@@ -100,6 +100,47 @@ export function Dashboard() {
           </Grid>
         </>
       </RequestWrapper>
+      <RequestWrapper2
+        result={getAnnouncementsResult}
+        render={(data) => {
+          const announcements: Announcement[] = data.getAllAnnouncements;
+          console.log(announcements);
+
+          return (
+            <>
+              <Stack direction="row" spacing={2} alignItems="center" margin="30px 30px 10px 30px">
+                <Typography variant={isMobile ? "h4" : "h3"}>Announcements</Typography>
+                {adminMode ? (
+                  <IconButton onClick={() => navigate("/admin/announcements")} sx={{ color: "gray" }}>
+                    <EditIcon />
+                  </IconButton>
+                ) : undefined}
+              </Stack>
+              <Grid container margin="0px 20px" alignItems="stretch" width="auto">
+                {announcements.length === 0 ? (
+                  <Stack
+                    direction={isMobile ? "column" : "row"}
+                    justifyContent="flex-start"
+                    alignItems="stretch"
+                    spacing={2}
+                    margin="0px 20px 20px 20px"
+                  >
+                    <Typography variant="body1" textAlign={"center"}>
+                      No announcements. Check back soon!
+                    </Typography>
+                  </Stack>
+                ) : (
+                  announcements.map((thisAnnouncement: Announcement) => (
+                    <Grid width="400px" margin="10px">
+                      <AnnouncementCard announcement={thisAnnouncement} />
+                    </Grid>
+                  ))
+                )}
+              </Grid>
+            </>
+          );
+        }}
+      />
       {/* Upcoming Events */}
       <RequestWrapper2
         result={getEvents}
