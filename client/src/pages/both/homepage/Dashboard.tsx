@@ -81,25 +81,6 @@ export function Dashboard() {
       />
 
       {/* Announcments */}
-      <RequestWrapper loading={getAnnouncementsResult.loading} error={getAnnouncementsResult.error}>
-        <>
-          <Stack direction="row" spacing={2} alignItems="center" margin="30px 30px 10px 30px">
-            <Typography variant={isMobile ? "h4" : "h3"}>Announcements</Typography>
-            {adminMode ? (
-              <IconButton onClick={() => navigate("/admin/announcements")} sx={{ color: "gray" }}>
-                <EditIcon />
-              </IconButton>
-            ) : undefined}
-          </Stack>
-          <Grid container margin="0px 20px" alignItems="stretch" width="auto">
-            {getAnnouncementsResult.data?.getAllAnnouncements?.map((thisAnnouncement: Announcement) => (
-              <Grid width="400px" margin="10px">
-                <AnnouncementCard announcement={thisAnnouncement} />
-              </Grid>
-            ))}
-          </Grid>
-        </>
-      </RequestWrapper>
       <RequestWrapper2
         result={getAnnouncementsResult}
         render={(data) => {
