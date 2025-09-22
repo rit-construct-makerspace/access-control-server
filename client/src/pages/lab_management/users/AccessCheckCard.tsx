@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
 import { Button, Card, CardActions  } from "@mui/material";
 import { AccessCheckExtraInfo } from "./UserModal";
 import { gql, useMutation } from "@apollo/client";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
 import { GET_USER } from "../../../queries/userQueries";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 const APPROVE_CHECK = gql`
   mutation ApproveAccessCheck($id: ID!) {
@@ -38,17 +38,7 @@ export default function AccessCheckCard({ accessCheck, userID }: AccessCheckCard
 
   const approved = accessCheck.approved;
 
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
   return (
     <Card

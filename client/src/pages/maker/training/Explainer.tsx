@@ -7,6 +7,7 @@ import QuizIcon from "@mui/icons-material/Quiz";
 import EventIcon from "@mui/icons-material/Event";
 import CarpenterIcon from "@mui/icons-material/Carpenter";
 import styled from "styled-components";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 const StyledExplainer = styled.div`
   line-height: 1.3em;
@@ -27,17 +28,7 @@ const StyledExplainer = styled.div`
 `;
 
 export default function Explainer() {
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 950;
+  const isMobile = useIsMobile();
 
 
   return (

@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { Module, Submission } from "../../../types/Quiz";
 import { useEffect, useState } from "react";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface SubmissionCardProps {
     submission: Submission;
@@ -14,17 +15,7 @@ interface SubmissionCardProps {
 }
 
 export default function SubmissionCard({ module, submission }: SubmissionCardProps) {
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 768;
+  const isMobile = useIsMobile();
 
 
   const submissionDate = new Date(+(submission.submissionDate)).toLocaleString('en-US');
