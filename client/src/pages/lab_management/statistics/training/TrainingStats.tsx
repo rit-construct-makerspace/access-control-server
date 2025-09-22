@@ -1,7 +1,7 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { Box, Button, Card, Collapse, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import gql from "graphql-tag";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import PageSectionHeader from "../../../../common/PageSectionHeader";
 import RequestWrapper from "../../../../common/RequestWrapper";
 import CloseIcon from '@mui/icons-material/Close';
@@ -15,6 +15,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import GET_TRAINING_MODULES from "../../../../queries/trainingQueries";
 import { TrainingModule } from "../../../../types/TrainingModule";
 import { TrainingStatCard } from "./TrainingStatCard";
+import { useIsMobile } from "../../../../common/IsMobileProvider";
 
 const GET_VERBOSE_TRAINING_SUBMISSIONS = gql`
   query GetTrainingSubmissionsWithAttachedEntities($startDate: String, $endDate: String, $moduleIDs: [String]) {
@@ -60,17 +61,7 @@ const FailedQuestionCard = (props: { question: string }) => (
 
 
 export function TrainingStats() {
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
   const [startDate, setStartDate] = useState<string>();
   const [endDate, setEndDate] = useState<string>();
