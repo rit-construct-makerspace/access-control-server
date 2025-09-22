@@ -32,6 +32,7 @@ import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { purge_images } from "./periodicActions.js";
 import { getAccountBalance } from "./integrations/currency/currency.js";
+import { getLastChargeSplitForTransactionById } from "./repositories/Currency/TransactionRepository.js";
 
 const require = createRequire(import.meta.url);
 
@@ -138,13 +139,13 @@ async function startServer() {
   //it might seem like you should be able to redirect straight to /app/ from / but for some reason it infitely refreshes
   // and this solves the issue
   app.get("/app/home", function (req, res) {
-    res.redirect(SECURE_ORIGIN+"/app/")
+    res.redirect(SECURE_ORIGIN + "/app/")
   })
 
 
   //redirects first landing make.rit.edu/ -> make.rit.edu/home
   app.get("/", function (req, res) {
-    res.redirect(SECURE_ORIGIN+"/app/home");
+    res.redirect(SECURE_ORIGIN + "/app/home");
   });
 
   app.get("/app/*apppage", function (req, res) {
@@ -547,18 +548,19 @@ async function startServer() {
     console.error("Unable to contact atrium api. Currency functionality may be limited", pingResponse);
   }
 
-  app.listen({ port: PORT }, () => {
+  app.listen({ port: PORT }, async () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
-    )
+    );
+    const res = await getAccountBalance("jehshed");
+    console.log("res", res);
+    const res2 = getLastChargeSplitForTransactionById(1461);
+    console.log("res2", res2);
   }
   );
 
-  const res = await getAccountBalance("jehshed");
-  console.log("res", res);
 
-  // const res2 = await adjustBalanceIfPossible(CurrencySource.Printers, 'jehshed', 2341, 1, 'test for 2 accounts', 67);
-  // console.log("res2", res2);
+
 }
 
 startServer();

@@ -75,6 +75,33 @@ export async function getCurrencyLedgerEntriesForTransactionEntryByEntryId(id: n
         .select("cl.*");
 }
 
+export async function getLastChargeSplitForTransactionById(transactionId: number): Promise<{ transactionEntryId: number, atrium?: { amount: number, txid: number, currencyLedgerId: number }, credit?: { amount: number, currencyLedgerId: number } }| undefined > {
+    type Row = {
+        transactionEntryId: number,
+        atriumCLID: number | null,
+        atriumAmount: number | null,
+        atriumRefID: number | null,
+        atriumTxId: number | null,
+        creditCLID: number | null,
+        creditAmount: number | null,
+    };
+    const rows = await knex("TransactionEntries as te")
+        .select(`te.id as "transactionEntryId"`, 
+            `cl_a.id as "atriumCLID`, 
+            `cl_a.amount as "atriumAmount`, 
+            `cl_a.refID as "atriumRefId"`, 
+            `cl_a.atxID as "atriumTxId`,
+            `cl_c.id as "creditCLID"`,
+            `cl_c.amount as "creditAmount` 
+        )
+        .leftJoin("CurrencyLedger as cl_a", knex.raw(`cl_a."transactionEntryId" = te.id and cl_a."currencyType" = 'atrium'`))
+        .leftJoin("CurrencyLedger as cl_c", knex.raw(`cl_c."transactionEntryId" = te.id and cl_c."currencyType" = 'construct_credit'`))
+        .where("te.id", "=", transactionId)
+        .orderBy("te.dateTime", "desc").debug(true);
+    console.log(rows);
+    return undefined;
+}
+
 export async function getChargeSplitForTransactionById(id: number): Promise<{ target: number, credit: number, atrium: number } | undefined> {
     const entries = await getTransactionEntriesByTransactionId(id);
     if (entries.length == 0) {
