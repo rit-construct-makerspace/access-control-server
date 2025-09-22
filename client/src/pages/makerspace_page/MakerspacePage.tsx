@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Alert, Button, Divider, FormControlLabel, IconButton, Stack, Switch, Typography } from "@mui/material";
+import { Alert, Button, Divider, FormControlLabel, IconButton, Link, Stack, Switch, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
@@ -41,42 +41,56 @@ export default function MakerspacePage() {
       return (
         <Stack spacing={"2"} padding={"0 20px 20px"} divider={<Divider orientation="horizontal" flexItem />}>
           <StaffBar />
-          <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
-            <title>{`${fullSpace.name} | Make @ RIT`}</title>
-            <Typography variant="h3" align="center">{fullSpace.name}</Typography>
-            {
-              isManagerFor(user, Number(makerspaceID))
-                ? <IconButton
-                  onClick={() => { navigate(`/makerspace/${makerspaceID}/edit`) }}
-                  sx={{ color: "gray" }}
-                >
-                  <EditIcon />
-                </IconButton>
-                : null
-            }
-
-          </Stack>
-          <MakerspaceHoursSection hours={fullSpace.hours} isMobile={isMobile} />
-          {
-            makerspaceTrainings.length > 0 &&
-            <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
-              <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
-                <Typography variant="h6">Makerspace Trainings</Typography>
-                {
-                  makerspaceTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
-                    ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
-                    : null
-                }
-              </Stack>
-              <Stack direction={isMobile ? "column" : "row"} spacing={1} alignItems={"center"}>
-                {
-                  makerspaceTrainings.map((ms: ModuleStatus) => (
-                    <ModuleStatusRow ms={ms} />
-                  ))
-                }
-              </Stack>
+          <Stack direction="column" spacing={1} justifyContent="center" alignItems="center" padding={"10px 0"}>
+            <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
+              <title>{`${fullSpace.name} | Make @ RIT`}</title>
+              <Typography variant="h3" align="center">{fullSpace.name}</Typography>
+              {
+                isManagerFor(user, Number(makerspaceID))
+                  ? <IconButton
+                    onClick={() => { navigate(`/makerspace/${makerspaceID}/edit`) }}
+                    sx={{ color: "gray" }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  : null
+              }
             </Stack>
-          }
+            <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
+              <Typography variant="h6" align="center">Location: {fullSpace.location}</Typography>
+              <Button variant="contained" color="info">Learn More</Button>
+            </Stack>
+            <Typography variant="body1">This is a short description.</Typography>
+          </Stack>
+
+          <MakerspaceHoursSection hours={fullSpace.hours} isMobile={isMobile} />
+
+          <Stack direction="column" spacing={1}>
+            <Typography variant="h3" align="center">Trainings & Equipment</Typography>
+            <Typography variant="body1" align="center">
+              Learn more about trainings <Link color="info">here</Link>.
+            </Typography>
+            {
+              makerspaceTrainings.length > 0 &&
+              <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
+                <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
+                  <Typography variant="h6">Makerspace Trainings</Typography>
+                  {
+                    makerspaceTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
+                      ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
+                      : null
+                  }
+                </Stack>
+                <Stack direction={isMobile ? "column" : "row"} spacing={1} alignItems={"center"}>
+                  {
+                    makerspaceTrainings.map((ms: ModuleStatus) => (
+                      <ModuleStatusRow ms={ms} />
+                    ))
+                  }
+                </Stack>
+              </Stack>
+            }
+          </Stack>
           <Stack padding={"10px"} direction="row" spacing={2}>
             <SearchBar
               placeholder="Search Equipment"
