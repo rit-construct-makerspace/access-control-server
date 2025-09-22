@@ -18,7 +18,7 @@ export default function RetakeQuiz(props: { moduleID: number }) {
   return (
     <RequestWrapper loading={ submissions.loading || submissions.data === undefined }
       error={ submissions.error } >
-    <Card sx={{ width: isMobile ? "100%" : "50%" }}>
+    <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>
       <CardHeader sx={{ fontWeight: "bold" }} title="Retake This Quiz"></CardHeader>
       <CardContent>
         <Card>
