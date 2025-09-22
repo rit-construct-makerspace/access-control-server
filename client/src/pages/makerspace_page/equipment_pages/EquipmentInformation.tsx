@@ -8,10 +8,10 @@ import EquipmentCard from "../../../common/EquipmentCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import GET_ROOMS from "../../../queries/roomQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import SaveIcon from '@mui/icons-material/Save';
+import SaveIcon from "@mui/icons-material/Save";
 import EquipmentTrainings from "./EquipmentTrainings";
-import ArchiveIcon from '@mui/icons-material/Archive';
-import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import ArchiveIcon from "@mui/icons-material/Archive";
+import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import FileUploadButton from "../../../common/FileUploadButton";
 
 interface EquipmentInformationProps {
@@ -34,11 +34,11 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   });
   const [publishEquipment] = useMutation(PUBLISH_EQUIPMENT, {
     variables: { id: props.equipment.id },
-    refetchQueries: ["GetEquipmentByID"]
+    refetchQueries: ["GetEquipmentByID"],
   });
   const [archiveEquipment] = useMutation(ARCHIVE_EQUIPMENT, {
     variables: { id: props.equipment.id },
-    refetchQueries: ["GetEquipmentByID"]
+    refetchQueries: ["GetEquipmentByID"],
   });
 
   const [name, setName] = useState(props.equipment.name);
@@ -49,7 +49,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [needsWelcome, setNeedsWelcome] = useState(props.equipment.needsWelcome);
   const [requiresTrainer, setRequiresTrainer] = useState(props.equipment.requiresTrainerApproval);
   const [room, setRoom] = useState(props.equipment.room);
-  const [moduleIDs, setModuleIds] = useState(props.equipment.trainingModules.map((mod) => (mod.id)));
+  const [moduleIDs, setModuleIds] = useState(props.equipment.trainingModules.map((mod) => mod.id));
 
   function handleEquipmentUpdate() {
     updateEquipment({
@@ -63,8 +63,8 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         notes: notes,
         byReservationOnly: byReservation,
         needsWelcome: needsWelcome,
-        requiresTrainerApproval: requiresTrainer
-      }
+        requiresTrainerApproval: requiresTrainer,
+      },
     });
   }
 
@@ -83,8 +83,10 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   return (
     <Stack direction={isMobile ? "column-reverse" : "row"} width={"100%"} justifyContent={"space-between"}>
       <Stack width={isMobile ? "100%" : "49%"} spacing={2}>
-        <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
-          <Typography variant="h5" fontWeight={"bold"}>Machine Information</Typography>
+        <Stack direction={isMobile ? "column" : "row"} justifyContent={"space-between"} alignItems={"center"}>
+          <Typography variant="h5" fontWeight={"bold"}>
+            Machine Information
+          </Typography>
           <Stack direction={"row"} spacing={2}>
             {/* Upload image button goes here */}
             <FileUploadButton
@@ -93,67 +95,50 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               text="Upload Image"
               onUpload={(name: string) => setImageUrl(name)}
             />
-            {
-              props.equipment.archived
-                ? <Button
-                  color="success"
-                  variant="contained"
-                  startIcon={<UnarchiveIcon />}
-                  onClick={() => publishEquipment()}
-                >
-                  Publish
-                </Button>
-                : <Button
-                  color="error"
-                  variant="contained"
-                  startIcon={<ArchiveIcon />}
-                  onClick={() => archiveEquipment()}
-                >
-                  Archive
-                </Button>
-            }
-            <Button
-              variant="contained"
-              startIcon={<SaveIcon />}
-              onClick={handleEquipmentUpdate}
-            >
+            {props.equipment.archived ? (
+              <Button
+                color="success"
+                variant="contained"
+                startIcon={<UnarchiveIcon />}
+                onClick={() => publishEquipment()}
+              >
+                Publish
+              </Button>
+            ) : (
+              <Button color="error" variant="contained" startIcon={<ArchiveIcon />} onClick={() => archiveEquipment()}>
+                Archive
+              </Button>
+            )}
+            <Button variant="contained" startIcon={<SaveIcon />} onClick={handleEquipmentUpdate}>
               Save
             </Button>
           </Stack>
         </Stack>
 
-        <TextField
-          label="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+        <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <TextField label="SOP URL" value={sopUrl} onChange={(e) => setSopUrl(e.target.value)} />
+        <RequestWrapper2
+          result={getRoomsResult}
+          render={(data) => {
+            const rooms = data.rooms; // TODO: filter to only rooms in THIS makerspace
+            return (
+              <Autocomplete
+                renderInput={(params: any) => <TextField {...params} label="Location" />}
+                /* Autocomplete's value prop wants undefined, not null.
+                 * But if we give it undefined then it thinks it's an
+                 * uncontrolled prop and throws a console error
+                 * when we set the value. This is a MUI problem.
+                 * @ts-ignore */
+                value={props.equipment.room}
+                options={rooms}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                getOptionLabel={(option) => option.name}
+                onChange={(e, value) => setRoom(value)}
+                disableClearable
+              />
+            );
+          }}
         />
-        <TextField
-          label="SOP URL"
-          value={sopUrl}
-          onChange={(e) => setSopUrl(e.target.value)}
-        />
-        <RequestWrapper2 result={getRoomsResult} render={(data) => {
-
-          const rooms = data.rooms; // TODO: filter to only rooms in THIS makerspace
-          return (
-            <Autocomplete
-              renderInput={(params: any) => (
-                <TextField {...params} label="Location" />
-              )}
-              /* Autocomplete's value prop wants undefined, not null.
-              * But if we give it undefined then it thinks it's an
-              * uncontrolled prop and throws a console error
-              * when we set the value. This is a MUI problem.
-              * @ts-ignore */
-              value={props.equipment.room}
-              options={rooms}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              getOptionLabel={(option) => option.name}
-              onChange={(e, value) => setRoom(value)}
-              disableClearable
-            />
-          );
-        }} />
         <TextField
           label="Description"
           style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em" }}
@@ -185,7 +170,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
           equipmentID={props.equipment.id}
           equipmentModules={props.equipment.trainingModules}
           addModule={(mID) => {
-            setModuleIds([...moduleIDs, mID])
+            setModuleIds([...moduleIDs, mID]);
           }}
           removeModule={(mID) => {
             var temp = [...moduleIDs];
@@ -211,10 +196,10 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               archived: props.equipment.archived,
             }}
             isMobile={isMobile}
-            staffMode={false} />
+            staffMode={false}
+          />
         </Box>
       </Stack>
-
     </Stack>
   );
 }
