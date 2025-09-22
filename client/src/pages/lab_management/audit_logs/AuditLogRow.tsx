@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
 import { Chip, Stack, SxProps, Typography } from "@mui/material";
 import { format, parseISO } from "date-fns";
 import reactStringReplace from "react-string-replace";
 import AuditLogEntity from "./AuditLogEntity";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 const chipSx: SxProps = {p: "3px", width: "min-content", fontSize: "0.75em"}
 
@@ -31,17 +31,7 @@ function formatDateTime(dateTime: string) {
 }
 
 export default function AuditLogRow({ dateTime, message, category }: AuditLogRowProps) {
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
   const [date, time] = formatDateTime(dateTime);
 
