@@ -1,6 +1,6 @@
 /**
  * tables.ts
- *
+ * 
  * This contains the definitions for the objects every knex select operation will map to.
  */
 
@@ -35,9 +35,9 @@ export interface EquipmentRow {
   addedAt: Date;
   /** *UNUSED. TODO SHOULD BE REMOVED*  */
   inUse: boolean;
-  /**
-   * what room this type of equipment resides in.
-   * NOTE: If you have 2 different rooms, you can not share equipment between them. You would need separate entries for the equipment in either room
+  /** 
+   * what room this type of equipment resides in. 
+   * NOTE: If you have 2 different rooms, you can not share equipment between them. You would need separate entries for the equipment in either room 
    */
   roomID: number;
   /** If the equipment is not in use and should not be shown to users */
@@ -69,7 +69,7 @@ export interface EquipmentInstancesRow {
   /** The state of the equipment, ACTIVE,RETIRED,NEEDS_REPAIRED, etc. */
   status: string;
   /** Optional FK of the card reader associated with this instance */
-  readerID: number | null;
+  readerID: number | null
 }
 
 export interface MaintenanceLogRow {
@@ -232,7 +232,6 @@ export interface RoomRow {
   name: string;
   archived: boolean;
   makerspaceID: number | null;
-  deleted: boolean;
 }
 
 /**
@@ -351,8 +350,8 @@ export interface ReaderRow {
   sessionStartTime: Date;
   SN: string;
   readerKeyCycle: number;
-  pairTime?: Date;
-  targetFirmwareVersion?: string;
+  pairTime?: Date
+  targetFirmwareVersion?: string
 }
 
 export interface MakerspaceWelcomeReaderRow {
@@ -378,7 +377,7 @@ export interface AnnouncementRow {
  * Store of in person competency checks for equipment
  * This is added on top of TrainingModules
  * to use equipment, you must complete all trainings
- * That then generates an AccessCheck which makerspace
+ * That then generates an AccessCheck which makerspace 
  * Staff can approve if you pass the in person check
  */
 export interface AccessCheckRow {
@@ -471,7 +470,7 @@ export interface StaffRow {
   makerspaceID: number;
 }
 
-/**
+/** 
  * Table describing which users are Trainers (for equipment)
  */
 export interface TrainerRow {
@@ -492,7 +491,7 @@ export interface RestrictionRow {
 
 /**
  * Table recording if a user passed a training and it has not expired
- * This table is the mechanism by which trainings expire.
+ * This table is the mechanism by which trainings expire. 
  * If its not here, that user can't use the machine
  * PassedModules records trainings that have not expired (It is kept up to date by purging expired trainings)
  * ModuleSubmissions records all quiz attempts forever
@@ -543,7 +542,7 @@ export interface CurrencyAccountsRow {
 
 /**
  * An organization is a group that can use the makerspace or purchase goods and services
- * Examples of these are University Clubs or Research Groups
+ * Examples of these are University Clubs or Research Groups 
  */
 export interface OrganizationsRow {
   /** Primary Key */
@@ -571,8 +570,8 @@ export interface CurrencyLedgerRow {
   transactionEntryId: number;
   /** Human readable description of the transaction */
   description: string;
-  /**
-   * The amount exchanged
+  /** 
+   * The amount exchanged 
    * Positive: Add money to the users account (refund)
    * Negative: Remove money from the users account (charge)
    */
@@ -580,7 +579,7 @@ export interface CurrencyLedgerRow {
   /** Atrium Transaction ID (only for Atrium transactions) */
   atxID: number | null;
   /** Atrium Ref ID (only for Atrium transactions) */
-  refID: number | null;
+  refID: number | null
 }
 
 /**
@@ -591,37 +590,38 @@ export interface CurrencyLedgerRow {
  */
 export interface TransactionRow {
   /** Primary Key */
-  id: number;
+  id: number,
   /** The time that the transaction was begun */
   dateTime: Date;
   /** Account that this transaction is against */
-  accountID: number;
+  accountID: number,
   /** Origin of the transaction */
-  origin: CurrencySource;
+  origin: CurrencySource,
   /** description of the transaction */
-  description: { text: string; data: unknown };
+  description: { text: string, data: unknown },
   /** Original outstanding charge. This should be taken into account and charged accordingly on the first exchange of money. Then it is set to 0 */
-  outstandingCharge: number;
+  outstandingCharge: number,
   /** Printer Job that this transaction will be applied for */
   printerJobId: number | null;
 }
 
 export interface TransactionEntryRow {
   /** Primary Key */
-  id: number;
+  id: number,
   /** Date that this was processed */
   dateTime: Date;
   /** Transaction that this entry corresponds to */
-  transactionID: number;
-  /**
+  transactionID: number,
+  /** 
    * The change in price to the transaction
    * sum(transaction->entries.amount) = the amount already charged to the account
    * sum(transactionEntry->ledgerEntries.amount) = transactionEntry.amount
    */
-  amount: number;
+  amount: number,
   /** Description of the entry. Why did the price change */
-  description: string;
-}
+  description: string,
+};
+
 
 /** 'Fake' Table used to atomically generate IDs for Atrium Transactions */
 export interface RefIDCounterRow {
@@ -634,7 +634,7 @@ export interface TempRolesRow {
 
 /**
  * Row to keep track of user sessions across server restarts
- * See PostgresStore in auth.ts
+ * See PostgresStore in auth.ts 
  * and
  * https://expressjs.com/en/resources/middleware/session.html
  */

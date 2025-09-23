@@ -23,7 +23,6 @@ export const RoomTypeDefs = gql`
     id: ID!
     name: String!
     makerspace: Makerspace
-    deleted: Boolean!
     equipment: [Equipment]
     recentSwipes: [Swipe]
     mentors: [User]
