@@ -85,8 +85,7 @@ export function Dashboard() {
         result={getAnnouncementsResult}
         render={(data) => {
           const announcements: Announcement[] = data.getAllAnnouncements;
-          console.log(announcements);
-
+          
           return (
             <>
               <Stack direction="row" spacing={2} alignItems="center" margin="30px 30px 10px 30px">
@@ -105,7 +104,7 @@ export function Dashboard() {
                 divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />}
                 margin="0px 20px 20px 20px"
               >
-                {announcements.length !== 0 ? (
+                {announcements.length === 0 ? (
                   <Typography variant="body1" textAlign="center">
                     No announcements. Check back soon!
                   </Typography>
