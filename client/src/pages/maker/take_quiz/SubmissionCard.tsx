@@ -1,12 +1,10 @@
 import {
   Card,
-  CardActionArea,
   CardContent,
   Typography,
   Grid
 } from "@mui/material";
 import { Module, Submission } from "../../../types/Quiz";
-import { useEffect, useState } from "react";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface SubmissionCardProps {
@@ -21,7 +19,6 @@ export default function SubmissionCard({ module, submission }: SubmissionCardPro
   const submissionDate = new Date(+(submission.submissionDate)).toLocaleString('en-US');
   return (
     <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>
-        <CardActionArea>
           <CardContent>
             <Grid container direction={isMobile ? "column" : "row"}>
               <Grid size={{xs: 12}}>
@@ -97,7 +94,6 @@ export default function SubmissionCard({ module, submission }: SubmissionCardPro
               </Grid>
             }
           </CardContent>
-        </CardActionArea>
       </Card>
   );
 }
