@@ -97,27 +97,24 @@ export function Dashboard() {
                   </IconButton>
                 ) : undefined}
               </Stack>
-              <Grid container margin="0px 20px" alignItems="stretch" width="auto">
-                {announcements.length === 0 ? (
-                  <Stack
-                    direction={isMobile ? "column" : "row"}
-                    justifyContent="flex-start"
-                    alignItems="stretch"
-                    spacing={2}
-                    margin="0px 20px 20px 20px"
-                  >
-                    <Typography variant="body1" textAlign={"center"}>
-                      No announcements. Check back soon!
-                    </Typography>
-                  </Stack>
+              <Stack
+                direction={isMobile ? "column" : "row"}
+                justifyContent="flex-start"
+                alignItems="stretch"
+                spacing={2}
+                divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />}
+                margin="0px 20px 20px 20px"
+              >
+                {announcements.length !== 0 ? (
+                  <Typography variant="body1" textAlign="center">
+                    No announcements. Check back soon!
+                  </Typography>
                 ) : (
                   announcements.map((thisAnnouncement: Announcement) => (
-                    <Grid width="400px" margin="10px">
-                      <AnnouncementCard announcement={thisAnnouncement} />
-                    </Grid>
+                    <AnnouncementCard announcement={thisAnnouncement} />
                   ))
                 )}
-              </Grid>
+              </Stack>
             </>
           );
         }}
