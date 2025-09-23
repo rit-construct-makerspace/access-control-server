@@ -54,7 +54,24 @@ const TrainingSubmissionResolvers = {
         return args.moduleID ? 
           await SubmissionRepo.getLatestSubmissionByModule(user.id, Number(args.moduleID)) :
           await SubmissionRepo.getLatestSubmission(user.id)
-    })
+    }),
+
+    /**
+     * Fetch failed submissions made by a user for a module
+     * @argument moduleId ID of the TrainingModule 
+     * @returns number of attempts made and limit allowed
+     * @throws GraphQLError if not authenticated or is on hold
+     */
+    remainingSubmissions: async (
+      _parent: any,
+      args: { moduleID: string },
+      { ifAuthenticated }: ApolloContext
+    ) => 
+      ifAuthenticated (async (user: any) => {
+        var failedSubmissions = (await SubmissionRepo.getFailedSubmissionsTodayByModuleAndUser(Number(args.moduleID), user.id)).length
+        return {"failedSubmissions" : failedSubmissions, "submissionLimit" : Number(process.env.TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK)};
+    }),
+
   }
 };
 
