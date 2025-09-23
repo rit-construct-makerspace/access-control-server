@@ -16,7 +16,7 @@ import * as ModuleRepo from "../Training/ModuleRepository.js";
  * @returns the specified room
  */
 export async function getRoomByID(roomID: number): Promise<Room | null> {
-  const knexResult = await knex.first("id", "name", "makerspaceID").from("Rooms").where({ id: roomID, deleted: false });
+  const knexResult = await knex.first("id", "name", "makerspaceID").from("Rooms").where("id", roomID);
 
   return singleRoomToDomain(knexResult);
 }
@@ -36,7 +36,7 @@ export async function getRooms(): Promise<Room[]> {
  * @returns {Room[]} rooms
  */
 export async function getRoomsByMakerspace(makerspaceID: number): Promise<Room[]> {
-  const knexResult = await knex("Rooms").select().where({ makerspaceID: makerspaceID, deleted: false });
+  const knexResult = await knex("Rooms").select().where("makerspaceID", makerspaceID);
   return roomsToDomain(knexResult);
 }
 
@@ -80,8 +80,7 @@ export async function archiveRoom(roomID: number): Promise<Room | null> {
  * @param roomID the ID of the room to delete
  */
 export async function deleteRoom(roomID: number): Promise<void> {
-  // await knex("Rooms").delete().where({id: roomID})
-  await knex("Rooms").where({ id: roomID }).update({ deleted: true });
+  await knex("Rooms").delete().where({ id: roomID });
 }
 
 /**
