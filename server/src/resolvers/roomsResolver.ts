@@ -44,10 +44,7 @@ const RoomResolvers = {
      * @throws GraphQLError if not MENTOR or STAFF or is on hold
      * @todo Probably rstrict this ot admin only, but ensure it is not used anywhere first
      */
-    rooms: async (
-      _: any,
-      args: { null: any },
-      { isStaff }: ApolloContext) =>
+    rooms: async (_: any, args: { null: any }, { isStaff }: ApolloContext) =>
       isStaff(async (user: CurrentUser) => {
         return await RoomRepo.getRooms();
       }),
@@ -93,9 +90,9 @@ const RoomResolvers = {
         const room = await RoomRepo.getRoomByID(args.roomID);
         if (!room) throw new GraphQLError(`Room ${args.roomID} does not exist`);
         if (!user.manager.includes(room.makerspaceID ?? -1) && !user.admin) {
-          throw new GraphQLError(`Insufficent Privilege for Makerspace ${room.makerspaceID}`)
-        };
-        return await RoomRepo.deleteRomm(args.roomID);
+          throw new GraphQLError(`Insufficent Privilege for Makerspace ${room.makerspaceID}`);
+        }
+        return await RoomRepo.deleteRoom(args.roomID);
       }),
 
     /**
@@ -105,14 +102,14 @@ const RoomResolvers = {
      * @returns updated Room
      * @throws GraphQLError if not STAFF or is on hold
      */
-    updateRoomName: async (_parent: any, args: { roomID: number, name: string }, { isManager }: ApolloContext) =>
+    updateRoomName: async (_parent: any, args: { roomID: number; name: string }, { isManager }: ApolloContext) =>
       isManager(async (user: CurrentUser) => {
         const room = await RoomRepo.getRoomByID(args.roomID);
         if (!room) throw new GraphQLError(`Room ${args.roomID} does not exist`);
         if (!user.manager.includes(room.makerspaceID ?? -1) && !user.admin) {
-          throw new GraphQLError(`Insufficent Privilege for Makerspace ${room.makerspaceID}`)
-        };
-        return await RoomRepo.updateRoomName(args.roomID, args.name)
+          throw new GraphQLError(`Insufficent Privilege for Makerspace ${room.makerspaceID}`);
+        }
+        return await RoomRepo.updateRoomName(args.roomID, args.name);
       }),
 
     /**
@@ -122,14 +119,18 @@ const RoomResolvers = {
      * @returns updated Room
      * @throws GraphQLError if not STAFF or is on hold
      */
-    setMakerspace: async (_parent: any, args: { roomID: number, makerspaceID: number }, { isManagerFor }: ApolloContext) => {
-      return isManagerFor(args.makerspaceID, async () => await RoomRepo.updateMakerspace(args.roomID, args.makerspaceID));
+    setMakerspace: async (
+      _parent: any,
+      args: { roomID: number; makerspaceID: number },
+      { isManagerFor }: ApolloContext
+    ) => {
+      return isManagerFor(
+        args.makerspaceID,
+        async () => await RoomRepo.updateMakerspace(args.roomID, args.makerspaceID)
+      );
     },
 
-    swipeIntoRoomWithID: async (
-      _parent: any,
-      args: { roomID: string; id: number }
-    ) => {
+    swipeIntoRoomWithID: async (_parent: any, args: { roomID: string; id: number }) => {
       const room = await RoomRepo.getRoomByID(Number(args.roomID));
       assert(room);
 
@@ -152,8 +153,8 @@ const RoomResolvers = {
     addTrainingToRoom: async (
       _parent: any,
       args: {
-        roomID: number,
-        moduleID: number,
+        roomID: number;
+        moduleID: number;
       },
       { isManagerFor }: ApolloContext
     ) => {
@@ -164,14 +165,14 @@ const RoomResolvers = {
 
       return isManagerFor(room.makerspaceID ?? -1, () => {
         RoomRepo.addTrainingToRoom(args.roomID, args.moduleID);
-      })
+      });
     },
 
     removeTrainingFromRoom: async (
       _parent: any,
       args: {
-        roomID: number,
-        moduleID: number,
+        roomID: number;
+        moduleID: number;
       },
       { isManagerFor }: ApolloContext
     ) => {
@@ -182,7 +183,7 @@ const RoomResolvers = {
 
       return isManagerFor(room.makerspaceID ?? -1, () => {
         RoomRepo.removeTrainingFromRoom(args.roomID, args.moduleID);
-      })
+      });
     },
   },
 };
