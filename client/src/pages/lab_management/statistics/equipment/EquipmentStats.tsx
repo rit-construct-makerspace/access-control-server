@@ -1,7 +1,7 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { Box, Button, Collapse, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Tooltip } from "@mui/material";
 import gql from "graphql-tag";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import PageSectionHeader from "../../../../common/PageSectionHeader";
 import GET_EQUIPMENTS from "../../../../queries/equipmentQueries";
 import Equipment from "../../../../types/Equipment";
@@ -15,6 +15,7 @@ import { EquipmentStatCard } from "./EquipmentStatCard";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { secondsToHumanString } from "../StatisticsFunctions";
+import { useIsMobile } from "../../../../common/IsMobileProvider";
 
 const GET_VERBOSE_EQUIPMENT_SESSIONS = gql`
   query GetEquipmentSessionsWithAttachedEntities($startDate: String, $endDate: String, $equipmentIDs: [String]) {
@@ -58,17 +59,7 @@ function joinEquipmentSession(obj: VerboseEquipmentSession) {
 
 
 export function EquipmentStats() {
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
   const [startDate, setStartDate] = useState<string>();
   const [endDate, setEndDate] = useState<string>();

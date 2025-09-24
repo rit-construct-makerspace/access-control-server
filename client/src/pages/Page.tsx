@@ -1,6 +1,7 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import Typography from "@mui/material/Typography";
 import { Stack } from "@mui/material";
+import { useIsMobile } from "../common/IsMobileProvider";
 
 interface PageProps {
   title: string;
@@ -17,18 +18,7 @@ export default function Page({
   children,
   noPadding = false
 }: PageProps) {
-
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-      setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-      window.addEventListener('resize', handleWindowSizeChange);
-      return () => {
-          window.removeEventListener('resize', handleWindowSizeChange);
-      }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
   return (
     <Stack
