@@ -81,8 +81,12 @@ const RoomResolvers = {
         return newRoom;
       }),
 
-    archiveRoom: async (_parent: any, args: any) => {
-      return await RoomRepo.archiveRoom(args.id);
+    archiveRoom: async (_parent: any, args: { roomID: number }) => {
+      return await RoomRepo.archiveRoom(args.roomID);
+    },
+
+    unarchiveRoom: async (_parent: ant, args: { roomID: number }) => {
+      return await RoomRepo.unarchiveRoom(args.roomID);
     },
 
     deleteRoom: async (_parent: any, args: { roomID: number }, { isManager }: ApolloContext) =>

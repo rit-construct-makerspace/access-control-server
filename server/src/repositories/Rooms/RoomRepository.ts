@@ -16,7 +16,7 @@ import * as ModuleRepo from "../Training/ModuleRepository.js";
  * @returns the specified room
  */
 export async function getRoomByID(roomID: number): Promise<Room | null> {
-  const knexResult = await knex.first("id", "name", "makerspaceID").from("Rooms").where("id", roomID);
+  const knexResult = await knex.first("id", "name", "makerspaceID", "archived").from("Rooms").where("id", roomID);
 
   return singleRoomToDomain(knexResult);
 }
@@ -68,6 +68,20 @@ export async function addRoom(room: Room): Promise<Room> {
  */
 export async function archiveRoom(roomID: number): Promise<Room | null> {
   const updatedRooms: Room[] = await knex("Rooms").where({ id: roomID }).update({ archived: true }).returning("*");
+
+  if (updatedRooms.length < 1) throw new EntityNotFound(`Could not find room #${roomID}`);
+
+  return updatedRooms[0];
+}
+
+/**
+ * Mark a room as UNARCHIVED / NOT ARCHIVED
+ * @param roomID the ID of the room to unarchive
+ * @returns the updated room
+ * @throws EntityNotFound on nonexisting ID
+ */
+export async function unarchiveRoom(roomID: number): Promise<Room | null> {
+  const updatedRooms: Room[] = await knex("Rooms").where({ id: roomID }).update({ archived: false }).returning("*");
 
   if (updatedRooms.length < 1) throw new EntityNotFound(`Could not find room #${roomID}`);
 
