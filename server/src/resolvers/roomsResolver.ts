@@ -85,7 +85,7 @@ const RoomResolvers = {
       return await RoomRepo.archiveRoom(args.roomID);
     },
 
-    unarchiveRoom: async (_parent: ant, args: { roomID: number }) => {
+    unarchiveRoom: async (_parent: any, args: { roomID: number }) => {
       return await RoomRepo.unarchiveRoom(args.roomID);
     },
 
