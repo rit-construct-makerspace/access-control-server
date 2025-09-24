@@ -14,7 +14,7 @@ import AccessCheckCard from "./AccessCheckCard";
 import ActionButton from "../../../common/ActionButton";
 import { GET_ALL_EQUIPMENTS } from "../../../queries/equipmentQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
-import CloseIcon from '@mui/icons-material/Close';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { stringAvatar } from "../../../common/avatarGenerator";
 import { isManager, isStaff, isStaffFor, isTrainerFor } from "../../../common/PrivilegeUtils";
 import RestrictionCard from "./RestrictionCard";
@@ -25,6 +25,8 @@ import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ManageUserArchive from "./ManageUserArchive";
 import { AccessCheckExtraInfo, GET_USER, Hold, Restriction } from "../../../queries/userQueries";
+import NavLink from "../../../top_nav/NavLink";
+
 
 const CREATE_HOLD = gql`
   mutation CreateHold($userID: ID!, $description: String!) {
@@ -182,9 +184,14 @@ export default function UserPage() {
                     <Typography>{user.pronouns}</Typography>
                   </Stack>
                 </Stack>
-                <IconButton color="error" onClick={() =>navigate(`/makerspace/${makerspaceID}/people`)} sx={{ width: "34px", height: "34px" }}>
-                  <CloseIcon />
+                <IconButton onClick={() =>navigate(`/makerspace/${makerspaceID}/people`)} sx={{ width: "51px", height: "51px", p: 0, fontSize: 14  }} >
+                  <ArrowBackIcon sx = {{fontSize: 18}}/> Back
                 </IconButton>
+                {/* <NavLink
+                  primary={"All People"}
+                  to={`/makerspace/${makerspaceID}/people`}
+                  icon={<ArrowBackIcon />}
+                /> */}
               </Stack>
 
               <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? undefined : "space-between"} mt={4}>

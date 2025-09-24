@@ -87,7 +87,7 @@ export default function StaffBar() {
         {
           window.location.pathname.match(/\/app\/makerspace\/\d+\/.+/gm) !== null
             ? <NavLink
-              primary={"Back"}
+              primary={"Home"}
               to={`/makerspace/${makerspaceID}`}
               icon={<ArrowBackIcon />}
             />
