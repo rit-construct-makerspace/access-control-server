@@ -2,7 +2,7 @@ import { useQuery } from "@apollo/client";
 import { Stack } from "@mui/material";
 import { useParams } from "react-router-dom";
 import RequestWrapper from "../../../common/RequestWrapper";
-import { GET_LATEST_SUBMISSION } from "../../../queries/getSubmissions";
+import { GET_LATEST_SUBMISSION, GET_SUBMISSION } from "../../../queries/getSubmissions";
 import { GET_MODULE } from "../../../queries/trainingQueries";
 import { Module } from "../../../types/Quiz";
 import SubmissionCard from "./SubmissionCard";
@@ -13,20 +13,30 @@ import { useIsMobile } from "../../../common/IsMobileProvider";
 
 export default function QuizResults() {
   const { id } = useParams<{ id: string }>();
-  const submissionResult = useQuery(GET_LATEST_SUBMISSION,
-    { 
-      variables: { moduleID: id },
-      fetchPolicy: 'network-only', // Prevents caching previous submissions if multiple attempts are made in one session
-      nextFetchPolicy: 'cache-first' // Caches this submission while we are using it
+  const {submissionID} = useParams <{submissionID: string }>();
+  const currentSubmissionResult = useQuery(GET_LATEST_SUBMISSION,
+      {
+        variables: { moduleID: id },
+        fetchPolicy: 'network-only', // Prevents caching previous submissions if multiple attempts are made in one session
+        nextFetchPolicy: 'cache-first' // Caches this submission while we are using it
+      }
+    );
+  const passedSubmissionResult = useQuery(GET_SUBMISSION,
+    {
+      variables: { submissionID: submissionID },
+      fetchPolicy: 'network-only',
+      nextFetchPolicy: 'cache-first'
     }
   );
+
+  const submissionResult = submissionID ? passedSubmissionResult : currentSubmissionResult
+
   const moduleResult = useQuery<{module: Module}>(
     GET_MODULE,
     {
       variables: { id }
     }
   );
-
   const isMobile = useIsMobile();
 
   return (

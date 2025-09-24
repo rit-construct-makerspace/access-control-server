@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const GET_SUBMISSION = gql`
   query GetSubmission($submissionID: ID) {
-    submission {
+    submission (submissionID: $submissionID){
       id
       moduleID
       makerID
@@ -45,6 +45,20 @@ export const GET_REMAINING_SUBMISSIONS = gql`
     remainingSubmissions(moduleID: $moduleID) {
       failedSubmissions
       submissionLimit
+    }
+  }
+`;
+
+export const GET_PASSED_SUBMISSION = gql `
+  query GetSubmission($moduleID: ID) {
+    passingSubmission(moduleID: $moduleID) {
+    id
+    moduleID
+    makerID
+    submissionDate
+    passed
+    expirationDate
+    summary
     }
   }
 `;

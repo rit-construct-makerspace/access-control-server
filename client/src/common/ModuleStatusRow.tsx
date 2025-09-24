@@ -7,6 +7,9 @@ import LockClockIcon from '@mui/icons-material/LockClock';
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { format } from "date-fns";
+import { useQuery } from "@apollo/client";
+import { GET_ACCESS_PROGRESSES } from "../queries/trainingQueries";
+import { GET_PASSED_SUBMISSION } from "../queries/getSubmissions";
 
 interface ModuleStatusRowProps {
   ms: ModuleStatus
@@ -14,9 +17,12 @@ interface ModuleStatusRowProps {
 
 export default function ModuleStatusRow(props: ModuleStatusRowProps) {
   const navigate = useNavigate();
+  const accessProgressResult = useQuery(GET_ACCESS_PROGRESSES, { variables: { sourceTrainingModuleID: props.ms.moduleID } });
+  const passedSubmission = useQuery(GET_PASSED_SUBMISSION, {variables: {moduleID: props.ms.moduleID}});
+  const navigateUrl = (!passedSubmission?.data?.passingSubmission?.id) ? `/maker/training/${props.ms.moduleID}` : `/maker/training/${props.ms.moduleID}/results/${passedSubmission?.data?.passingSubmission?.id}`
 
   return (
-    <CardActionArea onClick={() => navigate(`/maker/training/${props.ms.moduleID}`)} sx={{ width: "unset" }}>
+    <CardActionArea onClick={() => navigate(navigateUrl)} sx={{ width: "unset" }}>
       <Stack direction="row" spacing={1} alignItems="center" padding="10px" width="100%">
         {
           props.ms.status === "Passed"

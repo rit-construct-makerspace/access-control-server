@@ -72,6 +72,21 @@ const TrainingSubmissionResolvers = {
         return {"failedSubmissions" : failedSubmissions, "submissionLimit" : Number(process.env.TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK)};
     }),
 
+        /**
+     * Fetch most recent passing submissions within a year made by a user for a module
+     * @argument moduleId ID of the TrainingModule 
+     * @returns ModuleSubmission
+     * @throws GraphQLError if not authenticated or is on hold
+     */
+    passingSubmission: async (
+      _parent: any,
+      args: { moduleID: string },
+      { ifAuthenticated }: ApolloContext
+    ) => 
+      ifAuthenticated (async (user: any) => {
+        return await SubmissionRepo.getPassingSubmission(Number(args.moduleID), user.id)
+    }),
+
   }
 };
 

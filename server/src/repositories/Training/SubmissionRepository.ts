@@ -45,7 +45,6 @@ export async function getSubmission(
         .first();
 
     if (!submission) throw new EntityNotFound("Could not find submission id ${submissionID}");
-
     return submission;
 }
 
@@ -176,4 +175,17 @@ export async function getFailedSubmissionsTodayByModuleAndUser(moduleID: number,
     today.setMinutes(0);
     today.setSeconds(0)
     return await knex("ModuleSubmissions").select().where({moduleID, makerID: userID, passed: false}).andWhere("submissionDate", ">=", today);
+}
+
+/**
+ * Fetch the most recent passed submission within a year
+ * @param submissionID the unique ID of the submission
+ * @returns the submission
+ */
+export async function getPassingSubmission(moduleID: number, userID: number): Promise<ModuleSubmissionRow | undefined> {
+    var today = new Date();
+    const submission = await knex("ModuleSubmissions").select()
+    .where({moduleID, makerID: userID, passed: true}).andWhere("submissionDate", "<=", today).andWhere("expirationDate", ">", today )
+    .first();
+    return submission;
 }
