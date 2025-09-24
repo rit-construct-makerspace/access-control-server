@@ -26,7 +26,7 @@ export async function getRoomByID(roomID: number): Promise<Room | null> {
  * @returns {Room[]} rooms
  */
 export async function getRooms(): Promise<Room[]> {
-  const knexResult = await knex("Rooms").select("Rooms.id", "Rooms.name", "Rooms.archived").where("archived", false);
+  const knexResult = await knex("Rooms").select("Rooms.id", "Rooms.name").where("deleted", false);
   return roomsToDomain(knexResult);
 }
 
@@ -36,7 +36,7 @@ export async function getRooms(): Promise<Room[]> {
  * @returns {Room[]} rooms
  */
 export async function getRoomsByMakerspace(makerspaceID: number): Promise<Room[]> {
-  const knexResult = await knex("Rooms").select().where({ makerspaceID: makerspaceID, archived: false });
+  const knexResult = await knex("Rooms").select().where("makerspaceID", makerspaceID);
   return roomsToDomain(knexResult);
 }
 
