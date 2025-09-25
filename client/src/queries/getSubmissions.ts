@@ -39,3 +39,12 @@ export const GET_LATEST_SUBMISSION = gql`
     }
   }
 `;
+
+export const GET_REMAINING_SUBMISSIONS = gql`
+  query GetSubmissions($moduleID: ID) {
+    remainingSubmissions(moduleID: $moduleID) {
+      failedSubmissions
+      submissionLimit
+    }
+  }
+`;
