@@ -26,7 +26,7 @@ export async function getRoomByID(roomID: number): Promise<Room | null> {
  * @returns {Room[]} rooms
  */
 export async function getRooms(): Promise<Room[]> {
-  const knexResult = await knex("Rooms").select("Rooms.id", "Rooms.name").where("deleted", false);
+  const knexResult = await knex("Rooms").select("Rooms.id", "Rooms.name", "Rooms.archived");
   return roomsToDomain(knexResult);
 }
 
