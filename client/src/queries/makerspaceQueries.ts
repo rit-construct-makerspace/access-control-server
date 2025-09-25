@@ -5,13 +5,13 @@ import { TrainingModule } from "../common/TrainingModuleUtils";
 import MakerspaceHours from "../types/MakerspaceHours";
 
 export const GET_MAKERSPACES = gql`
- query GetMakerspaces {
-  makerspaces {
-    id
-    name
-    imageUrl
+  query GetMakerspaces {
+    makerspaces {
+      id
+      name
+      imageUrl
+    }
   }
- }
 `;
 
 export interface MakerspaceWithHours {
@@ -29,7 +29,7 @@ export interface FullMakerspace {
   subtitle: string | null;
   location: string | null;
   hours: MakerspaceHours[];
-  rooms: Room[]
+  rooms: Room[];
   imageUrl: string;
   trainingModules: TrainingModule[];
 }
@@ -43,22 +43,22 @@ export interface MakerspaceWithItems {
 }
 
 export const GET_MAKERSPACES_WITH_HOURS = gql`
- query GetMakerspacesWithHours {
-  makerspaces {
-    id
-    name
-    subtitle
-    location
-    hours {
+  query GetMakerspacesWithHours {
+    makerspaces {
+      id
+      name
+      subtitle
+      location
+      hours {
         day
         makerspaceID
         open
         close
         closed
       }
-    imageUrl
+      imageUrl
+    }
   }
- }
 `;
 
 export const GET_FULL_MAKERSPACES = gql`
@@ -79,6 +79,7 @@ export const GET_FULL_MAKERSPACES = gql`
       rooms {
         id
         name
+        archived
         equipment {
           id
           name
@@ -98,40 +99,40 @@ export const GET_FULL_MAKERSPACES = gql`
 `;
 
 export const GET_MAKERSPACES_WITH_ITEMS = gql`
- query GetMakerspacesWithItems($storefrontVisible: Boolean) {
-  makerspaces(storefrontVisible: $storefrontVisible) {
-    id
-    name
-    name
-    subtitle
-    location
-    items {
+  query GetMakerspacesWithItems($storefrontVisible: Boolean) {
+    makerspaces(storefrontVisible: $storefrontVisible) {
       id
-      image
       name
-      labels
-      unit
-      pluralUnit
-      count
-      pricePerUnit
-      threshold
-      staffOnly
-      storefrontVisible
-      notes
-      description
-      makerspaceID
-      makerspace {
+      name
+      subtitle
+      location
+      items {
         id
+        image
         name
-      }
-      tags {
-        id
-        label
-        color
+        labels
+        unit
+        pluralUnit
+        count
+        pricePerUnit
+        threshold
+        staffOnly
+        storefrontVisible
+        notes
+        description
+        makerspaceID
+        makerspace {
+          id
+          name
+        }
+        tags {
+          id
+          label
+          color
+        }
       }
     }
   }
- }
 `;
 
 export const GET_MAKERSPACE_BY_ID = gql`
@@ -152,6 +153,7 @@ export const GET_MAKERSPACE_BY_ID = gql`
       rooms {
         id
         name
+        archived
         equipment {
           id
           name
@@ -181,13 +183,7 @@ export const GET_MAKERSPACE_BY_ID = gql`
 `;
 
 export const UPDATE_MAKERSPACE = gql`
-  mutation UpdateMakerspace(
-    $id: ID!
-    $name: String!
-    $subtitle: String
-    $location: String
-    $imageUrl: String
-  ) {
+  mutation UpdateMakerspace($id: ID!, $name: String!, $subtitle: String, $location: String, $imageUrl: String) {
     updateMakerspace(
       id: $id
       newMakerspace: { name: $name, subtitle: $subtitle, location: $location, imageUrl: $imageUrl }
