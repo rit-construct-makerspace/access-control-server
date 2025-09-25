@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ConstructionIcon from '@mui/icons-material/Construction';
 import ModuleStatusRow from "./ModuleStatusRow";
 import ThemedMarkdown from "./ThemedMarkdown";
+import { memo } from "react";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -15,7 +16,7 @@ interface EquipmentCardProps {
   staffMode: boolean;
 }
 
-export default function EquipmentCard(props: EquipmentCardProps) {
+const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const user = useCurrentUser();
   const navigate = useNavigate();
@@ -146,4 +147,5 @@ export default function EquipmentCard(props: EquipmentCardProps) {
       </CardContent>
     </Card>
   );
-}
+});
+export default EquipmentCard;

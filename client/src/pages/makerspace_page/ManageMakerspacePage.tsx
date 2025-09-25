@@ -62,6 +62,8 @@ export default function ManageMakerspacePage() {
                   location={space.location}
                   hours={space.hours}
                   imageUrl={space.imageUrl}
+                  docsLink={space.docsLink}
+                  description={space.description}
                 />
                 <Stack spacing={2} alignItems="center">
                   <Stack

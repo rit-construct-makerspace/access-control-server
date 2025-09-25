@@ -15,7 +15,6 @@ export default function MakerspaceHoursSection(props: MakerspaceHoursProps) {
         props.hours.map((hour: MakerspaceHours) => {
           const dayDate = new Date(hour.day);
           const boldThis = today == dayDate.getDay();
-          console.log(hour);
 
           return (
             <Stack alignItems={"center"} direction={"row"} justifyContent={"space-between"}>

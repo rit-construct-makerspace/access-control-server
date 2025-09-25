@@ -42,7 +42,7 @@ export default function MakerspacePage() {
           <title>{`${fullSpace.name} | Make @ RIT`}</title>
           <StaffBar />
           {ExpandableHeader({makerspace: fullSpace, makerspaceTrainings})}
-          <Stack padding={"10px"} direction="row" spacing={2}>
+          <Stack padding={"10px"} direction="row" justifyContent={isMobile ? "space-between" : "flex-start"} spacing={2}>
             <SearchBar
               placeholder="Search Equipment"
               value={equipmentSearch}
