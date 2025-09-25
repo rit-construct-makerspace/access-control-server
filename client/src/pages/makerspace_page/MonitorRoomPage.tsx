@@ -74,8 +74,32 @@ export default function ManageRoomPage() {
 
   const queryResult = useQuery(GET_ROOM, { variables: { id: roomID } });
   const [updateRoomName] = useMutation(UPDATE_ROOM_NAME);
-  const [archiveRoom] = useMutation(ARCHIVE_ROOM);
-  const [unarchiveRoom] = useMutation(UNARCHIVE_ROOM);
+  const [archiveRoom] = useMutation(ARCHIVE_ROOM, {
+    // Cache update for archiving room
+    update(cache, { data: { archiveRoom } }) {
+      cache.modify({
+        id: cache.identify({ __typename: "Room", id: archiveRoom.id }),
+        fields: {
+          archived() {
+            return true;
+          },
+        },
+      });
+    },
+  });
+  const [unarchiveRoom] = useMutation(UNARCHIVE_ROOM, {
+    // Cache update for unarchiving room
+    update(cache, { data: { unarchiveRoom } }) {
+      cache.modify({
+        id: cache.identify({ __typename: "Room", id: unarchiveRoom.id }),
+        fields: {
+          archived() {
+            return false;
+          },
+        },
+      });
+    },
+  });
   const [deleteRoom] = useMutation(DELETE_ROOM);
 
   const [roomName, setRoomName] = useState("");
@@ -88,21 +112,23 @@ export default function ManageRoomPage() {
   }
 
   async function handleArchiveRoom() {
-    toast.info("Archiving Room...");
-    await archiveRoom({
-      variables: { id: roomID },
-      refetchQueries: [{ query: GET_ROOM, variables: { id: roomID } }],
-    });
-    toast.success("Room has been archived.");
+    try {
+      await archiveRoom({ variables: { id: roomID } });
+      toast.success("Room has been archived.");
+      queryResult.refetch();
+    } catch (error: any) {
+      toast.error(`Failed to archive room: ${error.message}`);
+    }
   }
 
   async function handleUnarchiveRoom() {
-    toast.info("Unarchiving Room...");
-    await unarchiveRoom({
-      variables: { id: roomID },
-      refetchQueries: [{ query: GET_ROOM, variables: { id: roomID } }],
-    });
-    toast.success("Room has been unarchived.");
+    try {
+      await unarchiveRoom({ variables: { id: roomID } });
+      toast.success("Room has been unarchived.");
+      queryResult.refetch();
+    } catch (error: any) {
+      toast.error(`Failed to unarchive room: ${error.message}`);
+    }
   }
 
   async function handleDeleteRoom() {
