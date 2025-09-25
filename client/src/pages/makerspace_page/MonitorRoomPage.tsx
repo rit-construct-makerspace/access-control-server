@@ -134,10 +134,14 @@ export default function ManageRoomPage() {
   async function handleDeleteRoom() {
     const confirm = window.confirm("Are you sure you want to delete? This cannot be undone.");
     if (confirm) {
-      await deleteRoom({
-        variables: { id: roomID },
-      });
-      navigate(`/makerspace/${makerspaceID}/edit`);
+      try {
+        await deleteRoom({ variables: { id: roomID } });
+        navigate(`/makerspace/${makerspaceID}/edit`);
+      } catch (error: any) {
+        toast.error(`Failed to delete room`);
+        console.log("error:", error);
+        console.log("message:", error.message);
+      }
     }
   }
 
@@ -171,20 +175,24 @@ export default function ManageRoomPage() {
                 <Typography variant={"h4"}>
                   Manage {room.name} [ID: {roomID}]
                 </Typography>
-                {isManagerFor(user, Number(roomID)) && !room.archived ? (
-                  <Button variant="contained" startIcon={<ArchiveIcon />} onClick={handleArchiveRoom}>
-                    Archive Room
-                  </Button>
-                ) : isManagerFor(user, Number(roomID)) && room.archived ? (
-                  <Button variant="contained" startIcon={<UnarchiveIcon />} onClick={handleUnarchiveRoom}>
-                    Unarchive Room
-                  </Button>
-                ) : null}
-                {isManagerFor(user, Number(roomID)) ? (
-                  <Button color="error" variant="contained" startIcon={<DeleteIcon />} onClick={handleDeleteRoom}>
-                    Delete Room
-                  </Button>
-                ) : null}
+                <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+                  {/* Archive / Unarchive button */}
+                  {isManagerFor(user, Number(roomID)) && !room.archived ? (
+                    <Button variant="contained" startIcon={<ArchiveIcon />} onClick={handleArchiveRoom}>
+                      Archive Room
+                    </Button>
+                  ) : (
+                    <Button variant="contained" startIcon={<UnarchiveIcon />} onClick={handleUnarchiveRoom}>
+                      Unarchive Room
+                    </Button>
+                  )}
+                  {/* Delete button */}
+                  {isManagerFor(user, Number(roomID)) ? (
+                    <Button color="error" variant="contained" startIcon={<DeleteIcon />} onClick={handleDeleteRoom}>
+                      Delete Room
+                    </Button>
+                  ) : null}
+                </Stack>
               </Stack>
               <Stack direction={isMobile ? "column" : "row"} width="auto" spacing={2}>
                 <Stack spacing={2} width={isMobile ? "auto" : "50%"} alignItems="flex-end">
