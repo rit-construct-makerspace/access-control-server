@@ -169,7 +169,7 @@ export function setupDevAuth(app: express.Application) {
     const ritUser = mapSamlTestToRit(user);
 
     // Create user in our database if they don't exist
-    var existingUser = await getUserByRitUsername(ritUser.ritUsername);
+    let existingUser = await getUserByRitUsername(ritUser.ritUsername);
     if (!existingUser) {
       existingUser = await createUser({
         firstName: ritUser.firstName,
