@@ -96,8 +96,14 @@ export function Dashboard() {
                   </IconButton>
                 ) : undefined}
               </Stack>
-              <Grid container margin="0px 20px" alignItems="stretch" width="auto">
-                {announcements.length === 0 ? (
+              <Grid
+                container
+                margin="0px 20px 20px 20px"
+                alignItems="center"
+                justifyContent={isMobile ? "center" : "left"}
+                width="auto"
+              >
+                {announcements.length !== 0 ? (
                   <Typography variant="body1" textAlign="center">
                     No announcements. Check back soon!
                   </Typography>
