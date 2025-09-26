@@ -10,10 +10,12 @@ import ResultsCard from "./ResultsCard";
 import EquipmentProgressCard from "./EquipmentProgessCard";
 import RetakeQuiz from "./RetakeQuiz";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { useCurrentUser } from "../../../common/CurrentUserProvider";
 
 export default function QuizResults() {
   const { id } = useParams<{ id: string }>();
   const {submissionID} = useParams <{submissionID: string }>();
+  const currentUser = useCurrentUser();
   const currentSubmissionResult = useQuery(GET_LATEST_SUBMISSION,
       {
         variables: { moduleID: id },
@@ -23,7 +25,7 @@ export default function QuizResults() {
     );
   const passedSubmissionResult = useQuery(GET_SUBMISSION,
     {
-      variables: { submissionID: submissionID },
+      variables: { submissionID: submissionID, userID: currentUser.id },
       fetchPolicy: 'network-only',
       nextFetchPolicy: 'cache-first'
     }
@@ -47,7 +49,7 @@ export default function QuizResults() {
         error={moduleResult.error}
       >
         <Stack spacing={2} justifyContent={"center"} margin={"30px 45px"}>
-          { submissionID ? 
+          { submissionID && passedSubmissionResult.data ? 
           <Stack direction={"row"} alignItems={"flex-start"} width={"100%"} >
             <Stack direction="column" width={isMobile ? "100%" : "50%"}>
               <SubmissionCard module={moduleResult.data?.module!} submission={passedSubmissionResult.data?.submission} />
