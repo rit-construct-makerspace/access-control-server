@@ -12,7 +12,7 @@ import ScannerIcon from '@mui/icons-material/Scanner';
 import SchoolIcon from "@mui/icons-material/School";
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { ButtonBase, Stack, Typography } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import { useIsMobile } from "../../common/IsMobileProvider";
@@ -29,12 +29,6 @@ export default function StaffBar() {
 
   const [mobileMenu, setMobileMenu] = useState(false);
 
-  useEffect(() => {
-    if (!isMobile && mobileMenu) {
-      setMobileMenu(false);
-    }
-  }, [isMobile, mobileMenu]);
-
   if (!isPriviledged && !isTrainer) {
     return null;
   }
@@ -48,7 +42,7 @@ export default function StaffBar() {
         padding="10px 0px"
       >
         {
-          mobileMenu
+          isMobile && mobileMenu
             ? <ButtonBase onClick={() => setMobileMenu(false)} sx={{ width: "100%", padding: "10px 0px" }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
                 <Typography variant="body1" color="grey">Trainer Actions</Typography>
@@ -81,7 +75,7 @@ export default function StaffBar() {
         padding="10px 0px"
       >
         {
-          mobileMenu
+          isMobile && mobileMenu
             ? <ButtonBase onClick={() => setMobileMenu(false)} sx={{ width: "100%", padding: "10px 0px" }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
                 <Typography variant="body1" color="grey">Staff Actions</Typography>
