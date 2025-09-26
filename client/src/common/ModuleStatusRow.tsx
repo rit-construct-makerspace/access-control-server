@@ -17,7 +17,6 @@ interface ModuleStatusRowProps {
 
 export default function ModuleStatusRow(props: ModuleStatusRowProps) {
   const navigate = useNavigate();
-  const accessProgressResult = useQuery(GET_ACCESS_PROGRESSES, { variables: { sourceTrainingModuleID: props.ms.moduleID } });
   const passedSubmission = useQuery(GET_PASSED_SUBMISSION, {variables: {moduleID: props.ms.moduleID}});
   const navigateUrl = (!passedSubmission?.data?.passingSubmission?.id) ? `/maker/training/${props.ms.moduleID}` : `/maker/training/${props.ms.moduleID}/results/${passedSubmission?.data?.passingSubmission?.id}`
 

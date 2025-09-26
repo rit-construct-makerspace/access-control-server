@@ -9,6 +9,7 @@ export const GET_SUBMISSION = gql`
       submissionDate
       passed
       expirationDate
+      summary
     }
   }
 `;

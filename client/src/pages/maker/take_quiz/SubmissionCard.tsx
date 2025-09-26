@@ -14,9 +14,8 @@ interface SubmissionCardProps {
 
 export default function SubmissionCard({ module, submission }: SubmissionCardProps) {
   const isMobile = useIsMobile();
-
-
   const submissionDate = new Date(+(submission.submissionDate)).toLocaleString('en-US');
+
   return (
     <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>
           <CardContent>

@@ -29,8 +29,6 @@ export default function QuizResults() {
     }
   );
 
-  const submissionResult = submissionID ? passedSubmissionResult : currentSubmissionResult
-
   const moduleResult = useQuery<{module: Module}>(
     GET_MODULE,
     {
@@ -41,26 +39,40 @@ export default function QuizResults() {
 
   return (
     <RequestWrapper
-      loading={submissionResult.loading || submissionResult.data === undefined}
-      error={submissionResult.error}
+      loading={currentSubmissionResult.loading || currentSubmissionResult.data === undefined}
+      error={currentSubmissionResult.error || currentSubmissionResult.error}
     >
       <RequestWrapper
         loading={moduleResult.loading || moduleResult.data === undefined}
         error={moduleResult.error}
       >
         <Stack spacing={2} justifyContent={"center"} margin={"30px 45px"}>
+          { submissionID ? 
           <Stack direction={"row"} alignItems={"flex-start"} width={"100%"} >
             <Stack direction="column" width={isMobile ? "100%" : "50%"}>
-              <SubmissionCard module={moduleResult.data?.module!} submission={submissionResult.data?.latestSubmission} />
-              {isMobile && moduleResult.data && !submissionResult.data?.latestSubmission.passed ? <RetakeQuiz moduleID={moduleResult.data?.module.id}></RetakeQuiz> : <></>}
+              <SubmissionCard module={moduleResult.data?.module!} submission={passedSubmissionResult.data?.submission} />
+              {isMobile && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
               {isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
-              <ResultsCard summary={submissionResult.data?.latestSubmission.summary}></ResultsCard>
+              <ResultsCard summary={passedSubmissionResult.data?.submission.summary}></ResultsCard>
             </Stack>
             <Stack direction="column" width={isMobile ? "100%" : "50%"}>
-              {!isMobile && !submissionResult.data?.latestSubmission.passed && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id}></RetakeQuiz> : <></>}
+              {!isMobile && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
               {!isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
             </Stack>
-          </Stack>
+            </Stack>
+            :
+            <Stack direction={"row"} alignItems={"flex-start"} width={"100%"} >
+            <Stack direction="column" width={isMobile ? "100%" : "50%"}>
+              <SubmissionCard module={moduleResult.data?.module!} submission={currentSubmissionResult.data?.latestSubmission} />
+              {isMobile && moduleResult.data && !currentSubmissionResult.data?.latestSubmission.passed ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
+              {isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
+              <ResultsCard summary={currentSubmissionResult.data?.latestSubmission.summary}></ResultsCard>
+            </Stack>
+            <Stack direction="column" width={isMobile ? "100%" : "50%"}>
+              {!isMobile && !currentSubmissionResult.data?.latestSubmission.passed && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
+              {!isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
+            </Stack>
+          </Stack>}
         </Stack>
       </RequestWrapper>
     </RequestWrapper>
