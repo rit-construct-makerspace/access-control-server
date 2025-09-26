@@ -10,7 +10,7 @@ import { expressMiddleware } from "@as-integrations/express5";
 import compression from "compression";
 import cors from "cors";
 import { schema } from "./schema.js";
-import { setupSessions, setupDevAuth, setupStagingAuth, setupAuth } from "./auth.js";
+import { setupSessions, setupDevAuth, setupSamlAuth, setupAuth } from "./auth.js";
 import context, { determineUser } from "./context.js";
 import path from "path";
 import * as schedule from "node-schedule";
@@ -101,7 +101,7 @@ async function startServer() {
      * Use the SAML configuration, but use insecure dev cookie handling
      */
     console.log("staging active");
-    setupStagingAuth(app);
+    setupSamlAuth(app);
   } else if (process.env.NODE_ENV === "production") {
     /**
      * mode: PRODUCTION
