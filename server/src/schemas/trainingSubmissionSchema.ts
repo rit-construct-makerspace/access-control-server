@@ -32,10 +32,7 @@ export const TrainingSubmissionTypeDefs = gql`
   }
 
   extend type Query {
-    submission(
-      submissionID: ID
-      userID: ID!
-    ): Submission
+    submission(submissionID: ID): Submission
     submissions(moduleID: ID): [Submission]
     latestSubmission(moduleID: ID): Submission
     remainingSubmissions(moduleID: ID): remainingSubmissions

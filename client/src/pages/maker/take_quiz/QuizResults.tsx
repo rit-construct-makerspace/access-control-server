@@ -25,7 +25,7 @@ export default function QuizResults() {
     );
   const passedSubmissionResult = useQuery(GET_SUBMISSION,
     {
-      variables: { submissionID: submissionID, userID: currentUser.id },
+      variables: { submissionID: submissionID },
       fetchPolicy: 'network-only',
       nextFetchPolicy: 'cache-first'
     }
@@ -39,6 +39,8 @@ export default function QuizResults() {
   );
   const isMobile = useIsMobile();
 
+  console.log(passedSubmissionResult?.data)
+
   return (
     <RequestWrapper
       loading={currentSubmissionResult.loading || currentSubmissionResult.data === undefined}
@@ -49,7 +51,7 @@ export default function QuizResults() {
         error={moduleResult.error}
       >
         <Stack spacing={2} justifyContent={"center"} margin={"30px 45px"}>
-          { submissionID && passedSubmissionResult.data ? 
+          { submissionID && passedSubmissionResult?.data?.submission.makerID === currentUser.id ? 
           <Stack direction={"row"} alignItems={"flex-start"} width={"100%"} >
             <Stack direction="column" width={isMobile ? "100%" : "50%"}>
               <SubmissionCard module={moduleResult.data?.module!} submission={passedSubmissionResult.data?.submission} />

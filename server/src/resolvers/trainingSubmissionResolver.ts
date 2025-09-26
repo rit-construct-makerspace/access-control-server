@@ -16,10 +16,10 @@ const TrainingSubmissionResolvers = {
      */
     submission: async (
       parent: any,
-      args: { submissionID: string, userID: string },
-      { ifStaffOrSelf }: ApolloContext
+      args: { submissionID: string },
+      { ifAuthenticated }: ApolloContext
     ) => 
-      ifStaffOrSelf (Number(args.userID), async (user: any) => {
+      ifAuthenticated (async (user: any) => {
         return SubmissionRepo.getSubmission(Number(args.submissionID));
     }),
 
