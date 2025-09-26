@@ -18,7 +18,7 @@ import { useIsMobile } from "../../common/IsMobileProvider";
 function HoursCard(hours: MakerspaceHours[]) {
     return <Card sx={{ width: "100%", height: "auto" }}>
         <CardContent>
-            <Typography variant="h6">Hours</Typography>
+            <Typography variant="h6" textAlign={"center"}>Hours</Typography>
             <MakerspaceHoursSection hours={hours} />
         </CardContent>
     </Card>
@@ -27,7 +27,7 @@ function HoursCard(hours: MakerspaceHours[]) {
 function AboutCard({ location, description, docsLink }: FullMakerspace) {
     return <Card sx={{ width: "100%", height: "auto" }}>
         <CardContent>
-            <Typography variant="h6">About</Typography>
+            <Typography variant="h6" textAlign={"center"}>About</Typography>
             <ThemedMarkdown>{description}</ThemedMarkdown>
 
             <Typography variant="body1" color="textSecondary">Visit Us: {location}</Typography>
@@ -40,7 +40,7 @@ function AboutCard({ location, description, docsLink }: FullMakerspace) {
 function MakerspaceTrainingCard(makerspaceTrainings: ModuleStatus[]) {
     return <Card sx={{ width: "100%", height: "auto" }}>
         <CardContent>
-            <Typography variant="h6">Makerspace Trainings</Typography>
+            <Typography variant="h6" textAlign={"center"} >Makerspace Trainings</Typography>
 
             <Stack direction={"column"} spacing={2} alignItems={"center"}>
                 {
@@ -144,7 +144,7 @@ export default function ExpandableHeader({ makerspace, makerspaceTrainings }: Ex
         <AccordionDetails>
             {
                 makerspaceTrainings.length > 0 &&
-                <Stack direction={isMobile ? "column" : "row"} spacing={3} justifyContent="space-around" flexGrow={0}>
+                <Stack direction={isMobile ? "column" : "row"} spacing={5} justifyContent="space-around" flexGrow={0}>
                     {AboutCard(makerspace)}
                     {HoursCard(makerspace.hours)}
                     {MakerspaceTrainingCard(makerspaceTrainings)}
