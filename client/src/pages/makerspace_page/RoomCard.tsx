@@ -1,4 +1,4 @@
-import { Card, CardActionArea, CardContent, Icon, Stack, Typography } from "@mui/material";
+import { Card, CardActionArea, CardContent, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Room from "../../types/Room";
 import ArchiveIcon from "@mui/icons-material/Archive";
