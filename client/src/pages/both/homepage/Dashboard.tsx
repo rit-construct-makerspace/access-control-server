@@ -85,7 +85,7 @@ export function Dashboard() {
         result={getAnnouncementsResult}
         render={(data) => {
           const announcements: Announcement[] = data.getAllAnnouncements;
-          
+
           return (
             <>
               <Stack direction="row" spacing={2} alignItems="center" margin="30px 30px 10px 30px">
@@ -96,24 +96,19 @@ export function Dashboard() {
                   </IconButton>
                 ) : undefined}
               </Stack>
-              <Stack
-                direction={isMobile ? "column" : "row"}
-                justifyContent="flex-start"
-                alignItems="stretch"
-                spacing={2}
-                divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />}
-                margin="0px 20px 20px 20px"
-              >
+              <Grid container margin="0px 20px" alignItems="stretch" width="auto">
                 {announcements.length === 0 ? (
                   <Typography variant="body1" textAlign="center">
                     No announcements. Check back soon!
                   </Typography>
                 ) : (
                   announcements.map((thisAnnouncement: Announcement) => (
-                    <AnnouncementCard announcement={thisAnnouncement} />
+                    <Grid width="400px" margin="10px">
+                      <AnnouncementCard announcement={thisAnnouncement} />
+                    </Grid>
                   ))
                 )}
-              </Stack>
+              </Grid>
             </>
           );
         }}
