@@ -76,6 +76,16 @@ async function startServer() {
   setupSessions(app);
 
 
+  // Force redirect to https in production
+  if (process.env.NODE_ENV === 'production') {
+    app.use(function (req, res, next) {
+      if (req.headers['x-forwarded-proto'] !== 'https') {
+        return res.redirect(['https://', req.get('Host'), req.url].join(''));
+      }
+      return next();
+    });
+  }
+
   // environment setup
   if (process.env.NODE_ENV === "development") {
     /**
@@ -134,20 +144,14 @@ async function startServer() {
   });
 
 
-  //it might seem like you should be able to redirect straight to /app/ from / but for some reason it infitely refreshes
-  // and this solves the issue
-  app.get("/app/home", function (req, res) {
-    res.redirect(SECURE_ORIGIN+"/app/")
-  })
 
 
   //redirects first landing make.rit.edu/ -> make.rit.edu/home
   app.get("/", function (req, res) {
-    res.redirect(SECURE_ORIGIN+"/app/home");
+    res.redirect(SECURE_ORIGIN + "/app/");
   });
 
   app.get("/app/*apppage", function (req, res) {
-    res.header
     res.sendFile(path.join(__dirname, "../../client/build", "index.html"));
   });
 
