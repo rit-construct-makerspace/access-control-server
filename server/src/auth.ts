@@ -514,5 +514,5 @@ export function setupStagingAuth(app: express.Application) {
 
 // TODO: Remove this and any references to this
 export function setupAuth(app: express.Application) {
-  //DEPRECATE
+  setupStagingAuth(app);
 }
