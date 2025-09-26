@@ -148,7 +148,7 @@ export function setupDevAuth(app: express.Application) {
     //validateInResponseTo: ValidateInResponseTo.never,
     disableRequestedAuthnContext: true,
     signatureAlgorithm: "sha256",
-    //wantAssertionsSigned: true,
+    wantAssertionsSigned: process.env.NODE_ENV ? true : undefined,
     digestAlgorithm: "sha256",
 
     // TODO production solution
