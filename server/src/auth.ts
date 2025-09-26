@@ -148,7 +148,7 @@ export function setupDevAuth(app: express.Application) {
     //validateInResponseTo: ValidateInResponseTo.never,
     disableRequestedAuthnContext: true,
     signatureAlgorithm: "sha256",
-    //wantAssertionsSigned: true,
+    wantAssertionsSigned: process.env.NODE_ENV ? true : undefined,
     digestAlgorithm: "sha256",
 
     // TODO production solution
@@ -169,7 +169,7 @@ export function setupDevAuth(app: express.Application) {
     const ritUser = mapSamlTestToRit(user);
 
     // Create user in our database if they don't exist
-    var existingUser = await getUserByRitUsername(ritUser.ritUsername);
+    let existingUser = await getUserByRitUsername(ritUser.ritUsername);
     if (!existingUser) {
       existingUser = await createUser({
         firstName: ritUser.firstName,
@@ -281,7 +281,7 @@ export function setupDevAuth(app: express.Application) {
 }
 
 //Setup Passport SAML configuration
-export function setupStagingAuth(app: express.Application) {
+export function setupSamlAuth(app: express.Application) {
   const issuer = process.env.ISSUER;
   const callbackUrl = process.env.CALLBACK_URL;
   const entryPoint = process.env.ENTRY_POINT;
@@ -512,7 +512,6 @@ export function setupStagingAuth(app: express.Application) {
 
 }
 
-// TODO: Remove this and any references to this
 export function setupAuth(app: express.Application) {
-  //DEPRECATE
+  setupSamlAuth(app); // decides on strictness between staging/production
 }
