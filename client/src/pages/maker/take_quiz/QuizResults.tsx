@@ -65,12 +65,12 @@ export default function QuizResults() {
             <Stack direction={"row"} alignItems={"flex-start"} width={"100%"} >
             <Stack direction="column" width={isMobile ? "100%" : "50%"}>
               <SubmissionCard module={moduleResult.data?.module!} submission={currentSubmissionResult.data?.latestSubmission} />
-              {isMobile && moduleResult.data && !currentSubmissionResult.data?.latestSubmission.passed ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
+              {isMobile && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
               {isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
               <ResultsCard summary={currentSubmissionResult.data?.latestSubmission.summary}></ResultsCard>
             </Stack>
             <Stack direction="column" width={isMobile ? "100%" : "50%"}>
-              {!isMobile && !currentSubmissionResult.data?.latestSubmission.passed && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
+              {!isMobile && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
               {!isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
             </Stack>
           </Stack>}

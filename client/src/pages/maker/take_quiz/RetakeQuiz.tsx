@@ -34,7 +34,7 @@ export default function RetakeQuiz(props: { moduleID: number }) {
                 <Typography>If you would like to unlock this training early and seek help with the quiz, please see a Makerspace Mentor.</Typography>
               </Stack>
               : <Stack>
-                <Typography>Click <Link href={`/app/maker/training/${props.moduleID}`}>here</Link> to retake this quiz.</Typography>
+                <Typography>Click <Link href={`/app/maker/training/${props.moduleID}`}>here</Link> {passedSubmission?.data?.passingSubmission? <>if you would like to refresh training.</>: <>to retake this quiz.</>}</Typography>
                 <Typography component="div">You have {remainingAttempts} {remainingAttempts === 1 ? <>attempt</> : <>attempts</>} remaining today.</Typography>
               </Stack>
             }
