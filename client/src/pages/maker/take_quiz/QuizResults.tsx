@@ -38,9 +38,6 @@ export default function QuizResults() {
     }
   );
   const isMobile = useIsMobile();
-
-  console.log(passedSubmissionResult?.data)
-
   return (
     <RequestWrapper
       loading={currentSubmissionResult.loading || currentSubmissionResult.data === undefined}
