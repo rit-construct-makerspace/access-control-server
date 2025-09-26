@@ -43,18 +43,20 @@ function MakerspaceTrainingCard(makerspaceTrainings: ModuleStatus[]) {
             <Typography variant="h6" textAlign={"center"} >Makerspace Trainings</Typography>
 
             <Stack direction={"column"} spacing={2} alignItems={"center"}>
-                {
-                    makerspaceTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
-                        ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
-                        : null
-                }
-            </Stack>
-            <Stack direction={"column"} spacing={1} alignItems={"center"}>
-                {
-                    makerspaceTrainings.map((ms: ModuleStatus) => (
-                        <ModuleStatusRow ms={ms} />
-                    ))
-                }
+                <Stack direction={"column"} spacing={2} alignItems={"center"}>
+                    {
+                        makerspaceTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
+                            ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
+                            : null
+                    }
+                </Stack>
+                <Stack direction={"column"} spacing={1}>
+                    {
+                        makerspaceTrainings.map((ms: ModuleStatus) => (
+                            <ModuleStatusRow ms={ms} />
+                        ))
+                    }
+                </Stack>
             </Stack>
         </CardContent>
     </Card>
@@ -69,7 +71,7 @@ export interface ExpandableHeaderProps {
 
 function TitleRow(navigate: any, isMobile: boolean, expanded: boolean, name: string, id: number, canEdit: boolean, hours: MakerspaceHours[], hasIncomplete: boolean, hasExpiring: boolean) {
     const title = <Typography variant="h3">{name}</Typography>;
-    
+
     const editIcon = canEdit
         ? <IconButton
             onClick={() => { navigate(`/makerspace/${id}/edit`) }}
@@ -87,7 +89,7 @@ function TitleRow(navigate: any, isMobile: boolean, expanded: boolean, name: str
             </Alert>
             : undefined;
 
-            const hoursElement = <CurrentHours times={hours} fillLine={isMobile} showDay={false} />;
+    const hoursElement = <CurrentHours times={hours} fillLine={isMobile} showDay={false} />;
 
     const expandButton = <Button
         color="primary"
@@ -100,7 +102,7 @@ function TitleRow(navigate: any, isMobile: boolean, expanded: boolean, name: str
         sx={{ fontSize: "1.25em", fontWeight: "bold", minWidth: "9em" }}>
         {expanded ? "Less Info" : "More Info"}
     </Button>;
-    
+
     const titleAndEdit = <Stack direction={"row"}>{title} {editIcon}</Stack>
 
     if (isMobile) {
