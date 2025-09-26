@@ -99,11 +99,12 @@ export function Dashboard() {
               <Grid
                 container
                 margin="0px 20px 20px 20px"
-                alignItems="center"
-                justifyContent={isMobile ? "center" : "left"}
+                direction={isMobile ? "column" : "row"}
+                alignItems="stretch"
+                justifyContent="flex-start"
                 width="auto"
               >
-                {announcements.length !== 0 ? (
+                {announcements.length === 0 ? (
                   <Typography variant="body1" textAlign="center">
                     No announcements. Check back soon!
                   </Typography>
