@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Alert, Button, Divider, FormControlLabel, IconButton, Stack, Switch, Typography } from "@mui/material";
+import { Button, Divider, FormControlLabel, Stack, Switch } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
@@ -10,12 +10,10 @@ import SearchBar from "../../common/SearchBar";
 import StaffBar from "./StaffBar";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
 import { useIsMobile } from "../../common/IsMobileProvider";
 import { isManagerFor, isStaffFor } from "../../common/PrivilegeUtils";
-import { ModuleStatus, moduleStatusMapper } from "../../common/TrainingModuleUtils";
-import MakerspaceHoursSection from "./MakerspaceHours";
-import ModuleStatusRow from "../../common/ModuleStatusRow";
+import { moduleStatusMapper } from "../../common/TrainingModuleUtils";
+import ExpandableHeader from "./ExpandableHeader";
 
 export default function MakerspacePage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
@@ -31,6 +29,7 @@ export default function MakerspacePage() {
   const staffMode = isStaffFor(user, Number(makerspaceID))
   const [showHidden, setShowHidden] = useState(false);
 
+
   return (
     <RequestWrapper2 result={getMakerspace} render={(data) => {
 
@@ -40,44 +39,10 @@ export default function MakerspacePage() {
 
       return (
         <Stack spacing={"2"} padding={"0 20px 20px"} divider={<Divider orientation="horizontal" flexItem />}>
+          <title>{`${fullSpace.name} | Make @ RIT`}</title>
           <StaffBar />
-          <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
-            <title>{`${fullSpace.name} | Make @ RIT`}</title>
-            <Typography variant="h3" align="center">{fullSpace.name}</Typography>
-            {
-              isManagerFor(user, Number(makerspaceID))
-                ? <IconButton
-                  onClick={() => { navigate(`/makerspace/${makerspaceID}/edit`) }}
-                  sx={{ color: "gray" }}
-                >
-                  <EditIcon />
-                </IconButton>
-                : null
-            }
-
-          </Stack>
-          <MakerspaceHoursSection hours={fullSpace.hours} isMobile={isMobile} />
-          {
-            makerspaceTrainings.length > 0 &&
-            <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
-              <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
-                <Typography variant="h6">Makerspace Trainings</Typography>
-                {
-                  makerspaceTrainings.some((ms) => (ms.status !== "Passed" && ms.status !== "Expiring Soon"))
-                    ? <Alert severity="error">You must pass the makerspace trainings before you can use equipment in the makerspace!</Alert>
-                    : null
-                }
-              </Stack>
-              <Stack direction={isMobile ? "column" : "row"} spacing={1} alignItems={"center"}>
-                {
-                  makerspaceTrainings.map((ms: ModuleStatus) => (
-                    <ModuleStatusRow ms={ms} />
-                  ))
-                }
-              </Stack>
-            </Stack>
-          }
-          <Stack padding={"10px"} direction="row" spacing={2}>
+          {ExpandableHeader({makerspace: fullSpace, makerspaceTrainings})}
+          <Stack padding={"10px"} direction="row" justifyContent={isMobile ? "space-between" : "flex-start"} spacing={2}>
             <SearchBar
               placeholder="Search Equipment"
               value={equipmentSearch}
