@@ -281,7 +281,7 @@ export function setupDevAuth(app: express.Application) {
 }
 
 //Setup Passport SAML configuration
-export function setupStagingAuth(app: express.Application) {
+export function setupSamlAuth(app: express.Application) {
   const issuer = process.env.ISSUER;
   const callbackUrl = process.env.CALLBACK_URL;
   const entryPoint = process.env.ENTRY_POINT;
@@ -333,7 +333,7 @@ export function setupStagingAuth(app: express.Application) {
       //wantAssertionsSigned: true,
       digestAlgorithm: "sha256",
 
-      // TODO production solution
+      // TODO production solutions
       acceptedClockSkewMs: 180, // "SAML assertion not yet valid" fix
     },
     (profile: any, done: any) => {
@@ -512,7 +512,6 @@ export function setupStagingAuth(app: express.Application) {
 
 }
 
-// TODO: Remove this and any references to this
 export function setupAuth(app: express.Application) {
-  setupStagingAuth(app);
+  setupSamlAuth(app); // decides on strictness between staging/production
 }

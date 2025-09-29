@@ -29,7 +29,7 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
   console.log("should hide", props.moduleID, modulesToHideInPersonFor, shouldHideCompetency)
 
   return (
-    <Card sx={{ width: isMobile ? "100%" : "50%" }}>
+    <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>
       <CardHeader sx={{ fontWeight: "bold" }} title="Next for you"></CardHeader>
       <RequestWrapper loading={accessProgressResult.loading} error={accessProgressResult.error}>
         <CardContent>

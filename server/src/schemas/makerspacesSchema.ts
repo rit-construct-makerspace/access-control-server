@@ -9,6 +9,8 @@ export interface MakerspaceInput {
   name: string;
   subtitle: string | null;
   location: string | null;
+  description: string;
+  docsLink: string;
   imageUrl: string;
 }
 
@@ -18,6 +20,8 @@ export const MakerspacesTypeDefs = gql`
     name: String!
     subtitle: String
     location: String
+    description: String
+    docsLink: String
     rooms: [Room]
     hours: [MakerspaceHours]
     items: [InventoryItem]
@@ -29,6 +33,8 @@ export const MakerspacesTypeDefs = gql`
     name: String!
     subtitle: String
     location: String
+    description: String
+    docsLink: String
     imageUrl: String
   }
 

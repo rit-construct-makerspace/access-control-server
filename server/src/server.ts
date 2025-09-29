@@ -10,7 +10,7 @@ import { expressMiddleware } from "@as-integrations/express5";
 import compression from "compression";
 import cors from "cors";
 import { schema } from "./schema.js";
-import { setupSessions, setupDevAuth, setupStagingAuth, setupAuth } from "./auth.js";
+import { setupSessions, setupDevAuth, setupSamlAuth, setupAuth } from "./auth.js";
 import context, { determineUser } from "./context.js";
 import path from "path";
 import * as schedule from "node-schedule";
@@ -76,9 +76,9 @@ async function startServer() {
   setupSessions(app);
 
 
-  // Force redirect to https in production
+  // Force redirect to https in production (actually dont yet)
   /*
-if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production') {
     app.use(function (req, res, next) {
       if (req.headers['x-forwarded-proto'] !== 'https') {
         return res.redirect(['https://', req.get('Host'), req.url].join(''));
@@ -86,7 +86,7 @@ if (process.env.NODE_ENV === 'production') {
       return next();
     });
   }
-*/
+  */
 
   // environment setup
   if (process.env.NODE_ENV === "development") {
@@ -103,7 +103,7 @@ if (process.env.NODE_ENV === 'production') {
      * Use the SAML configuration, but use insecure dev cookie handling
      */
     console.log("staging active");
-    setupStagingAuth(app);
+    setupSamlAuth(app);
   } else if (process.env.NODE_ENV === "production") {
     /**
      * mode: PRODUCTION
@@ -144,9 +144,6 @@ if (process.env.NODE_ENV === 'production') {
     //In staging/prod, /login will then redirect to the IdP
     res.redirect("/login");
   });
-
-
-
 
   //redirects  make.rit.edu/app/home(may be in peoples browsers history from old redirect)
   app.get("/app/home", function (req, res) {
