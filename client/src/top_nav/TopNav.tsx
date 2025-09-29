@@ -5,8 +5,6 @@ import LogoSvgOrange from "../assets/shed logo orange white.png";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import LayersIcon from '@mui/icons-material/Layers';
-import SlackIcon from "../common/SlackIcon";
-import EventIcon from "@mui/icons-material/Event";
 import NavLink from "./NavLink";
 import { useCurrentUser } from "../common/CurrentUserProvider";
 import SchoolIcon from "@mui/icons-material/School";
@@ -69,13 +67,6 @@ export default function TopNav() {
           </Alert>
           : null
       }
-      { // No ID alert
-        currentUser.cardTagID == null || currentUser.cardTagID === ""
-          ? <Alert variant="filled" severity="warning" sx={{ borderRadius: 0 }}>
-            Your RIT ID has not been associated with your Makerspace account yet. Please speak to a member of staff in the makerspace to rectify this before using any makerspace equipment. Trainings and 3DPrinterOS will remain available.
-          </Alert>
-          : null
-      }
       { // Lab training Alert
         labTraining
           ? <Alert variant="filled" severity="info" onClose={handleDismissLabTraining} sx={{ borderRadius: 0 }}>
@@ -90,18 +81,6 @@ export default function TopNav() {
       to="https://cloud.3dprinteros.com/ssosaml/rit/auth"
       primary="3D Printing"
       icon={<LayersIcon />}
-      newTab={true}
-    />,
-    <NavLink
-      to="https://rit.enterprise.slack.com/archives/C0440KNF916"
-      primary="Slack"
-      icon={<SlackIcon />}
-      newTab={true}
-    />,
-    <NavLink
-      to="https://rit0.sharepoint.com/:l:/s/shed-makerspace-internal/FLWWXKH1sflHs-h3tbs2ZFABOwYAmWuxffG18ansYFXlfA"
-      primary="Equipment Calendar"
-      icon={<EventIcon />}
       newTab={true}
     />,
     <NavLink

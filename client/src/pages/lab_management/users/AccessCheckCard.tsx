@@ -1,5 +1,4 @@
 import { Button, Card, CardActions  } from "@mui/material";
-import { AccessCheckExtraInfo } from "./UserModal";
 import { gql, useMutation } from "@apollo/client";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
 import { GET_USER } from "../../../queries/userQueries";

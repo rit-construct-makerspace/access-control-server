@@ -1,9 +1,9 @@
-import * as React from 'react';
-import SvgIcon from '@mui/material/SvgIcon';
+import * as React from "react";
+import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
-export default function SlackIcon() {
+export default function SlackIcon(props: SvgIconProps) {
   return (
-    <SvgIcon>
+    <SvgIcon {...props}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
@@ -11,7 +11,7 @@ export default function SlackIcon() {
         strokeWidth={1.5}
         stroke="currentColor"
       >
-        <path 
+        <path
           d="M 968.00,416.00
            C 968.00,416.00 752.00,416.00 752.00,416.00
              710.63,415.94 664.18,397.13 632.00,371.79
@@ -137,7 +137,8 @@ export default function SlackIcon() {
              1296.85,2097.63 1198.77,2067.44 1143.43,1990.00
              1131.86,1973.81 1122.95,1955.85 1116.67,1937.00
              1111.09,1920.26 1106.03,1898.66 1106.00,1881.00
-             1106.00,1881.00 1106.00,1662.00 1106.00,1662.00 Z" />
+             1106.00,1881.00 1106.00,1662.00 1106.00,1662.00 Z"
+        />
       </svg>
     </SvgIcon>
   );
