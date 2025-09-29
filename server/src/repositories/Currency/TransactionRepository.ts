@@ -34,6 +34,7 @@ export async function getTransactionById(id: number): Promise<TransactionRow | u
     return undefined;
 }
 
+
 export async function removeOutstandingChargeOnTransactionIfAvailable(id: number) {
     await knex("Transactions").where({ id: id }).update({ outstandingCharge: 0 })
 }
@@ -75,7 +76,12 @@ export async function getCurrencyLedgerEntriesForTransactionEntryByEntryId(id: n
         .select("cl.*");
 }
 
-export async function getLastChargeSplitForTransactionById(transactionId: number): Promise<{ transactionEntryId: number, atrium?: { amount: number, txid: number, currencyLedgerId: number }, credit?: { amount: number, currencyLedgerId: number } } | undefined> {
+/**
+ * Because we handle refunds by fully giving back then recharging, the last two charges hold the entire price
+ * @param transactionId the transaction to recall the charges for
+ * @returns a description of the last modification
+ */
+export async function getLastChargesForTransactionById(transactionId: number): Promise<{ transactionEntryId: number, atrium?: { amount: number, txid: number, currencyLedgerId: number }, credit?: { amount: number, currencyLedgerId: number } } | undefined> {
     type Row = {
         transactionEntryId: number,
         clID: number | null,
@@ -92,36 +98,14 @@ export async function getLastChargeSplitForTransactionById(transactionId: number
             `cl.atxID as "atriumTxId`,
         )
         .leftJoin("CurrencyLedger as cl", "cl.transactionEntryId", "te.id")
-        // .where("te.id", "=", transactionId)
-        .orderBy("te.dateTime", "desc").debug(true);
-    console.log(rows[0]);
+        .where("te.transactionId", "=", transactionId)
+        .orderBy("te.dateTime", "desc").debug(true) as Row[];
+        const justCharges = rows.filter(r => r.amount < 0); // we don't want the last refund
+    console.log("rows", rows);
+    console.log("justCharges", justCharges);
     return undefined;
 }
 
-export async function getChargeSplitForTransactionById(id: number): Promise<{ target: number, credit: number, atrium: number } | undefined> {
-    const entries = await getTransactionEntriesByTransactionId(id);
-    if (entries.length == 0) {
-        return undefined;
-    }
-    const sum = entries.reduce((acc, row) => row.amount + acc, 0);
-    const charges = await getCurrencyLedgerEntriesForTransactionById(id);
-    if (charges.length == 0) {
-        return undefined;
-    }
-
-    let aSum = 0;
-    let cSum = 0;
-    charges.forEach(val => {
-        if (val.currencyType == CurrencyType.Atrium) {
-            aSum += val.amount;
-        } else if (val.currencyType == CurrencyType.Credit) {
-            cSum += val.amount;
-        }
-    })
-
-    return { target: sum, atrium: aSum, credit: cSum };
-
-}
 /**
  * Create an update for a transaction
  * YOU PROBABLY SHOULDNT BE USING THIS DIRECTLY. THIS DOESNT ACTUALLY DO ANY CHARGING JUST RECORDS TO THE DB

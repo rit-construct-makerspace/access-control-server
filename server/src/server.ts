@@ -32,7 +32,7 @@ import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { purge_images } from "./periodicActions.js";
 import { getAccountBalance } from "./integrations/currency/currency.js";
-import { getLastChargeSplitForTransactionById } from "./repositories/Currency/TransactionRepository.js";
+import { getLastChargesForTransactionById } from "./repositories/Currency/TransactionRepository.js";
 import { CurrencySource } from "./integrations/currency/types.js";
 
 const require = createRequire(import.meta.url);
@@ -561,12 +561,8 @@ async function startServer() {
     );
     const res = await getAccountBalance("jehshed");
     console.log("res", res);
-    // const res2 = await getLastChargeSplitForTransactionById(3071);
-    // console.log("res2", res2);
-    // const res3 = await adjustBalanceIfPossible(CurrencySource.Printers, "jehshed", 18, 50, "have some back", 3336)
-    // console.log("res3", res3);
-    // const res4 = await reverseCharge(CurrencySource.Printers, 32237580);
-    // console.log("res4", res4);
+    const res2 = await getLastChargesForTransactionById(4120);
+    console.log("Res2", res2);
   }
   );
 
