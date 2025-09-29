@@ -155,10 +155,7 @@ async function startServer() {
   app.get("/app/home", function (req, res) {
     res.redirect(SECURE_ORIGIN + "/app/");
   });
-    res.redirect(SECURE_ORIGIN + "/app/");
-  });
   app.get("/", function (req, res) {
-    res.redirect(SECURE_ORIGIN + "/app/");
     res.redirect(SECURE_ORIGIN + "/app/");
   });
 
