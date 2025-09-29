@@ -7,7 +7,6 @@ import {
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
-import { useEffect, useState } from "react";
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 

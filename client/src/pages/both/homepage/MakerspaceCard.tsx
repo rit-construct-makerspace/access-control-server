@@ -1,9 +1,9 @@
-import { Button, Card, CardActionArea, CardContent, CardMedia, Stack, Typography, useTheme } from "@mui/material";
+import { Button, Card, CardActionArea, CardContent, CardMedia, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import * as TimeUtils from "../../../common/TimeUtils";
 import MakerspaceHours from "../../../types/MakerspaceHours";
+import CurrentHours from "../../../common/CurrentHours";
 
 interface MakerspaceCardProps {
   id: number;
@@ -16,46 +16,8 @@ interface MakerspaceCardProps {
   clickable?: boolean;
 }
 
-function getHoursToday(times: MakerspaceHours[], primaryColor: string, isMobile: boolean) {
-  const now = new Date();
-  const hours_today = times[now.getDay()];
-
-  const status = hours_today.closed
-    ? "CLOSED"
-    : TimeUtils.currentStatus(
-        hours_today.open?.substring(0, 5) ?? "12:00",
-        hours_today.close?.substring(0, 5) ?? "12:00"
-      );
-
-  return (
-    <Stack
-      width={"100%"}
-      justifyContent={isMobile ? "space-between" : "flex-start"}
-      spacing={"20px"}
-      direction="row"
-      alignItems={"center"}
-    >
-      <Typography color={status === "OPEN" ? "success" : "error"} fontWeight="bold">
-        {status}
-      </Typography>
-      <Stack justifyContent="space-between" direction="row">
-        <Typography color={primaryColor} fontWeight="bold">
-          {TimeUtils.dayToString(now.getDay())}
-        </Typography>
-        <Typography paddingLeft={"10px"}>
-          {hours_today.closed
-            ? ""
-            : `${TimeUtils.reformatTime(
-                times[now.getDay()].open?.substring(0, 5) ?? "12:00"
-              )} - ${TimeUtils.reformatTime(times[now.getDay()].close?.substring(0, 5) ?? "12:00")}`}
-        </Typography>
-      </Stack>
-    </Stack>
-  );
-}
 
 export default function MakerspaceCard(props: MakerspaceCardProps) {
-  const theme = useTheme();
   const navigate = useNavigate();
 
   const [isHovered, setIsHovered] = useState(false);
@@ -102,7 +64,7 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
           </Typography>
 
           <Stack direction={"row"} justifyContent={"space-between"} spacing={"20px"}>
-            {getHoursToday(props.hours, theme.palette.primary.main, props.isMobile)}
+            <CurrentHours times = {props.hours} fillLine = {props.isMobile} showDay={true}/>
             {!props.isMobile && (
               <Button
                 variant="contained"
