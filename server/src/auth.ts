@@ -513,5 +513,5 @@ export function setupSamlAuth(app: express.Application) {
 }
 
 export function setupAuth(app: express.Application) {
-  setupSamlAuth(app); // decides on strictness between staging/production
+  //DEPRECATE
 }

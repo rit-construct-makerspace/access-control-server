@@ -149,10 +149,16 @@ async function startServer() {
 
 
   //redirects  make.rit.edu/app/home(may be in peoples browsers history from old redirect)
+
+
+  //redirects  make.rit.edu/app/home(may be in peoples browsers history from old redirect)
   app.get("/app/home", function (req, res) {
     res.redirect(SECURE_ORIGIN + "/app/");
   });
+    res.redirect(SECURE_ORIGIN + "/app/");
+  });
   app.get("/", function (req, res) {
+    res.redirect(SECURE_ORIGIN + "/app/");
     res.redirect(SECURE_ORIGIN + "/app/");
   });
 
