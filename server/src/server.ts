@@ -145,9 +145,6 @@ async function startServer() {
     res.redirect("/login");
   });
 
-
-
-
   //redirects  make.rit.edu/app/home(may be in peoples browsers history from old redirect)
   app.get("/app/home", function (req, res) {
     res.redirect(SECURE_ORIGIN + "/app/");
