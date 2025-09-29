@@ -76,8 +76,9 @@ async function startServer() {
   setupSessions(app);
 
 
-  // Force redirect to https in production
-  if (process.env.NODE_ENV === 'production') {
+  // Force redirect to https in production (actually dont yet)
+  /*
+  if (process.env.NODE_ENV === 'production' || true) {
     app.use(function (req, res, next) {
       if (req.headers['x-forwarded-proto'] !== 'https') {
         return res.redirect(['https://', req.get('Host'), req.url].join(''));
@@ -85,6 +86,7 @@ async function startServer() {
       return next();
     });
   }
+  */
 
   // environment setup
   if (process.env.NODE_ENV === "development") {
