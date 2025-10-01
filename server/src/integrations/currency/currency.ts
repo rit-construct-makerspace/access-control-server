@@ -102,7 +102,6 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
   } catch (e) {
     console.error(`Currency: Failed to charge atrium for ${owner.username} for ${cents} cents, ${e}`)
   }
-  console.log("atrium succ", atriumSuccess);
   if (!atriumSuccess) {
     if (toCredit != 0) {
       await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, toCredit, source, "rectification for: " + description, transactionEntryId);
@@ -157,7 +156,7 @@ export async function refundChargeGroup(group: {
     // no work to do
     return false;
   }
-  console.log("Currency: Refunding", group);
+  console.log("Currency: Refunding group: ", group);
   let atriumGood = (group.atrium ? false : true); // automatically good if not applicable
   let creditGood = (group.credit ? false : true); // automatically good if not applicable
 

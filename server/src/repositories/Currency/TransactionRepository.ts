@@ -109,11 +109,10 @@ export async function getLastChargesForTransactionById(transactionId: number): P
         // dont even have the transaction entry (weird and bad)
         return undefined;
     }
-    console.log("Rows", rowsNotIncludingEmptyEntries);
  
     const entryIdWeCareAbout = rowsNotIncludingEmptyEntries[0].transactionEntryId;
     const justLastCharges = rowsNotIncludingEmptyEntries.filter(r => r.amount < 0 && r.transactionEntryId == entryIdWeCareAbout); // we don't want the last refund
-    console.log("justLst", justLastCharges);
+
     if (justLastCharges.length > 2) {
         // something has gone terribly wrong, we somehow charged 3 times with 2 currencies
         await createLog(`Strange Currency Bug That You Will Have To Fix Manually. Could not find history for transaction ID: ${transactionId}`, "currency")

@@ -555,19 +555,12 @@ async function startServer() {
     console.error("Unable to contact atrium api. Currency functionality may be limited", pingResponse);
   }
 
-  app.listen({ port: PORT }, async () => {
+  app.listen({ port: PORT }, () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     );
-    const res = await getAccountBalance("jehshed");
-    console.log("res", res);
-    // const res2 = await getLastChargesForTransactionById(4120);
-    // console.log("Res2", res2);
   }
   );
-
-
-
 }
 
 startServer();
