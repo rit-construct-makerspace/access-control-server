@@ -7,7 +7,7 @@ import AuditLogEntity from "../../audit_logs/AuditLogEntity";
 import { useQuery } from "@apollo/client";
 import { GET_CARTS } from "../../../../queries/cartQueries";
 import { InventoryCart } from "../../../../types/InventoryCart";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GET_MAKERSPACES } from "../../../../queries/makerspaceQueries";
 import { Checkbox, FormControlLabel, FormGroup, TextField, CircularProgress } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
@@ -34,6 +34,18 @@ export function CartListPage() {
     const userMatch = userString.includes(userSearch.toLowerCase());
     return makerspaceMatch && userMatch;
   });
+
+  const setUrlParam = (paramName: string, paramValue: string) => {
+    const params = new URLSearchParams(location.search);
+    params.set(paramName, paramValue);
+    navigate(`/makerspace/${makerspaceID}/storefront/carts?` + params, { replace: true });
+  };
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const queryString = searchParams.get("a") ?? "";
+
+    setUserSearch(queryString)
+  }, [location.search]);
 
   const columns: GridColDef<(typeof rows)[number]>[] = [
     {
@@ -105,7 +117,7 @@ export function CartListPage() {
           <TextField
             label="Search User"
             value={userSearch}
-            onChange={(e) => setUserSearch(e.target.value)}
+            onChange={(e) => {setUserSearch(e.target.value); setUrlParam("a", e.target.value)}}
             size="small"
           />
         </Stack>

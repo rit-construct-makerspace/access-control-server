@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SearchBar from "../../../common/SearchBar";
 import { Button, Divider, Stack, Typography } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
@@ -25,7 +25,19 @@ export default function TrainingModulesPage() {
   const handleNewModuleClicked = async () => {
     // Redirect to the module editor after creation
     navigate(`/makerspace/${makerspaceID}/training/new`);
+  };  
+
+  const setUrlParam = (paramName: string, paramValue: string) => {
+    const params = new URLSearchParams(location.search);
+    params.set(paramName, paramValue);
+    navigate(`/makerspace/${makerspaceID}/trainings?` + params, { replace: true });
   };
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const queryString = searchParams.get("a") ?? "";
+
+    setSearchText(queryString)
+  }, [location.search]);
 
   return (
     <Stack margin="0 20px" spacing={2}>
@@ -35,7 +47,8 @@ export default function TrainingModulesPage() {
         <SearchBar
           placeholder="Search training modules"
           value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          onChange={(e) => {setSearchText(e.target.value); setUrlParam("a", e.target.value)}}
+          onClear={() => setUrlParam("a", "")}
         />
         <Button
           loading={false}

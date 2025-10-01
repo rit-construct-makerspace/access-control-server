@@ -32,6 +32,18 @@ export default function ReadersPage() {
     }
   }, []);
 
+  const setUrlParam = (paramName: string, paramValue: string) => {
+    const params = new URLSearchParams(location.search);
+    params.set(paramName, paramValue);
+    navigate(`/makerspace/${makerspaceID}/readers?` + params, { replace: true });
+  };
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const queryString = searchParams.get("a") ?? "";
+
+    setSearchText(queryString)
+  }, [location.search]);
+
   const [restartAllReaders] = useMutation(RESTART_ALL_READERS, {variables: {makerspaceID: Number(makerspaceID)}});
 
   function restartAll(){
@@ -48,8 +60,8 @@ export default function ReadersPage() {
         <SearchBar
           placeholder="Search access devices"
           value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          onClear={() => setSearchText("")}
+          onChange={(e) => {setSearchText(e.target.value); setUrlParam("a", e.target.value)}}
+          onClear={() => setUrlParam("a", "")}
         />
         <Button color="success" variant="contained" onClick={() => { navigate("/admin/newreader") }}><AddIcon />Pair New Reader</Button>
         <FormControlLabel labelPlacement="start" label = "Show All Readers" control = {<Checkbox onChange={(e)=>setShowAllReaders(e.target.checked)}></Checkbox>} />

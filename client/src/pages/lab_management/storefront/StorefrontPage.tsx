@@ -72,6 +72,18 @@ export default function StorefrontPage() {
     setShowStaffItems(!showStaffItems)
   }
 
+  const setUrlParam = (paramName: string, paramValue: string) => {
+    const params = new URLSearchParams(location.search);
+    params.set(paramName, paramValue);
+    navigate(`/storefront?` + params, { replace: true });
+  };
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const queryString = searchParams.get("a") ?? "";
+
+    setSearchText(queryString)
+  }, [location.search]);  
+
   const getCartFromStorage = useCallback(() => {
     const storedCart = localStorage.getItem("cart");
     const parsedCart = storedCart && JSON.parse(storedCart);
@@ -177,7 +189,7 @@ export default function StorefrontPage() {
           placeholder="Search inventory"
           sx={{ mb: 2, alignSelf: "flex-start" }}
           value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          onChange={(e) => {setSearchText(e.target.value); setUrlParam("a", e.target.value)}}
           onClear={() => setSearchText("")}
         />
 
