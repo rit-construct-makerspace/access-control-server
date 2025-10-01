@@ -27,13 +27,10 @@ import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js"
 import { getMakerspaceHoursNextWeek } from "./repositories/Makerspaces/MakerspaceHoursRepository.js";
 import { getPassedTrainingsDaysAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
-import { adjustBalanceIfPossible, pingAtrium, reverseCharge } from "./integrations/atrium-integration/atrium.js";
+import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { purge_images } from "./periodicActions.js";
-import { getAccountBalance } from "./integrations/currency/currency.js";
-import { getLastChargesForTransactionById } from "./repositories/Currency/TransactionRepository.js";
-import { CurrencySource } from "./integrations/currency/types.js";
 
 const require = createRequire(import.meta.url);
 
