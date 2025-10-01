@@ -81,7 +81,11 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     if (lastCharges != undefined) {
         console.log("Have history", lastCharges);
         const amountAlreadyCharged = (lastCharges.atrium?.amount ?? 0) + (lastCharges.credit?.amount ?? 0)
-
+        if (centsToCharge + -amountAlreadyCharged > 0){
+            // recharge would give the user money (something fishy)
+            console.error(`Currency: Caught fraudulent refund before refund. Not gonna refund it. Probably needs manual rectification. tid: ${transactionID} asking for ${centsToCharge}, only ever spent ${-amountAlreadyCharged}`)
+            return false;
+        }
         const res = await Currency.refundChargeGroup(lastCharges, parent, entryId);
         if (typeof (res) == 'string') {
             console.error(`Currency: Error occured while trying to refund to recharge. tid: ${parent.id}, teid: ${entryId}, err: ${res}`);
@@ -95,7 +99,6 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
         return false;
     }
     // charge new amount
-    console.log("Chargin fr fr", centsToCharge);
     const chargeResult = await Currency.chargeAccount(parent.accountID, -centsToCharge, parent.origin, reason, entryId);
     if (typeof (chargeResult) == 'string') {
         // was an error
