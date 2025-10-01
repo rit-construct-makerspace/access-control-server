@@ -1,7 +1,8 @@
 import * as Atrium from "../atrium-integration/atrium.js"
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js"
 import { CurrencySource, MakeMoneyError } from "./types.js";
-import { getUserByAccountID } from "../../repositories/Users/UserRepository.js";
+import { TransactionRow } from "../../db/tables.js";
+import { getCurrencyLedgerEntry } from "../../repositories/Currency/CurrencyLedgerRepository.js";
 
 const USE_ATRIUM_FOR_CURRENCY = process.env.ATRIUM_ENABLED == "true";
 
@@ -39,16 +40,29 @@ export async function getAccountBalance(username: string): Promise<number | Make
 
 
 export function centsToDollarString(cents: number) {
-  if (cents == -0) {
+  if (cents == 0) {
+    // check for signed zero just in case (-0 equals 0 but may print with the - sign)
     cents = 0;
   }
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
 }
 
+/**
+ * Charge an account splitting between atrium and credit by favoring credit
+ * @param accountId the account to charge
+ * @param cents the cents to charge by (ALWAYS POSITIVE)
+ * @param source the source of this charge
+ * @param description the description explaining what this charge is about
+ * @param transactionEntryId the transaction entry that these charges are associated with
+ * @returns true if charging occured without error
+ * @returns false if the account did not have enough money to charge with
+ * @returns error if something bad happened while processing
+ */
 export async function chargeAccount(accountId: number, cents: number, source: CurrencySource, description: string, transactionEntryId: number): Promise<boolean | MakeMoneyError> {
   if (cents < 0) {
     return MakeMoneyError.InvalidSign;
   }
+  console.log("Charging account", accountId, cents);
   const owner = await CurrencyAccountRepo.getAccountOwner(accountId);
   if (owner === undefined) {
     return MakeMoneyError.NoAccount;
@@ -88,9 +102,10 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
   } catch (e) {
     console.error(`Currency: Failed to charge atrium for ${owner.username} for ${cents} cents, ${e}`)
   }
-
   if (!atriumSuccess) {
-    await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, toCredit, source, "rectification for: " + description, transactionEntryId);
+    if (toCredit != 0) {
+      await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, toCredit, source, "rectification for: " + description, transactionEntryId);
+    }
     return false;
   }
 
@@ -100,10 +115,14 @@ export async function chargeAccount(accountId: number, cents: number, source: Cu
 /**
  * "Safe" way to refund money. Will never go to atrium money, only ever to credit
  * @param accountId the account to give money to
- * @param cents the number of cents to give to that account
+ * @param cents the number of cents to give to that account (ALWAYS POSITIVE)
  * @returns true/false for success changing account amount, MakeMoneyError if failure operating
  */
 export async function refundCreditAccount(accountId: number, cents: number, source: CurrencySource, description: string, transactionEntryId?: number): Promise<boolean | MakeMoneyError> {
+  console.log("Refunding credit account", accountId, cents, source, description);
+  if (cents < 0) {
+    return MakeMoneyError.InvalidSign;
+  }
   try {
     return await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, cents, source, description, transactionEntryId)
   } catch {
@@ -111,71 +130,61 @@ export async function refundCreditAccount(accountId: number, cents: number, sour
   }
 }
 
+
 /**
- * Return money to a user without ever transferring more to them in atrium money than they originally put in
- * User of this function passes in the amount of money sent to credits or to atrium so far for this transaction
- * This function will make sure the amount refunded to atrium does not exceed the amount taken from atrium
- * This function will make sure the amount refunded to credit does not exceed the amount taken from credit
- * However, this function will bias refunds towards atrium if they are not complete.
- * @param accountId the account to refund to
- * @param cents a positive amount of cents to give to thi account
- * @param split the amount of sents per currency type split of a refund into. Both parameters must be > 0. 
- * @param transactionEntryId the transaction this refund is a part of
- * @returns true if transfer was successful
- * @returns RefundTooBig if the requested amount of refund exceeds the amount we are willing to give (the amount we have already taken)
- * @returns InvalidSign if atrium or credit values of split are negative or if cents is negative.
- * @returns NoAccount if no user with that account id can be found
+ * Refunds a group of charges associated with a transaction
+ * This is used to update a transaction to a new price. Worklflow looks like
+ * Reverse Old Charges -> Calculate New Total -> Charge New total 
+ * In order to handle tigerbuck account types correctly
+ * @param group the description of the group of charges
+ * @param transaction the parent transaction of this operation
+ * @param thisEntryId the transaction entry id that this operation should be associated with
+ * @returns true if everything worked correctly
+ * @returns false if there was nothing to refund
+ * @returns Error if something went fundementally wrong while processing
  */
-export async function refundAccountSplitting(accountId: number, cents: number, source: CurrencySource, split: { atrium: number, credit: number }, description: string, transactionEntryId: number): Promise<boolean | MakeMoneyError> {
-  if (split.atrium < 0 || split.credit < 0) {
-    return MakeMoneyError.InvalidSign;
+export async function refundChargeGroup(group: {
+  transactionEntryId: number,
+  atrium?: {
+    amount: number, txid: number, currencyLedgerId: number
+  },
+  credit?: {
+    amount: number, currencyLedgerId: number
   }
-  if (cents < 0) {
-    return MakeMoneyError.InvalidSign;
+}, transaction: TransactionRow, thisEntryId: number): Promise<boolean | MakeMoneyError> {
+  if (group.atrium === undefined && group.credit === undefined) {
+    // no work to do
+    return false;
   }
-  const user = await getUserByAccountID(accountId);
-  if (user === undefined) {
-    return MakeMoneyError.NoAccount;
-  }
+  console.log("Currency: Refunding group: ", group);
+  let atriumGood = (group.atrium ? false : true); // automatically good if not applicable
+  let creditGood = (group.credit ? false : true); // automatically good if not applicable
 
-  const availToRefund = split.atrium + split.credit;
-  if (cents > availToRefund) {
-    return MakeMoneyError.RefundTooLarge;
-  }
-
-
-  let toAtrium = split.atrium;
-  if (toAtrium > cents) {
-    toAtrium = cents;
-  }
-  if (!USE_ATRIUM_FOR_CURRENCY) {
-    toAtrium = 0;
-  }
-  if (toAtrium > 0) {
-    const res = await Atrium.adjustBalanceIfPossible(source, user.ritUsername, accountId, toAtrium, description, transactionEntryId)
-    // handle errors here, if fine, continue to credit side 
-    if ('success' in res && res.success == false) {
-      return false;
-    } else if (!('success' in res)){
-      console.error("Currency: Couldn't refund to atrium due to error", res);
-      return MakeMoneyError.SomethingElse
+  if (group.atrium) {
+    const atriumRes = await Atrium.reverseCharge(transaction.origin, group.atrium?.currencyLedgerId, thisEntryId);
+    if ('success' in atriumRes && 'atxid' in atriumRes && 'refid' in atriumRes) {
+      if (atriumRes.success) {
+        // all correct
+        atriumGood = true;
+      } else {
+        console.error(`Currency: Reverse latest atrium update declined. transaction ${transaction.id} for ${transaction.origin}. Will need manual rectification`, atriumRes);
+      }
+    } else {
+      console.error(`Currency: Could not reverse latest atrium update to transaction ${transaction.id} for ${transaction.origin}. Will need manual rectification`)
     }
   }
-
-  let toCredit = cents - toAtrium;
-  if (toCredit > split.credit) {
-    console.warn(`Currency: At some point keeping track of currency failed. Trying to refund ${toCredit} but only ${split.credit} available`);
-    toCredit = split.credit;
-  }
-  if (toCredit != 0) {
-    try {
-      const creditRes = await CurrencyAccountRepo.adjustAccountBalanceCents(accountId, toCredit, source, description, transactionEntryId);
-      return creditRes;
-    } catch {
-      return MakeMoneyError.NoAccount;
+  if (group.credit) {
+    const originalLedger = await getCurrencyLedgerEntry(group.credit.currencyLedgerId);
+    if (originalLedger) {
+      const creditRes = await refundCreditAccount(transaction.accountID, -group.credit.amount, transaction.origin, ('Reversing for possible new charge: ' + originalLedger.description), thisEntryId);
+      if (typeof (creditRes) == "string") {
+        console.error(`Currency: Could not reverse latest credit update to transaction ${transaction.id} for ${transaction.origin}. Will need manual rectification`)
+      } else {
+        creditGood = creditRes;
+      }
+    } else {
+      console.error(`Currency: Cannot find original currency ledger for reversal? Indicitave of a larger problem for transaction ID ${transaction.id}`)
     }
   }
-
-  // case where it all went to atrium
-  return true;
+  return creditGood && atriumGood;
 }
