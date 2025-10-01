@@ -90,13 +90,20 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
         // update amount to charge based on how much was already refunded/spent
         centsToCharge = amountAlreadyCharged + centsToCharge;
     }
-
+    if (centsToCharge > 0){
+        console.error(`Currency: Illegal attempt to refund more than spent: tid:${transactionID}, tried to adjust ${centsToCharge} with reason ${reason}`)
+        return false;
+    }
     // charge new amount
+    console.log("Chargin fr fr", centsToCharge);
     const chargeResult = await Currency.chargeAccount(parent.accountID, -centsToCharge, parent.origin, reason, entryId);
     if (typeof (chargeResult) == 'string') {
         // was an error
         console.error(`Currency: Could not charge account tid: ${parent.id}, teid: ${entryId}, err: ${chargeResult} `);
         return chargeResult;
+    }
+    if (!chargeResult){
+        return false;
     }
 
     await TransactionRepo.removeOutstandingChargeOnTransactionIfAvailable(transactionID);
