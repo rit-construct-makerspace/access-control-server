@@ -36,7 +36,7 @@ export async function getRooms(): Promise<Room[]> {
  * @returns {Room[]} rooms
  */
 export async function getRoomsByMakerspace(makerspaceID: number): Promise<Room[]> {
-  const knexResult = await knex("Rooms").select().where("makerspaceID", makerspaceID);
+  const knexResult = await knex("Rooms").select().where({ makerspaceID: makerspaceID });
   return roomsToDomain(knexResult);
 }
 
@@ -51,6 +51,7 @@ export async function addRoom(room: Room): Promise<Room> {
       {
         name: room.name,
         makerspaceID: room.makerspaceID,
+        archived: false,
       },
       "id"
     )

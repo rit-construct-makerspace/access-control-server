@@ -10,7 +10,6 @@ import SearchBar from "../../common/SearchBar";
 import StaffBar from "./StaffBar";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import { useIsMobile } from "../../common/IsMobileProvider";
 import { isManagerFor, isStaffFor } from "../../common/PrivilegeUtils";
 import { ModuleStatus, moduleStatusMapper } from "../../common/TrainingModuleUtils";
@@ -37,50 +36,21 @@ export default function MakerspacePage() {
       render={(data) => {
         const fullSpace: FullMakerspace = data.makerspaceByID;
 
-        const unarchivedRooms = fullSpace.rooms.filter((room) => !room.archived);
-
         const makerspaceTrainings = fullSpace.trainingModules.map(
           moduleStatusMapper(user.passedModules, user.trainingHolds)
         );
 
         return (
           <Stack spacing={"2"} padding={"0 20px 20px"} divider={<Divider orientation="horizontal" flexItem />}>
+            <title>{`${fullSpace.name} | Make @ RIT`}</title>
             <StaffBar />
-            <Stack direction="row" justifyContent="center" alignItems="center" spacing={2} width="auto">
-              <title>{`${fullSpace.name} | Make @ RIT`}</title>
-              <Typography variant="h3" align="center">
-                {fullSpace.name}
-              </Typography>
-              {isManagerFor(user, Number(makerspaceID)) ? (
-                <IconButton
-                  onClick={() => {
-                    navigate(`/makerspace/${makerspaceID}/edit`);
-                  }}
-                  sx={{ color: "gray" }}
-                >
-                  <EditIcon />
-                </IconButton>
-              ) : null}
-            </Stack>
-            <MakerspaceHoursSection hours={fullSpace.hours} isMobile={isMobile} />
-            {makerspaceTrainings.length > 0 && (
-              <Stack direction={"column"} alignItems={"center"} padding={"10px 0"} spacing={1}>
-                <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems={"center"}>
-                  <Typography variant="h6">Makerspace Trainings</Typography>
-                  {makerspaceTrainings.some((ms) => ms.status !== "Passed" && ms.status !== "Expiring Soon") ? (
-                    <Alert severity="error">
-                      You must pass the makerspace trainings before you can use equipment in the makerspace!
-                    </Alert>
-                  ) : null}
-                </Stack>
-                <Stack direction={isMobile ? "column" : "row"} spacing={1} alignItems={"center"}>
-                  {makerspaceTrainings.map((ms: ModuleStatus) => (
-                    <ModuleStatusRow ms={ms} />
-                  ))}
-                </Stack>
-              </Stack>
-            )}
-            <Stack padding={"10px"} direction="row" spacing={2}>
+            {ExpandableHeader({ makerspace: fullSpace, makerspaceTrainings })}
+            <Stack
+              padding={"10px"}
+              direction="row"
+              justifyContent={isMobile ? "space-between" : "flex-start"}
+              spacing={2}
+            >
               <SearchBar
                 placeholder="Search Equipment"
                 value={equipmentSearch}
@@ -105,7 +75,7 @@ export default function MakerspacePage() {
                 </Stack>
               )}
             </Stack>
-            {unarchivedRooms.map((room: Room) => (
+            {fullSpace.rooms.map((room: Room) => (
               <RoomSection
                 room={room}
                 equipmentSearch={equipmentSearch}
