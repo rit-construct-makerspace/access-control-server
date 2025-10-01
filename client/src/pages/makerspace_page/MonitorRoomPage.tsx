@@ -138,7 +138,10 @@ export default function ManageRoomPage() {
         await deleteRoom({ variables: { id: roomID } });
         navigate(`/makerspace/${makerspaceID}/edit`);
       } catch (error: any) {
-        toast.error(`Failed to delete room. Make sure all equipment is deleted or unassociated with this room first.`);
+        toast.error(`Failed to delete room: ${error.message}`);
+        // TODO: Delete these console.log lines when done testing/debugging
+        console.log("error:", error);
+        console.log("message:", error.message);
       }
     }
   }
