@@ -67,13 +67,6 @@ export default function TopNav() {
           </Alert>
           : null
       }
-      { // No ID alert
-        currentUser.cardTagID == null || currentUser.cardTagID === ""
-          ? <Alert variant="filled" severity="warning" sx={{ borderRadius: 0 }}>
-            Your RIT ID has not been associated with your Makerspace account yet. Please speak to a member of staff in the makerspace to rectify this before using any makerspace equipment. Trainings and 3DPrinterOS will remain available.
-          </Alert>
-          : null
-      }
       { // Lab training Alert
         labTraining
           ? <Alert variant="filled" severity="info" onClose={handleDismissLabTraining} sx={{ borderRadius: 0 }}>
