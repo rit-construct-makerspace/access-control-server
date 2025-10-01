@@ -64,34 +64,49 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     if (parent.outstandingCharge) {
         centsToCharge += parent.outstandingCharge;
     }
-    let split = await TransactionRepo.getChargeSplitForTransactionById(transactionID);
 
     const entryId = await TransactionRepo.createTransactionUpdate(parent.id, centsToCharge, reason)
     if (entryId === undefined) {
         console.error("Currency: Failed to create transaction ID");
         return MakeMoneyError.SomethingElse;
     }
+    if (centsToCharge == 0) {
+        // don't need to do anything
+        return true;
+    }
 
-    if (centsToCharge > 0) {
-        if (split === undefined) {
-            return await Currency.refundCreditAccount(parent.accountID, centsToCharge, parent.origin, reason, entryId)
-        } else {
-            // modify split so we never refund more than we've taken
-            if (split.atrium >= 0) { split.atrium = 0 };
-            if (split.credit >= 0) { split.credit = 0 };
-            let positiveSplit = { atrium: Math.abs(split.atrium), credit: Math.abs(split.credit) }; // we want the splits positive for the amount we can use
-
-            const res = await Currency.refundAccountSplitting(parent.accountID, centsToCharge, parent.origin, positiveSplit, reason, entryId)
-            if (typeof res == "string") {
-                return res;
-            }
+    // If here, have to modify price. In order to handle refunds, refund everything, recharge
+    // get last update
+    const lastCharges = await TransactionRepo.getLastChargesForTransactionById(transactionID);
+    if (lastCharges != undefined) {
+        console.log("Have history", lastCharges);
+        const amountAlreadyCharged = (lastCharges.atrium?.amount ?? 0) + (lastCharges.credit?.amount ?? 0)
+        if (centsToCharge + -amountAlreadyCharged > 0){
+            // recharge would give the user money (something fishy)
+            console.error(`Currency: Caught fraudulent refund before refund. Not gonna refund it. Probably needs manual rectification. tid: ${transactionID} asking for ${centsToCharge}, only ever spent ${-amountAlreadyCharged}`)
+            return false;
         }
-    } else {
-        const amt = Math.abs(centsToCharge);
-        const res = await Currency.chargeAccount(parent.accountID, amt, parent.origin, reason, entryId);
-        if (typeof res == "string") {
-            return res;
+        const res = await Currency.refundChargeGroup(lastCharges, parent, entryId);
+        if (typeof (res) == 'string') {
+            console.error(`Currency: Error occured while trying to refund to recharge. tid: ${parent.id}, teid: ${entryId}, err: ${res}`);
+            return res
         }
+        // update amount to charge based on how much was already refunded/spent
+        centsToCharge = amountAlreadyCharged + centsToCharge;
+    }
+    if (centsToCharge > 0){
+        console.error(`Currency: Illegal attempt to refund more than spent: tid:${transactionID}, tried to adjust ${centsToCharge} with reason ${reason}`)
+        return false;
+    }
+    // charge new amount
+    const chargeResult = await Currency.chargeAccount(parent.accountID, -centsToCharge, parent.origin, reason, entryId);
+    if (typeof (chargeResult) == 'string') {
+        // was an error
+        console.error(`Currency: Could not charge account tid: ${parent.id}, teid: ${entryId}, err: ${chargeResult} `);
+        return chargeResult;
+    }
+    if (!chargeResult){
+        return false;
     }
 
     await TransactionRepo.removeOutstandingChargeOnTransactionIfAvailable(transactionID);
