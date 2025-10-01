@@ -106,9 +106,8 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
   if ((await getAccountIDByUsername(username)) === undefined){
     xmlrpcRespond(res, [0]);
     return;
-  } else {
-    console.log("ASDSADSADSADSA");
   }
+  
   try {
     const result = await Currency.getAccountBalance(username);
     if (typeof result === "number") { // number result
