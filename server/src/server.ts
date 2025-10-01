@@ -561,8 +561,8 @@ async function startServer() {
     );
     const res = await getAccountBalance("jehshed");
     console.log("res", res);
-    const res2 = await getLastChargesForTransactionById(4120);
-    console.log("Res2", res2);
+    // const res2 = await getLastChargesForTransactionById(4120);
+    // console.log("Res2", res2);
   }
   );
 

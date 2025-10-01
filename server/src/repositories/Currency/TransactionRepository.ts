@@ -1,6 +1,7 @@
 import { knex } from "../../db/index.js";
 import { CurrencyLedgerRow, TransactionEntryRow, TransactionRow } from "../../db/tables.js";
 import { CurrencySource, CurrencyType } from "../../integrations/currency/types.js";
+import { createLog } from "../AuditLogs/AuditLogRepository.js";
 
 /**
  * Create the parent element of a transaction
@@ -82,28 +83,56 @@ export async function getCurrencyLedgerEntriesForTransactionEntryByEntryId(id: n
  * @returns a description of the last modification
  */
 export async function getLastChargesForTransactionById(transactionId: number): Promise<{ transactionEntryId: number, atrium?: { amount: number, txid: number, currencyLedgerId: number }, credit?: { amount: number, currencyLedgerId: number } } | undefined> {
+
     type Row = {
         transactionEntryId: number,
-        clID: number | null,
+        CLID: number,
         currencyType: CurrencyType,
         amount: number,
         atriumRefID: number | null,
         atriumTxId: number | null,
     };
     const rows = await knex("TransactionEntries as te")
-        .select(`te.id as "transactionEntryId"`,
-            `cl.id as "atriumCLID`,
-            `cl.amount as "atriumAmount`,
-            `cl.refID as "atriumRefId"`,
-            `cl.atxID as "atriumTxId`,
+        .select(`te.id as transactionEntryId`,
+            `cl.id as CLID`,
+            `cl.currencyType as currencyType`,
+            `cl.amount as amount`,
+            `cl.refID as atriumRefId`,
+            `cl.atxID as atriumTxId`,
         )
         .leftJoin("CurrencyLedger as cl", "cl.transactionEntryId", "te.id")
-        .where("te.transactionId", "=", transactionId)
+        .where("te.transactionID", "=", transactionId)
         .orderBy("te.dateTime", "desc").debug(true) as Row[];
-        const justCharges = rows.filter(r => r.amount < 0); // we don't want the last refund
-    console.log("rows", rows);
-    console.log("justCharges", justCharges);
-    return undefined;
+
+    const rowsNotIncludingEmptyEntries = rows.filter(r => r.CLID !== null);
+    if (rowsNotIncludingEmptyEntries.length == 0) {
+        // dont even have the transaction entry (weird and bad)
+        return undefined;
+    }
+    console.log("Rows", rowsNotIncludingEmptyEntries);
+ 
+    const entryIdWeCareAbout = rowsNotIncludingEmptyEntries[0].transactionEntryId;
+    const justLastCharges = rowsNotIncludingEmptyEntries.filter(r => r.amount < 0 && r.transactionEntryId == entryIdWeCareAbout); // we don't want the last refund
+    console.log("justLst", justLastCharges);
+    if (justLastCharges.length > 2) {
+        // something has gone terribly wrong, we somehow charged 3 times with 2 currencies
+        await createLog(`Strange Currency Bug That You Will Have To Fix Manually. Could not find history for transaction ID: ${transactionId}`, "currency")
+        return undefined;
+    }
+    let atrium: { amount: number, txid: number, currencyLedgerId: number } | undefined = undefined;
+    let credit: { amount: number, currencyLedgerId: number } | undefined = undefined;
+    for (const cl of justLastCharges) {
+        if (cl.currencyType == CurrencyType.Atrium) {
+            if (cl.atriumTxId == null) {
+                console.error("Currency: Failed to find atrium transaction ID for atrium charge.")
+            } else {
+                atrium = { amount: cl.amount, currencyLedgerId: cl.CLID, txid: cl.atriumTxId }
+            }
+        } else if (cl.currencyType == CurrencyType.Credit) {
+            credit = { amount: cl.amount, currencyLedgerId: cl.CLID };
+        }
+    }
+    return { transactionEntryId: entryIdWeCareAbout, atrium, credit };
 }
 
 /**

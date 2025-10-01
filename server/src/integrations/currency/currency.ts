@@ -1,10 +1,8 @@
 import * as Atrium from "../atrium-integration/atrium.js"
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js"
 import { CurrencySource, MakeMoneyError } from "./types.js";
-import { getUserByAccountID } from "../../repositories/Users/UserRepository.js";
-import { getTransactionById } from "../../repositories/Currency/TransactionRepository.js";
 import { TransactionRow } from "../../db/tables.js";
-import { getCurrencyLedgerEntries, getCurrencyLedgerEntry } from "../../repositories/Currency/CurrencyLedgerRepository.js";
+import { getCurrencyLedgerEntry } from "../../repositories/Currency/CurrencyLedgerRepository.js";
 
 const USE_ATRIUM_FOR_CURRENCY = process.env.ATRIUM_ENABLED == "true";
 
@@ -42,7 +40,8 @@ export async function getAccountBalance(username: string): Promise<number | Make
 
 
 export function centsToDollarString(cents: number) {
-  if (cents == -0) {
+  if (cents == 0) {
+    // check for signed zero just in case (-0 equals 0 but may print with the - sign)
     cents = 0;
   }
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
@@ -121,6 +120,8 @@ export async function refundCreditAccount(accountId: number, cents: number, sour
  * Reverse Old Charges -> Calculate New Total -> Charge New total 
  * In order to handle tigerbuck account types correctly
  * @param group the description of the group of charges
+ * @param transaction the parent transaction of this operation
+ * @param thisEntryId the transaction entry id that this operation should be associated with
  * @returns true if everything worked correctly
  * @returns false if there was nothing to refund
  * @returns Error if something went fundementally wrong while processing
@@ -133,20 +134,36 @@ export async function refundChargeGroup(group: {
   credit?: {
     amount: number, currencyLedgerId: number
   }
-}, transaction: TransactionRow): Promise<boolean | MakeMoneyError> {
+}, transaction: TransactionRow, thisEntryId: number): Promise<boolean | MakeMoneyError> {
   if (group.atrium === undefined && group.credit === undefined) {
     // no work to do
     return false;
   }
+  console.log("refunding", group);
+  let atriumGood = (group.atrium ? false : true); // automatically good if not applicable
+  let creditGood = (group.credit ? false : true); // automatically good if not applicable
+
   if (group.atrium) {
-    const atriumRes = await Atrium.reverseCharge(transaction.origin, group.atrium?.currencyLedgerId);
-    if (atriumRes.type)
-  }
-  if (group.credit) {
-    const originalLedger = getCurrencyLedgerEntry(group.credit.currencyLedgerId);
-    if (originalLedger) {
-      const creditRes = refundCreditAccount(transaction.accountID, group.credit.amount, transaction.origin,))
+    const atriumRes = await Atrium.reverseCharge(transaction.origin, group.atrium?.currencyLedgerId, thisEntryId);
+    if ('success' in atriumRes && 'atxid' in atriumRes && 'refid' in atriumRes) {
+      // all correct
+      atriumGood = true;
+    } else {
+      console.error(`Currency: Could not reverse latest atrium update to transaction ${transaction.id} for ${transaction.origin}. Will need manual rectification`)
     }
   }
-  return MakeMoneyError.Unimplemented;
+  if (group.credit) {
+    const originalLedger = await getCurrencyLedgerEntry(group.credit.currencyLedgerId);
+    if (originalLedger) {
+      const creditRes = await refundCreditAccount(transaction.accountID, group.credit.amount, transaction.origin, ('Reversal for: ' + originalLedger.description), thisEntryId);
+      if (typeof (creditRes) == "string") {
+        console.error(`Currency: Could not reverse latest credit update to transaction ${transaction.id} for ${transaction.origin}. Will need manual rectification`)
+      } else {
+        creditGood = creditRes;
+      }
+    } else {
+      console.error(`Currency: Cannot find original currency ledger for reversal? Indicitave of a larger problem for transaction ID ${transaction.id}`)
+    }
+  }
+  return creditGood && atriumGood;
 }

@@ -7,7 +7,6 @@ import { CurrencySource, MakeMoneyError } from "./types.js"
 import * as TransactionRepo from "../../repositories/Currency/TransactionRepository.js"
 import * as Currency from "./currency.js"
 import { send_transaction_email } from "../email/email.js";
-import { reverseCharge } from "../atrium-integration/atrium.js";
 
 /**
  * Check if a charge qualifies for the outstanding charge exception
@@ -78,22 +77,22 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
 
     // If here, have to modify price. In order to handle refunds, refund everything, recharge
     // get last update
-    const split = await TransactionRepo.getLastChargesForTransactionById(transactionID);
-    if (split == undefined) {
-        console.error(`Currency: COULDNT FIND SPLIT FOR TRANSACTION ID ${transactionID}. Call your local service person`);
-        return MakeMoneyError.NoHistoryForTransaction;
-    }
-    const amountAlreadyCharged = (split.atrium?.amount ?? 0) + (split.credit?.amount ?? 0)
+    const lastCharges = await TransactionRepo.getLastChargesForTransactionById(transactionID);
+    if (lastCharges != undefined) {
+        console.log("Have history", lastCharges);
+        const amountAlreadyCharged = (lastCharges.atrium?.amount ?? 0) + (lastCharges.credit?.amount ?? 0)
 
-    const res = await Currency.refundChargeGroup(split, parent);
-    if (typeof(res) == 'string') {
-        console.error(`Currency: Error occured while trying to refund to recharge. tid: ${parent.id}, teid: ${entryId}, err: ${res}`);
-        return res
+        const res = await Currency.refundChargeGroup(lastCharges, parent, entryId);
+        if (typeof (res) == 'string') {
+            console.error(`Currency: Error occured while trying to refund to recharge. tid: ${parent.id}, teid: ${entryId}, err: ${res}`);
+            return res
+        }
+        // update amount to charge based on how much was already refunded/spent
+        centsToCharge = amountAlreadyCharged + centsToCharge;
     }
 
-    const fullAmount = amountAlreadyCharged + centsToCharge;
     // charge new amount
-    const chargeResult = await Currency.chargeAccount(parent.accountID, fullAmount, parent.origin, reason, entryId);
+    const chargeResult = await Currency.chargeAccount(parent.accountID, -centsToCharge, parent.origin, reason, entryId);
     if (typeof (chargeResult) == 'string') {
         // was an error
         console.error(`Currency: Could not charge account tid: ${parent.id}, teid: ${entryId}, err: ${chargeResult} `);

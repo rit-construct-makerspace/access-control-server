@@ -38,7 +38,7 @@ function structToTS(obj: object): XMLRPCStruct | undefined {
     return undefined;
   }
   const members: { name: string[], value: any[] }[] = obj.member as { name: string[], value: any[] }[];
-  var struct: { [key: string]: XMLRPCValue } = {};
+  const struct: { [key: string]: XMLRPCValue } = {};
   members.forEach((o: { name: string[], value: any[] }) => {
     struct[o.name[0]] = valueToTS(o.value[0]);
   });
@@ -236,7 +236,7 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
   const username = params[0];
   const adjustment = params[1];
   const comment = params[2];
-  var accountname = undefined;
+  let accountname = undefined;
 
   if (typeof username !== "string" || typeof adjustment !== "number" || typeof comment !== "string") {
     xmlrpcRespondFault(res, 2, `incorrect types for adjustUserAccountBalanceIfAvailable takes (string, double, string, string)`);
@@ -258,6 +258,7 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
   // Blindly accecpt changes of $0 (won't even be recorded)
   if (adjustment == 0){
     xmlrpcRespond(res, [true]);
+    return;
   }
 
   try {
@@ -270,12 +271,15 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
     const result = await process3dPrintTransaction(username, amountCents, transaction);
     if (typeof result === "string") {
       xmlrpcRespondFault(res, 500, result);
+      return;
     } else {
       xmlrpcRespond(res, [result]);
+      return;
     }
   } catch (e) {
     console.error(e)
     xmlrpcRespondFault(res, 404, `could not adjust balance for user '${username}': ${e}`)
+    return;
   }
 }
 
@@ -369,7 +373,7 @@ export function registerEndpoints(app: express.Application) {
     console.error("PAPERCUT: Free 3D Printing is turned on");
     createLog("Free 3D Printing is enabled", "server");
   }
-  var handlers: Map<string, Function> = new Map();
+  const handlers: Map<string, Function> = new Map();
   handlers.set("api.getUserAccountBalance", papercut_getUserAccountBalance);
   handlers.set("api.adjustUserAccountBalanceIfAvailable", papercut_adjustUserAccountBalanceIfAvailable);
 
