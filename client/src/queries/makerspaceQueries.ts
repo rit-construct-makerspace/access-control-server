@@ -19,8 +19,6 @@ export interface MakerspaceWithHours {
   name: string;
   subtitle: string | null;
   location: string | null;
-  description: string;
-  docsLink: string;
   hours: MakerspaceHours[];
   imageUrl: string;
 }
@@ -30,8 +28,6 @@ export interface FullMakerspace {
   name: string;
   subtitle: string | null;
   location: string | null;
-  description: string;
-  docsLink: string;
   hours: MakerspaceHours[];
   rooms: Room[];
   imageUrl: string;
@@ -43,21 +39,17 @@ export interface MakerspaceWithItems {
   name: string;
   subtitle: string | null;
   location: string | null;
-  description: string;
-  docsLink: string;
   items: InventoryItem[];
 }
 
 export const GET_MAKERSPACES_WITH_HOURS = gql`
- query GetMakerspacesWithHours {
-  makerspaces {
-    id
-    name
-    subtitle
-    location
-    description
-    docsLink
-    hours {
+  query GetMakerspacesWithHours {
+    makerspaces {
+      id
+      name
+      subtitle
+      location
+      hours {
         day
         makerspaceID
         open
@@ -76,8 +68,6 @@ export const GET_FULL_MAKERSPACES = gql`
       name
       subtitle
       location
-      description
-      docsLink
       hours {
         day
         makerspaceID
@@ -109,16 +99,8 @@ export const GET_FULL_MAKERSPACES = gql`
 `;
 
 export const GET_MAKERSPACES_WITH_ITEMS = gql`
- query GetMakerspacesWithItems($storefrontVisible: Boolean) {
-  makerspaces(storefrontVisible: $storefrontVisible) {
-    id
-    name
-    name
-    subtitle
-    location
-    description
-    docsLink
-    items {
+  query GetMakerspacesWithItems($storefrontVisible: Boolean) {
+    makerspaces(storefrontVisible: $storefrontVisible) {
       id
       name
       name
@@ -160,8 +142,6 @@ export const GET_MAKERSPACE_BY_ID = gql`
       name
       subtitle
       location
-      description
-      docsLink
       hours {
         day
         makerspaceID
@@ -203,18 +183,10 @@ export const GET_MAKERSPACE_BY_ID = gql`
 `;
 
 export const UPDATE_MAKERSPACE = gql`
-  mutation UpdateMakerspace(
-    $id: ID!
-    $name: String!
-    $subtitle: String
-    $location: String
-    $description: String
-    $docsLink: String
-    $imageUrl: String
-  ) {
+  mutation UpdateMakerspace($id: ID!, $name: String!, $subtitle: String, $location: String, $imageUrl: String) {
     updateMakerspace(
       id: $id
-      newMakerspace: { name: $name, subtitle: $subtitle, location: $location, description: $description, docsLink: $docsLink, imageUrl: $imageUrl }
+      newMakerspace: { name: $name, subtitle: $subtitle, location: $location, imageUrl: $imageUrl }
     ) {
       id
     }

@@ -1,4 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
+import PrettyModal from "../../../common/PrettyModal";
 import { Alert, Avatar, Box, Button, Card, Chip, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import InfoBlob from "./InfoBlob";
@@ -14,7 +15,7 @@ import AccessCheckCard from "./AccessCheckCard";
 import ActionButton from "../../../common/ActionButton";
 import { GET_ALL_EQUIPMENTS } from "../../../queries/equipmentQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import { stringAvatar } from "../../../common/avatarGenerator";
 import { isManager, isStaff, isStaffFor, isTrainerFor } from "../../../common/PrivilegeUtils";
 import RestrictionCard from "./RestrictionCard";
@@ -24,9 +25,57 @@ import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ManageUserArchive from "./ManageUserArchive";
-import { AccessCheckExtraInfo, GET_USER, Hold, Restriction } from "../../../queries/userQueries";
-import NavLink from "../../../top_nav/NavLink";
+import { GET_USER } from "../../../queries/userQueries";
 
+export interface Hold {
+  id: string;
+  description: string;
+  creator: {
+    firstName: string;
+    lastName: string;
+  };
+  remover?: {
+    firstName: string;
+    lastName: string;
+  };
+  createDate: string;
+  removeDate?: string;
+}
+
+export interface Restriction {
+  id: number;
+  reason: string;
+  creator: {
+    firstName: string;
+    lastName: string;
+  };
+  makerspace: {
+    id: number;
+    name: string;
+  };
+  createDate: string;
+}
+
+export interface AccessCheck {
+  id: string;
+  equipmentID: string;
+  approved: boolean;
+}
+
+export interface AccessCheckExtraInfo {
+  id: number;
+  approved: boolean;
+  equipment: {
+    id: number;
+    name: string;
+    requiresTrainerApproval: boolean;
+    room: {
+      makerspace: {
+        id: number;
+      }
+    }
+  }
+}
 
 const CREATE_HOLD = gql`
   mutation CreateHold($userID: ID!, $description: String!) {
@@ -76,8 +125,13 @@ const DELETE_PASSED_MODULE = gql`
   }
 `;
 
-export default function UserPage() {
-  const { makerspaceID, userID} = useParams<{ makerspaceID: string, userID: string }>();
+interface UserModalProps {
+  selectedUserID: string;
+  onClose: () => void;
+}
+
+export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
@@ -92,15 +146,15 @@ export default function UserPage() {
   const [createHold] = useMutation(CREATE_HOLD);
   const [createRestriction] = useMutation(CREATE_RESTRICTION);
   const [setNotesMutation, setNotesResult] = useMutation(SET_NOTES);
-  const [refreshCheck, refreshCheckResult] = useMutation(REFRESH_CHECKS, { variables: { userID: userID }, refetchQueries: [{ query: GET_USER, variables: { id: userID } }] });
-  const [createCheck] = useMutation(CREATE_CHECK, { refetchQueries: [{ query: GET_USER, variables: { id: userID } }] });
-  const [deleteTrainingHold] = useMutation(DELETE_TRAINING_HOLD, { refetchQueries: [{ query: GET_USER, variables: { id: userID } }] });
-  const [deletePassedModule] = useMutation(DELETE_PASSED_MODULE, { refetchQueries: [{ query: GET_USER, variables: { id: userID } }] });
+  const [refreshCheck, refreshCheckResult] = useMutation(REFRESH_CHECKS, { variables: { userID: selectedUserID }, refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
+  const [createCheck] = useMutation(CREATE_CHECK, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
+  const [deleteTrainingHold] = useMutation(DELETE_TRAINING_HOLD, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
+  const [deletePassedModule] = useMutation(DELETE_PASSED_MODULE, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
   const getMakerspacesResult = useQuery(GET_FULL_MAKERSPACES);
 
   useEffect(() => {
-    if (userID) getUser({ variables: { id: userID } });
-  }, [userID, getUser]);
+    if (selectedUserID) getUser({ variables: { id: selectedUserID } });
+  }, [selectedUserID, getUser]);
 
   const handlePlaceHoldClicked = () => {
     const description = window.prompt("Enter hold description:");
@@ -114,7 +168,7 @@ export default function UserPage() {
 
     createHold({
       variables: { userID: getUserResult.data.user.id, description },
-      refetchQueries: [{ query: GET_USER, variables: { id: userID } }],
+      refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }],
     });
   };
 
@@ -134,7 +188,7 @@ export default function UserPage() {
 
     createRestriction({
       variables: { userID: getUserResult.data.user.id, makerspaceID: restrictionMakerspace, reason: reason },
-      refetchQueries: [{ query: GET_USER, variables: { id: userID } }]
+      refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }]
     });
   }
 
@@ -144,7 +198,7 @@ export default function UserPage() {
 
   function handleCheckCreate() {
     if (!newCheckEquipmentID) return;
-    createCheck({ variables: { userID: userID, equipmentID: newCheckEquipmentID } });
+    createCheck({ variables: { userID: selectedUserID, equipmentID: newCheckEquipmentID } });
     setOpenCreateCheckDialouge(false);
   }
 
@@ -153,7 +207,7 @@ export default function UserPage() {
   };
 
   return (
-    <Box margin="10px 25px">
+    <PrettyModal open={!!selectedUserID} onClose={onClose} width={isMobile ? 300 : 1600}>
       <RequestWrapper2
         result={getUserResult}
         render={({ user }) => {
@@ -184,14 +238,9 @@ export default function UserPage() {
                     <Typography>{user.pronouns}</Typography>
                   </Stack>
                 </Stack>
-                <IconButton onClick={() =>navigate(`/makerspace/${makerspaceID}/people`)} sx={{ width: "51px", height: "51px", p: 0, fontSize: 14  }} >
-                  <ArrowBackIcon sx = {{fontSize: 18}}/> Back
+                <IconButton color="error" onClick={onClose} sx={{ width: "34px", height: "34px" }}>
+                  <CloseIcon />
                 </IconButton>
-                {/* <NavLink
-                  primary={"All People"}
-                  to={`/makerspace/${makerspaceID}/people`}
-                  icon={<ArrowBackIcon />}
-                /> */}
               </Stack>
 
               <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? undefined : "space-between"} mt={4}>
@@ -271,7 +320,7 @@ export default function UserPage() {
                               <IconButton
                                 color="error"
                                 disabled={!isStaffFor(currentUser, module.moduleID ?? -1)}
-                                onClick={() => deletePassedModule({ variables: { userID: userID, moduleID: module.moduleID } })}
+                                onClick={() => deletePassedModule({ variables: { userID: selectedUserID, moduleID: module.moduleID } })}
                               >
                                 <DeleteIcon />
                               </IconButton>
@@ -405,14 +454,14 @@ export default function UserPage() {
                     placeholder="Notes"
                     value={notes}
                     onChange={handleNotesChanged}
-                    onSubmit={() => setNotesMutation({ variables: { userID: userID, notes: notes } })}
+                    onSubmit={() => setNotesMutation({ variables: { userID: selectedUserID, notes: notes } })}
                     multiline
                     minRows={2}
                   />
                   <Button
                     variant="contained"
                     loading={setNotesResult.loading}
-                    onClick={() => setNotesMutation({ variables: { userID: userID, notes: notes } })}
+                    onClick={() => setNotesMutation({ variables: { userID: selectedUserID, notes: notes } })}
                     sx={{ alignSelf: "flex-end" }}
                   >
                     Update Notes
@@ -423,6 +472,6 @@ export default function UserPage() {
           );
         }}
       />
-    </Box>
+    </PrettyModal >
   );
 }

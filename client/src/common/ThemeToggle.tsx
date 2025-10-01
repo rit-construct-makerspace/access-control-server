@@ -2,11 +2,14 @@ import { useState } from "react";
 import { Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
-import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
+import CookieIcon from '@mui/icons-material/Cookie';
 import { ThemeController } from "../Theme";
+import { useCurrentUser } from "../common/CurrentUserProvider";
 
 
 export default function ThemeToggle() {
+  const currentUser = useCurrentUser();
+
   const [curTheme, setCurTheme] = useState(ThemeController.activeTheme.getThemeString());
 
   ThemeController.addStringWatcher(setCurTheme);
@@ -35,12 +38,15 @@ export default function ThemeToggle() {
           <Typography>Dark</Typography>
         </Stack>
       </ToggleButton>
-      <ToggleButton value={"italian_restaurant"}>
-        <Stack direction={"row"} spacing={1}>
-          <DinnerDiningIcon />
-          <Typography>Unlimited Breadsticks</Typography>
-        </Stack>
-      </ToggleButton>
+      {
+        currentUser.admin &&
+        <ToggleButton value={"italian_restaurant"}>
+          <Stack direction={"row"} spacing={1}>
+            <CookieIcon />
+            <Typography>Italian Restaurant</Typography>
+          </Stack>
+        </ToggleButton>
+      }
     </ToggleButtonGroup>
   );
 }

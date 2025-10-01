@@ -76,8 +76,7 @@ async function startServer() {
   setupSessions(app);
 
 
-  // Force redirect to https in production (actually dont yet)
-  /*
+  // Force redirect to https in production
   if (process.env.NODE_ENV === 'production') {
     app.use(function (req, res, next) {
       if (req.headers['x-forwarded-proto'] !== 'https') {
@@ -86,7 +85,6 @@ async function startServer() {
       return next();
     });
   }
-  */
 
   // environment setup
   if (process.env.NODE_ENV === "development") {
@@ -144,6 +142,9 @@ async function startServer() {
     //In staging/prod, /login will then redirect to the IdP
     res.redirect("/login");
   });
+
+
+
 
   //redirects  make.rit.edu/app/home(may be in peoples browsers history from old redirect)
   app.get("/app/home", function (req, res) {

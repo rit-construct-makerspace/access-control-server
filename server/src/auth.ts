@@ -333,7 +333,7 @@ export function setupSamlAuth(app: express.Application) {
       //wantAssertionsSigned: true,
       digestAlgorithm: "sha256",
 
-      // TODO production solutions
+      // TODO production solution
       acceptedClockSkewMs: 180, // "SAML assertion not yet valid" fix
     },
     (profile: any, done: any) => {

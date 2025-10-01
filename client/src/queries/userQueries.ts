@@ -10,56 +10,6 @@ export interface PartialUser {
   restrictions: any[];
 }
 
-export interface AccessCheck {
-  id: string;
-  equipmentID: string;
-  approved: boolean;
-}
-
-export interface AccessCheckExtraInfo {
-  id: number;
-  approved: boolean;
-  equipment: {
-    id: number;
-    name: string;
-    requiresTrainerApproval: boolean;
-    room: {
-      makerspace: {
-        id: number;
-      }
-    }
-  }
-}
-
-export interface Hold {
-  id: string;
-  description: string;
-  creator: {
-    firstName: string;
-    lastName: string;
-  };
-  remover?: {
-    firstName: string;
-    lastName: string;
-  };
-  createDate: string;
-  removeDate?: string;
-}
-
-export interface Restriction {
-  id: number;
-  reason: string;
-  creator: {
-    firstName: string;
-    lastName: string;
-  };
-  makerspace: {
-    id: number;
-    name: string;
-  };
-  createDate: string;
-}
-
 const GET_USERS = gql`
   query GetUsers($searchText: String) {
     users(searchText: $searchText) {

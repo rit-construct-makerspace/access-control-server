@@ -4,7 +4,7 @@ import MakerspaceCard from "../both/homepage/MakerspaceCard";
 import { useIsMobile } from "../../common/IsMobileProvider";
 import MakerspaceHours from "../../types/MakerspaceHours";
 import SaveIcon from '@mui/icons-material/Save';
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { UPDATE_MAKERSPACE } from "../../queries/makerspaceQueries";
 import { toast } from "react-toastify";
@@ -16,8 +16,6 @@ interface MakerspaceInforamtionProps {
   location: string | null;
   hours: MakerspaceHours[];
   imageUrl: string;
-  docsLink: string;
-  description: string;
 }
 
 export default function ManageMakerspaceInformation(props: MakerspaceInforamtionProps) {
@@ -29,12 +27,10 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
   const [makerspaceSubtitle, setMakerspaceSubtitle] = useState(props.subtitle ?? "");
   const [makerspaceLocation, setMakerspaceLocation] = useState(props.location ?? "");
   const [imgUrl, setImgUrl] = useState(props.imageUrl);
-  const [docsLink, setDocsLink] = useState(props.docsLink);
-  const [description, setDescription] = useState(props.description);
 
-  const handleUpdateMakerspace = useCallback(async () => {
+  const handleUpdateMakerspace = async () => {
     await updateMakerspace({
-      variables: { id: props.id, name: makerspaceName, subtitle: makerspaceSubtitle, location: makerspaceLocation, imageUrl: imgUrl, docsLink: docsLink, description: description },
+      variables: { id: props.id, name: makerspaceName, subtitle: makerspaceSubtitle, location: makerspaceLocation, imageUrl: imgUrl },
       onCompleted() {
         toast.success("Updated makerspace");
       },
@@ -42,13 +38,13 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
         toast.error(`Failed to update makerspace: ${error.message}`);
       },
     });
-  }, [updateMakerspace, props, makerspaceName, makerspaceSubtitle, makerspaceLocation, imgUrl, docsLink, description]);
+  };
 
   useEffect(() => {
     if (imgUrl !== props.imageUrl) {
       handleUpdateMakerspace();
     }
-  }, [props.imageUrl, imgUrl, handleUpdateMakerspace])
+  }, [imgUrl])
 
   return (
     <Stack spacing={3} alignItems={"center"}>
@@ -76,7 +72,7 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
           variant="contained"
           startIcon={<SaveIcon />}
           onClick={() => {
-            const changed = makerspaceName !== props.name || makerspaceLocation !== props.location || makerspaceSubtitle !== props.subtitle || docsLink !== props.docsLink || description !== props.description;
+            const changed = makerspaceName !== props.name || makerspaceLocation !== props.location || makerspaceSubtitle !== props.subtitle;
             if (changed) handleUpdateMakerspace();
           }}
         >
@@ -85,8 +81,7 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
       </Stack>
       <TextField label="Subtitle" value={makerspaceSubtitle} onChange={(e) => (setMakerspaceSubtitle(e.target.value))} sx={{ width: "90%" }} />
       <TextField label="Location" value={makerspaceLocation} onChange={(e) => (setMakerspaceLocation(e.target.value))} sx={{ width: "90%" }} />
-      <TextField label="Docs URL" value={docsLink} onChange={(e) => (setDocsLink(e.target.value))} sx={{ width: "90%" }} />
-      <TextField multiline label="Description (Supports Markdown)" value={description} onChange={(e) => (setDescription(e.target.value))} sx={{ width: "90%" }} />
+
     </Stack>
   );
 }

@@ -88,7 +88,7 @@ class ItalianRestaurant implements MakeTheme {
         contrastText: "#FFFFFF",
       },
       secondary: {
-        main: "#532943",
+        main: "#7D55C7",
         contrastText: "#FFFFFF",
       },
       warning: {

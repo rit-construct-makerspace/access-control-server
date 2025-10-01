@@ -407,10 +407,6 @@ export interface MakerspaceRow {
   subtitle: string | null;
   /** Room code for the makerspace */
   location: string | null;
-  /** Longer description of makerspace */
-  description: string
-  /** Link to the documentation page for this makerspace */
-  docsLink: string;
   /** CDN Image Identifier */
   imageUrl: string;
   /** If true, this makerspace is out of use and can't be visited. It is effecively deleted  */
