@@ -22,6 +22,7 @@ export const RoomTypeDefs = gql`
   type Room {
     id: ID!
     name: String!
+    archived: Boolean!
     makerspace: Makerspace
     equipment: [Equipment]
     recentSwipes: [Swipe]
@@ -42,6 +43,7 @@ export const RoomTypeDefs = gql`
   extend type Mutation {
     addRoom(room: RoomInput): Room
     archiveRoom(roomID: ID!): Room
+    unarchiveRoom(roomID: ID!): Room
     deleteRoom(roomID: ID!): Room
 
     updateRoomName(roomID: ID!, name: String): Room
