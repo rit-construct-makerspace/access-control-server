@@ -22,21 +22,13 @@ export default function StatisticsPage() {
         <Typography variant="h4">Statistics</Typography>
         <Box>
           <Typography variant="h4">Today's Numbers</Typography>
-          <Stack direction={"row"} flexWrap={"wrap"}>
-            <RequestWrapper loading={getNumSiteVisitsTodayResult.loading} error={getNumSiteVisitsTodayResult.error}>
-              <CountCard label="Site Visits" count={getNumSiteVisitsTodayResult.data?.dailySiteVisits.value} unit="visits"></CountCard>
-            </RequestWrapper>
-            <RequestWrapper loading={getNumRoomSwipesToday.loading} error={getNumRoomSwipesToday.error}>
-              <CountCard label="Room Sign-ins" count={getNumRoomSwipesToday.data?.numRoomSwipesToday} unit="sign-ins"></CountCard>
-            </RequestWrapper>
-            <RequestWrapper loading={getNumEquipmentSessionsToday.loading} error={getNumEquipmentSessionsToday.error}>
-              <CountCard label="Equipment Uses*" count={getNumEquipmentSessionsToday.data?.numEquipmentSessionsToday} unit="activations"></CountCard>
-            </RequestWrapper>
-            <RequestWrapper loading={getNumNewUsersToday.loading} error={getNumNewUsersToday.error}>
-              <CountCard label="New users" count={getNumNewUsersToday.data?.numNewUsersToday} unit="users"></CountCard>
-            </RequestWrapper>
-          </Stack>
-          <Typography variant="body2">* Only counts ACS-connected equipment</Typography>
+          <iframe 
+          src="https://ykmrl3.stackhero-network.com/public-dashboards/ba0320862be849f0a5e863f49c312b4a"
+            width={"100%"}
+            height={"500px"}
+          >
+
+          </iframe>
         </Box>
 
         <EquipmentStats />

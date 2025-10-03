@@ -3,6 +3,7 @@ import InventoryItem from "../../../types/InventoryItem";
 import { Stack } from "@mui/system";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import { memo } from "react";
 
 interface ListingCardProps {
   item: InventoryItem
@@ -10,7 +11,7 @@ interface ListingCardProps {
   openDetailsModal: (item: InventoryItem) => void;
 }
 
-export function ListingCard(props: ListingCardProps) {
+export const ListingCard = memo(function ListingCard(props: ListingCardProps) {
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
 
@@ -51,4 +52,5 @@ export function ListingCard(props: ListingCardProps) {
       </CardActions>
     </Card>
   );
-}
+});
+
