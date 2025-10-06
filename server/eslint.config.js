@@ -5,8 +5,10 @@ export default tseslint.config(
 	eslint.configs.recommended,
 	tseslint.configs.recommended,
 	{
-		parserOptions: {
-			project: "./tsconfig.json"
+		languageOptions: {
+			parserOptions: {
+				project: "./tsconfig.json"
+			}
 		},
 		ignores: ["dist"],
 		rules: {

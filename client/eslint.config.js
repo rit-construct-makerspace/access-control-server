@@ -8,14 +8,15 @@ import react from 'eslint-plugin-react'
 export default tseslint.config(
   { ignores: ['dist'] },
   {
-    parserOptions: {
-			project: "./tsconfig.json"
-		},
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        project: "./tsconfig.json"
+      },
+  
     },
     plugins: {
       'react-hooks': reactHooks,
