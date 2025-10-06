@@ -6,7 +6,7 @@ import RequestWrapper2 from "../../common/RequestWrapper2";
 import RoomMakerspaceAssociation from "./RoomMakerspaceAssociation";
 import { ARCHIVE_ROOM, DELETE_ROOM, UNARCHIVE_ROOM, UPDATE_ROOM_NAME } from "../../queries/roomQueries";
 import ArchiveIcon from "@mui/icons-material/Archive";
-import UnarchiveIcon from "@mui/icons-material/Unarchive";
+import PublishIcon from "@mui/icons-material/Publish";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import SaveIcon from "@mui/icons-material/Save";
@@ -132,7 +132,6 @@ export default function ManageRoomPage() {
       });
       navigate(`/makerspace/${makerspaceID}/edit`);
     } catch (error: any) {
-      console.log(error);
       toast.error(error.message);
     }
   }
@@ -170,9 +169,9 @@ export default function ManageRoomPage() {
                 <Stack direction={isMobile ? "column" : "row"} spacing={2}>
                   {room.archived ? (
                     <Button
-                      color="primary"
+                      color="success"
                       variant="contained"
-                      startIcon={<UnarchiveIcon />}
+                      startIcon={<PublishIcon />}
                       onClick={handleUnarchiveRoom}
                     >
                       Publish Room
@@ -182,11 +181,9 @@ export default function ManageRoomPage() {
                       Archive Room
                     </Button>
                   )}
-                  {isManagerFor(user, Number(roomID)) ? (
-                    <Button color="error" variant="contained" startIcon={<DeleteIcon />} onClick={handleDeleteRoom}>
+                    <Button color="error" variant="contained" startIcon={<DeleteIcon />} onClick={handleDeleteRoom} disabled={isManagerFor(user, Number(roomID)) ? false : true}>
                       Delete Room
                     </Button>
-                  ) : null}
                 </Stack>
               </Stack>
               <Stack direction={isMobile ? "column" : "row"} width="auto" spacing={2}>
@@ -201,7 +198,7 @@ export default function ManageRoomPage() {
                   <RoomMakerspaceAssociation
                     makerspaceID={room.makerspace?.id}
                     roomID={Number(roomID)}
-                  ></RoomMakerspaceAssociation>
+                  />
                 </Stack>
               </Stack>
             </Stack>
