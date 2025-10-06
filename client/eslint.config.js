@@ -8,6 +8,9 @@ import react from 'eslint-plugin-react'
 export default tseslint.config(
   { ignores: ['dist'] },
   {
+    parserOptions: {
+			project: "./tsconfig.json"
+		},
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
