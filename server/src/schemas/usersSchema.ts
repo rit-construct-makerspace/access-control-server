@@ -93,7 +93,7 @@ export const UsersTypeDefs = gql`
     usersLimit(searchText: String): [User]
     user(id: ID!): User
     currentUser: User
-    numUsers: Count
+    numUsers: Int
     userByUsernameorUID(value: String): User
   }
 
