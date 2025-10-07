@@ -36,8 +36,6 @@ import { DataPointsTypeDefs } from "./schemas/dataPointsSchema.js";
 import DataPointsResolver from "./resolvers/dataPointResolver.js";
 import PermissionResolver from "./resolvers/permissionResolver.js";
 import { PermissionTypeDefs } from "./schemas/permissionSchema.js";
-import { StatisticQueryTypeDefs } from "./schemas/statisticQuerySchema.js";
-import StatisticQueryResolver from "./resolvers/statisticQueryResolver.js";
 import { EquipmentSessionTypeDefs } from "./schemas/equipmentSessionsSchema.js";
 import EquipmentSessionsResolver from "./resolvers/equipmentSessionsResolver.js";
 import { EventsTypeDefs } from "./schemas/eventsSchema.js";
@@ -92,7 +90,6 @@ export const schema = makeExecutableSchema({
     MakerspaceHoursTypeDefs,
     DataPointsTypeDefs,
     PermissionTypeDefs,
-    StatisticQueryTypeDefs,
     EquipmentSessionTypeDefs,
     EventsTypeDefs,
     TermsTypeDefs,
@@ -122,7 +119,6 @@ export const schema = makeExecutableSchema({
     MakerspaceHoursResolver,
     DataPointsResolver,
     PermissionResolver,
-    StatisticQueryResolver,
     EquipmentSessionsResolver,
     EventsResolver,
     TermsResolver,

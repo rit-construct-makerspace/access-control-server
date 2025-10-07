@@ -2,8 +2,7 @@ import { Box, Divider, Grid, IconButton, Stack } from "@mui/material";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
-import { gql, useQuery } from "@apollo/client";
-import RequestWrapper from "../../../common/RequestWrapper";
+import { useQuery } from "@apollo/client";
 import { GET_MAKERSPACES_WITH_HOURS, MakerspaceWithHours } from "../../../queries/makerspaceQueries";
 import MakerspaceCard from "./MakerspaceCard";
 import { Announcement, GET_ANNOUNCEMENTS } from "../../../queries/announcementsQueries";
@@ -15,19 +14,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import { isAdmin } from "../../../common/PrivilegeUtils";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 
-const INCREMENT_SITE_VISITS = gql`
-  query IncrementSiteVisits {
-    incrementSiteVisits
-  }
-`;
-
 export function Dashboard() {
   const currentUser = useCurrentUser();
   const adminMode = isAdmin(currentUser);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  const incrementSiteVisits = useQuery(INCREMENT_SITE_VISITS);
   const getMakerspacesResult = useQuery(GET_MAKERSPACES_WITH_HOURS);
   const getAnnouncementsResult = useQuery(GET_ANNOUNCEMENTS);
   const getEvents = useQuery(GET_EVENTS);
@@ -35,9 +27,6 @@ export function Dashboard() {
   return (
     <Box>
       <title>Make @ RIT</title>
-      <RequestWrapper loading={incrementSiteVisits.loading} error={incrementSiteVisits.error}>
-        <></>
-      </RequestWrapper>
       {/* Makerspaces */}
       <RequestWrapper2
         result={getMakerspacesResult}

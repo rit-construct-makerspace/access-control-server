@@ -1,7 +1,6 @@
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import ArchitectureIcon from '@mui/icons-material/Architecture';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import BarChartIcon from '@mui/icons-material/BarChart';
 import HistoryIcon from "@mui/icons-material/History";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -132,11 +131,6 @@ export default function StaffBar() {
           primary={"Readers"}
           to={`/makerspace/${makerspaceID}/readers`}
           icon={<ScannerIcon />}
-        />
-        <NavLink
-          primary={"Statistics"}
-          to={"/admin/statistics"}
-          icon={<BarChartIcon />}
         />
         <NavLink
           primary={"Finances"}
