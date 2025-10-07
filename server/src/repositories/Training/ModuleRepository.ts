@@ -141,6 +141,14 @@ export async function updateModule(
 }
 
 /**
+ * Delete a specified training module
+ * @param id the ID of the existing module
+ */
+export async function deleteModule(id: number): Promise<void> {
+  await knex("TrainingModule").where({ id }).delete();
+}
+
+/**
  * Fetch all passed modules by user id
  * @param userID the userID to filter by
  * @returns {PassedModule[]} all modules passed by the user
