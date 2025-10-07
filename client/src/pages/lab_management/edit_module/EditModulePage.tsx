@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PublishTrainingModuleButton from "../training_modules/PublishTrainingModuleButton";
 import ArchiveTrainingModuleButton from "../training_modules/ArchiveTrainingModuleButton";
+import DeleteTrainingModuleButton from "../training_modules/DeleteTrainingModuleButton";
 import { DropResult } from "@hello-pangea/dnd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
@@ -25,6 +26,8 @@ import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../queries/makerspac
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isAdmin, isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
+
+
 interface EditModulePageProps {
   moduleInitialValue: Module;
   deleteModule: () => Promise<void>;
@@ -90,6 +93,8 @@ export default function EditModulePage({
     await deleteModule();
 
     trainingModDeletedAnimation();
+
+    navigate(`/makerspace/${makerspaceID}/trainings`)
   }
 
   const handleAddQuizItem = (item: QuizItem) => {
@@ -196,6 +201,7 @@ export default function EditModulePage({
           }
           Save
         </Fab>
+        <DeleteTrainingModuleButton moduleID={module.id} appearance="large" handleClick={handleDeleteClicked} />
       </Stack>
       <QuizBuilder quiz={module.quiz ? module.quiz : []} handleAdd={handleAddQuizItem} handleRemove={handleRemoveQuizItem} handleUpdate={handleUpdateQuizItem} handleOnDragEnd={handleOnDragEnd} />
     </Stack >
