@@ -12,7 +12,6 @@
     "@mui/material": "^7.1.0",
     "@mui/system": "^7.1.0",
     "@vitejs/plugin-react": "^5.0.0",
-    "@mui/x-charts": "^8.10.0",
     "@mui/x-data-grid": "^8.3.1",
     "@mui/x-date-pickers": "^8.3.1",
     "client": "file:",
