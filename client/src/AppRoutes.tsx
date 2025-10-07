@@ -49,6 +49,7 @@ import NewEquipmentPage from "./pages/makerspace_page/equipment_pages/NewEquipme
 import EquipmentRedirector from "./pages/makerspace_page/equipment_pages/EquipmentRedirector";
 import HelpPage from "./pages/maker/signup/HelpPage";
 import UserPage from "./pages/lab_management/users/UserPage";
+import GlobalSearchPage from "./pages/both/globalsearch/GlobalSearchPage";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -127,6 +128,7 @@ export default function AppRoutes() {
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/storefront" element={<StorefrontPage />} />
+          <Route path= "/search/:query" element={<GlobalSearchPage />} />
 
           {/* Routes that need to be protected by auth */}
           <Route element={<AuthedRoute />}>
