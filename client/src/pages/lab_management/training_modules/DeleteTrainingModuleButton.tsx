@@ -5,9 +5,10 @@ import GET_TRAINING_MODULES, { DELETE_MODULE } from "../../../queries/trainingQu
 interface DeleteTrainingModuleButtonProps {
   moduleID: number;
   appearance: "icon-only" | "small" | "medium" | "large";
+  handleClick: () => Promise<void>;
 }
 
-export default function DeletTrainingModuleButton(props: DeleteTrainingModuleButtonProps) {
+export default function DeleteTrainingModuleButton(props: DeleteTrainingModuleButtonProps) {
   const [deleteTrainingModule, { loading }] = useMutation(DELETE_MODULE, {
     variables: { id: props.moduleID},
     refetchQueries: [
@@ -25,7 +26,7 @@ export default function DeletTrainingModuleButton(props: DeleteTrainingModuleBut
   return (
     <DeleteButton 
       appearance={props.appearance} 
-      handleClick={handleClick}
+      handleClick={props.handleClick || handleClick}
       loading={loading}
       tooltipText="Delete Module"
     />
