@@ -8,6 +8,7 @@ import { Room } from "../models/rooms/room.js";
 import { ApolloContext, CurrentUser } from "../context.js";
 import * as MakerspaceRepo from "../repositories/Makerspaces/MakerspaceRespository.js";
 import { GraphQLError } from "graphql";
+import { isManager } from "../privilege.js";
 
 const RoomResolvers = {
   Room: {
@@ -81,13 +82,25 @@ const RoomResolvers = {
         return newRoom;
       }),
 
-    archiveRoom: async (_parent: any, args: any) => {
-      return await RoomRepo.archiveRoom(args.roomID);
-    },
+    archiveRoom: async (_parent: any, args: { roomID: number }, { isManager }: ApolloContext) =>
+      isManager(async (user: CurrentUser) => {
+        const room = await RoomRepo.getRoomByID(args.roomID);
+        if (!room) throw new GraphQLError(`Room ${args.roomID} does not exist`);
+        if (!user.manager.includes(room.makerspaceID ?? -1) && !user.admin) {
+          throw new GraphQLError(`Insufficent Privilege for Makerspace ${room.makerspaceID}`);
+        }
+        return await RoomRepo.archiveRoom(args.roomID);
+      }),
 
-    unarchiveRoom: async (_parent: any, args: any) => {
-      return await RoomRepo.unarchiveRoom(args.roomID);
-    },
+    unarchiveRoom: async (_parent: any, args: { roomID: number }, { isManager }: ApolloContext) =>
+      isManager(async (user: CurrentUser) => {
+        const room = await RoomRepo.getRoomByID(args.roomID);
+        if (!room) throw new GraphQLError(`Room ${args.roomID} does not exist`);
+        if (!user.manager.includes(room.makerspaceID ?? -1) && !user.admin) {
+          throw new GraphQLError(`Insufficent Privilege for Makerspace ${room.makerspaceID}`);
+        }
+        return await RoomRepo.unarchiveRoom(args.roomID);
+      }),
 
     deleteRoom: async (_parent: any, args: { roomID: number }, { isManager }: ApolloContext) =>
       isManager(async (user: CurrentUser) => {
