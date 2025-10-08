@@ -166,6 +166,7 @@ export const GET_MAKERSPACE_BY_ID = gql`
       rooms {
         id
         name
+        archived
         equipment {
           id
           name
