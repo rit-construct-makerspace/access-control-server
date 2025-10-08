@@ -5,7 +5,6 @@ import {redirect} from "react-router-dom";
 
 export default function LogoutPromptPage() {
     const logout = useCallback(() => {
-        console.log("Logging out...")
         fetch("/logout", {
             mode: 'cors',
             method: 'POST',
