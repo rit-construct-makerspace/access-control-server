@@ -4,6 +4,7 @@ import Equipment from "./Equipment";
 export default interface Room {
   id: number;
   name: string;
+  archived: boolean;
   equipment: Equipment[];
   trainingModules: TrainingModule[];
 }
