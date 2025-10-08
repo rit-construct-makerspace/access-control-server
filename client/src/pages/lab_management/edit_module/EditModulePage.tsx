@@ -1,7 +1,6 @@
 import QuizBuilder from "./quiz/QuizBuilder";
 import {
-  CircularProgress,
-  Fab,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -14,8 +13,8 @@ import {
 import SaveIcon from "@mui/icons-material/Save";
 import { useImmer } from "use-immer";
 import { Module, QuizItem } from "../../../types/Quiz";
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import PublishTrainingModuleButton from "../training_modules/PublishTrainingModuleButton";
 import ArchiveTrainingModuleButton from "../training_modules/ArchiveTrainingModuleButton";
 import DeleteTrainingModuleButton from "../training_modules/DeleteTrainingModuleButton";
@@ -26,7 +25,6 @@ import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../queries/makerspac
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isAdmin, isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-
 
 interface EditModulePageProps {
   moduleInitialValue: Module;
@@ -39,7 +37,7 @@ export default function EditModulePage({
   moduleInitialValue,
   deleteModule,
   updateModule,
-  updateLoading
+  updateLoading,
 }: EditModulePageProps) {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const currentUser = useCurrentUser();
@@ -51,7 +49,7 @@ export default function EditModulePage({
   const getMakerspacesResult = useQuery(GET_FULL_MAKERSPACES);
 
   const trainingModSavedAnimation = () => {
-    toast.success('Training Module Saved', {
+    toast.success("Training Module Saved", {
       position: "bottom-left",
       autoClose: 3000,
       hideProgressBar: false,
@@ -61,10 +59,10 @@ export default function EditModulePage({
       progress: undefined,
       theme: "colored",
     });
-  }
+  };
 
   const trainingModDeletedAnimation = () => {
-    toast.error('Training Module Deleted', {
+    toast.error("Training Module Deleted", {
       position: "bottom-left",
       autoClose: 3000,
       hideProgressBar: false,
@@ -74,15 +72,15 @@ export default function EditModulePage({
       progress: undefined,
       theme: "colored",
     });
-  }
+  };
 
   const handleSaveClicked = async () => {
     await updateModule(module);
 
     trainingModSavedAnimation();
 
-    navigate(`/makerspace/${makerspaceID}/trainings`)
-  }
+    navigate(`/makerspace/${makerspaceID}/trainings`);
+  };
   // we should be able to delete soon
   // eslint-disable-next-line
   const handleDeleteClicked = async () => {
@@ -94,8 +92,8 @@ export default function EditModulePage({
 
     trainingModDeletedAnimation();
 
-    navigate(`/makerspace/${makerspaceID}/trainings`)
-  }
+    navigate(`/makerspace/${makerspaceID}/trainings`);
+  };
 
   const handleAddQuizItem = (item: QuizItem) => {
     setModule((draft) => {
@@ -146,23 +144,23 @@ export default function EditModulePage({
           label="Module title"
           value={module.name}
           onChange={(e) => setModule((draft) => {
-            draft.name = e.target.value;
+              draft.name = e.target.value;
           })}
           sx={{ width: "600px" }}
         />
         <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
-          const makerspaces = data.makerspaces;
+            const makerspaces = data.makerspaces;
           const possibleMakerspaces = makerspaces.filter((space: FullMakerspace) => (isManagerFor(currentUser, space.id)))
-          return (
-            <FormControl>
-              <InputLabel id="associated-makerspace">Associated Makerspace</InputLabel>
-              <Select
-                id="associated-makerspace"
-                label="Associated Makerspace"
-                sx={{ width: "600px" }}
-                value={module.makerspaceID}
+            return (
+              <FormControl>
+                <InputLabel id="associated-makerspace">Associated Makerspace</InputLabel>
+                <Select
+                  id="associated-makerspace"
+                  label="Associated Makerspace"
+                  sx={{ width: "600px" }}
+                  value={module.makerspaceID}
                 onChange={(e) => setModule((draft) => {
-                  draft.makerspaceID = e.target.value != null ? Number(e.target.value) : null;
+                      draft.makerspaceID = e.target.value != null ? Number(e.target.value) : null;
                 })}>
                 {
                   possibleMakerspaces.map((space: FullMakerspace) => (
@@ -173,37 +171,28 @@ export default function EditModulePage({
                   isAdmin(currentUser) &&
                   <MenuItem>Unassociate Training</MenuItem>
                 }
-              </Select>
-            </FormControl>
-          );
-        }}
-        />
-        {
-          module.archived
-            ? <PublishTrainingModuleButton moduleID={module.id} appearance="large" />
-            : <ArchiveTrainingModuleButton moduleID={module.id} appearance="large" />
-        }
-        <Fab
-          onClick={handleSaveClicked}
-          color="secondary"
-          variant="extended"
-          size="large"
-          sx={{
-            margin: 0,
+                </Select>
+              </FormControl>
+            );
           }}
-        >
-          {
-            updateLoading ? (
-              <CircularProgress size={20} sx={{ color: "white", mr: 1 }} />
-            ) : (
-              <SaveIcon sx={{ mr: 1 }} />
-            )
-          }
+        />
+        {module.archived ? (
+          <PublishTrainingModuleButton moduleID={module.id} appearance="large" />
+        ) : (
+          <ArchiveTrainingModuleButton moduleID={module.id} appearance="large" />
+        )}
+        <Button startIcon={<SaveIcon />} color="secondary" variant="contained" onClick={handleSaveClicked} size="large">
           Save
-        </Fab>
+        </Button>
         <DeleteTrainingModuleButton moduleID={module.id} appearance="large" handleClick={handleDeleteClicked} />
       </Stack>
-      <QuizBuilder quiz={module.quiz ? module.quiz : []} handleAdd={handleAddQuizItem} handleRemove={handleRemoveQuizItem} handleUpdate={handleUpdateQuizItem} handleOnDragEnd={handleOnDragEnd} />
-    </Stack >
+      <QuizBuilder
+        quiz={module.quiz ? module.quiz : []}
+        handleAdd={handleAddQuizItem}
+        handleRemove={handleRemoveQuizItem}
+        handleUpdate={handleUpdateQuizItem}
+        handleOnDragEnd={handleOnDragEnd}
+      />
+    </Stack>
   );
 }
