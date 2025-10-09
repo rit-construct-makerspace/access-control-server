@@ -1,6 +1,5 @@
-import { useLazyQuery, useQuery } from "@apollo/client";
-import { GET_USER } from "../users/UserModal";
-import { GET_USER_BY_USERNAME_OR_UID, PartialUser } from "../../../queries/getUsers";
+import { useLazyQuery } from "@apollo/client";
+import { GET_USER_BY_USERNAME_OR_UID, PartialUser } from "../../../queries/userQueries";
 import { GET_TOOL_ITEM_INSTANCES_BY_BORROWER } from "../../../queries/toolItemQueries";
 import { useEffect, useState } from "react";
 import { ToolItemInstance, ToolItemType } from "../../../types/ToolItem";

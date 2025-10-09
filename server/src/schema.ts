@@ -28,16 +28,14 @@ import { ReaderTypeDefs } from "./schemas/readersSchema.js";
 import ReadersResolver from "./resolvers/readersResolver.js";
 import { AccessCheckTypeDefs } from "./schemas/accessChecksSchema.js";
 import AccessChecksResolver from "./resolvers/accessChecksResolver.js";
-import ZoneHoursResolver from "./resolvers/zoneHoursResolver.js";
-import { ZoneHoursTypeDefs } from "./schemas/zoneHoursSchema.js";
-import ZonesResolver from "./resolvers/zonesResolver.js";
-import { ZonesTypeDefs } from "./schemas/zonesSchema.js";
+import MakerspaceHoursResolver from "./resolvers/makerspaceHoursResolver.js";
+import { MakerspaceHoursTypeDefs } from "./schemas/makerspaceHoursSchema.js";
+import MakerspacesResolver from "./resolvers/makerspaceResolver.js";
+import { MakerspacesTypeDefs } from "./schemas/makerspacesSchema.js";
 import { DataPointsTypeDefs } from "./schemas/dataPointsSchema.js";
 import DataPointsResolver from "./resolvers/dataPointResolver.js";
 import PermissionResolver from "./resolvers/permissionResolver.js";
 import { PermissionTypeDefs } from "./schemas/permissionSchema.js";
-import { StatisticQueryTypeDefs } from "./schemas/statisticQuerySchema.js";
-import StatisticQueryResolver from "./resolvers/statisticQueryResolver.js";
 import { EquipmentSessionTypeDefs } from "./schemas/equipmentSessionsSchema.js";
 import EquipmentSessionsResolver from "./resolvers/equipmentSessionsResolver.js";
 import { EventsTypeDefs } from "./schemas/eventsSchema.js";
@@ -88,11 +86,10 @@ export const schema = makeExecutableSchema({
     AnnouncementsTypeDefs,
     ReaderTypeDefs,
     AccessCheckTypeDefs,
-    ZonesTypeDefs,
-    ZoneHoursTypeDefs,
+    MakerspacesTypeDefs,
+    MakerspaceHoursTypeDefs,
     DataPointsTypeDefs,
     PermissionTypeDefs,
-    StatisticQueryTypeDefs,
     EquipmentSessionTypeDefs,
     EventsTypeDefs,
     TermsTypeDefs,
@@ -118,11 +115,10 @@ export const schema = makeExecutableSchema({
     AnnouncementsResolver,
     ReadersResolver,
     AccessChecksResolver,
-    ZonesResolver,
-    ZoneHoursResolver,
+    MakerspacesResolver,
+    MakerspaceHoursResolver,
     DataPointsResolver,
     PermissionResolver,
-    StatisticQueryResolver,
     EquipmentSessionsResolver,
     EventsResolver,
     TermsResolver,

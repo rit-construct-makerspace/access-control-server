@@ -1,5 +1,4 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import PrettyModal from "../../../common/PrettyModal";
 import { Alert, Avatar, Box, Button, Card, Chip, FormControl, IconButton, InputLabel, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import InfoBlob from "./InfoBlob";
@@ -15,144 +14,19 @@ import AccessCheckCard from "./AccessCheckCard";
 import ActionButton from "../../../common/ActionButton";
 import { GET_ALL_EQUIPMENTS } from "../../../queries/equipmentQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
-import CloseIcon from '@mui/icons-material/Close';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { stringAvatar } from "../../../common/avatarGenerator";
 import { isManager, isStaff, isStaffFor, isTrainerFor } from "../../../common/PrivilegeUtils";
 import RestrictionCard from "./RestrictionCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
-import { FullZone, GET_FULL_ZONES } from "../../../queries/zoneQueries";
+import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../queries/makerspaceQueries";
 import LockIcon from '@mui/icons-material/Lock';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ManageUserArchive from "./ManageUserArchive";
+import { AccessCheckExtraInfo, GET_USER, Hold, Restriction } from "../../../queries/userQueries";
+import NavLink from "../../../top_nav/NavLink";
 
-export interface Hold {
-  id: string;
-  description: string;
-  creator: {
-    firstName: string;
-    lastName: string;
-  };
-  remover?: {
-    firstName: string;
-    lastName: string;
-  };
-  createDate: string;
-  removeDate?: string;
-}
-
-export interface Restriction {
-  id: number;
-  reason: string;
-  creator: {
-    firstName: string;
-    lastName: string;
-  };
-  makerspace: {
-    id: number;
-    name: string;
-  };
-  createDate: string;
-}
-
-export interface AccessCheck {
-  id: string;
-  equipmentID: string;
-  approved: boolean;
-}
-
-export interface AccessCheckExtraInfo {
-  id: number;
-  approved: boolean;
-  equipment: {
-    id: number;
-    name: string;
-    requiresTrainerApproval: boolean;
-    room: {
-      zone: {
-        id: number;
-      }
-    }
-  }
-}
-
-export const GET_USER = gql`
-  query GetUser($id: ID!) {
-    user(id: $id) {
-      id
-      firstName
-      lastName
-      pronouns      
-      college
-      expectedGraduation
-      registrationDate
-      ritUsername
-      cardTagID
-      notes
-      archived
-      forceArchive
-      holds {
-        id
-        creator {
-          firstName
-          lastName
-        }
-        remover {
-          firstName
-          lastName
-        }
-        createDate
-        removeDate
-        description
-      }
-      restrictions {
-        id
-        creator {
-          firstName
-          lastName
-        }
-        makerspace {
-          id
-          name
-        }
-        reason
-        createDate
-      }
-      accessChecks {
-        id
-        equipment {
-          id
-          name
-          requiresTrainerApproval
-          room {
-            zone {
-              id
-            }
-          }
-        }
-        approved
-      }
-      passedModules {
-        moduleID
-        moduleName
-        passedDate
-        makerspaceID
-      }
-      trainingHolds {
-        id
-        module {
-          id
-          name
-        }
-        expires
-      }
-      admin
-      manager
-      staff
-      trainer
-    }
-  }
-`;
 
 const CREATE_HOLD = gql`
   mutation CreateHold($userID: ID!, $description: String!) {
@@ -202,13 +76,8 @@ const DELETE_PASSED_MODULE = gql`
   }
 `;
 
-interface UserModalProps {
-  selectedUserID: string;
-  onClose: () => void;
-}
-
-export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
-  const { makerspaceID } = useParams<{ makerspaceID: string }>();
+export default function UserPage() {
+  const { makerspaceID, userID} = useParams<{ makerspaceID: string, userID: string }>();
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
@@ -223,15 +92,15 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
   const [createHold] = useMutation(CREATE_HOLD);
   const [createRestriction] = useMutation(CREATE_RESTRICTION);
   const [setNotesMutation, setNotesResult] = useMutation(SET_NOTES);
-  const [refreshCheck, refreshCheckResult] = useMutation(REFRESH_CHECKS, { variables: { userID: selectedUserID }, refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
-  const [createCheck] = useMutation(CREATE_CHECK, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
-  const [deleteTrainingHold] = useMutation(DELETE_TRAINING_HOLD, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
-  const [deletePassedModule] = useMutation(DELETE_PASSED_MODULE, { refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }] });
-  const getZonesResult = useQuery(GET_FULL_ZONES);
+  const [refreshCheck, refreshCheckResult] = useMutation(REFRESH_CHECKS, { variables: { userID: userID }, refetchQueries: [{ query: GET_USER, variables: { id: userID } }] });
+  const [createCheck] = useMutation(CREATE_CHECK, { refetchQueries: [{ query: GET_USER, variables: { id: userID } }] });
+  const [deleteTrainingHold] = useMutation(DELETE_TRAINING_HOLD, { refetchQueries: [{ query: GET_USER, variables: { id: userID } }] });
+  const [deletePassedModule] = useMutation(DELETE_PASSED_MODULE, { refetchQueries: [{ query: GET_USER, variables: { id: userID } }] });
+  const getMakerspacesResult = useQuery(GET_FULL_MAKERSPACES);
 
   useEffect(() => {
-    if (selectedUserID) getUser({ variables: { id: selectedUserID } });
-  }, [selectedUserID, getUser]);
+    if (userID) getUser({ variables: { id: userID } });
+  }, [userID, getUser]);
 
   const handlePlaceHoldClicked = () => {
     const description = window.prompt("Enter hold description:");
@@ -245,7 +114,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
     createHold({
       variables: { userID: getUserResult.data.user.id, description },
-      refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }],
+      refetchQueries: [{ query: GET_USER, variables: { id: userID } }],
     });
   };
 
@@ -265,7 +134,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
     createRestriction({
       variables: { userID: getUserResult.data.user.id, makerspaceID: restrictionMakerspace, reason: reason },
-      refetchQueries: [{ query: GET_USER, variables: { id: selectedUserID } }]
+      refetchQueries: [{ query: GET_USER, variables: { id: userID } }]
     });
   }
 
@@ -275,7 +144,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
   function handleCheckCreate() {
     if (!newCheckEquipmentID) return;
-    createCheck({ variables: { userID: selectedUserID, equipmentID: newCheckEquipmentID } });
+    createCheck({ variables: { userID: userID, equipmentID: newCheckEquipmentID } });
     setOpenCreateCheckDialouge(false);
   }
 
@@ -284,15 +153,15 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
   };
 
   return (
-    <PrettyModal open={!!selectedUserID} onClose={onClose} width={isMobile ? 300 : 1600}>
+    <Box margin="10px 25px">
       <RequestWrapper2
         result={getUserResult}
         render={({ user }) => {
           const filteredACs: AccessCheckExtraInfo[] = user.accessChecks.filter(
             (ac: AccessCheckExtraInfo) => (
               ac.equipment.requiresTrainerApproval
-                ? isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id))
-                : (isStaffFor(currentUser, Number(ac.equipment.room.zone.id)) || isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.zone.id)))
+                ? isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.makerspace.id))
+                : (isStaffFor(currentUser, Number(ac.equipment.room.makerspace.id)) || isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.makerspace.id)))
             )
           );
 
@@ -315,9 +184,14 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                     <Typography>{user.pronouns}</Typography>
                   </Stack>
                 </Stack>
-                <IconButton color="error" onClick={onClose} sx={{ width: "34px", height: "34px" }}>
-                  <CloseIcon />
+                <IconButton onClick={() =>navigate(`/makerspace/${makerspaceID}/people`)} sx={{ width: "51px", height: "51px", p: 0, fontSize: 14  }} >
+                  <ArrowBackIcon sx = {{fontSize: 18}}/> Back
                 </IconButton>
+                {/* <NavLink
+                  primary={"All People"}
+                  to={`/makerspace/${makerspaceID}/people`}
+                  icon={<ArrowBackIcon />}
+                /> */}
               </Stack>
 
               <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? undefined : "space-between"} mt={4}>
@@ -397,7 +271,7 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                               <IconButton
                                 color="error"
                                 disabled={!isStaffFor(currentUser, module.moduleID ?? -1)}
-                                onClick={() => deletePassedModule({ variables: { userID: selectedUserID, moduleID: module.moduleID } })}
+                                onClick={() => deletePassedModule({ variables: { userID: userID, moduleID: module.moduleID } })}
                               >
                                 <DeleteIcon />
                               </IconButton>
@@ -476,11 +350,11 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
 
                   {
                     isStaff(currentUser)
-                      ? <RequestWrapper2 result={getZonesResult} render={(data) => {
+                      ? <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
 
-                        const fullZones: FullZone[] = data.zones;
+                        const fullSpaces: FullMakerspace[] = data.makerspaces;
                         // I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript 
-                        const potentialRestrictions = fullZones.filter((zone: FullZone) => isStaffFor(currentUser, Number(zone.id)))
+                        const potentialRestrictions = fullSpaces.filter((space: FullMakerspace) => isStaffFor(currentUser, Number(space.id)))
 
                         return (
                           <Stack direction="row" spacing={1} mt={2} alignItems={"center"}>
@@ -492,8 +366,8 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                                 fullWidth
                               >
                                 {
-                                  potentialRestrictions.map((zone: FullZone) => (
-                                    <MenuItem value={zone.id}>{zone.name} ID: {zone.id}</MenuItem>
+                                  potentialRestrictions.map((space: FullMakerspace) => (
+                                    <MenuItem value={space.id}>{space.name} ID: {space.id}</MenuItem>
                                   ))
                                 }
                               </Select>
@@ -531,14 +405,14 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
                     placeholder="Notes"
                     value={notes}
                     onChange={handleNotesChanged}
-                    onSubmit={() => setNotesMutation({ variables: { userID: selectedUserID, notes: notes } })}
+                    onSubmit={() => setNotesMutation({ variables: { userID: userID, notes: notes } })}
                     multiline
                     minRows={2}
                   />
                   <Button
                     variant="contained"
                     loading={setNotesResult.loading}
-                    onClick={() => setNotesMutation({ variables: { userID: selectedUserID, notes: notes } })}
+                    onClick={() => setNotesMutation({ variables: { userID: userID, notes: notes } })}
                     sx={{ alignSelf: "flex-end" }}
                   >
                     Update Notes
@@ -549,6 +423,6 @@ export default function UserModal({ selectedUserID, onClose }: UserModalProps) {
           );
         }}
       />
-    </PrettyModal >
+    </Box>
   );
 }

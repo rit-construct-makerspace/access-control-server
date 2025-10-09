@@ -1,4 +1,4 @@
-export default interface ZoneHours {
+export default interface MakerspaceHours {
     day: Date;
     makerspaceID: number;
     open: string | null;
@@ -6,7 +6,7 @@ export default interface ZoneHours {
     closed: boolean;
 }
 
-export interface ZoneDefaultHours {
+export interface MakerspaceDefaultHours {
     dayOfWeek: number;
     makerspaceID: number;
     open: string | null;

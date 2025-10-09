@@ -10,7 +10,7 @@ import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { ApolloContext, CurrentUser } from "../context.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { getActiveTrainingHoldsByUser } from "../repositories/Training/TrainingHoldsRespository.js";
-import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
+import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
 import { UserRow } from "../db/tables.js";
 
@@ -308,7 +308,7 @@ const UsersResolvers = {
       { isAdmin }: ApolloContext
     ) => isAdmin(async (user: CurrentUser) => {
       const target = await UserRepo.getUserByID(args.userID);
-      const makerspace = await getZoneByID(args.makerspaceID);
+      const makerspace = await getMakerspaceByID(args.makerspaceID);
       if (makerspace === undefined) {
         throw new EntityNotFound(`Makerspace ${args.makerspaceID} Not Found`);
       }
@@ -328,7 +328,7 @@ const UsersResolvers = {
       { isManagerFor }: ApolloContext
     ) => isManagerFor(args.makerspaceID, async (user: CurrentUser) => {
       const target = await UserRepo.getUserByID(args.userID);
-      const makerspace = await getZoneByID(args.makerspaceID);
+      const makerspace = await getMakerspaceByID(args.makerspaceID);
       if (makerspace === undefined) {
         throw new EntityNotFound(`Makerspace ${args.makerspaceID} Not Found`);
       }
@@ -349,7 +349,7 @@ const UsersResolvers = {
     ) => {
       const equipment = await EquipmentRepo.getEquipmentByID(args.equipmentID);
       const room = await RoomRepo.getRoomByID(equipment.roomID);
-      return await isManagerFor(room?.zoneID ?? -1, async (user: CurrentUser) => {
+      return await isManagerFor(room?.makerspaceID ?? -1, async (user: CurrentUser) => {
         const target = await UserRepo.getUserByID(args.userID);
         await createLog(
           `{user} granted TRAINER access for {equipment} to {user}`,
@@ -368,7 +368,7 @@ const UsersResolvers = {
       { isAdmin }: ApolloContext
     ) => isAdmin(async (user: CurrentUser) => {
       const target = await UserRepo.getUserByID(args.userID);
-      const makerspace = await getZoneByID(args.makerspaceID);
+      const makerspace = await getMakerspaceByID(args.makerspaceID);
       if (makerspace === undefined) {
         throw new EntityNotFound(`Makerspace ${args.makerspaceID} Not Found`);
       }
@@ -388,7 +388,7 @@ const UsersResolvers = {
       { isManagerFor }: ApolloContext
     ) => isManagerFor(args.makerspaceID, async (user: CurrentUser) => {
       const target = await UserRepo.getUserByID(args.userID);
-      const makerspace = await getZoneByID(args.makerspaceID);
+      const makerspace = await getMakerspaceByID(args.makerspaceID);
       if (makerspace === undefined) {
         throw new EntityNotFound(`Makerspace ${args.makerspaceID} Not Found`);
       }
@@ -409,7 +409,7 @@ const UsersResolvers = {
     ) => {
       const equipment = await EquipmentRepo.getEquipmentByID(args.equipmentID);
       const room = await RoomRepo.getRoomByID(equipment.roomID);
-      return await isManagerFor(room?.zoneID ?? -1, async (user: CurrentUser) => {
+      return await isManagerFor(room?.makerspaceID ?? -1, async (user: CurrentUser) => {
         const target = await UserRepo.getUserByID(args.userID);
         await createLog(
           `{user} revoked TRAINER access for {equipment} from {user}`,

@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useParams } from "react-router-dom";
-import { FullZone, GET_ZONE_BY_ID } from "../../queries/zoneQueries";
+import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { Divider, Typography } from "@mui/material";
 import { Stack } from "@mui/system";
@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 export default function HoursDisplay() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
-  const getZoneResult = useQuery(GET_ZONE_BY_ID, { variables: { id: makerspaceID }, pollInterval: 300000 })
+  const getMakerspaceResult = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID }, pollInterval: 300000 })
 
   const [date, setDate] = useState(new Date());
 
@@ -31,8 +31,8 @@ export default function HoursDisplay() {
   })
 
   return (
-    <RequestWrapper2 result={getZoneResult} render={(data) => {
-      const makerspace: FullZone = data.zoneByID;
+    <RequestWrapper2 result={getMakerspaceResult} render={(data) => {
+      const makerspace: FullMakerspace = data.makerspaceByID;
 
       const week = makerspace.hours
 

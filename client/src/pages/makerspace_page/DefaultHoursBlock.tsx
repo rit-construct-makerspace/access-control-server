@@ -1,6 +1,6 @@
 import * as TimeUtils from "../../common/TimeUtils"
 import { Button, Checkbox, FormControlLabel, InputAdornment, Stack, TextField, Typography } from "@mui/material";
-import { ZoneDefaultHours } from "../../types/ZoneHours";
+import { MakerspaceDefaultHours } from "../../types/MakerspaceHours";
 import { useState } from "react";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import gql from "graphql-tag";
@@ -14,7 +14,7 @@ export const UPDATE_DEFAULT_HOURS = gql`
 `;
 
 interface DefaultHoursBlockProps {
-  hours: ZoneDefaultHours;
+  hours: MakerspaceDefaultHours;
 }
 
 export default function DefaultHoursBlock(props: DefaultHoursBlockProps) {
@@ -25,7 +25,7 @@ export default function DefaultHoursBlock(props: DefaultHoursBlockProps) {
   const [close, setClose] = useState(props.hours.close?.substring(0, 5));
 
   const [updateHours] = useMutation(UPDATE_DEFAULT_HOURS, {
-    refetchQueries: ["GetZoneDefaultHours"], // Doesn't work for some reason
+    refetchQueries: ["GetMakerspaceDefaultHours"], // Doesn't work for some reason
     awaitRefetchQueries: true,
     onCompleted() {
       toast.success(`Updated ${TimeUtils.dayToString(props.hours.dayOfWeek)} hours`)

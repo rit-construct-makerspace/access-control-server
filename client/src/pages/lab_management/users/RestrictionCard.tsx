@@ -1,10 +1,10 @@
 import gql from "graphql-tag";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { GET_USER, Restriction } from "./UserModal";
 import { Button, Card, CardActions, CardContent, CardHeader, Stack, Typography, useTheme } from "@mui/material";
 import { useMutation } from "@apollo/client";
 import { format, parseISO } from "date-fns";
 import { isStaffFor } from "../../../common/PrivilegeUtils";
+import { GET_USER, Restriction } from "../../../queries/userQueries";
 
 interface RestrictionCardProps {
     restriction: Restriction;

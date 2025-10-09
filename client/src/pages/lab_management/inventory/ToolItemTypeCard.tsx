@@ -6,15 +6,16 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useMutation } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { DELETE_TYPE, GET_TOOL_ITEM_TYPES } from "../../../queries/toolItemQueries";
 import { useNavigate, useParams } from "react-router-dom";
 import { ToolItemInstanceCard } from "./ToolItemInstanceCard";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import Markdown from "react-markdown";
 import AddIcon from '@mui/icons-material/Add';
 import { isManager } from "../../../common/PrivilegeUtils";
+import ThemedMarkdown from "../../../common/ThemedMarkdown";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 
 export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnInstanceClick }: { type: ToolItemType, handleLoanInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void, handleReturnInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void }) {
@@ -61,17 +62,7 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
     </div>
   );
 
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
 
   return (
@@ -87,7 +78,7 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
         <Box width={"98.5%"} pl={"1.5%"}>
           <CardHeader title={<Typography variant="h4" pt={"2%"}>{type.name}</Typography>} action={isManager(currentUser) && CONTROL_MENU} sx={{ height: 15, pb: 3, pl: 1 }}></CardHeader>
           <Box my={2} mx={2} py={1} px={1} border={`1px solid ${localStorage.getItem("themeMode") === "dark" ? "#000000" : "#fafafa"}`}>
-            <Markdown>{type.description}</Markdown>
+            <ThemedMarkdown>{type.description}</ThemedMarkdown>
           </Box>
         </Box>
       </Stack>

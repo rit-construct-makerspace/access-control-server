@@ -231,7 +231,7 @@ export interface RoomRow {
   id: number;
   name: string;
   archived: boolean;
-  zoneID: number | null;
+  makerspaceID: number | null;
 }
 
 /**
@@ -271,6 +271,8 @@ export interface TrainingModuleItem {
   type: string;
   text: string;
   options?: ModuleItemOption[];
+  hint: string;
+  affirmation: string;
 }
 
 export interface TrainingHoldsRow {
@@ -392,15 +394,23 @@ export interface AccessCheckRow {
 }
 
 /**
- * A Zone (In the process of being renamed to Makerspace)
+ * A Makerspace
  * A specific makerspace within the system
  * A Makerspace can have multiple Rooms inside of it containing specific equipment
  */
-export interface ZoneRow {
+export interface MakerspaceRow {
   /** Primary Key */
   id: number;
   /** A human readable name for the makerspace */
   name: string;
+  /** Quick blurb explaining what happens in this makerspace */
+  subtitle: string | null;
+  /** Room code for the makerspace */
+  location: string | null;
+  /** Longer description of makerspace */
+  description: string
+  /** Link to the documentation page for this makerspace */
+  docsLink: string;
   /** CDN Image Identifier */
   imageUrl: string;
   /** If true, this makerspace is out of use and can't be visited. It is effecively deleted  */
@@ -658,7 +668,7 @@ declare module "knex/types/tables.js" {
     MakerspaceWelcomeReaders: MakerspaceWelcomeReaderRow;
     ReaderLogs: ReaderLogRow;
     AccessChecks: AccessCheckRow;
-    Zones: ZoneRow;
+    Makerspaces: MakerspaceRow;
     DataPoints: DataPointsRow;
     EquipmentSessions: EquipmentSessionRow;
     InventoryLedger: InventoryLedgerRow;

@@ -1,4 +1,4 @@
-import { CardActionArea, Link, Stack } from "@mui/material";
+import { CardActionArea, Link, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { ModuleStatus } from "./TrainingModuleUtils";
 import WarningIcon from "@mui/icons-material/Warning";
@@ -6,6 +6,7 @@ import HourglassBottomIcon from '@mui/icons-material/HourglassBottom';
 import LockClockIcon from '@mui/icons-material/LockClock';
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import { format } from "date-fns";
 
 interface ModuleStatusRowProps {
   ms: ModuleStatus
@@ -30,7 +31,14 @@ export default function ModuleStatusRow(props: ModuleStatusRowProps) {
                     ? <LockClockIcon color="error" />
                     : null
         }
-        <Link variant="body2" color="primary" width={"stretch"}>{props.ms.moduleName}</Link>
+        <Stack direction="column" width="100%">
+          <Link variant="body2" color="primary" width={"stretch"}>{props.ms.moduleName}</Link>
+          {
+            props.ms.status === "Passed" || props.ms.status === "Expiring Soon"
+              ? <Typography variant="body2">Expires: {format(new Date(props.ms.expirationDate), "MMM d, yyyy")}</Typography>
+              : null
+          }
+        </Stack>
       </Stack>
     </CardActionArea>
   );

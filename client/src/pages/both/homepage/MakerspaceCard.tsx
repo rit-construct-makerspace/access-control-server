@@ -1,0 +1,96 @@
+import { Button, Card, CardActionArea, CardContent, CardMedia, Stack, Typography } from "@mui/material";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import MakerspaceHours from "../../../types/MakerspaceHours";
+import CurrentHours from "../../../common/CurrentHours";
+
+interface MakerspaceCardProps {
+  id: number;
+  name: string;
+  subtitle: string | null;
+  location: string | null;
+  hours: MakerspaceHours[];
+  imageUrl: string;
+  isMobile: boolean;
+  clickable?: boolean;
+}
+
+
+export default function MakerspaceCard(props: MakerspaceCardProps) {
+  const navigate = useNavigate();
+
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <Card
+      sx={{ width: props.isMobile ? "350px" : "500px" }}
+      elevation={isHovered ? undefined : 8}
+      onMouseEnter={() => {
+        setIsHovered(true);
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+      }}
+    >
+      <CardActionArea
+        onClick={
+          props.clickable === true || props.clickable === undefined
+            ? () => {
+                navigate(`/makerspace/${props.id}`);
+              }
+            : () => {
+                /* Do nothing */
+              }
+        }
+      >
+        <CardMedia
+          component="img"
+          height={props.isMobile ? "197px" : "281px"}
+          image={import.meta.env.VITE_CDN_URL + "user-uploads/" + props.imageUrl}
+        />
+        <CardContent sx={{ justifyContent: "center", display: "flex", flexDirection: "column" }}>
+          <Stack direction={"row"} justifyContent={"space-between"} alignItems={"end"}>
+            <Typography variant="h4">{props.name}</Typography>
+            {!props.isMobile && (
+              <Typography variant="h6" color="textSecondary" alignSelf={"center"}>
+                {props.location}
+              </Typography>
+            )}
+          </Stack>
+
+          <Typography variant="h5" color="textSecondary">
+            {props.subtitle}
+          </Typography>
+
+          <Stack direction={"row"} justifyContent={"space-between"} spacing={"20px"}>
+            <CurrentHours times = {props.hours} fillLine = {props.isMobile} showDay={true}/>
+            {!props.isMobile && (
+              <Button
+                variant="contained"
+                endIcon={<ChevronRightIcon />}
+                sx={{ display: "flex", alignItems: "center", lineHeight: 0 }}
+              >
+                Explore
+              </Button>
+            )}
+          </Stack>
+          {props.isMobile && (
+            <Stack direction="row" justifyContent={"space-between"} paddingTop={"10px"}>
+              <Typography variant="h6" color="textSecondary" alignSelf={"center"}>
+                {props.location}
+              </Typography>
+              <Button
+                variant="contained"
+                endIcon={<ChevronRightIcon />}
+                sx={{ display: "flex", alignItems: "center", lineHeight: 0 }}
+              >
+                Explore
+              </Button>
+            </Stack>
+          )}
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  );
+}

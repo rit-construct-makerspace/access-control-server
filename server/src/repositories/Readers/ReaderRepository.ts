@@ -4,9 +4,9 @@
  */
 
 import { knex } from "../../db/index.js";
-import { ReaderLogRow, ReaderRow, TextFieldRow, ZoneRow } from "../../db/tables.js";
+import { ReaderLogRow, ReaderRow, TextFieldRow, MakerspaceRow } from "../../db/tables.js";
 import { getInstanceByReaderID } from "../Equipment/EquipmentInstancesRepository.js";
-import { getZoneByID } from "../Zones/ZonesRespository.js";
+import { getMakerspaceByID } from "../Makerspaces/MakerspaceRespository.js";
 
 /**
  * Fetch a card ready buy it's primary key
@@ -45,7 +45,7 @@ export async function getReaderBySN(
 export async function getReaders(makerspaceID: number | null = null): Promise<ReaderRow[]> {
     //Order them to prevent random ordering everytime the client polls, also prioritize help
     if (makerspaceID == null) {
-        // don't need to sort by zone, easy mode
+        // don't need to sort by makerspace, easy mode
         return await knex("Readers")
             .select("*", knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
             .orderBy("faultOrder", "asc")
@@ -56,11 +56,11 @@ export async function getReaders(makerspaceID: number | null = null): Promise<Re
     const res = await knex("Readers as r")
     .select('r.*', knex.raw('case when state = \'Fault\' then 0 when (z.id is null and rz.id is null) then 2 else 1 end as "faultOrder"'))
     .leftOuterJoin("MakerspaceWelcomeReaders as mwr", "mwr.readerID", "r.id")
-    .leftJoin("Zones as z", "z.id", "mwr.makerspaceID")
+    .leftJoin("Makerspaces as z", "z.id", "mwr.makerspaceID")
     .leftOuterJoin("EquipmentInstances as ei", "ei.readerID", "r.id")
     .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
     .leftJoin("Rooms as rs", "rs.id", "e.roomID")
-    .leftJoin("Zones as rz", "rz.id", "rs.zoneID")
+    .leftJoin("Makerspaces as rz", "rz.id", "rs.makerspaceID")
     .where("z.id", "=", makerspaceID).orWhere("rz.id", "=", makerspaceID).orWhere(knex.raw("z.id is null and rz.id is null"))
     .orderBy("faultOrder", "asc")
     .orderBy("e.name", "asc")
@@ -96,7 +96,7 @@ export async function getReadersWithPairings(): Promise<ReaderRowWithPairings[]>
             knex.raw('ei.name as "instanceName"'),
             knex.raw("case when state = 'Fault' then 0 else 1 end as \"faultOrder\""))
         .leftOuterJoin("MakerspaceWelcomeReaders as mwr", "mwr.readerID", "r.id")
-        .leftJoin("Zones as z", "z.id", "mwr.makerspaceID")
+        .leftJoin("Makerspaces as z", "z.id", "mwr.makerspaceID")
         .leftOuterJoin("EquipmentInstances as ei", "ei.readerID", "r.id")
         .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
         .orderBy("faultOrder", "asc")
@@ -175,7 +175,7 @@ export async function getReaderLogs(searchParams: { makerspaceID?: number, from:
         query = query.leftJoin("EquipmentInstances as ei", "rl.readerID", "ei.readerID")
             .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
             .leftJoin("Rooms as rs", "e.roomID", "rs.id")
-            .where("rs.zoneID", "=", Number(searchParams.makerspaceID));
+            .where("rs.makerspaceID", "=", Number(searchParams.makerspaceID));
     }
     if (searchParams.from) {
         query.andWhere("dateTime", ">", searchParams.from);
@@ -325,13 +325,13 @@ export async function submitReaderLogWithInstance(readerID: number | null, curre
  * @param readerID the reader to query the makerspace on
  * @returns the id of the makerspace that this reader is linked with
  */
-export async function getMakerspaceOfWelcomeReader(readerID: number): Promise<ZoneRow | undefined> {
+export async function getMakerspaceOfWelcomeReader(readerID: number): Promise<MakerspaceRow | undefined> {
     const res = (await knex("Readers as r").leftJoin("MakerspaceWelcomeReaders as mwr", "r.id", 'mwr.readerID').where({ readerID: readerID }).select("mwr.makerspaceID").first())
 
     if (res == null) {
         return undefined;
     }
-    return getZoneByID(res.makerspaceID);
+    return getMakerspaceByID(res.makerspaceID);
 }
 
 /**

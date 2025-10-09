@@ -8,7 +8,7 @@ const GET_EQUIPMENT_MAKERSPACE = gql`
   query GetEquipmentMakerspace($id: ID!) {
     equipment(id: $id) {
       room {
-        zone {
+        makerspace {
           id
         }
       }
@@ -25,7 +25,7 @@ export default function EquipmentRedirector() {
 
   return (
     <RequestWrapper2 result={getEquipmentMakerspaceResult} render={(data) => {
-      navigate(`/makerspace/${data.equipment.room.zone.id}/equipment/${equipmentID}`);
+      navigate(`/makerspace/${data.equipment.room.makerspace.id}/equipment/${equipmentID}`);
       return (
         <Button variant="contained" onClick={() => navigate("/")}>You shouldn't be here</Button>
       );

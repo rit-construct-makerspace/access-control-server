@@ -8,7 +8,7 @@ import { ApolloContext, CurrentUser } from "../context.js";
 import { getUserByID } from "../repositories/Users/UserRepository.js";
 import { getEquipmentSessions } from "../repositories/Equipment/EquipmentSessionsRepository.js";
 import { getRoomByID } from "../repositories/Rooms/RoomRepository.js";
-import { getZoneByID } from "../repositories/Zones/ZonesRespository.js";
+import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
 
 const EquipmentSessionsResolver = {
   EquipmentSession: {
@@ -35,16 +35,16 @@ const EquipmentSessionsResolver = {
       if (parent.equipmentID == null || parent.equipmentID == "" || Number(parent.equipmentID) == 0) return null;
       return getRoomByID((await EquipmentRepo.getEquipmentByID(Number(parent.equipmentID))).roomID)
     },
-    //Map Room.zone to Zone
-    zone: async (
+    //Map Room.makerspace to Makerspace
+    makerspace: async (
       parent: { equipmentID: string },
       _args: any,
       _context: ApolloContext) => {
       if (parent.equipmentID == null || parent.equipmentID == "" || Number(parent.equipmentID) == 0) return null;
-      const zoneID = (await getRoomByID((await EquipmentRepo.getEquipmentByID(Number(parent.equipmentID))).roomID))?.zoneID;
+      const makerspaceID = (await getRoomByID((await EquipmentRepo.getEquipmentByID(Number(parent.equipmentID))).roomID))?.makerspaceID;
 
-      if (!zoneID) return null;
-      else return getZoneByID(zoneID);
+      if (!makerspaceID) return null;
+      else return getMakerspaceByID(makerspaceID);
     },
   },
 
