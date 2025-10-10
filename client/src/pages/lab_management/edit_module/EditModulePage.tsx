@@ -11,6 +11,7 @@ import {
   useTheme,
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useImmer } from "use-immer";
 import { Module, QuizItem } from "../../../types/Quiz";
 import { toast } from "react-toastify";
@@ -81,8 +82,7 @@ export default function EditModulePage({
 
     navigate(`/makerspace/${makerspaceID}/trainings`);
   };
-  // we should be able to delete soon
-  // eslint-disable-next-line
+
   const handleDeleteClicked = async () => {
     if (!window.confirm("Are you sure you want to delete this module?")) {
       return;
@@ -184,7 +184,15 @@ export default function EditModulePage({
         <Button startIcon={<SaveIcon />} color="secondary" variant="contained" onClick={handleSaveClicked} size="large">
           Save
         </Button>
-        <DeleteTrainingModuleButton moduleID={module.id} appearance="large" handleClick={handleDeleteClicked} />
+        <Button
+          startIcon={<DeleteIcon />}
+          color="error"
+          variant="contained"
+          onClick={handleDeleteClicked}
+          size="large"
+        >
+          Delete
+        </Button>
       </Stack>
       <QuizBuilder
         quiz={module.quiz ? module.quiz : []}
