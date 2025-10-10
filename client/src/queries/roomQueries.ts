@@ -11,7 +11,23 @@ const GET_ROOMS = gql`
 
 export const CREATE_ROOM = gql`
   mutation CreateRoom($name: String!, $makerspaceID: ID!) {
-    addRoom(room: { name: $name, makerspaceID: $makerspaceID}) {
+    addRoom(room: { name: $name, makerspaceID: $makerspaceID }) {
+      id
+    }
+  }
+`;
+
+export const ARCHIVE_ROOM = gql`
+  mutation ArchiveRoom($id: ID!) {
+    archiveRoom(roomID: $id) {
+      id
+    }
+  }
+`;
+
+export const UNARCHIVE_ROOM = gql`
+  mutation UnarchiveRoom($id: ID!) {
+    unarchiveRoom(roomID: $id) {
       id
     }
   }

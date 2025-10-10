@@ -84,7 +84,7 @@ export const UsersTypeDefs = gql`
     lastName: String!
   }
 
-  input Count {
+  type Count {
     count: Int
   }
 
