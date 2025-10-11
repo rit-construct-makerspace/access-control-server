@@ -159,6 +159,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             requiresTrainer ? "requiresTrainer" : null,
             requiresInPerson ? "requiresInPerson" : null
           ]}
+          sx={{alignSelf: "center"}}
         >
           <ToggleButton value={"byReservation"} onClick={() => setByReservation(!byReservation)}>
             Reservation Only
@@ -201,6 +202,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               needsWelcome: needsWelcome,
               notes: notes,
               archived: props.equipment.archived,
+              requiresInPerson: requiresInPerson,
             }}
             isMobile={isMobile}
             staffMode={false}

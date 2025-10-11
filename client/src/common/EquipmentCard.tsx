@@ -33,10 +33,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
    * @return {boolean} True if a module has not been taken; False if all modules have been taken.
    */
   const hasNotTakenModule = moduleStatuses.some((ms: { status: string }) => ms.status === "Not taken");
-  const equipmentIdsToHideCompetencyFor = (import.meta.env.VITE_EQUIPMENT_IDS_WITHOUT_INPERSON ?? "")
-    .split(",")
-    .map((s) => Number(s));
-  const shouldHideCompetency = equipmentIdsToHideCompetencyFor.includes(Number(props.equipment.id));
+
   return (
     <Card
       sx={{
@@ -88,7 +85,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                   {moduleStatuses.map((ms: ModuleStatus) => (
                     <ModuleStatusRow ms={ms} />
                   ))}
-                  {!props.equipment.byReservationOnly && !shouldHideCompetency ? (
+                  {props.equipment.requiresInPerson ? (
                     <Stack direction={"row"} spacing={1} alignItems="center" padding="10px">
                       {hasApprovedAccessCheck ? <CheckCircleIcon color="success" /> : <CloseIcon color="error" />}
                       <Typography variant="body2">In-Person Competency Check</Typography>
