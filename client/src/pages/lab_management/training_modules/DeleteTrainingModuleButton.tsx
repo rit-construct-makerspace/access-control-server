@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import DeleteButton from "../../../common/DeleteButton";
 import GET_TRAINING_MODULES, { DELETE_MODULE } from "../../../queries/trainingQueries";
+import { toast } from "react-toastify";
 
 interface DeleteTrainingModuleButtonProps {
   moduleID: number;
@@ -17,10 +18,16 @@ export default function DeleteTrainingModuleButton(props: DeleteTrainingModuleBu
   });
 
   const handleClick = async () => {
-    window.confirm("Are you sure you want to delete this training module? This cannot be undone.")
-    if (!confirm) return;
+    if (!window.confirm("Are you sure you want to delete this training module?")) { 
+      return; 
+    }
 
-    await deleteTrainingModule();
+    try {
+      await deleteTrainingModule();
+    } catch (error) {
+      toast.error("Failed to delete training module");
+      return;
+    }
   }
 
   return (
