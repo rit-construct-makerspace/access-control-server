@@ -18,7 +18,6 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import PublishTrainingModuleButton from "../training_modules/PublishTrainingModuleButton";
 import ArchiveTrainingModuleButton from "../training_modules/ArchiveTrainingModuleButton";
-import DeleteTrainingModuleButton from "../training_modules/DeleteTrainingModuleButton";
 import { DropResult } from "@hello-pangea/dnd";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
@@ -63,7 +62,7 @@ export default function EditModulePage({
   };
 
   const trainingModDeletedAnimation = () => {
-    toast.error("Training Module Deleted", {
+    toast.success("Training Module Deleted", {
       position: "bottom-left",
       autoClose: 3000,
       hideProgressBar: false,
@@ -88,11 +87,14 @@ export default function EditModulePage({
       return;
     }
 
-    await deleteModule();
-
-    trainingModDeletedAnimation();
-
-    navigate(`/makerspace/${makerspaceID}/trainings`);
+    try {
+      await deleteModule();
+      trainingModDeletedAnimation();
+      navigate(`/makerspace/${makerspaceID}/trainings`);
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Failed to delete training module");
+    }
   };
 
   const handleAddQuizItem = (item: QuizItem) => {
