@@ -19,7 +19,6 @@ import EditNewModulePage from "./pages/lab_management/edit_module/EditNewModuleP
 import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnouncementPage";
 import EditAnnouncement from "./pages/lab_management/announcements/EditAnnouncement";
 import ReadersPage from "./pages/lab_management/readers/ReadersPage";
-import StatisticsPage from "./pages/lab_management/statistics/StatisticsPage";
 import EditTermsPage from "./pages/lab_management/policy/EditTermsPage";
 import TermsPage from "./pages/both/policy/TermsPage";
 import ResolutionLogPage from "./pages/lab_management/manage_equipment/ResolutionLog";
@@ -191,14 +190,13 @@ export default function AppRoutes() {
             <Route path="/maker/training" element={<TrainingPage />} />
             <Route path="/maker/training/:id" element={<QuizPage />} />
             <Route path="/maker/training/:id/results" element={<QuizResults />} />
+            <Route path="/maker/training/:id/results/:submissionID" element={<QuizResults />} />
 
             <Route path="/maker/materials" element={<InventoryPreviewPage />} />
 
             <Route path="/admin/equipment/logs/:logid" element={<ResolutionLogPage />} />
 
             <Route path="/admin/inventory" element={<InventoryPage />} />
-
-            <Route path="/admin/statistics" element={<StatisticsPage />} />
 
             <Route path="/admin/terms" element={<EditTermsPage />} />
           </Route>
