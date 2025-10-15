@@ -3,6 +3,7 @@ import InventoryItem from "../../../types/InventoryItem";
 import { Stack } from "@mui/system";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import { findImage } from "../../../common/ImageFinder.js";
 
 interface ListingCardProps {
   item: InventoryItem
@@ -19,7 +20,7 @@ export function ListingCard(props: ListingCardProps) {
       <CardActionArea onClick= {() => props.openDetailsModal(props.item)}>
       {!isMobile && <CardMedia
         sx={{ height: 140 }}
-        image={(props.item.image && props.item.image != "") ? import.meta.env.VITE_CDN_URL + "user-uploads/" + props.item.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")}
+        image={findImage(props.item.image)}
       />}
       <CardContent sx={{ minHeight: 125 }}>
         <Typography gutterBottom variant="h5" component="div">{props.item.name}</Typography>
