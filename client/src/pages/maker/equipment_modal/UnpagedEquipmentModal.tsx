@@ -19,6 +19,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import LockIcon from '@mui/icons-material/Lock';
 import LockClockIcon from '@mui/icons-material/LockClock';
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { findImage } from "../../../common/ImageFinder.js";
 
 interface EquipmentModalProps {
   equipmentID: number | undefined;
@@ -54,7 +55,7 @@ export default function UnpagedEquipmentModal({ equipmentID, setEquipmentID }: E
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Avatar
                   sx={{ width: 80, height: 80 }}
-                  src={(equipment.imageUrl == undefined || equipment.imageUrl == null ? "" + import.meta.env.VITE_CDN_URL + "shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/" + equipment.imageUrl)}
+                  src={findImage(equipment.imageUrl, import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/")}
                 />
                 <Stack>
                   <Typography variant="h4">{equipment.name}</Typography>
