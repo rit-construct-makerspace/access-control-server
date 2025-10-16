@@ -12,8 +12,6 @@ export default function LogoutPromptPage() {
             redirect: 'follow'
         })
             .then(() => {
-                console.log("logged out")
-
                 //reload is needed to force logout user, in the future should make this happen in a better way
                 //possibly redirect to login page?
 
