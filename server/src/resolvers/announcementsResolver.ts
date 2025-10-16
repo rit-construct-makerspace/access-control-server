@@ -45,7 +45,7 @@ const AnnouncementsResolver = {
      */
     createAnnouncement: async (
       _parent: any,
-      args: {title: string, description: string},
+      args: {title: string, description: string, linkText: string, linkUrl: string},
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
         return await createAnnouncement(args);
@@ -61,7 +61,7 @@ const AnnouncementsResolver = {
      */
     updateAnnouncement: async (
       _parent: any,
-      args: {id: number, title: string, description: string},
+      args: {id: number, title: string, description: string, linkText: string, linkUrl: string},
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
         return await updateAnnouncement(args);
