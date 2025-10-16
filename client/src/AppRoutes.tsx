@@ -188,6 +188,7 @@ export default function AppRoutes() {
             <Route path="/maker/training" element={<TrainingPage />} />
             <Route path="/maker/training/:id" element={<QuizPage />} />
             <Route path="/maker/training/:id/results" element={<QuizResults />} />
+            <Route path="/maker/training/:id/results/:submissionID" element={<QuizResults />} />
 
             <Route path="/maker/materials" element={<InventoryPreviewPage />} />
 

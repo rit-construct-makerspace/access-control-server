@@ -13,6 +13,8 @@ import EquipmentTrainings from "./EquipmentTrainings";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import FileUploadButton from "../../../common/FileUploadButton";
+import { GET_FULL_MAKERSPACES } from "../../../queries/makerspaceQueries.js";
+
 
 interface EquipmentInformationProps {
   equipment: Equipment;
@@ -24,7 +26,11 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const getRoomsResult = useQuery(GET_ROOMS);
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT, {
-    refetchQueries: ["GetEquipmentByID"],
+    refetchQueries: [
+      "GetEquipmentByID",
+      { query: GET_ROOMS }, 
+      { query: GET_FULL_MAKERSPACES }
+    ],
     onCompleted() {
       toast.success("Updated equipment");
     },
@@ -34,11 +40,11 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   });
   const [publishEquipment] = useMutation(PUBLISH_EQUIPMENT, {
     variables: { id: props.equipment.id },
-    refetchQueries: ["GetEquipmentByID"],
+    refetchQueries: ["GetEquipmentByID", { query: GET_ROOMS }],
   });
   const [archiveEquipment] = useMutation(ARCHIVE_EQUIPMENT, {
     variables: { id: props.equipment.id },
-    refetchQueries: ["GetEquipmentByID"],
+    refetchQueries: ["GetEquipmentByID", { query: GET_ROOMS }],
   });
 
   const [name, setName] = useState(props.equipment.name);
