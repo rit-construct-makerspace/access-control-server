@@ -68,8 +68,8 @@ export async function getItemsWhereStorefront(storefrontVisible: boolean, makers
 export async function getItemByIdWhereStorefront(
   id: number,
   storefrontVisible: boolean
-): Promise<InventoryItemRow | undefined> {
-  return (await knex("InventoryItem").select().where({ id, storefrontVisible }).first());
+): Promise<InventoryItemRow | null> {
+  return (await knex("InventoryItem").select().where({ id, storefrontVisible }).first()) ?? null;
 }
 
 /**
@@ -79,13 +79,13 @@ export async function getItemByIdWhereStorefront(
  */
 export async function getItemById(
   itemId: number
-): Promise<InventoryItemRow | undefined> {
+): Promise<InventoryItemRow | null> {
   const knexResult = await knex
     .first()
     .from("InventoryItem")
     .where("id", itemId);
 
-  return (knexResult);
+  return knexResult ?? null;
 }
 
 /**
@@ -216,7 +216,7 @@ export async function setItemAmount(
  */
 export async function archiveItem(
   itemId: number
-): Promise<InventoryItemRow | undefined> {
+): Promise<InventoryItemRow | null> {
   const updatedInventoryItems: InventoryItemRow[] = await knex("InventoryItem").where({ id: itemId }).update({ archived: true });
   if (updatedInventoryItems.length < 1) throw new EntityNotFound(`Could not find inventory item #${itemId}`);
 
@@ -270,8 +270,8 @@ export async function getTags(): Promise<InventoryTagRow[]> {
  * @param id ID of Inventory Tag to fetch
  * @returns Inventory Tag or undefined if not exist
  */
-export async function getTagByID(id: number): Promise<InventoryTagRow | undefined> {
-  return await knex("InventoryTags").select().where({ id }).first();
+export async function getTagByID(id: number): Promise<InventoryTagRow | null> {
+  return await knex("InventoryTags").select().where({ id }).first() ?? null;
 }
 
 /**
