@@ -117,7 +117,6 @@ export async function updateRoomName(roomID: number, name: string): Promise<Room
  * @returns the updated room
  */
 export async function updateMakerspace(roomID: number, makerspaceID: number): Promise<Room | null> {
-  console.log(roomID + " " + makerspaceID);
   await knex("Rooms").where({ id: roomID }).update({
     makerspaceID: makerspaceID,
   });
