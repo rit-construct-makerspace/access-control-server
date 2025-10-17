@@ -5,10 +5,7 @@
 import { knex } from "../../db/index.js";
 import { InventoryTagRow } from "../../db/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
-import {
-  inventoryItemsToDomain,
-  singleInventoryItemToDomain,
-} from "../../mappers/store/InventoryItemMapper.js";
+
 import {
   InventoryItem,
   InventoryItemInput,
