@@ -154,7 +154,6 @@ export async function getMissingTrainingModules(
 ): Promise<TrainingModuleRow[]> {
   let modules = await getModulesByEquipment(equipmentID);
   let incompleteTrainings = [];
-  console.log(modules.toString());
   // get last submission from maker for every module
   for(let i = 0; i < modules.length; i++) {
     if (await ModuleRepo.hasPassedModule(user.id, modules[i].id)) {
