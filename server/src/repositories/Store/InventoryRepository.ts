@@ -3,7 +3,7 @@
  */
 
 import { knex } from "../../db/index.js";
-import { InventoryTagRow } from "../../db/tables.js";
+import { InventoryItemRow, InventoryTagRow } from "../../db/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 
 import {
@@ -15,13 +15,12 @@ import {
  * Fetch all Inventory Items
  * @returns all InventoryItems
  */
-export async function getItems(makerspaceID?: number): Promise<InventoryItem[]> {
-  const knexResult = knex("InventoryItem").select().where('archived', false);
+export async function getItems(makerspaceID?: number): Promise<InventoryItemRow[]> {
+  let query = knex("InventoryItem").select().where('archived', false);
   if (makerspaceID) {
-    knexResult.where('makerspaceID', makerspaceID);
+    query = query.where('makerspaceID', makerspaceID);
   }
-
-  return inventoryItemsToDomain(await knexResult);
+  return await query;
 }
 
 /**
@@ -29,9 +28,9 @@ export async function getItems(makerspaceID?: number): Promise<InventoryItem[]> 
  * @param itemIds IDs of Inventory Items to find
  * @returns matching Inventory Items
  */
-export async function getItemsByID(itemIds: number[]): Promise<InventoryItem[]> {
+export async function getItemsByID(itemIds: number[]): Promise<InventoryItemRow[]> {
   const knexResult = knex("InventoryItem").select().whereIn("id", itemIds);
-  return inventoryItemsToDomain(await knexResult);
+  return (await knexResult);
 }
 
 /**
@@ -39,12 +38,12 @@ export async function getItemsByID(itemIds: number[]): Promise<InventoryItem[]> 
  * @param staffOnly whether to fetch staffOnly items or not staffOnly items
  * @returns matching Inventory Items
  */
-export async function getItemsWhereStaff(staffOnly: boolean, makerspaceID?: number): Promise<InventoryItem[]> {
+export async function getItemsWhereStaff(staffOnly: boolean, makerspaceID?: number): Promise<InventoryItemRow[]> {
   const knexResult = knex("InventoryItem").select().where({ staffOnly });
   if (makerspaceID) {
     knexResult.where('makerspaceID', makerspaceID);
   }
-  return inventoryItemsToDomain(await knexResult);
+  return (await knexResult);
 }
 
 /**
@@ -52,12 +51,12 @@ export async function getItemsWhereStaff(staffOnly: boolean, makerspaceID?: numb
  * @param storefrontVisible 
  * @returns matching Inventory Items
  */
-export async function getItemsWhereStorefront(storefrontVisible: boolean, makerspaceID?: number): Promise<InventoryItem[]> {
+export async function getItemsWhereStorefront(storefrontVisible: boolean, makerspaceID?: number): Promise<InventoryItemRow[]> {
   const knexResult = knex("InventoryItem").select().where({ storefrontVisible });
   if (makerspaceID) {
     knexResult.where('makerspaceID', makerspaceID);
   }
-  return inventoryItemsToDomain(await knexResult);
+  return (await knexResult);
 }
 
 /**
@@ -69,8 +68,8 @@ export async function getItemsWhereStorefront(storefrontVisible: boolean, makers
 export async function getItemByIdWhereStorefront(
   id: number,
   storefrontVisible: boolean
-): Promise<InventoryItem | null> {
-  return singleInventoryItemToDomain(await knex("InventoryItem").select().where({ id, storefrontVisible }));
+): Promise<InventoryItemRow | undefined> {
+  return (await knex("InventoryItem").select().where({ id, storefrontVisible }).first());
 }
 
 /**
@@ -80,13 +79,13 @@ export async function getItemByIdWhereStorefront(
  */
 export async function getItemById(
   itemId: number
-): Promise<InventoryItem | null> {
+): Promise<InventoryItemRow | undefined> {
   const knexResult = await knex
     .first()
     .from("InventoryItem")
     .where("id", itemId);
 
-  return singleInventoryItemToDomain(knexResult);
+  return (knexResult);
 }
 
 /**
@@ -98,7 +97,7 @@ export async function getItemById(
 export async function updateItemById(
   itemId: number,
   item: InventoryItemInput
-): Promise<InventoryItem | null> {
+): Promise<InventoryItemRow | null> {
   await knex("InventoryItem").where({ id: itemId }).update({
     name: item.name,
     image: item.image,
@@ -112,7 +111,7 @@ export async function updateItemById(
     makerspaceID: item.makerspaceID,
   });
 
-  return await getItemById(itemId);
+  return await getItemById(itemId) ?? null;
 }
 
 /**
@@ -122,7 +121,7 @@ export async function updateItemById(
  */
 export async function addItem(
   item: InventoryItemInput
-): Promise<InventoryItem | null> {
+): Promise<InventoryItemRow | null> {
   const newId = (
     await knex("InventoryItem").insert(
       {
@@ -140,7 +139,7 @@ export async function addItem(
       "id"
     )
   )[0];
-  return await getItemById(newId.id);
+  return await getItemById(newId.id) ?? null;
 }
 
 /**
@@ -152,7 +151,7 @@ export async function addItem(
 export async function addItemAmount(
   itemId: number,
   amount: number
-): Promise<InventoryItem | null> {
+): Promise<InventoryItemRow | null> {
   const updateItem = (
     await knex("InventoryItem")
       .where({ id: itemId })
@@ -164,7 +163,7 @@ export async function addItemAmount(
       )
   )[0];
 
-  return await getItemById(updateItem.id);
+  return await getItemById(updateItem.id) ?? null;
 }
 
 export async function addItemsAmounts(
@@ -195,7 +194,7 @@ export async function addItemsAmounts(
 export async function setItemAmount(
   itemId: number,
   amount: number
-): Promise<InventoryItem | null> {
+): Promise<InventoryItemRow | null> {
   const updateItem = (
     await knex("InventoryItem")
       .where({ id: itemId })
@@ -207,7 +206,7 @@ export async function setItemAmount(
       )
   )[0];
 
-  return await getItemById(updateItem.id);
+  return await getItemById(updateItem.id) ?? null;
 }
 
 /**
@@ -217,9 +216,8 @@ export async function setItemAmount(
  */
 export async function archiveItem(
   itemId: number
-): Promise<InventoryItem | null> {
-  let updatedInventoryItems: InventoryItem[] = await knex("InventoryItem").where({ id: itemId }).update({ archived: true });
-
+): Promise<InventoryItemRow | undefined> {
+  const updatedInventoryItems: InventoryItemRow[] = await knex("InventoryItem").where({ id: itemId }).update({ archived: true });
   if (updatedInventoryItems.length < 1) throw new EntityNotFound(`Could not find inventory item #${itemId}`);
 
   return updatedInventoryItems[0];
