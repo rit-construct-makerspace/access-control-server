@@ -84,7 +84,6 @@ export async function getUserByIDOrUndefined(userID: number): Promise<UserRow | 
 export async function getUserByRitUsername(
   ritUsername: string
 ): Promise<UserRow | undefined> {
-  console.log("Checking user: " + ritUsername);
   if (!ritUsername) {
     return undefined;
   }
@@ -122,7 +121,6 @@ export async function createUser(user: {
   lastName: string;
   ritUsername: string;
 }): Promise<UserRow> {
-  console.log("Creating user entry: " + user.ritUsername);
   const accountID = await CurrencyAccountRepo.createAccount();
   const [newID] = await knex("Users").insert({ ...user, accountID: accountID }, "id");
   return await getUserByID(newID.id);
