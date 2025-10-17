@@ -47,8 +47,9 @@ export default function TrainingModulesPage() {
         <SearchBar
           placeholder="Search training modules"
           value={searchText}
-          onChange={(e) => {setSearchText(e.target.value); setUrlParam("a", e.target.value)}}
-          onClear={() => setUrlParam("a", "")}
+          onChange={(e) => setSearchText(e.target.value)}
+          onSubmit={() => setUrlParam("a", searchText) }
+          onClear={() => setSearchText("")}
         />
         <Button
           loading={false}

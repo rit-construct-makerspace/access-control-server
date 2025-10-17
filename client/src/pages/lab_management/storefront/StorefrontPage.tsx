@@ -189,7 +189,8 @@ export default function StorefrontPage() {
           placeholder="Search inventory"
           sx={{ mb: 2, alignSelf: "flex-start" }}
           value={searchText}
-          onChange={(e) => {setSearchText(e.target.value); setUrlParam("a", e.target.value)}}
+          onChange={(e) => setSearchText(e.target.value)}
+          onSubmit={() => setUrlParam("a", searchText) }
           onClear={() => setSearchText("")}
         />
 

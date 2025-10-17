@@ -59,7 +59,8 @@ export default function MakerspacePage() {
             <SearchBar
               placeholder="Search Equipment"
               value={equipmentSearch}
-              onChange={(e) =>  { setEquipmentSearch(e.target.value); setUrlParam("a", e.target.value)}}
+              onChange={(e) =>  setEquipmentSearch(e.target.value)}
+              onSubmit={() => setUrlParam("a", equipmentSearch) }
               onClear={() => setUrlParam("a", "")}
             />
             {

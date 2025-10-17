@@ -52,7 +52,8 @@ export default function InventoryPage() {
             <SearchBar
               placeholder="Search inventory"
               value={searchText}
-              onChange={(e) => {setSearchText(e.target.value); setUrlParam("a", e.target.value)}}
+              onChange={(e) => setSearchText(e.target.value)}
+              onSubmit={() =>  setUrlParam("a", searchText)}
               onClear={() => setSearchText("")}
             />
             <Button

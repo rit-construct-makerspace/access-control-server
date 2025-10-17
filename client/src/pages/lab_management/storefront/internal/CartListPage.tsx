@@ -117,7 +117,8 @@ export function CartListPage() {
           <TextField
             label="Search User"
             value={userSearch}
-            onChange={(e) => {setUserSearch(e.target.value); setUrlParam("a", e.target.value)}}
+            onChange={(e) => setUserSearch(e.target.value)}
+            onSubmit={() => setUrlParam("a", userSearch) }
             size="small"
           />
         </Stack>

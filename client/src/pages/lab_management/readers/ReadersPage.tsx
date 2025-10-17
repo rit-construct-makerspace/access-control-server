@@ -60,8 +60,9 @@ export default function ReadersPage() {
         <SearchBar
           placeholder="Search access devices"
           value={searchText}
-          onChange={(e) => {setSearchText(e.target.value); setUrlParam("a", e.target.value)}}
-          onClear={() => setUrlParam("a", "")}
+          onChange={(e) => setSearchText(e.target.value)}
+          onSubmit={() => setUrlParam("a", searchText) }
+          onClear={() => setSearchText("")}
         />
         <Button color="success" variant="contained" onClick={() => { navigate("/admin/newreader") }}><AddIcon />Pair New Reader</Button>
         <FormControlLabel labelPlacement="start" label = "Show All Readers" control = {<Checkbox onChange={(e)=>setShowAllReaders(e.target.checked)}></Checkbox>} />
