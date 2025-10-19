@@ -11,7 +11,7 @@ export default function Footer() {
             <Typography variant="h4" display={"flex"} alignItems={"end"}>
               Make Something Interesting
               <img
-                src="https://emoji.slack-edge.com/T018A0NHZNY/balloonritchie/41333b3f01b96f1a.png"
+                src="https://d1msoab4sbdxmc.cloudfront.net/misc-images/balloon_ritchie.png"
                 alt="Balloon Ritchie"
                 height="40px"
                 style={{ paddingLeft: "10px" }}
