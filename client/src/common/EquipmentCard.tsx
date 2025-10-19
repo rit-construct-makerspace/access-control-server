@@ -115,25 +115,27 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
             <Typography>
               <ThemedMarkdown>{props.equipment.notes}</ThemedMarkdown>
             </Typography>
-            {props.equipment.byReservationOnly ? (
-              <Typography variant="subtitle1" ml={1}>
-                Reservation only. Email{" "}
-                <Link href={"mailto:make@rit.edu"} target={"_blank"}>
-                  {" "}
-                  make@rit.edu{" "}
-                </Link>{" "}
-                to schedule.
-              </Typography>
-            ) : null}
-            <Button
-              size="small"
-              variant="contained"
-              color="info"
-              onClick={() => window.open(props.equipment.sopUrl, "_blank")}
-              sx={{ alignSelf: "flex-end" }}
-            >
-              Learn More
-            </Button>
+            <Stack direction={"row"} justifyContent={"space-between"}>
+              {props.equipment.byReservationOnly ? (
+                <Typography variant="subtitle1" ml={1}>
+                  Reservation only. Email{" "}
+                  <Link href={"mailto:make@rit.edu"} target={"_blank"}>
+                    {" "}
+                    make@rit.edu{" "}
+                  </Link>{" "}
+                  to schedule.
+                </Typography>
+              ) : <Typography/>}
+              <Button
+                size="small"
+                variant="contained"
+                color="info"
+                onClick={() => window.open(props.equipment.sopUrl, "_blank")}
+                sx={{ alignSelf: "flex-end" }}
+              >
+                Learn More
+              </Button>
+            </Stack>
           </Stack>
         </Stack>
       </CardContent>
