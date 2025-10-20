@@ -48,6 +48,7 @@ import NewEquipmentPage from "./pages/makerspace_page/equipment_pages/NewEquipme
 import EquipmentRedirector from "./pages/makerspace_page/equipment_pages/EquipmentRedirector";
 import HelpPage from "./pages/maker/signup/HelpPage";
 import UserPage from "./pages/lab_management/users/UserPage";
+import CheckoutPage from "./pages/lab_management/storefront/CheckoutPage";
 
 // This is where we map the browser's URL to a
 // React component with the help of React Router.
@@ -135,7 +136,7 @@ export default function AppRoutes() {
             <Route path="/equipment/:equipmentID" element={<EquipmentRedirector />} />
 
             {/* Routes for trainers + higher */}
-            <Route>
+            <Route element={<TrainerRoute />}>
               <Route path="/makerspace/:makerspaceID" element={<StaffBar />}>
 
                 <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />} />
@@ -143,9 +144,11 @@ export default function AppRoutes() {
                 <Route path="/makerspace/:makerspaceID/inventory" element={<InventoryPage />} />
                 <Route path="/makerspace/:makerspaceID/storefront/carts" element={<CartListPage />} />
                 <Route path="/makerspace/:makerspaceID/storefront/carts/:cartID" element={<CartPage />} />
+                <Route path="/makerspace/:makerspaceID/storefront/carts/:cartID" element={<CartPage />} />
 
                 {/* Routes for staff + higher */}
                 <Route element={<StaffRoute />}>
+
                   <Route path="/makerspace/:makerspaceID/trainings" element={<TrainingModulesPage />} />
                   <Route path="/makerspace/:makerspaceID/training/new" element={<EditNewModulePage />} />
                   <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
@@ -201,6 +204,9 @@ export default function AppRoutes() {
           {/* END OF PROTECTED ROUTES */}
 
           <Route path="/storefront" element={<StorefrontPage />} />
+          <Route element={<StaffRoute />}>
+            <Route path="/storefront/checkout" element={<CheckoutPage />} />
+          </Route>
 
           <Route path="/logoutprompt" element={<LogoutPromptPage />} />
 

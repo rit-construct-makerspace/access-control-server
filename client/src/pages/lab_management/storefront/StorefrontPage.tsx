@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Box, Button, Divider, Snackbar, Stack, Switch, Typography } from "@mui/material";
+import { Box, Divider, Snackbar, Stack, Switch, Typography } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import InventoryItem from "../../../types/InventoryItem";
 import AddToCartModal from "./AddToCartModal";
@@ -10,14 +10,12 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_INVENTORY_ITEMS } from "../../../queries/inventoryQueries";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { isAdmin, isManager, isOnlyTrainer, isStaff } from "../../../common/PrivilegeUtils";
-import Page from "../../Page";
+import { isAdmin, isManager, isStaff } from "../../../common/PrivilegeUtils";
 import { ListingCard } from "./ListingCard";
 import { ListingModal } from "./ListingModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { GET_MAKERSPACES_WITH_ITEMS, MakerspaceWithItems } from "../../../queries/makerspaceQueries";
 import CheckoutSuccessModal from "./CheckoutSuccessModal";
-import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { useNavigate } from "react-router-dom";
 
 
@@ -40,8 +38,6 @@ function updateLocalStorage(cart: ShoppingCartEntry[] | null) {
 
 export default function StorefrontPage() {
   const currentUser = useCurrentUser();
-  const isMobile = useIsMobile();
-  const navigate = useNavigate();
 
   const { loading, error, data } = useQuery(GET_MAKERSPACES_WITH_ITEMS, { variables: { storefrontVisible: isStaff(currentUser) ? null : true } });
 
@@ -142,13 +138,6 @@ export default function StorefrontPage() {
 
   return (
     <RequestWrapper loading={loading} error={error}>
-      <Page title={"Store"} noPadding={isMobile} topRightAddons={
-        (isOnlyTrainer(currentUser) || isStaff(currentUser)) ? (
-          <Button variant="contained" color="secondary" startIcon={<ShoppingCartCheckoutIcon />} onClick={() => { navigate(`/makerspace/36/storefront/carts`) }}>
-            View Carts
-          </Button>
-        ) : null
-      }>
         <title>Storefront | Make @ RIT</title>
 
         {(currentUser.visitor==false && import.meta.env.VITE_DISABLE_STOREFRONT_CART === "false") && <ShoppingCart
@@ -239,7 +228,6 @@ export default function StorefrontPage() {
             return groups;
           }, {})}
         />
-      </Page>
     </RequestWrapper>
   );
 }
