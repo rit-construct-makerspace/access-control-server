@@ -42,6 +42,7 @@ export async function getEquipmentByID(id: number): Promise<EquipmentRow> {
                               id: id
                             })
                             .first();
+
   if (!equipment) throw new EntityNotFound(`Could not find equipment #${id}`);
 
   return equipment;
