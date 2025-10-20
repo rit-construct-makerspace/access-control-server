@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, FormControlLabel, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { Equipment } from "./EditEquipmentPage";
 import { ARCHIVE_EQUIPMENT, PUBLISH_EQUIPMENT, UPDATE_EQUIPMENT } from "../../../queries/equipmentQueries";
 import { useMutation, useQuery } from "@apollo/client";
@@ -54,6 +54,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [byReservation, setByReservation] = useState(props.equipment.byReservationOnly);
   const [needsWelcome, setNeedsWelcome] = useState(props.equipment.needsWelcome);
   const [requiresTrainer, setRequiresTrainer] = useState(props.equipment.requiresTrainerApproval);
+  const [requiresInPerson, setRequiresInPerson] = useState(props.equipment.requiresInPerson);
   const [room, setRoom] = useState(props.equipment.room);
   const [moduleIDs, setModuleIds] = useState(props.equipment.trainingModules.map((mod) => mod.id));
 
@@ -70,6 +71,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         byReservationOnly: byReservation,
         needsWelcome: needsWelcome,
         requiresTrainerApproval: requiresTrainer,
+        requiresInPerson: requiresInPerson,
       },
     });
   }
@@ -155,23 +157,29 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
           multiline
           rows={3}
         />
-        <Stack direction={"row"} justifyContent={"space-around"}>
-          <FormControlLabel
-            control={<Switch checked={byReservation} onChange={(e) => setByReservation(e.target.checked)} />}
-            label={<b>Available By Reservation Only</b>}
-            labelPlacement="top"
-          />
-          <FormControlLabel
-            control={<Switch checked={needsWelcome} onChange={(e) => setNeedsWelcome(e.target.checked)} />}
-            label={<b>Needs Welcome</b>}
-            labelPlacement="top"
-          />
-          <FormControlLabel
-            control={<Switch checked={requiresTrainer} onChange={(e) => setRequiresTrainer(e.target.checked)} />}
-            label={<b>Requires Trainer to Approve</b>}
-            labelPlacement="top"
-          />
-        </Stack>
+        <ToggleButtonGroup
+          color="primary"
+          value={[
+            byReservation ? "byReservation" : null,
+            needsWelcome ? "needsWelcome" : null,
+            requiresTrainer ? "requiresTrainer" : null,
+            requiresInPerson ? "requiresInPerson" : null
+          ]}
+          sx={{alignSelf: "center"}}
+        >
+          <ToggleButton value={"byReservation"} onClick={() => setByReservation(!byReservation)}>
+            Reservation Only
+          </ToggleButton>
+          <ToggleButton value={"needsWelcome"} onClick={() => setNeedsWelcome(!needsWelcome)}>
+            Needs Welcome
+          </ToggleButton>
+          <ToggleButton value={"requiresTrainer"} onClick={() => setRequiresTrainer(!requiresTrainer)}>
+            Requires Trainer Approval
+          </ToggleButton>
+          <ToggleButton value={"requiresInPerson"} onClick={() => setRequiresInPerson(!requiresInPerson)}>
+            Requires In-Person
+          </ToggleButton>
+        </ToggleButtonGroup>
         <EquipmentTrainings
           equipmentID={props.equipment.id}
           equipmentModules={props.equipment.trainingModules}
@@ -200,6 +208,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               needsWelcome: needsWelcome,
               notes: notes,
               archived: props.equipment.archived,
+              requiresInPerson: requiresInPerson,
             }}
             isMobile={isMobile}
             staffMode={false}

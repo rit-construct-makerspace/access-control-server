@@ -15,6 +15,7 @@ export interface EquipmentInput {
   byReservationOnly: boolean;
   needsWelcome: boolean;
   requiresTrainerApproval: boolean;
+  requiresInPerson: boolean;
 }
 
 export const EquipmentTypeDefs = gql`
@@ -34,6 +35,7 @@ export const EquipmentTypeDefs = gql`
     byReservationOnly: Boolean
     needsWelcome: Boolean
     requiresTrainerApproval: Boolean
+    requiresInPerson: Boolean
   }
 
   input EquipmentInput {
@@ -46,6 +48,7 @@ export const EquipmentTypeDefs = gql`
     byReservationOnly: Boolean
     needsWelcome: Boolean
     requiresTrainerApproval: Boolean
+    requiresInPerson: Boolean
   }
 
   extend type Query {
