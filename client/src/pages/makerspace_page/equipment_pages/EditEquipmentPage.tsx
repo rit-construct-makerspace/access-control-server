@@ -23,6 +23,7 @@ export interface Equipment {
   byReservationOnly: boolean;
   needsWelcome: boolean;
   requiresTrainerApproval: boolean;
+  requiresInPerson: boolean;
   room: {
     id: number;
     name: string;
