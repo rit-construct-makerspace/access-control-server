@@ -5,13 +5,6 @@
 
 import { gql } from "graphql-tag";
 
-export interface AuditLog {
-  id: string;
-  dateTime: string;
-  message: string;
-  category: string;
-}
-
 export const AuditLogsTypeDefs = gql`
   scalar DateTime
 

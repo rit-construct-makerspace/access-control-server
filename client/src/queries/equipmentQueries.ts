@@ -61,6 +61,7 @@ export const GET_EQUIPMENT_BY_ID = gql`
       byReservationOnly
       needsWelcome
       requiresTrainerApproval
+      requiresInPerson
     }
   }
 `;
@@ -178,10 +179,22 @@ export const UPDATE_EQUIPMENT = gql`
     $byReservationOnly: Boolean
     $needsWelcome: Boolean
     $requiresTrainerApproval: Boolean
+    $requiresInPerson: Boolean
   ) {
     updateEquipment(
       id: $id
-      equipment: { name: $name, roomID: $roomID, moduleIDs: $moduleIDs, imageUrl: $imageUrl, sopUrl: $sopUrl, notes: $notes, byReservationOnly: $byReservationOnly, needsWelcome: $needsWelcome, requiresTrainerApproval: $requiresTrainerApproval }
+      equipment: {
+        name: $name,
+        roomID: $roomID,
+        moduleIDs: $moduleIDs,
+        imageUrl: $imageUrl,
+        sopUrl: $sopUrl,
+        notes: $notes,
+        byReservationOnly: $byReservationOnly,
+        needsWelcome: $needsWelcome,
+        requiresTrainerApproval: $requiresTrainerApproval,
+        requiresInPerson: $requiresInPerson
+      }
     ) {
       id
     }
