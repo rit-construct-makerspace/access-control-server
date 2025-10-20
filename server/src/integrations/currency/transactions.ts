@@ -79,7 +79,6 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     // get last update
     const lastCharges = await TransactionRepo.getLastChargesForTransactionById(transactionID);
     if (lastCharges != undefined) {
-        console.log("Have history", lastCharges);
         // If we have charged the user money last time, this will be negative
         // If it is positive, we have somehow paid them
         const deltaForThisTransaction = (lastCharges.atrium?.amount ?? 0) + (lastCharges.credit?.amount ?? 0)
