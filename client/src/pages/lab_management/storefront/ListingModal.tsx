@@ -6,7 +6,7 @@ import { useIsMobile } from "../../../common/IsMobileProvider";
 import { isStaff } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useState } from "react";
-import { findImage } from "../../../common/ImageFinder.js";
+import { makeCDNLink } from "../../../common/ImageFinder.js";
 
 interface ListingModalProps {
   item: InventoryItem;
@@ -37,7 +37,7 @@ export function ListingModal(props: ListingModalProps) {
     <PrettyModal width={!isMobile ? 1000 : "100%"} open={props.open} onClose={props.onClose}>
       <Stack direction={isMobile ? "column" : "row"} justifyContent={"space-between"} flexWrap={"wrap"} mb={"1em"}>
         <Box sx={{ maxWidth: 400, width: !isMobile ? "50%" : "100%" }}>
-          <img src={findImage(props.item.image)} style={{ width: "100%" }} alt="RIT SHED Logo" />
+          <img src={makeCDNLink(props.item.image)} style={{ width: "100%" }} alt="RIT SHED Logo" />
         </Box>
 
         <Box width={!isMobile ? "50%" : "100%"}>

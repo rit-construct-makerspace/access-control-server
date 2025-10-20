@@ -21,7 +21,7 @@ import LockClockIcon from '@mui/icons-material/LockClock';
 
 import { Link } from "react-router-dom";
 import { useIsMobile } from "../../../common/IsMobileProvider";
-import { findImage } from "../../../common/ImageFinder.js";
+import { makeCDNLink } from "../../../common/ImageFinder.js";
 
 interface EquipmentModalProps {
   equipmentID: string;
@@ -56,7 +56,7 @@ export default function EquipmentModal({ equipmentID }: EquipmentModalProps) {
               <Stack direction="row" alignItems="center" spacing={2}>
                 <Avatar
                   sx={{ width: 80, height: 80 }}
-                  src={findImage(equipment.imageUrl, import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/")}
+                  src={makeCDNLink(equipment.imageUrl, import.meta.env.VITE_CDN_EQUIPMENT_DIR + "/")}
                 />
                 <Stack>
                   <Typography variant="h4">{equipment.name}</Typography>

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MakerspaceHours from "../../../types/MakerspaceHours";
 import CurrentHours from "../../../common/CurrentHours";
-import { findImage } from "../../../common/ImageFinder.js";
+import { makeCDNLink } from "../../../common/ImageFinder.js";
 
 interface MakerspaceCardProps {
   id: number;
@@ -48,7 +48,7 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
         <CardMedia
           component="img"
           height={props.isMobile ? "197px" : "281px"}
-          image={findImage(props.imageUrl, "user-uploads/")}
+          image={makeCDNLink(props.imageUrl, "user-uploads/")}
         />
         <CardContent sx={{ justifyContent: "center", display: "flex", flexDirection: "column" }}>
           <Stack direction={"row"} justifyContent={"space-between"} alignItems={"end"}>

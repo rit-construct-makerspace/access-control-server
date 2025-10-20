@@ -16,7 +16,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { isManager } from "../../../common/PrivilegeUtils";
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import { useIsMobile } from "../../../common/IsMobileProvider";
-import { findImage } from "../../../common/ImageFinder.js";
+import { makeCDNLink } from "../../../common/ImageFinder.js";
 
 
 export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnInstanceClick }: { type: ToolItemType, handleLoanInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void, handleReturnInstanceClick: (item: ToolItemInstance, type: ToolItemType) => void }) {
@@ -73,7 +73,7 @@ export function ToolItemTypeCard({ type, handleLoanInstanceClick, handleReturnIn
           component="img"
           width={150}
           height={150}
-          image={findImage(type.imageUrl, "user-uploads/")}
+          image={makeCDNLink(type.imageUrl, "user-uploads/")}
           alt={`${type.name} image`}
           sx={{ width: 150 }} />
         <Box width={"98.5%"} pl={"1.5%"}>

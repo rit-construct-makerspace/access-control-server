@@ -4,7 +4,7 @@ import QuizItemDraft from "./QuizItemDraft";
 import { Stack, TextField } from "@mui/material";
 import { QuizItem } from "../../../../types/Quiz";
 import FileUploadButton from "../../../../common/FileUploadButton";
-import { findImage } from "../../../../common/ImageFinder.js";
+import { makeCDNLink } from "../../../../common/ImageFinder.js";
 
 const StyledImage = styled.img`
   border-radius: 4px;
@@ -32,7 +32,7 @@ export default function ImageEmbedDraft({
           color="info"
           variant="contained"
           text="Upload Image"
-          onUpload={(name: string) => updateImageEmbed({ ...imageEmbed, text: findImage(name, "user-uploads/") })}
+          onUpload={(name: string) => updateImageEmbed({ ...imageEmbed, text: makeCDNLink(name, "user-uploads/") })}
         />
         {imageEmbed.text && <StyledImage src={imageEmbed.text} alt="" />}
       </Stack>
