@@ -117,7 +117,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
             </Typography>
             <Stack direction={"row"} justifyContent={"space-between"}>
               {props.equipment.byReservationOnly ? (
-                <Typography variant="subtitle1" ml={1}>
+                <Typography variant="subtitle1">
                   Reservation only. Email{" "}
                   <Link href={"mailto:make@rit.edu"} target={"_blank"}>
                     {" "}
