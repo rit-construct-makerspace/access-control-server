@@ -4,7 +4,6 @@
 
 import { Room } from "../../models/rooms/room.js";
 import { knex } from "../../db/index.js";
-import { roomsToDomain, singleRoomToDomain } from "../../mappers/rooms/roomMapper.js";
 import assert from "assert";
 import { RoomSwipeRow, TrainingModuleRow } from "../../db/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
@@ -17,8 +16,10 @@ import * as ModuleRepo from "../Training/ModuleRepository.js";
  */
 export async function getRoomByID(roomID: number): Promise<Room | null> {
   const knexResult = await knex.first("id", "name", "archived", "makerspaceID").from("Rooms").where("id", roomID);
-
-  return singleRoomToDomain(knexResult);
+  if (knexResult === undefined) {
+    return null;
+  }
+  return knexResult;
 }
 
 /**
@@ -26,8 +27,7 @@ export async function getRoomByID(roomID: number): Promise<Room | null> {
  * @returns {Room[]} rooms
  */
 export async function getRooms(): Promise<Room[]> {
-  const knexResult = await knex("Rooms").select("Rooms.id", "Rooms.name");
-  return roomsToDomain(knexResult);
+  return await knex("Rooms").select("id", "name", "archived", "makerspaceID");
 }
 
 /**
@@ -36,8 +36,7 @@ export async function getRooms(): Promise<Room[]> {
  * @returns {Room[]} rooms
  */
 export async function getRoomsByMakerspace(makerspaceID: number): Promise<Room[]> {
-  const knexResult = await knex("Rooms").select().where({ makerspaceID: makerspaceID });
-  return roomsToDomain(knexResult);
+  return await knex("Rooms").select("id", "name", "archived", "makerspaceID").where({ makerspaceID: makerspaceID });
 }
 
 /**

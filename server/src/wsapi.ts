@@ -417,7 +417,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     }
 
     //Check that equipment access check is completed
-    if (!(process.env.GLOBAL_ACCESS_CHECK_BYPASS == "TRUE") && !(await isApproved(user.id, machine.id))) {
+    if (!(process.env.GLOBAL_ACCESS_CHECK_BYPASS == "TRUE") && (machine.requiresInPerson) && !(await isApproved(user.id, machine.id))) {
       wsApiLog("{user} failed to swipe into {machine} - {equipment} with error '{error}'", "auth",
         { id: user.id, label: getUsersFullName(user) },
         { id: machine.id, label: reader.name },
