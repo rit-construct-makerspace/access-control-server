@@ -79,15 +79,18 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
     // get last update
     const lastCharges = await TransactionRepo.getLastChargesForTransactionById(transactionID);
     if (lastCharges != undefined) {
+        console.log("Have history", lastCharges);
         // If we have charged the user money last time, this will be negative
         // If it is positive, we have somehow paid them
         const deltaForThisTransaction = (lastCharges.atrium?.amount ?? 0) + (lastCharges.credit?.amount ?? 0)
         if (centsToCharge + deltaForThisTransaction > 0){
             // recharge would give the user money (something fishy)
+            console.error(`Currency: Caught fraudulent refund before refund. Not gonna refund it. Probably needs manual rectification. tid: ${transactionID} asking for ${centsToCharge}, only ever spent ${-deltaForThisTransaction}`)
             return false;
         }
         const res = await Currency.refundChargeGroup(lastCharges, parent, entryId);
         if (typeof (res) == 'string') {
+            console.error(`Currency: Error occured while trying to refund to recharge. tid: ${parent.id}, teid: ${entryId}, err: ${res}`);
             return res
         }
         // update amount to charge based on how much was already refunded/spent
