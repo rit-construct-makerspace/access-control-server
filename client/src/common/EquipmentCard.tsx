@@ -33,10 +33,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
    * @return {boolean} True if a module has not been taken; False if all modules have been taken.
    */
   const hasNotTakenModule = moduleStatuses.some((ms: { status: string }) => ms.status === "Not taken");
-  const equipmentIdsToHideCompetencyFor = (import.meta.env.VITE_EQUIPMENT_IDS_WITHOUT_INPERSON ?? "")
-    .split(",")
-    .map((s) => Number(s));
-  const shouldHideCompetency = equipmentIdsToHideCompetencyFor.includes(Number(props.equipment.id));
+
   return (
     <Card
       sx={{
@@ -88,7 +85,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                   {moduleStatuses.map((ms: ModuleStatus) => (
                     <ModuleStatusRow ms={ms} />
                   ))}
-                  {!props.equipment.byReservationOnly && !shouldHideCompetency ? (
+                  {props.equipment.requiresInPerson ? (
                     <Stack direction={"row"} spacing={1} alignItems="center" padding="10px">
                       {hasApprovedAccessCheck ? <CheckCircleIcon color="success" /> : <CloseIcon color="error" />}
                       <Typography variant="body2">In-Person Competency Check</Typography>
@@ -118,25 +115,27 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
             <Typography>
               <ThemedMarkdown>{props.equipment.notes}</ThemedMarkdown>
             </Typography>
-            {props.equipment.byReservationOnly ? (
-              <Typography variant="subtitle1" ml={1}>
-                Reservation only. Email{" "}
-                <Link href={"mailto:make@rit.edu"} target={"_blank"}>
-                  {" "}
-                  make@rit.edu{" "}
-                </Link>{" "}
-                to schedule.
-              </Typography>
-            ) : null}
-            <Button
-              size="small"
-              variant="contained"
-              color="info"
-              onClick={() => window.open(props.equipment.sopUrl, "_blank")}
-              sx={{ alignSelf: "flex-end" }}
-            >
-              Learn More
-            </Button>
+            <Stack direction={"row"} justifyContent={"space-between"}>
+              {props.equipment.byReservationOnly ? (
+                <Typography variant="subtitle1">
+                  Reservation only. Email{" "}
+                  <Link href={"mailto:make@rit.edu"} target={"_blank"}>
+                    {" "}
+                    make@rit.edu{" "}
+                  </Link>{" "}
+                  to schedule.
+                </Typography>
+              ) : <Typography/>}
+              <Button
+                size="small"
+                variant="contained"
+                color="info"
+                onClick={() => window.open(props.equipment.sopUrl, "_blank")}
+                sx={{ alignSelf: "flex-end" }}
+              >
+                Learn More
+              </Button>
+            </Stack>
           </Stack>
         </Stack>
       </CardContent>
