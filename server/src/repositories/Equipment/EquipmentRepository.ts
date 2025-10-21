@@ -272,6 +272,7 @@ export async function updateEquipment(
     byReservationOnly: equipment.byReservationOnly,
     needsWelcome: equipment.needsWelcome ?? true,
     requiresTrainerApproval: equipment.requiresTrainerApproval,
+    requiresInPerson: equipment.requiresInPerson
   });
 
   await updateModules(id, equipment.moduleIDs);
@@ -297,6 +298,7 @@ export async function addEquipment(
       notes: equipment.notes ?? undefined,
       byReservationOnly: equipment.byReservationOnly,
       needsWelcome: equipment.needsWelcome ?? true,
+      requiresTrainerApproval: equipment.requiresTrainerApproval ?? false,
     },
     "id"
   );
