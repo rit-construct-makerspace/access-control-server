@@ -42,7 +42,6 @@ export const CartResolver = {
       if (args.makerspaceID) {
         return await getInventoryCartsByMakerspace(args.makerspaceID);
       }
-      console.log("No makerspaceID provided");
       return await getInventoryCarts();
     }
   },
