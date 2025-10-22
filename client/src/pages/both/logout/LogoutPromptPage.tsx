@@ -5,7 +5,6 @@ import {redirect} from "react-router-dom";
 
 export default function LogoutPromptPage() {
     const logout = useCallback(() => {
-        console.log("Logging out...")
         fetch("/logout", {
             mode: 'cors',
             method: 'POST',
@@ -13,8 +12,6 @@ export default function LogoutPromptPage() {
             redirect: 'follow'
         })
             .then(() => {
-                console.log("logged out")
-
                 //reload is needed to force logout user, in the future should make this happen in a better way
                 //possibly redirect to login page?
 
