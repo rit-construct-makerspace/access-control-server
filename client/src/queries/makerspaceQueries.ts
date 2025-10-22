@@ -101,6 +101,8 @@ export const GET_FULL_MAKERSPACES = gql`
           numAvailable
           numInUse
           byReservationOnly
+          needsWelcome
+          requiresInPerson
         }
       }
     }
@@ -179,6 +181,9 @@ export const GET_MAKERSPACE_BY_ID = gql`
           numAvailable
           numInUse
           byReservationOnly
+          needsWelcome
+          requiresInPerson
+
           notes
           archived
         }

@@ -237,33 +237,25 @@ export async function getPassedEquipmentIDsByModuleID(
   userID: number
 ): Promise<number[]> {
   const equipmentIdRows = await getEquipmentIDsByModuleID(moduleID);
-  console.log("equipmentIdRows: " + equipmentIdRows);
 
   var equipmentPassed: number[] = [];
   
   for (var i = 0; i <= equipmentIdRows.length; i++) {
-    console.log("equipmentIdRows i: " + JSON.stringify(equipmentIdRows[i], null, 4))
     const equipmentID = equipmentIdRows[i] != undefined ? equipmentIdRows[i].equipmentID : -1;
     if (equipmentID === -1) continue;
     const modulesForEquipment = await getModulesIDsByEquipmentID(equipmentID);
-    console.log("equipmentID: " + equipmentID);
-    console.log("modulesForEquipment: " + JSON.stringify(modulesForEquipment, null, 4));
 
     var passed = true;
 
     for (var j = 0; j <= modulesForEquipment.length; j++) {
-      console.log("modulesForEquipment j: " + JSON.stringify(modulesForEquipment[j], null, 4));
       if (modulesForEquipment[j] != undefined && !(await hasPassedModule(userID, modulesForEquipment[j]["moduleID"]))) {
-        console.log("failed");
         passed = false;
       }
     }
 
     if (passed) {
-      console.log("passed")
       await equipmentPassed.push(equipmentID);
     }
   }
-  console.log("equipmentPassed: " + equipmentPassed)
   return equipmentPassed;
 }
