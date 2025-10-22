@@ -9,6 +9,7 @@ import ConstructionIcon from "@mui/icons-material/Construction";
 import ModuleStatusRow from "./ModuleStatusRow";
 import ThemedMarkdown from "./ThemedMarkdown";
 import { memo } from "react";
+import { makeCDNLink } from "./ImageFinder.js";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -50,7 +51,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                 <Box width="150px" height="200px">
                   <CardMedia
                     component="img"
-                    image={(props.equipment.imageUrl === undefined || props.equipment.imageUrl == null || props.equipment.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + "user-uploads/" + props.equipment.imageUrl}
+                    image={makeCDNLink(props.equipment.imageUrl, "user-uploads/")}
                     alt={`Picture of ${props.equipment.name}`}
                     sx={{ width: "150px", height: "200px", backgroundColor: "lightgray" }}
                   />
