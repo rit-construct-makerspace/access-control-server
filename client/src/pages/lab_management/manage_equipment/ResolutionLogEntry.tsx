@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Chip, IconButton, MenuItem, Select, Stack, TableCell, TableRow, Typography } from "@mui/material";
 import { format, parseISO } from "date-fns";
 import { ADD_TAG_TO_LOG, DELETE_RESOLUTION_LOG, GET_RESOLUTION_LOGS, MaintenanceTag, REMOVE_TAG_FROM_LOG, ResolutionLogItem } from "../../../queries/maintenanceLogQueries";
@@ -10,6 +10,7 @@ import MaintenanceTagChip from "./MaintenanceTagChip";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { isManager } from "../../../common/PrivilegeUtils";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 
 function formatDateTime(dateTime: string) {
@@ -18,18 +19,7 @@ function formatDateTime(dateTime: string) {
 
 export default function ResolutionLogEntry({ logItem, allTags }: { logItem: ResolutionLogItem, allTags: MaintenanceTag[] }) {
   const currentUser = useCurrentUser();
-
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
   const tags = [logItem.tag1, logItem.tag2, logItem.tag3];
 

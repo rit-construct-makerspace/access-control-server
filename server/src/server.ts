@@ -10,11 +10,11 @@ import { expressMiddleware } from "@as-integrations/express5";
 import compression from "compression";
 import cors from "cors";
 import { schema } from "./schema.js";
-import { setupSessions, setupDevAuth, setupStagingAuth, setupAuth } from "./auth.js";
+import { setupSessions, setupDevAuth, setupSamlAuth, setupAuth } from "./auth.js";
 import context, { determineUser } from "./context.js";
 import path from "path";
 import * as schedule from "node-schedule";
-import { getUserByCardTagID, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
+import { getUserByCardTagID, getUsersFullName } from "./repositories/Users/UserRepository.js";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { getReaderBySN, getReaderCertCA } from "./repositories/Readers/ReaderRepository.js";
 import morgan from "morgan"; //Log provider
@@ -22,7 +22,6 @@ import { createRequire } from "module";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
 import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
-import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getMakerspaceHoursNextWeek } from "./repositories/Makerspaces/MakerspaceHoursRepository.js";
 import { getPassedTrainingsDaysAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
@@ -31,6 +30,7 @@ import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { purge_images } from "./periodicActions.js";
+import { InventoryItemRow } from "./db/tables.js";
 
 const require = createRequire(import.meta.url);
 
@@ -76,6 +76,18 @@ async function startServer() {
   setupSessions(app);
 
 
+  // Force redirect to https in production (actually dont yet)
+  /*
+  if (process.env.NODE_ENV === 'production') {
+    app.use(function (req, res, next) {
+      if (req.headers['x-forwarded-proto'] !== 'https') {
+        return res.redirect(['https://', req.get('Host'), req.url].join(''));
+      }
+      return next();
+    });
+  }
+  */
+
   // environment setup
   if (process.env.NODE_ENV === "development") {
     /**
@@ -91,7 +103,7 @@ async function startServer() {
      * Use the SAML configuration, but use insecure dev cookie handling
      */
     console.log("staging active");
-    setupStagingAuth(app);
+    setupSamlAuth(app);
   } else if (process.env.NODE_ENV === "production") {
     /**
      * mode: PRODUCTION
@@ -133,21 +145,15 @@ async function startServer() {
     res.redirect("/login");
   });
 
-
-  //it might seem like you should be able to redirect straight to /app/ from / but for some reason it infitely refreshes
-  // and this solves the issue
+  //redirects  make.rit.edu/app/home(may be in peoples browsers history from old redirect)
   app.get("/app/home", function (req, res) {
-    res.redirect(SECURE_ORIGIN+"/app/")
-  })
-
-
-  //redirects first landing make.rit.edu/ -> make.rit.edu/home
+    res.redirect(SECURE_ORIGIN + "/app/");
+  });
   app.get("/", function (req, res) {
-    res.redirect(SECURE_ORIGIN+"/app/home");
+    res.redirect(SECURE_ORIGIN + "/app/");
   });
 
   app.get("/app/*apppage", function (req, res) {
-    res.header
     res.sendFile(path.join(__dirname, "../../client/build", "index.html"));
   });
 
@@ -267,7 +273,7 @@ async function startServer() {
   app.get("/api/inv", async function (req, res) {
     try {
       const fetchType: "public" | "internal" | "staff" | "all" = req.body.Type ?? "public";
-      var items: InventoryItem[] = [];
+      let items: InventoryItemRow[] = [];
 
       if (fetchType === "internal" || fetchType === "staff" || fetchType === "all") {
         if (req.body.Key != process.env.INV_API_KEY) {

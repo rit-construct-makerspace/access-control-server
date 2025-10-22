@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, FormControlLabel, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { Equipment } from "./EditEquipmentPage";
 import { ARCHIVE_EQUIPMENT, PUBLISH_EQUIPMENT, UPDATE_EQUIPMENT } from "../../../queries/equipmentQueries";
 import { useMutation, useQuery } from "@apollo/client";
@@ -8,11 +8,13 @@ import EquipmentCard from "../../../common/EquipmentCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import GET_ROOMS from "../../../queries/roomQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import SaveIcon from '@mui/icons-material/Save';
+import SaveIcon from "@mui/icons-material/Save";
 import EquipmentTrainings from "./EquipmentTrainings";
-import ArchiveIcon from '@mui/icons-material/Archive';
-import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import ArchiveIcon from "@mui/icons-material/Archive";
+import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import FileUploadButton from "../../../common/FileUploadButton";
+import { GET_FULL_MAKERSPACES } from "../../../queries/makerspaceQueries.js";
+
 
 interface EquipmentInformationProps {
   equipment: Equipment;
@@ -24,7 +26,11 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const getRoomsResult = useQuery(GET_ROOMS);
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT, {
-    refetchQueries: ["GetEquipmentByID"],
+    refetchQueries: [
+      "GetEquipmentByID",
+      { query: GET_ROOMS }, 
+      { query: GET_FULL_MAKERSPACES }
+    ],
     onCompleted() {
       toast.success("Updated equipment");
     },
@@ -34,11 +40,11 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   });
   const [publishEquipment] = useMutation(PUBLISH_EQUIPMENT, {
     variables: { id: props.equipment.id },
-    refetchQueries: ["GetEquipmentByID"]
+    refetchQueries: ["GetEquipmentByID", { query: GET_ROOMS }],
   });
   const [archiveEquipment] = useMutation(ARCHIVE_EQUIPMENT, {
     variables: { id: props.equipment.id },
-    refetchQueries: ["GetEquipmentByID"]
+    refetchQueries: ["GetEquipmentByID", { query: GET_ROOMS }],
   });
 
   const [name, setName] = useState(props.equipment.name);
@@ -48,8 +54,9 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [byReservation, setByReservation] = useState(props.equipment.byReservationOnly);
   const [needsWelcome, setNeedsWelcome] = useState(props.equipment.needsWelcome);
   const [requiresTrainer, setRequiresTrainer] = useState(props.equipment.requiresTrainerApproval);
+  const [requiresInPerson, setRequiresInPerson] = useState(props.equipment.requiresInPerson);
   const [room, setRoom] = useState(props.equipment.room);
-  const [moduleIDs, setModuleIds] = useState(props.equipment.trainingModules.map((mod) => (mod.id)));
+  const [moduleIDs, setModuleIds] = useState(props.equipment.trainingModules.map((mod) => mod.id));
 
   function handleEquipmentUpdate() {
     updateEquipment({
@@ -63,8 +70,9 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         notes: notes,
         byReservationOnly: byReservation,
         needsWelcome: needsWelcome,
-        requiresTrainerApproval: requiresTrainer
-      }
+        requiresTrainerApproval: requiresTrainer,
+        requiresInPerson: requiresInPerson,
+      },
     });
   }
 
@@ -83,8 +91,10 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   return (
     <Stack direction={isMobile ? "column-reverse" : "row"} width={"100%"} justifyContent={"space-between"}>
       <Stack width={isMobile ? "100%" : "49%"} spacing={2}>
-        <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
-          <Typography variant="h5" fontWeight={"bold"}>Machine Information</Typography>
+        <Stack direction={isMobile ? "column" : "row"} justifyContent={"space-between"} alignItems={"center"}>
+          <Typography variant="h5" fontWeight={"bold"}>
+            Machine Information
+          </Typography>
           <Stack direction={"row"} spacing={2}>
             {/* Upload image button goes here */}
             <FileUploadButton
@@ -93,67 +103,50 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               text="Upload Image"
               onUpload={(name: string) => setImageUrl(name)}
             />
-            {
-              props.equipment.archived
-                ? <Button
-                  color="success"
-                  variant="contained"
-                  startIcon={<UnarchiveIcon />}
-                  onClick={() => publishEquipment()}
-                >
-                  Publish
-                </Button>
-                : <Button
-                  color="error"
-                  variant="contained"
-                  startIcon={<ArchiveIcon />}
-                  onClick={() => archiveEquipment()}
-                >
-                  Archive
-                </Button>
-            }
-            <Button
-              variant="contained"
-              startIcon={<SaveIcon />}
-              onClick={handleEquipmentUpdate}
-            >
+            {props.equipment.archived ? (
+              <Button
+                color="success"
+                variant="contained"
+                startIcon={<UnarchiveIcon />}
+                onClick={() => publishEquipment()}
+              >
+                Publish
+              </Button>
+            ) : (
+              <Button color="error" variant="contained" startIcon={<ArchiveIcon />} onClick={() => archiveEquipment()}>
+                Archive
+              </Button>
+            )}
+            <Button variant="contained" startIcon={<SaveIcon />} onClick={handleEquipmentUpdate}>
               Save
             </Button>
           </Stack>
         </Stack>
 
-        <TextField
-          label="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+        <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <TextField label="SOP URL" value={sopUrl} onChange={(e) => setSopUrl(e.target.value)} />
+        <RequestWrapper2
+          result={getRoomsResult}
+          render={(data) => {
+            const rooms = data.rooms; // TODO: filter to only rooms in THIS makerspace
+            return (
+              <Autocomplete
+                renderInput={(params: any) => <TextField {...params} label="Location" />}
+                /* Autocomplete's value prop wants undefined, not null.
+                 * But if we give it undefined then it thinks it's an
+                 * uncontrolled prop and throws a console error
+                 * when we set the value. This is a MUI problem.
+                 * @ts-ignore */
+                value={props.equipment.room}
+                options={rooms}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                getOptionLabel={(option) => option.name}
+                onChange={(e, value) => setRoom(value)}
+                disableClearable
+              />
+            );
+          }}
         />
-        <TextField
-          label="SOP URL"
-          value={sopUrl}
-          onChange={(e) => setSopUrl(e.target.value)}
-        />
-        <RequestWrapper2 result={getRoomsResult} render={(data) => {
-
-          const rooms = data.rooms; // TODO: filter to only rooms in THIS makerspace
-          return (
-            <Autocomplete
-              renderInput={(params: any) => (
-                <TextField {...params} label="Location" />
-              )}
-              /* Autocomplete's value prop wants undefined, not null.
-              * But if we give it undefined then it thinks it's an
-              * uncontrolled prop and throws a console error
-              * when we set the value. This is a MUI problem.
-              * @ts-ignore */
-              value={props.equipment.room}
-              options={rooms}
-              isOptionEqualToValue={(option, value) => option.id === value.id}
-              getOptionLabel={(option) => option.name}
-              onChange={(e, value) => setRoom(value)}
-              disableClearable
-            />
-          );
-        }} />
         <TextField
           label="Description"
           style={{ background: "none", fontFamily: "Roboto", fontSize: "1em", lineHeight: "2em" }}
@@ -164,28 +157,34 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
           multiline
           rows={3}
         />
-        <Stack direction={"row"} justifyContent={"space-around"}>
-          <FormControlLabel
-            control={<Switch checked={byReservation} onChange={(e) => setByReservation(e.target.checked)} />}
-            label={<b>Available By Reservation Only</b>}
-            labelPlacement="top"
-          />
-          <FormControlLabel
-            control={<Switch checked={needsWelcome} onChange={(e) => setNeedsWelcome(e.target.checked)} />}
-            label={<b>Needs Welcome</b>}
-            labelPlacement="top"
-          />
-          <FormControlLabel
-            control={<Switch checked={requiresTrainer} onChange={(e) => setRequiresTrainer(e.target.checked)} />}
-            label={<b>Requires Trainer to Approve</b>}
-            labelPlacement="top"
-          />
-        </Stack>
+        <ToggleButtonGroup
+          color="primary"
+          value={[
+            byReservation ? "byReservation" : null,
+            needsWelcome ? "needsWelcome" : null,
+            requiresTrainer ? "requiresTrainer" : null,
+            requiresInPerson ? "requiresInPerson" : null
+          ]}
+          sx={{alignSelf: "center"}}
+        >
+          <ToggleButton value={"byReservation"} onClick={() => setByReservation(!byReservation)}>
+            Reservation Only
+          </ToggleButton>
+          <ToggleButton value={"needsWelcome"} onClick={() => setNeedsWelcome(!needsWelcome)}>
+            Needs Welcome
+          </ToggleButton>
+          <ToggleButton value={"requiresTrainer"} onClick={() => setRequiresTrainer(!requiresTrainer)}>
+            Requires Trainer Approval
+          </ToggleButton>
+          <ToggleButton value={"requiresInPerson"} onClick={() => setRequiresInPerson(!requiresInPerson)}>
+            Requires In-Person
+          </ToggleButton>
+        </ToggleButtonGroup>
         <EquipmentTrainings
           equipmentID={props.equipment.id}
           equipmentModules={props.equipment.trainingModules}
           addModule={(mID) => {
-            setModuleIds([...moduleIDs, mID])
+            setModuleIds([...moduleIDs, mID]);
           }}
           removeModule={(mID) => {
             var temp = [...moduleIDs];
@@ -209,12 +208,13 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               needsWelcome: needsWelcome,
               notes: notes,
               archived: props.equipment.archived,
+              requiresInPerson: requiresInPerson,
             }}
             isMobile={isMobile}
-            staffMode={false} />
+            staffMode={false}
+          />
         </Box>
       </Stack>
-
     </Stack>
   );
 }

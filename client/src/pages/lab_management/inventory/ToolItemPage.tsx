@@ -20,7 +20,6 @@ import { isManager } from "../../../common/PrivilegeUtils";
 export function ToolItemPage() {
   const { typeid, instanceid, makerspaceID } = useParams<{ typeid: string, instanceid: string, makerspaceID: string }>();
 
-  console.log(typeid, instanceid, makerspaceID);
   const [searchParams] = useSearchParams()
   const location = useLocation();
   const navigate = useNavigate();

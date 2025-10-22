@@ -12,20 +12,11 @@ import { AccessProgress } from "../../../types/TrainingModule";
 import MinimalTrainingModuleRow from "../../../common/MinimalTrainingModuleRow";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 
 export default function EquipmentProgressCard(props: { moduleID: number }) {
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 768;
+  const isMobile = useIsMobile();
 
   const accessProgressResult = useQuery(GET_ACCESS_PROGRESSES, { variables: { sourceTrainingModuleID: props.moduleID } });
 
@@ -35,10 +26,9 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
 
   const modulesToHideInPersonFor: number[] = (import.meta.env.VITE_MODULE_IDS_WITHOUT_INPERSON ?? "").split(",").map(s => Number(s));
   const shouldHideCompetency = modulesToHideInPersonFor.includes(Number(props.moduleID));
-  console.log("should hide", props.moduleID, modulesToHideInPersonFor, shouldHideCompetency)
 
   return (
-    <Card sx={{ width: isMobile ? "100%" : "50%" }}>
+    <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>
       <CardHeader sx={{ fontWeight: "bold" }} title="Next for you"></CardHeader>
       <RequestWrapper loading={accessProgressResult.loading} error={accessProgressResult.error}>
         <CardContent>

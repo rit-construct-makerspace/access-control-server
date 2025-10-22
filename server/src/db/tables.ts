@@ -54,6 +54,8 @@ export interface EquipmentRow {
   needsWelcome?: boolean;
   /** If a piece of equipment is suffeciently complicated, you can designate trainers to teach people how to use the machine. */
   requiresTrainerApproval: boolean;
+  /** Whether a piece of equipment requires an in person knowledge check to be completed before allowing access */
+  requiresInPerson: boolean;
 }
 
 /**
@@ -407,6 +409,10 @@ export interface MakerspaceRow {
   subtitle: string | null;
   /** Room code for the makerspace */
   location: string | null;
+  /** Longer description of makerspace */
+  description: string
+  /** Link to the documentation page for this makerspace */
+  docsLink: string;
   /** CDN Image Identifier */
   imageUrl: string;
   /** If true, this makerspace is out of use and can't be visited. It is effecively deleted  */

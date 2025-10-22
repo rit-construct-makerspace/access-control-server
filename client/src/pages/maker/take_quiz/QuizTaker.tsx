@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Markdown from 'react-markdown'
 import GET_TRAINING_MODULES from "../../../queries/trainingQueries";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 
 const StyledDiv = styled.div`
@@ -65,18 +66,7 @@ interface QuizTakerProps {
 export default function QuizTaker({ module }: QuizTakerProps) {
 
   const [quizProgressed, setQuizProgressed] = useState<boolean>(false);
-
-  const [width, setWidth] = useState<number>(window.innerWidth);
-  function handleWindowSizeChange() {
-    setWidth(window.innerWidth);
-  }
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowSizeChange);
-    return () => {
-      window.removeEventListener('resize', handleWindowSizeChange);
-    }
-  }, []);
-  const isMobile = width <= 950;
+  const isMobile = useIsMobile();
 
 
   const initialAnswerSheet = module.quiz

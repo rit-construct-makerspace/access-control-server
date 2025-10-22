@@ -8,6 +8,7 @@ import { Box, Button, Divider, FormControl, InputLabel, MenuItem, Select, Stack,
 import GET_ROOMS from "../../../queries/roomQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import Room from "../../../types/Room";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 
 export function ToolItemInstanceModal({ item, type }: { item?: ToolItemInstance, type: ToolItemType }) {
@@ -52,7 +53,6 @@ export function ToolItemInstanceModal({ item, type }: { item?: ToolItemInstance,
     } else setUIDAlert(false);
 
     setNewItem({...newItem, typeID: Number(newItem.typeID), locationRoomID: Number(newItem.locationRoomID)});
-    console.log(newItem);
 
     if (item) editInstance({variables: {id: item.id, toolItemInstance: {
       typeID: newItem.typeID,
@@ -86,7 +86,7 @@ export function ToolItemInstanceModal({ item, type }: { item?: ToolItemInstance,
           window.removeEventListener('resize', handleWindowSizeChange);
       }
   }, []);
-  const isMobile = width <= 1100;
+  const isMobile = useIsMobile();
 
 
   return (

@@ -59,7 +59,8 @@
     "side-channel-list": "^1.0.0",
     "side-channel-map": "^1.0.1",
     "side-channel-weakmap": "^1.0.2",
-    "typescript": "^4.4.3",
+    "typescript": "^5",
+    "tsx": "^4.16.5",
     "uuid": "^8.3.2",
     "ws": "^8.18.3",
     "xml2js": "^0.6.2"
@@ -95,7 +96,6 @@
     "node": "^22.6.0",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
-    "tsx": "^4.16.5",
     "typescript-eslint": "^8.44.0"
   },
   "engines": {
