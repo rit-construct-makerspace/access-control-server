@@ -1,6 +1,13 @@
 import type { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
+    if (!(await knex.schema.hasColumn("Announcements", "hasLink"))) {
+    // create hasLink column if it doesn't exist
+    await knex.schema.alterTable("Announcements", (t) => {
+      t.boolean("hasLink").notNullable().defaultTo(false);
+    });
+  }
+
   if (!(await knex.schema.hasColumn("Announcements", "linkText"))) {
     // create linkText column if it doesn't exist
     await knex.schema.alterTable("Announcements", (t) => {
@@ -17,6 +24,13 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
+  if (await knex.schema.hasColumn("Announcements", "hasLink")) {
+    // drop hasLink column if it exists
+    await knex.schema.alterTable("Announcements", (t) => {
+      t.dropColumn("hasLink");
+    });
+  }
+
   if (await knex.schema.hasColumn("Announcements", "linkText")) {
     // drop linkText column if it exists
     await knex.schema.alterTable("Announcements", (t) => {

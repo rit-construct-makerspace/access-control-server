@@ -35,6 +35,7 @@ export async function getAnnouncementByID(announcementID: number): Promise<Annou
 export async function createAnnouncement(announcement: {
   title: string;
   description: string;
+  hasLink: boolean;
   linkText: string;
   linkUrl: string;
 }): Promise<AnnouncementRow> {
@@ -51,6 +52,7 @@ export async function updateAnnouncement(announcement: {
   id: number;
   title: string;
   description: string;
+  hasLink: boolean;
   linkText: string;
   linkUrl: string;
 }): Promise<AnnouncementRow> {
@@ -59,6 +61,7 @@ export async function updateAnnouncement(announcement: {
     .update({
       title: announcement.title,
       description: announcement.description,
+      hasLink: announcement.hasLink,
       linkText: announcement.linkText,
       linkUrl: announcement.linkUrl,
     });
