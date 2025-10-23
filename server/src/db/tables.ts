@@ -647,6 +647,12 @@ export interface ExpressSessionRow {
   session: string;
 }
 
+export interface CustomUrlRow {
+  id:number;
+  shortUrl: string;
+  longUrl: string;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -694,5 +700,6 @@ declare module "knex/types/tables.js" {
     RefIDCounter: RefIDCounterRow;
     RolesTemp: TempRolesRow;
     ExpressSessions: ExpressSessionRow;
+    CustomURLs: CustomUrlRow;
   }
 }

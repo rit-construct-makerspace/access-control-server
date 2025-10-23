@@ -31,6 +31,7 @@ import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { purge_images } from "./periodicActions.js";
+import { getCustomUrl } from "./repositories/Links/customUrlRepository.js";
 
 const require = createRequire(import.meta.url);
 
@@ -161,7 +162,10 @@ async function startServer() {
   //   res.redirect("/app");
   // });
 
-
+  app.get("/link/:link", async function (req, res){
+    const customUrl = await getCustomUrl((req.params.link));
+    res.redirect( customUrl?.longUrl );
+  });
 
   /** ===============================================================================================
    * ACS Hardware Endpoints
