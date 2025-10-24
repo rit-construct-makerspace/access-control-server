@@ -11,7 +11,6 @@ import { useQuery } from "@apollo/client";
 import { GET_ACCESS_PROGRESSES } from "../queries/trainingQueries";
 import { GET_PASSED_SUBMISSION } from "../queries/getSubmissions";
 import { useCurrentUser } from "./CurrentUserProvider.js";
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 interface ModuleStatusRowProps {
