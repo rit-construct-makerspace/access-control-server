@@ -1,18 +1,17 @@
-import { ChangeEvent, useState } from "react";
-import {
-  Button,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import React, { ChangeEvent, useState } from "react";
+import { Button, FormControlLabel, Grid, Stack, Switch, TextField, Typography } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import { Announcement } from "../../../queries/announcementsQueries";
 import { useNavigate } from "react-router-dom";
 import DeleteAnnouncementButton from "./button/DeleteAnnouncementButton";
+import AnnouncementCard from "../../both/homepage/AnnouncementCard.js";
+import { toast } from "react-toastify";
 
 interface InputErrors {
   title?: boolean;
   description?: boolean;
+  linkText?: boolean;
+  linkUrl?: boolean;
 }
 
 interface AnnouncementPageProps {
@@ -32,20 +31,46 @@ export default function AnnouncementModalContents({
   onDelete,
   loading,
 }: AnnouncementPageProps) {
-
   const navigate = useNavigate();
-  
+
   const [inputErrors, setInputErrors] = useState<InputErrors>({});
 
-  const handleStringChange =
-    (property: keyof Announcement) =>
-    (e: ChangeEvent<HTMLInputElement>) =>
-      setAnnouncementDraft({ ...announcementDraft, [property]: e.target.value });
+  const handleStringChange = (property: keyof Announcement) => (e: ChangeEvent<HTMLInputElement>) =>
+    setAnnouncementDraft({ ...announcementDraft, [property]: e.target.value });
+
+  const handleHasLinkSwitch = (e: ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    if (!checked) {
+      setAnnouncementDraft({
+        ...announcementDraft,
+        hasLink: false,
+        linkText: "",
+        linkUrl: "",
+      });
+    } else {
+      setAnnouncementDraft({ ...announcementDraft, hasLink: true });
+    }
+  };
+
+  const normalizeUrl = (url: string) => {
+    if (!url) return "";
+    return /^https?:\/\//.test(url) ? url : "https://" + url;
+  };
+
+  const handleUrlBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const raw = e.target.value.trim();
+    const normalized = normalizeUrl(raw);
+
+    setAnnouncementDraft({ ...announcementDraft, linkUrl: normalized });
+  };
 
   const handleSaveClick = async () => {
+
     const updatedInputErrors: InputErrors = {
-      title: !announcementDraft.title,
-      description: !announcementDraft.description,
+      title: !draft.title,
+      description: !draft.description,
+      linkText: draft.hasLink && !draft.linkText,
+      linkUrl: draft.hasLink && !draft.linkUrl,
     };
 
     setInputErrors(updatedInputErrors);
@@ -53,23 +78,28 @@ export default function AnnouncementModalContents({
     const hasInputErrors = Object.values(updatedInputErrors).some((e) => e);
     if (hasInputErrors) return;
 
-    await onSave();
-
-    navigate("/admin/announcements");
+    try {
+      await onSave();
+      navigate("/admin/announcements");
+    } catch (error) {
+      toast.error("Failed to save announcement. " + (error instanceof Error ? error.message : ""));
+    }
   };
 
   const handleDeleteClick = async () => {
-    await onDelete()
-    navigate("/admin/announcements");
-  }
+    try {
+      await onDelete();
+      navigate("/admin/announcements");
+    } catch (error) {
+      toast.error("Failed to delete announcement." + (error instanceof Error ? error.message : ""));
+    }
+  };
 
   const title = `${isNewAnnouncement ? "New" : "Edit"} Announcement`;
 
   return (
     <Stack padding="25px" spacing={2}>
-      <Typography variant="h5">
-        {title}
-      </Typography>
+      <Typography variant="h5">{title}</Typography>
       <Stack direction="row" spacing={2}>
         <Stack spacing={2} flexGrow={1}>
           <TextField
@@ -90,15 +120,45 @@ export default function AnnouncementModalContents({
               minRows={3}
             />
           </Stack>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={announcementDraft.hasLink}
+                onChange={handleHasLinkSwitch}
+              />
+            }
+            label={<b>Link Button</b>}
+            labelPlacement="top"
+          />
+          {announcementDraft.hasLink ? (
+            <>
+              <TextField
+                label="Link Text"
+                type="string"
+                value={announcementDraft.linkText ?? ""}
+                error={inputErrors.linkText}
+                onChange={handleStringChange("linkText")}
+                required
+              />
+              <TextField
+                helperText="Please enter a valid URL, including 'http://' or 'https://'. If you leave it out, we'll assume 'https://'."
+                label="Link URL"
+                type="url"
+                value={announcementDraft.linkUrl ?? ""}
+                error={inputErrors.linkUrl}
+                onChange={handleStringChange("linkUrl")}
+                onBlur={handleUrlBlur}
+                required
+              />
+            </>
+          ) : null}
         </Stack>
       </Stack>
 
       <Stack direction="row" justifyContent="flex-end" spacing={2}>
         {!isNewAnnouncement && (
           <Stack direction="row" spacing={2}>
-            <DeleteAnnouncementButton 
-              onDelete={handleDeleteClick}
-            />
+            <DeleteAnnouncementButton onDelete={handleDeleteClick} />
           </Stack>
         )}
 
@@ -114,6 +174,11 @@ export default function AnnouncementModalContents({
           Save
         </Button>
       </Stack>
+      <Grid margin="10px" display="flex" justifyContent="center" alignItems="center">
+        <Grid width="400px">
+          <AnnouncementCard announcement={announcementDraft} />
+        </Grid>
+      </Grid>
     </Stack>
   );
 }

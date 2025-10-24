@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { GET_ANNOUNCEMENTS, CREATE_ANNOUNCEMENT } from "../../../queries/announcementsQueries";
-import { Box, Button, FormControlLabel, Stack, Switch, TextField, Typography } from "@mui/material";
+import { Button, FormControlLabel, Grid, Stack, Switch, TextField, Typography } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import { useNavigate } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
@@ -19,7 +19,7 @@ export default function NewAnnouncementPage() {
 
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [hasLinkButton, setHasLinkButton] = useState(false);
+  const [newHasLink, setNewHasLink] = useState(false);
   const [newLinkUrl, setNewLinkUrl] = useState("");
   const [newLinkText, setNewLinkText] = useState("");
 
@@ -27,12 +27,32 @@ export default function NewAnnouncementPage() {
 
   const [createAnnouncement, mutation] = useMutation(CREATE_ANNOUNCEMENT);
 
+  const handleHasLinkSwitch = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewHasLink(e.target.checked);
+    if (!newHasLink) {
+      setNewLinkText("");
+      setNewLinkUrl("");
+    }
+  };
+
+  const normalizeUrl = (url: string) => {
+    if (!url) return "";
+    return /^https?:\/\//.test(url) ? url : "https://" + url;
+  };
+
+  const handleUrlBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const raw = e.target.value.trim();
+    const normalized = normalizeUrl(raw);
+
+    setNewLinkUrl(normalized);
+  };
+
   const handleSaveClick = async () => {
     const updatedInputErrors: InputErrors = {
       title: !newTitle,
       description: !newDescription,
-      linkText: hasLinkButton && !newLinkText,
-      linkUrl: hasLinkButton && !newLinkUrl,
+      linkText: newHasLink && !newLinkText,
+      linkUrl: newHasLink && !newLinkUrl,
     };
 
     setInputErrors(updatedInputErrors);
@@ -44,6 +64,7 @@ export default function NewAnnouncementPage() {
       variables: {
         title: newTitle,
         description: newDescription,
+        hasLink: newHasLink,
         linkText: newLinkText,
         linkUrl: newLinkUrl,
       },
@@ -58,6 +79,7 @@ export default function NewAnnouncementPage() {
   const announcement: any = {
     title: newTitle,
     description: newDescription,
+    hasLink: newHasLink,
     linkText: newLinkText,
     linkUrl: newLinkUrl,
   };
@@ -66,14 +88,13 @@ export default function NewAnnouncementPage() {
     <Stack padding={"25px"} spacing={2}>
       <title>New Announcment | Make @ RIT</title>
       <Typography variant="h5">New Announcement</Typography>
-
       <Stack direction="row" spacing={2}>
         <Stack spacing={2} flexGrow={1}>
           <TextField
             label="Name"
             value={newTitle ?? ""}
             error={inputErrors.title}
-            onChange={(e) => setNewTitle(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setNewTitle(e.target.value)}
           />
           <Stack direction="row" spacing={2}>
             <TextField
@@ -82,32 +103,34 @@ export default function NewAnnouncementPage() {
               type="string"
               value={newDescription ?? ""}
               error={inputErrors.description}
-              onChange={(e) => setNewDescription(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setNewDescription(e.target.value)}
               multiline
               minRows={3}
             />
           </Stack>
           <FormControlLabel
-            control={<Switch checked={hasLinkButton} onChange={(e) => setHasLinkButton(e.target.checked)} />}
+            control={<Switch checked={newHasLink} onChange={handleHasLinkSwitch} />}
             label={<b>Link Button</b>}
             labelPlacement="top"
           />
-          {hasLinkButton ? (
+          {newHasLink ? (
             <>
               <TextField
                 label="Link Text"
                 type="string"
                 value={newLinkText ?? ""}
                 error={inputErrors.linkText}
-                onChange={(e: any) => setNewLinkText(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setNewLinkText(e.target.value)}
                 required
               />
               <TextField
+                helperText="Please enter a valid URL, including 'http://' or 'https://'. If you leave it out, we'll assume 'https://'."
                 label="Link URL"
                 type="string"
                 value={newLinkUrl ?? ""}
                 error={inputErrors.linkUrl}
-                onChange={(e: any) => setNewLinkUrl(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setNewLinkUrl(e.target.value)}
+                onBlur={handleUrlBlur}
                 required
               />
             </>
@@ -138,11 +161,11 @@ export default function NewAnnouncementPage() {
         </Button>
       </Stack>
 
-      <Stack justifyContent={"center"} alignItems={"center"}>
-        <Box width={"100%"} height={"min-content"} justifyContent={"center"} display={"grid"}>
+      <Grid margin="10px" display="flex" justifyContent="center" alignItems="center">
+        <Grid width="400px">
           <AnnouncementCard announcement={announcement} />
-        </Box>
-      </Stack>
+        </Grid>
+      </Grid>
     </Stack>
   );
 }
