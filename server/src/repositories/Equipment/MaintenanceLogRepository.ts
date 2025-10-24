@@ -69,7 +69,6 @@ export async function getMaintenanceLogByID(id: number): Promise<MaintenanceLogR
  * @returns new Maintenance Log
  */
 export async function createResolutionLog(authorID: number, equipmentID: number, instanceID: number | undefined, issue: string, content: string): Promise<ResolutionLogRow> {
-    console.log(instanceID)
     return await knex("ResolutionLogs").insert({authorID, equipmentID, instanceID, issue, content});
 }
 

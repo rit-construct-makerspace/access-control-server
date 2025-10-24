@@ -14,7 +14,7 @@ import { setupSessions, setupDevAuth, setupSamlAuth, setupAuth } from "./auth.js
 import context, { determineUser } from "./context.js";
 import path from "path";
 import * as schedule from "node-schedule";
-import { getUserByCardTagID, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
+import { getUserByCardTagID, getUsersFullName } from "./repositories/Users/UserRepository.js";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { getReaderBySN, getReaderCertCA } from "./repositories/Readers/ReaderRepository.js";
 import morgan from "morgan"; //Log provider
@@ -22,7 +22,6 @@ import { createRequire } from "module";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
 import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
-import { InventoryItem } from "./schemas/storeFrontSchema.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getMakerspaceHoursNextWeek } from "./repositories/Makerspaces/MakerspaceHoursRepository.js";
 import { getPassedTrainingsDaysAgo, purgeExpiredPassedModules } from "./repositories/Training/PassedRepository.js";
@@ -32,6 +31,7 @@ import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { purge_images } from "./periodicActions.js";
 import { getCustomUrl } from "./repositories/Links/customUrlRepository.js";
+import { InventoryItemRow } from "./db/tables.js";
 
 const require = createRequire(import.meta.url);
 
@@ -277,7 +277,7 @@ async function startServer() {
   app.get("/api/inv", async function (req, res) {
     try {
       const fetchType: "public" | "internal" | "staff" | "all" = req.body.Type ?? "public";
-      var items: InventoryItem[] = [];
+      let items: InventoryItemRow[] = [];
 
       if (fetchType === "internal" || fetchType === "staff" || fetchType === "all") {
         if (req.body.Key != process.env.INV_API_KEY) {

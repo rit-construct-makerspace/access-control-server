@@ -157,7 +157,6 @@ const EquipmentResolvers = {
         if (!user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
           throw new GraphQLError(`Insufficent Privilege for Makerspace ${room?.makerspaceID}`)
         }
-        console.log(args.equipment)
         return await EquipmentRepo.updateEquipment(Number(args.id), args.equipment);
       }),
 

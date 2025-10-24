@@ -9,6 +9,7 @@ import ConstructionIcon from "@mui/icons-material/Construction";
 import ModuleStatusRow from "./ModuleStatusRow";
 import ThemedMarkdown from "./ThemedMarkdown";
 import { memo } from "react";
+import { makeCDNLink } from "./ImageFinder.js";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -33,10 +34,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
    * @return {boolean} True if a module has not been taken; False if all modules have been taken.
    */
   const hasNotTakenModule = moduleStatuses.some((ms: { status: string }) => ms.status === "Not taken");
-  const equipmentIdsToHideCompetencyFor = (import.meta.env.VITE_EQUIPMENT_IDS_WITHOUT_INPERSON ?? "")
-    .split(",")
-    .map((s) => Number(s));
-  const shouldHideCompetency = equipmentIdsToHideCompetencyFor.includes(Number(props.equipment.id));
+
   return (
     <Card
       sx={{
@@ -53,7 +51,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                 <Box width="150px" height="200px">
                   <CardMedia
                     component="img"
-                    image={(props.equipment.imageUrl === undefined || props.equipment.imageUrl == null || props.equipment.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + "user-uploads/" + props.equipment.imageUrl}
+                    image={makeCDNLink(props.equipment.imageUrl, "user-uploads/")}
                     alt={`Picture of ${props.equipment.name}`}
                     sx={{ width: "150px", height: "200px", backgroundColor: "lightgray" }}
                   />
@@ -88,7 +86,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                   {moduleStatuses.map((ms: ModuleStatus) => (
                     <ModuleStatusRow ms={ms} />
                   ))}
-                  {!props.equipment.byReservationOnly && !shouldHideCompetency ? (
+                  {props.equipment.requiresInPerson ? (
                     <Stack direction={"row"} spacing={1} alignItems="center" padding="10px">
                       {hasApprovedAccessCheck ? <CheckCircleIcon color="success" /> : <CloseIcon color="error" />}
                       <Typography variant="body2">In-Person Competency Check</Typography>
@@ -118,25 +116,27 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
             <Typography>
               <ThemedMarkdown>{props.equipment.notes}</ThemedMarkdown>
             </Typography>
-            {props.equipment.byReservationOnly ? (
-              <Typography variant="subtitle1" ml={1}>
-                Reservation only. Email{" "}
-                <Link href={"mailto:make@rit.edu"} target={"_blank"}>
-                  {" "}
-                  make@rit.edu{" "}
-                </Link>{" "}
-                to schedule.
-              </Typography>
-            ) : null}
-            <Button
-              size="small"
-              variant="contained"
-              color="info"
-              onClick={() => window.open(props.equipment.sopUrl, "_blank")}
-              sx={{ alignSelf: "flex-end" }}
-            >
-              Learn More
-            </Button>
+            <Stack direction={"row"} justifyContent={"space-between"}>
+              {props.equipment.byReservationOnly ? (
+                <Typography variant="subtitle1">
+                  Reservation only. Email{" "}
+                  <Link href={"mailto:make@rit.edu"} target={"_blank"}>
+                    {" "}
+                    make@rit.edu{" "}
+                  </Link>{" "}
+                  to schedule.
+                </Typography>
+              ) : <Typography/>}
+              <Button
+                size="small"
+                variant="contained"
+                color="info"
+                onClick={() => window.open(props.equipment.sopUrl, "_blank")}
+                sx={{ alignSelf: "flex-end" }}
+              >
+                Learn More
+              </Button>
+            </Stack>
           </Stack>
         </Stack>
       </CardContent>

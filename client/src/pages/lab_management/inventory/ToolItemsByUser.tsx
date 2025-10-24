@@ -26,9 +26,7 @@ export function ToolItemsByUser({ handleReturnItemClick }: { handleReturnItemCli
   }
 
   useEffect(() => {
-    getUser({ variables: { value: userSearch } }).then((result) => {
-      console.log(userSearch)
-    });
+    getUser({ variables: { value: userSearch } }).then((result) => {});
     getToolItems({variables: {id: getUserSafe?.id ?? 0}});
     setToolItemsSafe(getToolItemsResult.data?.toolItemInstancesByBorrower ?? []);
   }, [userSearch, setUserSearch, getToolItemsSafe]);
