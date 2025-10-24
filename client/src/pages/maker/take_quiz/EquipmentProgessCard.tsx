@@ -26,7 +26,6 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
 
   const modulesToHideInPersonFor: number[] = (import.meta.env.VITE_MODULE_IDS_WITHOUT_INPERSON ?? "").split(",").map(s => Number(s));
   const shouldHideCompetency = modulesToHideInPersonFor.includes(Number(props.moduleID));
-  console.log("should hide", props.moduleID, modulesToHideInPersonFor, shouldHideCompetency)
 
   return (
     <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>

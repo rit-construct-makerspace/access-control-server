@@ -64,7 +64,7 @@ export async function addSpecialHours(hours: SpecialHoursRow): Promise<boolean> 
         await knex("SpecialHours").insert(hours).onConflict(["day", "makerspaceID"]).merge();
         return true;
     } catch (e) {
-        console.log(e);
+        console.error(e);
         return false;
     }
 
@@ -75,7 +75,7 @@ export async function deleteSpecialHours(day: Date, makerspaceID: number): Promi
         await knex("SpecialHours").where({ day: day, makerspaceID: makerspaceID }).delete();
         return true;
     } catch (e) {
-        console.log(e);
+        console.error(e);
         return false;
     }
 }
@@ -85,7 +85,7 @@ export async function updateDefaultHours(hours: DefaultHoursRow): Promise<boolea
         await knex("DefaultHours").insert(hours).onConflict(["dayOfWeek", "makerspaceID"]).merge();
         return true;
     } catch (e) {
-        console.log(e);
+        console.error(e);
         return false
     }
 }

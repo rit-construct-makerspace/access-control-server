@@ -3,8 +3,7 @@
  */
 
 import { knex } from "../../db/index.js";
-import { logsToDomain } from "../../mappers/auditLogs/auditLogMapper.js";
-import { AuditLog } from "../../schemas/auditLogsSchema.js";
+import { AuditLogRow } from "../../db/tables.js";
 
 
 //Options to filter by log type
@@ -82,7 +81,7 @@ export async function getLogs(
   stopDate: string,
   searchText: string,
   filters?: Filters
-): Promise<AuditLog[]> {
+): Promise<AuditLogRow[]> {
   //Add every active filter to SQL-valid array syntax
   const filterString = ((filters?.welcome ? "'welcome', " : "")
     + (filters?.auth ? "'auth', " : "")
@@ -119,5 +118,5 @@ export async function getLogs(
   .limit(100)
 
   //Map rows
-  return logsToDomain(knexResult);
+  return knexResult;
 }
