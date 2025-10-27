@@ -58,11 +58,13 @@ export const GET_LEDGERS = gql`
     $startDate: DateTime
     $stopDate: DateTime
     $searchText: String
+    $limit: Int
   ) {
     Ledgers(
       startDate: $startDate
       stopDate: $stopDate
       searchText: $searchText
+      limit: $limit
     ) {
       id
       timestamp
