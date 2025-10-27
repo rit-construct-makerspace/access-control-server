@@ -47,6 +47,7 @@ export default function MakerspacePage() {
     <RequestWrapper2 result={getMakerspace} render={(data) => {
 
       const fullSpace: FullMakerspace = data.makerspaceByID;
+      const liveRooms = fullSpace.rooms.filter((room: Room) => !room.archived);
 
       const makerspaceTrainings = fullSpace.trainingModules.map(moduleStatusMapper(user.passedModules, user.trainingHolds));
 
@@ -78,7 +79,7 @@ export default function MakerspacePage() {
             }
           </Stack>
 
-          {fullSpace.rooms.map((room: Room) => (
+          {liveRooms.map((room: Room) => (
             <RoomSection room={room} equipmentSearch={equipmentSearch} isMobile={isMobile} staffMode={staffMode} showHidden={showHidden} />
           ))}
         </Stack>

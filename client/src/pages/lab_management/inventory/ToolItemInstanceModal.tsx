@@ -53,7 +53,6 @@ export function ToolItemInstanceModal({ item, type }: { item?: ToolItemInstance,
     } else setUIDAlert(false);
 
     setNewItem({...newItem, typeID: Number(newItem.typeID), locationRoomID: Number(newItem.locationRoomID)});
-    console.log(newItem);
 
     if (item) editInstance({variables: {id: item.id, toolItemInstance: {
       typeID: newItem.typeID,

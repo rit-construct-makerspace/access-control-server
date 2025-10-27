@@ -29,8 +29,6 @@ export function CartPage() {
 
   const [rows, setRows] = useState<CartItemCountState[]>(staticRows.map(item => ({ ...item, newCartcount: item.cartcount })));
 
-  console.log("rows", rows);
-
   useEffect(() => {
     setRows(staticRows.map(item => ({ ...item, newCartcount: item.cartcount })));
   }, [staticRows]);

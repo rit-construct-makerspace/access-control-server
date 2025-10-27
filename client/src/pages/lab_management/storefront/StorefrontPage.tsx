@@ -186,7 +186,7 @@ export default function StorefrontPage() {
 
 
         <SearchBar
-          placeholder="Search inventory"
+          placeholder="Search Store"
           sx={{ mb: 2, alignSelf: "flex-start" }}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}

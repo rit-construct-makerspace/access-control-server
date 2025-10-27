@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { Card, CardContent, CardHeader, Link, Typography } from "@mui/material";
-import { GET_REMAINING_SUBMISSIONS } from "../../../queries/getSubmissions";
+import { GET_PASSED_SUBMISSION, GET_REMAINING_SUBMISSIONS } from "../../../queries/getSubmissions";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { Stack } from "@mui/system";
 import RequestWrapper from "../../../common/RequestWrapper";
@@ -14,6 +14,9 @@ export default function RetakeQuiz(props: { moduleID: number }) {
             fetchPolicy: 'network-only',
         }
     );
+    const passedSubmission = useQuery(GET_PASSED_SUBMISSION, {variables: {moduleID: props.moduleID}});
+    const expirationDate = new Date(+(passedSubmission?.data?.passingSubmission?.expirationDate)).toLocaleString('en-US');
+    const remainingAttempts = Number(submissions.data?.remainingSubmissions.submissionLimit) - Number(submissions.data?.remainingSubmissions.failedSubmissions)
 
   return (
     <RequestWrapper loading={ submissions.loading || submissions.data === undefined }
@@ -23,15 +26,16 @@ export default function RetakeQuiz(props: { moduleID: number }) {
       <CardContent>
         <Card>
           <CardContent>
-            {submissions.data?.remainingSubmissions.failedSubmissions >= submissions.data?.remainingSubmissions.submissionLimit ?
+            {passedSubmission?.data?.passingSubmission ? <Typography>Your training expires on {expirationDate}</Typography> : <></>}
+            {remainingAttempts <= 0 ?
               <Stack>
                 <Typography><b>This training has been locked due to too many attempts. </b></Typography>
                 <Typography>You will be unable to progress and submit this quiz until <b>tomorrow</b>.</Typography>
                 <Typography>If you would like to unlock this training early and seek help with the quiz, please see a Makerspace Mentor.</Typography>
               </Stack>
               : <Stack>
-                <Typography>Click <Link href={`/app/maker/training/${props.moduleID}`}>here</Link> to retake this quiz.</Typography>
-                <Typography component="div">You have {submissions.data?.remainingSubmissions.submissionLimit - submissions.data?.remainingSubmissions.failedSubmissions} attempts remaining today.</Typography>
+                <Typography>Click <Link href={`/app/maker/training/${props.moduleID}`}>here</Link> {passedSubmission?.data?.passingSubmission? <>if you would like to renew your training.</>: <>to retake this quiz.</>}</Typography>
+                <Typography component="div">You have {remainingAttempts} {remainingAttempts === 1 ? <>attempt</> : <>attempts</>} remaining today.</Typography>
               </Stack>
             }
           </CardContent>
