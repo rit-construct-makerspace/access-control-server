@@ -8,7 +8,7 @@ import { gql, useMutation } from "@apollo/client";
 import { GET_CURRENT_USER } from "../../../common/CurrentUserProvider";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Markdown from 'react-markdown'
+import Markdown from "react-markdown";
 import GET_TRAINING_MODULES from "../../../queries/trainingQueries";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 
@@ -159,17 +159,23 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     }
   });
 
+    useEffect(() => {
+      if (module.name) {
+        document.title = `${module.name} | Make @ RIT`;
+      }
+    }, [module.name]);
+
   return (
     <Stack spacing={4} sx={styles.strongerBolds}>
       {module.isLocked &&
-      <Card>
-        <CardContent>
-          <b>This training is locked due to too many attempts.</b>
-          <br />
-          You will be unable to progress and submit this quiz until <b>tomorrow</b>.
+        <Card>
+          <CardContent>
+            <b>This training is locked due to too many attempts.</b>
+            <br />
+            You will be unable to progress and submit this quiz until <b>tomorrow</b>.
           <br /><br />
-          If you would like to unlock this training early and seek help with the quiz, please see a Makerspace Mentor.
-        </CardContent>
+            If you would like to unlock this training early and seek help with the quiz, please see a Makerspace Mentor.
+          </CardContent>
       </Card>}
 
       {module.quiz.map((quizItem) => {
@@ -179,14 +185,14 @@ export default function QuizTaker({ module }: QuizTakerProps) {
         switch (quizItem.type) {
           case QuizItemType.Text:
             return <Typography key={quizItem.id} sx={styles.strongerBolds}>
-              <Markdown
-                components={{
-                  a({ children, ...props }) {
+                <Markdown
+                  components={{
+                    a({ children, ...props }) {
                     return <a target="_blank" rel="noopener noreferrer"{...props}>{children}</a>;
-                  },
+                    },
                 }}>
-                {quizItem.text}
-              </Markdown>
+                  {quizItem.text}
+                </Markdown>
               </Typography>;
           case QuizItemType.MultipleChoice:
             return (
