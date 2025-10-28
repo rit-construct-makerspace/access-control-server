@@ -54,6 +54,8 @@ export interface EquipmentRow {
   needsWelcome?: boolean;
   /** If a piece of equipment is suffeciently complicated, you can designate trainers to teach people how to use the machine. */
   requiresTrainerApproval: boolean;
+  /** Whether a piece of equipment requires an in person knowledge check to be completed before allowing access */
+  requiresInPerson: boolean;
 }
 
 /**

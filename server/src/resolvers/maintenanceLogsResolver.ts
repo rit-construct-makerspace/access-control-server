@@ -228,7 +228,6 @@ const MaintenanceLogsResolver = {
         async (user: CurrentUser) => {
           await createLog(`{user} created a maintenance log for {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: args.equipmentID, label: (await getEquipmentByID(args.equipmentID)).name });
           const result = await createMaintenanceLog(user.id, args.equipmentID, args.instanceID == 0 ? undefined : args.instanceID, args.content);
-          console.log(args)
           await notifyMachineIssueCreated(args.equipmentID, args.instanceID, args.content)
           return result;
         }
