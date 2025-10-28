@@ -38,6 +38,13 @@ export default function QuizResults() {
     }
   );
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    if (moduleResult.data?.module?.name) {
+      document.title = `${moduleResult.data?.module?.name} Results | Make @ RIT`;
+    }
+  }, [moduleResult.data?.module?.name]);
+
   return (
     <RequestWrapper
       loading={currentSubmissionResult.loading || currentSubmissionResult.data === undefined}
