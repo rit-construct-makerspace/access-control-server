@@ -2,6 +2,7 @@ import { CardActionArea, Stack, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import PublishTrainingModuleButton from "./PublishTrainingModuleButton";
 import ArchiveTrainingModuleButton from "./ArchiveTrainingModuleButton";
+import DeleteTrainingModuleButton from "./DeleteTrainingModuleButton";
 import { TrainingModule } from "../../../common/TrainingModuleUtils";
 
 interface TrainingModuleProps {
@@ -37,6 +38,7 @@ export default function TrainingModuleRow({ module }: TrainingModuleProps) {
           ? <PublishTrainingModuleButton moduleID={module.id} appearance="icon-only" />
           : <ArchiveTrainingModuleButton moduleID={module.id} appearance="icon-only" />
       }
+      <DeleteTrainingModuleButton moduleID={module.id} appearance="icon-only" />
     </Stack>
   );
 }

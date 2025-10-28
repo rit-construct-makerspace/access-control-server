@@ -397,6 +397,17 @@ const TrainingModuleResolvers = {
         return module;
       }),
 
+    /** Delete a TrainingModule
+     * @argument id ID of the TrainingModule to delete
+     */
+    deleteModule: async (
+      _parent: any,
+      args: { id: string },
+      { isStaff }: ApolloContext
+    ) => isStaff(async (user: any) => {
+      await ModuleRepo.deleteModule(Number(args.id));
+    }),
+
     /**
      * Calculate submission grade and create a TrainingSubmission
      * @argument moduleID ID of TrainingModule the submission is for
