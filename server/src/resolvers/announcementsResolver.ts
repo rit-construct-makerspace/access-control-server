@@ -40,7 +40,6 @@ const AnnouncementsResolver = {
      * Create an Announcement
      * @argument title Announcement header
      * @argument description Announcement body
-     * @argument hasLink Whether announcement has a link
      * @argument linkText Link text
      * @argument linkUrl Link URL
      * @returns new Announcement
@@ -48,7 +47,7 @@ const AnnouncementsResolver = {
      */
     createAnnouncement: async (
       _parent: any,
-      args: {title: string, description: string, hasLink: boolean, linkText: string, linkUrl: string},
+      args: {title: string, description: string, linkText: string, linkUrl: string},
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
         return await createAnnouncement(args);
@@ -59,7 +58,6 @@ const AnnouncementsResolver = {
      * @argument id ID of announcement to modify
      * @argument title New Announcement header
      * @argument description New Announcement body
-     * @argument hasLink Whether announcement has a link
      * @argument linkText New link text
      * @argument linkUrl New link URL
      * @returns new Announcement
@@ -67,7 +65,7 @@ const AnnouncementsResolver = {
      */
     updateAnnouncement: async (
       _parent: any,
-      args: {id: number, title: string, description: string, hasLink: boolean, linkText: string, linkUrl: string},
+      args: {id: number, title: string, description: string, linkText: string, linkUrl: string},
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
         return await updateAnnouncement(args);

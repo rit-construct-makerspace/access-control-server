@@ -4,7 +4,6 @@ export interface Announcement {
   id: string;
   title: string;
   description: string;
-  hasLink: boolean;
   linkText: string;
   linkUrl: string;
 }
@@ -15,7 +14,6 @@ export const GET_ANNOUNCEMENTS = gql`
       id
       title
       description
-      hasLink
       linkText
       linkUrl
     }
@@ -23,12 +21,11 @@ export const GET_ANNOUNCEMENTS = gql`
 `;
 
 export const CREATE_ANNOUNCEMENT = gql`
-mutation CreateAnnouncement($title: String!, $description: String!, $hasLink: Boolean!, $linkText: String!, $linkUrl: String!) {
-  createAnnouncement(title: $title, description: $description, hasLink: $hasLink, linkText: $linkText, linkUrl: $linkUrl) {
+mutation CreateAnnouncement($title: String!, $description: String!, $linkText: String, $linkUrl: String) {
+  createAnnouncement(title: $title, description: $description, linkText: $linkText, linkUrl: $linkUrl) {
     id
     title
     description
-    hasLink
     linkText
     linkUrl
   }
@@ -41,7 +38,6 @@ export const GET_ANNOUNCEMENT = gql`
       id
       title
       description
-      hasLink
       linkText
       linkUrl
     }
@@ -49,12 +45,11 @@ export const GET_ANNOUNCEMENT = gql`
 `;
 
 export const UPDATE_ANNOUNCEMENT = gql`
-  mutation UpdateAnnouncement($id: ID!, $title: String!, $description: String!, $hasLink: Boolean!, $linkText: String!, $linkUrl: String!) {
-    updateAnnouncement(id: $id, title: $title, description: $description, hasLink: $hasLink, linkText: $linkText, linkUrl: $linkUrl) {
+  mutation UpdateAnnouncement($id: ID!, $title: String!, $description: String!, $linkText: String, $linkUrl: String) {
+    updateAnnouncement(id: $id, title: $title, description: $description, linkText: $linkText, linkUrl: $linkUrl) {
       id
       title
       description
-      hasLink
       linkText
       linkUrl
     }

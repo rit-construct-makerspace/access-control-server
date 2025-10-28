@@ -33,6 +33,7 @@ export default function AnnouncementModalContents({
 }: AnnouncementPageProps) {
   const navigate = useNavigate();
 
+  const [showLinkFields, setShowLinkFields] = useState(!!announcementDraft.linkUrl || !!announcementDraft.linkText);
   const [inputErrors, setInputErrors] = useState<InputErrors>({});
 
   const handleStringChange = (property: keyof Announcement) => (e: ChangeEvent<HTMLInputElement>) =>
@@ -40,15 +41,13 @@ export default function AnnouncementModalContents({
 
   const handleHasLinkSwitch = (e: ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
+    setShowLinkFields(checked);
     if (!checked) {
       setAnnouncementDraft({
         ...announcementDraft,
-        hasLink: false,
         linkText: "",
         linkUrl: "",
       });
-    } else {
-      setAnnouncementDraft({ ...announcementDraft, hasLink: true });
     }
   };
 
@@ -65,12 +64,11 @@ export default function AnnouncementModalContents({
   };
 
   const handleSaveClick = async () => {
-
     const updatedInputErrors: InputErrors = {
-      title: !draft.title,
-      description: !draft.description,
-      linkText: draft.hasLink && !draft.linkText,
-      linkUrl: draft.hasLink && !draft.linkUrl,
+      title: !announcementDraft.title,
+      description: !announcementDraft.description,
+      linkText: showLinkFields && !announcementDraft.linkText,
+      linkUrl: showLinkFields && !announcementDraft.linkUrl,
     };
 
     setInputErrors(updatedInputErrors);
@@ -121,16 +119,11 @@ export default function AnnouncementModalContents({
             />
           </Stack>
           <FormControlLabel
-            control={
-              <Switch
-                checked={announcementDraft.hasLink}
-                onChange={handleHasLinkSwitch}
-              />
-            }
+            control={<Switch checked={showLinkFields} onChange={handleHasLinkSwitch} />}
             label={<b>Link Button</b>}
             labelPlacement="top"
           />
-          {announcementDraft.hasLink ? (
+          {showLinkFields && (
             <>
               <TextField
                 label="Link Text"
@@ -151,7 +144,7 @@ export default function AnnouncementModalContents({
                 required
               />
             </>
-          ) : null}
+          )}
         </Stack>
       </Stack>
 

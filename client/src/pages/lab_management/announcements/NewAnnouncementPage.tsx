@@ -19,7 +19,7 @@ export default function NewAnnouncementPage() {
 
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
-  const [newHasLink, setNewHasLink] = useState(false);
+  const [showLinkFields, setShowLinkFields] = useState(false);
   const [newLinkUrl, setNewLinkUrl] = useState("");
   const [newLinkText, setNewLinkText] = useState("");
 
@@ -28,8 +28,9 @@ export default function NewAnnouncementPage() {
   const [createAnnouncement, mutation] = useMutation(CREATE_ANNOUNCEMENT);
 
   const handleHasLinkSwitch = (e: ChangeEvent<HTMLInputElement>) => {
-    setNewHasLink(e.target.checked);
-    if (!newHasLink) {
+    const checked = e.target.checked;
+    setShowLinkFields(checked);
+    if (!checked) {
       setNewLinkText("");
       setNewLinkUrl("");
     }
@@ -51,8 +52,8 @@ export default function NewAnnouncementPage() {
     const updatedInputErrors: InputErrors = {
       title: !newTitle,
       description: !newDescription,
-      linkText: newHasLink && !newLinkText,
-      linkUrl: newHasLink && !newLinkUrl,
+      linkText: showLinkFields && !newLinkText,
+      linkUrl: showLinkFields && !newLinkUrl,
     };
 
     setInputErrors(updatedInputErrors);
@@ -64,7 +65,6 @@ export default function NewAnnouncementPage() {
       variables: {
         title: newTitle,
         description: newDescription,
-        hasLink: newHasLink,
         linkText: newLinkText,
         linkUrl: newLinkUrl,
       },
@@ -79,7 +79,6 @@ export default function NewAnnouncementPage() {
   const announcement: any = {
     title: newTitle,
     description: newDescription,
-    hasLink: newHasLink,
     linkText: newLinkText,
     linkUrl: newLinkUrl,
   };
@@ -109,11 +108,11 @@ export default function NewAnnouncementPage() {
             />
           </Stack>
           <FormControlLabel
-            control={<Switch checked={newHasLink} onChange={handleHasLinkSwitch} />}
+            control={<Switch checked={showLinkFields} onChange={handleHasLinkSwitch} />}
             label={<b>Link Button</b>}
             labelPlacement="top"
           />
-          {newHasLink ? (
+          {showLinkFields && (
             <>
               <TextField
                 label="Link Text"
@@ -134,7 +133,7 @@ export default function NewAnnouncementPage() {
                 required
               />
             </>
-          ) : null}
+          )}
         </Stack>
       </Stack>
 

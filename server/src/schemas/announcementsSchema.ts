@@ -10,7 +10,6 @@ export const AnnouncementsTypeDefs = gql`
     id: ID!
     title: String!
     description: String!
-    hasLink: Boolean!
     linkText: String
     linkUrl: String
   }
@@ -18,7 +17,6 @@ export const AnnouncementsTypeDefs = gql`
   input AnnouncementInput {
     title: String!
     description: String!
-    hasLink: Boolean!
     linkText: String
     linkUrl: String
   }
@@ -29,8 +27,8 @@ export const AnnouncementsTypeDefs = gql`
   }
 
   type Mutation {
-    createAnnouncement(title: String!, description: String!, hasLink: Boolean!, linkText: String, linkUrl: String): Announcement
-    updateAnnouncement(id: ID!, title: String!, description: String!, hasLink: Boolean!, linkText: String, linkUrl: String): Announcement
+    createAnnouncement(title: String!, description: String!, linkText: String, linkUrl: String): Announcement
+    updateAnnouncement(id: ID!, title: String!, description: String!, linkText: String, linkUrl: String): Announcement
     updateAnnouncementWithInputType(id: ID!, input: AnnouncementInput!): Announcement
     deleteAnnouncement(id: ID!): Boolean
   }

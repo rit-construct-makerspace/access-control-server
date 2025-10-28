@@ -19,7 +19,7 @@ export default function AnnouncementCard(props: AnnouncementCardProps) {
         </Typography>
       </CardContent>
       <CardActions sx={{ justifyContent: 'flex-end' }}>
-        {props.announcement.hasLink ? (
+        {props.announcement.linkUrl ? (
           <Button
             variant="contained"
             color="info"

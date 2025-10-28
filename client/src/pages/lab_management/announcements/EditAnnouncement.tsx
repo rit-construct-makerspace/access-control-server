@@ -20,7 +20,6 @@ export default function EditAnnouncement() {
       id: id,
       title: announcementDraft.title,
       description: announcementDraft.description,
-      hasLink: announcementDraft.hasLink,
       linkText: announcementDraft.linkText,
       linkUrl: announcementDraft.linkUrl,
     },
