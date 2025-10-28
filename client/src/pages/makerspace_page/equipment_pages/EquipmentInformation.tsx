@@ -88,6 +88,24 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
     }
   }, [moduleIDs]);
 
+  window.addEventListener('beforeunload', (event) => {
+    const unsaved = name !== props.equipment.name ||
+      imageUrl !== props.equipment.imageUrl ||
+      sopUrl !== props.equipment.sopUrl ||
+      notes !== props.equipment.notes ||
+      byReservation !== props.equipment.byReservationOnly ||
+      needsWelcome !== props.equipment.needsWelcome ||
+      requiresTrainer !== props.equipment.requiresTrainerApproval ||
+      requiresInPerson !== props.equipment.requiresInPerson ||
+      room.id !== props.equipment.room.id ||
+      moduleIDs.length !== props.equipment.trainingModules.length;
+
+    if (unsaved) {
+      event.preventDefault();
+      return '';
+    }
+  });
+
   return (
     <Stack direction={isMobile ? "column-reverse" : "row"} width={"100%"} justifyContent={"space-between"}>
       <Stack width={isMobile ? "100%" : "49%"} spacing={2}>
