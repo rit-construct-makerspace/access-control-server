@@ -8,8 +8,8 @@ export async function up(knex: Knex): Promise<void> {
     }
 
     await knex.schema.createTable("CustomUrls", (t) => {
-        t.increments("id").primary();
-        t.string("shortUrl")
+        t.increments("id");
+        t.string("shortUrl").primary();
         t.string("longUrl")
     })
 }

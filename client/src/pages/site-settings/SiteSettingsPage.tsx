@@ -88,11 +88,14 @@ export default function SiteSettingsPage() {
             </Grid>
           );
         }} />
+        <Stack direction={"column"} spacing={1}>
         <Stack direction={"row"} spacing={2}>
           <Typography variant="h4">Custom Links</Typography>
           <Button color="success" variant="contained" onClick={() => setCreateCustomUrlModal(true)} startIcon={<AddIcon />}>
             Create Custom Link
           </Button>
+        </Stack>
+          <Typography>Pages requiring user authentication may not work properly (see issue # 667). Please check that the links work.</Typography>
         </Stack>
         <RequestWrapper2 result={getCustomUrlsResult} render={(data) => {
           return(

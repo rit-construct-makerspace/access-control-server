@@ -4,6 +4,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useMutation } from "@apollo/client";
 import { useState } from "react";
 import { UPDATE_CUSTOM_URL } from "../../queries/customUrlQueries.js";
+import { toast } from "react-toastify";
 
 interface UpdateCustomUrlModalProps {
   open: boolean;
@@ -18,8 +19,16 @@ export default function UpdateCustomUrlModal(props: UpdateCustomUrlModalProps) {
   const [updateCustomUrl] = useMutation(UPDATE_CUSTOM_URL, { refetchQueries: ["GetUrls"] });
 
   async function handleUpdateCustomUrl() {
-    await updateCustomUrl({ variables: { id: props.id, shortUrl: newShortUrl === null ? props.shortUrl : newShortUrl, longUrl: newLongUrl === null ? props.longUrl : newLongUrl } });
-    handleUpdateCustomUrlModalClose();
+    await updateCustomUrl({
+      variables: { id: props.id, shortUrl: (newShortUrl == null || newShortUrl == "") ? props.shortUrl : newShortUrl, longUrl: (newLongUrl == null || newLongUrl == "") ? props.longUrl : newLongUrl },
+      onCompleted() {
+        toast.success("Updated custom link");
+        handleUpdateCustomUrlModalClose();
+      },
+      onError(error) {
+        toast.error(`Failed to update custom link: ${error.message}`);
+      },
+    });
   }
 
   const [newShortUrl, setNewShortUrl] = useState(props.shortUrl || null);
@@ -39,6 +48,7 @@ export default function UpdateCustomUrlModal(props: UpdateCustomUrlModalProps) {
           fullWidth
           required
           label="Custom Url"
+          helperText={`Link Preview: ${import.meta.env.VITE_ORIGIN}/link/${newShortUrl === null ? props.shortUrl : newShortUrl}`}
           value={newShortUrl === null ? props.shortUrl : newShortUrl}
           onChange={(e) => setNewShortUrl(e.target.value)}
         />
@@ -46,6 +56,7 @@ export default function UpdateCustomUrlModal(props: UpdateCustomUrlModalProps) {
           fullWidth
           required
           label="Full Link"
+          helperText={"Include full URIs with http://"}
           value={newLongUrl === null ? props.longUrl : newLongUrl}
           onChange={(e) => setNewLongUrl(e.target.value)}
         />

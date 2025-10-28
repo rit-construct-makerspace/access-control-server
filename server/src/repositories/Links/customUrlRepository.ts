@@ -7,7 +7,7 @@ export async function getCustomUrl(shortUrl: string): Promise<CustomUrlRow> {
 }
 
 export async function getCustomUrls() {
-  return await knex('CustomUrls').select('*');
+  return await knex('CustomUrls').select('*').orderBy("id", "asc");
 }
 
 export async function getCustomUrlById(id:number): Promise<CustomUrlRow | undefined> {

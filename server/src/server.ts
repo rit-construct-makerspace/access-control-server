@@ -164,7 +164,10 @@ async function startServer() {
 
   app.get("/link/:link", async function (req, res){
     const customUrl = await getCustomUrl((req.params.link));
-    res.redirect( customUrl?.longUrl );
+    if(customUrl == null ){
+      return res.status(404).send();
+    }
+    res.redirect( customUrl?.longUrl);
   });
 
   /** ===============================================================================================
