@@ -95,13 +95,14 @@ const StorefrontResolvers = {
      */
     Ledgers: async (
       _: any,
-      args: { startDate: string, stopDate: string, searchText: string },
+      args: { startDate: string, stopDate: string, searchText: string, limit: number },
       { isStaff }: ApolloContext) => {
       return isStaff(() => {
         const startDate = args.startDate ?? "2020-01-01";
         const stopDate = args.stopDate ?? "2200-01-01";
         const searchText = args.searchText ?? "";
-        return getLedgers(startDate, stopDate, searchText);
+        const limit = args.limit ?? 100;
+        return getLedgers(startDate, stopDate, searchText, limit);
       });
     },
 

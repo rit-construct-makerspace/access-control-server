@@ -3,7 +3,7 @@ import { Button, Divider, FormControlLabel, Stack, Switch } from "@mui/material"
 import { useNavigate, useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RoomSection from "./RoomSection";
 import Room from "../../types/Room";
 import SearchBar from "../../common/SearchBar";
@@ -28,7 +28,20 @@ export default function MakerspacePage() {
 
   const staffMode = isStaffFor(user, Number(makerspaceID))
   const [showHidden, setShowHidden] = useState(false);
+  
+  const setUrlParam = (paramName: string, paramValue: string) => {
+    const params = new URLSearchParams(location.search);
+    params.set(paramName, paramValue);
+    navigate(`/makerspace/${makerspaceID}?` + params, { replace: true });
+  };
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const queryString = searchParams.get("a") ?? "";
 
+    setEquipmentSearch(queryString)
+
+    getMakerspace
+  }, [location.search]);
 
   return (
     <RequestWrapper2 result={getMakerspace} render={(data) => {
@@ -47,8 +60,9 @@ export default function MakerspacePage() {
             <SearchBar
               placeholder="Search Equipment"
               value={equipmentSearch}
-              onChange={(e) => setEquipmentSearch(e.target.value)}
-              onClear={() => setEquipmentSearch("")}
+              onChange={(e) =>  setEquipmentSearch(e.target.value)}
+              onSubmit={() => setUrlParam("a", equipmentSearch) }
+              onClear={() => setUrlParam("a", "")}
             />
             {
               isManagerFor(user, Number(makerspaceID)) && (

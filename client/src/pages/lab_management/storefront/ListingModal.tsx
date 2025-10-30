@@ -7,6 +7,7 @@ import { isStaff } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useState } from "react";
 import { makeCDNLink } from "../../../common/ImageFinder.js";
+import ThemedMarkdown from "../../../common/ThemedMarkdown.js";
 
 interface ListingModalProps {
   item: InventoryItem;
@@ -46,16 +47,23 @@ export function ListingModal(props: ListingModalProps) {
           </Typography>
           <Box mt={1}>
             <Typography variant="body1">
-              {(props.item.description && props.item.description !== "") ? props.item.description : <i>No description.</i>}
+              {props.item.description && props.item.description !== "" ? (
+                <ThemedMarkdown>{props.item.description}</ThemedMarkdown>
+              ) : (
+                <i>No description.</i>
+              )}
             </Typography>
-            {isStaff(currentUser) && props.item.notes !== "" &&
+
+            {isStaff(currentUser) && props.item.notes !== "" && (
               <div>
-                <Divider sx={{ my: "1em" }} textAlign="left">Internal Details</Divider>
-                <Typography variant="body1">
+                <Divider sx={{ my: "1em" }} textAlign="left">
+                  Internal Details
+                </Divider>
+                <ThemedMarkdown>
                   {props.item.notes}
-                </Typography>
+                </ThemedMarkdown>
               </div>
-            }
+            )}
           </Box>
         </Box>
       </Stack>
