@@ -13,6 +13,7 @@ import { GET_MAKERSPACES_WITH_ITEMS, MakerspaceWithItems } from "../../../querie
 import { InventoryForMakerspace } from "./common/InventoryForMakerspace";
 import { useNavigate } from "react-router-dom";
 import LowInventory from "./common/LowInventory";
+import StaffBar from "../../makerspace_page/StaffBar";
 
 
 export default function InventoryPage() {
@@ -42,6 +43,7 @@ export default function InventoryPage() {
     <RequestWrapper loading={makerspacesWithItemsResult.loading} error={makerspacesWithItemsResult.error}>
       <AdminPage>
         <title>Inventory | Make @ RIT</title>
+        <StaffBar />
         <Box margin="25px">
           <Stack direction="row" justifyContent="space-between" alignItems="baseline">
             <Typography variant="h4">Inventory</Typography>
