@@ -56,7 +56,7 @@ function MakerspaceTrainingCard(makerspaceTrainings: ModuleStatus[], user: any) 
         <Stack direction={"column"} spacing={2} alignItems={"center"}>
           <Stack direction={"column"} spacing={2} alignItems={"center"}>
             {user.visitor ? (
-              <Alert color="secondary">Log in to view training progress.</Alert>
+              <Alert severity="info">Log in to view training progress.</Alert>
             ) : makerspaceTrainings.some((ms) => ms.status !== "Passed" && ms.status !== "Expiring Soon") ? (
               <Alert severity="error">
                 You must pass the makerspace trainings before you can use equipment in the makerspace!
@@ -106,13 +106,13 @@ function TitleRow(
 
   const alert = user.visitor ? (
     // user is not logged in
-    <Alert color="secondary">Log in to view training progress.</Alert>
+    <Alert severity="info">Log in to view training progress.</Alert>
   ) : hasIncomplete ? (
     // user is logged in with incomplete trainings
-    <Alert color="error">You have incomplete makerspace trainings.</Alert>
+    <Alert severity="error">You have incomplete makerspace trainings.</Alert>
   ) : hasExpiring ? (
     // user is logged in with expiring trainings
-    <Alert color="warning">You have makerspace trainings that expire soon.</Alert>
+    <Alert severity="warning">You have makerspace trainings that expire soon.</Alert>
   ) : undefined;
 
   const hoursElement = <CurrentHours times={hours} fillLine={isMobile} showDay={false} />;
