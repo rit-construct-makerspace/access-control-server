@@ -1,25 +1,25 @@
-import ArchiveIcon from "@mui/icons-material/Archive";
+import DeleteIcon from '@mui/icons-material/Delete';
 import ActionButton from "./ActionButton";
 
-interface ArchiveButtonProps {
+interface DeleteButtonProps {
   appearance: "icon-only" | "small" | "medium" | "large";
   handleClick: () => Promise<void>;
   loading: boolean;
   tooltipText: string;
 }
 
-export default function ArchiveButton(props: ArchiveButtonProps) {
+export default function DeleteButton(props: DeleteButtonProps) {
   return (
     <ActionButton
       iconSize={25}
       tooltipText={props.tooltipText}
-      buttonText="Hide"
+      buttonText="Delete"
       appearance={props.appearance}
-      color="primary"
+      color="error"
       handleClick={props.handleClick}
       loading={props.loading}
     >
-      <ArchiveIcon />
+      <DeleteIcon />
     </ActionButton>
-  );
+  )
 }

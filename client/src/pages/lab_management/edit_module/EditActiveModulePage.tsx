@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { Module } from "../../../types/Quiz";
-import { GET_TRAINING_MODULES, UPDATE_MODULE, ARCHIVE_MODULE, GET_MODULE_WITH_ANSWERS } from "../../../queries/trainingQueries";
+import { GET_TRAINING_MODULES, UPDATE_MODULE, DELETE_MODULE, GET_MODULE_WITH_ANSWERS } from "../../../queries/trainingQueries";
 import 'react-toastify/dist/ReactToastify.css';
 import EditModulePage from "./EditModulePage";
 
@@ -16,7 +16,7 @@ export default function EditActiveModulePage() {
 
   const [updateModule, updateResult] = useMutation(UPDATE_MODULE);
 
-  const [deleteModule] = useMutation(ARCHIVE_MODULE, {
+  const [deleteModule] = useMutation(DELETE_MODULE, {
     variables: { id },
     refetchQueries: [{ query: GET_TRAINING_MODULES }],
     onCompleted: () => navigate(`/makerspace/${makerspaceID}/trainings`),

@@ -113,7 +113,7 @@ export const StoreFrontTypeDefs = gql`
     InventoryItems(storefrontVisible: Boolean, makerspaceID: ID): [InventoryItem]
     InventoryItem(id: ID!): InventoryItem
     Labels: [String]
-    Ledgers(startDate: DateTime, stopDate: DateTime, searchText: String): [InventoryLedger]
+    Ledgers(startDate: DateTime, stopDate: DateTime, searchText: String, limit: Int): [InventoryLedger]
     inventoryTags: [InventoryTag]
   }
 

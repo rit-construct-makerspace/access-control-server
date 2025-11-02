@@ -3,6 +3,7 @@ import QuizItemDraft from "./QuizItemDraft";
 import { Stack } from "@mui/material";
 import { QuizItem } from "../../../../types/Quiz";
 import FileUploadButton from "../../../../common/FileUploadButton";
+import { makeCDNLink } from "../../../../common/ImageFinder.js";
 
 const StyledImage = styled.img`
   border-radius: 4px;
@@ -30,7 +31,7 @@ export default function ImageEmbedDraft({
           color="info"
           variant="contained"
           text="Upload Image"
-          onUpload={(name: string) => updateImageEmbed({ ...imageEmbed, text: import.meta.env.VITE_CDN_URL + "user-uploads/" + name })}
+          onUpload={(name: string) => updateImageEmbed({ ...imageEmbed, text: makeCDNLink(name, "user-uploads/") })}
         />
         {imageEmbed.text && <StyledImage src={imageEmbed.text} alt="" />}
       </Stack>
