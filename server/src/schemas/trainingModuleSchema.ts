@@ -65,6 +65,7 @@ export const TrainingModuleTypeDefs = gql`
     updateModule(id: ID!, name: String!, quiz: JSON!, reservationPrompt: JSON, makerspaceID: ID): TrainingModule
     archiveModule(id: ID!): TrainingModule
     publishModule(id: ID!): TrainingModule
+    deleteModule(id: ID!): TrainingModule
 
     """
     Submit a trainingModule for assessment, the attempt will be stored
