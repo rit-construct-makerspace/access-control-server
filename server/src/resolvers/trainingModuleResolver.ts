@@ -408,7 +408,6 @@ const TrainingModuleResolvers = {
     ) => isStaff(async (user: any) => {
 
       const module = await ModuleRepo.getModuleByID(Number(args.id));
-      console.log("Deleting module", module);
       await createLog(
         "{user} deleted {module} module.",
         "admin",

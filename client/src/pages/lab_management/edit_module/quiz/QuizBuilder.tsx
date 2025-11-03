@@ -8,7 +8,7 @@ import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
 import { QuizItem, QuizItemType } from "../../../../types/Quiz";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import EmptyPageSection from "../../../../common/EmptyPageSection";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import QuestionBox from "./QuestionBox";
 
 interface QuizBuilderProps {
