@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
-import { Alert, Grid, Typography } from "@mui/material";
+import { Alert, Grid } from "@mui/material";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import EquipmentInstanceCard from "./EquipmentInstanceCard";
 

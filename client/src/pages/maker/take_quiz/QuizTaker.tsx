@@ -5,12 +5,12 @@ import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
 import Question from "./Question";
 import styled, { css } from "styled-components";
 import { gql, useMutation } from "@apollo/client";
-import { GET_CURRENT_USER } from "../../../common/CurrentUserProvider";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Markdown from 'react-markdown'
 import GET_TRAINING_MODULES from "../../../queries/trainingQueries";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { GET_CURRENT_USER } from "../../../queries/userQueries";
 
 
 const StyledDiv = styled.div`

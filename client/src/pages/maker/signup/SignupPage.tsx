@@ -9,13 +9,12 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  GET_CURRENT_USER,
   useCurrentUser,
 } from "../../../common/CurrentUserProvider";
 import styled from "styled-components";
 import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
-import { UPDATE_STUDENT_PROFILE } from "../../../queries/userQueries";
+import { GET_CURRENT_USER, UPDATE_STUDENT_PROFILE } from "../../../queries/userQueries";
 
 const StyledFakeTextField = styled.div`
   border-radius: 4px;
