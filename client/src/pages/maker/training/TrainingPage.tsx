@@ -10,16 +10,7 @@ import {
 } from "../../../common/TrainingModuleUtils";
 import TrainingModuleRow from "../../../common/TrainingModuleRow";
 import SearchBar, { searchFilter } from "../../../common/SearchBar";
-
-export const GET_ALL_TRAINING_MODULES = gql`
-	query GetAllTrainingModules {
-		modules {
-			id
-			name
-			archived
-		}
-	}
-`;
+import { GET_ALL_TRAINING_MODULES } from "../../../queries/trainingQueries";
 
 /**
  * This function returns a page that displays all training modules with their statuses for the current user, along with
