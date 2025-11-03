@@ -74,6 +74,10 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
   const onDragEnd = (result: DropResult) =>
     handleOnDragEnd(result)
 
+  // const update = useCallback((newItem: QuizItem) => updateItem(item.id, newItem), [updateItem, item]);
+  // const remove = useCallback(() => handleRemove(item.id), [handleRemove, item]);
+  // const duplicate = useCallback(() => duplicateItem(item), [duplicateItem, item]);
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Stack alignItems="center">
