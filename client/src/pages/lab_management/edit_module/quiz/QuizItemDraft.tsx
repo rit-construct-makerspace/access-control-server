@@ -1,4 +1,4 @@
-import React, { memo, ReactNode } from "react";
+import { memo, ReactNode } from "react";
 import styled from "styled-components";
 import { Card, CardActions, IconButton } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -6,7 +6,6 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { Draggable } from "@hello-pangea/dnd";
 import { Stack } from "@mui/system";
-import { QuizItem } from "../../../../types/Quiz";
 
 const StyledDragHandle = styled.div`
   display: flex;
