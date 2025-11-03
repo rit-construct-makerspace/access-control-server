@@ -154,7 +154,6 @@ export async function getMissingTrainingModules(
 ): Promise<TrainingModuleRow[]> {
   let modules = await getModulesByEquipment(equipmentID);
   let incompleteTrainings = [];
-  console.log(modules.toString());
   // get last submission from maker for every module
   for(let i = 0; i < modules.length; i++) {
     if (await ModuleRepo.hasPassedModule(user.id, modules[i].id)) {
@@ -273,6 +272,7 @@ export async function updateEquipment(
     byReservationOnly: equipment.byReservationOnly,
     needsWelcome: equipment.needsWelcome ?? true,
     requiresTrainerApproval: equipment.requiresTrainerApproval,
+    requiresInPerson: equipment.requiresInPerson
   });
 
   await updateModules(id, equipment.moduleIDs);
@@ -298,6 +298,7 @@ export async function addEquipment(
       notes: equipment.notes ?? undefined,
       byReservationOnly: equipment.byReservationOnly,
       needsWelcome: equipment.needsWelcome ?? true,
+      requiresTrainerApproval: equipment.requiresTrainerApproval ?? false,
     },
     "id"
   );

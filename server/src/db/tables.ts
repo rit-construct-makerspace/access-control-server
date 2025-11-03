@@ -54,6 +54,8 @@ export interface EquipmentRow {
   needsWelcome?: boolean;
   /** If a piece of equipment is suffeciently complicated, you can designate trainers to teach people how to use the machine. */
   requiresTrainerApproval: boolean;
+  /** Whether a piece of equipment requires an in person knowledge check to be completed before allowing access */
+  requiresInPerson: boolean;
 }
 
 /**
@@ -647,6 +649,12 @@ export interface ExpressSessionRow {
   session: string;
 }
 
+export interface CustomUrlRow {
+  id:number;
+  shortUrl: string;
+  longUrl: string;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -694,5 +702,6 @@ declare module "knex/types/tables.js" {
     RefIDCounter: RefIDCounterRow;
     RolesTemp: TempRolesRow;
     ExpressSessions: ExpressSessionRow;
+    CustomURLs: CustomUrlRow;
   }
 }

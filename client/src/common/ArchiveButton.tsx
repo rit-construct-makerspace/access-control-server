@@ -15,7 +15,7 @@ export default function ArchiveButton(props: ArchiveButtonProps) {
       tooltipText={props.tooltipText}
       buttonText="Hide"
       appearance={props.appearance}
-      color="error"
+      color="primary"
       handleClick={props.handleClick}
       loading={props.loading}
     >

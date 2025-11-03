@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import CreateIcon from "@mui/icons-material/Create";
@@ -11,6 +11,7 @@ import Ledger from "./Ledger";
 import InventoryTagsModal from "./InventoryTagsModal";
 import { GET_MAKERSPACES_WITH_ITEMS, MakerspaceWithItems } from "../../../queries/makerspaceQueries";
 import { InventoryForMakerspace } from "./common/InventoryForMakerspace";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -19,10 +20,24 @@ export default function InventoryPage() {
   const [modalItemId, setModalItemId] = useState<string>("");
   const [tagsModalOpen, setTagsModalOpen] = useState<boolean>(false);
 
+  const navigate = useNavigate();
+
   const inventoryTagsResult = useQuery(GET_INVENTORY_TAGS);
 
   const makerspacesWithItemsResult = useQuery(GET_MAKERSPACES_WITH_ITEMS);
 
+  const setUrlParam = (paramName: string, paramValue: string) => {
+    const params = new URLSearchParams(location.search);
+    params.set(paramName, paramValue);
+    navigate(`/admin/inventory?` + params, { replace: true });
+  };
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const queryString = searchParams.get("a") ?? "";
+
+    setSearchText(queryString)
+  }, [location.search]);
+  
   return (
     <RequestWrapper loading={makerspacesWithItemsResult.loading} error={makerspacesWithItemsResult.error}>
       <AdminPage>
@@ -38,6 +53,7 @@ export default function InventoryPage() {
               placeholder="Search inventory"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
+              onSubmit={() =>  setUrlParam("a", searchText)}
               onClear={() => setSearchText("")}
             />
             <Button

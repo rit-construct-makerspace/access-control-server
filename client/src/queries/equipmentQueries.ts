@@ -15,6 +15,7 @@ export const GET_EQUIPMENTS = gql`
       numAvailable
       numInUse
       byReservationOnly
+      requiresInPerson
       room {
         makerspace {
           id
@@ -61,6 +62,7 @@ export const GET_EQUIPMENT_BY_ID = gql`
       byReservationOnly
       needsWelcome
       requiresTrainerApproval
+      requiresInPerson
     }
   }
 `;
@@ -86,6 +88,7 @@ export const GET_ANY_EQUIPMENT_BY_ID = gql`
       numInUse
       byReservationOnly
       needsWelcome
+      requiresInPerson
     }
   }
 `;
@@ -111,6 +114,7 @@ export const GET_CORRESPONDING_MACHINE_BY_READER_ID = gql`
       numInUse
       byReservationOnly
       needsWelcome
+      requiresInPerson
     }
   }
 `;
@@ -127,6 +131,7 @@ export const GET_ARCHIVED_EQUIPMENTS = gql`
       sopUrl
       byReservationOnly
       needsWelcome
+      requiresInPerson
     }
   }
 `;
@@ -150,6 +155,7 @@ export const GET_ARCHIVED_EQUIPMENT_BY_ID = gql`
       notes
       byReservationOnly
       needsWelcome
+      requiresInPerson
     }
   }
 `;
@@ -178,10 +184,22 @@ export const UPDATE_EQUIPMENT = gql`
     $byReservationOnly: Boolean
     $needsWelcome: Boolean
     $requiresTrainerApproval: Boolean
+    $requiresInPerson: Boolean
   ) {
     updateEquipment(
       id: $id
-      equipment: { name: $name, roomID: $roomID, moduleIDs: $moduleIDs, imageUrl: $imageUrl, sopUrl: $sopUrl, notes: $notes, byReservationOnly: $byReservationOnly, needsWelcome: $needsWelcome, requiresTrainerApproval: $requiresTrainerApproval }
+      equipment: {
+        name: $name,
+        roomID: $roomID,
+        moduleIDs: $moduleIDs,
+        imageUrl: $imageUrl,
+        sopUrl: $sopUrl,
+        notes: $notes,
+        byReservationOnly: $byReservationOnly,
+        needsWelcome: $needsWelcome,
+        requiresTrainerApproval: $requiresTrainerApproval,
+        requiresInPerson: $requiresInPerson
+      }
     ) {
       id
     }
