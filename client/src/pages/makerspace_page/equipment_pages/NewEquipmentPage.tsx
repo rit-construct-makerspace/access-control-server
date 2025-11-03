@@ -28,7 +28,6 @@ export default function NewEquipmentPage() {
   });
 
   const [name, setName] = useState("");
-  const [imageUrl, _] = useState("");
   const [sopUrl, setSopUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [byReservation, setByReservation] = useState(false);
@@ -48,7 +47,7 @@ export default function NewEquipmentPage() {
         name: name,
         roomID: room.id,
         moduleIDs: [],
-        imageUrl: imageUrl,
+        imageUrl: "",
         sopUrl: sopUrl,
         notes: notes,
         byReservationOnly: byReservation,
