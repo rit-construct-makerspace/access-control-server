@@ -15,7 +15,7 @@ import AnnouncementsPage from "./pages/lab_management/announcements/Announcement
 import NotFoundPage from "./pages/NotFoundPage";
 import EditActiveModulePage from "./pages/lab_management/edit_module/EditActiveModulePage";
 import LogoutPromptPage from "./pages/both/logout/LogoutPromptPage";
-import EditNewModulePage from "./pages/lab_management/edit_module/EditNewModulePage";
+import NewModulePage from "./pages/lab_management/edit_module/NewModulePage";
 import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnouncementPage";
 import EditAnnouncement from "./pages/lab_management/announcements/EditAnnouncement";
 import ReadersPage from "./pages/lab_management/readers/ReadersPage";
@@ -147,7 +147,7 @@ export default function AppRoutes() {
                 {/* Routes for staff + higher */}
                 <Route element={<StaffRoute />}>
                   <Route path="/makerspace/:makerspaceID/trainings" element={<TrainingModulesPage />} />
-                  <Route path="/makerspace/:makerspaceID/training/new" element={<EditNewModulePage />} />
+                  <Route path="/makerspace/:makerspaceID/training/new" element={<NewModulePage />} />
                   <Route path="/makerspace/:makerspaceID/training/:id" element={<EditActiveModulePage />} />
 
                   <Route path="/makerspace/:makerspaceID/equipment/new" element={<NewEquipmentPage />} />

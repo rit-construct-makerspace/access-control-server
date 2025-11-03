@@ -1,14 +1,16 @@
-import React, { ReactNode } from "react";
+import React, { memo, ReactNode } from "react";
 import styled from "styled-components";
 import { Card, CardActions, IconButton } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { Draggable } from "@hello-pangea/dnd";
+import { Stack } from "@mui/system";
+import { QuizItem } from "../../../../types/Quiz";
 
 const StyledDragHandle = styled.div`
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: row nowrap;
   align-items: center;
   background: #eaeaea;
 
@@ -21,12 +23,12 @@ interface QuizItemDraftProps {
   itemId: string;
   index: number;
   children: ReactNode;
-  onRemove: () => void;
+  onRemove: (itemId: string) => void;
   onDuplicate: () => void;
   extraActions?: ReactNode;
 }
 
-export default function QuizItemDraft({
+const QuizItemDraft = memo(function QuizItemDraft({
   itemId,
   index,
   children,
@@ -34,6 +36,7 @@ export default function QuizItemDraft({
   onDuplicate,
   extraActions,
 }: QuizItemDraftProps) {
+  console.log("quiz item draft render", index);
   return (
     <Draggable draggableId={itemId} index={index}>
       {(provided, _snapshot) => (
@@ -41,25 +44,30 @@ export default function QuizItemDraft({
           ref={provided.innerRef}
           {...provided.draggableProps}
           elevation={4}
-          sx={{ width: 1200, display: "flex", mb: 4, flexFlow: "column nowrap" }}
+          sx={{ width: 1200, display: "flex", mb: 4, flexFlow: "row nowrap" }}
         >
-          <StyledDragHandle {...provided.dragHandleProps}>
-            <DragIndicatorIcon />
-          </StyledDragHandle>
+            <StyledDragHandle {...provided.dragHandleProps}>
+              <DragIndicatorIcon />
+            </StyledDragHandle>
 
-          {children}
+            <Stack direction="column" width={"100%"}>
+              {children}
 
-          <CardActions>
-            <IconButton aria-label="Delete" onClick={onRemove}>
-              <DeleteOutlineIcon />
-            </IconButton>
-            <IconButton aria-label="Duplicate" onClick={onDuplicate}>
-              <ContentCopyIcon />
-            </IconButton>
-            {extraActions}
-          </CardActions>
+              <CardActions>
+                <IconButton aria-label="Delete" onClick={() => onRemove(itemId)}>
+                  <DeleteOutlineIcon />
+                </IconButton>
+                <IconButton aria-label="Duplicate" onClick={onDuplicate}>
+                  <ContentCopyIcon />
+                </IconButton>
+                {extraActions}
+              </CardActions>
+
+            </Stack>
         </Card>
       )}
     </Draggable>
   );
-}
+});
+
+export default QuizItemDraft;

@@ -14,8 +14,8 @@ interface PdfEmbedProps {
   index: number;
   pdfEmbed: QuizItem;
   updatepdfEmbed: (updatepdfEmbed: QuizItem) => void;
-  onRemove: () => void;
-  onDuplicate: () => void;
+  onRemove: (itemId: string) => void;
+  onDuplicate: (item: QuizItem) => void;
 }
 
 export default function PdfEmbedDraft({
@@ -26,7 +26,7 @@ export default function PdfEmbedDraft({
   onDuplicate,
 }: PdfEmbedProps) {
   return (
-    <QuizItemDraft onRemove={onRemove} onDuplicate={onDuplicate} index={index} itemId={pdfEmbed.id}>
+    <QuizItemDraft onRemove={onRemove} onDuplicate={() => onDuplicate(pdfEmbed)} index={index} itemId={pdfEmbed.id}>
       <Stack padding={2} spacing={2}>
         <TextField
           label="PDF URL"

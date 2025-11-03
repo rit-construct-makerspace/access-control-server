@@ -1,7 +1,6 @@
-import React from "react";
 import styled from "styled-components";
 import QuizItemDraft from "./QuizItemDraft";
-import { Stack, TextField } from "@mui/material";
+import { Stack } from "@mui/material";
 import { QuizItem } from "../../../../types/Quiz";
 import FileUploadButton from "../../../../common/FileUploadButton";
 import { makeCDNLink } from "../../../../common/ImageFinder.js";
@@ -14,8 +13,8 @@ interface ImageEmbedDraftProps {
   index: number;
   imageEmbed: QuizItem;
   updateImageEmbed: (updatedImageEmbed: QuizItem) => void;
-  onRemove: () => void;
-  onDuplicate: () => void;
+  onRemove: (itemId: string) => void;
+  onDuplicate: (item: QuizItem) => void;
 }
 
 export default function ImageEmbedDraft({
@@ -26,7 +25,7 @@ export default function ImageEmbedDraft({
   onDuplicate,
 }: ImageEmbedDraftProps) {
   return (
-    <QuizItemDraft onRemove={onRemove} onDuplicate={onDuplicate} index={index} itemId={imageEmbed.id}>
+    <QuizItemDraft onRemove={onRemove} onDuplicate={()=>onDuplicate(imageEmbed)} index={index} itemId={imageEmbed.id}>
       <Stack padding={2} spacing={2}>
         <FileUploadButton
           color="info"
