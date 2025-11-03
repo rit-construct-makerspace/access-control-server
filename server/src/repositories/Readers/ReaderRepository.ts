@@ -170,7 +170,6 @@ export async function unpairReaderAsMakerspaceWelcomer(readerID: number, makersp
 
 export async function getReaderLogs(searchParams: { makerspaceID?: number, from: Date, to: Date, pageOffset?: number, pageLimit: number }): Promise<ReaderLogRow[]> {
     let query = knex("ReaderLogs as rl");
-    console.log("Makerspace filter", searchParams.makerspaceID);
     if (searchParams.makerspaceID) {
         query = query.leftJoin("EquipmentInstances as ei", "rl.readerID", "ei.readerID")
             .leftJoin("Equipment as e", "ei.equipmentID", "e.id")

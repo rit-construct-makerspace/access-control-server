@@ -9,6 +9,8 @@ import ConstructionIcon from "@mui/icons-material/Construction";
 import ModuleStatusRow from "./ModuleStatusRow";
 import ThemedMarkdown from "./ThemedMarkdown";
 import { memo } from "react";
+import { makeCDNLink } from "./ImageFinder.js";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -50,7 +52,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                 <Box width="150px" height="200px">
                   <CardMedia
                     component="img"
-                    image={(props.equipment.imageUrl === undefined || props.equipment.imageUrl == null || props.equipment.imageUrl === "") ? import.meta.env.BASE_URL + "/shed_acronym_vert.jpg" : "" + import.meta.env.VITE_CDN_URL + "user-uploads/" + props.equipment.imageUrl}
+                    image={makeCDNLink(props.equipment.imageUrl, "user-uploads/")}
                     alt={`Picture of ${props.equipment.name}`}
                     sx={{ width: "150px", height: "200px", backgroundColor: "lightgray" }}
                   />
@@ -79,7 +81,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
               <Stack direction="row" justifyContent="space-between" height="100%">
                 {/* Trainings & Access Check */}
                 <Stack width="100%">
-                  {hasNotTakenModule || (!hasApprovedAccessCheck && !props.equipment.byReservationOnly ) ? (
+                  {hasNotTakenModule || (!hasApprovedAccessCheck && !props.equipment.byReservationOnly) ? (
                     <Typography paddingLeft={"10px"}>To access, complete:</Typography>
                   ) : null}
                   {moduleStatuses.map((ms: ModuleStatus) => (
@@ -87,7 +89,13 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                   ))}
                   {props.equipment.requiresInPerson ? (
                     <Stack direction={"row"} spacing={1} alignItems="center" padding="10px">
-                      {hasApprovedAccessCheck ? <CheckCircleIcon color="success" /> : <CloseIcon color="error" />}
+                      {user.visitor ? (
+                        <RadioButtonUncheckedIcon color="secondary" />
+                      ) : hasApprovedAccessCheck ? (
+                        <CheckCircleIcon color="success" />
+                      ) : (
+                        <CloseIcon color="error" />
+                      )}
                       <Typography variant="body2">In-Person Competency Check</Typography>
                     </Stack>
                   ) : null}

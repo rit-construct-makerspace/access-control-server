@@ -100,7 +100,6 @@ export default function LogPage() {
   });
 
   function handleAdvSearchChange(e: any, property: string) {
-    console.log(e.target.value)
     setFilters({ ...filters, [property]: !(filters[property as keyof typeof filters]) });
     localStorage.setItem(property, (!(filters[property as keyof typeof filters]) ? "1" : "0"));
     setUrlParam(property, (!(filters[property as keyof typeof filters]) ? "1" : "0"));
