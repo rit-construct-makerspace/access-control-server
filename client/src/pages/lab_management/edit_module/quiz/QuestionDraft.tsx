@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import { memo } from "react";
 import {
   Button,
   CardContent,
@@ -63,7 +63,6 @@ const QuestionDraft = memo(function QuestionDraft({
     console.error("Tried to render question with undefined options");
     return null;
   }
-  console.log("Rerendering qdraft", index);
   const question = item as Required<QuizItem>;
 
   return (

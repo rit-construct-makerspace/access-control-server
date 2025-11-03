@@ -406,6 +406,16 @@ const TrainingModuleResolvers = {
       args: { id: string },
       { isStaff }: ApolloContext
     ) => isStaff(async (user: any) => {
+
+      const module = await ModuleRepo.getModuleByID(Number(args.id));
+      console.log("Deleting module", module);
+      await createLog(
+        "{user} deleted {module} module.",
+        "admin",
+        { id: user.id, label: getUsersFullName(user) },
+        { id: args.id, label: module.name ?? "undefined" }
+      );
+
       await ModuleRepo.deleteModule(Number(args.id));
     }),
 

@@ -13,16 +13,6 @@ interface QuestionBoxProps {
     handleRemove: (itemId: string) => void
 }
 
-// function eq(before: QuestionBoxProps, after: QuestionBoxProps): boolean{
-    // const ieq = before.item == after.item;
-    // const ineq = before.index == after.index;
-    // const dupEq = before.duplicateItem == after.duplicateItem;
-    // const upEq = before.updateItem == after.updateItem;
-    // const remEq = before.handleRemove == after.handleRemove;
-    // console.log("qb eq", ieq, ineq, dupEq, upEq, remEq);
-    // return ieq && ineq && dupEq && upEq && remEq;
-// }
-
 const QuestionBox = memo(function QuestionBox(
     { item,
         index,
