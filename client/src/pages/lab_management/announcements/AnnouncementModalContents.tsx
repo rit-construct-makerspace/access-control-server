@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Button, FormControlLabel, Grid, Stack, Switch, TextField, Typography } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import { Announcement } from "../../../queries/announcementsQueries";
@@ -34,6 +34,10 @@ export default function AnnouncementModalContents({
   const navigate = useNavigate();
 
   const [showLinkFields, setShowLinkFields] = useState(!!announcementDraft.linkUrl || !!announcementDraft.linkText);
+  useEffect(() => {
+    setShowLinkFields(Boolean(announcementDraft.linkUrl || announcementDraft.linkText));
+  }, [announcementDraft.linkUrl, announcementDraft.linkText]);
+
   const [inputErrors, setInputErrors] = useState<InputErrors>({});
 
   const handleStringChange = (property: keyof Announcement) => (e: ChangeEvent<HTMLInputElement>) =>
