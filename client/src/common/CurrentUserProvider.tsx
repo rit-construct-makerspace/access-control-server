@@ -1,46 +1,8 @@
 import { createContext, ReactElement, useContext } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import RequestWrapper2 from "./RequestWrapper2";
 import { Navigate, useLocation } from "react-router-dom";
-import { AccessCheck } from "../queries/userQueries";
-
-export const GET_CURRENT_USER = gql`
-  query GetCurrentUser {
-    currentUser {
-      id
-      ritUsername
-      firstName
-      lastName
-      setupComplete
-      archived
-      admin
-      holds {
-        removeDate
-      }
-      passedModules {
-        moduleID
-        moduleName
-        passedDate
-      }
-      accessChecks {
-        equipmentID
-        approved
-      }
-      cardTagID
-      trainingHolds {
-        moduleID
-        expires
-      }
-      manager
-      staff
-      trainer
-      currencyAccount{
-        id
-        balance
-      }
-    }
-  }
-`;
+import { AccessCheck, GET_CURRENT_USER } from "../queries/userQueries";
 
 export interface PassedModule {
   moduleID: number;

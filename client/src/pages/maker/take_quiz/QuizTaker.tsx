@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Module, QuizItemType } from "../../../types/Quiz";
 import { useImmer } from "use-immer";
 import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
@@ -103,9 +103,12 @@ export default function QuizTaker({ module }: QuizTakerProps) {
         (o) => o === optionID
       );
 
-      optionIndex === -1
-        ? draft[itemIndex].optionIDs.push(optionID)
-        : draft[itemIndex].optionIDs.splice(optionIndex, 1);
+      if (optionIndex === -1){
+        draft[itemIndex].optionIDs.push(optionID)
+      } else {
+        draft[itemIndex].optionIDs.splice(optionIndex, 1);
+      }
+
     })
     setQuizProgressed(true);
   };
