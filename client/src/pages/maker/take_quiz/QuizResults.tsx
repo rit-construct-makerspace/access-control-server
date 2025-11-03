@@ -11,6 +11,7 @@ import EquipmentProgressCard from "./EquipmentProgessCard";
 import RetakeQuiz from "./RetakeQuiz";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import { useEffect } from "react";
 
 export default function QuizResults() {
   const { id } = useParams<{ id: string }>();
@@ -39,11 +40,6 @@ export default function QuizResults() {
   );
   const isMobile = useIsMobile();
 
-  useEffect(() => {
-    if (moduleResult.data?.module?.name) {
-      document.title = `${moduleResult.data?.module?.name} Results | Make @ RIT`;
-    }
-  }, [moduleResult.data?.module?.name]);
 
   return (
     <RequestWrapper
@@ -55,6 +51,7 @@ export default function QuizResults() {
         error={moduleResult.error}
       >
         <Stack spacing={2} justifyContent={"center"} margin={"30px 45px"}>
+          <title>{`${moduleResult.data?.module?.name} Results | Make @ RIT`}</title>
           { submissionID && passedSubmissionResult?.data?.submission.makerID === currentUser.id ? 
           <Stack direction={"row"} alignItems={"flex-start"} width={"100%"} >
             <Stack direction="column" width={isMobile ? "100%" : "50%"}>
