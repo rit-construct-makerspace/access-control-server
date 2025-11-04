@@ -1,9 +1,9 @@
 import { Autocomplete, TextField } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { GET_ALL_EQUIPMENTS } from "../queries/equipmentQueries";
+import { GET_ALL_PUBLISHED_EQUIPMENTS } from "../queries/equipmentQueries";
 import { useQuery } from "@apollo/client";
-import GET_TRAINING_MODULES from "../queries/trainingQueries";
+import { GET_PUBLISHED_TRAINING_MODULES } from "../queries/trainingQueries";
 import GET_ROOMS from "../queries/roomQueries";
 import { FullMakerspace, GET_FULL_MAKERSPACES, GET_MAKERSPACES } from "../queries/makerspaceQueries";
 import Equipment from "../types/Equipment";
@@ -14,16 +14,16 @@ export default function GlobalSearchBar() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const getEquipment = useQuery(GET_ALL_EQUIPMENTS)
-  const getTrainings = useQuery(GET_TRAINING_MODULES)
+  const getEquipment = useQuery(GET_ALL_PUBLISHED_EQUIPMENTS)
+  const getTrainings = useQuery(GET_PUBLISHED_TRAINING_MODULES)
   const getRooms = useQuery(GET_ROOMS)
   const getMakerspaces = useQuery(GET_FULL_MAKERSPACES)
 
   const options: any[] = [];
-   getEquipment.data?.allEquipment.forEach((equipment:Equipment) => {
+   getEquipment.data?.equipments.forEach((equipment:Equipment) => {
     options.push({label:equipment.name, category:"Equipments", item:equipment})
    });
-  getTrainings.data?.modules.forEach((module:TrainingModule) => {
+  getTrainings.data?.publishedModules.forEach((module:TrainingModule) => {
     options.push({label:module.name, category:"Trainings", item:module})
   });
   getRooms.data?.rooms.forEach((room:Room) => {
@@ -43,12 +43,21 @@ export default function GlobalSearchBar() {
         navigate(`/search/` + encodedQuery)
         break
       case 'selectOption':
-        {
-          const encodedLabel = value.label.replace('/', '%2F')
+        const category = value.category
+        const encodedLabel = value.label.replace('/', '%2F')
+        if(category === "Equipments"){
+          navigate(`/makerspace/` + value.item.room.makerspace.id + `?a=${encodedLabel}`)
+        }
+        else if(category === "Trainings"){
+          navigate(`/maker/training/${value.item.id}`)
+        }
+        else if(category === "Makerspaces"){
+          navigate(`/makerspace/${value.item.id}`)
+        }
+        else{
           navigate(`/search/` + encodedLabel)
           break
         }
-        
     }
   };
 

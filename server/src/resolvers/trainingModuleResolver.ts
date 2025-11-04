@@ -252,6 +252,14 @@ const TrainingModuleResolvers = {
         return module;
       }),
 
+    publishedModules: async (
+      _parent: any,
+      _args: any,
+    ) => {
+      return await ModuleRepo.getModulesWhereArchived(false);
+    },
+
+
     /**
      * Fetch an array of AccessProgress items representing progress on gaining access to all equipment relating to the noted TrainingModule
      * @argument sourceTrainingModuleID ID of TrainingModule to source from

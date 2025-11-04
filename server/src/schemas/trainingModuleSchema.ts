@@ -56,6 +56,7 @@ export const TrainingModuleTypeDefs = gql`
     module(id: ID!): TrainingModule
     moduleWithAnswers(id: ID!): TrainingModule
     archivedModules: [TrainingModule]
+    publishedModules: [TrainingModule]
     archivedModule(id: ID!): TrainingModule
     relatedAccessProgress(sourceTrainingModuleID: ID!): [AccessProgress]
   }

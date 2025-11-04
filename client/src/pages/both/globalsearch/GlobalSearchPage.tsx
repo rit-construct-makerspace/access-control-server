@@ -1,4 +1,4 @@
-import { CardActionArea, Divider, Grid, Link, Stack, Typography } from "@mui/material";
+import { Divider, Grid, Stack, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import Equipment from "../../../types/Equipment";
 import { GET_EQUIPMENTS } from "../../../queries/equipmentQueries";
@@ -7,7 +7,7 @@ import EquipmentCard from "../../../common/EquipmentCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import RequestWrapper from "../../../common/RequestWrapper";
-import GET_TRAINING_MODULES from "../../../queries/trainingQueries";
+import { GET_PUBLISHED_TRAINING_MODULES } from "../../../queries/trainingQueries";
 import { ModuleStatus, moduleStatusMapper, TrainingModule } from "../../../common/TrainingModuleUtils";
 import ModuleStatusRow from "../../../common/ModuleStatusRow";
 import { GET_MAKERSPACES_WITH_HOURS, MakerspaceWithHours } from "../../../queries/makerspaceQueries";
@@ -28,26 +28,16 @@ export default function GlobalSearchPage (){
     ));
 
 
-  // TODO: make a new query for published only and/or to allow visitors to query this
-  const getTrainings = useQuery(GET_TRAINING_MODULES);
-  const filteredTrainings = getTrainings.data?.modules.filter((training: TrainingModule) => training.name.toLowerCase().includes(query!.toLowerCase()));
+  const getTrainings = useQuery(GET_PUBLISHED_TRAINING_MODULES);
+  const filteredTrainings = getTrainings.data?.publishedModules.filter((training: TrainingModule) => training.name.toLowerCase().includes(query!.toLowerCase()));
   const moduleStatuses = filteredTrainings?.map(
     moduleStatusMapper(user.passedModules, user.trainingHolds)
   );
-  const foundTrainingsVisitor = getTrainings?.data?.modules?.map((module: TrainingModule) => (
-    <CardActionArea onClick={() => navigate(`/maker/training/${module.moduleID}`)} sx={{ width: "unset" }}>
-      <Stack direction="row" spacing={1} alignItems="center" padding="10px" width="100%"></Stack>
-      <Stack direction="column" width="100%">
-        <Link variant="body2" color="primary" width={"stretch"}>{module.moduleName}</Link>
-      </Stack>
-    </CardActionArea>
-  ));
-  const foundTrainingsUser = moduleStatuses?.map((moduleStatus: ModuleStatus) => (
+  const foundTrainings = moduleStatuses?.map((moduleStatus: ModuleStatus) => (
     <Grid key={moduleStatus.moduleID} size={isMobile ? 12 : 3}>
       <ModuleStatusRow ms={moduleStatus} />
     </Grid>
   ));
-  const foundTrainings = user.visitor ? foundTrainingsVisitor : foundTrainingsUser
 
   const getMakerspaces = useQuery(GET_MAKERSPACES_WITH_HOURS)
   const filteredMakerspaces = getMakerspaces.data?.makerspaces.filter((makerspace: MakerspaceWithHours) => makerspace.name.toLowerCase().includes(query!.toLowerCase()))
