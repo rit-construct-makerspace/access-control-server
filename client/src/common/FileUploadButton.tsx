@@ -1,7 +1,6 @@
-import { Button, ButtonOwnProps, Input, styled, Typography } from "@mui/material";
+import { Button, ButtonOwnProps, styled } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { height } from "@mui/system";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 const VisuallyHiddenInput = styled('input')({
   clip: 'rect(0 0 0 0)',
