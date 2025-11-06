@@ -103,7 +103,7 @@ export async function setModuleArchived(id: number, archived: boolean): Promise<
  * @param quiz {TrainingModuleItem} the attached quiz
  * @returns the added module
  */
-export async function addModule(name: string, quiz: object, makerspaceID: number | null): Promise<TrainingModuleRow> {
+export async function addModule(name: string, quiz: object, makerspaceID: number | null, archived: boolean = true): Promise<TrainingModuleRow> {
 
 
   const addedModule: TrainingModuleRow[] = await knex("TrainingModule")
@@ -112,6 +112,7 @@ export async function addModule(name: string, quiz: object, makerspaceID: number
                           name: name,
                           quiz: JSON.stringify(quiz) as unknown as TrainingModuleItem[], //quiz has same format as TrainingModuleItem, (updateModule does  as unknown as TrainingModuleItem[] behind the scene somewhere but I cannot find how to do that)
                           makerspaceID: makerspaceID,
+                          archived: archived,
                         }, "*");
 
   if (addedModule.length < 1) throw new EntityNotFound(`Could not add module ${name}`);
@@ -238,16 +239,16 @@ export async function getPassedEquipmentIDsByModuleID(
 ): Promise<number[]> {
   const equipmentIdRows = await getEquipmentIDsByModuleID(moduleID);
 
-  var equipmentPassed: number[] = [];
+  const equipmentPassed: number[] = [];
   
-  for (var i = 0; i <= equipmentIdRows.length; i++) {
+  for (let i = 0; i <= equipmentIdRows.length; i++) {
     const equipmentID = equipmentIdRows[i] != undefined ? equipmentIdRows[i].equipmentID : -1;
     if (equipmentID === -1) continue;
     const modulesForEquipment = await getModulesIDsByEquipmentID(equipmentID);
 
-    var passed = true;
+    let passed = true;
 
-    for (var j = 0; j <= modulesForEquipment.length; j++) {
+    for (let j = 0; j <= modulesForEquipment.length; j++) {
       if (modulesForEquipment[j] != undefined && !(await hasPassedModule(userID, modulesForEquipment[j]["moduleID"]))) {
         passed = false;
       }

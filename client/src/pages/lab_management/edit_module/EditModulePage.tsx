@@ -25,7 +25,7 @@ import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../queries/makerspac
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isAdmin, isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-
+import { useCallback } from "react";
 interface EditModulePageProps {
   moduleInitialValue: Module;
   deleteModule: () => Promise<void>;
@@ -97,33 +97,33 @@ export default function EditModulePage({
     }
   };
 
-  const handleAddQuizItem = (item: QuizItem) => {
+  const handleAddQuizItem = useCallback((item: QuizItem) => {
     setModule((draft) => {
       draft?.quiz.push(item);
     });
-  };
+  }, [setModule]);
 
-  const handleRemoveQuizItem = (itemId: string) => {
+  const handleRemoveQuizItem = useCallback((itemId: string) => {
     setModule((draft) => {
       const index = draft!.quiz.findIndex((i) => i.id === itemId);
       draft?.quiz.splice(index, 1);
     });
-  };
+  }, [setModule]);
 
-  const handleUpdateQuizItem = (itemId: string, updatedItem: QuizItem) => {
+  const handleUpdateQuizItem = useCallback((updatedItem: QuizItem) => {
     setModule((draft) => {
-      const index = draft!.quiz.findIndex((i) => i.id === itemId);
+      const index = draft!.quiz.findIndex((i) => i.id === updatedItem.id);
       draft!.quiz[index] = updatedItem;
     });
-  };
+  }, [setModule]);
 
-  const handleOnDragEnd = (result: DropResult) => {
+  const handleOnDragEnd = useCallback((result: DropResult) => {
     setModule((draft) => {
       if (!result.destination) return;
       const [removed] = draft!.quiz.splice(result.source.index, 1);
       draft!.quiz.splice(result.destination.index, 0, removed);
     });
-  };
+  }, [setModule]);
 
   return (
     <Stack margin="0 20px 20px" spacing={2}>
