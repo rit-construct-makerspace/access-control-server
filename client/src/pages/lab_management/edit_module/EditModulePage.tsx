@@ -154,12 +154,11 @@ export default function EditModulePage({
             const makerspaces = data.makerspaces;
           const possibleMakerspaces = makerspaces.filter((space: FullMakerspace) => (isManagerFor(currentUser, space.id)))
             return (
-              <FormControl>
+              <FormControl sx={{ width: "600px" }}>
                 <InputLabel id="associated-makerspace">Associated Makerspace</InputLabel>
                 <Select
                   id="associated-makerspace"
                   label="Associated Makerspace"
-                  sx={{ width: "600px" }}
                   value={module.makerspaceID}
                 onChange={(e) => setModule((draft) => {
                       draft.makerspaceID = e.target.value != null ? Number(e.target.value) : null;
