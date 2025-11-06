@@ -1,7 +1,7 @@
 import { IconButton } from "@mui/material";
 import { Box } from "@mui/system";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { isManager } from "../../../../common/PrivilegeUtils";
 import { StaffOnlyToggle } from "./StaffOnlyToggle";
 import { StorefrontVisibleToggle } from "./StorefrontVisibleToggle";
@@ -25,7 +25,13 @@ interface InventoryForMakerspaceProps {
 
 export function InventoryForMakerspace(props: InventoryForMakerspaceProps) {
   const currentUser = useCurrentUser();
-  const [windowWidth] = useState<number>(window.innerWidth);
+  // keep an optional window width if it's still needed elsewhere (updates on resize)
+  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const safeData = props.makerspace.items ?? [];
   const sortedItems = sortItemsByName(safeData);
@@ -33,20 +39,18 @@ export function InventoryForMakerspace(props: InventoryForMakerspaceProps) {
 
   const columns: GridColDef<(typeof matchingItems)[number]>[] = [
     {
-      field: 'name',
-      headerName: 'Item',
-      minWidth: 400,
-      width: windowWidth > 1550 ? windowWidth * 0.425 : windowWidth * 0.2,
-      maxWidth: 700
+      field: "name",
+      headerName: "Item",
+      minWidth: 240,
+      flex: 2.5,
     },
     {
-      field: 'tags',
-      headerName: 'Tags',
-      minWidth: 230,
-      width: windowWidth > 1550 ? windowWidth * 0.35 : windowWidth * 0.2,
-      maxWidth: 500,
-      valueGetter: (value, row) => (row.tags),
-      renderCell: (params) => (<TagsCell item={params.row} allTags={props.tags} />)
+      field: "tags",
+      headerName: "Tags",
+      minWidth: 180,
+      flex: 1.5,
+      valueGetter: (value, row) => row.tags,
+      renderCell: (params) => <TagsCell item={params.row} allTags={props.tags} />,
     },
     {
       field: 'count',
@@ -56,9 +60,9 @@ export function InventoryForMakerspace(props: InventoryForMakerspaceProps) {
     },
     {
       field: 'pricePerUnit',
-      headerName: 'Price / Unit',
+      headerName: "Price / Unit",
       width: 130,
-      valueGetter: (value, row) => (`$${row.pricePerUnit.toFixed(2)}`),
+      valueGetter: (value, row) => `$${row.pricePerUnit.toFixed(2)}`,
     },
     {
       field: 'staffOnly',
