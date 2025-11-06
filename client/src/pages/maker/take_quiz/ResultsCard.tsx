@@ -7,11 +7,13 @@ import {
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
+import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface ResultsCardProps {
-    summary: Array<ChoiceSummary>
+  summary: Array<ChoiceSummary>;
 }
 
 interface ChoiceSummary {
@@ -42,7 +44,7 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
 
   return (
     <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>
-      <CardHeader title="Question Summary"></CardHeader>
+      <CardHeader title="Summary & Feedback"></CardHeader>
       <CardContent>
         {summaryObj.map((choiceSummary: ChoiceSummary) => (
           <Card elevation={2} sx={{ p: 2 }}>
@@ -52,7 +54,10 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
               : <CloseIcon color="error" />}
               <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><ThemedMarkdown>{choiceSummary.questionText}</ThemedMarkdown></Typography>
             </Stack>
-            <Stack direction={"row"} spacing={2} alignItems="center" >
+            <Stack direction={"row"} spacing={2} alignItems="center">
+              {choiceSummary.correct 
+              ? <ThumbUpAltOutlinedIcon color="info" /> 
+              : <LightbulbOutlinedIcon color="warning" />}
               <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><ThemedMarkdown>{choiceSummary.comment}</ThemedMarkdown></Typography>
             </Stack>
           </Card>
