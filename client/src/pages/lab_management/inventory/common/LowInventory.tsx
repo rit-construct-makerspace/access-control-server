@@ -62,12 +62,6 @@ export default function LowInventory(props: LowInventoryProps) {
 			width: 140,
 			valueGetter: (value, row) => row.threshold,
 		},
-		{
-			field: "pricePerUnit",
-			headerName: "Price / Unit",
-			width: 130,
-			valueGetter: (value, row) => `$${row.pricePerUnit.toFixed(2)}`,
-		},
 	];
 
 	return (
