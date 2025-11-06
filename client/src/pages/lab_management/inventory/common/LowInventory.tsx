@@ -53,6 +53,12 @@ export default function LowInventory(props: LowInventoryProps) {
       width: 110,
       valueGetter: (value, row) => row.count,
     },
+		{
+			field: "threshold",
+			headerName: "Minimum Needed",
+			width: 140,
+			valueGetter: (value, row) => row.threshold,
+		},
     {
       field: "pricePerUnit",
       headerName: "Price / Unit",
