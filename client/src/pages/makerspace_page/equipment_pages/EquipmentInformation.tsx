@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, FormControlLabel, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { Equipment } from "./EditEquipmentPage";
 import { ARCHIVE_EQUIPMENT, PUBLISH_EQUIPMENT, UPDATE_EQUIPMENT } from "../../../queries/equipmentQueries";
 import { useMutation, useQuery } from "@apollo/client";
@@ -14,7 +14,7 @@ import ArchiveIcon from "@mui/icons-material/Archive";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import FileUploadButton from "../../../common/FileUploadButton";
 import { GET_FULL_MAKERSPACES } from "../../../queries/makerspaceQueries.js";
-
+import { useBlocker } from "react-router-dom";
 
 interface EquipmentInformationProps {
   equipment: Equipment;
@@ -26,11 +26,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const getRoomsResult = useQuery(GET_ROOMS);
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT, {
-    refetchQueries: [
-      "GetEquipmentByID",
-      { query: GET_ROOMS }, 
-      { query: GET_FULL_MAKERSPACES }
-    ],
+    refetchQueries: ["GetEquipmentByID", { query: GET_ROOMS }, { query: GET_FULL_MAKERSPACES }],
     onCompleted() {
       toast.success("Updated equipment");
     },
@@ -57,6 +53,8 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [requiresInPerson, setRequiresInPerson] = useState(props.equipment.requiresInPerson);
   const [room, setRoom] = useState(props.equipment.room);
   const [moduleIDs, setModuleIds] = useState(props.equipment.trainingModules.map((mod) => mod.id));
+  const [unsaved, setUnsaved] = useState(false);
+  const [blockerDialogOpen, setBlockerDialogOpen] = useState(false);
 
   function handleEquipmentUpdate() {
     updateEquipment({
@@ -88,23 +86,47 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
     }
   }, [moduleIDs]);
 
-  window.addEventListener('beforeunload', (event) => {
-    const unsaved = name !== props.equipment.name ||
-      imageUrl !== props.equipment.imageUrl ||
-      sopUrl !== props.equipment.sopUrl ||
-      notes !== props.equipment.notes ||
-      byReservation !== props.equipment.byReservationOnly ||
-      needsWelcome !== props.equipment.needsWelcome ||
-      requiresTrainer !== props.equipment.requiresTrainerApproval ||
-      requiresInPerson !== props.equipment.requiresInPerson ||
-      room.id !== props.equipment.room.id ||
-      moduleIDs.length !== props.equipment.trainingModules.length;
+  useEffect(() => {
+    setUnsaved(
+      name !== props.equipment.name ||
+        imageUrl !== props.equipment.imageUrl ||
+        sopUrl !== props.equipment.sopUrl ||
+        notes !== props.equipment.notes ||
+        byReservation !== props.equipment.byReservationOnly ||
+        needsWelcome !== props.equipment.needsWelcome ||
+        requiresTrainer !== props.equipment.requiresTrainerApproval ||
+        requiresInPerson !== props.equipment.requiresInPerson ||
+        room.id !== props.equipment.room.id ||
+        moduleIDs.length !== props.equipment.trainingModules.length
+    );
+  }, [
+    name,
+    imageUrl,
+    sopUrl,
+    notes,
+    byReservation,
+    needsWelcome,
+    requiresTrainer,
+    requiresInPerson,
+    room.id,
+    moduleIDs.length,
+  ]);
 
-    if (unsaved) {
-      event.preventDefault();
-      return '';
-    }
-  });
+  useEffect(() => {
+    const handler = (event: BeforeUnloadEvent) => {
+      if (unsaved) {
+        event.preventDefault();
+        return "";
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [unsaved]);
+
+  console.log("unsaved:", unsaved);
+  console.log("Mounting hook...");
+  const blocker = useBlocker( ({ currentLocation, nextLocation }) => unsaved && currentLocation.pathname !== nextLocation.pathname );
+  console.log("Mounted");
 
   return (
     <Stack direction={isMobile ? "column-reverse" : "row"} width={"100%"} justifyContent={"space-between"}>
@@ -138,6 +160,27 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             <Button variant="contained" startIcon={<SaveIcon />} onClick={handleEquipmentUpdate}>
               Save
             </Button>
+
+            {blocker.state === "blocked" ? 
+              <Dialog
+                open={blockerDialogOpen}
+                onClose={() => { setBlockerDialogOpen(false) }}
+                aria-labelledby="blocker-dialog-title"
+                aria-describedby="blocker-dialog-description"
+              >
+                <DialogTitle id="blocker-dialog-title">Unsaved Changes</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="blocker-dialog-description">
+                    You have unsaved changes. Are you sure you want to leave?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => blocker.reset()}>Stay on Page</Button>
+                  <Button onClick={() => blocker.proceed()}>Leave Page</Button>
+                </DialogActions>
+              </Dialog>
+            : null}
+
           </Stack>
         </Stack>
 
@@ -150,11 +193,6 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             return (
               <Autocomplete
                 renderInput={(params: any) => <TextField {...params} label="Location" />}
-                /* Autocomplete's value prop wants undefined, not null.
-                 * But if we give it undefined then it thinks it's an
-                 * uncontrolled prop and throws a console error
-                 * when we set the value. This is a MUI problem.
-                 * @ts-ignore */
                 value={props.equipment.room}
                 options={rooms}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -181,9 +219,9 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             byReservation ? "byReservation" : null,
             needsWelcome ? "needsWelcome" : null,
             requiresTrainer ? "requiresTrainer" : null,
-            requiresInPerson ? "requiresInPerson" : null
+            requiresInPerson ? "requiresInPerson" : null,
           ]}
-          sx={{alignSelf: "center"}}
+          sx={{ alignSelf: "center" }}
         >
           <ToggleButton value={"byReservation"} onClick={() => setByReservation(!byReservation)}>
             Reservation Only
