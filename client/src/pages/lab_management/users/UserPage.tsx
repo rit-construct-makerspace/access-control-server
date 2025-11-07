@@ -33,18 +33,9 @@ export default function UserPage() {
       <RequestWrapper2
         result={getUserResult}
         render={({ user }) => {
-        // TODO: this can probably go?
-          const filteredACs: AccessCheckExtraInfo[] = user.accessChecks.filter(
-            (ac: AccessCheckExtraInfo) => (
-              ac.equipment.requiresTrainerApproval
-                ? isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.makerspace.id))
-                : (isStaffFor(currentUser, Number(ac.equipment.room.makerspace.id)) || isTrainerFor(currentUser, Number(ac.equipment.id), Number(ac.equipment.room.makerspace.id)))
-            )
-          );
-
           return (
             <Stack>
-              <Info user= {user} />
+              <Info user={user} />
               <Stack direction={isMobile ? "column" : "row"} width="100%" mt={4} spacing={4} justifyContent="center">
                 <Stack width="50%">
                   <AccessChecks user={user} />
@@ -58,9 +49,7 @@ export default function UserPage() {
                   <ManageUserArchive userID={user.id} forceArchive={user.forceArchive} />
                 </Stack>
               </Stack>
-
-            <Notes user={user} />
-
+              <Notes user={user} />
             </Stack>
           );
         }}

@@ -51,8 +51,7 @@ export default function AccessChecks(props: AccessCheckProps) {
   );
 
   return (
-    // TODO: check if this is the right width
-    <Stack width="50%">
+    <Stack >
       <Typography variant="h6" component="div" mb={1}>
         Access Checks
       </Typography>
