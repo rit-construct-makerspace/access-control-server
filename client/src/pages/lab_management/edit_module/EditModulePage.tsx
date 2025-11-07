@@ -130,7 +130,7 @@ export default function EditModulePage({
       <title>Edit Training | Make @ RIT</title>
       <Typography variant="h4" textAlign="center">Edit {module.name}</Typography>
       <Stack
-        direction="row"
+        direction={isMobile ? "column" : "row"}
         alignItems="center"
         justifyContent="center"
         spacing={2}
@@ -177,12 +177,22 @@ export default function EditModulePage({
             );
           }}
         />
+        <Stack
+          direction="row"
+          spacing={2}
+        >
         {module.archived ? (
           <PublishTrainingModuleButton moduleID={module.id} appearance="large" />
         ) : (
           <ArchiveTrainingModuleButton moduleID={module.id} appearance="large" />
         )}
-        <Button startIcon={<SaveIcon />} color="secondary" variant="contained" onClick={handleSaveClicked} size="large">
+          <Button
+            startIcon={<SaveIcon />}
+            color="secondary"
+            variant="contained"
+            onClick={handleSaveClicked}
+            size="large"
+          >
           Save
         </Button>
         <Button
@@ -194,6 +204,7 @@ export default function EditModulePage({
         >
           Delete
         </Button>
+        </Stack>
       </Stack>
       <QuizBuilder
         quiz={module.quiz ? module.quiz : []}

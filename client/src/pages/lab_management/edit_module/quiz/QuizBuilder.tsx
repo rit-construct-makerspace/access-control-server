@@ -4,12 +4,13 @@ import ContactSupportIcon from "@mui/icons-material/ContactSupport";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import ImageIcon from "@mui/icons-material/Image";
-import DocumentScannerIcon from '@mui/icons-material/DocumentScanner';
+import DocumentScannerIcon from "@mui/icons-material/DocumentScanner";
 import { QuizItem, QuizItemType } from "../../../../types/Quiz";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import EmptyPageSection from "../../../../common/EmptyPageSection";
 import { useCallback } from "react";
 import QuestionBox from "./QuestionBox";
+import { width } from "@mui/system";
 
 interface QuizBuilderProps {
   quiz: QuizItem[];
@@ -19,21 +20,27 @@ interface QuizBuilderProps {
   handleOnDragEnd: (result: DropResult) => void;
 }
 
-export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdate, handleOnDragEnd }: QuizBuilderProps) {
-
+export default function QuizBuilder({
+  quiz,
+  handleAdd,
+  handleRemove,
+  handleUpdate,
+  handleOnDragEnd,
+}: QuizBuilderProps) {
   const update = useCallback((newItem: QuizItem) => handleUpdate(newItem), [handleUpdate]);
   const remove = useCallback((itemId: string) => handleRemove(itemId), [handleRemove]);
 
-
-  const duplicateItem = useCallback((item: QuizItem) => {
-    handleAdd({
-      id: uuidv4(),
-      type: item.type,
-      text: item.text,
-      options: item.options,
-    });
-  }, [handleAdd]);
-
+  const duplicateItem = useCallback(
+    (item: QuizItem) => {
+      handleAdd({
+        id: uuidv4(),
+        type: item.type,
+        text: item.text,
+        options: item.options,
+      });
+    },
+    [handleAdd]
+  );
 
   const createQuestion = () =>
     handleAdd({
@@ -71,8 +78,7 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
       text: "",
     });
 
-  const onDragEnd = (result: DropResult) =>
-    handleOnDragEnd(result)
+  const onDragEnd = (result: DropResult) => handleOnDragEnd(result);
 
   // const update = useCallback((newItem: QuizItem) => updateItem(item.id, newItem), [updateItem, item]);
   // const remove = useCallback(() => handleRemove(item.id), [handleRemove, item]);
@@ -83,20 +89,27 @@ export default function QuizBuilder({ quiz, handleAdd, handleRemove, handleUpdat
       <Stack alignItems="center">
         <Droppable droppableId="droppable">
           {(provided) => (
-            <div {...provided.droppableProps} ref={provided.innerRef}>
-              {quiz.map(
-                (item, index) => <QuestionBox item={item} index={index} handleRemove={remove} updateItem={update} duplicateItem={duplicateItem} />)
-              }
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}
+            >
+              {quiz.map((item, index) => (
+                <QuestionBox
+                  item={item}
+                  index={index}
+                  handleRemove={remove}
+                  updateItem={update}
+                  duplicateItem={duplicateItem}
+                />
+              ))}
               {provided.placeholder}
             </div>
           )}
         </Droppable>
 
         {!quiz.length && (
-          <EmptyPageSection
-            label="Add items via the buttons below."
-            sx={{ mb: 2, alignSelf: "stretch" }}
-          />
+          <EmptyPageSection label="Add items via the buttons below." sx={{ mb: 2, alignSelf: "stretch" }} />
         )}
 
         <ButtonGroup fullWidth sx={{ width: 600, backgroundColor: "white" }}>
