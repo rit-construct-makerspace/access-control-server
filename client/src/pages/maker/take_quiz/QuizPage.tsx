@@ -8,9 +8,6 @@ import { Stack } from "@mui/system";
 import { Typography } from "@mui/material";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 
-
-// we're going to bring this back soon probably 
-// eslint-disable-next-line 
 function _shuffle(array: any[] | undefined) {
   if (array === undefined) return undefined;
   let currentIndex = array.length;

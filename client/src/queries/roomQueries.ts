@@ -49,4 +49,43 @@ export const UPDATE_ROOM_NAME = gql`
   }
 `;
 
+export const GET_ROOM = gql`
+  query GetRoom($id: ID!) {
+    room(id: $id) {
+      name
+      archived
+      makerspace {
+        id
+        name
+      }
+      recentSwipes {
+        id
+        user {
+          id
+          firstName
+          lastName
+        }
+      }
+      equipment {
+        id
+        name
+        archived
+        imageUrl
+        sopUrl
+        trainingModules {
+          id
+          name
+        }
+        numAvailable
+        numInUse
+        byReservationOnly
+      }
+      trainingModules {
+        id
+        name
+      }
+    }
+  }
+`;
+
 export default GET_ROOMS;
