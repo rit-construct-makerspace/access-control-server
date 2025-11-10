@@ -1,6 +1,5 @@
 import { Divider, Grid, Stack, Typography } from "@mui/material";
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
-import { GET_ALL_TRAINING_MODULES } from "../../../maker/training/TrainingPage";
 import { useQuery } from "@apollo/client";
 import {
   ModuleStatus,
@@ -12,6 +11,7 @@ import AccessCheck from "../../../../types/AccessCheck";
 import EquipmentCard from "../../../../common/EquipmentCard";
 import ModuleStatusRow from "../../../../common/ModuleStatusRow";
 import { useIsMobile } from "../../../../common/IsMobileProvider";
+import { GET_ALL_TRAINING_MODULES } from "../../../../queries/trainingQueries";
 
 export default function UserTraingingsPage() {
   const user = useCurrentUser();
