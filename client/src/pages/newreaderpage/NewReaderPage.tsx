@@ -30,7 +30,7 @@ export default function NewReaderPage() {
     }
 
     function applyNetworkToJson(){
-        var obj: any = {};
+        const obj: any = {};
         if (UseWifi){
             obj["SSID"] = SSID;
             obj["Password"] = Password;
@@ -45,7 +45,7 @@ export default function NewReaderPage() {
             setCert("Failed to pair (no certs)");
             return;
         }
-        var obj: any = {};
+        const obj: any = {};
         obj["Server"] = resp.data.pairReader.siteName;
         obj["Key"] = resp.data.pairReader.readerKey;
 

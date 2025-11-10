@@ -306,6 +306,7 @@ const TrainingModuleResolvers = {
           args.name,
           args.quiz,
           args.makerspaceID,
+          true, // default to archived to avoid pollution
         );
 
         await createLog(
@@ -396,6 +397,26 @@ const TrainingModuleResolvers = {
 
         return module;
       }),
+
+    /** Delete a TrainingModule
+     * @argument id ID of the TrainingModule to delete
+     */
+    deleteModule: async (
+      _parent: any,
+      args: { id: string },
+      { isStaff }: ApolloContext
+    ) => isStaff(async (user: any) => {
+
+      const module = await ModuleRepo.getModuleByID(Number(args.id));
+      await createLog(
+        "{user} deleted {module} module.",
+        "admin",
+        { id: user.id, label: getUsersFullName(user) },
+        { id: args.id, label: module.name ?? "undefined" }
+      );
+
+      await ModuleRepo.deleteModule(Number(args.id));
+    }),
 
     /**
      * Calculate submission grade and create a TrainingSubmission

@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { Equipment } from "./EditEquipmentPage";
 import { ARCHIVE_EQUIPMENT, PUBLISH_EQUIPMENT, UPDATE_EQUIPMENT } from "../../../queries/equipmentQueries";
 import { useMutation, useQuery } from "@apollo/client";
@@ -243,7 +243,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             setModuleIds([...moduleIDs, mID]);
           }}
           removeModule={(mID) => {
-            var temp = [...moduleIDs];
+            const temp = [...moduleIDs];
             temp.splice(temp.indexOf(mID), 1);
             setModuleIds(temp);
           }}

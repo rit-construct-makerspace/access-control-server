@@ -94,6 +94,14 @@ export const PUBLISH_MODULE = gql`
   }
 `;
 
+export const DELETE_MODULE = gql`
+  mutation DeleteModule($id: ID!) {
+    deleteModule(id: $id) {
+      id
+    }
+  }
+`;
+
 export const GET_ACCESS_PROGRESSES = gql`
   query RelatedAccessProgress($sourceTrainingModuleID: ID!) {
     relatedAccessProgress(sourceTrainingModuleID: $sourceTrainingModuleID) {
@@ -112,6 +120,16 @@ export const GET_ACCESS_PROGRESSES = gql`
       accessCheckDone
     }
   }
+`;
+
+export const GET_ALL_TRAINING_MODULES = gql`
+	query GetAllTrainingModules {
+		modules {
+			id
+			name
+			archived
+		}
+	}
 `;
 
 export default GET_TRAINING_MODULES;

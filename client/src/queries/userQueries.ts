@@ -206,4 +206,42 @@ export const UPDATE_STUDENT_PROFILE = gql`
 `;
 
 
+export const GET_CURRENT_USER = gql`
+  query GetCurrentUser {
+    currentUser {
+      id
+      ritUsername
+      firstName
+      lastName
+      setupComplete
+      archived
+      admin
+      holds {
+        removeDate
+      }
+      passedModules {
+        moduleID
+        moduleName
+        passedDate
+      }
+      accessChecks {
+        equipmentID
+        approved
+      }
+      cardTagID
+      trainingHolds {
+        moduleID
+        expires
+      }
+      manager
+      staff
+      trainer
+      currencyAccount{
+        id
+        balance
+      }
+    }
+  }
+`;
+
 export default GET_USERS;
