@@ -7,11 +7,10 @@ import styled, { css } from "styled-components";
 import { gql, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import Markdown from 'react-markdown'
+import Markdown from "react-markdown";
 import GET_TRAINING_MODULES from "../../../queries/trainingQueries";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { GET_CURRENT_USER } from "../../../queries/userQueries";
-
 
 const StyledDiv = styled.div`
   border-radius: 4px;
@@ -21,18 +20,18 @@ const StyledDiv = styled.div`
 
 const styles = {
   strongerBolds: {
-    '& p': {
-      fontWeight: 400
+    "& p": {
+      fontWeight: 400,
     },
-    '& strong': {
-      fontWeight: 900
-    }
-  }
+    "& strong": {
+      fontWeight: 900,
+    },
+  },
 };
 
 const elevationTwoShadow = css`
-  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+    0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 `;
 
 const StyledImageEmbed = styled.img`
@@ -64,27 +63,18 @@ interface QuizTakerProps {
 }
 
 export default function QuizTaker({ module }: QuizTakerProps) {
-
   const [quizProgressed, setQuizProgressed] = useState<boolean>(false);
   const isMobile = useIsMobile();
 
-
   const initialAnswerSheet = module.quiz
-    .filter(
-      (item) =>
-        item.type === QuizItemType.MultipleChoice ||
-        item.type === QuizItemType.Checkboxes
-    )
+    .filter((item) => item.type === QuizItemType.MultipleChoice || item.type === QuizItemType.Checkboxes)
     .map((item) => ({ itemID: item.id, optionIDs: [] }));
 
-  const [answerSheet, setAnswerSheet] =
-    useImmer<AnswerSheet>(initialAnswerSheet);
+  const [answerSheet, setAnswerSheet] = useImmer<AnswerSheet>(initialAnswerSheet);
 
   const [submitModule, result] = useMutation(SUBMIT_MODULE, {
     variables: { moduleID: module.id, answerSheet },
-    refetchQueries: [
-      { query: GET_CURRENT_USER }, { query: GET_TRAINING_MODULES }
-    ]
+    refetchQueries: [{ query: GET_CURRENT_USER }, { query: GET_TRAINING_MODULES }],
   });
 
   const selectMultipleChoiceOption = (itemID: string, optionID: string) => {
@@ -99,9 +89,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     setAnswerSheet((draft) => {
       const itemIndex = draft.findIndex((i) => i.itemID === itemID);
 
-      const optionIndex = draft[itemIndex].optionIDs.findIndex(
-        (o) => o === optionID
-      );
+      const optionIndex = draft[itemIndex].optionIDs.findIndex((o) => o === optionID);
 
       if (optionIndex === -1){
         draft[itemIndex].optionIDs.push(optionID)
@@ -114,7 +102,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
   };
 
   const trainingSubmissionAnimation = () => {
-    toast.success('Training Module Submitted', {
+    toast.success("Training Module Submitted", {
       position: "bottom-left",
       autoClose: 3000,
       hideProgressBar: false,
@@ -124,10 +112,10 @@ export default function QuizTaker({ module }: QuizTakerProps) {
       progress: undefined,
       theme: "colored",
     });
-  }
+  };
 
   const trainingCancelAnimation = () => {
-    toast.error('Training Not Saved', {
+    toast.error("Training Not Saved", {
       position: "bottom-left",
       autoClose: 3000,
       hideProgressBar: false,
@@ -137,7 +125,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
       progress: undefined,
       theme: "light",
     });
-  }
+  };
 
   const navigate = useNavigate();
 
@@ -151,46 +139,56 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     if (!window.confirm("Are you sure you want to cancel this quiz? Progress will be lost.")) {
       return;
     }
-    navigate('../maker/training')
+    navigate("../maker/training");
     trainingCancelAnimation();
   };
 
-  window.addEventListener('beforeunload', function (e) {
+  window.addEventListener("beforeunload", function (e) {
     if (quizProgressed) {
       e.preventDefault();
-      return ''
+      return "";
     }
   });
+  
 
   return (
     <Stack spacing={4} sx={styles.strongerBolds}>
-      {module.isLocked &&
-      <Card>
-        <CardContent>
-          <b>This training is locked due to too many attempts.</b>
-          <br />
-          You will be unable to progress and submit this quiz until <b>tomorrow</b>.
-          <br /><br />
-          If you would like to unlock this training early and seek help with the quiz, please see a Makerspace Mentor.
-        </CardContent>
-      </Card>}
+      <title>{`${module.name} | Make @ RIT`}</title>
+      {module.isLocked && (
+        <Card>
+          <CardContent>
+            <b>This training is locked due to too many attempts.</b>
+            <br />
+            You will be unable to progress and submit this quiz until <b>tomorrow</b>.
+            <br />
+            <br />
+            If you would like to unlock this training early and seek help with the quiz, please see a Makerspace Mentor.
+          </CardContent>
+        </Card>
+      )}
 
       {module.quiz.map((quizItem) => {
-        const selectedOptionIDs =
-          answerSheet.find((qi) => qi.itemID === quizItem.id)?.optionIDs ?? [];
+        const selectedOptionIDs = answerSheet.find((qi) => qi.itemID === quizItem.id)?.optionIDs ?? [];
 
         switch (quizItem.type) {
           case QuizItemType.Text:
-            return <Typography key={quizItem.id} sx={styles.strongerBolds}>
-              <Markdown
-                components={{
-                  a({ children, ...props }) {
-                    return <a target="_blank" rel="noopener noreferrer"{...props}>{children}</a>;
-                  },
-                }}>
-                {quizItem.text}
-              </Markdown>
-              </Typography>;
+            return (
+              <Typography key={quizItem.id} sx={styles.strongerBolds}>
+                <Markdown
+                  components={{
+                    a({ children, ...props }) {
+                      return (
+                        <a target="_blank" rel="noopener noreferrer" {...props}>
+                          {children}
+                        </a>
+                      );
+                    },
+                  }}
+                >
+                  {quizItem.text}
+                </Markdown>
+              </Typography>
+            );
           case QuizItemType.MultipleChoice:
             return (
               <Question
@@ -198,9 +196,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
                 key={quizItem.id}
                 quizItem={quizItem}
                 disabled={module.isLocked ?? false}
-                onClick={(optionID) =>
-                  selectMultipleChoiceOption(quizItem.id, optionID)
-                }
+                onClick={(optionID) => selectMultipleChoiceOption(quizItem.id, optionID)}
               />
             );
           case QuizItemType.Checkboxes:
@@ -210,27 +206,27 @@ export default function QuizTaker({ module }: QuizTakerProps) {
                 key={quizItem.id}
                 quizItem={quizItem}
                 disabled={module.isLocked ?? false}
-                onClick={(optionID) =>
-                  toggleCheckboxOption(quizItem.id, optionID)
-                }
+                onClick={(optionID) => toggleCheckboxOption(quizItem.id, optionID)}
               />
             );
           case QuizItemType.ImageEmbed:
             return (
-              <StyledImageEmbed key={quizItem.id} alt="" src={quizItem.text} style={isMobile ? { width: "80vw" } : {}} />
-            );
-          case QuizItemType.YoutubeEmbed:
-            return (
-              <StyledIFrame
+              <StyledImageEmbed
                 key={quizItem.id}
-                src={`https://www.youtube.com/embed/${quizItem.text}`}
+                alt=""
+                src={quizItem.text}
+                style={isMobile ? { width: "80vw" } : {}}
               />
             );
+          case QuizItemType.YoutubeEmbed:
+            return <StyledIFrame key={quizItem.id} src={`https://www.youtube.com/embed/${quizItem.text}`} />;
           case QuizItemType.PdfEmbed:
             return (
               <StyledDiv>
                 <object data={quizItem.text} type="application/pdf" width="100%" height="100%">
-                  <p><a href={quizItem.text}>Embeded PDF</a></p>
+                  <p>
+                    <a href={quizItem.text}>Embeded PDF</a>
+                  </p>
                 </object>
               </StyledDiv>
             );
@@ -249,15 +245,10 @@ export default function QuizTaker({ module }: QuizTakerProps) {
         >
           Submit
         </Button>
-        <Button
-          variant="outlined"
-          sx={{ alignSelf: "flex-end" }}
-          onClick={() => cancelQuiz()}
-        >
+        <Button variant="outlined" sx={{ alignSelf: "flex-end" }} onClick={() => cancelQuiz()}>
           Cancel
         </Button>
       </Stack>
-
     </Stack>
   );
 }
