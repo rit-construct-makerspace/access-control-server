@@ -10,7 +10,6 @@ import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import EmptyPageSection from "../../../../common/EmptyPageSection";
 import { useCallback } from "react";
 import QuestionBox from "./QuestionBox";
-import { width } from "@mui/system";
 
 interface QuizBuilderProps {
   quiz: QuizItem[];
