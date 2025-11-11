@@ -2,15 +2,12 @@ import { useEffect } from "react";
 import { Box, Stack } from "@mui/material";
 import { useLazyQuery } from "@apollo/client";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import PrivilegeControl from "./PrivilegeControl";
+import PrivilegeControl from "./userpage/PrivilegeControl";
 import { useParams } from "react-router-dom";
-import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import CardTagSettings from "./CardTagSettings";
-import { isStaffFor, isTrainerFor } from "../../../common/PrivilegeUtils";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import ManageUserArchive from "./ManageUserArchive";
-import { AccessCheckExtraInfo, GET_USER } from "../../../queries/userQueries";
-import NavLink from "../../../top_nav/NavLink";
+import { GET_USER } from "../../../queries/userQueries";
 import HoldsRestrictions from "./userpage/HoldsRestrictions";
 import AccessChecks from "./userpage/AccessChecks";
 import Trainings from "./userpage/Trainings";
@@ -19,7 +16,6 @@ import Notes from "./userpage/Notes";
 
 export default function UserPage() {
   const { userID} = useParams<{ userID: string }>();
-  const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
 
   const [getUser, getUserResult] = useLazyQuery(GET_USER);
