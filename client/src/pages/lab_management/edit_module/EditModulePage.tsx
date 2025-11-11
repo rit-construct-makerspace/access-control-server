@@ -26,6 +26,9 @@ import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isAdmin, isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useCallback } from "react";
+import { useIsMobile } from "../../../common/IsMobileProvider";
+
+
 interface EditModulePageProps {
   moduleInitialValue: Module;
   deleteModule: () => Promise<void>;
@@ -43,6 +46,7 @@ export default function EditModulePage({
   const currentUser = useCurrentUser();
   const navigate = useNavigate();
   const theme = useTheme();
+  const isMobile = useIsMobile();
 
   const [module, setModule] = useImmer<Module>(moduleInitialValue);
 
