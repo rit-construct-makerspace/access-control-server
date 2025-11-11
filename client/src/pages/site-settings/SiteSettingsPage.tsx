@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Button, Card, Grid, Stack, Typography, Link } from "@mui/material";
-import gql from "graphql-tag";
 import { GET_MAKERSPACES } from "../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import DeleteIcon from '@mui/icons-material/Delete';

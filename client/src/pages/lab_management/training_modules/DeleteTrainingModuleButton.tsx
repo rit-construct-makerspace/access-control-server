@@ -25,7 +25,7 @@ export default function DeleteTrainingModuleButton(props: DeleteTrainingModuleBu
     try {
       await deleteTrainingModule();
     } catch (error) {
-      toast.error("Failed to delete training module");
+      toast.error(`Failed to delete training module: ${error}`);
       return;
     }
   }

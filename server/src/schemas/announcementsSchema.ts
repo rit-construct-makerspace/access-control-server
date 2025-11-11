@@ -10,11 +10,15 @@ export const AnnouncementsTypeDefs = gql`
     id: ID!
     title: String!
     description: String!
+    linkText: String
+    linkUrl: String
   }
 
   input AnnouncementInput {
     title: String!
     description: String!
+    linkText: String
+    linkUrl: String
   }
 
   type Query {
@@ -23,8 +27,8 @@ export const AnnouncementsTypeDefs = gql`
   }
 
   type Mutation {
-    createAnnouncement(title: String!, description: String!): Announcement
-    updateAnnouncement(id: ID!, title: String!, description: String!): Announcement
+    createAnnouncement(title: String!, description: String!, linkText: String, linkUrl: String): Announcement
+    updateAnnouncement(id: ID!, title: String!, description: String!, linkText: String, linkUrl: String): Announcement
     updateAnnouncementWithInputType(id: ID!, input: AnnouncementInput!): Announcement
     deleteAnnouncement(id: ID!): Boolean
   }

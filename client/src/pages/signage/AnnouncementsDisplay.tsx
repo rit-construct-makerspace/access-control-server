@@ -12,8 +12,8 @@ const StyledQRCode = styled.img`
     padding: 10px;
 `;
 
-var listLength = 0;
-var index = 0;
+let listLength = 0;
+let index = 0;
 
 export default function AnnouncementsDisplay() {
 
@@ -32,7 +32,7 @@ export default function AnnouncementsDisplay() {
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((oldProgress) => {
-        var newProgress = oldProgress === 100 ? 0 : Math.min(oldProgress + 1, 100);
+        const newProgress = oldProgress === 100 ? 0 : Math.min(oldProgress + 1, 100);
 
         if (newProgress < oldProgress) {
           handleNextAnnouncement();

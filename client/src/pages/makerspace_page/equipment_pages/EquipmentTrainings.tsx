@@ -18,7 +18,7 @@ export default function EquipmentTrainings(props: EquipmentTrainingProps) {
   return (
     <RequestWrapper2 result={getModulesResult} render={(data) => {
 
-      const possibleModules = getModulesResult.data.modules.filter((m: ObjectSummary) => (
+      const possibleModules = data.modules.filter((m: ObjectSummary) => (
         !props.equipmentModules.some((eMod) => m.id === eMod.id) // TODO: filter to this makerspace's + global trainings
       ));
 

@@ -22,7 +22,7 @@ export default function Ledger() {
 
 
   const matchingItems = queryResult.data?.Ledgers.filter((i: InventoryLedger) => {
-    var searchString = i.category + " " + i.initiator?.firstName + " " + i.initiator?.lastName + " " + i.items.toString() + " " + i.purchaser?.firstName + " " + i.purchaser?.lastName + " " + i.totalCost + " ";
+    const searchString = i.category + " " + i.initiator?.firstName + " " + i.initiator?.lastName + " " + i.items.toString() + " " + i.purchaser?.firstName + " " + i.purchaser?.lastName + " " + i.totalCost + " ";
     return searchString.toLowerCase().includes(searchText.toLowerCase())
   });
 

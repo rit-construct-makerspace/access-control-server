@@ -23,7 +23,7 @@ export default function HoursDisplay() {
   })
 
   useEffect(() => {
-    var timer = setInterval(() => setDate(new Date()), 1000)
+    const timer = setInterval(() => setDate(new Date()), 1000)
 
     return () => {
       clearInterval(timer);

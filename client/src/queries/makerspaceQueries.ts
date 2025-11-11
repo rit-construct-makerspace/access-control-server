@@ -242,3 +242,15 @@ export const REMOVE_TRAINING_FROM_MAKERSPACE = gql`
     }
   }
 `;
+
+export const UPDATE_DEFAULT_HOURS = gql`
+  mutation UpdateDefaultHours($hours: DefaultHoursInput!) {
+    updateDefaultHours(hours: $hours)
+  }
+`;
+
+export const DELETE_SPECIAL_HOURS = gql`
+  mutation DeleteSpecialHours($day: DateTime!, $makerspaceID: ID!) {
+    deleteSpecialHours(day: $day, makerspaceID: $makerspaceID)
+  }
+`;

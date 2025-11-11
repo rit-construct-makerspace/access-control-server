@@ -28,7 +28,6 @@ export default function NewEquipmentPage() {
   });
 
   const [name, setName] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
   const [sopUrl, setSopUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [byReservation, setByReservation] = useState(false);
@@ -48,7 +47,7 @@ export default function NewEquipmentPage() {
         name: name,
         roomID: room.id,
         moduleIDs: [],
-        imageUrl: imageUrl,
+        imageUrl: "",
         sopUrl: sopUrl,
         notes: notes,
         byReservationOnly: byReservation,
@@ -93,11 +92,6 @@ export default function NewEquipmentPage() {
               renderInput={(params: any) => (
                 <TextField {...params} required label="Location" />
               )}
-              /* Autocomplete's value prop wants undefined, not null.
-              * But if we give it undefined then it thinks it's an
-              * uncontrolled prop and throws a console error
-              * when we set the value. This is a MUI problem.
-              * @ts-ignore */
               value={room}
               options={rooms}
               isOptionEqualToValue={(option, value) => option.id === value.id}
