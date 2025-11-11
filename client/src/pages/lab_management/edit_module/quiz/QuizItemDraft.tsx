@@ -6,8 +6,6 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import { Draggable } from "@hello-pangea/dnd";
 import { Stack } from "@mui/system";
-import { useIsMobile } from "../../../../common/IsMobileProvider";
-
 
 const StyledDragHandle = styled.div`
   display: flex;
@@ -38,7 +36,6 @@ const QuizItemDraft = memo(function QuizItemDraft({
   extraActions,
 }: QuizItemDraftProps) {
   console.log("quiz item draft render", index);
-  const isMobile = useIsMobile();
   
   return (
     <Draggable draggableId={itemId} index={index}>
