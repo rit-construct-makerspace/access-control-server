@@ -1,4 +1,18 @@
-import { Autocomplete, Box, Button, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Stack,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
 import { Equipment } from "./EditEquipmentPage";
 import { ARCHIVE_EQUIPMENT, PUBLISH_EQUIPMENT, UPDATE_EQUIPMENT } from "../../../queries/equipmentQueries";
 import { useMutation, useQuery } from "@apollo/client";
@@ -22,6 +36,10 @@ interface EquipmentInformationProps {
 
 export default function EquipmentInformation(props: EquipmentInformationProps) {
   const isMobile = useIsMobile();
+
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) => unsaved && currentLocation.pathname !== nextLocation.pathname
+  );
 
   const getRoomsResult = useQuery(GET_ROOMS);
 
@@ -113,6 +131,12 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   ]);
 
   useEffect(() => {
+    if (blocker.state === "blocked") {
+      setBlockerDialogOpen(true);
+    }
+  }, [blocker.state]);
+
+  useEffect(() => {
     const handler = (event: BeforeUnloadEvent) => {
       if (unsaved) {
         event.preventDefault();
@@ -122,11 +146,6 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
   }, [unsaved]);
-
-  console.log("unsaved:", unsaved);
-  console.log("Mounting hook...");
-  const blocker = useBlocker( ({ currentLocation, nextLocation }) => unsaved && currentLocation.pathname !== nextLocation.pathname );
-  console.log("Mounted");
 
   return (
     <Stack direction={isMobile ? "column-reverse" : "row"} width={"100%"} justifyContent={"space-between"}>
@@ -161,10 +180,12 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               Save
             </Button>
 
-            {blocker.state === "blocked" ? 
+            {blocker.state === "blocked" && (
               <Dialog
                 open={blockerDialogOpen}
-                onClose={() => { setBlockerDialogOpen(false) }}
+                onClose={() => {
+                  setBlockerDialogOpen(false);
+                }}
                 aria-labelledby="blocker-dialog-title"
                 aria-describedby="blocker-dialog-description"
               >
@@ -179,8 +200,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
                   <Button onClick={() => blocker.proceed()}>Leave Page</Button>
                 </DialogActions>
               </Dialog>
-            : null}
-
+            )}
           </Stack>
         </Stack>
 
