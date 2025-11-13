@@ -87,6 +87,7 @@ export default function HoldsRestrictions(props: HoldsRestrictionsProps) {
           variant="contained"
           onClick={handlePlaceHoldClicked}
           startIcon={<BlockIcon />}
+          disabled={!isStaff(currentUser)}
         >
           Place hold
         </Button>
