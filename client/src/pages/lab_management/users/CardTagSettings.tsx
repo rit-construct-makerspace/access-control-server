@@ -97,6 +97,7 @@ export default function CardTagSettings({
             onClick={handleSubmit}
             startIcon={<AddCardIcon />}
             sx={{ whiteSpace: "nowrap", minWidth: "unset" }}
+            disabled={!isStaff(currentUser)}
           >
             Update Card Tag
           </Button>

@@ -152,7 +152,13 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                     }
                   </Select>
                 </FormControl>
-                <Button variant="contained" color="success" onClick={handleAddManagerPerms} startIcon={<PersonAddIcon />}>
+									<Button
+										variant="contained"
+										color="success"
+										onClick={handleAddManagerPerms}
+										startIcon={<PersonAddIcon />}
+										disabled={!isStaff(currentUser)}
+									>
                   Add
                 </Button>
               </Stack>
@@ -197,7 +203,13 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                     }
                   </Select>
                 </FormControl>
-                <Button variant="contained" color="success" onClick={handleAddStaffPerms} startIcon={<PersonAddIcon />}>
+									<Button
+										variant="contained"
+										color="success"
+										onClick={handleAddStaffPerms}
+										startIcon={<PersonAddIcon />}
+                    disabled={!isStaff(currentUser)}
+									>
                   Add
                 </Button>
               </Stack>
@@ -218,7 +230,13 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                   <InputLabel id="add-trainer-permissions"></InputLabel>
                   <TrainerEquipmentSelect user={props.user} setAddTrainerPerms={setAddTrainerPerms} />
                 </FormControl>
-                <Button variant="contained" color="success" onClick={handleAddTrainerPerms} startIcon={<PersonAddIcon />}>
+									<Button
+										variant="contained"
+										color="success"
+										onClick={handleAddTrainerPerms}
+										startIcon={<PersonAddIcon />}
+                    disabled={!isStaff(currentUser)}
+									>
                   Add
                 </Button>
               </Stack>
