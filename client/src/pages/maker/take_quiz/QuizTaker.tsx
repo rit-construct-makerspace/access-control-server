@@ -72,10 +72,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
 
   const [answerSheet, setAnswerSheet] = useImmer<AnswerSheet>(initialAnswerSheet);
 
-  const [submitModule, result] = useMutation(SUBMIT_MODULE, {
-    variables: { moduleID: module.id, answerSheet },
-    refetchQueries: [{ query: GET_CURRENT_USER }, { query: GET_TRAINING_MODULES }],
-  });
+  const [submitModule, result] = useMutation(SUBMIT_MODULE);
 
   const selectMultipleChoiceOption = (itemID: string, optionID: string) => {
     setAnswerSheet((draft) => {
@@ -130,9 +127,15 @@ export default function QuizTaker({ module }: QuizTakerProps) {
   const navigate = useNavigate();
 
   const submitAndViewResults = async () => {
-    await submitModule();
-    navigate(`results`);
-    trainingSubmissionAnimation();
+    await submitModule({
+    variables: { moduleID: module.id, answerSheet },
+    refetchQueries: [{ query: GET_CURRENT_USER }, { query: GET_TRAINING_MODULES }],
+    onError (error){
+      toast.error(`Failed to submit: ${error.message}`);
+    },
+    onCompleted: (results) => {navigate(`results`); trainingSubmissionAnimation();}
+  });
+
   };
 
   const cancelQuiz = async () => {
