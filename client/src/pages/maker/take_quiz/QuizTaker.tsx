@@ -133,7 +133,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     onError (error){
       toast.error(`Failed to submit: ${error.message}`);
     },
-    onCompleted: (results) => {navigate(`results`); trainingSubmissionAnimation();}
+    onCompleted() {navigate(`results`); trainingSubmissionAnimation();}
   });
 
   };
@@ -195,6 +195,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
           case QuizItemType.MultipleChoice:
             return (
               <Question
+                moduleID={module.id}
                 selectedOptionIDs={selectedOptionIDs}
                 key={quizItem.id}
                 quizItem={quizItem}
@@ -205,6 +206,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
           case QuizItemType.Checkboxes:
             return (
               <Question
+                moduleID={module.id}
                 selectedOptionIDs={selectedOptionIDs}
                 key={quizItem.id}
                 quizItem={quizItem}
