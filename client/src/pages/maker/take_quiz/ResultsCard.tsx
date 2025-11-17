@@ -65,8 +65,7 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
                     <ThemedMarkdown>{choiceSummary.comment}</ThemedMarkdown>
                   </Typography>
                 </>
-              : 
-                <Alert
+              : <Alert
                   icon={<LightbulbOutlinedIcon fontSize="inherit" />}
                   severity="warning"
                   sx={{ margin: 0 }}
