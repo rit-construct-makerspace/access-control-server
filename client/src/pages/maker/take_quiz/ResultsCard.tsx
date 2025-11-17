@@ -3,7 +3,9 @@ import {
   CardContent,
   Typography,
   Stack,
-  CardHeader
+  CardHeader,
+  Alert,
+  AlertTitle
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
@@ -56,14 +58,14 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
               <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><ThemedMarkdown>{choiceSummary.questionText}</ThemedMarkdown></Typography>
             </Stack>
             <Stack direction={"row"} spacing={2} alignItems="center">
-              {choiceSummary.correct ? (
-                <>
+              {choiceSummary.correct 
+              ? <>
                   <ThumbUpAltOutlinedIcon color="info" />
                   <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}>
                     <ThemedMarkdown>{choiceSummary.comment}</ThemedMarkdown>
                   </Typography>
                 </>
-              ) : (
+              : 
                 <Alert
                   icon={<LightbulbOutlinedIcon fontSize="inherit" />}
                   severity="warning"
@@ -82,7 +84,7 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
                     </ThemedMarkdown>
                   </Typography>
                 </Alert>
-              )}
+              }
             </Stack>
           </Card>
         ))}
