@@ -44,8 +44,9 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
 
   return (
     <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>
-      <CardHeader title="Summary & Feedback"></CardHeader>
+      <CardHeader title="Summary & Feedback"/>
       <CardContent>
+        <Stack direction={"column"} spacing={2}>
         {summaryObj.map((choiceSummary: ChoiceSummary) => (
           <Card elevation={2} sx={{ p: 2 }}>
             <Stack direction={"row"} spacing={2} alignItems="center" >
@@ -85,6 +86,7 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
             </Stack>
           </Card>
         ))}
+        </Stack>
       </CardContent>
     </Card>
   );
