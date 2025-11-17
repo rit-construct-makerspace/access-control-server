@@ -55,10 +55,34 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
               <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><ThemedMarkdown>{choiceSummary.questionText}</ThemedMarkdown></Typography>
             </Stack>
             <Stack direction={"row"} spacing={2} alignItems="center">
-              {choiceSummary.correct 
-              ? <ThumbUpAltOutlinedIcon color="info" /> 
-              : <LightbulbOutlinedIcon color="warning" />}
-              <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><ThemedMarkdown>{choiceSummary.comment}</ThemedMarkdown></Typography>
+              {choiceSummary.correct ? (
+                <>
+                  <ThumbUpAltOutlinedIcon color="info" />
+                  <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}>
+                    <ThemedMarkdown>{choiceSummary.comment}</ThemedMarkdown>
+                  </Typography>
+                </>
+              ) : (
+                <Alert
+                  icon={<LightbulbOutlinedIcon fontSize="inherit" />}
+                  severity="warning"
+                  variant="filled"
+                  sx={{ margin: 0 }}
+                >
+                  <AlertTitle>Hint</AlertTitle>
+                  <Typography sx={{ fontWeight: 500, ...styles.strongerBolds }}>
+                    <ThemedMarkdown
+                      components={{
+                        p({ children }) {
+                          return <p style={{ margin: 0 }}>{children}</p>;
+                        },
+                      }}
+                    >
+                      {choiceSummary.comment}
+                    </ThemedMarkdown>
+                  </Typography>
+                </Alert>
+              )}
             </Stack>
           </Card>
         ))}

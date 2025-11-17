@@ -8,11 +8,12 @@ import ReactMarkdown from "react-markdown";
  * @param props children to pass to ReactMarkdown 
  * @returns ReactElement that ReactMarkdown gives
  */
-export default function ThemedMarkdown(props: { children: string }): ReactElement {
+export default function ThemedMarkdown(props: { children: string, components?: object }): ReactElement {
     return <ReactMarkdown components={{
         a({ children, ...props }) {
             return <Link target="_blank" rel="noopener noreferrer"{...props}>{children}</Link>;
         },
+        ...props.components,
     }}
     >{props.children}
     </ReactMarkdown>
