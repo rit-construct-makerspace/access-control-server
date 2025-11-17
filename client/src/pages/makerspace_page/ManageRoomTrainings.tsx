@@ -6,7 +6,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import GET_TRAINING_MODULES from "../../queries/trainingQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { useState } from "react";
-import { GET_ROOM } from "./MonitorRoomPage";
+import { GET_ROOM } from "../../queries/roomQueries";
 import { useParams } from "react-router-dom";
 
 interface ManageRoomTrainingsProps {

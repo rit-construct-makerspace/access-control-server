@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import RoomMakerspaceAssociation from "./RoomMakerspaceAssociation";
-import { ARCHIVE_ROOM, DELETE_ROOM, UNARCHIVE_ROOM, UPDATE_ROOM_NAME } from "../../queries/roomQueries";
+import { ARCHIVE_ROOM, DELETE_ROOM, GET_ROOM, UNARCHIVE_ROOM, UPDATE_ROOM_NAME } from "../../queries/roomQueries";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import PublishIcon from "@mui/icons-material/Publish";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -16,45 +16,6 @@ import { TrainingModule } from "../../common/TrainingModuleUtils";
 import ManageRoomTrainings from "./ManageRoomTrainings";
 import { toast } from "react-toastify";
 import EquipmentBlockDialog from "./EquipmentBlockDialog";
-
-export const GET_ROOM = gql`
-  query GetRoom($id: ID!) {
-    room(id: $id) {
-      name
-      archived
-      makerspace {
-        id
-        name
-      }
-      recentSwipes {
-        id
-        user {
-          id
-          firstName
-          lastName
-        }
-      }
-      equipment {
-        id
-        name
-        archived
-        imageUrl
-        sopUrl
-        trainingModules {
-          id
-          name
-        }
-        numAvailable
-        numInUse
-        byReservationOnly
-      }
-      trainingModules {
-        id
-        name
-      }
-    }
-  }
-`;
 
 export interface Swipe {
   id: string;
