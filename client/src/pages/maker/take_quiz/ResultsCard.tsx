@@ -66,7 +66,6 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
                 <Alert
                   icon={<LightbulbOutlinedIcon fontSize="inherit" />}
                   severity="warning"
-                  variant="filled"
                   sx={{ margin: 0 }}
                 >
                   <AlertTitle>Hint</AlertTitle>
