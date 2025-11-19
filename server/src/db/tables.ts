@@ -273,6 +273,7 @@ export interface TrainingModuleItem {
   type: string;
   text: string;
   options?: ModuleItemOption[];
+  correctAnswers?: number;
   hint: string;
   affirmation: string;
 }

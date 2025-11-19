@@ -27,6 +27,19 @@ export const GET_MODULE_WITH_ANSWERS = gql`
   }
 `;
 
+export const GET_MODULE_ANSWER_COUNT = gql`
+  query GetModuleAnswerCount($id: ID!) {
+    moduleWithAnswerCount(id: $id){
+      id
+      name
+      quiz
+      reservationPrompt
+      archived
+      isLocked
+    }
+  }
+`;
+
 export const GET_ARCHIVED_MODULE = gql`
   query GetArchivedModule($id: ID!) {
     archivedModule(id: $id) {

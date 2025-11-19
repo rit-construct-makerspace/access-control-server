@@ -16,14 +16,6 @@ const styles = {
   }
 };
 
-const GET_CORRECT_ANSWER_COUNT = gql`
-  query GetModuleQuestionAnswerCount($id: ID!, $itemID: String!) {
-    moduleQuestionAnswerCount(id: $id, itemID: $itemID){
-      count
-    }
-  }
-`;
-
 interface QuestionProps {
   moduleID: number;
   selectedOptionIDs: string[];
@@ -39,7 +31,6 @@ export default function Question({
   onClick,
   disabled
 }: QuestionProps) {
-  const correctAnswerCount = useQuery(GET_CORRECT_ANSWER_COUNT, {variables: {id:moduleID, itemID: quizItem.id}})
 
   return (
     <Card elevation={2} sx={{ p: 2 }}>
@@ -51,7 +42,7 @@ export default function Question({
             },
           }}
         >{quizItem.type === QuizItemType.Checkboxes 
-          ? quizItem.text + ` (Please select ${correctAnswerCount.data?.moduleQuestionAnswerCount.count} choices.)`
+          ? quizItem.text + ` (Please select ${quizItem?.correctAnswers} choices.)`
           : quizItem.text}</Markdown>
       </Typography>
       {quizItem.options?.map((o) => (

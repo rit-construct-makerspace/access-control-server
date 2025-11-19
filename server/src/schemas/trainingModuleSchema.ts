@@ -45,10 +45,6 @@ export const TrainingModuleTypeDefs = gql`
     accessCheckDone: Boolean!
   }
 
-  type CorrectAnswerCount {
-    count: Int
-  }
-
   input AnswerInput {
     itemID: ID!
     optionIDs: [ID]!
@@ -59,7 +55,7 @@ export const TrainingModuleTypeDefs = gql`
     modulesWithAnswers: [TrainingModule]
     module(id: ID!): TrainingModule
     moduleWithAnswers(id: ID!): TrainingModule
-    moduleQuestionAnswerCount(id: ID!, itemID: String!): CorrectAnswerCount
+    moduleWithAnswerCount(id: ID!): TrainingModule
     archivedModules: [TrainingModule]
     archivedModule(id: ID!): TrainingModule
     relatedAccessProgress(sourceTrainingModuleID: ID!): [AccessProgress]

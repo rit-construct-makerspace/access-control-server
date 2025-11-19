@@ -104,16 +104,16 @@ const removeAnswersFromQuiz = (quiz: TrainingModuleItem[]) => {
   }
 };
 
-function findAnswerCount(quiz: TrainingModuleItem[], itemID: String){
+function editQuizOptions(quiz: TrainingModuleItem[]){
   for (const item of quiz) {
-    if(item.id === itemID && item.options){
+    if(item.options){
       var count = 0;
       for (const option of item.options) {
         if(option.correct == true){
           count++;
         }
       }
-      return count;
+      item.correctAnswers = count;
     }
   }
 }
@@ -234,20 +234,20 @@ const TrainingModuleResolvers = {
     },
 
     /**
-     * Finds a question based on module and id of item. No restrictions on user.
+     * Finds a module based id of item. No restrictions on user. Only returns # of correct answers for options
      * @argument id ID of TrainingModule
-     * @argument itemID id of item within trainingmodule
+     * @argument itemID id of item within TrainingModule
      * @returns number of correct answers for a question
      */
-      moduleQuestionAnswerCount: async (
+      moduleWithAnswerCount: async (
       _parent: any,
       args: { id: number, itemID: string },
       { ifAuthenticated }: ApolloContext
     ) => {
       return ifAuthenticated(async (_user: any) => {
         const module = await ModuleRepo.getModuleByID(args.id);
-        const answerCount = findAnswerCount(module.quiz, args.itemID)
-        return {"count": answerCount};
+        editQuizOptions(module.quiz)
+        return module;
       })
     },
 
