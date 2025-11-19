@@ -15,7 +15,7 @@ import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import { useIsMobile } from "../../common/IsMobileProvider";
-import { isOnlyTrainer, isStaffFor } from "../../common/PrivilegeUtils";
+import { isOnlyTrainer, isStaffFor, isManagerFor } from "../../common/PrivilegeUtils";
 import NavLink from "../../top_nav/NavLink";
 
 export default function StaffBar() {
@@ -25,6 +25,7 @@ export default function StaffBar() {
   const isMobile = useIsMobile();
   const isPriviledged = isStaffFor(user, Number(makerspaceID));
   const isTrainer = isOnlyTrainer(user);
+  const isManager = isManagerFor(user, Number(makerspaceID));
 
   const [mobileMenu, setMobileMenu] = useState(false);
 
@@ -127,11 +128,13 @@ export default function StaffBar() {
           to={`/makerspace/${makerspaceID}/history`}
           icon={<HistoryIcon />}
         />
-        <NavLink
-          primary={"Readers"}
-          to={`/makerspace/${makerspaceID}/readers`}
-          icon={<ScannerIcon />}
-        />
+        {isManager ? (
+          <NavLink
+            primary={"Readers"}
+            to={`/makerspace/${makerspaceID}/readers`}
+            icon={<ScannerIcon />}
+          />
+        ) : null}
         <NavLink
           primary={"Finances"}
           to={`/makerspace/${makerspaceID}/currency`}

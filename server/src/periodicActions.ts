@@ -51,3 +51,12 @@ export async function purge_images(): Promise<void> {
 		console.error("Could not purge images: ", e);
 	}
 }
+
+export async function deletePastSpecialHours(): Promise<void> {
+	try {
+		await knex("SpecialHours").where("day", "<", knex.fn.now()).del();
+	} catch(e) {
+		console.error("Could not delete past special hours: ", e);
+	}
+}
+
