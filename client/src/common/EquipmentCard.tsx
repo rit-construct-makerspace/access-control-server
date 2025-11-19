@@ -96,7 +96,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                       ) : (
                         <CloseIcon color="error" />
                       )}
-                      <Typography variant="body2">Staff Sign Off</Typography>
+                      <Typography variant="body2">Staff Sign-Off</Typography>
                     </Stack>
                   ) : null}
                 </Stack>

@@ -53,7 +53,7 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
                       {accessProgress.accessCheckDone
                         ? <CheckCircleIcon color="success" />
                         : <CloseIcon color="error" />}
-                      <Typography variant="body2" fontWeight={"bold"} fontSize={"1.1em"}>Staff Sign Off</Typography>
+                      <Typography variant="body2" fontWeight={"bold"} fontSize={"1.1em"}>Staff Sign-Off</Typography>
                     </Stack>
                     {(!accessProgress.accessCheckDone && accessProgress.availableModules.length === 0) &&
                       <Typography variant="body2" fontSize={"1.1em"} px={5}>Almost done! Just speak to a Maker Mentor to finish your training on the {accessProgress.equipment.name}</Typography>}

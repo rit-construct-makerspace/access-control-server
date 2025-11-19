@@ -116,7 +116,7 @@ export default function UserTraingingsPage() {
                 ))}
               </Grid>
               <Typography variant="h4">
-                Awaiting Staff Sign Off
+                Awaiting Staff Sign-Off
               </Typography>
               <Grid
                 container
