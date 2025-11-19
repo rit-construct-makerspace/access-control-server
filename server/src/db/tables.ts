@@ -168,7 +168,7 @@ export interface InventoryLedgerRow {
 
 /**
  * A record of a quiz submission.
- * Note, this table does not control access to equipment. Rather, the AccessChecks and PassedModules tables record successful In-person checks and Non-expired trainings respectively
+ * Note, this table does not control access to equipment. Rather, the AccessChecks and PassedModules tables record successful In-person checks (staff sign-offs) and Non-expired trainings respectively
  * PassedModules records trainings that have not expired (It is kept up to date by purging expired trainings)
  * ModuleSubmissions records all quiz attempts forever
  * AccessChecks records in person competency checks
