@@ -14,12 +14,6 @@ interface LowInventoryProps {
 }
 
 export default function LowInventory(props: LowInventoryProps) {
-	const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
-	useEffect(() => {
-		const onResize = () => setWindowWidth(window.innerWidth);
-		window.addEventListener("resize", onResize);
-		return () => window.removeEventListener("resize", onResize);
-	}, []);
 
 	const inventoryItemsResult = useQuery(GET_INVENTORY_ITEMS);
 	const lowInventoryItems = inventoryItemsResult.data?.InventoryItems.filter(

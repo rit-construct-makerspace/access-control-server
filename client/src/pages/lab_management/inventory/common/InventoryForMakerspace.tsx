@@ -25,13 +25,6 @@ interface InventoryForMakerspaceProps {
 
 export function InventoryForMakerspace(props: InventoryForMakerspaceProps) {
   const currentUser = useCurrentUser();
-  // keep an optional window width if it's still needed elsewhere (updates on resize)
-  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
-  useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const safeData = props.makerspace.items ?? [];
   const sortedItems = sortItemsByName(safeData);
