@@ -25,7 +25,6 @@ import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ManageUserArchive from "./ManageUserArchive";
 import { AccessCheckExtraInfo, GET_USER, Hold, Restriction } from "../../../queries/userQueries";
-import NavLink from "../../../top_nav/NavLink";
 
 
 const CREATE_HOLD = gql`

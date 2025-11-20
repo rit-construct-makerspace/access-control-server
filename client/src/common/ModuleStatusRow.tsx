@@ -8,7 +8,6 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { format } from "date-fns";
 import { useQuery } from "@apollo/client";
-import { GET_ACCESS_PROGRESSES } from "../queries/trainingQueries";
 import { GET_PASSED_SUBMISSION } from "../queries/getSubmissions";
 import { useCurrentUser } from "./CurrentUserProvider.js";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';

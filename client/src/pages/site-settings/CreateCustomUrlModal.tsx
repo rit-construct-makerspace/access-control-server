@@ -1,8 +1,7 @@
-import { Button, Link, Stack, TextField, Typography } from "@mui/material";
+import { Button, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../common/PrettyModal";
 import AddIcon from '@mui/icons-material/Add';
 import { useMutation } from "@apollo/client";
-import gql from "graphql-tag";
 import { useState } from "react";
 import { CREATE_CUSTOM_URL } from "../../queries/customUrlQueries";
 import { toast } from "react-toastify";
