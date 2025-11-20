@@ -108,8 +108,8 @@ export default function StaffBar() {
           icon={<ArchitectureIcon />}
         />
         <NavLink
-          primary={"Orders"}
-          to={`/makerspace/${makerspaceID}/storefront/carts`}
+          primary={"Purchase"}
+          to={`/makerspace/${makerspaceID}/storefront/checkout`}
           icon={<ShoppingCartCheckoutIcon />}
         />
         <NavLink

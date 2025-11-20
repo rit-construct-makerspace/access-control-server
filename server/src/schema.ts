@@ -60,6 +60,8 @@ import { CurrencyLedgerResolvers } from "./resolvers/currencyLedgerResolver.js";
 import { CurrencyLedgerTypeDefs } from "./schemas/currencyLedgerSchema.js";
 import { OrganizationTypeDefs } from "./schemas/organizationsSchema.js";
 import { OrganizationResolver } from "./resolvers/organizationsResolver.js";
+import {  ChargeResolver } from "./resolvers/chargeResolver.js";
+import { ChargeTypeDefs } from "./schemas/chargeSchema.js";
 
 // for custom scalars such as Date
 const resolveFunctions = {
@@ -99,6 +101,7 @@ export const schema = makeExecutableSchema({
     CartTypeDefs,
     CurrencyLedgerTypeDefs,
     OrganizationTypeDefs,
+    ChargeTypeDefs,
   ],
   resolvers: [
     resolveFunctions,
@@ -129,5 +132,6 @@ export const schema = makeExecutableSchema({
     CartResolver,
     CurrencyLedgerResolvers,
     OrganizationResolver,
+    ChargeResolver,
   ]
 });

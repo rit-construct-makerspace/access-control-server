@@ -37,8 +37,6 @@ import NoPrivilegePage from "./pages/NoPrivilegePage";
 import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
 import HoursDisplay from "./pages/signage/HoursDisplay";
 import EventsDisplay from "./pages/signage/EventsDisplay";
-import { CartListPage } from "./pages/lab_management/storefront/internal/CartListPage";
-import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
 import SiteSettingsPage from "./pages/site-settings/SiteSettingsPage";
@@ -142,9 +140,6 @@ export default function AppRoutes() {
                 <Route path="/makerspace/:makerspaceID/people" element={<UsersPage />} />
                 <Route path="/makerspace/:makerspaceID/people/:userID" element={<UserPage/>} />
                 <Route path="/makerspace/:makerspaceID/inventory" element={<InventoryPage />} />
-                <Route path="/makerspace/:makerspaceID/storefront/carts" element={<CartListPage />} />
-                <Route path="/makerspace/:makerspaceID/storefront/carts/:cartID" element={<CartPage />} />
-                <Route path="/makerspace/:makerspaceID/storefront/carts/:cartID" element={<CartPage />} />
 
                 {/* Routes for staff + higher */}
                 <Route element={<StaffRoute />}>
@@ -165,6 +160,8 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
                   <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
                   <Route path="/makerspace/:makerspaceID/organizations" element={<OrganizationsPage />} />
+                  <Route path="/makerspace/:makerspaceID/storefront/checkout" element={<CheckoutPage />} />
+
 
                   {/* Routes for manager + higher */}
                   <Route element={<ManagerRoute />}>
@@ -202,11 +199,6 @@ export default function AppRoutes() {
             <Route path="/admin/terms" element={<EditTermsPage />} />
           </Route>
           {/* END OF PROTECTED ROUTES */}
-
-          <Route path="/storefront" element={<StorefrontPage />} />
-          <Route element={<StaffRoute />}>
-            <Route path="/storefront/checkout" element={<CheckoutPage />} />
-          </Route>
 
           <Route path="/logoutprompt" element={<LogoutPromptPage />} />
 

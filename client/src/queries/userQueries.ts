@@ -10,6 +10,20 @@ export interface PartialUser {
   restrictions: any[];
 }
 
+export const PARTIAL_USER_FRAGMENT = gql`
+fragment PartialUserFragment on User {
+    id
+    ritUsername
+    firstName
+    lastName
+    setupComplete
+    activeHold
+    restrictions {
+      id
+    }
+  }
+`;
+
 export interface AccessCheck {
   id: string;
   equipmentID: string;
