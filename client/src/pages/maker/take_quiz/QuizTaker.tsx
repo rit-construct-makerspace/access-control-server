@@ -64,11 +64,16 @@ interface QuizTakerProps {
 
 export default function QuizTaker({ module }: QuizTakerProps) {
   const [quizProgressed, setQuizProgressed] = useState<boolean>(false);
+  const [blockSubmit, setBlockSubmit] = useState<boolean>(true);
   const isMobile = useIsMobile();
 
   const initialAnswerSheet = module.quiz
     .filter((item) => item.type === QuizItemType.MultipleChoice || item.type === QuizItemType.Checkboxes)
     .map((item) => ({ itemID: item.id, optionIDs: [] }));
+
+  const answerSheetReq = module.quiz
+  .filter((item) => item.type === QuizItemType.MultipleChoice || item.type === QuizItemType.Checkboxes)
+  .map((item) => ({itemID: item.id, reqCount: item.correctAnswers}))
 
   const [answerSheet, setAnswerSheet] = useImmer<AnswerSheet>(initialAnswerSheet);
 
@@ -79,6 +84,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
       const index = draft.findIndex((i) => i.itemID === itemID);
       draft[index].optionIDs = [optionID];
     });
+    checkAllAnswered();
     setQuizProgressed(true);
   };
 
@@ -95,8 +101,22 @@ export default function QuizTaker({ module }: QuizTakerProps) {
       }
 
     })
+    checkAllAnswered();
     setQuizProgressed(true);
   };
+
+  const checkAllAnswered = async () => {
+    var allAnswered = true
+    answerSheet.forEach((o) => {
+      const itemIndex = answerSheetReq.findIndex((i) => i.itemID === o.itemID);
+      if(o.optionIDs.length != answerSheetReq[itemIndex].reqCount){
+        allAnswered = false;
+      }
+    })
+    setBlockSubmit(!allAnswered)
+  }
+
+  console.log(blockSubmit)
 
   const trainingSubmissionAnimation = () => {
     toast.success("Training Module Submitted", {
@@ -245,7 +265,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
           loading={result.loading}
           variant="contained"
           sx={{ alignSelf: "flex-end" }}
-          disabled={module.isLocked ?? false}
+          disabled={(module.isLocked || blockSubmit) ?? false}
           onClick={() => submitAndViewResults()}
         >
           Submit
