@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Module, QuizItemType } from "../../../types/Quiz";
 import { useImmer } from "use-immer";
 import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
@@ -64,7 +64,7 @@ interface QuizTakerProps {
 
 export default function QuizTaker({ module }: QuizTakerProps) {
   const [quizProgressed, setQuizProgressed] = useState<boolean>(false);
-  const [blockSubmit, setBlockSubmit] = useState<boolean>(true);
+  const [blockSubmit, setBlockSubmit] = useState(true);
   const isMobile = useIsMobile();
 
   const initialAnswerSheet = module.quiz
@@ -73,7 +73,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
 
   const answerSheetReq = module.quiz
   .filter((item) => item.type === QuizItemType.MultipleChoice || item.type === QuizItemType.Checkboxes)
-  .map((item) => ({itemID: item.id, reqCount: item.correctAnswers}))
+  .map((item) => ({itemID: item.id, reqCount: item.correctAnswers}));
 
   const [answerSheet, setAnswerSheet] = useImmer<AnswerSheet>(initialAnswerSheet);
 
@@ -84,7 +84,6 @@ export default function QuizTaker({ module }: QuizTakerProps) {
       const index = draft.findIndex((i) => i.itemID === itemID);
       draft[index].optionIDs = [optionID];
     });
-    checkAllAnswered();
     setQuizProgressed(true);
   };
 
@@ -101,22 +100,20 @@ export default function QuizTaker({ module }: QuizTakerProps) {
       }
 
     })
-    checkAllAnswered();
     setQuizProgressed(true);
   };
 
-  const checkAllAnswered = async () => {
-    var allAnswered = true
+  useEffect(() => {
+    var allAnswered = true;
     answerSheet.forEach((o) => {
       const itemIndex = answerSheetReq.findIndex((i) => i.itemID === o.itemID);
       if(o.optionIDs.length != answerSheetReq[itemIndex].reqCount){
         allAnswered = false;
       }
     })
-    setBlockSubmit(!allAnswered)
-  }
-
-  console.log(blockSubmit)
+    setBlockSubmit(!allAnswered); 
+  });
+  
 
   const trainingSubmissionAnimation = () => {
     toast.success("Training Module Submitted", {
@@ -150,9 +147,6 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     await submitModule({
     variables: { moduleID: module.id, answerSheet },
     refetchQueries: [{ query: GET_CURRENT_USER }, { query: GET_TRAINING_MODULES }],
-    onError (error){
-      toast.error(`Failed to submit: ${error.message}`);
-    },
     onCompleted() {navigate(`results`); trainingSubmissionAnimation();}
   });
 
@@ -215,7 +209,6 @@ export default function QuizTaker({ module }: QuizTakerProps) {
           case QuizItemType.MultipleChoice:
             return (
               <Question
-                moduleID={module.id}
                 selectedOptionIDs={selectedOptionIDs}
                 key={quizItem.id}
                 quizItem={quizItem}
@@ -226,7 +219,6 @@ export default function QuizTaker({ module }: QuizTakerProps) {
           case QuizItemType.Checkboxes:
             return (
               <Question
-                moduleID={module.id}
                 selectedOptionIDs={selectedOptionIDs}
                 key={quizItem.id}
                 quizItem={quizItem}

@@ -2,8 +2,6 @@ import { QuizItem, QuizItemType } from "../../../types/Quiz";
 import { Card, Typography } from "@mui/material";
 import Option from "./Option";
 import Markdown from "react-markdown";
-import gql from "graphql-tag";
-import { useQuery } from "@apollo/client";
 
 const styles = {
   strongerBolds: {
@@ -17,7 +15,6 @@ const styles = {
 };
 
 interface QuestionProps {
-  moduleID: number;
   selectedOptionIDs: string[];
   quizItem: QuizItem;
   onClick: (optionID: string) => void;
@@ -25,13 +22,11 @@ interface QuestionProps {
 }
 
 export default function Question({
-  moduleID,
   selectedOptionIDs,
   quizItem,
   onClick,
   disabled
 }: QuestionProps) {
-
   return (
     <Card elevation={2} sx={{ p: 2 }}>
       <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}>

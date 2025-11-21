@@ -510,13 +510,6 @@ const TrainingModuleResolvers = {
               (item) => item.itemID === question.id
             )?.optionIDs;
 
-            //Stop if user hasn't answered all questions 
-            if(correctOptionIDs.length !== submittedOptionIDs?.length || submittedOptionIDs == null){
-              throw Error(
-                'You have not answered all questions. Please try again.'
-              )
-            }
-
             //Increment correcct if submitted options match correct options (order doesn't matter)
             //Increment incorrect otherwise
             if (submittedOptionIDsCorrect(correctOptionIDs, submittedOptionIDs)) {
