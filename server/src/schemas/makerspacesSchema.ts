@@ -18,6 +18,7 @@ export const MakerspacesTypeDefs = gql`
   type Makerspace {
     id: ID!
     name: String!
+    archived: Boolean!
     subtitle: String
     location: String
     description: String
@@ -47,6 +48,7 @@ export const MakerspacesTypeDefs = gql`
     deleteMakerspace(id: ID!): Makerspace
     addMakerspace(name: String!): Makerspace
     archiveMakerspace(id: ID!): Makerspace
+    unarchiveMakerspace(id: ID!): Makerspace
     updateMakerspace(id: ID!, newMakerspace: MakerspaceInput): Makerspace
     addTrainingToMakerspace(makerspaceID: ID!, moduleID: ID!): [TrainingModule]
     removeTrainingFromMakerspace(makerspaceID: ID!, moduleID: ID!): [TrainingModule]
