@@ -65,7 +65,7 @@ export async function updateMakerspace(
  * @returns 1
  */
 export async function deleteMakerspace(id: number): Promise<number> {
-  await knex('OpenHours').update({ makerspaceID: null }).where({ makerspaceID: id })
+  await knex('DefaultHours').delete().where({ makerspaceID: id });
   await knex('Rooms').update({ makerspaceID: null }).where({ makerspaceID: id })
 
   return await knex('Makerspaces').delete().where({ id });
