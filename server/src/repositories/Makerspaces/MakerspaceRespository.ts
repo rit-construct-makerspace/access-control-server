@@ -127,3 +127,7 @@ export async function archiveMakerspace(id: number, archive = true): Promise<Mak
     return undefined;
   }
 }
+
+export async function unarchiveMakerspace(id: number): Promise<MakerspaceRow | undefined> {
+  return await archiveMakerspace(id, false);
+}

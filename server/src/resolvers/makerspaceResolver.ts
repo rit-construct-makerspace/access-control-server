@@ -1,5 +1,5 @@
 import { ApolloContext } from "../context.js";
-import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getMakerspaceByID, getMakerspaces, getTrainingsByMakerspace, removeTrainingFromMakerspace, updateMakerspace } from "../repositories/Makerspaces/MakerspaceRespository.js";
+import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getMakerspaceByID, getMakerspaces, getTrainingsByMakerspace, removeTrainingFromMakerspace, unarchiveMakerspace, updateMakerspace } from "../repositories/Makerspaces/MakerspaceRespository.js";
 import { MakerspaceRow } from "../db/tables.js";
 import { getRoomsByMakerspace } from "../repositories/Rooms/RoomRepository.js";
 import { MakerspaceInput } from "../schemas/makerspacesSchema.js";
@@ -141,6 +141,13 @@ const MakerspacesResolver = {
         { id: user.id, label: getUsersFullName(user) }
       )
       return await archiveMakerspace(args.id);
+    }),
+
+    unarchiveMakerspace: async (_parent: any, args: { id: number }, { isAdmin }: ApolloContext) => isAdmin(async (user) => {
+      createLog(`{user} unarchived makerspace ${args.id}`, "admin",
+        { id: user.id, label: getUsersFullName(user) }
+      )
+      return await unarchiveMakerspace(args.id);
     })
 
   }
