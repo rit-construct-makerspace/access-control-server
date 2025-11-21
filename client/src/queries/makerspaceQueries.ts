@@ -5,18 +5,19 @@ import { TrainingModule } from "../common/TrainingModuleUtils";
 import MakerspaceHours from "../types/MakerspaceHours";
 
 export const GET_MAKERSPACES = gql`
- query GetMakerspaces {
-  makerspaces {
-    id
-    name
-    imageUrl
+  query GetMakerspaces {
+    makerspaces {
+      id
+      name
+      imageUrl
+    }
   }
- }
 `;
 
 export interface MakerspaceWithHours {
   id: number;
   name: string;
+  archived: boolean;
   subtitle: string | null;
   location: string | null;
   description: string;
@@ -28,12 +29,13 @@ export interface MakerspaceWithHours {
 export interface FullMakerspace {
   id: number;
   name: string;
+  archived: boolean;
   subtitle: string | null;
   location: string | null;
   description: string;
   docsLink: string;
   hours: MakerspaceHours[];
-  rooms: Room[]
+  rooms: Room[];
   imageUrl: string;
   trainingModules: TrainingModule[];
 }
@@ -49,24 +51,25 @@ export interface MakerspaceWithItems {
 }
 
 export const GET_MAKERSPACES_WITH_HOURS = gql`
- query GetMakerspacesWithHours {
-  makerspaces {
-    id
-    name
-    subtitle
-    location
-    description
-    docsLink
-    hours {
+  query GetMakerspacesWithHours {
+    makerspaces {
+      id
+      name
+      archived
+      subtitle
+      location
+      description
+      docsLink
+      hours {
         day
         makerspaceID
         open
         close
         closed
       }
-    imageUrl
+      imageUrl
+    }
   }
- }
 `;
 
 export const GET_FULL_MAKERSPACES = gql`
@@ -74,6 +77,7 @@ export const GET_FULL_MAKERSPACES = gql`
     makerspaces {
       id
       name
+      archived
       subtitle
       location
       description
@@ -110,42 +114,42 @@ export const GET_FULL_MAKERSPACES = gql`
 `;
 
 export const GET_MAKERSPACES_WITH_ITEMS = gql`
- query GetMakerspacesWithItems($storefrontVisible: Boolean) {
-  makerspaces(storefrontVisible: $storefrontVisible) {
-    id
-    name
-    name
-    subtitle
-    location
-    description
-    docsLink
-    items {
+  query GetMakerspacesWithItems($storefrontVisible: Boolean) {
+    makerspaces(storefrontVisible: $storefrontVisible) {
       id
-      image
       name
-      labels
-      unit
-      pluralUnit
-      count
-      pricePerUnit
-      threshold
-      staffOnly
-      storefrontVisible
-      notes
+      name
+      subtitle
+      location
       description
-      makerspaceID
-      makerspace {
+      docsLink
+      items {
         id
+        image
         name
-      }
-      tags {
-        id
-        label
-        color
+        labels
+        unit
+        pluralUnit
+        count
+        pricePerUnit
+        threshold
+        staffOnly
+        storefrontVisible
+        notes
+        description
+        makerspaceID
+        makerspace {
+          id
+          name
+        }
+        tags {
+          id
+          label
+          color
+        }
       }
     }
   }
- }
 `;
 
 export const GET_MAKERSPACE_BY_ID = gql`
@@ -153,6 +157,7 @@ export const GET_MAKERSPACE_BY_ID = gql`
     makerspaceByID(id: $id) {
       id
       name
+      archived
       subtitle
       location
       description
@@ -212,7 +217,14 @@ export const UPDATE_MAKERSPACE = gql`
   ) {
     updateMakerspace(
       id: $id
-      newMakerspace: { name: $name, subtitle: $subtitle, location: $location, description: $description, docsLink: $docsLink, imageUrl: $imageUrl }
+      newMakerspace: {
+        name: $name
+        subtitle: $subtitle
+        location: $location
+        description: $description
+        docsLink: $docsLink
+        imageUrl: $imageUrl
+      }
     ) {
       id
     }
@@ -252,5 +264,21 @@ export const UPDATE_DEFAULT_HOURS = gql`
 export const DELETE_SPECIAL_HOURS = gql`
   mutation DeleteSpecialHours($day: DateTime!, $makerspaceID: ID!) {
     deleteSpecialHours(day: $day, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const ARCHIVE_MAKERSPACE = gql`
+  mutation ArchiveMakerspace($id: ID!) {
+    archiveMakerspace(id: $id) {
+      id
+    }
+  }
+`;
+
+export const UNARCHIVE_MAKERSPACE = gql`
+  mutation UnarchiveMakerspace($id: ID!) {
+    unarchiveMakerspace(id: $id) {
+      id
+    }
   }
 `;
