@@ -54,9 +54,17 @@ const MakerspacesResolver = {
       context: any
     ) => {
       const makerspaces = await getMakerspaces();
-      if (context.user && context.user.admin) {
-        return makerspaces;
+
+      if (context.user) {
+        // All makerspaces if admin
+        if(context.user.admin) {
+          return makerspaces;
+        }
+        // All published makerspaces and any archived ones the user manages
+        const managedIDs = context.user.manager || [];
+        return makerspaces.filter((makerspace) => !makerspace.archived || managedIDs.includes(makerspace.id));
       }
+        // Only published makerspaces for other users
         return makerspaces.filter((makerspace) => !makerspace.archived);
     },
 
@@ -68,8 +76,9 @@ const MakerspacesResolver = {
     makerspaceByID: async (
       _parent: any,
       args: { id: number },
+      context: any,
     ) => {
-      return await getMakerspaceByID(args.id);
+      return getMakerspaceByID(args.id);;
     },
   },
 
