@@ -13,8 +13,8 @@ import * as ModuleRepo from '../Training/ModuleRepository.js';
  * Fetch all Makerspaces
  * @returns all Makerspaces
  */
-export async function getMakerspaces(archived = false): Promise<MakerspaceRow[]> {
-  return await knex('Makerspaces').select().where({ archived: archived });
+export async function getMakerspaces(): Promise<MakerspaceRow[]> {
+  return await knex('Makerspaces').select();
 }
 
 /**
