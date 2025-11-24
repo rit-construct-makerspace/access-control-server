@@ -51,8 +51,13 @@ const MakerspacesResolver = {
     makerspaces: async (
       _parent: any,
       _args: any,
+      context: any
     ) => {
-      return await getMakerspaces();
+      const makerspaces = await getMakerspaces();
+      if (context.user && context.user.admin) {
+        return makerspaces;
+      }
+        return makerspaces.filter((makerspace) => !makerspace.archived);
     },
 
     /**
@@ -81,7 +86,7 @@ const MakerspacesResolver = {
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
         const res = await createMakerspace(args.name);
-        return res
+        return res;
       }),
 
     updateMakerspace: async (
@@ -90,7 +95,7 @@ const MakerspacesResolver = {
       { isManagerFor }: ApolloContext) =>
       isManagerFor(args.id, async () => {
         const res = await updateMakerspace(args.id, args.newMakerspace);
-        return res
+        return res;
       }),
 
     /**
@@ -116,8 +121,8 @@ const MakerspacesResolver = {
       },
       { isManagerFor }: ApolloContext
     ) => isManagerFor(args.makerspaceID, async () => {
-      return await addTrainingToMakerspace(args.makerspaceID, args.moduleID);
-    }),
+        return await addTrainingToMakerspace(args.makerspaceID, args.moduleID);
+      }),
 
     removeTrainingFromMakerspace: async (
       _parent: any,
@@ -127,8 +132,8 @@ const MakerspacesResolver = {
       },
       { isManagerFor }: ApolloContext
     ) => isManagerFor(args.makerspaceID, async () => {
-      return await removeTrainingFromMakerspace(args.makerspaceID, args.moduleID);
-    }),
+        return await removeTrainingFromMakerspace(args.makerspaceID, args.moduleID);
+      }),
 
     archiveMakerspace: async (
       _parent: any,
@@ -140,14 +145,14 @@ const MakerspacesResolver = {
       createLog(`{user} archived makerspace ${args.id}`, "admin",
         { id: user.id, label: getUsersFullName(user) }
       )
-      return await archiveMakerspace(args.id);
-    }),
+        return await archiveMakerspace(args.id);
+      }),
 
     unarchiveMakerspace: async (_parent: any, args: { id: number }, { isAdmin }: ApolloContext) => isAdmin(async (user) => {
       createLog(`{user} unarchived makerspace ${args.id}`, "admin",
         { id: user.id, label: getUsersFullName(user) }
       )
-      return await unarchiveMakerspace(args.id);
+        return await unarchiveMakerspace(args.id);
     })
 
   }
