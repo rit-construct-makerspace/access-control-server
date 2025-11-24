@@ -12,7 +12,8 @@ import InventoryTagsModal from "./InventoryTagsModal";
 import { GET_MAKERSPACES_WITH_ITEMS, MakerspaceWithItems } from "../../../queries/makerspaceQueries";
 import { InventoryForMakerspace } from "./common/InventoryForMakerspace";
 import { useNavigate } from "react-router-dom";
-
+import LowInventory from "./common/LowInventory";
+import StaffBar from "../../makerspace_page/StaffBar";
 
 
 export default function InventoryPage() {
@@ -42,6 +43,7 @@ export default function InventoryPage() {
     <RequestWrapper loading={makerspacesWithItemsResult.loading} error={makerspacesWithItemsResult.error}>
       <AdminPage>
         <title>Inventory | Make @ RIT</title>
+        <StaffBar />
         <Box margin="25px">
           <Stack direction="row" justifyContent="space-between" alignItems="baseline">
             <Typography variant="h4">Inventory</Typography>
@@ -67,17 +69,28 @@ export default function InventoryPage() {
           </Stack>
 
           <Box sx={{ width: "100%", overflowX: "scroll" }}>
+            {/* Running Low Section */}
+            <LowInventory
+              searchText={searchText}
+              tags={inventoryTagsResult.data?.inventoryTags || []}
+              setModalItemId={setModalItemId}
+            />
+
+            {/* Makerspace Inventories */}
             {makerspacesWithItemsResult.data?.makerspaces.map((space: MakerspaceWithItems) => (
-              <InventoryForMakerspace key={space.id} makerspace={space} searchText={searchText} tags={inventoryTagsResult.data?.inventoryTags || []} setModalItemId={setModalItemId} />
+              <InventoryForMakerspace
+                key={space.id}
+                makerspace={space}
+                searchText={searchText}
+                tags={inventoryTagsResult.data?.inventoryTags || []}
+                setModalItemId={setModalItemId}
+              />
             ))}
           </Box>
 
-          <Ledger></Ledger>
+          <Ledger />
 
-          <MaterialModal
-            itemId={modalItemId}
-            onClose={() => setModalItemId("")}
-          />
+          <MaterialModal itemId={modalItemId} onClose={() => setModalItemId("")} />
 
           <InventoryTagsModal tagModalOpen={tagsModalOpen} setTagModalOpen={setTagsModalOpen} />
         </Box>

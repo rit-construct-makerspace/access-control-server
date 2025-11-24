@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Module, QuizItemType } from "../../../types/Quiz";
 import { useImmer } from "use-immer";
 import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
 import Question from "./Question";
 import styled, { css } from "styled-components";
 import { gql, useMutation } from "@apollo/client";
-import { GET_CURRENT_USER } from "../../../common/CurrentUserProvider";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Markdown from "react-markdown";
 import GET_TRAINING_MODULES from "../../../queries/trainingQueries";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { GET_CURRENT_USER } from "../../../queries/userQueries";
 
 const StyledDiv = styled.div`
   border-radius: 4px;
@@ -91,10 +91,13 @@ export default function QuizTaker({ module }: QuizTakerProps) {
 
       const optionIndex = draft[itemIndex].optionIDs.findIndex((o) => o === optionID);
 
-      optionIndex === -1
-        ? draft[itemIndex].optionIDs.push(optionID)
-        : draft[itemIndex].optionIDs.splice(optionIndex, 1);
-    });
+      if (optionIndex === -1){
+        draft[itemIndex].optionIDs.push(optionID)
+      } else {
+        draft[itemIndex].optionIDs.splice(optionIndex, 1);
+      }
+
+    })
     setQuizProgressed(true);
   };
 

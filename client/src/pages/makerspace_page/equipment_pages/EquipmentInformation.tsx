@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, FormControlLabel, Stack, Switch, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { Equipment } from "./EditEquipmentPage";
 import { ARCHIVE_EQUIPMENT, PUBLISH_EQUIPMENT, UPDATE_EQUIPMENT } from "../../../queries/equipmentQueries";
 import { useMutation, useQuery } from "@apollo/client";
@@ -132,11 +132,6 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             return (
               <Autocomplete
                 renderInput={(params: any) => <TextField {...params} label="Location" />}
-                /* Autocomplete's value prop wants undefined, not null.
-                 * But if we give it undefined then it thinks it's an
-                 * uncontrolled prop and throws a console error
-                 * when we set the value. This is a MUI problem.
-                 * @ts-ignore */
                 value={props.equipment.room}
                 options={rooms}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -177,7 +172,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             Requires Trainer Approval
           </ToggleButton>
           <ToggleButton value={"requiresInPerson"} onClick={() => setRequiresInPerson(!requiresInPerson)}>
-            Requires In-Person
+            Requires Sign-Off
           </ToggleButton>
         </ToggleButtonGroup>
         <EquipmentTrainings
@@ -187,7 +182,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             setModuleIds([...moduleIDs, mID]);
           }}
           removeModule={(mID) => {
-            var temp = [...moduleIDs];
+            const temp = [...moduleIDs];
             temp.splice(temp.indexOf(mID), 1);
             setModuleIds(temp);
           }}

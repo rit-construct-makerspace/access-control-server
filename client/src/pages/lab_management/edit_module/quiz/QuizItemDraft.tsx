@@ -36,6 +36,7 @@ const QuizItemDraft = memo(function QuizItemDraft({
   extraActions,
 }: QuizItemDraftProps) {
   console.log("quiz item draft render", index);
+  
   return (
     <Draggable draggableId={itemId} index={index}>
       {(provided, _snapshot) => (
@@ -43,7 +44,7 @@ const QuizItemDraft = memo(function QuizItemDraft({
           ref={provided.innerRef}
           {...provided.draggableProps}
           elevation={4}
-          sx={{ width: 1200, display: "flex", mb: 4, flexFlow: "row nowrap" }}
+          sx={{ width: "100%", minWidth: 300, maxWidth: 1200, display: "flex", mb: 4, flexGrow: 1, flexFlow: "row nowrap" }}
         >
             <StyledDragHandle {...provided.dragHandleProps}>
               <DragIndicatorIcon />

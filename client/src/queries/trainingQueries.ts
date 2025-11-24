@@ -122,4 +122,14 @@ export const GET_ACCESS_PROGRESSES = gql`
   }
 `;
 
+export const GET_ALL_TRAINING_MODULES = gql`
+	query GetAllTrainingModules {
+		modules {
+			id
+			name
+			archived
+		}
+	}
+`;
+
 export default GET_TRAINING_MODULES;

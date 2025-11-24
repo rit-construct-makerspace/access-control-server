@@ -7,7 +7,6 @@ import { useParams } from "react-router-dom";
 
 
 export default function EditAnnouncement() {
-
   const { id } = useParams<{ id: string }>();
 
   const [announcementDraft, setAnnouncementDraft] = useState<Partial<Announcement>>({});
@@ -17,19 +16,20 @@ export default function EditAnnouncement() {
   });
 
   const [updateAnnouncement, mutation] = useMutation(UPDATE_ANNOUNCEMENT, {
-    variables: { id: id, title: announcementDraft.title, description: announcementDraft.description },
-    refetchQueries: [
-      { query: GET_ANNOUNCEMENTS },
-      { query: GET_ANNOUNCEMENT, variables: { id } },
-    ],
+    variables: {
+      id: id,
+      title: announcementDraft.title,
+      description: announcementDraft.description,
+      linkText: announcementDraft.linkText,
+      linkUrl: announcementDraft.linkUrl,
+    },
+    refetchQueries: [{ query: GET_ANNOUNCEMENTS }, { query: GET_ANNOUNCEMENT, variables: { id } }],
   });
 
   const [deleteAnnouncement, del] = useMutation(DELETE_ANNOUNCEMENT, {
     variables: { id: id },
-    refetchQueries: [
-      { query: GET_ANNOUNCEMENTS }
-    ],
-  })
+    refetchQueries: [{ query: GET_ANNOUNCEMENTS }],
+  });
 
   // After the item has been fetched, fill in the draft
   useEffect(() => {
@@ -39,7 +39,6 @@ export default function EditAnnouncement() {
       __typename: undefined,
     });
   }, [query.data, setAnnouncementDraft]);
-
 
   return (
     <RequestWrapper loading={query.loading || del.loading} error={query.error || del.error} minHeight={322}>
