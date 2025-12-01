@@ -1,6 +1,6 @@
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { BrowserRouter, RouterProvider } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import { ThemeController } from "./Theme";
 import { IsMobileProvider } from "./common/IsMobileProvider";
 import { useState } from "react";
@@ -22,17 +22,12 @@ export default function App() {
     <ApolloProvider client={apolloClient}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        {/* <BrowserRouter basename={import.meta.env.BASE_URL}> */}
-        {/* <CurrentUserProvider> */}
           <IsMobileProvider>
-            {/* <AppRoutes /> */}
             <>
               <RouterProvider router={appRouter} />
               <ToastContainer position="bottom-left" transition={Slide} />
             </>
           </IsMobileProvider>
-        {/* </CurrentUserProvider> */}
-        {/* </BrowserRouter> */}
       </ThemeProvider>
     </ApolloProvider>
   );
