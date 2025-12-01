@@ -35,17 +35,33 @@ export const OrganizationResolver = {
       _parent: any,
       args: {
         username: string,
-        displayname: string
+        displayname: string,
+        notes: string
       },
       { isManager }: ApolloContext
     ) => {
       return await isManager(async (user) => {
-        const result = await OrgRepo.createOrganization(args.username, args.displayname);
+        const result = await OrgRepo.createOrganization(args.username, args.displayname, args.notes);
 
         createLog("{user} created the {organization} organization", "admin",
           { id: user.id, label: getUsersFullName(user) },
           { id: result.id, label: args.displayname }
         );
+
+        return result;
+      })
+    },
+
+    editOrganizationNotes: async (
+      _parent: any,
+      args: {
+        orgID: number,
+        notes: string
+      },
+      { isManager }: ApolloContext
+    ) => {
+      return isManager(async (user) => {
+        const result =  await OrgRepo.editOrganizationNotes(args.orgID, args.notes);
 
         return result;
       })

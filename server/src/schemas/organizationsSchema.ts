@@ -6,6 +6,7 @@ export const OrganizationTypeDefs = gql`
     id: ID!
     username: String!
     displayname: String
+    notes: String
     accountID: ID!
     account: CurrencyAccount!
   }
@@ -15,7 +16,8 @@ export const OrganizationTypeDefs = gql`
   }
 
   extend type Mutation {
-    createOrganization(username: String!, displayname: String): Organization
+    createOrganization(username: String!, displayname: String, notes: String): Organization
+    editOrganizationNotes(orgID: ID!, notes: String!): Organization
     deleteOrganization(orgID: ID!): Boolean
   }
 `;

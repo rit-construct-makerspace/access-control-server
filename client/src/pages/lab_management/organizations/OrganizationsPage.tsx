@@ -6,11 +6,14 @@ import { useLazyQuery, useMutation } from "@apollo/client";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 import PrettyModal from "../../../common/PrettyModal";
-import CloseIcon from '@mui/icons-material/Close';
+import CloseIcon from "@mui/icons-material/Close";
 import { CurrencyAccount } from "../currency/CurrencyAccounts";
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ThemedMarkdown from "../../../common/ThemedMarkdown";
+import { toast } from "react-toastify";
 
 const SEARCH_ORGS_LIMIT = gql`
   query SearchOrganizationsLimit($searchText: String!) {
@@ -18,6 +21,7 @@ const SEARCH_ORGS_LIMIT = gql`
       id
       username
       displayname
+      notes
       accountID
       account {
         id
@@ -28,9 +32,18 @@ const SEARCH_ORGS_LIMIT = gql`
 `;
 
 const CREATE_ORG = gql`
-  mutation CreateOrganization($username: String!, $displayname: String) {
-    createOrganization(username: $username, displayname: $displayname) {
+  mutation CreateOrganization($username: String!, $displayname: String, $notes: String) {
+    createOrganization(username: $username, displayname: $displayname, notes: $notes) {
       id
+    }
+  }
+`;
+
+const EDIT_ORG_NOTES = gql`
+  mutation EditOrganizationNotes($orgID: ID!, $notes: String!) {
+    editOrganizationNotes(orgID: $orgID, notes: $notes) {
+      id 
+      notes
     }
   }
 `;
@@ -45,8 +58,9 @@ type Organization = {
   id: number;
   username: string;
   displayname: string;
-  account: CurrencyAccount
-}
+  notes: string;
+  account: CurrencyAccount;
+};
 
 export default function OrganizationsPage() {
   const isMobile = useIsMobile();
@@ -55,14 +69,18 @@ export default function OrganizationsPage() {
   const navigate = useNavigate();
 
   const [getOrganizations, getOrganizationsResult] = useLazyQuery(SEARCH_ORGS_LIMIT);
-  const [createOrganization] = useMutation(CREATE_ORG, { refetchQueries: ["SearchOrganizationsLimit"] })
-  const [deleteOrganization] = useMutation(DELETE_ORG, { refetchQueries: ["SearchOrganizationsLimit"] })
+  const [createOrganization] = useMutation(CREATE_ORG, { refetchQueries: ["SearchOrganizationsLimit"] });
+  const [editOrganizationNotes] = useMutation(EDIT_ORG_NOTES, { refetchQueries: ["SearchOrganizationsLimit"] });
+  const [deleteOrganization] = useMutation(DELETE_ORG, { refetchQueries: ["SearchOrganizationsLimit"] });
 
   const [searchText, setSearchText] = useState("");
-  const [open, setOpen] = useState(false);
+  const [openCreateNewOrg, setOpenCreateNewOrg] = useState(false);
+  const [openEditOrgNotes, setOpenEditOrgNotes] = useState(false);
 
   const [username, setUsername] = useState("");
   const [displayname, setDisplayname] = useState("");
+  const [notes, setNotes] = useState("");
+  const [orgID, setOrgID] = useState<number>(0);
 
   const setUrlParam = (paramName: string, paramValue: string) => {
     const params = new URLSearchParams(location.search);
@@ -89,14 +107,37 @@ export default function OrganizationsPage() {
       return;
     }
 
-    createOrganization({ variables: { username: username, displayname: displayname } });
-    handleExit();
+    createOrganization({ variables: { username: username, displayname: displayname, notes: notes } });
+    handleExitCreateNewOrg();
   }
-
-  function handleExit() {
+  function handleExitCreateNewOrg() {
     setUsername("");
     setDisplayname("");
-    setOpen(false);
+    setNotes("");
+    setOpenCreateNewOrg(false);
+  }
+
+  function handleOpenEditOrgNotes(org: Organization) {
+    setOrgID(org.id);
+    setNotes(org.notes);
+    setOpenEditOrgNotes(true);
+  }
+  function handleEditedNotes() {
+    editOrganizationNotes({ 
+      variables: { orgID: orgID, notes: notes }, 
+      onCompleted: () => {
+        toast.success("Organization notes updated successfully");
+        handleExitEditOrgNotes();
+      },
+      onError: (error) => {
+        toast.error("Error updating organization notes: " + error.message);
+      }
+    });
+  }
+  function handleExitEditOrgNotes() {
+    setOrgID(0);
+    setNotes("");
+    setOpenEditOrgNotes(false);
   }
 
   const moneyForamtter = new Intl.NumberFormat("en-US", {
@@ -107,26 +148,26 @@ export default function OrganizationsPage() {
   return (
     <RequestWrapper2 result={getOrganizationsResult} render={(data) => {
 
-      const organizations: Organization[] = data.searchOrganizationsLimit;
+        const organizations: Organization[] = data.searchOrganizationsLimit;
 
-      return (
-        <Stack spacing={2} margin={"10px 20px"}>
-          <title>Organizations | Make @ RIT</title>
-          <Stack direction={isMobile ? "column" : "row"} spacing={2}>
-            <Typography variant="h4">Organizations</Typography>
-            <SearchBar
-              placeholder="Search Organizations"
-              sx={{ maxWidth: 300 }}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              onClear={() => setUrlParam("q", "")}
-              onSubmit={() => setUrlParam("q", searchText)}
-            />
-            <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={() => setOpen(true)}>
-              New Organization
-            </Button>
-          </Stack>
-          <Grid container spacing={2} justifyContent={"center"}>
+        return (
+          <Stack spacing={2} margin={"10px 20px"}>
+            <title>Organizations | Make @ RIT</title>
+            <Stack direction={isMobile ? "column" : "row"} spacing={2}>
+              <Typography variant="h4">Organizations</Typography>
+              <SearchBar
+                placeholder="Search Organizations"
+                sx={{ maxWidth: 300 }}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onClear={() => setUrlParam("q", "")}
+                onSubmit={() => setUrlParam("q", searchText)}
+              />
+              <Button variant="contained" color="success" startIcon={<AddIcon />} onClick={() => setOpenCreateNewOrg(true)}>
+                New Organization
+              </Button>
+            </Stack>
+            <Grid container spacing={2} justifyContent={"center"}>
             {
               organizations.map((org) => {
 
@@ -139,6 +180,12 @@ export default function OrganizationsPage() {
                           <Typography><b>Account ID:</b> {org.account.id}</Typography>
                           <Typography><b>Credits:</b> {moneyForamtter.format(org.account.balance / 100)}</Typography>
                         </Stack>
+                        {org.notes && (
+                          <Stack direction={"column"} alignItems={"center"}>
+                            <Typography fontWeight={"bold"}>Notes:</Typography>
+                            <ThemedMarkdown>{org.notes}</ThemedMarkdown>
+                          </Stack>
+                        )}
                         <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
                           <Button
                             color="error"
@@ -150,10 +197,19 @@ export default function OrganizationsPage() {
                           </Button>
 
                           <Button
+                            color="primary"
+                            startIcon={<EditIcon />}
+                            sx={{ alignSelf: "center" }}
+                            onClick={() => handleOpenEditOrgNotes(org)}
+                          >
+                            Edit Notes
+                          </Button>
+
+                          <Button
                             color="secondary"
                             sx={{ alignSelf: "flex-end" }}
                             onClick={() => {
-                              navigate(`/makerspace/${makerspaceID}/currency?a=${org.username}`)
+                              navigate(`/makerspace/${makerspaceID}/currency?a=${org.username}`);
                             }}
                           >
                             View Account
@@ -165,49 +221,88 @@ export default function OrganizationsPage() {
                 );
               })
             }
-          </Grid>
-          <PrettyModal open={open} onClose={handleExit} width={"400px"}>
-            <Stack width={"100%"} spacing={2} alignItems={"center"}>
+            </Grid>
+            {/* Create New Org Modal */}
+            <PrettyModal open={openCreateNewOrg} onClose={handleExitCreateNewOrg} width={"400px"}>
+              <Stack width={"100%"} spacing={2} alignItems={"center"}>
               <Stack direction={"row"} spacing={1} justifyContent={"space-between"} width={"100%"} alignItems={"center"}>
-                <Typography variant="h5">Create new Organization</Typography>
-                <IconButton color="error" onClick={handleExit}>
-                  <CloseIcon />
-                </IconButton>
-              </Stack>
+                  <Typography variant="h5">Create new Organization</Typography>
+                  <IconButton color="error" onClick={handleExitCreateNewOrg}>
+                    <CloseIcon />
+                  </IconButton>
+                </Stack>
 
-              <TextField
-                label="Username"
-                fullWidth
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-              <TextField
-                label="Display Name"
-                fullWidth
-                value={displayname}
-                onChange={(e) => setDisplayname(e.target.value)}
-              />
-              <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
+                <TextField
+                  label="Username"
+                  fullWidth
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+                <TextField
+                  label="Display Name"
+                  fullWidth
+                  value={displayname}
+                  onChange={(e) => setDisplayname(e.target.value)}
+                />
+                <TextField
+                  label="Notes"
+                  fullWidth
+                  multiline
+                  minRows={3}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+                <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
                 <Button
                   variant="contained"
                   color="error"
-                  onClick={handleExit}
+                  onClick={handleExitCreateNewOrg}
                 >
-                  Cancel
-                </Button>
+                    Cancel
+                  </Button>
                 <Button
                   variant="contained"
                   color="success"
                   onClick={handleNewOrg}
                 >
-                  Submit
-                </Button>
+                    Submit
+                  </Button>
+                </Stack>
               </Stack>
-            </Stack>
-          </PrettyModal >
-        </Stack >
-      );
+            </PrettyModal>
+
+            {/* Edit Org Notes Modal */}
+            <PrettyModal open={openEditOrgNotes} onClose={handleExitEditOrgNotes} width={"400px"}>
+              <Stack width={"100%"} spacing={2} alignItems={"center"}>
+                <Stack
+                  direction={"row"}
+                  spacing={1}
+                  justifyContent={"space-between"}
+                  width={"100%"}
+                  alignItems={"center"}
+                >
+                  <Typography variant="h5">Edit Organization Notes</Typography>
+                  <IconButton color="error" onClick={handleExitEditOrgNotes}>
+                    <CloseIcon />
+                  </IconButton>
+                </Stack>
+                <TextField
+                  label="Notes"
+                  fullWidth
+                  multiline
+                  minRows={3}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+                <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
+                  <Button variant="contained" color="error" onClick={handleExitEditOrgNotes}>Cancel</Button>
+                  <Button variant="contained" color="success" onClick={handleEditedNotes}>Submit</Button>
+                </Stack>
+              </Stack>
+            </PrettyModal>
+          </Stack>
+        );
     }} />
   );
 }

@@ -3,11 +3,12 @@ import { knex } from "../../db/index.js";
 import { GraphQLError } from "graphql";
 import { OrganizationsRow } from "../../db/tables.js";
 
-export async function createOrganization(username: string, displayname?: string): Promise<OrganizationsRow> {
+export async function createOrganization(username: string, displayname?: string, notes?: string): Promise<OrganizationsRow> {
   // Create the account for the organization
   const accountID = await CurrencyAccountRepo.createAccount();
 
-  const data = displayname ? { username: username, displayname: displayname } : { username: username }
+  const data = displayname ? { username: username, displayname: displayname, notes: notes } : { username: username, notes: notes };
+  
 
   try {
     var orgID = await knex("Organizations").insert({ ...data, accountID: accountID }).returning("*");
@@ -22,6 +23,11 @@ export async function createOrganization(username: string, displayname?: string)
     CurrencyAccountRepo.deleteAccount(accountID);
     throw new GraphQLError("Failed to create organization")
   }
+}
+
+export async function editOrganizationNotes(orgID: number, notes: string): Promise<OrganizationsRow | undefined> {
+  await knex("Organizations").where("id", orgID).update({ notes: notes });
+  return await getOrganizationByOrgID(orgID);
 }
 
 export async function getOrganizationByOrgID(id: number): Promise<OrganizationsRow | undefined> {
