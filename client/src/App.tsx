@@ -1,7 +1,5 @@
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import { CurrentUserProvider } from "./common/CurrentUserProvider";
-import AppRoutes from "./AppRoutes";
 import { BrowserRouter, RouterProvider } from "react-router-dom";
 import { ThemeController } from "./Theme";
 import { IsMobileProvider } from "./common/IsMobileProvider";
