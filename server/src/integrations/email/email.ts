@@ -2,6 +2,7 @@ import FormData from "form-data";
 import * as Mailgun from "mailgun.js"
 import { generateReceiptEmail } from "./receipt-template.js"
 import { generateExpiryEmail, ExpiryDescription } from "./training-expiry-template.js"
+import { balChangeInfo, generateBalanceChangeEmail } from "./balance-change-template.js";
 const mailgun = new Mailgun.default(FormData);
 const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere' });
 const MAIL_DOMAIN = process.env.MAIL_DOMAIN ?? "";
@@ -66,6 +67,17 @@ export async function send_training_expiry_email(email: string, desc: ExpiryDesc
         fromAccount: "training",
         to: [email],
         subject: "RIT SHED: " + ((desc.type == "warning") ? "Trainings Expiring Soon" : "Training Expiry Notice") + " - " + new Date().toLocaleDateString(),
+        textContent: content.text,
+        htmlContent: content.html,
+    })
+}
+
+export async function send_cc_balance_change_email(email: string, desc: balChangeInfo) {
+    const content = generateBalanceChangeEmail(desc);
+    send_generic_email({
+        fromAccount: "cc",
+        to: [email],
+        subject: "RIT SHED: Account Balance Adjusted - " + new Date().toLocaleDateString(),
         textContent: content.text,
         htmlContent: content.html,
     })
