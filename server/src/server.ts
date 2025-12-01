@@ -1,7 +1,6 @@
 /**
  * server.ts
  * Server Configuration and API
- * See also wsapi.ts
  */
 import * as papercut from "./integrations/papercut/papercut.js"
 import express from "express";
