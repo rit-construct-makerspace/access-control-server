@@ -44,7 +44,7 @@ export const OrganizationResolver = {
 
         createLog("{user} created the {organization} organization", "admin",
           { id: user.id, label: getUsersFullName(user) },
-          { id: result, label: args.displayname }
+          { id: result.id, label: args.displayname }
         );
 
         return result;
