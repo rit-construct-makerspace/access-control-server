@@ -186,7 +186,7 @@ export default function EditModulePage({
           spacing={2}
         >
         {module.archived ? (
-          <PublishTrainingModuleButton moduleID={module.id} appearance="large" />
+          <PublishTrainingModuleButton moduleID={module.id} appearance="large" onBeforePublish={async () => {await updateModule(module)}} />
         ) : (
           <ArchiveTrainingModuleButton moduleID={module.id} appearance="large" />
         )}
