@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Module, QuizItemType } from "../../../types/Quiz";
 import { useImmer } from "use-immer";
 import { Button, Card, CardContent, Stack, Typography } from "@mui/material";
@@ -64,7 +64,6 @@ interface QuizTakerProps {
 
 export default function QuizTaker({ module }: QuizTakerProps) {
   const [quizProgressed, setQuizProgressed] = useState<boolean>(false);
-  const [blockSubmit, setBlockSubmit] = useState(true);
   const isMobile = useIsMobile();
 
   const initialAnswerSheet = module.quiz
@@ -102,19 +101,9 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     })
     setQuizProgressed(true);
   };
-
-  useEffect(() => {
-    var allAnswered = true;
-    answerSheet.forEach((o) => {
-      const itemIndex = answerSheetReq.findIndex((i) => i.itemID === o.itemID);
-      if(o.optionIDs.length != answerSheetReq[itemIndex].reqCount){
-        allAnswered = false;
-      }
-    })
-    setBlockSubmit(!allAnswered); 
-  });
   
-
+  const checkAllAnswered = (element: any, index: number) => (element.optionIDs.length != answerSheetReq[index].reqCount); 
+  
   const trainingSubmissionAnimation = () => {
     toast.success("Training Module Submitted", {
       position: "bottom-left",
@@ -257,7 +246,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
           loading={result.loading}
           variant="contained"
           sx={{ alignSelf: "flex-end" }}
-          disabled={(module.isLocked || blockSubmit) ?? false}
+          disabled={(module.isLocked || (answerSheet.some(checkAllAnswered))) ?? false}
           onClick={() => submitAndViewResults()}
         >
           Submit

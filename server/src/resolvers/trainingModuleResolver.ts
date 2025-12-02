@@ -104,7 +104,7 @@ const removeAnswersFromQuiz = (quiz: TrainingModuleItem[]) => {
   }
 };
 
-function editQuizOptions(quiz: TrainingModuleItem[]){
+function countQuizCorrectOptions(quiz: TrainingModuleItem[]){
   for (const item of quiz) {
     if(item.options){
       var count = 0;
@@ -246,7 +246,7 @@ const TrainingModuleResolvers = {
     ) => {
       return ifAuthenticated(async (_user: any) => {
         const module = await ModuleRepo.getModuleByID(args.id);
-        editQuizOptions(module.quiz)
+        countQuizCorrectOptions(module.quiz)
         return module;
       })
     },
