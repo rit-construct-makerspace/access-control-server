@@ -26,6 +26,9 @@ import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isAdmin, isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useCallback } from "react";
+import { useIsMobile } from "../../../common/IsMobileProvider";
+
+
 interface EditModulePageProps {
   moduleInitialValue: Module;
   deleteModule: () => Promise<void>;
@@ -43,6 +46,7 @@ export default function EditModulePage({
   const currentUser = useCurrentUser();
   const navigate = useNavigate();
   const theme = useTheme();
+  const isMobile = useIsMobile();
 
   const [module, setModule] = useImmer<Module>(moduleInitialValue);
 
@@ -130,7 +134,7 @@ export default function EditModulePage({
       <title>Edit Training | Make @ RIT</title>
       <Typography variant="h4" textAlign="center">Edit {module.name}</Typography>
       <Stack
-        direction="row"
+        direction={isMobile ? "column" : "row"}
         alignItems="center"
         justifyContent="center"
         spacing={2}
@@ -154,12 +158,11 @@ export default function EditModulePage({
             const makerspaces = data.makerspaces;
           const possibleMakerspaces = makerspaces.filter((space: FullMakerspace) => (isManagerFor(currentUser, space.id)))
             return (
-              <FormControl>
+              <FormControl sx={{ width: "600px" }}>
                 <InputLabel id="associated-makerspace">Associated Makerspace</InputLabel>
                 <Select
                   id="associated-makerspace"
                   label="Associated Makerspace"
-                  sx={{ width: "600px" }}
                   value={module.makerspaceID}
                 onChange={(e) => setModule((draft) => {
                       draft.makerspaceID = e.target.value != null ? Number(e.target.value) : null;
@@ -178,12 +181,22 @@ export default function EditModulePage({
             );
           }}
         />
+        <Stack
+          direction="row"
+          spacing={2}
+        >
         {module.archived ? (
           <PublishTrainingModuleButton moduleID={module.id} appearance="large" />
         ) : (
           <ArchiveTrainingModuleButton moduleID={module.id} appearance="large" />
         )}
-        <Button startIcon={<SaveIcon />} color="secondary" variant="contained" onClick={handleSaveClicked} size="large">
+          <Button
+            startIcon={<SaveIcon />}
+            color="secondary"
+            variant="contained"
+            onClick={handleSaveClicked}
+            size="large"
+          >
           Save
         </Button>
         <Button
@@ -195,6 +208,7 @@ export default function EditModulePage({
         >
           Delete
         </Button>
+        </Stack>
       </Stack>
       <QuizBuilder
         quiz={module.quiz ? module.quiz : []}

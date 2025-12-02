@@ -48,7 +48,7 @@ const templateSource: string = `
     
     </ul>
 
-If you have already passed the in-person competency check, you will not need to re-take it.
+If you already have the staff sign-off, you will not need to re-take it.
 
 </div>
 `
