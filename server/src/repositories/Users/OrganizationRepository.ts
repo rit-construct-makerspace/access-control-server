@@ -3,7 +3,7 @@ import { knex } from "../../db/index.js";
 import { GraphQLError } from "graphql";
 import { OrganizationsRow } from "../../db/tables.js";
 
-export async function createOrganization(username: string, displayname?: string, notes: string): Promise<OrganizationsRow> {
+export async function createOrganization(username: string, notes: string, displayname?: string): Promise<OrganizationsRow> {
   // Create the account for the organization
   const accountID = await CurrencyAccountRepo.createAccount();
 
