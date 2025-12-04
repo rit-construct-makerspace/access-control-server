@@ -6,7 +6,7 @@ export const OrganizationTypeDefs = gql`
     id: ID!
     username: String!
     displayname: String
-    notes: String
+    notes: String!
     accountID: ID!
     account: CurrencyAccount!
   }
