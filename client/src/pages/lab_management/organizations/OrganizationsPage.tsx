@@ -180,7 +180,7 @@ export default function OrganizationsPage() {
                           <Typography><b>Account ID:</b> {org.account.id}</Typography>
                           <Typography><b>Credits:</b> {moneyForamtter.format(org.account.balance / 100)}</Typography>
                         </Stack>
-                        {org.notes && (
+                        {org.notes.length > 0 && (
                           <Stack direction={"column"} alignItems={"center"}>
                             <Typography fontWeight={"bold"}>Notes:</Typography>
                             <ThemedMarkdown>{org.notes}</ThemedMarkdown>

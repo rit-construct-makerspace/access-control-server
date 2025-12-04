@@ -3,7 +3,7 @@ import type { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.alterTable("Organizations", (table) => {
-    table.text("notes").nullable().defaultTo(null).after("displayname").comment("Notes about the organization for staff");
+    table.text("notes").notNullable().defaultTo('').after("displayname").comment("Notes about the organization for staff");
   });
 }
 
