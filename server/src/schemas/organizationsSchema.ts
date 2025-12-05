@@ -13,6 +13,7 @@ export const OrganizationTypeDefs = gql`
 
   extend type Query {
     searchOrganizationsLimit(searchText: String): [Organization]
+    getOrganizationByID(id: ID!): Organization
   }
 
   extend type Mutation {
