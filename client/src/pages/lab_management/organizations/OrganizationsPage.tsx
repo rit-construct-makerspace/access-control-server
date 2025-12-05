@@ -14,45 +14,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import { toast } from "react-toastify";
-
-const SEARCH_ORGS_LIMIT = gql`
-  query SearchOrganizationsLimit($searchText: String!) {
-    searchOrganizationsLimit(searchText: $searchText) {
-      id
-      username
-      displayname
-      notes
-      accountID
-      account {
-        id
-        balance
-      }
-    }
-  }
-`;
-
-const CREATE_ORG = gql`
-  mutation CreateOrganization($username: String!, $displayname: String, $notes: String) {
-    createOrganization(username: $username, displayname: $displayname, notes: $notes) {
-      id
-    }
-  }
-`;
-
-const EDIT_ORG_NOTES = gql`
-  mutation EditOrganizationNotes($orgID: ID!, $notes: String!) {
-    editOrganizationNotes(orgID: $orgID, notes: $notes) {
-      id 
-      notes
-    }
-  }
-`;
-
-const DELETE_ORG = gql`
-  mutation DeleteOrganization($orgID: ID!) {
-    deleteOrganization(orgID: $orgID)
-  }
-`;
+import { SEARCH_ORGS_LIMIT, CREATE_ORG, EDIT_ORG_NOTES, DELETE_ORG } from "../../../queries/organizationQueries";
 
 type Organization = {
   id: number;
