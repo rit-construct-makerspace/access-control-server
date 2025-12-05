@@ -3,6 +3,8 @@ import { Link } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManagerFor } from "../../../common/PrivilegeUtils";
+import { useQuery } from "@apollo/client";
+import { GET_ORG_BY_ID } from "../../../queries/organizationQueries";
 
 interface AuditLogEntityProps {
   entityCode: string;
@@ -41,8 +43,16 @@ export default function AuditLogEntity({ entityCode }: AuditLogEntityProps) {
   const manager = isManagerFor(user, Number(makerspaceID));
 
   const [entityType, id, label] = entityCode.split(":");
-
+  
   let url = getEntityUrl(entityType, id, makerspaceID ?? "0");
+
+  // If the entity is an organization, use its data to build its URL
+  if (entityType === "organization") {
+    const { data: orgData } = useQuery(GET_ORG_BY_ID, {
+      variables: { id: id },
+    });
+    url = `/makerspace/${makerspaceID}/currency?a=${orgData?.getOrganizationByID?.username}`;
+  }
 
   // If this would link to the readers page, but the current user is not a manager,
   // fall back to the makerspace history instead of exposing a non-accessible link.
@@ -53,19 +63,18 @@ export default function AuditLogEntity({ entityCode }: AuditLogEntityProps) {
   const [reveal, setReveal] = useState(entityType !== "conceal");
 
   const toggleConcealment = () => {
-    setReveal(reveal => !reveal)
-  }
+    setReveal((reveal) => !reveal);
+  };
 
   return (
     <span>
-      {!reveal
-        ? <Link onClick={toggleConcealment}>
-          Click to Reveal
-        </Link>
-        : <Link onClick={() => navigate(url)} sx={{ cursor: "pointer" }}>
+      {!reveal ? (
+        <Link onClick={toggleConcealment}>Click to Reveal</Link>
+      ) : (
+        <Link onClick={() => navigate(url)} sx={{ cursor: "pointer" }}>
           {label}
         </Link>
-      }
+      )}
     </span>
   );
 }
