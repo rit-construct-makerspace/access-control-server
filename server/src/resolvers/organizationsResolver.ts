@@ -27,7 +27,18 @@ export const OrganizationResolver = {
       return isStaff(async () => {
         return await OrgRepo.searchOrganizationsLimit(args.searchText);
       })
-    }
+    },
+    getOrganizationByID: async (
+      _parent: any,
+      args: {
+        id: number
+      },
+      { isStaff }: ApolloContext  
+    ) => {
+      return isStaff(async () => {
+        return await OrgRepo.getOrganizationByOrgID(args.id);
+      })
+    },
   },
 
   Mutation: {
@@ -41,7 +52,7 @@ export const OrganizationResolver = {
       { isManager }: ApolloContext
     ) => {
       return await isManager(async (user) => {
-        const result = await OrgRepo.createOrganization(args.username, args.displayname, args.notes);
+        const result = await OrgRepo.createOrganization(args.username, args.notes, args.displayname);
 
         createLog("{user} created the {organization} organization", "admin",
           { id: user.id, label: getUsersFullName(user) },
