@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
@@ -10,7 +10,7 @@ interface AuditLogEntityProps {
   entityCode: string;
 }
 
-function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
+function getEntityUrl(entityType: string, id: string, makerspaceID: string, orgUsername?: string) {
   switch (entityType) {
     case "user":
       return `/makerspace/${makerspaceID}/people/${id}`;
@@ -30,6 +30,8 @@ function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
       return `/makerspace/${makerspaceID}/readers#id-${id}`;
     case "makerspace":
       return `/makerspace/${id}`;
+    case "organization":
+      return `/makerspace/${makerspaceID}/currency?a=${orgUsername}`;
     default:
       return `/makerspace/${makerspaceID}/history`;
   }
@@ -43,16 +45,22 @@ export default function AuditLogEntity({ entityCode }: AuditLogEntityProps) {
   const manager = isManagerFor(user, Number(makerspaceID));
 
   const [entityType, id, label] = entityCode.split(":");
-  
-  let url = getEntityUrl(entityType, id, makerspaceID ?? "0");
+  const [orgUsername, setOrgUsername] = useState("");
 
-  // If the entity is an organization, use its data to build its URL
-  if (entityType === "organization") {
-    const { data: orgData } = useQuery(GET_ORG_BY_ID, {
-      variables: { id: id },
-    });
-    url = `/makerspace/${makerspaceID}/currency?a=${orgData?.getOrganizationByID?.username}`;
-  }
+  // Query only when entity is an organization
+  const { data: orgData } = useQuery(GET_ORG_BY_ID, {
+    variables: { id: Number(id) },
+    skip: entityType !== "organization",
+  });
+
+  // Update state when org data arrives
+  useEffect(() => {
+    if (entityType === "organization" && orgData?.getOrganizationByID?.username) {
+      setOrgUsername(orgData.getOrganizationByID.username);
+    }
+  }, [entityType, orgData]);
+
+  let url = getEntityUrl(entityType, id, makerspaceID ?? "0", orgUsername ?? null );
 
   // If this would link to the readers page, but the current user is not a manager,
   // fall back to the makerspace history instead of exposing a non-accessible link.
