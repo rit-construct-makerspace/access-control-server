@@ -47,9 +47,14 @@ export async function searchOrganizationsLimit(searchText?: string, limit = 100)
     return await knex("Organizations").select("*").limit(limit);
   }
 
-  return await knex("Organizations").select("*").limit(limit)
-    .whereILike("displayname", `%${searchText}%`)
-    .orWhereILike("username", `%${searchText}%`);
+  if (!Number.isNaN(Number(searchText))) {
+    return await knex("Organizations").select("*").limit(limit)
+      .where("id", Number(searchText));
+  } else {
+    return await knex("Organizations").select("*").limit(limit)
+      .whereILike("displayname", `%${searchText}%`)
+      .orWhereILike("username", `%${searchText}%`);
+  }
 }
 
 export async function deleteOrganization(orgID: number): Promise<Boolean> {
