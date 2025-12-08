@@ -14,7 +14,12 @@ import {
   Typography,
 } from "@mui/material";
 import { Equipment } from "./EditEquipmentPage";
-import { ARCHIVE_EQUIPMENT, PUBLISH_EQUIPMENT, UPDATE_EQUIPMENT } from "../../../queries/equipmentQueries";
+import {
+  ARCHIVE_EQUIPMENT,
+  GET_EQUIPMENT_BY_ID,
+  PUBLISH_EQUIPMENT,
+  UPDATE_EQUIPMENT,
+} from "../../../queries/equipmentQueries";
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -44,7 +49,12 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const getRoomsResult = useQuery(GET_ROOMS);
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT, {
-    refetchQueries: ["GetEquipmentByID", { query: GET_ROOMS }, { query: GET_FULL_MAKERSPACES }],
+    refetchQueries: [
+      { query: GET_EQUIPMENT_BY_ID, variables: { id: props.equipment.id } },
+      { query: GET_ROOMS },
+      { query: GET_FULL_MAKERSPACES },
+    ],
+    awaitRefetchQueries: true,
     onCompleted() {
       toast.success("Updated equipment");
     },
@@ -54,11 +64,11 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   });
   const [publishEquipment] = useMutation(PUBLISH_EQUIPMENT, {
     variables: { id: props.equipment.id },
-    refetchQueries: ["GetEquipmentByID", { query: GET_ROOMS }],
+    refetchQueries: [{ query: GET_EQUIPMENT_BY_ID, variables: { id: props.equipment.id } }, { query: GET_ROOMS }],
   });
   const [archiveEquipment] = useMutation(ARCHIVE_EQUIPMENT, {
     variables: { id: props.equipment.id },
-    refetchQueries: ["GetEquipmentByID", { query: GET_ROOMS }],
+    refetchQueries: [{ query: GET_EQUIPMENT_BY_ID, variables: { id: props.equipment.id } }, { query: GET_ROOMS }],
   });
 
   const [name, setName] = useState(props.equipment.name);
@@ -129,6 +139,22 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
     room.id,
     moduleIDs.length,
   ]);
+
+  useEffect(() => {
+    if (props.equipment) {
+      setName(props.equipment.name);
+      setImageUrl(props.equipment.imageUrl);
+      setSopUrl(props.equipment.sopUrl);
+      setNotes(props.equipment.notes);
+      setByReservation(props.equipment.byReservationOnly);
+      setNeedsWelcome(props.equipment.needsWelcome);
+      setRequiresTrainer(props.equipment.requiresTrainerApproval);
+      setRequiresInPerson(props.equipment.requiresInPerson);
+      setRoom(props.equipment.room);
+      setModuleIds(props.equipment.trainingModules.map((mod) => mod.id));
+      setUnsaved(false); // reset flag after syncing
+    }
+  }, [props.equipment]);
 
   useEffect(() => {
     if (blocker.state === "blocked") {
