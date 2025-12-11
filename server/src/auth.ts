@@ -260,9 +260,6 @@ export function setupDevAuth(app: express.Application) {
   });
 
   app.post("/login/callback", function (req, res, next) {
-    if (req.query.redir) {
-      redir_url = req.query.redir
-    }
     passport.authenticate("saml", {
       successRedirect: redir_url,
       failureFlash: true,
