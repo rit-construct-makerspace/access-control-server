@@ -10,24 +10,24 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import ArchiveIcon from "@mui/icons-material/Archive";
+import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useImmer } from "use-immer";
 import { Module, QuizItem } from "../../../types/Quiz";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import PublishTrainingModuleButton from "../training_modules/PublishTrainingModuleButton";
-import ArchiveTrainingModuleButton from "../training_modules/ArchiveTrainingModuleButton";
 import { DropResult } from "@hello-pangea/dnd";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isAdmin, isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useCallback } from "react";
 import { useIsMobile } from "../../../common/IsMobileProvider";
-
+import GET_TRAINING_MODULES, { ARCHIVE_MODULE, GET_ARCHIVED_TRAINING_MODULES, GET_MODULE, PUBLISH_MODULE } from "../../../queries/trainingQueries";
 
 interface EditModulePageProps {
   moduleInitialValue: Module;
@@ -49,41 +49,65 @@ export default function EditModulePage({
   const isMobile = useIsMobile();
 
   const [module, setModule] = useImmer<Module>(moduleInitialValue);
-
+  const queryResult = useQuery(GET_MODULE, { variables: { id: module.id } });
   const getMakerspacesResult = useQuery(GET_FULL_MAKERSPACES);
 
-  const trainingModSavedAnimation = () => {
-    toast.success("Training Module Saved", {
-      position: "bottom-left",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+  const [publishModule] = useMutation(PUBLISH_MODULE, {
+    variables: { id: module.id },
+    refetchQueries: [
+      { query: GET_TRAINING_MODULES },
+      { query: GET_ARCHIVED_TRAINING_MODULES },
+    ],
+    awaitRefetchQueries: true,
+    onCompleted: () => {
+      setModule((draft) => {
+        draft.archived = false;
+      });
+      toast.success("Training Module Published");
+      queryResult.refetch();
+    },
+    onError: (error) => {
+      toast.error(`Failed to publish training module: ${error.message}`);
+    },
+  });
+  const [archiveModule] = useMutation(ARCHIVE_MODULE, {
+    variables: { id: module.id },
+    refetchQueries: [
+      { query: GET_TRAINING_MODULES },
+      { query: GET_ARCHIVED_TRAINING_MODULES },
+    ],
+    awaitRefetchQueries: true,
+    onCompleted: () => {
+      setModule((draft) => {
+        draft.archived = true;
+      });
+      toast.success("Training Module Archived");
+      queryResult.refetch();
+    },
+    onError: (error) => {
+      toast.error(`Failed to archive training module: ${error.message}`);
+    },
+  });
+
+  // Prefer server value for `archived` when available so buttons update after refetch
+  const moduleArchived = queryResult?.data?.module?.archived ?? module.archived;
+
+  const handlePublishClicked = async () => {
+    await updateModule(module);
+    await publishModule();
   };
 
-  const trainingModDeletedAnimation = () => {
-    toast.success("Training Module Deleted", {
-      position: "bottom-left",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
+  const handleHideClicked = async () => {
+    await archiveModule();
   };
 
   const handleSaveClicked = async () => {
-    await updateModule(module);
-
-    trainingModSavedAnimation();
-
-    navigate(`/makerspace/${makerspaceID}/trainings`);
+    try {
+      await updateModule(module);
+      toast.success("Training Module Saved");
+    } catch (error) {
+      toast.error(`Failed to save training module: ${error}`);
+    }
   };
 
   const handleDeleteClicked = async () => {
@@ -93,40 +117,39 @@ export default function EditModulePage({
 
     try {
       await deleteModule();
-      trainingModDeletedAnimation();
+      toast.success("Training Module Deleted");
       navigate(`/makerspace/${makerspaceID}/trainings`);
     } catch (error: any) {
-      console.error(error);
-      toast.error("Failed to delete training module");
+      toast.error(`Failed to delete training module: ${error.message}`);
     }
   };
 
   const handleAddQuizItem = useCallback((item: QuizItem) => {
-    setModule((draft) => {
-      draft?.quiz.push(item);
-    });
+      setModule((draft) => {
+        draft?.quiz.push(item);
+      });
   }, [setModule]);
 
   const handleRemoveQuizItem = useCallback((itemId: string) => {
-    setModule((draft) => {
-      const index = draft!.quiz.findIndex((i) => i.id === itemId);
-      draft?.quiz.splice(index, 1);
-    });
+      setModule((draft) => {
+        const index = draft!.quiz.findIndex((i) => i.id === itemId);
+        draft?.quiz.splice(index, 1);
+      });
   }, [setModule]);
 
   const handleUpdateQuizItem = useCallback((updatedItem: QuizItem) => {
-    setModule((draft) => {
-      const index = draft!.quiz.findIndex((i) => i.id === updatedItem.id);
-      draft!.quiz[index] = updatedItem;
-    });
+      setModule((draft) => {
+        const index = draft!.quiz.findIndex((i) => i.id === updatedItem.id);
+        draft!.quiz[index] = updatedItem;
+      });
   }, [setModule]);
 
   const handleOnDragEnd = useCallback((result: DropResult) => {
-    setModule((draft) => {
-      if (!result.destination) return;
-      const [removed] = draft!.quiz.splice(result.source.index, 1);
-      draft!.quiz.splice(result.destination.index, 0, removed);
-    });
+      setModule((draft) => {
+        if (!result.destination) return;
+        const [removed] = draft!.quiz.splice(result.source.index, 1);
+        draft!.quiz.splice(result.destination.index, 0, removed);
+      });
   }, [setModule]);
 
   return (
@@ -181,15 +204,28 @@ export default function EditModulePage({
             );
           }}
         />
-        <Stack
-          direction="row"
-          spacing={2}
-        >
-        {module.archived ? (
-          <PublishTrainingModuleButton moduleID={module.id} appearance="large" />
-        ) : (
-          <ArchiveTrainingModuleButton moduleID={module.id} appearance="large" />
-        )}
+        <Stack direction="row" spacing={2}>
+          {moduleArchived ? (
+            <Button
+              startIcon={<UnarchiveIcon />}
+              color="success"
+              variant="contained"
+              onClick={handlePublishClicked}
+              size="large"
+            >
+              Publish
+            </Button>
+          ) : (
+            <Button
+              startIcon={<ArchiveIcon />}
+              color="primary"
+              variant="contained"
+              onClick={handleHideClicked}
+              size="large"
+            >
+              Hide
+            </Button>
+          )}
           <Button
             startIcon={<SaveIcon />}
             color="secondary"
@@ -197,17 +233,17 @@ export default function EditModulePage({
             onClick={handleSaveClicked}
             size="large"
           >
-          Save
-        </Button>
-        <Button
-          startIcon={<DeleteIcon />}
-          color="error"
-          variant="contained"
-          onClick={handleDeleteClicked}
-          size="large"
-        >
-          Delete
-        </Button>
+            Save
+          </Button>
+          <Button
+            startIcon={<DeleteIcon />}
+            color="error"
+            variant="contained"
+            onClick={handleDeleteClicked}
+            size="large"
+          >
+            Delete
+          </Button>
         </Stack>
       </Stack>
       <QuizBuilder
