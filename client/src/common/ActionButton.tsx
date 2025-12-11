@@ -72,7 +72,7 @@ export default function ActionButton(props: React.PropsWithChildren<ActionButton
               <Button
                 disabled={props.disabled}
                 loading={props.loading}
-                variant="outlined"
+                variant="contained"
                 startIcon={props.children}
                 color={props.color}
                 onClick={handleClick}
