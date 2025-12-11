@@ -557,6 +557,8 @@ export interface OrganizationsRow {
   username: string;
   /** Human readable name for the organization */
   displayname: string;
+  /** Notes about the organization for staff */
+  notes: string;
   /** Corresponding account for this groups money */
   accountID: number;
 }
