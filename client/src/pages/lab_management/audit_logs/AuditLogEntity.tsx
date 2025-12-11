@@ -10,7 +10,7 @@ interface AuditLogEntityProps {
   entityCode: string;
 }
 
-function getEntityUrl(entityType: string, id: string, makerspaceID: string, orgUsername?: string) {
+function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
   switch (entityType) {
     case "user":
       return `/makerspace/${makerspaceID}/people/${id}`;
