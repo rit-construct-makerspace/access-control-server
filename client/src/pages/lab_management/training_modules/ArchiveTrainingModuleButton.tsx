@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import ArchiveButton from "../../../common/ArchiveButton";
 import { ARCHIVE_MODULE, GET_ARCHIVED_MODULE, GET_ARCHIVED_TRAINING_MODULES, GET_TRAINING_MODULES } from "../../../queries/trainingQueries";
+import { toast } from "react-toastify";
 
 interface ArchiveTrainingModuleButtonProps {
   moduleID: number;
@@ -10,6 +11,12 @@ interface ArchiveTrainingModuleButtonProps {
 export default function ArchiveTrainingModuleButton(props: ArchiveTrainingModuleButtonProps) {
   const [archiveTrainingModule, { loading }] = useMutation(ARCHIVE_MODULE, {
     variables: { id: props.moduleID },
+    onCompleted: () => {
+      toast.success("Training Module Archived", {
+        position: "bottom-left",
+        autoClose: 3000,
+      });
+    },
     refetchQueries: [
       { query: GET_TRAINING_MODULES },
       { query: GET_ARCHIVED_TRAINING_MODULES },
