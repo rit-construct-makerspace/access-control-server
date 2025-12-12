@@ -3,6 +3,7 @@ import * as Mailgun from "mailgun.js"
 import { generateReceiptEmail } from "./receipt-template.js"
 import { generateExpiryEmail, ExpiryDescription } from "./training-expiry-template.js"
 import { balChangeInfo, generateBalanceChangeEmail } from "./balance-change-template.js";
+import { generateHoldPlacedEmail } from "./hold-placed-template.js";
 const mailgun = new Mailgun.default(FormData);
 const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere' });
 const MAIL_DOMAIN = process.env.MAIL_DOMAIN ?? "";
@@ -78,6 +79,17 @@ export async function send_cc_balance_change_email(email: string, desc: balChang
         fromAccount: "cc",
         to: [email],
         subject: "RIT SHED: Account Balance Adjusted - " + new Date().toLocaleDateString(),
+        textContent: content.text,
+        htmlContent: content.html,
+    })
+}
+
+export async function send_hold_placed_email(email: string, desc: string) {
+    const content = generateHoldPlacedEmail(desc);
+    send_generic_email({
+        fromAccount: "holds",
+        to: [email],
+        subject: "RIT SHED: Hold Placed On Account - " + new Date().toLocaleDateString(),
         textContent: content.text,
         htmlContent: content.html,
     })
