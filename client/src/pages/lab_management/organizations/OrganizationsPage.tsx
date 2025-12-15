@@ -171,7 +171,7 @@ export default function OrganizationsPage() {
                             color="secondary"
                             sx={{ alignSelf: "flex-end" }}
                             onClick={() => {
-                              navigate(`/makerspace/${makerspaceID}/currency?a=${org.username}`);
+                              navigate(`/makerspace/${makerspaceID}/currency?a=${org.username}&l=${org.username}`);
                             }}
                           >
                             View Account
