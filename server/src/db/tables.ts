@@ -168,7 +168,7 @@ export interface InventoryLedgerRow {
 
 /**
  * A record of a quiz submission.
- * Note, this table does not control access to equipment. Rather, the AccessChecks and PassedModules tables record successful In-person checks and Non-expired trainings respectively
+ * Note, this table does not control access to equipment. Rather, the AccessChecks and PassedModules tables record successful In-person checks (staff sign-offs) and Non-expired trainings respectively
  * PassedModules records trainings that have not expired (It is kept up to date by purging expired trainings)
  * ModuleSubmissions records all quiz attempts forever
  * AccessChecks records in person competency checks
@@ -522,16 +522,16 @@ export interface ModulesForMakerspacesRow {
 export interface SpecialHoursRow {
   day: Date;
   makerspaceID: number;
-  open: String | null;
-  close: String | null;
+  open: string | null;
+  close: string | null;
   closed: boolean;
 }
 
 export interface DefaultHoursRow {
   dayOfWeek: number;
   makerspaceID: number;
-  open: String | null;
-  close: String | null;
+  open: string | null;
+  close: string | null;
   closed: boolean;
 }
 
@@ -557,6 +557,8 @@ export interface OrganizationsRow {
   username: string;
   /** Human readable name for the organization */
   displayname: string;
+  /** Notes about the organization for staff */
+  notes: string;
   /** Corresponding account for this groups money */
   accountID: number;
 }

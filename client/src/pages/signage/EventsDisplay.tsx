@@ -8,8 +8,8 @@ import { format } from "date-fns";
 import QRCode from "react-qr-code";
 
 
-var listLength = 0;
-var index = 0;
+let listLength = 0;
+let index = 0;
 
 export default function EventsDisplay() {
 
@@ -28,7 +28,7 @@ export default function EventsDisplay() {
     useEffect(() => {
         const timer = setInterval(() => {
             setProgress((oldProgress) => {
-                var newProgress = oldProgress === 100 ? 0 : Math.min(oldProgress + 1, 100);
+                const newProgress = oldProgress === 100 ? 0 : Math.min(oldProgress + 1, 100);
 
                 if (newProgress < oldProgress) {
                     handleNextEvent();
@@ -78,7 +78,7 @@ export default function EventsDisplay() {
 
             return (
                 <Stack height="100vh" width="100%" justifyContent="space-between">
-                    <Fade in={(progress < 99 && progress > 1) || (false && events.length === 1)} appear={false}>
+                    <Fade in={(progress < 99 && progress > 1) || (events.length === 1)} appear={false}>
                         <Box height="100%">
                             {
                                 eventGraphics.slice(index, index + 1)
@@ -90,4 +90,4 @@ export default function EventsDisplay() {
             );
         }} />
     );
-};
+}

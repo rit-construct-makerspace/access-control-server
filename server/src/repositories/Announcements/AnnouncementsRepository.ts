@@ -11,11 +11,11 @@ import { AnnouncementRow } from "../../db/tables.js";
  * @returns array of AnnouncementRow
  */
 export async function getAnnouncements() {
-  return knex('Announcements').orderBy("id", "desc");
+  return knex("Announcements").orderBy("id", "desc");
 }
 
 /**
- * 
+ *
  * @param announcementID the unique ID of the announcement to retrieve
  * @returns AnnouncementRow the Announcment at requested ID
  * @throws EntityNotFound on nonexistent ID
@@ -35,6 +35,8 @@ export async function getAnnouncementByID(announcementID: number): Promise<Annou
 export async function createAnnouncement(announcement: {
   title: string;
   description: string;
+  linkText: string;
+  linkUrl: string;
 }): Promise<AnnouncementRow> {
   const [newID] = await knex("Announcements").insert(announcement, "id");
   return await getAnnouncementByID(newID.id);
@@ -46,12 +48,21 @@ export async function createAnnouncement(announcement: {
  * @returns AnnouncmentRow updated Announcement
  */
 export async function updateAnnouncement(announcement: {
-  id: number
+  id: number;
   title: string;
   description: string;
+  linkText: string;
+  linkUrl: string;
 }): Promise<AnnouncementRow> {
-  await knex("Announcements").where({ id: announcement.id}).update({ title: announcement.title, description: announcement.description})
-  return getAnnouncementByID(announcement.id)
+  await knex("Announcements")
+    .where({ id: announcement.id })
+    .update({
+      title: announcement.title,
+      description: announcement.description,
+      linkText: announcement.linkText,
+      linkUrl: announcement.linkUrl,
+    });
+  return getAnnouncementByID(announcement.id);
 }
 
 /**
@@ -59,7 +70,7 @@ export async function updateAnnouncement(announcement: {
  * @param id the unique ID of the Announcment to delete
  * @returns boolean true
  */
-export async function deleteAnnouncement(id: number): Promise<boolean>{
-  await knex("Announcements").where({ id: id}).delete()
-  return true
+export async function deleteAnnouncement(id: number): Promise<boolean> {
+  await knex("Announcements").where({ id: id }).delete();
+  return true;
 }

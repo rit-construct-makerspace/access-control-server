@@ -103,7 +103,7 @@ export default function TopNav() {
       variant="contained"
       color="secondary"
       endIcon={<PersonIcon />}
-      onClick={() => window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")}
+      onClick={() => window.location.replace(import.meta.env.VITE_LOGIN_URL + "?redir=" + import.meta.env.VITE_ORIGIN + window.location.pathname)}
     >
       LOGIN
     </Button>

@@ -1,15 +1,9 @@
 import { Checkbox, FormControlLabel, IconButton, InputAdornment, Stack, TextField, Typography } from "@mui/material";
 import MakerspaceHours from "../../types/MakerspaceHours";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
-import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
 import DeleteIcon from '@mui/icons-material/Delete';
-
-export const DELETE_SPECIAL_HOURS = gql`
-  mutation DeleteSpecialHours($day: DateTime!, $makerspaceID: ID!) {
-    deleteSpecialHours(day: $day, makerspaceID: $makerspaceID)
-  }
-`;
+import { DELETE_SPECIAL_HOURS } from "../../queries/makerspaceQueries";
 
 interface SpecialHoursBlockProps {
   hours: MakerspaceHours;
