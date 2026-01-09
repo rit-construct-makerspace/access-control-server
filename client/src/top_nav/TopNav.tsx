@@ -74,7 +74,7 @@ export default function TopNav() {
 //          All Makerspace users must complete the <a href="https://www.youtube.com/watch?v=XfELJU1mRMg">Shop Safety training course</a> before using any equipment.
 //        </Alert>
 //        : null
-//    }
+    }
     </Stack>
 
   const navlinks = [
