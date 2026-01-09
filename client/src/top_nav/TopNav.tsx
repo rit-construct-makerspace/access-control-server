@@ -67,13 +67,14 @@ export default function TopNav() {
           </Alert>
           : null
       }
-      { // Lab training Alert
-        labTraining
-          ? <Alert variant="filled" severity="info" onClose={handleDismissLabTraining} sx={{ borderRadius: 0 }}>
-            All Makerspace users must complete the <a href="https://rit.sabacloud.com/Saba/Web_spf/NA3P1PRD0049/common/leclassview/dowbt-0000171534">Shop Safety training course</a> before using any equipment.
-          </Alert>
-          : null
-      }
+// Removed lab training alert 1-9-2026, will re-enable whne the new training link is avaialable.
+//    { // Lab training Alert
+//      labTraining
+//        ? <Alert variant="filled" severity="info" onClose={handleDismissLabTraining} sx={{ borderRadius: 0 }}>
+//          All Makerspace users must complete the <a href="https://www.youtube.com/watch?v=XfELJU1mRMg">Shop Safety training course</a> before using any equipment.
+//        </Alert>
+//        : null
+//    }
     </Stack>
 
   const navlinks = [
