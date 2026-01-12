@@ -62,6 +62,17 @@ export const GET_ARCHIVED_TRAINING_MODULES = gql`
   }
 `;
 
+export const GET_PUBLISHED_TRAINING_MODULES = gql`
+  query GetPublishedTrainingModules {
+    publishedModules {
+      id
+      name
+      archived
+      makerspaceID
+    }
+  }
+`
+
 export const CREATE_TRAINING_MODULE = gql`
   mutation CreateTrainingModule($name: String!, $quiz: JSON!, $makerspaceID: ID) {
     createModule(name: $name, quiz: $quiz, makerspaceID: $makerspaceID) {

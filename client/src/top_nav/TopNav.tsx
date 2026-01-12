@@ -18,6 +18,7 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import ArticleIcon from '@mui/icons-material/Article';
 import TuneIcon from '@mui/icons-material/Tune';
 import LogoutIcon from '@mui/icons-material/Logout';
+import GlobalSearchBar from "./GlobalSearchBar";
 
 const StyledLogo = styled.img`
   padding: 12px;
@@ -183,8 +184,10 @@ export default function TopNav() {
                 <StyledLogo width="100%" src={localStorage.getItem("themeMode") === "dark" ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" />
               </ButtonBase>
               {navlinks}
+              <GlobalSearchBar></GlobalSearchBar>
               {userProfileButton}
               {userMenu}
+              
             </Stack>
           </AppBar>
         </Box>

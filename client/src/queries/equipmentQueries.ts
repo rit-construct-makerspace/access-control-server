@@ -35,6 +35,21 @@ export const GET_ALL_EQUIPMENTS = gql`
   }
 `;
 
+export const GET_ALL_PUBLISHED_EQUIPMENTS = gql`
+  query GetAllPublishedEquipment {
+    equipments {
+      id
+      name
+      archived
+      room {
+        makerspace {
+          id
+        }
+      }
+    }
+  }
+`
+
 export const GET_EQUIPMENT_BY_ID = gql`
   query GetEquipmentByID($id: ID!) {
     equipment(id: $id) {
