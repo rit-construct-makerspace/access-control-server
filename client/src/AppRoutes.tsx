@@ -55,8 +55,9 @@ import UserPage from "./pages/lab_management/users/UserPage";
 // Authed Routes
 function AuthedRoute() {
   const user = useCurrentUser();
+  const redir = window.location.pathname;
   if (user.visitor) {
-    window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")
+    window.location.replace(import.meta.env.VITE_LOGIN_URL + "?redir=" + import.meta.env.VITE_ORIGIN + redir)
     return <></>;
   } else {
     return <Outlet />

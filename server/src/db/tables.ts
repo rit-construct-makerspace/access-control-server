@@ -273,6 +273,7 @@ export interface TrainingModuleItem {
   type: string;
   text: string;
   options?: ModuleItemOption[];
+  correctAnswers?: number;
   hint: string;
   affirmation: string;
 }
@@ -522,16 +523,16 @@ export interface ModulesForMakerspacesRow {
 export interface SpecialHoursRow {
   day: Date;
   makerspaceID: number;
-  open: String | null;
-  close: String | null;
+  open: string | null;
+  close: string | null;
   closed: boolean;
 }
 
 export interface DefaultHoursRow {
   dayOfWeek: number;
   makerspaceID: number;
-  open: String | null;
-  close: String | null;
+  open: string | null;
+  close: string | null;
   closed: boolean;
 }
 
@@ -557,6 +558,8 @@ export interface OrganizationsRow {
   username: string;
   /** Human readable name for the organization */
   displayname: string;
+  /** Notes about the organization for staff */
+  notes: string;
   /** Corresponding account for this groups money */
   accountID: number;
 }

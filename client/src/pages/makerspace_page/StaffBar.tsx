@@ -9,7 +9,6 @@ import PaidIcon from '@mui/icons-material/Paid';
 import PeopleIcon from "@mui/icons-material/People";
 import ScannerIcon from '@mui/icons-material/Scanner';
 import SchoolIcon from "@mui/icons-material/School";
-import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { ButtonBase, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
@@ -107,11 +106,6 @@ export default function StaffBar() {
           primary={"Tools"}
           to={`/makerspace/${makerspaceID}/tools`}
           icon={<ArchitectureIcon />}
-        />
-        <NavLink
-          primary={"Orders"}
-          to={`/makerspace/${makerspaceID}/storefront/carts`}
-          icon={<ShoppingCartCheckoutIcon />}
         />
         <NavLink
           primary={"People"}
