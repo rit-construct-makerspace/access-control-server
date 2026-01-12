@@ -1,6 +1,25 @@
-import { Autocomplete, Box, Button, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Stack,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Typography,
+} from "@mui/material";
 import { Equipment } from "./EditEquipmentPage";
-import { ARCHIVE_EQUIPMENT, PUBLISH_EQUIPMENT, UPDATE_EQUIPMENT } from "../../../queries/equipmentQueries";
+import {
+  ARCHIVE_EQUIPMENT,
+  GET_EQUIPMENT_BY_ID,
+  PUBLISH_EQUIPMENT,
+  UPDATE_EQUIPMENT,
+} from "../../../queries/equipmentQueries";
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -14,7 +33,7 @@ import ArchiveIcon from "@mui/icons-material/Archive";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import FileUploadButton from "../../../common/FileUploadButton";
 import { GET_FULL_MAKERSPACES } from "../../../queries/makerspaceQueries.js";
-
+import { useBlocker } from "react-router-dom";
 
 interface EquipmentInformationProps {
   equipment: Equipment;
@@ -23,14 +42,19 @@ interface EquipmentInformationProps {
 export default function EquipmentInformation(props: EquipmentInformationProps) {
   const isMobile = useIsMobile();
 
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) => unsaved && currentLocation.pathname !== nextLocation.pathname
+  );
+
   const getRoomsResult = useQuery(GET_ROOMS);
 
   const [updateEquipment] = useMutation(UPDATE_EQUIPMENT, {
     refetchQueries: [
-      "GetEquipmentByID",
-      { query: GET_ROOMS }, 
-      { query: GET_FULL_MAKERSPACES }
+      { query: GET_EQUIPMENT_BY_ID, variables: { id: props.equipment.id } },
+      { query: GET_ROOMS },
+      { query: GET_FULL_MAKERSPACES },
     ],
+    awaitRefetchQueries: true,
     onCompleted() {
       toast.success("Updated equipment");
     },
@@ -40,11 +64,11 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   });
   const [publishEquipment] = useMutation(PUBLISH_EQUIPMENT, {
     variables: { id: props.equipment.id },
-    refetchQueries: ["GetEquipmentByID", { query: GET_ROOMS }],
+    refetchQueries: [{ query: GET_EQUIPMENT_BY_ID, variables: { id: props.equipment.id } }, { query: GET_ROOMS }],
   });
   const [archiveEquipment] = useMutation(ARCHIVE_EQUIPMENT, {
     variables: { id: props.equipment.id },
-    refetchQueries: ["GetEquipmentByID", { query: GET_ROOMS }],
+    refetchQueries: [{ query: GET_EQUIPMENT_BY_ID, variables: { id: props.equipment.id } }, { query: GET_ROOMS }],
   });
 
   const [name, setName] = useState(props.equipment.name);
@@ -57,6 +81,8 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [requiresInPerson, setRequiresInPerson] = useState(props.equipment.requiresInPerson);
   const [room, setRoom] = useState(props.equipment.room);
   const [moduleIDs, setModuleIds] = useState(props.equipment.trainingModules.map((mod) => mod.id));
+  const [unsaved, setUnsaved] = useState(false);
+  const [blockerDialogOpen, setBlockerDialogOpen] = useState(false);
 
   function handleEquipmentUpdate() {
     updateEquipment({
@@ -74,6 +100,8 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         requiresInPerson: requiresInPerson,
       },
     });
+
+    setUnsaved(false);
   }
 
   useEffect(() => {
@@ -87,6 +115,49 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
       handleEquipmentUpdate();
     }
   }, [moduleIDs]);
+
+  useEffect(() => {
+    setUnsaved(
+      name !== props.equipment.name ||
+      imageUrl !== props.equipment.imageUrl ||
+      sopUrl !== props.equipment.sopUrl ||
+      notes !== props.equipment.notes ||
+      byReservation !== props.equipment.byReservationOnly ||
+      needsWelcome !== props.equipment.needsWelcome ||
+      requiresTrainer !== props.equipment.requiresTrainerApproval ||
+      requiresInPerson !== props.equipment.requiresInPerson ||
+      room.id !== props.equipment.room.id ||
+      moduleIDs.length !== props.equipment.trainingModules.length
+    );
+  }, [
+    name,
+    imageUrl,
+    sopUrl,
+    notes,
+    byReservation,
+    needsWelcome,
+    requiresTrainer,
+    requiresInPerson,
+    room.id,
+    moduleIDs.length,
+  ]);
+
+  useEffect(() => {
+    if (blocker.state === "blocked") {
+      setBlockerDialogOpen(true);
+    }
+  }, [blocker.state]);
+
+  useEffect(() => {
+    const handler = (event: BeforeUnloadEvent) => {
+      if (unsaved) {
+        event.preventDefault();
+        return "";
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [unsaved]);
 
   return (
     <Stack direction={isMobile ? "column-reverse" : "row"} width={"100%"} justifyContent={"space-between"}>
@@ -120,6 +191,28 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             <Button variant="contained" startIcon={<SaveIcon />} onClick={handleEquipmentUpdate}>
               Save
             </Button>
+
+            {blocker.state === "blocked" && (
+              <Dialog
+                open={blockerDialogOpen}
+                onClose={() => {
+                  setBlockerDialogOpen(false);
+                }}
+                aria-labelledby="blocker-dialog-title"
+                aria-describedby="blocker-dialog-description"
+              >
+                <DialogTitle id="blocker-dialog-title">Unsaved Changes</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="blocker-dialog-description">
+                    You have unsaved changes. Are you sure you want to leave?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => blocker.reset()}>Stay on Page</Button>
+                  <Button onClick={() => blocker.proceed()}>Leave Page</Button>
+                </DialogActions>
+              </Dialog>
+            )}
           </Stack>
         </Stack>
 
@@ -158,9 +251,9 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             byReservation ? "byReservation" : null,
             needsWelcome ? "needsWelcome" : null,
             requiresTrainer ? "requiresTrainer" : null,
-            requiresInPerson ? "requiresInPerson" : null
+            requiresInPerson ? "requiresInPerson" : null,
           ]}
-          sx={{alignSelf: "center"}}
+          sx={{ alignSelf: "center" }}
         >
           <ToggleButton value={"byReservation"} onClick={() => setByReservation(!byReservation)}>
             Reservation Only
@@ -172,7 +265,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             Requires Trainer Approval
           </ToggleButton>
           <ToggleButton value={"requiresInPerson"} onClick={() => setRequiresInPerson(!requiresInPerson)}>
-            Requires In-Person
+            Requires Sign-Off
           </ToggleButton>
         </ToggleButtonGroup>
         <EquipmentTrainings

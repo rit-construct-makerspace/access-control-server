@@ -29,7 +29,7 @@ import * as Emailer from "./integrations/email/email.js"
 import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
-import { purge_images } from "./periodicActions.js";
+import { deletePastSpecialHours, purge_images } from "./periodicActions.js";
 import { getCustomUrl } from "./repositories/Links/customUrlRepository.js";
 import { InventoryItemRow } from "./db/tables.js";
 
@@ -532,6 +532,9 @@ async function startServer() {
 
     // Find unused images on AWS and 'remove' them
     await purge_images();
+
+    // Delete past special hours
+    await deletePastSpecialHours();
   });
 
 

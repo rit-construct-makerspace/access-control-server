@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import { isManagerFor } from "../../../common/PrivilegeUtils";
+import { useQuery } from "@apollo/client";
+import { GET_ORG_BY_ID } from "../../../queries/organizationQueries";
 
 interface AuditLogEntityProps {
   entityCode: string;
@@ -26,6 +30,8 @@ function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
       return `/makerspace/${makerspaceID}/readers#id-${id}`;
     case "makerspace":
       return `/makerspace/${id}`;
+    case "organization":
+      return `/makerspace/${makerspaceID}/organizations?q=${id}`;
     default:
       return `/makerspace/${makerspaceID}/history`;
   }
@@ -35,27 +41,34 @@ export default function AuditLogEntity({ entityCode }: AuditLogEntityProps) {
   const navigate = useNavigate();
   // Dangerous!!! Might be undefined. A temporary fix until history/logs can be overhauled
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
+  const user = useCurrentUser();
+  const manager = isManagerFor(user, Number(makerspaceID));
 
   const [entityType, id, label] = entityCode.split(":");
 
-  const url = getEntityUrl(entityType, id, makerspaceID ?? "0");
+  let url = getEntityUrl(entityType, id, makerspaceID ?? "0" );
+
+  // If this would link to the readers page, but the current user is not a manager,
+  // fall back to the makerspace history instead of exposing a non-accessible link.
+  if ((entityType === "access_device" || entityType === "machine") && !manager) {
+    url = `/makerspace/${makerspaceID}/history`;
+  }
 
   const [reveal, setReveal] = useState(entityType !== "conceal");
 
   const toggleConcealment = () => {
-    setReveal(reveal => !reveal)
-  }
+    setReveal((reveal) => !reveal);
+  };
 
   return (
     <span>
-      {!reveal
-        ? <Link onClick={toggleConcealment}>
-          Click to Reveal
-        </Link>
-        : <Link onClick={() => navigate(url)} sx={{ cursor: "pointer" }}>
+      {!reveal ? (
+        <Link onClick={toggleConcealment}>Click to Reveal</Link>
+      ) : (
+        <Link onClick={() => navigate(url)} sx={{ cursor: "pointer" }}>
           {label}
         </Link>
-      }
+      )}
     </span>
   );
 }
