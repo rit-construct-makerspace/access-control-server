@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Button, Card, Grid, Stack, Typography, Link } from "@mui/material";
+import { Button, Card, Grid, Stack, Typography, Link, IconButton } from "@mui/material";
 import { GET_MAKERSPACES } from "../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,6 +12,8 @@ import { GET_ALL_CUSTOM_URLS } from "../../queries/customUrlQueries";
 import UpdateCustomUrlModal from "./UpdateCustomUrlModal";
 import DeleteCustomUrlModal from "./DeleteCustomUrlModal";
 import CreateCustomUrlModal from "./CreateCustomUrlModal";
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { toast } from "react-toastify";
 
 export default function SiteSettingsPage() {
   const navigate = useNavigate();
@@ -27,8 +29,8 @@ export default function SiteSettingsPage() {
   const [createCustomUrlModal, setCreateCustomUrlModal] = useState(false);
   const [deleteCustomUrlModal, setDeleteCustomUrlModal] = useState(false);
   const [updateCustomUrlModal, setUpdateCustomUrlModal] = useState(false);
-  const [deleteUrl, setDeleteUrl] = useState({ id: 0, shortUrl: ""});
-  const [updateUrl, setUpdateUrl] = useState({id: 0, shortUrl: "", longUrl: ""})
+  const [deleteUrl, setDeleteUrl] = useState({ id: 0, shortUrl: "" });
+  const [updateUrl, setUpdateUrl] = useState({ id: 0, shortUrl: "", longUrl: "" })
 
   function handleArchive(id: number, name: string) {
     setDeletionTarget({ id: id, name: name });
@@ -36,13 +38,18 @@ export default function SiteSettingsPage() {
   }
 
   function handleDelete(id: number, shortUrl: string) {
-    setDeleteUrl({id: id, shortUrl: shortUrl});
+    setDeleteUrl({ id: id, shortUrl: shortUrl });
     setDeleteCustomUrlModal(true);
   }
 
-  function handleUpdateUrl(id: number, shortUrl: string, longUrl: string){
-    setUpdateUrl({id: id, shortUrl: shortUrl, longUrl: longUrl})
+  function handleUpdateUrl(id: number, shortUrl: string, longUrl: string) {
+    setUpdateUrl({ id: id, shortUrl: shortUrl, longUrl: longUrl })
     setUpdateCustomUrlModal(true);
+  }
+
+  async function copyShortLink(link: string) {
+    await navigator.clipboard.writeText(`https://make.rit.edu/${link}`);
+    toast.success("Link copied to clipboard");
   }
 
   return (
@@ -88,24 +95,27 @@ export default function SiteSettingsPage() {
           );
         }} />
         <Stack direction={"column"} spacing={1}>
-        <Stack direction={"row"} spacing={2}>
-          <Typography variant="h4">Custom Links</Typography>
-          <Button color="success" variant="contained" onClick={() => setCreateCustomUrlModal(true)} startIcon={<AddIcon />}>
-            Create Custom Link
-          </Button>
-        </Stack>
+          <Stack direction={"row"} spacing={2}>
+            <Typography variant="h4">Custom Links</Typography>
+            <Button color="success" variant="contained" onClick={() => setCreateCustomUrlModal(true)} startIcon={<AddIcon />}>
+              Create Custom Link
+            </Button>
+          </Stack>
           <Typography>Pages requiring user authentication may not work properly (see issue # 667). Please check that the links work.</Typography>
         </Stack>
         <RequestWrapper2 result={getCustomUrlsResult} render={(data) => {
-          return(
+          return (
             <Grid container spacing={3}>
               {
-                data.urls.map((customUrl: {id: number, shortUrl: string, longUrl: string}) => (
+                data.urls.map((customUrl: { id: number, shortUrl: string, longUrl: string }) => (
                   <Grid>
                     <Card variant="outlined">
                       <Stack width={"300px"} padding={"10px"} spacing={1}>
-                        <Typography variant="subtitle1">/link/{customUrl.shortUrl}</Typography>
-                        <Typography style={{ wordWrap: "break-word" }}>Links to: <Link rel="noopener noreferrer" href={customUrl.longUrl} target="_blank">{customUrl.longUrl}</Link></Typography>
+                        <Stack direction={"row"} spacing={1} alignItems={"center"} width={"max-content"} sx={{ ":hover": { cursor: "pointer" } }} onClick={() => copyShortLink(`link/${customUrl.shortUrl}`)}>
+                          <Typography variant="subtitle1" color="primary">/link/{customUrl.shortUrl}</Typography>
+                          <ContentCopyIcon color="primary" />
+                        </Stack>
+                        <Typography noWrap>Links to: <Link rel="noopener noreferrer" href={customUrl.longUrl} target="_blank">{customUrl.longUrl}</Link></Typography>
                         <Stack direction={"row"} justifyContent={"space-between"}>
                           <Button
                             color="error"
@@ -115,7 +125,7 @@ export default function SiteSettingsPage() {
                           >
                             Delete
                           </Button>
-                          <Button color="secondary" variant="outlined" onClick={() => {handleUpdateUrl(customUrl.id, customUrl.shortUrl, customUrl.longUrl)}}>
+                          <Button color="secondary" variant="outlined" onClick={() => { handleUpdateUrl(customUrl.id, customUrl.shortUrl, customUrl.longUrl) }}>
                             Edit
                           </Button>
                         </Stack>
