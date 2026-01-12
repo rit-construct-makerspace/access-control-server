@@ -100,6 +100,8 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         requiresInPerson: requiresInPerson,
       },
     });
+
+    setUnsaved(false);
   }
 
   useEffect(() => {
@@ -117,15 +119,15 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   useEffect(() => {
     setUnsaved(
       name !== props.equipment.name ||
-        imageUrl !== props.equipment.imageUrl ||
-        sopUrl !== props.equipment.sopUrl ||
-        notes !== props.equipment.notes ||
-        byReservation !== props.equipment.byReservationOnly ||
-        needsWelcome !== props.equipment.needsWelcome ||
-        requiresTrainer !== props.equipment.requiresTrainerApproval ||
-        requiresInPerson !== props.equipment.requiresInPerson ||
-        room.id !== props.equipment.room.id ||
-        moduleIDs.length !== props.equipment.trainingModules.length
+      imageUrl !== props.equipment.imageUrl ||
+      sopUrl !== props.equipment.sopUrl ||
+      notes !== props.equipment.notes ||
+      byReservation !== props.equipment.byReservationOnly ||
+      needsWelcome !== props.equipment.needsWelcome ||
+      requiresTrainer !== props.equipment.requiresTrainerApproval ||
+      requiresInPerson !== props.equipment.requiresInPerson ||
+      room.id !== props.equipment.room.id ||
+      moduleIDs.length !== props.equipment.trainingModules.length
     );
   }, [
     name,
@@ -139,22 +141,6 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
     room.id,
     moduleIDs.length,
   ]);
-
-  useEffect(() => {
-    if (props.equipment) {
-      setName(props.equipment.name);
-      setImageUrl(props.equipment.imageUrl);
-      setSopUrl(props.equipment.sopUrl);
-      setNotes(props.equipment.notes);
-      setByReservation(props.equipment.byReservationOnly);
-      setNeedsWelcome(props.equipment.needsWelcome);
-      setRequiresTrainer(props.equipment.requiresTrainerApproval);
-      setRequiresInPerson(props.equipment.requiresInPerson);
-      setRoom(props.equipment.room);
-      setModuleIds(props.equipment.trainingModules.map((mod) => mod.id));
-      setUnsaved(false); // reset flag after syncing
-    }
-  }, [props.equipment]);
 
   useEffect(() => {
     if (blocker.state === "blocked") {
