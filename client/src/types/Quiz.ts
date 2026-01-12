@@ -18,6 +18,7 @@ export interface QuizItem {
   type: QuizItemType;
   text: string;
   options?: Option[];
+  correctAnswers?: number;
   hint?: string;
   affirmation?: string;
 }
