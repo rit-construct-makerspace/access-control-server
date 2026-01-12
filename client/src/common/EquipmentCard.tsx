@@ -68,19 +68,19 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                   isPriviledged
                     ? <Button
                       onClick={() => { navigate(`/makerspace/${makerspaceID}/equipment/${props.equipment.id}`) }}
-                    aria-label="edit button"
-                    sx={{ width: "40px", height: "40px" }}
-                    variant="contained"
-                    color="primary"
-                  >
-                    <ConstructionIcon />
-                  </Button>
+                      aria-label="edit button"
+                      sx={{ width: "40px", height: "40px" }}
+                      variant="contained"
+                      color="primary"
+                    >
+                      <ConstructionIcon />
+                    </Button>
                     : null
                 }
               </Stack>
               <Stack direction="row" justifyContent="space-between" height="100%">
                 {/* Trainings & Access Check */}
-                <Stack width="100%">
+                <Stack width="100%" height={"135px"} overflow={"scroll"}>
                   {hasNotTakenModule || (!hasApprovedAccessCheck && !props.equipment.byReservationOnly) ? (
                     <Typography paddingLeft={"10px"}>To access, complete:</Typography>
                   ) : null}
@@ -88,7 +88,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                     <ModuleStatusRow ms={ms} />
                   ))}
                   {props.equipment.requiresInPerson ? (
-                    <Stack direction={"row"} spacing={1} alignItems="center" padding="10px">
+                    <Stack direction={"row"} spacing={1} alignItems="center" padding="7px">
                       {user.visitor ? (
                         <RadioButtonUncheckedIcon color="secondary" />
                       ) : hasApprovedAccessCheck ? (
@@ -133,7 +133,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                   </Link>{" "}
                   to schedule.
                 </Typography>
-              ) : <Typography/>}
+              ) : <Typography />}
               <Button
                 size="small"
                 variant="contained"
