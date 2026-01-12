@@ -14,6 +14,8 @@ import DeleteCustomUrlModal from "./DeleteCustomUrlModal";
 import CreateCustomUrlModal from "./CreateCustomUrlModal";
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { toast } from "react-toastify";
+import QrCodeIcon from '@mui/icons-material/QrCode';
+import QRCodeModal from "./QRCodeModal";
 
 export default function SiteSettingsPage() {
   const navigate = useNavigate();
@@ -31,6 +33,9 @@ export default function SiteSettingsPage() {
   const [updateCustomUrlModal, setUpdateCustomUrlModal] = useState(false);
   const [deleteUrl, setDeleteUrl] = useState({ id: 0, shortUrl: "" });
   const [updateUrl, setUpdateUrl] = useState({ id: 0, shortUrl: "", longUrl: "" })
+
+  const [qrTarget, setQrTarget] = useState("");
+  const [qrModal, setQrModal] = useState(false);
 
   function handleArchive(id: number, name: string) {
     setDeletionTarget({ id: id, name: name });
@@ -50,6 +55,11 @@ export default function SiteSettingsPage() {
   async function copyShortLink(link: string) {
     await navigator.clipboard.writeText(`https://make.rit.edu/${link}`);
     toast.success("Link copied to clipboard");
+  }
+
+  function handleQr(link: string) {
+    setQrTarget(link);
+    setQrModal(true);
   }
 
   return (
@@ -125,6 +135,13 @@ export default function SiteSettingsPage() {
                           >
                             Delete
                           </Button>
+                          <Button
+                            color="primary"
+                            variant="contained"
+                            onClick={() => handleQr("link/" + customUrl.shortUrl)}
+                          >
+                            <QrCodeIcon />
+                          </Button>
                           <Button color="secondary" variant="outlined" onClick={() => { handleUpdateUrl(customUrl.id, customUrl.shortUrl, customUrl.longUrl) }}>
                             Edit
                           </Button>
@@ -144,6 +161,7 @@ export default function SiteSettingsPage() {
         <DeleteCustomUrlModal open={deleteCustomUrlModal} onClose={() => setDeleteCustomUrlModal(false)} id={deleteUrl.id} shortUrl={deleteUrl.shortUrl} />
         <CreateCustomUrlModal open={createCustomUrlModal} onClose={() => setCreateCustomUrlModal(false)} />
         <UpdateCustomUrlModal open={updateCustomUrlModal} onClose={() => setUpdateCustomUrlModal(false)} id={updateUrl.id} shortUrl={updateUrl.shortUrl} longUrl={updateUrl.longUrl} />
+        <QRCodeModal open={qrModal} onClose={() => setQrModal(false)} link={qrTarget} />
       </Stack>
     </Stack >
   );
