@@ -279,7 +279,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             Requires Trainer Approval
           </ToggleButton>
           <ToggleButton value={"requiresInPerson"} onClick={() => setRequiresInPerson(!requiresInPerson)}>
-            Requires In-Person
+            Requires Sign-Off
           </ToggleButton>
         </ToggleButtonGroup>
         <EquipmentTrainings

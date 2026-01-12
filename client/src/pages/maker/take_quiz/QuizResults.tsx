@@ -54,26 +54,26 @@ export default function QuizResults() {
           <title>{`${moduleResult.data?.module?.name} Results | Make @ RIT`}</title>
           { submissionID && passedSubmissionResult?.data?.submission.makerID === currentUser.id ? 
           <Stack direction={"row"} alignItems={"flex-start"} width={"100%"} >
-            <Stack direction="column" width={isMobile ? "100%" : "50%"}>
+            <Stack direction="column" width={isMobile ? "100%" : "50%"} spacing={2}>
               <SubmissionCard module={moduleResult.data?.module!} submission={passedSubmissionResult.data?.submission} />
               {isMobile && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
               {isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
               <ResultsCard summary={passedSubmissionResult.data?.submission.summary}></ResultsCard>
             </Stack>
-            <Stack direction="column" width={isMobile ? "100%" : "50%"}>
+            <Stack direction="column" width={isMobile ? "100%" : "50%"} spacing={2}>
               {!isMobile && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
               {!isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
             </Stack>
             </Stack>
             :
             <Stack direction={"row"} alignItems={"flex-start"} width={"100%"} >
-            <Stack direction="column" width={isMobile ? "100%" : "50%"}>
+            <Stack direction="column" width={isMobile ? "100%" : "50%"} spacing={2}>
               <SubmissionCard module={moduleResult.data?.module!} submission={currentSubmissionResult.data?.latestSubmission} />
               {isMobile && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
               {isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
               <ResultsCard summary={currentSubmissionResult.data?.latestSubmission.summary}></ResultsCard>
             </Stack>
-            <Stack direction="column" width={isMobile ? "100%" : "50%"}>
+            <Stack direction="column" width={isMobile ? "100%" : "50%"} spacing={2}>
               {!isMobile && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
               {!isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
             </Stack>

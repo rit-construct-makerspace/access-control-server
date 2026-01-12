@@ -55,8 +55,9 @@ import UserPage from "./pages/lab_management/users/UserPage";
 // Authed Routes
 function AuthedRoute() {
   const user = useCurrentUser();
+  const redir = window.location.pathname;
   if (user.visitor) {
-    window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/")
+    window.location.replace(import.meta.env.VITE_LOGIN_URL + "?redir=" + import.meta.env.VITE_ORIGIN + redir)
     return <></>;
   } else {
     return <Outlet />
@@ -160,11 +161,11 @@ export default function AppRoutes() {
                   <Route path="/makerspace/:makerspaceID/tools/instance/" element={<ToolItemPage />} />
 
                   <Route path="/makerspace/:makerspaceID/history" element={<AuditLogsPage />} />
-                  <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
                   <Route path="/makerspace/:makerspaceID/organizations" element={<OrganizationsPage />} />
 
                   {/* Routes for manager + higher */}
                   <Route element={<ManagerRoute />}>
+                    <Route path="/makerspace/:makerspaceID/readers" element={<ReadersPage />} />
                     <Route path="/makerspace/:makerspaceID/edit" element={<ManageMakerspacePage />} />
                     <Route path="/makerspace/:makerspaceID/edit/room/:roomID" element={<ManageRoomPage />} />
                     <Route path="/makerspace/:makerspaceID/currency" element={<CurrencyPage />} />
