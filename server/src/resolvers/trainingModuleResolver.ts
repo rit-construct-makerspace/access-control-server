@@ -104,12 +104,12 @@ const removeAnswersFromQuiz = (quiz: TrainingModuleItem[]) => {
   }
 };
 
-function countQuizCorrectOptions(quiz: TrainingModuleItem[]){
+function countQuizCorrectOptions(quiz: TrainingModuleItem[]) {
   for (const item of quiz) {
-    if(item.options){
+    if (item.options) {
       var count = 0;
       for (const option of item.options) {
-        if(option.correct == true){
+        if (option.correct == true) {
           count++;
         }
       }
@@ -239,7 +239,7 @@ const TrainingModuleResolvers = {
      * @argument itemID id of item within TrainingModule
      * @returns number of correct answers for a question
      */
-      moduleWithAnswerCount: async (
+    moduleWithAnswerCount: async (
       _parent: any,
       args: { id: number, itemID: string },
       { ifAuthenticated }: ApolloContext
@@ -523,7 +523,7 @@ const TrainingModuleResolvers = {
           }
 
           //Calculate percentage grade
-          const grade = (correct / (incorrect + correct)) * 100;
+          const grade = Math.round((correct / (incorrect + correct)) * 100);
 
           //Insert submission record
           SubmissionRepo.addSubmission(
@@ -533,7 +533,7 @@ const TrainingModuleResolvers = {
             JSON.stringify(choiceSummary)
           ).then(async (id) => {
             await createLog(
-              `{user} submitted attempt of {module} with a grade of ${grade}.`,
+              `{user} submitted attempt of {module} with a grade of ${grade} (${correct}/${incorrect + correct}).`,
               "training",
               { id: user.id, label: getUsersFullName(user) },
               { id: args.moduleID, label: module.name }
@@ -543,7 +543,7 @@ const TrainingModuleResolvers = {
             if (grade >= MODULE_PASSING_THRESHOLD) {
               const associatedWorgroup = printerWorkgroupForModule(Number(args.moduleID));
               if (associatedWorgroup) {
-                  add3DPrinterOSUser(user.ritUsername, String(associatedWorgroup)).then(async function (result) {
+                add3DPrinterOSUser(user.ritUsername, String(associatedWorgroup)).then(async function (result) {
                   if (result) {
                     await createLog(
                       `{user} has been automatically added to 3DPrinterOS Workgroup ${associatedWorgroup}.`,
