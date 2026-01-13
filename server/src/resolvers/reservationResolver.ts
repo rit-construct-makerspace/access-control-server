@@ -59,7 +59,7 @@ const ReservationResolver = {
       args: {
         id: number
       },
-      { isManager }: ApolloContext
+      { isManager }: ApolloContext // Should really be isManagerFor
     ) => isManager(async (user) => {
       return await ReservationRepo.deleteReservation(args.id);
     })
