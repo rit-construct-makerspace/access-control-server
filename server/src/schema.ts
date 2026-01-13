@@ -62,6 +62,7 @@ import { OrganizationTypeDefs } from "./schemas/organizationsSchema.js";
 import { OrganizationResolver } from "./resolvers/organizationsResolver.js";
 import { CustomUrlTypeDef } from "./schemas/customUrlSchema.js";
 import CustomUrlResolver from "./resolvers/customUrlResolver.js";
+import ReservationResolver from "./resolvers/reservationResolver.js";
 
 // for custom scalars such as Date
 const resolveFunctions = {
@@ -133,5 +134,6 @@ export const schema = makeExecutableSchema({
     CurrencyLedgerResolvers,
     OrganizationResolver,
     CustomUrlResolver,
+    ReservationResolver,
   ]
 });

@@ -64,4 +64,6 @@ const ReservationResolver = {
       return await ReservationRepo.deleteReservation(args.id);
     })
   }
-}
+};
+
+export default ReservationResolver;
