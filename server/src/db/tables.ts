@@ -56,6 +56,8 @@ export interface EquipmentRow {
   requiresTrainerApproval: boolean;
   /** Whether a piece of equipment requires an in person knowledge check to be completed before allowing access */
   requiresInPerson: boolean;
+  /** Whether or not a piece of equipment can be reserved */
+  schedulable: boolean;
 }
 
 /**

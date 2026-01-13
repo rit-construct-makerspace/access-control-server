@@ -22,10 +22,17 @@ export async function up(knex: Knex): Promise<void> {
     t.timestamp("start").notNullable();
     t.timestamp("end").notNullable();
   });
+
+  await knex.schema.alterTable("Equipment", (t) => {
+    t.boolean("schedulable").notNullable().defaultTo(false);
+  });
 }
 
 
 export async function down(knex: Knex): Promise<void> {
   await knex.schema.dropTableIfExists("Reservations");
+  await knex.schema.alterTable("Equipment", (t) => {
+    t.dropColumn("schedulable");
+  })
 }
 
