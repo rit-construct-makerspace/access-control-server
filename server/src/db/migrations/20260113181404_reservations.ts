@@ -7,6 +7,7 @@ export async function up(knex: Knex): Promise<void> {
   }
 
   if (await knex.schema.hasColumn("Reservations", "makerID")) {
+    await knex.schema.dropTableIfExists("ReservationEvents");
     await knex.schema.dropTable("Reservations");
   }
 
@@ -21,8 +22,6 @@ export async function up(knex: Knex): Promise<void> {
     t.timestamp("start").notNullable();
     t.timestamp("end").notNullable();
   });
-
-  await knex.schema.dropTableIfExists("ReservationEvents");
 }
 
 
