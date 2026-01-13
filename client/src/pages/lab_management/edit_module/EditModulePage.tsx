@@ -15,7 +15,7 @@ import UnarchiveIcon from "@mui/icons-material/Unarchive";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useImmer } from "use-immer";
-import { Module, QuizItem } from "../../../types/Quiz";
+import { Module, QuizItem, QuizItemType } from "../../../types/Quiz";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { DropResult } from "@hello-pangea/dnd";
@@ -92,7 +92,25 @@ export default function EditModulePage({
   // Prefer server value for `archived` when available so buttons update after refetch
   const moduleArchived = queryResult?.data?.module?.archived ?? module.archived;
 
+  function hasCorrectAnswers() {
+    if (module.quiz.some(
+      (question) => {
+        // We filter to these types of questions because the 
+        if ([QuizItemType.Checkboxes, QuizItemType.MultipleChoice].includes(question.type)) {
+          return !question.options?.some((option) => option.correct)
+        }
+      }
+    )) {
+      toast.error("All questions must have a correct answer!")
+      return false;
+    }
+    return true;
+  }
+
   const handlePublishClicked = async () => {
+    if (!hasCorrectAnswers()) {
+      return;
+    }
     await updateModule(module);
     await publishModule();
   };
@@ -102,6 +120,9 @@ export default function EditModulePage({
   };
 
   const handleSaveClicked = async () => {
+    if (!hasCorrectAnswers()) {
+      return;
+    }
     try {
       await updateModule(module);
       toast.success("Training Module Saved");
@@ -125,31 +146,31 @@ export default function EditModulePage({
   };
 
   const handleAddQuizItem = useCallback((item: QuizItem) => {
-      setModule((draft) => {
-        draft?.quiz.push(item);
-      });
+    setModule((draft) => {
+      draft?.quiz.push(item);
+    });
   }, [setModule]);
 
   const handleRemoveQuizItem = useCallback((itemId: string) => {
-      setModule((draft) => {
-        const index = draft!.quiz.findIndex((i) => i.id === itemId);
-        draft?.quiz.splice(index, 1);
-      });
+    setModule((draft) => {
+      const index = draft!.quiz.findIndex((i) => i.id === itemId);
+      draft?.quiz.splice(index, 1);
+    });
   }, [setModule]);
 
   const handleUpdateQuizItem = useCallback((updatedItem: QuizItem) => {
-      setModule((draft) => {
-        const index = draft!.quiz.findIndex((i) => i.id === updatedItem.id);
-        draft!.quiz[index] = updatedItem;
-      });
+    setModule((draft) => {
+      const index = draft!.quiz.findIndex((i) => i.id === updatedItem.id);
+      draft!.quiz[index] = updatedItem;
+    });
   }, [setModule]);
 
   const handleOnDragEnd = useCallback((result: DropResult) => {
-      setModule((draft) => {
-        if (!result.destination) return;
-        const [removed] = draft!.quiz.splice(result.source.index, 1);
-        draft!.quiz.splice(result.destination.index, 0, removed);
-      });
+    setModule((draft) => {
+      if (!result.destination) return;
+      const [removed] = draft!.quiz.splice(result.source.index, 1);
+      draft!.quiz.splice(result.destination.index, 0, removed);
+    });
   }, [setModule]);
 
   return (
@@ -173,22 +194,22 @@ export default function EditModulePage({
           label="Module title"
           value={module.name}
           onChange={(e) => setModule((draft) => {
-              draft.name = e.target.value;
+            draft.name = e.target.value;
           })}
           sx={{ width: "600px" }}
         />
         <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
-            const makerspaces = data.makerspaces;
+          const makerspaces = data.makerspaces;
           const possibleMakerspaces = makerspaces.filter((space: FullMakerspace) => (isManagerFor(currentUser, space.id)))
-            return (
-              <FormControl sx={{ width: "600px" }}>
-                <InputLabel id="associated-makerspace">Associated Makerspace</InputLabel>
-                <Select
-                  id="associated-makerspace"
-                  label="Associated Makerspace"
-                  value={module.makerspaceID}
+          return (
+            <FormControl sx={{ width: "600px" }}>
+              <InputLabel id="associated-makerspace">Associated Makerspace</InputLabel>
+              <Select
+                id="associated-makerspace"
+                label="Associated Makerspace"
+                value={module.makerspaceID}
                 onChange={(e) => setModule((draft) => {
-                      draft.makerspaceID = e.target.value != null ? Number(e.target.value) : null;
+                  draft.makerspaceID = e.target.value != null ? Number(e.target.value) : null;
                 })}>
                 {
                   possibleMakerspaces.map((space: FullMakerspace) => (
@@ -199,10 +220,10 @@ export default function EditModulePage({
                   isAdmin(currentUser) &&
                   <MenuItem>Unassociate Training</MenuItem>
                 }
-                </Select>
-              </FormControl>
-            );
-          }}
+              </Select>
+            </FormControl>
+          );
+        }}
         />
         <Stack direction="row" spacing={2}>
           {moduleArchived ? (
