@@ -8,7 +8,6 @@ import { AnnouncementsTypeDefs } from "./schemas/announcementsSchema.js";
 import { TrainingModuleTypeDefs } from "./schemas/trainingModuleSchema.js";
 import { TrainingSubmissionTypeDefs } from "./schemas/trainingSubmissionSchema.js";
 import { StoreFrontTypeDefs } from "./schemas/storeFrontSchema.js";
-import { ReservationsTypeDefs } from "./schemas/reservationsSchema.js";
 import { UsersTypeDefs } from "./schemas/usersSchema.js";
 import { HoldsTypeDefs } from "./schemas/holdsSchema.js";
 import { EquipmentTypeDefs } from "./schemas/equipmentSchema.js";
@@ -63,6 +62,7 @@ import { OrganizationResolver } from "./resolvers/organizationsResolver.js";
 import { CustomUrlTypeDef } from "./schemas/customUrlSchema.js";
 import CustomUrlResolver from "./resolvers/customUrlResolver.js";
 import ReservationResolver from "./resolvers/reservationResolver.js";
+import { ReservationTypeDefs } from "./schemas/reservationSchema.js";
 
 // for custom scalars such as Date
 const resolveFunctions = {
@@ -81,7 +81,6 @@ export const schema = makeExecutableSchema({
     TrainingModuleTypeDefs,
     TrainingSubmissionTypeDefs,
     StoreFrontTypeDefs,
-    ReservationsTypeDefs,
     DateTimeTypeDefinition,
     RoomTypeDefs,
     AuditLogsTypeDefs,
@@ -103,6 +102,7 @@ export const schema = makeExecutableSchema({
     CurrencyLedgerTypeDefs,
     OrganizationTypeDefs,
     CustomUrlTypeDef,
+    ReservationTypeDefs
   ],
   resolvers: [
     resolveFunctions,

@@ -1,7 +1,24 @@
 import { ApolloContext } from "../context.js"
+import { ReservationRow } from "../db/tables.js";
 import * as ReservationRepo from "../repositories/Equipment/ReservationRepository.js"
+import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
+import * as UserRepo from "../repositories/Users/UserRepository.js";
 
 const ReservationResolver = {
+  Reservation: {
+    equipment: async (
+      parent: ReservationRow
+    ) => {
+      return await EquipmentRepo.getEquipmentByID(parent.equipmentID);
+    },
+
+    user: async (
+      parent: ReservationRow
+    ) => {
+      return await UserRepo.getUserByID(parent.userID);
+    }
+  },
+
   Query: {
     reservation: async (
       _parent: any,
