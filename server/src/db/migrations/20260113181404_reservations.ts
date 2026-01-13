@@ -17,9 +17,9 @@ export async function up(knex: Knex): Promise<void> {
     t.integer("userID").references("id").inTable("Users").notNullable()
       .onUpdate("CASCADE").onDelete("CASCADE");
     t.string("description").notNullable();
-    t.boolean("approved").notNullable();
-    t.timestamp("start");
-    t.timestamp("end");
+    t.boolean("approved").notNullable().defaultTo(false);
+    t.timestamp("start").notNullable();
+    t.timestamp("end").notNullable();
   });
 
   await knex.schema.dropTableIfExists("ReservationEvents");
