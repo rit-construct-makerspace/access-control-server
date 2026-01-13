@@ -25,28 +25,20 @@ export async function deleteReservation(id: number): Promise<number> {
 }
 
 /**
- * 
- * @param start optional ISO 8601 timestamp from Date.toISOString()
- * @param end optional ISO 8601 timestamp from Date.toISOString()
+ * One endpoint to flexibly get resevations based on a variety of parameters
+ * @param range contains optional ISO 8601 timestamps from Date.toISOString() start and end, looks for reservations taht start or end within this range inclusively
  * @param equipmentIDs optional parameter to limit scope to a specific set of equipment
  */
-export async function getReservationsFlexibly(start?: string, end?: string, equipmentIDs?: number[]): Promise<ReservationRow[]> {
-  let time_query = knex("Reservations").select("*");
+export async function getReservationsFlexibly(range?: { start: string, end: string }, equipmentIDs?: number[]): Promise<ReservationRow[]> {
+  let query = knex("Reservations");
 
-  if (start !== undefined && end !== undefined) {
-    time_query = knex("Reservations").where("end", ">=", start).andWhere("start", "<=", end);
+  if (range !== undefined) {
+    query = query.where("end", ">=", range.start).andWhere("start", "<=", range.end);
   }
 
-  let equipment_query = knex("Reservations").select("*");
   if (equipmentIDs !== undefined) {
-    for (let i = 0; i < equipmentIDs.length; i++) {
-      if (i === 0) {
-        equipment_query = knex("Reservations").where("equipmentID", equipmentIDs[i]);
-      } else {
-        equipment_query = equipment_query.orWhere("equipmentID", equipmentIDs[i]);
-      }
-    }
+    query = query.whereIn("equipmentID", equipmentIDs);
   }
 
-  return knex("Reservations").where("id", "in", time_query).andWhere("id", "in", equipment_query).limit(200);
+  return await query.limit(200);
 }
