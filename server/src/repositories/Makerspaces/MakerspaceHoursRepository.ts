@@ -19,6 +19,11 @@ const day_formatter = new Intl.DateTimeFormat("en-US", {
     weekday: "long"
 });
 
+const date_formatter = new Intl.DateTimeFormat("en-us", {
+    timeZone: "America/New_York",
+    day: "numeric"
+})
+
 function dateToLocalizedNum(day: Date): number {
     switch (day_formatter.format(day)) {
         case "Sunday":
@@ -27,7 +32,7 @@ function dateToLocalizedNum(day: Date): number {
             return 1;
         case "Tuesday":
             return 2;
-        case "Wednsday":
+        case "Wednesday":
             return 3;
         case "Thursday":
             return 4;
@@ -82,11 +87,12 @@ export async function getMakerspaceHoursNextWeek(makerspaceID: number): Promise<
     var target = new Date();
     for (let i = 0; i < 7; i++) {
         await getMakerspaceHoursOnDay(target, makerspaceID).then((result) => {
-            week[result.day.getDay()] = { ...result, day: new Date(result.day) };
-            target.setDate(target.getDate() + 1);
+            week[dateToLocalizedNum(result.day)] = { ...result, day: new Date(result.day) };
+            target.setDate(Number(date_formatter.format(target)) + 1);
+            console.log(full_formatter.format(target));
         });
     }
-
+    console.log(week);
     return week;
 }
 
