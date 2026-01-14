@@ -76,6 +76,22 @@ export default function ReservationRequestPage() {
     }
   }
 
+  function handleEventResize(resize: { event: Event, start: Date, end: Date }) {
+    if (resize.event.title === "Draft Reservation") {
+      setStart(resize.start);
+      setEnd(resize.end);
+      setEvents(events.map(
+        (one_event) => {
+          if (one_event.title === resize.event.title) {
+            return { start: resize.start, end: resize.end, title: one_event.title };
+          } else {
+            return one_event;
+          }
+        }
+      ));
+    }
+  }
+
   return (
     <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
       <Stack width={"20%"} spacing={2}>
@@ -146,6 +162,7 @@ export default function ReservationRequestPage() {
             events={events}
             // @ts-ignore
             onEventDrop={handleEventDrop}
+            onEventResize={handleEventResize}
           />
         </Paper>
       </ThemeProvider>
