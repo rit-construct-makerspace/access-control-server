@@ -26,7 +26,7 @@ export default function ModuleStatusRow(props: ModuleStatusRowProps) {
 
   return (
     <CardActionArea onClick={() => navigate(navigateUrl)} sx={{ width: "unset" }}>
-      <Stack direction="row" spacing={1} alignItems="center" padding="10px" width="100%">
+      <Stack direction="row" spacing={1} alignItems="center" padding="7px" width="100%">
         {user.visitor ? (
           <RadioButtonUncheckedIcon color="secondary" />
         ) : props.ms.status === "Passed" ? (

@@ -1,4 +1,4 @@
-import { QuizItem } from "../../../types/Quiz";
+import { QuizItem, QuizItemType } from "../../../types/Quiz";
 import { Card, Typography } from "@mui/material";
 import Option from "./Option";
 import Markdown from "react-markdown";
@@ -13,7 +13,6 @@ const styles = {
     }
   }
 };
-
 
 interface QuestionProps {
   selectedOptionIDs: string[];
@@ -37,7 +36,9 @@ export default function Question({
               return <a target="_blank" rel="noopener noreferrer"{...props}>{children}</a>;
             },
           }}
-        >{quizItem.text}</Markdown>
+        >{quizItem.type === QuizItemType.Checkboxes 
+          ? quizItem.text + ` (Please select ${quizItem?.correctAnswers} choices.)`
+          : quizItem.text}</Markdown>
       </Typography>
       {quizItem.options?.map((o) => (
         <Option
