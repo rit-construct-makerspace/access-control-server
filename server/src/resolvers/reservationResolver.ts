@@ -3,6 +3,7 @@ import { ReservationRow } from "../db/tables.js";
 import * as ReservationRepo from "../repositories/Equipment/ReservationRepository.js"
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as UserRepo from "../repositories/Users/UserRepository.js";
+import { GraphQLError } from "graphql";
 
 const ReservationResolver = {
   Reservation: {
@@ -76,10 +77,16 @@ const ReservationResolver = {
       args: {
         id: number
       },
-      { isManager }: ApolloContext // Should really be isManagerFor
-    ) => isManager(async (user) => {
-      return await ReservationRepo.deleteReservation(args.id);
-    })
+      { ifManagerOrSelf }: ApolloContext // Should really be isManagerFor
+    ) => {
+      const target = await ReservationRepo.getReservationById(args.id);
+      if (!target) {
+        throw new GraphQLError(`Reservation ${args.id} does not exist`);
+      }
+      return ifManagerOrSelf(target.userID, async (user) => {
+        return await ReservationRepo.deleteReservation(args.id);
+      })
+    }
   }
 };
 
