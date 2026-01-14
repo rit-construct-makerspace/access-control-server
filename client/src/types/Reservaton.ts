@@ -10,3 +10,11 @@ export interface Reservation {
   equipment: Equipment,
   user: CurrentUser
 }
+
+export interface ReservationEvent {
+  title: React.ReactNode,
+  start: Date,
+  end: Date,
+  isDraggable: boolean,
+  reservation: Reservation
+}

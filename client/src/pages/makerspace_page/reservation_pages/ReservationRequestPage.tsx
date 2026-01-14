@@ -8,7 +8,7 @@ import startOfWeek from 'date-fns/startOfWeek'
 import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'; // if using DnD
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { LightTheme } from "../../../Theme";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
@@ -18,7 +18,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_RESERVATION, GET_RESERVATIONS_FLEXIBLY } from "../../../queries/reservationQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { toast } from "react-toastify";
-import { Reservation } from "../../../types/Reservaton";
+import { Reservation, ReservationEvent } from "../../../types/Reservaton";
 import { border, style } from "@mui/system";
 import ReservationModal from "./ReservationModal";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
@@ -46,14 +46,6 @@ const formatter = new Intl.DateTimeFormat("en-US", {
   hour: "numeric",
   minute: "2-digit"
 });
-
-interface ReservationEvent {
-  title: React.ReactNode,
-  start: Date,
-  end: Date,
-  isDraggable: boolean,
-  reservation: Reservation
-}
 
 export default function ReservationRequestPage() {
   const { makerspaceID, equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
