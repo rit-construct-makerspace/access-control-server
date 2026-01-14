@@ -12,7 +12,7 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css'; // if using DnD
 import { LightTheme } from "../../../Theme";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
-import CheckIcon from '@mui/icons-material/Check';
+import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_RESERVATION, GET_RESERVATIONS_FLEXIBLY } from "../../../queries/reservationQueries";
@@ -22,6 +22,7 @@ import { Reservation } from "../../../types/Reservaton";
 import { border, style } from "@mui/system";
 import ReservationModal from "./ReservationModal";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
+import { isManager, isManagerOrSelf } from "../../../common/PrivilegeUtils";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -167,16 +168,21 @@ export default function ReservationRequestPage() {
 
   return (
     <RequestWrapper2 result={getEquipmentById} render={(data) => {
+      const equipment = data.equipment;
       return (
         <RequestWrapper2 result={getReservationsResult} render={(data) => {
           const liveReservationEvents: ReservationEvent[] = data.reservations.map(
             (reservation: Reservation) => {
               return {
-                title: <Stack>
-                  <Typography variant="body1">{`${reservation.user.firstName} ${reservation.user.lastName}`}</Typography>
-                  <Typography variant="subtitle1">{reservation.approved ? "[Approved]" : "(Pending)"}</Typography>
-                  <Typography variant="body2">{reservation.description}</Typography>
-                </Stack>,
+                title: isManagerOrSelf(user, Number(reservation.user.id))
+                  ? <Stack>
+                    <Typography variant="body1">{isManager(user) ? reservation.user.ritUsername : reservation.user.firstName}</Typography>
+                    <Typography variant="subtitle1">{reservation.approved ? "[Approved]" : "(Pending)"}</Typography>
+                    <Typography variant="body2">{reservation.description}</Typography>
+                  </Stack>
+                  : <Stack>
+                    <Typography variant="subtitle1">{reservation.approved ? "[Approved]" : "(Pending)"}</Typography>
+                  </Stack>,
                 start: new Date(Number(reservation.start)),
                 end: new Date(Number(reservation.end)),
                 isDraggable: false,
@@ -187,8 +193,14 @@ export default function ReservationRequestPage() {
 
           return (
             <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
+              <title>{`Reserve ${equipment.name} | Make @ RIT`}</title>
               <Stack width={"20%"} spacing={2}>
-                <Typography variant="h5" textAlign={"center"}>{`Requesting a reservation for\n${"{equipment name}"}`}</Typography>
+                <Typography variant="h5" textAlign={"center"}>
+                  Requesting a reservation for:
+                  <Typography variant="inherit">
+                    {equipment.name}
+                  </Typography>
+                </Typography>
                 {
                   selectionMade ?
                     <Stack spacing={2}>
@@ -224,12 +236,12 @@ export default function ReservationRequestPage() {
                           Cancel
                         </Button>
                         <Button
-                          color="success"
+                          color="secondary"
                           variant="contained"
-                          startIcon={<CheckIcon />}
+                          startIcon={<InsertInvitationIcon />}
                           onClick={() => handleSubmitReservation()}
                         >
-                          Confirm
+                          Request
                         </Button>
                       </Stack>
                     </Stack>

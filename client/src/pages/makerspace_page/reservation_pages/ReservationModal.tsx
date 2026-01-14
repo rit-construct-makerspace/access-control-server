@@ -2,7 +2,7 @@ import { Button, Card, Stack, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import { Reservation } from "../../../types/Reservaton";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { isManager } from "../../../common/PrivilegeUtils";
+import { isManager, isManagerOrSelf } from "../../../common/PrivilegeUtils";
 import { useMutation } from "@apollo/client";
 import { DELETE_RESERVATION, SET_RESERVATION_APPROVAL } from "../../../queries/reservationQueries";
 import { toast } from "react-toastify";
@@ -74,7 +74,11 @@ export default function ReservationModal(props: ReservationModalProps) {
   return (
     <PrettyModal open={props.open} onClose={props.onClose} width={"500px"}>
       <Stack spacing={2}>
-        <Typography variant="h5">{`${props.reservation.user.firstName}'s ${props.reservation.equipment.name} Reservation`}</Typography>
+        {
+          isManagerOrSelf(user, Number(props.reservation.user.id))
+            ? <Typography variant="h5">{`${props.reservation.user.firstName}'s (${props.reservation.user.ritUsername}) ${props.reservation.equipment.name} Reservation`}</Typography>
+            : <Typography variant="h5">{`${props.reservation.equipment.name} Reservation`}</Typography>
+        }
         <Card sx={{ width: "100%", padding: "10px" }} elevation={5}>
           <Stack spacing={2}>
             <Stack direction={"row"} justifyContent={"space-between"}>
@@ -88,11 +92,12 @@ export default function ReservationModal(props: ReservationModalProps) {
           </Stack>
         </Card>
         {
-          props.reservation.description === "" ? null :
-            <Stack>
+          (isManagerOrSelf(user, Number(props.reservation.user.id)) && props.reservation.description !== "")
+            ? <Stack>
               <Typography variant="subtitle1">Description:</Typography>
               <Typography>{props.reservation.description}</Typography>
             </Stack>
+            : null
         }
         <Stack direction={"row"} justifyContent={"space-between"}>
           <Button
@@ -100,7 +105,7 @@ export default function ReservationModal(props: ReservationModalProps) {
             variant="contained"
             onClick={props.onClose}
           >
-            Cancel
+            Close
           </Button>
           <Stack direction={"row"} spacing={2}>
             {

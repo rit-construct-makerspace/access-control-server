@@ -29,6 +29,7 @@ export const GET_RESERVATIONS_FLEXIBLY = gql`
         id
         firstName
         lastName
+        ritUsername
       }
       equipment {
         id
