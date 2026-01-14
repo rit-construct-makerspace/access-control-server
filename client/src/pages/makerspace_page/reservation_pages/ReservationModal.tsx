@@ -3,6 +3,9 @@ import PrettyModal from "../../../common/PrettyModal";
 import { Reservation } from "../../../types/Reservaton";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManager } from "../../../common/PrivilegeUtils";
+import { useMutation } from "@apollo/client";
+import { DELETE_RESERVATION, SET_RESERVATION_APPROVAL } from "../../../queries/reservationQueries";
+import { toast } from "react-toastify";
 
 interface ReservationModalProps {
   open: boolean,
@@ -24,6 +27,29 @@ export default function ReservationModal(props: ReservationModalProps) {
 
   if (props.reservation === undefined) {
     return;
+  }
+
+  const [setReservationApproval] = useMutation(SET_RESERVATION_APPROVAL, { refetchQueries: ["Reservations"] });
+  const [deleteReservation] = useMutation(DELETE_RESERVATION, { refetchQueries: ["Reservations"] });
+
+  function handleReservationApproval() {
+    if (!props.reservation) {
+      return;
+    }
+
+    try {
+      setReservationApproval({
+        variables: {
+          id: props.reservation.id,
+          approve: !props.reservation.approved
+        }
+      })
+    } catch (e) {
+      toast.error("Failed to modify approval: " + e);
+    }
+
+    toast.success(`Reservation ${props.reservation.approved ? "Unapproved" : "Approved"}`)
+    props.onClose();
   }
 
   return (
@@ -63,6 +89,7 @@ export default function ReservationModal(props: ReservationModalProps) {
                 <Button
                   color={props.reservation.approved ? "warning" : "success"}
                   variant="contained"
+                  onClick={handleReservationApproval}
                 >
                   {props.reservation.approved ? "Unapprove" : "Approve"}
                 </Button>
