@@ -52,6 +52,25 @@ export default function ReservationModal(props: ReservationModalProps) {
     props.onClose();
   }
 
+  function handleDeleteReservation() {
+    if (!props.reservation) {
+      return;
+    }
+
+    try {
+      deleteReservation({
+        variables: {
+          id: props.reservation.id
+        }
+      })
+    } catch (e) {
+      toast.error("Failed to delete reservation: " + e);
+    }
+
+    toast.success("Deleted Reservation")
+    props.onClose();
+  }
+
   return (
     <PrettyModal open={props.open} onClose={props.onClose} width={"500px"}>
       <Stack spacing={2}>
@@ -100,6 +119,7 @@ export default function ReservationModal(props: ReservationModalProps) {
                 <Button
                   color="error"
                   variant="contained"
+                  onClick={handleDeleteReservation}
                 >
                   Delete
                 </Button>
