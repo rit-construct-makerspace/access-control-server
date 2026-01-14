@@ -21,6 +21,7 @@ import { toast } from "react-toastify";
 import { Reservation } from "../../../types/Reservaton";
 import { border, style } from "@mui/system";
 import ReservationModal from "./ReservationModal";
+import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -45,22 +46,32 @@ const formatter = new Intl.DateTimeFormat("en-US", {
   minute: "2-digit"
 });
 
+interface ReservationEvent {
+  title: React.ReactNode,
+  start: Date,
+  end: Date,
+  isDraggable: boolean,
+  reservation: Reservation
+}
+
 export default function ReservationRequestPage() {
   const { makerspaceID, equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
   const user = useCurrentUser();
 
   const lightTheme = (new LightTheme).getTheme();
 
-  const [range, setRange] = useState<{ start: Date, end: Date }>(
-    { start: new Date(localizer.startOf(new Date(), "week", 0)), end: localizer.endOf(new Date(), "week", 0) }
-  );
-
   const getReservationsResult = useQuery(GET_RESERVATIONS_FLEXIBLY, {
     variables: {
-      range: { start: range.start, end: range.end },
+      range: {
+        start: localizer.startOf(new Date(), "week", 0).toISOString(),
+        end: localizer.endOf(new Date(), "week", 0).toISOString()
+      },
       equipmentIDs: [Number(equipmentID)]
     }
   });
+
+  const getEquipmentById = useQuery(GET_EQUIPMENT_BY_ID, { variables: { id: equipmentID } })
+
   const [createReservation] = useMutation(CREATE_RESERVATION, { refetchQueries: ["Reservations"] });
 
   const [draftReservation, setDraftReservation] = useState<Event>({ title: "Draft Reservation", start: undefined, end: undefined });
@@ -108,7 +119,7 @@ export default function ReservationRequestPage() {
     setDescription("");
   }
 
-  function eventPropGetter(event: Event, start: Date, end: Date, isSelected: boolean) {
+  function eventPropGetter(event: ReservationEvent, start: Date, end: Date, isSelected: boolean) {
     if (event.title?.toString().includes("Draft")) {
       return {
         style: {
@@ -116,7 +127,7 @@ export default function ReservationRequestPage() {
           border: "0px"
         }
       }
-    } else if (event.title?.toString().includes("Pending")) {
+    } else if (!event.reservation.approved) {
       return {
         style: {
           backgroundColor: lightTheme.palette.secondary.main,
@@ -133,10 +144,20 @@ export default function ReservationRequestPage() {
     }
   }
 
+  function handleRangeChange(dates: Date[]) {
+    getReservationsResult.refetch({
+      range: {
+        start: localizer.startOf(dates[0], "day").toISOString(),
+        end: localizer.endOf(dates[6], "day").toISOString()
+      },
+      equipmentIDs: [Number(equipmentID)]
+    });
+  }
+
   const [targetReservation, setTargetReservation] = useState<Reservation>();
   const [reservationModal, setReservationModal] = useState(false);
-  function handleEventSelect(event: { title: string, start: Date, end: Date, isDraggable: boolean, reservation: Reservation }) {
-    if (event.title.includes("Draft")) {
+  function handleEventSelect(event: ReservationEvent) {
+    if (event.title?.toString().includes("Draft")) {
       return;
     }
 
@@ -145,103 +166,110 @@ export default function ReservationRequestPage() {
   }
 
   return (
-    <RequestWrapper2 result={getReservationsResult} render={(data) => {
-      const liveReservationEvents = data.reservations.map(
-        (reservation: Reservation) => {
-          return {
-            title: `${reservation.approved ? null : "(Pending) "}${reservation.user.firstName} ${reservation.user.lastName}`,
-            start: new Date(Number(reservation.start)),
-            end: new Date(Number(reservation.end)),
-            isDraggable: false,
-            reservation: reservation,
-          }
-        }
-      );
-
-      console.log(liveReservationEvents);
-
+    <RequestWrapper2 result={getEquipmentById} render={(data) => {
       return (
-        <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
-          <Stack width={"20%"} spacing={2}>
-            <Typography variant="h5" textAlign={"center"}>{`Requesting a reservation for\n${"{equipment name}"}`}</Typography>
-            {
-              selectionMade ?
-                <Stack spacing={2}>
-                  <Card sx={{ width: "100%", padding: "10px" }}>
+        <RequestWrapper2 result={getReservationsResult} render={(data) => {
+          const liveReservationEvents: ReservationEvent[] = data.reservations.map(
+            (reservation: Reservation) => {
+              return {
+                title: <Stack>
+                  <Typography variant="body1">{`${reservation.user.firstName} ${reservation.user.lastName}`}</Typography>
+                  <Typography variant="subtitle1">{reservation.approved ? "[Approved]" : "(Pending)"}</Typography>
+                  <Typography variant="body2">{reservation.description}</Typography>
+                </Stack>,
+                start: new Date(Number(reservation.start)),
+                end: new Date(Number(reservation.end)),
+                isDraggable: false,
+                reservation: reservation,
+              }
+            }
+          );
+
+          return (
+            <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
+              <Stack width={"20%"} spacing={2}>
+                <Typography variant="h5" textAlign={"center"}>{`Requesting a reservation for\n${"{equipment name}"}`}</Typography>
+                {
+                  selectionMade ?
                     <Stack spacing={2}>
+                      <Card sx={{ width: "100%", padding: "10px" }}>
+                        <Stack spacing={2}>
+                          <Stack direction={"row"} justifyContent={"space-between"}>
+                            <Typography fontWeight={"bold"}>From:</Typography>
+                            <Typography>{formatter.format(draftReservation.start)}</Typography>
+                          </Stack>
+                          <Stack direction={"row"} justifyContent={"space-between"}>
+                            <Typography fontWeight={"bold"}>To:</Typography>
+                            <Typography>{formatter.format(draftReservation.end)}</Typography>
+                          </Stack>
+                        </Stack>
+                      </Card>
+                      <TextField
+                        multiline
+                        rows={3}
+                        placeholder="Description..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                      />
                       <Stack direction={"row"} justifyContent={"space-between"}>
-                        <Typography fontWeight={"bold"}>From:</Typography>
-                        <Typography>{formatter.format(draftReservation.start)}</Typography>
-                      </Stack>
-                      <Stack direction={"row"} justifyContent={"space-between"}>
-                        <Typography fontWeight={"bold"}>To:</Typography>
-                        <Typography>{formatter.format(draftReservation.end)}</Typography>
+                        <Button
+                          color="error"
+                          variant="contained"
+                          startIcon={<CloseIcon />}
+                          onClick={() => {
+                            setDraftReservation({ ...draftReservation, start: undefined, end: undefined });
+                            setDescription("");
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          color="success"
+                          variant="contained"
+                          startIcon={<CheckIcon />}
+                          onClick={() => handleSubmitReservation()}
+                        >
+                          Confirm
+                        </Button>
                       </Stack>
                     </Stack>
-                  </Card>
-                  <TextField
-                    multiline
-                    rows={3}
-                    placeholder="Description..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    : null
+                }
+              </Stack>
+              {/* The calendar CSS does not like dark mode, so we wrap it in light theme and put in on a <Paper/> to ensure it is legible */}
+              <ThemeProvider theme={lightTheme}>
+                <Paper
+                  sx={{
+                    width: "80%"
+                  }}
+                >
+                  <DnDCalendar
+                    localizer={localizer}
+                    defaultView={"week"}
+                    views={["week"]}
+                    selectable={true}
+                    step={15}
+                    timeslots={2}
+                    scrollToTime={new Date((new Date()).setHours(9, 0, 0, 0))}
+                    style={{
+                      height: 800
+                    }}
+                    eventPropGetter={eventPropGetter}
+                    onSelectSlot={handleSlotSelect}
+                    events={[...liveReservationEvents, { ...draftReservation, isDraggable: true }]}
+                    onSelectEvent={handleEventSelect}
+                    onRangeChange={handleRangeChange}
+                    // @ts-ignore
+                    onEventDrop={handleEventDrop}
+                    onEventResize={handleEventResize}
+                    draggableAccessor={"isDraggable"}
                   />
-                  <Stack direction={"row"} justifyContent={"space-between"}>
-                    <Button
-                      color="error"
-                      variant="contained"
-                      startIcon={<CloseIcon />}
-                      onClick={() => {
-                        setDraftReservation({ ...draftReservation, start: undefined, end: undefined });
-                        setDescription("");
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      color="success"
-                      variant="contained"
-                      startIcon={<CheckIcon />}
-                      onClick={() => handleSubmitReservation()}
-                    >
-                      Confirm
-                    </Button>
-                  </Stack>
-                </Stack>
-                : null
-            }
-          </Stack>
-          {/* The calendar CSS does not like dark mode, so we wrap it in light theme and put in on a <Paper/> to ensure it is legible */}
-          <ThemeProvider theme={lightTheme}>
-            <Paper
-              sx={{
-                width: "80%"
-              }}
-            >
-              <DnDCalendar
-                localizer={localizer}
-                defaultView={"week"}
-                views={["week"]}
-                selectable={true}
-                step={15}
-                timeslots={2}
-                scrollToTime={new Date((new Date()).setHours(9, 0, 0, 0))}
-                style={{
-                  height: 800
-                }}
-                eventPropGetter={eventPropGetter}
-                onSelectSlot={handleSlotSelect}
-                events={[...liveReservationEvents, { ...draftReservation, isDraggable: true }]}
-                onSelectEvent={handleEventSelect}
-                // @ts-ignore
-                onEventDrop={handleEventDrop}
-                onEventResize={handleEventResize}
-                draggableAccessor={"isDraggable"}
-              />
-            </Paper>
-          </ThemeProvider>
-          <ReservationModal open={reservationModal} onClose={() => setReservationModal(false)} reservation={targetReservation} />
-        </Stack >
+                </Paper>
+              </ThemeProvider>
+              <ReservationModal open={reservationModal} onClose={() => setReservationModal(false)} reservation={targetReservation} />
+            </Stack >
+          );
+        }} />
       )
     }} />
   );
