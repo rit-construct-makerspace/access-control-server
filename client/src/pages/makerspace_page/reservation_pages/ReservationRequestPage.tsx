@@ -14,6 +14,12 @@ import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import { useMutation, useQuery } from "@apollo/client";
+import { CREATE_RESERVATION, GET_RESERVATIONS_FLEXIBLY } from "../../../queries/reservationQueries";
+import RequestWrapper2 from "../../../common/RequestWrapper2";
+import { toast } from "react-toastify";
+import { Reservation } from "../../../types/Reservaton";
+import { border, style } from "@mui/system";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -42,18 +48,29 @@ export default function ReservationRequestPage() {
   const { makerspaceID, equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
   const user = useCurrentUser();
 
+  const lightTheme = (new LightTheme).getTheme();
+
+  const [range, setRange] = useState<{ start: Date, end: Date }>(
+    { start: new Date(localizer.startOf(new Date(), "week", 0)), end: localizer.endOf(new Date(), "week", 0) }
+  );
+
+  const getReservationsResult = useQuery(GET_RESERVATIONS_FLEXIBLY, {
+    variables: {
+      range: { start: range.start, end: range.end },
+      equipmentIDs: [Number(equipmentID)]
+    }
+  });
+  const [createReservation] = useMutation(CREATE_RESERVATION, { refetchQueries: ["Reservations"] });
+
   const [draftReservation, setDraftReservation] = useState<Event>({ title: "Draft Reservation", start: undefined, end: undefined });
   const selectionMade = draftReservation.start !== undefined && draftReservation.end !== undefined;
 
   const [description, setDescription] = useState("");
 
-  const [events, setEvents] = useState<Event[]>([]);
-
   function handleSlotSelect(selection: SlotInfo) {
     if (selection.action === "select") {
       setDraftReservation({ ...draftReservation, start: selection.start, end: selection.end })
     }
-
   }
 
   function handleEventDrop(drop: { event: Event, start: Date, end: Date, isAllDay: boolean }) {
@@ -68,83 +85,150 @@ export default function ReservationRequestPage() {
     }
   }
 
+  async function handleSubmitReservation() {
+    if (!selectionMade) return;
+    try {
+      await createReservation({
+        variables: {
+          userID: Number(user.id),
+          equipmentID: Number(equipmentID),
+          start: draftReservation.start?.toISOString(),
+          end: draftReservation.end?.toISOString(),
+          description: description
+        }
+      });
+    } catch (e) {
+      toast.error("Failed to request reservation: " + e);
+      return;
+    }
+
+    toast.success("Request made!");
+    setDraftReservation({ ...draftReservation, start: undefined, end: undefined });
+    setDescription("");
+  }
+
+  function eventPropGetter(event: Event, start: Date, end: Date, isSelected: boolean) {
+    if (event.title?.toString().includes("Draft")) {
+      return {
+        style: {
+          backgroundColor: lightTheme.palette.info.main,
+          border: "0px"
+        }
+      }
+    } else if (event.title?.toString().includes("Pending")) {
+      return {
+        style: {
+          backgroundColor: lightTheme.palette.secondary.main,
+          border: "0px"
+        }
+      }
+    } else {
+      return {
+        style: {
+          backgroundColor: lightTheme.palette.primary.main,
+          border: "0px"
+        }
+      }
+    }
+  }
+
   return (
-    <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
-      <Stack width={"20%"} spacing={2}>
-        <Typography variant="h5" textAlign={"center"}>{`Requesting a reservation for\n${"{equipment name}"}`}</Typography>
-        {
-          selectionMade ?
-            <Stack spacing={2}>
-              <Card sx={{ width: "100%", padding: "10px" }}>
+    <RequestWrapper2 result={getReservationsResult} render={(data) => {
+      const liveReservationEvents = data.reservations.map(
+        (reservation: Reservation) => {
+          console.log(reservation);
+          return {
+            title: `${reservation.approved ? null : "(Pending) "}${reservation.user.firstName} ${reservation.user.lastName}`,
+            start: new Date(Number(reservation.start)),
+            end: new Date(Number(reservation.end)),
+            isDraggable: false,
+          }
+        }
+      );
+
+      console.log(liveReservationEvents);
+
+      return (
+        <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
+          <Stack width={"20%"} spacing={2}>
+            <Typography variant="h5" textAlign={"center"}>{`Requesting a reservation for\n${"{equipment name}"}`}</Typography>
+            {
+              selectionMade ?
                 <Stack spacing={2}>
+                  <Card sx={{ width: "100%", padding: "10px" }}>
+                    <Stack spacing={2}>
+                      <Stack direction={"row"} justifyContent={"space-between"}>
+                        <Typography fontWeight={"bold"}>From:</Typography>
+                        <Typography>{formatter.format(draftReservation.start)}</Typography>
+                      </Stack>
+                      <Stack direction={"row"} justifyContent={"space-between"}>
+                        <Typography fontWeight={"bold"}>To:</Typography>
+                        <Typography>{formatter.format(draftReservation.end)}</Typography>
+                      </Stack>
+                    </Stack>
+                  </Card>
+                  <TextField
+                    multiline
+                    rows={3}
+                    placeholder="Description..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
                   <Stack direction={"row"} justifyContent={"space-between"}>
-                    <Typography fontWeight={"bold"}>From:</Typography>
-                    <Typography>{formatter.format(draftReservation.start)}</Typography>
-                  </Stack>
-                  <Stack direction={"row"} justifyContent={"space-between"}>
-                    <Typography fontWeight={"bold"}>To:</Typography>
-                    <Typography>{formatter.format(draftReservation.end)}</Typography>
+                    <Button
+                      color="error"
+                      variant="contained"
+                      startIcon={<CloseIcon />}
+                      onClick={() => {
+                        setDraftReservation({ ...draftReservation, start: undefined, end: undefined });
+                        setDescription("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      color="success"
+                      variant="contained"
+                      startIcon={<CheckIcon />}
+                      onClick={() => handleSubmitReservation()}
+                    >
+                      Confirm
+                    </Button>
                   </Stack>
                 </Stack>
-              </Card>
-              <TextField
-                multiline
-                rows={3}
-                placeholder="Description..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                : null
+            }
+          </Stack>
+          {/* The calendar CSS does not like dark mode, so we wrap it in light theme and put in on a <Paper/> to ensure it is legible */}
+          <ThemeProvider theme={lightTheme}>
+            <Paper
+              sx={{
+                width: "80%"
+              }}
+            >
+              <DnDCalendar
+                localizer={localizer}
+                defaultView={"week"}
+                views={["week"]}
+                selectable={true}
+                step={15}
+                timeslots={2}
+                scrollToTime={new Date((new Date()).setHours(9, 0, 0, 0))}
+                style={{
+                  height: 800
+                }}
+                eventPropGetter={eventPropGetter}
+                onSelectSlot={handleSlotSelect}
+                events={[...liveReservationEvents, { ...draftReservation, isDraggable: true }]}
+                // @ts-ignore
+                onEventDrop={handleEventDrop}
+                onEventResize={handleEventResize}
+                draggableAccessor={"isDraggable"}
               />
-              <Stack direction={"row"} justifyContent={"space-between"}>
-                <Button
-                  color="error"
-                  variant="contained"
-                  startIcon={<CloseIcon />}
-                  onClick={() => {
-                    setDraftReservation({ ...draftReservation, start: undefined, end: undefined });
-                    setDescription("");
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  color="success"
-                  variant="contained"
-                  startIcon={<CheckIcon />}
-                  onClick={() => {/* Submit Event */ }}
-                >
-                  Confirm
-                </Button>
-              </Stack>
-            </Stack>
-            : null
-        }
-      </Stack>
-      {/* The calendar CSS does not like dark mode, so we wrap it in light theme and put in on a <Paper/> to ensure it is legible */}
-      <ThemeProvider theme={(new LightTheme).getTheme()}>
-        <Paper
-          sx={{
-            width: "80%"
-          }}
-        >
-          <DnDCalendar
-            localizer={localizer}
-            defaultView={"week"}
-            views={["week"]}
-            selectable={true}
-            step={15}
-            timeslots={2}
-            scrollToTime={new Date((new Date()).setHours(9, 0, 0, 0))}
-            style={{
-              height: 800
-            }}
-            onSelectSlot={handleSlotSelect}
-            events={[...events, draftReservation]}
-            // @ts-ignore
-            onEventDrop={handleEventDrop}
-            onEventResize={handleEventResize}
-          />
-        </Paper>
-      </ThemeProvider>
-    </Stack >
+            </Paper>
+          </ThemeProvider>
+        </Stack >
+      )
+    }} />
   );
 }
