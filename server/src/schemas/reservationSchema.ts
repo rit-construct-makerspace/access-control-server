@@ -8,6 +8,7 @@ export const ReservationTypeDefs = gql`
     start: String!,
     end: String!,
     description: String,
+    approved: Boolean!,
     equipment: Equipment!,
     user: User!
   }
