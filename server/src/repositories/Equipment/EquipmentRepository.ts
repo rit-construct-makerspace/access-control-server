@@ -16,7 +16,7 @@ import * as UserRepo from "../Users/UserRepository.js";
  */
 export async function getEquipment(): Promise<EquipmentRow[]> {
   return knex("Equipment")
-          .select();
+    .select();
 }
 
 /**
@@ -26,8 +26,8 @@ export async function getEquipment(): Promise<EquipmentRow[]> {
  */
 export async function getEquipmentWhereArchived(archived: boolean): Promise<EquipmentRow[]> {
   return knex("Equipment")
-          .select()
-          .where({archived: archived});
+    .select()
+    .where({ archived: archived });
 }
 
 /**
@@ -38,10 +38,10 @@ export async function getEquipmentWhereArchived(archived: boolean): Promise<Equi
  */
 export async function getEquipmentByID(id: number): Promise<EquipmentRow> {
   const equipment = await knex("Equipment")
-                            .where({
-                              id: id
-                            })
-                            .first();
+    .where({
+      id: id
+    })
+    .first();
 
   if (!equipment) throw new EntityNotFound(`Could not find equipment #${id}`);
 
@@ -57,11 +57,11 @@ export async function getEquipmentByID(id: number): Promise<EquipmentRow> {
  */
 export async function getEquipmentByIDWhereArchived(id: number, archived: boolean): Promise<EquipmentRow> {
   const equipment = await knex("Equipment")
-                            .where({
-                              id: id,
-                              archived: archived
-                            })
-                            .first();
+    .where({
+      id: id,
+      archived: archived
+    })
+    .first();
 
   if (!equipment) throw new EntityNotFound(`Could not find equipment #${id}`);
 
@@ -77,9 +77,9 @@ export async function getEquipmentByIDWhereArchived(id: number, archived: boolea
  */
 export async function setEquipmentArchived(equipmentID: number, archived: boolean): Promise<EquipmentRow> {
   const updatedEquipment = await knex("Equipment")
-                                  .where({ id: equipmentID })
-                                  .update({ archived: archived })
-                                  .returning("*");
+    .where({ id: equipmentID })
+    .update({ archived: archived })
+    .returning("*");
 
   if (updatedEquipment.length < 1) throw new EntityNotFound(`Could not find equipment #${equipmentID}`);
 
@@ -97,10 +97,10 @@ export async function getEquipmentWithRoomID(
   archived: boolean
 ): Promise<EquipmentRow[]> {
   return knex("Equipment")
-          .select()
-          .where({
-            roomID: roomID,
-          });
+    .select()
+    .where({
+      roomID: roomID,
+    });
 }
 
 /**
@@ -112,9 +112,9 @@ export async function getModulesByEquipment(
   equipmentID: number
 ): Promise<TrainingModuleRow[]> {
   return await knex("ModulesForEquipment")
-  .join("TrainingModule", "TrainingModule.id", "ModulesForEquipment.moduleID")
-  .select("TrainingModule.*")
-  .where("ModulesForEquipment.equipmentID", equipmentID);
+    .join("TrainingModule", "TrainingModule.id", "ModulesForEquipment.moduleID")
+    .select("TrainingModule.*")
+    .where("ModulesForEquipment.equipmentID", equipmentID);
 }
 
 /**
@@ -130,7 +130,7 @@ export async function hasTrainingModules(
   let modules = await getModulesByEquipment(equipmentID);
   let hasTraining = true;
   // get last submission from maker for every module
-  for(let i = 0; i < modules.length; i++) {
+  for (let i = 0; i < modules.length; i++) {
     if (await ModuleRepo.hasPassedModule(user.id, modules[i].id)) {
       continue;
     }
@@ -155,7 +155,7 @@ export async function getMissingTrainingModules(
   let modules = await getModulesByEquipment(equipmentID);
   let incompleteTrainings = [];
   // get last submission from maker for every module
-  for(let i = 0; i < modules.length; i++) {
+  for (let i = 0; i < modules.length; i++) {
     if (await ModuleRepo.hasPassedModule(user.id, modules[i].id)) {
       continue;
     }
@@ -180,7 +180,7 @@ export async function UserIdHasTrainingModules(
   let modules = await getModulesByEquipment(equipmentID);
   let hasTraining = true;
   // get last submission from maker for every module
-  for(let i = 0; i < modules.length; i++) {
+  for (let i = 0; i < modules.length; i++) {
     if (await ModuleRepo.hasPassedModule(userID, modules[i].id)) {
       continue;
     }
@@ -272,7 +272,8 @@ export async function updateEquipment(
     byReservationOnly: equipment.byReservationOnly,
     needsWelcome: equipment.needsWelcome ?? true,
     requiresTrainerApproval: equipment.requiresTrainerApproval,
-    requiresInPerson: equipment.requiresInPerson
+    requiresInPerson: equipment.requiresInPerson,
+    schedulable: equipment.schedulable
   });
 
   await updateModules(id, equipment.moduleIDs);

@@ -79,6 +79,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [needsWelcome, setNeedsWelcome] = useState(props.equipment.needsWelcome);
   const [requiresTrainer, setRequiresTrainer] = useState(props.equipment.requiresTrainerApproval);
   const [requiresInPerson, setRequiresInPerson] = useState(props.equipment.requiresInPerson);
+  const [schedulable, setSchedulable] = useState(props.equipment.schedulable);
   const [room, setRoom] = useState(props.equipment.room);
   const [moduleIDs, setModuleIds] = useState(props.equipment.trainingModules.map((mod) => mod.id));
   const [unsaved, setUnsaved] = useState(false);
@@ -98,6 +99,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         needsWelcome: needsWelcome,
         requiresTrainerApproval: requiresTrainer,
         requiresInPerson: requiresInPerson,
+        schedulable: schedulable,
       },
     });
 
@@ -127,7 +129,8 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
       requiresTrainer !== props.equipment.requiresTrainerApproval ||
       requiresInPerson !== props.equipment.requiresInPerson ||
       room.id !== props.equipment.room.id ||
-      moduleIDs.length !== props.equipment.trainingModules.length
+      moduleIDs.length !== props.equipment.trainingModules.length ||
+      schedulable !== props.equipment.schedulable
     );
   }, [
     name,
@@ -140,6 +143,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
     requiresInPerson,
     room.id,
     moduleIDs.length,
+    schedulable,
   ]);
 
   useEffect(() => {
@@ -252,6 +256,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             needsWelcome ? "needsWelcome" : null,
             requiresTrainer ? "requiresTrainer" : null,
             requiresInPerson ? "requiresInPerson" : null,
+            schedulable ? "schedulable" : null
           ]}
           sx={{ alignSelf: "center" }}
         >
@@ -266,6 +271,9 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
           </ToggleButton>
           <ToggleButton value={"requiresInPerson"} onClick={() => setRequiresInPerson(!requiresInPerson)}>
             Requires Sign-Off
+          </ToggleButton>
+          <ToggleButton value={"schedulable"} onClick={() => setSchedulable(!schedulable)}>
+            Schedulable
           </ToggleButton>
         </ToggleButtonGroup>
         <EquipmentTrainings
