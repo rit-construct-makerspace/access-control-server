@@ -2,26 +2,26 @@ import { ReservationRow } from "../../db/tables.js";
 import { knex } from "../../db/index.js";
 
 export async function createReservation(userID: number, equipmentID: number, start: string, end: string, description?: string): Promise<ReservationRow> {
-  return knex("Reservations").insert({
+  return (await knex("Reservations").insert({
     userID: userID,
     equipmentID: equipmentID,
     start: start,
     end: end,
     description: description ?? ""
-  });
+  }).returning("*"))[0];
 }
 
 export async function getReservationById(id: number): Promise<ReservationRow | undefined> {
-  return knex("Reservations").select().where({ id: id }).first();
+  return await knex("Reservations").select().where({ id: id }).first();
 }
 
 export async function setReservationApproval(id: number, approve: boolean): Promise<ReservationRow | undefined> {
   await knex("Reservations").update({ approved: approve }).where({ id: id });
-  return getReservationById(id);
+  return await getReservationById(id);
 }
 
 export async function deleteReservation(id: number): Promise<number> {
-  return knex("Reservations").delete().where({ id: id });
+  return await knex("Reservations").delete().where({ id: id });
 }
 
 /**
