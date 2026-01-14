@@ -305,6 +305,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               notes: notes,
               archived: props.equipment.archived,
               requiresInPerson: requiresInPerson,
+              schedulable: schedulable
             }}
             isMobile={isMobile}
             staffMode={false}

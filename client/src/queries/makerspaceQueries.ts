@@ -183,7 +183,7 @@ export const GET_MAKERSPACE_BY_ID = gql`
           byReservationOnly
           needsWelcome
           requiresInPerson
-
+          schedulable
           notes
           archived
         }
