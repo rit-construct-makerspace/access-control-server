@@ -42,9 +42,8 @@ export default function ReservationRequestPage() {
   const { makerspaceID, equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
   const user = useCurrentUser();
 
-  const [start, setStart] = useState<Date | undefined>(undefined);
-  const [end, setEnd] = useState<Date | undefined>(undefined);
-  const selectionMade = start !== undefined && end !== undefined;
+  const [draftReservation, setDraftReservation] = useState<Event>({ title: "Draft Reservation", start: undefined, end: undefined });
+  const selectionMade = draftReservation.start !== undefined && draftReservation.end !== undefined;
 
   const [description, setDescription] = useState("");
 
@@ -52,43 +51,20 @@ export default function ReservationRequestPage() {
 
   function handleSlotSelect(selection: SlotInfo) {
     if (selection.action === "select") {
-      setStart(selection.start);
-      setEnd(selection.end);
-
-      setEvents([...events, { title: "Draft Reservation", start: selection.start, end: selection.end }]);
+      setDraftReservation({ ...draftReservation, start: selection.start, end: selection.end })
     }
 
   }
 
   function handleEventDrop(drop: { event: Event, start: Date, end: Date, isAllDay: boolean }) {
     if (drop.event.title === "Draft Reservation") {
-      setStart(drop.start);
-      setEnd(drop.end);
-      setEvents(events.map(
-        (one_event) => {
-          if (one_event.title === drop.event.title) {
-            return { start: drop.start, end: drop.end, title: one_event.title };
-          } else {
-            return one_event;
-          }
-        }
-      ));
+      setDraftReservation({ ...draftReservation, start: drop.start, end: drop.end });
     }
   }
 
   function handleEventResize(resize: { event: Event, start: Date, end: Date }) {
     if (resize.event.title === "Draft Reservation") {
-      setStart(resize.start);
-      setEnd(resize.end);
-      setEvents(events.map(
-        (one_event) => {
-          if (one_event.title === resize.event.title) {
-            return { start: resize.start, end: resize.end, title: one_event.title };
-          } else {
-            return one_event;
-          }
-        }
-      ));
+      setDraftReservation({ ...draftReservation, start: resize.start, end: resize.end });
     }
   }
 
@@ -103,11 +79,11 @@ export default function ReservationRequestPage() {
                 <Stack spacing={2}>
                   <Stack direction={"row"} justifyContent={"space-between"}>
                     <Typography fontWeight={"bold"}>From:</Typography>
-                    <Typography>{formatter.format(start)}</Typography>
+                    <Typography>{formatter.format(draftReservation.start)}</Typography>
                   </Stack>
                   <Stack direction={"row"} justifyContent={"space-between"}>
                     <Typography fontWeight={"bold"}>To:</Typography>
-                    <Typography>{formatter.format(end)}</Typography>
+                    <Typography>{formatter.format(draftReservation.end)}</Typography>
                   </Stack>
                 </Stack>
               </Card>
@@ -123,7 +99,10 @@ export default function ReservationRequestPage() {
                   color="error"
                   variant="contained"
                   startIcon={<CloseIcon />}
-                  onClick={() => { setStart(undefined); setEnd(undefined); setDescription("") }}
+                  onClick={() => {
+                    setDraftReservation({ ...draftReservation, start: undefined, end: undefined });
+                    setDescription("");
+                  }}
                 >
                   Cancel
                 </Button>
@@ -159,7 +138,7 @@ export default function ReservationRequestPage() {
               height: 800
             }}
             onSelectSlot={handleSlotSelect}
-            events={events}
+            events={[...events, draftReservation]}
             // @ts-ignore
             onEventDrop={handleEventDrop}
             onEventResize={handleEventResize}
