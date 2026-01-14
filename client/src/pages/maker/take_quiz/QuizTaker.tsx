@@ -71,8 +71,8 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     .map((item) => ({ itemID: item.id, optionIDs: [] }));
 
   const answerSheetReq = module.quiz
-  .filter((item) => item.type === QuizItemType.MultipleChoice || item.type === QuizItemType.Checkboxes)
-  .map((item) => ({itemID: item.id, reqCount: item.correctAnswers}));
+    .filter((item) => item.type === QuizItemType.MultipleChoice || item.type === QuizItemType.Checkboxes)
+    .map((item) => ({ itemID: item.id, reqCount: item.correctAnswers }));
 
   const [answerSheet, setAnswerSheet] = useImmer<AnswerSheet>(initialAnswerSheet);
 
@@ -92,7 +92,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
 
       const optionIndex = draft[itemIndex].optionIDs.findIndex((o) => o === optionID);
 
-      if (optionIndex === -1){
+      if (optionIndex === -1) {
         draft[itemIndex].optionIDs.push(optionID)
       } else {
         draft[itemIndex].optionIDs.splice(optionIndex, 1);
@@ -101,9 +101,9 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     })
     setQuizProgressed(true);
   };
-  
-  const checkAllAnswered = (element: any, index: number) => (element.optionIDs.length != answerSheetReq[index].reqCount); 
-  
+
+  const checkAllAnswered = (element: any, index: number) => (element.optionIDs.length != answerSheetReq[index].reqCount);
+
   const trainingSubmissionAnimation = () => {
     toast.success("Training Module Submitted", {
       position: "bottom-left",
@@ -134,10 +134,10 @@ export default function QuizTaker({ module }: QuizTakerProps) {
 
   const submitAndViewResults = async () => {
     await submitModule({
-    variables: { moduleID: module.id, answerSheet },
-    refetchQueries: [{ query: GET_CURRENT_USER }, { query: GET_TRAINING_MODULES }],
-    onCompleted() {navigate(`results`); trainingSubmissionAnimation();}
-  });
+      variables: { moduleID: module.id, answerSheet },
+      refetchQueries: [{ query: GET_CURRENT_USER }, { query: GET_TRAINING_MODULES }],
+      onCompleted() { navigate(`results`); trainingSubmissionAnimation(); }
+    });
 
   };
 
@@ -155,7 +155,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
       return "";
     }
   });
-  
+
 
   return (
     <Stack spacing={4} sx={styles.strongerBolds}>
@@ -246,7 +246,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
           loading={result.loading}
           variant="contained"
           sx={{ alignSelf: "flex-end" }}
-          disabled={(module.isLocked || (answerSheet.some(checkAllAnswered))) ?? false}
+          //disabled={(module.isLocked || (answerSheet.some(checkAllAnswered))) ?? false}
           onClick={() => submitAndViewResults()}
         >
           Submit
