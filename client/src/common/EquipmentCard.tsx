@@ -143,7 +143,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                       color="secondary"
                       variant="contained"
                       size="small"
-                      onClick={() => navigate(`makerspace/${36}`)}
+                      onClick={() => navigate(`/makerspace/${makerspaceID}/reserve/${props.equipment.id}`)}
                     >
                       Reserve
                     </Button>
