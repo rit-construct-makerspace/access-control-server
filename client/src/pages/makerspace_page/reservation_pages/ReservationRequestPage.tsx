@@ -20,6 +20,7 @@ import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { toast } from "react-toastify";
 import { Reservation } from "../../../types/Reservaton";
 import { border, style } from "@mui/system";
+import ReservationModal from "./ReservationModal";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -132,16 +133,27 @@ export default function ReservationRequestPage() {
     }
   }
 
+  const [targetReservation, setTargetReservation] = useState<Reservation>();
+  const [reservationModal, setReservationModal] = useState(false);
+  function handleEventSelect(event: { title: string, start: Date, end: Date, isDraggable: boolean, reservation: Reservation }) {
+    if (event.title.includes("Draft")) {
+      return;
+    }
+
+    setTargetReservation(event.reservation);
+    setReservationModal(true);
+  }
+
   return (
     <RequestWrapper2 result={getReservationsResult} render={(data) => {
       const liveReservationEvents = data.reservations.map(
         (reservation: Reservation) => {
-          console.log(reservation);
           return {
             title: `${reservation.approved ? null : "(Pending) "}${reservation.user.firstName} ${reservation.user.lastName}`,
             start: new Date(Number(reservation.start)),
             end: new Date(Number(reservation.end)),
             isDraggable: false,
+            reservation: reservation,
           }
         }
       );
@@ -220,6 +232,7 @@ export default function ReservationRequestPage() {
                 eventPropGetter={eventPropGetter}
                 onSelectSlot={handleSlotSelect}
                 events={[...liveReservationEvents, { ...draftReservation, isDraggable: true }]}
+                onSelectEvent={handleEventSelect}
                 // @ts-ignore
                 onEventDrop={handleEventDrop}
                 onEventResize={handleEventResize}
@@ -227,6 +240,7 @@ export default function ReservationRequestPage() {
               />
             </Paper>
           </ThemeProvider>
+          <ReservationModal open={reservationModal} onClose={() => setReservationModal(false)} reservation={targetReservation} />
         </Stack >
       )
     }} />

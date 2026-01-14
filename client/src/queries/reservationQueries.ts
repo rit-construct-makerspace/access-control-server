@@ -49,3 +49,19 @@ export const CREATE_RESERVATION = gql`
     }
   }
 `;
+
+export const SET_RESERVATION_APPROVAL = gql`
+  mutation setReservationApproval($id: Int!, $approve: Boolean!) {
+    setReservationApproval(id: $id, approve: $approve) {
+      id
+    }
+  }
+`;
+
+export const DELETE_RESERVATION = gql`
+  mutation DeleteReservation($id: Int!) {
+    deleteReservation(id: $id) {
+      num
+    }
+  }
+`;
