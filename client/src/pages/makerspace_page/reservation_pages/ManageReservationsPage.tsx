@@ -3,13 +3,13 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { useParams } from "react-router";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
+import { Autocomplete, AutocompleteRenderInputParams, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
 import { format, getDay, parse, startOfWeek, toDate } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { LightTheme } from "../../../Theme";
 import ReservationModal from "./ReservationModal";
 import { Reservation, ReservationEvent } from "../../../types/Reservation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_RESERVATIONS_FLEXIBLY } from "../../../queries/reservationQueries";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
@@ -40,38 +40,36 @@ export default function ManageReservationsPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const lightTheme = (new LightTheme).getTheme();
 
-  const getReservationsResult = useQuery(GET_RESERVATIONS_FLEXIBLY, {
-    variables: {
-      range: {
-        start: localizer.startOf(new Date(), "day").toISOString(),
-        end: localizer.endOf(new Date(), "day").toISOString()
-      },
-    }
-  });
+  const [selectedEquipment, setSelectedEquipment] = useState<Equipment[]>([]);
 
   const [targetDay, setTargetDay] = useState(new Date());
+  const [dateRange, setDateRange] = useState<{ start: Date, end: Date }>({
+    start: localizer.startOf(targetDay, "day"),
+    end: localizer.endOf(targetDay, "day")
+  });
   function onNavigate(newDate: Date) {
     setTargetDay(newDate);
   }
+
+  const getReservationsResult = useQuery(GET_RESERVATIONS_FLEXIBLY, {
+    variables: {
+      range: {
+        start: dateRange.start.toISOString(),
+        end: dateRange.end.toISOString()
+      },
+      equipmentIDs: selectedEquipment.map((equipment) => Number(equipment.id))
+    }
+  });
 
   function handleRangeChange(dates: Date[] | { start: Date, end: Date }) {
 
     if (Array.isArray(dates)) { // Went to day view
       setTargetDay(dates[0]);
-      getReservationsResult.refetch({
-        range: {
-          start: localizer.startOf(dates[0], "day").toISOString(),
-          end: localizer.endOf(dates[0], "day").toISOString()
-        }
-      });
+      setDateRange({ start: localizer.startOf(dates[0], "day"), end: localizer.endOf(dates[0], "day") });
     } else { // Went to month view
-      getReservationsResult.refetch({
-        range: {
-          start: dates.start,
-          end: dates.end
-        }
-      })
+      setDateRange({ start: dates.start, end: dates.end });
     }
+    getReservationsResult.refetch();
   }
 
   const [view, setView] = useState<string>(Views.DAY);
@@ -95,8 +93,6 @@ export default function ManageReservationsPage() {
     setTargetReservation(event.reservation);
     setReservationModal(true);
   }
-
-  const [targetEquipment, setTargetEquipment] = useState<[Number]>();
 
   function eventPropGetter(event: ReservationEvent, start: Date, end: Date, isSelected: boolean) {
     if (event.title?.toString().includes("Draft")) {
@@ -123,6 +119,11 @@ export default function ManageReservationsPage() {
     }
   }
 
+  function handleEquipmentSelection(newEquipment: Equipment[]) {
+    setSelectedEquipment(newEquipment);
+    getReservationsResult.refetch();
+  }
+
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
   return (
@@ -135,10 +136,15 @@ export default function ManageReservationsPage() {
         room.equipment.filter((equipment) => (equipment.byReservationOnly || equipment.schedulable))
       ))).flat(1);
 
-      const resources = reservableEquipment.map((equipment: Equipment) => ({
-        resourceId: equipment.id,
-        resourceTitle: equipment.name
-      }))
+      const resources = selectedEquipment.length > 0
+        ? reservableEquipment.filter((equipment) => selectedEquipment.includes(equipment)).map((equipment: Equipment) => ({
+          resourceId: equipment.id,
+          resourceTitle: equipment.name
+        }))
+        : reservableEquipment.map((equipment: Equipment) => ({
+          resourceId: equipment.id,
+          resourceTitle: equipment.name
+        }));
 
       return (
         <RequestWrapper2 result={getReservationsResult} render={(data) => {
@@ -196,6 +202,23 @@ export default function ManageReservationsPage() {
                   type="date"
                   label="Date"
                   onChange={(e) => { handleRangeChange([parse(e.target.value, "yyyy-MM-dd", new Date())]); onView(Views.DAY); }}
+                />
+                <Autocomplete
+                  renderInput={
+                    (params) => (
+                      <TextField
+                        {...params}
+                        label="Equipment"
+                        placeholder="Filter equipment..."
+                      />
+                    )
+                  }
+                  options={reservableEquipment}
+                  getOptionLabel={(option) => option.name}
+                  filterSelectedOptions
+                  multiple
+                  value={selectedEquipment}
+                  onChange={(event: any, newValue: Equipment[]) => handleEquipmentSelection(newValue)}
                 />
               </Stack>
               <ThemeProvider theme={lightTheme}>

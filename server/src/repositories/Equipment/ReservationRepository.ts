@@ -36,7 +36,7 @@ export async function getReservationsFlexibly(range?: { start: string, end: stri
     query = query.where("end", ">=", range.start).andWhere("start", "<=", range.end);
   }
 
-  if (equipmentIDs !== undefined) {
+  if (equipmentIDs !== undefined && equipmentIDs.length > 0) {
     query = query.whereIn("equipmentID", equipmentIDs);
   }
 
