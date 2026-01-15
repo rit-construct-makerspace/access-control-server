@@ -1,13 +1,14 @@
 import { ReservationRow } from "../../db/tables.js";
 import { knex } from "../../db/index.js";
 
-export async function createReservation(userID: number, equipmentID: number, start: string, end: string, description?: string): Promise<ReservationRow> {
+export async function createReservation(userID: number, equipmentID: number, start: string, end: string, description?: string, approved: boolean = false): Promise<ReservationRow> {
   return (await knex("Reservations").insert({
     userID: userID,
     equipmentID: equipmentID,
     start: start,
     end: end,
-    description: description ?? ""
+    description: description ?? "",
+    approved: approved
   }).returning("*"))[0];
 }
 

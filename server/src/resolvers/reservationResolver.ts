@@ -3,6 +3,7 @@ import { ReservationRow } from "../db/tables.js";
 import * as ReservationRepo from "../repositories/Equipment/ReservationRepository.js"
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as UserRepo from "../repositories/Users/UserRepository.js";
+import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
 import { GraphQLError } from "graphql";
 
 const ReservationResolver = {
@@ -54,11 +55,18 @@ const ReservationResolver = {
         equipmentID: number,
         start: string,
         end: string,
-        description?: string
+        description?: string,
+        approved?: boolean
       },
       { ifAuthenticated }: ApolloContext
     ) => ifAuthenticated(async (user) => {
-      return await ReservationRepo.createReservation(args.userID, args.equipmentID, args.start, args.end, args.description);
+      const equipment = await EquipmentRepo.getEquipmentByID(args.equipmentID);
+      const room = await RoomRepo.getRoomByID(equipment.roomID);
+      if (!equipment.schedulable && !(equipment.byReservationOnly && user.manager.includes(room?.id ?? -1))) {
+        throw new GraphQLError("This equipment cannot be reserved");
+      }
+
+      return await ReservationRepo.createReservation(args.userID, args.equipmentID, args.start, args.end, args.description, args.approved);
     }),
 
     setReservationApproval: async (
