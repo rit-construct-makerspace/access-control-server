@@ -1,21 +1,25 @@
-import { Calendar, dateFnsLocalizer, Views } from "react-big-calendar";
+import { Calendar, dateFnsLocalizer, Event, SlotInfo, Views } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { useParams } from "react-router";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Autocomplete, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
+import { Autocomplete, Button, Card, Divider, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
 import { format, getDay, parse, startOfWeek } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { LightTheme } from "../../../Theme";
 import ReservationModal from "./ReservationModal";
 import { Reservation, ReservationEvent } from "../../../types/Reservation";
 import { useState } from "react";
-import { useQuery } from "@apollo/client";
-import { GET_RESERVATIONS_FLEXIBLY } from "../../../queries/reservationQueries";
+import { useMutation, useQuery } from "@apollo/client";
+import { CREATE_RESERVATION, GET_RESERVATIONS_FLEXIBLY } from "../../../queries/reservationQueries";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import Room from "../../../types/Room";
 import Equipment from "../../../types/Equipment";
+import { toast } from "react-toastify";
+import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import CloseIcon from '@mui/icons-material/Close';
+import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 
 const DnDCalendar = withDragAndDrop(Calendar);
 const locales = {
@@ -29,16 +33,21 @@ const localizer = dateFnsLocalizer({
   locales,
 })
 
-const date_formatter = new Intl.DateTimeFormat("en-US", {
+const formatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
+  weekday: "long",
+  month: "long",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit"
 });
 
 export default function ManageReservationsPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const lightTheme = (new LightTheme).getTheme();
+  const user = useCurrentUser();
+
+  const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment[]>([]);
 
@@ -124,7 +133,62 @@ export default function ManageReservationsPage() {
     getReservationsResult.refetch();
   }
 
-  const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
+  const [createReservation] = useMutation(CREATE_RESERVATION, { refetchQueries: ["Reservations"] });
+
+  const [draftReservation, setDraftReservation] = useState<{
+    title: React.ReactNode,
+    start: Date | undefined,
+    end: Date | undefined,
+    resourceId: string | number | undefined
+  }>({ title: "Draft Reservation", start: undefined, end: undefined, resourceId: -1 });
+  const selectionMade = draftReservation.start !== undefined && draftReservation.end !== undefined;
+
+  const [description, setDescription] = useState("");
+
+  function handleSlotSelect(selection: SlotInfo) {
+    if (view == Views.MONTH) {
+      return;
+    }
+
+    if (selection.action === "select") {
+      setDraftReservation({ ...draftReservation, start: selection.start, end: selection.end, resourceId: selection.resourceId })
+    }
+  }
+
+  function handleEventDrop(drop: { event: Event, start: Date, end: Date, isAllDay: boolean }) {
+    if (drop.event.title === "Draft Reservation") {
+      setDraftReservation({ ...draftReservation, start: drop.start, end: drop.end });
+    }
+  }
+
+  function handleEventResize(resize: { event: Event, start: Date, end: Date }) {
+    if (resize.event.title === "Draft Reservation") {
+      setDraftReservation({ ...draftReservation, start: resize.start, end: resize.end });
+    }
+  }
+
+  async function handleSubmitReservation() {
+    if (!selectionMade) return;
+    try {
+      await createReservation({
+        variables: {
+          userID: Number(user.id),
+          equipmentID: Number(draftReservation.resourceId),
+          start: draftReservation.start?.toISOString(),
+          end: draftReservation.end?.toISOString(),
+          description: description,
+          approved: true
+        }
+      });
+    } catch (e) {
+      toast.error("Failed to make reservation: " + e);
+      return;
+    }
+
+    toast.success("Reservation made!");
+    setDraftReservation({ ...draftReservation, start: undefined, end: undefined });
+    setDescription("");
+  }
 
   return (
     <RequestWrapper2 result={getMakerspace} render={(data) => {
@@ -221,6 +285,54 @@ export default function ManageReservationsPage() {
                   value={selectedEquipment}
                   onChange={(event: any, newValue: Equipment[]) => handleEquipmentSelection(newValue)}
                 />
+                {
+                  selectionMade ?
+                    <Stack spacing={2}>
+                      <Divider orientation="horizontal" />
+                      <Typography variant="subtitle1">Create a reservation:</Typography>
+                      <Card sx={{ width: "100%", padding: "10px" }}>
+                        <Stack spacing={2}>
+                          <Stack direction={"row"} justifyContent={"space-between"}>
+                            <Typography fontWeight={"bold"}>From:</Typography>
+                            <Typography>{formatter.format(draftReservation.start)}</Typography>
+                          </Stack>
+                          <Stack direction={"row"} justifyContent={"space-between"}>
+                            <Typography fontWeight={"bold"}>To:</Typography>
+                            <Typography>{formatter.format(draftReservation.end)}</Typography>
+                          </Stack>
+                        </Stack>
+                      </Card>
+                      <TextField
+                        multiline
+                        rows={3}
+                        placeholder="Description..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                      />
+                      <Stack direction={"row"} justifyContent={"space-between"}>
+                        <Button
+                          color="error"
+                          variant="contained"
+                          startIcon={<CloseIcon />}
+                          onClick={() => {
+                            setDraftReservation({ ...draftReservation, start: undefined, end: undefined });
+                            setDescription("");
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          color="success"
+                          variant="contained"
+                          startIcon={<InsertInvitationIcon />}
+                          onClick={() => handleSubmitReservation()}
+                        >
+                          Create
+                        </Button>
+                      </Stack>
+                    </Stack>
+                    : null
+                }
               </Stack>
               <ThemeProvider theme={lightTheme}>
                 <Paper
@@ -241,16 +353,19 @@ export default function ManageReservationsPage() {
                     timeslots={2}
                     scrollToTime={new Date((new Date()).setHours(9, 0, 0, 0))}
                     style={{
-                      height: 800
+                      height: 750
                     }}
                     resources={resources}
                     resourceIdAccessor={"resourceId"}
                     resourceTitleAccessor={"resourceTitle"}
                     eventPropGetter={eventPropGetter}
-                    events={liveReservationEvents}
+                    events={[...liveReservationEvents, draftReservation]}
                     onSelectEvent={handleEventSelect}
                     onRangeChange={handleRangeChange}
                     draggableAccessor={"isDraggable"}
+                    onSelectSlot={handleSlotSelect}
+                    onEventDrop={handleEventDrop}
+                    onEventResize={handleEventResize}
                   />
                 </Paper>
               </ThemeProvider>

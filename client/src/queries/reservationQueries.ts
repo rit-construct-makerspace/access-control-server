@@ -44,8 +44,8 @@ export const GET_RESERVATIONS_FLEXIBLY = gql`
 `
 
 export const CREATE_RESERVATION = gql`
-  mutation CreateReservation($userID: Int!, $equipmentID: Int!, $start: String!, $end: String!, $description: String) {
-    createReservation(userID: $userID, equipmentID: $equipmentID, start: $start, end: $end, description: $description) {
+  mutation CreateReservation($userID: Int!, $equipmentID: Int!, $start: String!, $end: String!, $description: String, $approved: Boolean) {
+    createReservation(userID: $userID, equipmentID: $equipmentID, start: $start, end: $end, description: $description, approved: $approved) {
       id
     }
   }
