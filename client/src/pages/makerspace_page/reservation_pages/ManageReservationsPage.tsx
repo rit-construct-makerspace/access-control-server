@@ -196,6 +196,7 @@ export default function ManageReservationsPage() {
 
           return (
             <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
+              <title>{`${fullSpace.name} Reservations`}</title>
               <Stack width={"20%"} spacing={2}>
                 <TextField
                   value={format(targetDay, "yyyy-MM-dd")}
