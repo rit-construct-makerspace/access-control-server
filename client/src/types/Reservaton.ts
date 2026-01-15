@@ -16,5 +16,6 @@ export interface ReservationEvent {
   start: Date,
   end: Date,
   isDraggable: boolean,
-  reservation: Reservation
+  reservation: Reservation,
+  resourceId?: number
 }
