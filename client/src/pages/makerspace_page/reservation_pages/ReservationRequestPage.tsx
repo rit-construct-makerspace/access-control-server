@@ -1,5 +1,5 @@
 import { Box, Button, Card, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { Calendar, dateFnsLocalizer, SlotInfo, Event } from "react-big-calendar";
 import withDragAndDrop, { EventInteractionArgs } from "react-big-calendar/lib/addons/dragAndDrop";
 import format from 'date-fns/format'
@@ -23,6 +23,7 @@ import { border, style } from "@mui/system";
 import ReservationModal from "./ReservationModal";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
 import { isManager, isManagerOrSelf } from "../../../common/PrivilegeUtils";
+import Equipment from "../../../types/Equipment";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -50,6 +51,7 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 export default function ReservationRequestPage() {
   const { makerspaceID, equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
   const user = useCurrentUser();
+  const navigate = useNavigate();
 
   const lightTheme = (new LightTheme).getTheme();
 
@@ -160,7 +162,11 @@ export default function ReservationRequestPage() {
 
   return (
     <RequestWrapper2 result={getEquipmentById} render={(data) => {
-      const equipment = data.equipment;
+      const equipment: Equipment = data.equipment;
+
+      if (!equipment.schedulable) {
+        navigate(`/makerspace/${makerspaceID}`)
+      }
       return (
         <RequestWrapper2 result={getReservationsResult} render={(data) => {
           const liveReservationEvents: ReservationEvent[] = data.reservations.map(
