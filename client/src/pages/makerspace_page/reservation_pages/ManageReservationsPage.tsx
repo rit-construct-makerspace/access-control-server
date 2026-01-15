@@ -3,8 +3,8 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { useParams } from "react-router";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Paper, Stack, ThemeProvider, Typography } from "@mui/material";
-import { format, getDay, parse, startOfWeek } from "date-fns";
+import { Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
+import { format, getDay, parse, startOfWeek, toDate } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { LightTheme } from "../../../Theme";
 import ReservationModal from "./ReservationModal";
@@ -28,6 +28,13 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 })
+
+const date_formatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
 
 export default function ManageReservationsPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
@@ -141,25 +148,12 @@ export default function ManageReservationsPage() {
               ? data.reservations.map(
                 (reservation: Reservation) => ({
                   title: <Typography variant="subtitle1">{`${reservation.approved ? "[Approved]" : "(Pending)"} Reservation(s)`}</Typography>,
-                  start: new Date(Number(reservation.start)),
-                  end: new Date(Number(reservation.end)),
+                  start: localizer.startOf(new Date(Number(reservation.start)), "day"),
+                  end: localizer.endOf(new Date(Number(reservation.end)), "day"),
                   reservation: reservation,
                   isDraggable: false,
                   resourceId: reservation.equipment.id
                 })
-              ).filter(
-                (reservation: ReservationEvent, pos: number, self: ReservationEvent[]) => {
-                  return !self.some(
-                    (reservation_b, idx) => (
-                      (
-                        localizer.startOf(reservation.start, "day") === localizer.startOf(reservation_b.end, "day")
-                        || localizer.endOf(reservation.end, "day") === localizer.endOf(reservation_b.end, "day")
-                      )
-                      && pos !== idx
-                      && reservation.reservation.approved === reservation_b.reservation.approved
-                    )
-                  )
-                }
               )
               : data.reservations.map(
                 (reservation: Reservation) => ({
@@ -176,10 +170,33 @@ export default function ManageReservationsPage() {
                 })
               );
 
+          if (view === Views.MONTH) {
+            for (let i = liveReservationEvents.length - 1; i >= 0; i--) {
+              for (let j = 0; j < liveReservationEvents.length; j++) {
+                if (
+                  (
+                    liveReservationEvents[i].start.toISOString() === liveReservationEvents[j].start.toISOString()
+                    || liveReservationEvents[i].end.toISOString() === liveReservationEvents[j].end.toISOString()
+                  )
+                  && j != i
+                  && liveReservationEvents[i].reservation.approved === liveReservationEvents[j].reservation.approved
+                ) {
+                  liveReservationEvents.splice(i, 1);
+                  break;
+                }
+              }
+            }
+          }
+
           return (
             <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
               <Stack width={"20%"} spacing={2}>
-
+                <TextField
+                  value={format(targetDay, "yyyy-MM-dd")}
+                  type="date"
+                  label="Date"
+                  onChange={(e) => { handleRangeChange([parse(e.target.value, "yyyy-MM-dd", new Date())]); onView(Views.DAY); }}
+                />
               </Stack>
               <ThemeProvider theme={lightTheme}>
                 <Paper
