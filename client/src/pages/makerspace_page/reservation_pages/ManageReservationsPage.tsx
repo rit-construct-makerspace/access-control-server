@@ -128,22 +128,40 @@ export default function ManageReservationsPage() {
       return (
         <RequestWrapper2 result={getReservationsResult} render={(data) => {
 
-          const liveReservationEvents: ReservationEvent[] = data.reservations.map(
-            (reservation: Reservation) => ({
-              title: <Stack>
-                <Typography variant="body1">{reservation.user.ritUsername}</Typography>
-                <Typography variant="subtitle1">{reservation.approved ? "[Approved]" : "(Pending)"}</Typography>
-                <Typography variant="body2">{reservation.description}</Typography>
-              </Stack>,
-              start: new Date(Number(reservation.start)),
-              end: new Date(Number(reservation.end)),
-              reservation: reservation,
-              isDraggable: false,
-              resourceId: reservation.equipment.id
-            })
-          );
-
-          console.log(liveReservationEvents);
+          const liveReservationEvents: ReservationEvent[] =
+            view === Views.MONTH
+              ? data.reservations.map(
+                (reservation: Reservation) => ({
+                  title: <Typography variant="subtitle1">{`${reservation.approved ? "[Approved]" : "(Pending)"} Reservation`}</Typography>,
+                  start: new Date(Number(reservation.start)),
+                  end: new Date(Number(reservation.end)),
+                  reservation: reservation,
+                  isDraggable: false,
+                  resourceId: reservation.equipment.id
+                })
+              ).filter(
+                (reservation: ReservationEvent, pos: number, self: ReservationEvent[]) => {
+                  return !self.some(
+                    (reservation_b, idx) => (
+                      reservation.start === reservation_b.end && reservation.end === reservation_b.end && pos !== idx
+                    )
+                  )
+                }
+              )
+              : data.reservations.map(
+                (reservation: Reservation) => ({
+                  title: <Stack>
+                    <Typography variant="body1">{reservation.user.ritUsername}</Typography>
+                    <Typography variant="subtitle1">{reservation.approved ? "[Approved]" : "(Pending)"}</Typography>
+                    <Typography variant="body2">{reservation.description}</Typography>
+                  </Stack>,
+                  start: new Date(Number(reservation.start)),
+                  end: new Date(Number(reservation.end)),
+                  reservation: reservation,
+                  isDraggable: false,
+                  resourceId: reservation.equipment.id
+                })
+              );
 
           return (
             <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
