@@ -3,7 +3,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { useParams } from "react-router";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { Paper, Stack, ThemeProvider } from "@mui/material";
+import { Paper, Stack, ThemeProvider, Typography } from "@mui/material";
 import { format, getDay, parse, startOfWeek } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { LightTheme } from "../../../Theme";
@@ -83,6 +83,31 @@ export default function ManageReservationsPage() {
     setView(view);
   }
 
+  function eventPropGetter(event: ReservationEvent, start: Date, end: Date, isSelected: boolean) {
+    if (event.title?.toString().includes("Draft")) {
+      return {
+        style: {
+          backgroundColor: lightTheme.palette.info.main,
+          border: "0px"
+        }
+      }
+    } else if (!event.reservation.approved) {
+      return {
+        style: {
+          backgroundColor: lightTheme.palette.secondary.main,
+          border: "0px"
+        }
+      }
+    } else {
+      return {
+        style: {
+          backgroundColor: lightTheme.palette.primary.main,
+          border: "0px"
+        }
+      }
+    }
+  }
+
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
   return (
@@ -105,7 +130,11 @@ export default function ManageReservationsPage() {
 
           const liveReservationEvents: ReservationEvent[] = data.reservations.map(
             (reservation: Reservation) => ({
-              title: reservation.user.firstName,
+              title: <Stack>
+                <Typography variant="body1">{reservation.user.ritUsername}</Typography>
+                <Typography variant="subtitle1">{reservation.approved ? "[Approved]" : "(Pending)"}</Typography>
+                <Typography variant="body2">{reservation.description}</Typography>
+              </Stack>,
               start: new Date(Number(reservation.start)),
               end: new Date(Number(reservation.end)),
               reservation: reservation,
@@ -142,7 +171,7 @@ export default function ManageReservationsPage() {
                     resources={resources}
                     resourceIdAccessor={"resourceId"}
                     resourceTitleAccessor={"resourceTitle"}
-                    // eventPropGetter={eventPropGetter}
+                    eventPropGetter={eventPropGetter}
                     // onSelectSlot={handleSlotSelect}
                     events={liveReservationEvents}
                     onSelectEvent={handleEventSelect}
