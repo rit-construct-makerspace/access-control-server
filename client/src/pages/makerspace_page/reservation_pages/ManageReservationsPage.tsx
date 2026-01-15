@@ -204,6 +204,7 @@ export default function ManageReservationsPage() {
                     width: "80%"
                   }}
                 >
+                  {/* @ts-expect-error */}
                   <DnDCalendar
                     date={targetDay}
                     onNavigate={onNavigate}
@@ -222,13 +223,9 @@ export default function ManageReservationsPage() {
                     resourceIdAccessor={"resourceId"}
                     resourceTitleAccessor={"resourceTitle"}
                     eventPropGetter={eventPropGetter}
-                    // onSelectSlot={handleSlotSelect}
                     events={liveReservationEvents}
                     onSelectEvent={handleEventSelect}
                     onRangeChange={handleRangeChange}
-                    // // @ts-ignore
-                    // onEventDrop={handleEventDrop}
-                    // onEventResize={handleEventResize}
                     draggableAccessor={"isDraggable"}
                   />
                 </Paper>
