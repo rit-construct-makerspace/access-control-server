@@ -18,7 +18,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_RESERVATION, GET_RESERVATIONS_FLEXIBLY } from "../../../queries/reservationQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { toast } from "react-toastify";
-import { Reservation, ReservationEvent } from "../../../types/Reservaton";
+import { Reservation, ReservationEvent } from "../../../types/Reservation";
 import { border, style } from "@mui/system";
 import ReservationModal from "./ReservationModal";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";

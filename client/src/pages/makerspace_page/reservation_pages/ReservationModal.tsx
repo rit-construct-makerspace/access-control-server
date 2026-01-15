@@ -1,6 +1,6 @@
 import { Button, Card, Stack, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
-import { Reservation } from "../../../types/Reservaton";
+import { Reservation } from "../../../types/Reservation";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManager, isManagerOrSelf } from "../../../common/PrivilegeUtils";
 import { useMutation } from "@apollo/client";
