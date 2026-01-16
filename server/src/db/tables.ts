@@ -639,7 +639,7 @@ export interface MaintenanceTicketRow {
   imageUrl: string | null;
   closed: boolean;
   dateCreated: string; // ISO 8601 date string, gotten via Date.toISOString()
-  dateClosed: string; // ^
+  dateClosed: string | null; // ^
 }
 
 declare module "knex/types/tables.js" {

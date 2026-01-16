@@ -18,7 +18,7 @@ export async function up(knex: Knex): Promise<void> {
     t.string("imageUrl").nullable().defaultTo(null);
     t.boolean("closed").notNullable().defaultTo(false);
     t.timestamp("dateCreated").notNullable().defaultTo(knex.fn.now());
-    t.timestamp("dateClosed").notNullable();
+    t.timestamp("dateClosed").nullable();
   })
 }
 
