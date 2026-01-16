@@ -13,22 +13,28 @@ export const MaintenanceTicketTypeDefs = gql`
     LOW
   }
 
+  enum MaintenanceTicketStatus {
+    TODO
+    IN_PROGRESS
+    CLOSED
+  }
+
   type MaintenanceTicket {
     id: Int!
     type: MaintenanceTicketType!
     severity: MaintenanceTicketSeverity!
+    status: MaintenanceTicketStatus!
     instanceID: Int!
     userID: Int!
     description: String!
     imageUrl: String
-    closed: Boolean!
     dateCreated: String!
     dateClosed: String
   }
 
   extend type Query {
     maintenanceTicket(id: Int!): MaintenanceTicket
-    maintenanceTickets(makerspaceIDs: [Int], equipmentIDs: [Int], instanceIDs: [Int], closed: Boolean): [MaintenanceTicket]
+    maintenanceTickets(makerspaceIDs: [Int], equipmentIDs: [Int], instanceIDs: [Int], status: MaintenanceTicketStatus): [MaintenanceTicket]
   }
 
   extend type Mutation {
@@ -41,6 +47,6 @@ export const MaintenanceTicketTypeDefs = gql`
       imageUrl: String
     ): MaintenanceTicket
 
-    modifyMaintenanceTicketClosed(id: Int!, closed: Boolean!): Int
+    modifyMaintenanceTicketClosed(id: Int!, status: MaintenanceTicketStatus!): Int
   }
 `;

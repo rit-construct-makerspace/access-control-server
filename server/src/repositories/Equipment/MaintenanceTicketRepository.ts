@@ -1,5 +1,5 @@
 import { knex } from "../../db/index.js";
-import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketType } from "../../db/tables.js";
+import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../db/tables.js";
 
 export async function createMaintenanceTicket(
   type: MaintenanceTicketType,
@@ -19,8 +19,8 @@ export async function createMaintenanceTicket(
   });
 }
 
-export async function modifyMaintenanceTicketClosed(id: number, closed: boolean): Promise<number> {
-  return await knex("MaintenanceTickets").update({ closed: closed }).where({ id: id });
+export async function modifyMaintenanceTicketStatus(id: number, status: MaintenanceTicketStatus): Promise<number> {
+  return await knex("MaintenanceTickets").update({ status: status }).where({ id: id });
 }
 
 
@@ -28,7 +28,7 @@ export async function getMaintenanceTicketsFlexibly(
   makerspaceIDs?: number[],
   equipmentIDs?: number[],
   instanceIDs?: number[],
-  closed?: boolean
+  status?: MaintenanceTicketStatus
 ): Promise<MaintenanceTicketRow[]> {
 
   let query = knex("MaintenanceTickets")
@@ -48,8 +48,8 @@ export async function getMaintenanceTicketsFlexibly(
     query = query.whereIn("instanceID", instanceIDs);
   }
 
-  if (closed !== undefined) {
-    query.where({ closed: closed })
+  if (status !== undefined) {
+    query.where("status", status);
   }
 
   return await query.select("MaintenanceTickets.*").limit(200);

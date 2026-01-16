@@ -629,15 +629,21 @@ export enum MaintenanceTicketSeverity {
   "LOW"
 }
 
+export enum MaintenanceTicketStatus {
+  "TODO",
+  "IN_PROGRESS",
+  "CLOSED"
+}
+
 export interface MaintenanceTicketRow {
   id: number;
   type: MaintenanceTicketType;
   severity: MaintenanceTicketSeverity;
+  status: MaintenanceTicketStatus;
   instanceID: number;
   userID: number;
   description: string;
   imageUrl: string | null;
-  closed: boolean;
   dateCreated: string; // ISO 8601 date string, gotten via Date.toISOString()
   dateClosed: string | null; // ^
 }

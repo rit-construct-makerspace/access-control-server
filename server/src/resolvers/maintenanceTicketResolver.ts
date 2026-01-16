@@ -1,6 +1,5 @@
 import { ApolloContext } from "../context.js"
-import { MaintenanceTicketSeverity, MaintenanceTicketType } from "../db/tables.js"
-import { isStaff } from "../privilege.js"
+import { MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../db/tables.js"
 import * as MaintenanctTicketRepo from "../repositories/Equipment/MaintenanceTicketRepository.js"
 
 const MaintenanceTicketResolver = {
@@ -25,11 +24,11 @@ const MaintenanceTicketResolver = {
         makerspaceIDs?: number[],
         equipmentIDs?: number[],
         instanceIDs?: number[],
-        closed?: boolean
+        status?: MaintenanceTicketStatus
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      await MaintenanctTicketRepo.getMaintenanceTicketsFlexibly(args.makerspaceIDs, args.equipmentIDs, args.instanceIDs, args.closed)
+      await MaintenanctTicketRepo.getMaintenanceTicketsFlexibly(args.makerspaceIDs, args.equipmentIDs, args.instanceIDs, args.status)
     ))
   },
 
@@ -53,11 +52,11 @@ const MaintenanceTicketResolver = {
       _parent: any,
       args: {
         id: number,
-        closed: boolean
+        status: MaintenanceTicketStatus
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      await MaintenanctTicketRepo.modifyMaintenanceTicketClosed(args.id, args.closed)
+      await MaintenanctTicketRepo.modifyMaintenanceTicketStatus(args.id, args.status)
     ))
   }
 }

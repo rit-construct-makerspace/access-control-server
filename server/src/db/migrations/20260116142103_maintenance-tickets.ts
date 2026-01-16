@@ -10,13 +10,13 @@ export async function up(knex: Knex): Promise<void> {
     t.increments("id").primary();
     t.enu("severity", ["HIGH", "MEDIUM", "LOW"]).notNullable();
     t.enu("type", ["AUTOMATIC", "REPORTED"]).notNullable();
+    t.enu("status", ["TODO", "IN_PROGRESS", "CLOSED"]).notNullable().defaultTo("TODO")
     t.integer("instanceID").references("id").inTable("EquipmentInstances").notNullable()
       .onUpdate("CASCADE").onDelete("CASCADE");
     t.integer("userID").references("id").inTable("Users").notNullable()
       .onUpdate("CASCADE").onDelete("CASCADE");
     t.string("description").notNullable().defaultTo("");
     t.string("imageUrl").nullable().defaultTo(null);
-    t.boolean("closed").notNullable().defaultTo(false);
     t.timestamp("dateCreated").notNullable().defaultTo(knex.fn.now());
     t.timestamp("dateClosed").nullable();
   })
