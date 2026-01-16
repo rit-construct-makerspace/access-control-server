@@ -28,7 +28,7 @@ export async function getMaintenanceTicketsFlexibly(
   makerspaceIDs?: number[],
   equipmentIDs?: number[],
   instanceIDs?: number[]
-) {
+): Promise<MaintenanceTicketRow[]> {
 
   let query = knex("MaintenanceTickets")
     .join("EquipmentInstances", "MaintenanceTickets.instanceID", "EquipmentInstances.id")
@@ -48,4 +48,8 @@ export async function getMaintenanceTicketsFlexibly(
   }
 
   return await query.select("MaintenanceTickets.*").limit(200);
+}
+
+export async function getMaintenanceTicket(id: number): Promise<MaintenanceTicketRow | undefined> {
+  return await knex("MaintenanceTickets").where({ id: id }).first();
 }
