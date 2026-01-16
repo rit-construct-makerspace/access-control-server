@@ -24,7 +24,7 @@ export const ReservationTypeDefs = gql`
   }
 
   extend type Mutation {
-    createReservation(userID: Int!, equipmentID: Int!, start: String!, end: String!, description: String): Reservation
+    createReservation(userID: Int!, equipmentID: Int!, start: String!, end: String!, description: String, approved: Boolean): Reservation
     setReservationApproval(id: Int!, approve: Boolean!): Reservation
     deleteReservation(id: Int!): Int
   }

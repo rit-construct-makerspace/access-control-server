@@ -253,6 +253,7 @@ export default function ReservationRequestPage() {
                     width: "80%"
                   }}
                 >
+                  {/* @ts-expect-error */}
                   <DnDCalendar
                     localizer={localizer}
                     defaultView={"week"}
