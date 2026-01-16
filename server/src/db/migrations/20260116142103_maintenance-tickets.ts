@@ -2,9 +2,9 @@ import type { Knex } from "knex";
 
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.schema.dropTableIfExists("MaintenanceTags");
-  await knex.schema.dropTableIfExists("MaintenanceLogs");
   await knex.schema.dropTableIfExists("ResolutionLogs");
+  await knex.schema.dropTableIfExists("MaintenanceLogs");
+  await knex.schema.dropTableIfExists("MaintenanceTags");
 
   await knex.schema.createTable("MaintenanceTickets", (t) => {
     t.increments("id").primary();
