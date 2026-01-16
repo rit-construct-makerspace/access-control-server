@@ -24,11 +24,12 @@ const MaintenanceTicketResolver = {
       args: {
         makerspaceIDs?: number[],
         equipmentIDs?: number[],
-        instanceIDs?: number[]
+        instanceIDs?: number[],
+        closed?: boolean
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      await MaintenanctTicketRepo.getMaintenanceTicketsFlexibly(args.makerspaceIDs, args.equipmentIDs, args.instanceIDs)
+      await MaintenanctTicketRepo.getMaintenanceTicketsFlexibly(args.makerspaceIDs, args.equipmentIDs, args.instanceIDs, args.closed)
     ))
   },
 

@@ -27,7 +27,8 @@ export async function modifyMaintenanceTicketClosed(id: number, closed: boolean)
 export async function getMaintenanceTicketsFlexibly(
   makerspaceIDs?: number[],
   equipmentIDs?: number[],
-  instanceIDs?: number[]
+  instanceIDs?: number[],
+  closed?: boolean
 ): Promise<MaintenanceTicketRow[]> {
 
   let query = knex("MaintenanceTickets")
@@ -45,6 +46,10 @@ export async function getMaintenanceTicketsFlexibly(
 
   if (instanceIDs !== undefined && instanceIDs.length > 0) {
     query = query.whereIn("instanceID", instanceIDs);
+  }
+
+  if (closed !== undefined) {
+    query.where({ closed: closed })
   }
 
   return await query.select("MaintenanceTickets.*").limit(200);
