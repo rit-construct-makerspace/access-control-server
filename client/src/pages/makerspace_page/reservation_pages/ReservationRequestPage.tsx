@@ -172,7 +172,7 @@ export default function ReservationRequestPage() {
           const liveReservationEvents: ReservationEvent[] = data.reservations.map(
             (reservation: Reservation) => {
               return {
-                title: isManagerOrSelf(user, Number(reservation.user.id))
+                title: isManagerOrSelf(user, Number(reservation.user?.id ?? -1))
                   ? <Stack>
                     <Typography variant="body1">{isManager(user) ? reservation.user.ritUsername : reservation.user.firstName}</Typography>
                     <Typography variant="subtitle1">{reservation.approved ? "[Approved]" : "(Pending)"}</Typography>

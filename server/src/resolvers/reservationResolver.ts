@@ -15,9 +15,31 @@ const ReservationResolver = {
     },
 
     user: async (
-      parent: ReservationRow
+      parent: ReservationRow,
+      _args: any,
+      { ifManagerOrSelf }: ApolloContext
     ) => {
-      return await UserRepo.getUserByID(parent.userID);
+      try {
+        return ifManagerOrSelf(parent.userID, async (user) => (
+          await UserRepo.getUserByID(parent.userID)
+        ))
+      } catch (e) {
+        return undefined
+      }
+    },
+
+    description: async (
+      parent: ReservationRow,
+      _args: any,
+      { ifManagerOrSelf }: ApolloContext
+    ) => {
+      try {
+        return ifManagerOrSelf(parent.userID, async (user) => (
+          parent.description
+        ))
+      } catch {
+        return undefined
+      }
     }
   },
 
@@ -89,7 +111,7 @@ const ReservationResolver = {
       args: {
         id: number
       },
-      { ifManagerOrSelf }: ApolloContext // Should really be isManagerFor
+      { ifManagerOrSelf }: ApolloContext // Should check if they are correct manager
     ) => {
       const target = await ReservationRepo.getReservationById(args.id);
       if (!target) {

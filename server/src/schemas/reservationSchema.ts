@@ -10,7 +10,7 @@ export const ReservationTypeDefs = gql`
     description: String,
     approved: Boolean!,
     equipment: Equipment!,
-    user: User!
+    user: User
   }
 
   input Range {
