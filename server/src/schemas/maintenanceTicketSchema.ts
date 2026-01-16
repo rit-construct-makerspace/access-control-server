@@ -30,6 +30,8 @@ export const MaintenanceTicketTypeDefs = gql`
     imageUrl: String
     dateCreated: String!
     dateClosed: String
+    instance: EquipmentInstance!
+    creator: User!
   }
 
   extend type Query {

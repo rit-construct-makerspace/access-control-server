@@ -58,3 +58,16 @@ export async function getMaintenanceTicketsFlexibly(
 export async function getMaintenanceTicket(id: number): Promise<MaintenanceTicketRow | undefined> {
   return await knex("MaintenanceTickets").where({ id: id }).first();
 }
+
+export async function paginatedMaintenanceTickets(pagination: { page: number, pageSize: number }): Promise<MaintenanceTicketRow[]> {
+  let query = knex("MaintenanceTickets")
+    .join("EquipmentInstances", "MaintenanceTickets.instanceID", "EquipmentInstances.id")
+    .join("Equipment", "EquipmentInstances.equipmentID", "Equipment.id")
+    .join("Rooms", "Equipment.roomID", "Rooms.id");
+
+  // pagination
+  query = query.offset(pagination.pageSize * pagination.page).limit(pagination.pageSize);
+
+
+  return await query;
+}

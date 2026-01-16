@@ -1,10 +1,26 @@
 import { ApolloContext } from "../context.js"
-import { MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../db/tables.js"
-import * as MaintenanctTicketRepo from "../repositories/Equipment/MaintenanceTicketRepository.js"
+import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../db/tables.js"
+import * as MaintenanceTicketRepo from "../repositories/Equipment/MaintenanceTicketRepository.js"
+import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js"
+import * as UserRepo from "../repositories/Users/UserRepository.js"
 
 const MaintenanceTicketResolver = {
   MaintenanceTicket: {
+    instance: async (
+      parent: MaintenanceTicketRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (user) => (
+      InstanceRepo.getInstanceByID(parent.id)
+    )),
 
+    creator: async (
+      parent: MaintenanceTicketRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (user) => (
+      UserRepo.getUserByID(parent.userID)
+    ))
   },
 
   Query: {
@@ -15,7 +31,7 @@ const MaintenanceTicketResolver = {
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      await MaintenanctTicketRepo.getMaintenanceTicket(args.id)
+      await MaintenanceTicketRepo.getMaintenanceTicket(args.id)
     )),
 
     maintenanceTickets: async (
@@ -28,7 +44,20 @@ const MaintenanceTicketResolver = {
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      await MaintenanctTicketRepo.getMaintenanceTicketsFlexibly(args.makerspaceIDs, args.equipmentIDs, args.instanceIDs, args.status)
+      await MaintenanceTicketRepo.getMaintenanceTicketsFlexibly(args.makerspaceIDs, args.equipmentIDs, args.instanceIDs, args.status)
+    )),
+
+    paginatedMaintenanceTickets: async (
+      _parent: any,
+      args: {
+        pagination: {
+          page: number,
+          pageSize: number
+        }
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff(async (user) => (
+      await MaintenanceTicketRepo.paginatedMaintenanceTickets(args.pagination)
     ))
   },
 
@@ -45,7 +74,7 @@ const MaintenanceTicketResolver = {
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      await MaintenanctTicketRepo.createMaintenanceTicket(args.type, args.severity, args.instanceID, args.userID, args.description, args.imageUrl)
+      await MaintenanceTicketRepo.createMaintenanceTicket(args.type, args.severity, args.instanceID, args.userID, args.description, args.imageUrl)
     )),
 
     modifyMaintenanceTicketClosed: async (
@@ -56,7 +85,7 @@ const MaintenanceTicketResolver = {
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      await MaintenanctTicketRepo.modifyMaintenanceTicketStatus(args.id, args.status)
+      await MaintenanceTicketRepo.modifyMaintenanceTicketStatus(args.id, args.status)
     ))
   }
 }
