@@ -41,8 +41,6 @@ import { EventsTypeDefs } from "./schemas/eventsSchema.js";
 import { EventsResolver } from "./resolvers/eventsResolver.js";
 import { TermsTypeDefs } from "./schemas/TermsSchema.js";
 import TermsResolver from "./resolvers/termsResolver.js";
-import { MaintenanceLogsTypeDefs } from "./schemas/maintenanceLogSchema.js";
-import MaintenanceLogsResolver from "./resolvers/maintenanceLogsResolver.js";
 import { EquipmentInstanceTypeDefs } from "./schemas/equipmentInstanceSchema.js";
 import EquipmentInstanceResolver from "./resolvers/equipmentInstanceResolver.js";
 import { ToolItemTypeDefs } from "./schemas/toolItemsSchema.js";
@@ -95,7 +93,6 @@ export const schema = makeExecutableSchema({
     EquipmentSessionTypeDefs,
     EventsTypeDefs,
     TermsTypeDefs,
-    MaintenanceLogsTypeDefs,
     ToolItemTypeDefs,
     CurrencyAccountsTypeDefs,
     CartTypeDefs,
@@ -126,7 +123,6 @@ export const schema = makeExecutableSchema({
     EquipmentSessionsResolver,
     EventsResolver,
     TermsResolver,
-    MaintenanceLogsResolver,
     ToolItemResolver,
     RestrictionResolver,
     CurrencyAccountResolvers,
