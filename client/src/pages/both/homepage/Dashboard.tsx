@@ -32,7 +32,7 @@ export function Dashboard() {
         result={getMakerspacesResult}
         render={(data) => {
           const makerspaces: MakerspaceWithHours[] = data.makerspaces;
-          const filteredSpaces: MakerspaceWithHours[] = makerspaces.filter((_makerspace: MakerspaceWithHours) => true); // TODO: grab the 'archieved' field from the db and check it (more logic than that required)
+          const filteredSpaces: MakerspaceWithHours[] = makerspaces.filter((_makerspace: MakerspaceWithHours) => true);
           const sortedSpaces = filteredSpaces.sort((a: MakerspaceWithHours, b: MakerspaceWithHours) =>
             a.name.toLowerCase().localeCompare(b.name.toLowerCase())
           );

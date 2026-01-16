@@ -13,8 +13,8 @@ import * as ModuleRepo from '../Training/ModuleRepository.js';
  * Fetch all Makerspaces
  * @returns all Makerspaces
  */
-export async function getMakerspaces(archived = false): Promise<MakerspaceRow[]> {
-  return await knex('Makerspaces').select().where({ archived: archived });
+export async function getMakerspaces(): Promise<MakerspaceRow[]> {
+  return await knex('Makerspaces').select();
 }
 
 /**
@@ -65,7 +65,7 @@ export async function updateMakerspace(
  * @returns 1
  */
 export async function deleteMakerspace(id: number): Promise<number> {
-  await knex('OpenHours').update({ makerspaceID: null }).where({ makerspaceID: id })
+  await knex('DefaultHours').delete().where({ makerspaceID: id });
   await knex('Rooms').update({ makerspaceID: null }).where({ makerspaceID: id })
 
   return await knex('Makerspaces').delete().where({ id });
@@ -126,4 +126,8 @@ export async function archiveMakerspace(id: number, archive = true): Promise<Mak
   } else {
     return undefined;
   }
+}
+
+export async function unarchiveMakerspace(id: number): Promise<MakerspaceRow | undefined> {
+  return await archiveMakerspace(id, false);
 }
