@@ -120,7 +120,7 @@ export default function ReservationModal(props: ReservationModalProps) {
                 : null
             }
             {
-              user.id === props.reservation.user.id ?
+              isManagerOrSelf(user, Number(props.reservation.user.id)) ?
                 <Button
                   color="error"
                   variant="contained"
