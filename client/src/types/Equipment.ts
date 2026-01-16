@@ -9,6 +9,7 @@ export default interface Equipment {
   byReservationOnly: boolean;
   needsWelcome?: boolean;
   requiresInPerson: boolean;
+  schedulable: boolean;
   readerID?: number;
   notes: string;
   archived: boolean;
@@ -23,6 +24,7 @@ export interface EquipmentWithRoom {
   numAvailable: number;
   numInUse: number;
   byReservationOnly: boolean;
+  schedulable: boolean;
   archived: boolean;
   notes: string;
   room: {

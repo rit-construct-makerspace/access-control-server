@@ -53,3 +53,15 @@ export function isOnlyTrainer(user: CurrentUser) {
 
     return user.trainer.length > 0;
 }
+
+export function isManagerOrSelf(user: CurrentUser, targetId: Number) {
+    if (isManager(user)) {
+        return true;
+    }
+
+    if (Number(user.id) === Number(targetId)) {
+        return true;
+    }
+
+    return false;
+}

@@ -56,6 +56,8 @@ export interface EquipmentRow {
   requiresTrainerApproval: boolean;
   /** Whether a piece of equipment requires an in person knowledge check to be completed before allowing access */
   requiresInPerson: boolean;
+  /** Whether or not a piece of equipment can be reserved */
+  schedulable: boolean;
 }
 
 /**
@@ -200,26 +202,6 @@ export interface ModulesForEquipmentRow {
   equipmentID: number;
   /** FK:TrainingModules */
   moduleID: number;
-}
-
-export interface ReservationEventRow {
-  id: number;
-  reservationID: number;
-  eventType: string;
-  userID: number;
-  dateTime: Date;
-  payload: string;
-}
-
-export interface ReservationRow {
-  id: number;
-  makerID: number;
-  createDate: Date;
-  startTime: Date;
-  endTime: Date;
-  equipmentID: number;
-  status: string;
-  lastUpdated: Date;
 }
 
 export interface RoomSwipeRow {
@@ -653,9 +635,19 @@ export interface ExpressSessionRow {
 }
 
 export interface CustomUrlRow {
-  id:number;
+  id: number;
   shortUrl: string;
   longUrl: string;
+}
+
+export interface ReservationRow {
+  id: number;
+  equipmentID: number;
+  userID: number;
+  description: string;
+  approved: boolean;
+  start: string; // ISO 8601 date string, gotten via Date.toISOString()
+  end: string; // ^
 }
 
 declare module "knex/types/tables.js" {
@@ -668,7 +660,6 @@ declare module "knex/types/tables.js" {
     InventoryTags: InventoryTagRow;
     ModuleSubmissions: ModuleSubmissionRow;
     ModulesForEquipment: ModulesForEquipmentRow;
-    ReservationEvents: ReservationEventRow;
     Reservations: ReservationRow;
     RoomSwipes: RoomSwipeRow;
     Rooms: RoomRow;

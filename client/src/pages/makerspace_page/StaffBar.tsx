@@ -9,6 +9,7 @@ import PaidIcon from '@mui/icons-material/Paid';
 import PeopleIcon from "@mui/icons-material/People";
 import ScannerIcon from '@mui/icons-material/Scanner';
 import SchoolIcon from "@mui/icons-material/School";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { ButtonBase, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
@@ -122,13 +123,24 @@ export default function StaffBar() {
           to={`/makerspace/${makerspaceID}/history`}
           icon={<HistoryIcon />}
         />
-        {isManager ? (
-          <NavLink
-            primary={"Readers"}
-            to={`/makerspace/${makerspaceID}/readers`}
-            icon={<ScannerIcon />}
-          />
-        ) : null}
+        {
+          isManager
+            ? <NavLink
+              primary={"Reservations"}
+              to={`/makerspace/${makerspaceID}/reservations`}
+              icon={<CalendarMonthIcon />}
+            />
+            : null
+        }
+        {
+          isManager
+            ? <NavLink
+              primary={"Readers"}
+              to={`/makerspace/${makerspaceID}/readers`}
+              icon={<ScannerIcon />}
+            />
+            : null
+        }
         <NavLink
           primary={"Finances"}
           to={`/makerspace/${makerspaceID}/currency`}

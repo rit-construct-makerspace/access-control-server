@@ -63,6 +63,7 @@ export const GET_EQUIPMENT_BY_ID = gql`
       needsWelcome
       requiresTrainerApproval
       requiresInPerson
+      schedulable
     }
   }
 `;
@@ -156,6 +157,7 @@ export const GET_ARCHIVED_EQUIPMENT_BY_ID = gql`
       byReservationOnly
       needsWelcome
       requiresInPerson
+      schedulable
     }
   }
 `;
@@ -185,6 +187,7 @@ export const UPDATE_EQUIPMENT = gql`
     $needsWelcome: Boolean
     $requiresTrainerApproval: Boolean
     $requiresInPerson: Boolean
+    $schedulable: Boolean
   ) {
     updateEquipment(
       id: $id
@@ -199,6 +202,7 @@ export const UPDATE_EQUIPMENT = gql`
         needsWelcome: $needsWelcome,
         requiresTrainerApproval: $requiresTrainerApproval,
         requiresInPerson: $requiresInPerson
+        schedulable: $schedulable
       }
     ) {
       id

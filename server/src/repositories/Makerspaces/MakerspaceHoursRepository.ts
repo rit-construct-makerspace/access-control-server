@@ -89,10 +89,8 @@ export async function getMakerspaceHoursNextWeek(makerspaceID: number): Promise<
         await getMakerspaceHoursOnDay(target, makerspaceID).then((result) => {
             week[dateToLocalizedNum(result.day)] = { ...result, day: new Date(result.day) };
             target.setDate(Number(date_formatter.format(target)) + 1);
-            console.log(full_formatter.format(target));
         });
     }
-    console.log(week);
     return week;
 }
 

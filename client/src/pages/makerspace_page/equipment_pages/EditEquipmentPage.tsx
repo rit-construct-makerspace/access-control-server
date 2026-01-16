@@ -28,6 +28,7 @@ export interface Equipment {
   needsWelcome: boolean;
   requiresTrainerApproval: boolean;
   requiresInPerson: boolean;
+  schedulable: boolean;
   room: {
     id: number;
     name: string;
@@ -140,7 +141,7 @@ export default function EditEquipmentPage() {
             <InstanceGrid equipmentID={equipment.id ?? 0} isMobile={isMobile} />
           </Stack>
           {/* Equipment Information Modal */}
-          <PrettyModal open={editEquipmentModal} onClose={() => setEditEquipmentModal(false)} width={"80%"} elevation={8}>
+          <PrettyModal open={editEquipmentModal} onClose={() => setEditEquipmentModal(false)} width={"90%"} elevation={8}>
             <EquipmentInformation equipment={equipment} />
           </PrettyModal>
         </Stack>
