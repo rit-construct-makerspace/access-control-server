@@ -6,8 +6,8 @@ export async function createMaintenanceTicket(
   type: MaintenanceTicketType,
   severity: MaintenanceTicketSeverity,
   instanceID: number,
-  userID: number,
   description: string,
+  userID?: number,
   imageUrl?: string
 ): Promise<MaintenanceTicketRow> {
   const result = await knex("MaintenanceTickets").insert({

@@ -25,13 +25,13 @@ export const MaintenanceTicketTypeDefs = gql`
     severity: MaintenanceTicketSeverity!
     status: MaintenanceTicketStatus!
     instanceID: Int!
-    userID: Int!
+    userID: Int
     description: String!
     imageUrl: String
     dateCreated: String!
     dateClosed: String
     instance: EquipmentInstance!
-    creator: User!
+    creator: User
   }
 
   input Pagination {

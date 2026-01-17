@@ -19,7 +19,9 @@ const MaintenanceTicketResolver = {
       _args: any,
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      UserRepo.getUserByID(parent.userID)
+      parent.userID
+        ? UserRepo.getUserByID(parent.userID)
+        : undefined
     ))
   },
 
@@ -73,7 +75,7 @@ const MaintenanceTicketResolver = {
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      await MaintenanceTicketRepo.createMaintenanceTicket(MaintenanceTicketType.REPORTED, args.severity, args.instanceID, args.userID, args.description, args.imageUrl)
+      await MaintenanceTicketRepo.createMaintenanceTicket(MaintenanceTicketType.REPORTED, args.severity, args.instanceID, args.description, args.userID, args.imageUrl)
     )),
 
     modifyMaintenanceTicketClosed: async (

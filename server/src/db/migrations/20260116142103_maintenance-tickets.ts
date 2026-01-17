@@ -13,8 +13,8 @@ export async function up(knex: Knex): Promise<void> {
     t.enu("status", ["TODO", "IN_PROGRESS", "CLOSED"]).notNullable().defaultTo("TODO")
     t.integer("instanceID").references("id").inTable("EquipmentInstances").notNullable()
       .onUpdate("CASCADE").onDelete("CASCADE");
-    t.integer("userID").references("id").inTable("Users").notNullable()
-      .onUpdate("CASCADE").onDelete("CASCADE");
+    t.integer("userID").references("id").inTable("Users").nullable()
+      .onUpdate("CASCADE").onDelete("SET NULL");
     t.string("description").notNullable().defaultTo("");
     t.string("imageUrl").nullable().defaultTo(null);
     t.timestamp("dateCreated").notNullable().defaultTo(knex.fn.now());

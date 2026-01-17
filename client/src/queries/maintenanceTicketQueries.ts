@@ -28,7 +28,7 @@ export interface MaintenanceTicket {
   imageUrl: string | null,
   dateCreated: string,
   dateClosed: string | null,
-  creator: CurrentUser,
+  creator: CurrentUser | undefined,
   instance: EquipmentInstance
 }
 

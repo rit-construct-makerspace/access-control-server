@@ -641,7 +641,7 @@ export interface MaintenanceTicketRow {
   severity: MaintenanceTicketSeverity;
   status: MaintenanceTicketStatus;
   instanceID: number;
-  userID: number;
+  userID: number | undefined;
   description: string;
   imageUrl: string | null;
   dateCreated: string; // ISO 8601 date string, gotten via Date.toISOString()
