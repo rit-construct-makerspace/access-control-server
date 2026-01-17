@@ -47,7 +47,6 @@ export const MaintenanceTicketTypeDefs = gql`
 
   extend type Mutation {
     createMaintenanceTicket(
-      type: MaintenanceTicketType!
       severity: MaintenanceTicketSeverity!
       instanceID: Int!
       userID: Int!

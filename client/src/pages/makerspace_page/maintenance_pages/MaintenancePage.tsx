@@ -1,4 +1,4 @@
-import { Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
 import { useQuery } from "@apollo/client";
@@ -6,6 +6,8 @@ import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { DataGrid, GridRowsProp, GridColDef, GridFilterModel, GridPaginationModel, GridSortModel } from "@mui/x-data-grid";
 import { useState } from "react";
 import { MaintenanceTicket, PAGINATED_MAINTENANCE_TICKETS } from "../../../queries/maintenanceTicketQueries";
+import NewTicketModal from "./NewTicketModal";
+import WarningIcon from '@mui/icons-material/Warning';
 
 const formatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
@@ -24,6 +26,8 @@ export default function MaintenancePage() {
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 100, });
   const [filterModel, setFilterModel] = useState<GridFilterModel>();
   const [sortModel, setSortModel] = useState<GridSortModel>();
+
+  const [newTicketModal, setNewTicketModal] = useState(false);
 
   const getMaintenanceTickets = useQuery(PAGINATED_MAINTENANCE_TICKETS, {
     variables: {
@@ -83,7 +87,17 @@ export default function MaintenancePage() {
 
           return (
             <Stack padding={"15px"} spacing={2}>
-              <Typography>{`Maintenance Items for ${makerspace.name}`}</Typography>
+              <Stack direction={"row"} justifyContent={"space-between"}>
+                <Typography variant="h4">{`Maintenance Items for ${makerspace.name}`}</Typography>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  onClick={() => setNewTicketModal(true)}
+                  startIcon={<WarningIcon />}
+                >
+                  Report Issue
+                </Button>
+              </Stack>
               <DataGrid
                 columns={columns}
                 rows={rows}
@@ -98,6 +112,7 @@ export default function MaintenancePage() {
                 onSortModelChange={handleSortModelChange}
                 rowCount={-1}
               />
+              <NewTicketModal open={newTicketModal} onClose={() => setNewTicketModal(false)} makerspace={makerspace} />
             </Stack>
           );
         }} />

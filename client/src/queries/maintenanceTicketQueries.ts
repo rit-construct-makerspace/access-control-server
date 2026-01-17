@@ -8,9 +8,9 @@ export enum MaintenanceTicketType {
 }
 
 export enum MaintenanceTicketSeverity {
-  "HIGH",
-  "MEDIUM",
-  "LOW"
+  HIGH = "HIGH",
+  MEDIUM = "MEDIUM",
+  LOW = "LOW"
 }
 
 export enum MaintenanceTicketStatus {
@@ -33,7 +33,7 @@ export interface MaintenanceTicket {
 }
 
 export const PAGINATED_MAINTENANCE_TICKETS = gql`
-  query PaginatedMaintenanceTickets($pagination: Pagination) {
+  query PaginatedMaintenanceTickets($pagination: Pagination!) {
     paginatedMaintenanceTickets(pagination: $pagination) {
       id
       type
@@ -55,6 +55,53 @@ export const PAGINATED_MAINTENANCE_TICKETS = gql`
           name
         }
       }
+    }
+  }
+`;
+
+export const GET_MAINTENANCE_TICKET = gql`
+  query MaintenanceTicket($id: Int!) {
+    maintenanceTicket(id: $id) {
+      id
+      type
+      severity
+      status
+      description
+      imageUrl
+      dateCreated
+      dateClosed
+      creator {
+        id
+        ritUsername
+      }
+      instance {
+        id
+        name
+        equipment {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const CREATE_MAINTENANCE_TICKET = gql`
+  mutation CreateMaintenanceTicket(
+    $severity: MaintenanceTicketSeverity!,
+    $instanceID: Int!,
+    $userID: Int!,
+    $description: String!,
+    $imageUrl: String
+  ) {
+    createMaintenanceTicket(
+      severity: $severity,
+      instanceID: $instanceID,
+      userID: $userID,
+      description: $description,
+      imageUrl: $imageUrl
+    ) {
+      id
     }
   }
 `;
