@@ -50,7 +50,6 @@ export default function NewTicketModal(props: NewTicketModalProps) {
   async function handleCreateTicket() {
     if (!(equipment && instance && (severity !== undefined))) {
       toast.error("A required field is empty!");
-      console.log(equipment, instance, severity);
       return;
     }
     try {

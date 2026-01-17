@@ -11,7 +11,7 @@ const MaintenanceTicketResolver = {
       _args: any,
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      InstanceRepo.getInstanceByID(parent.id)
+      InstanceRepo.getInstanceByID(parent.instanceID)
     )),
 
     creator: async (

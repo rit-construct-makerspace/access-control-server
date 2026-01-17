@@ -11,8 +11,8 @@ import WarningIcon from '@mui/icons-material/Warning';
 
 const formatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
-  weekday: "long",
-  month: "long",
+  year: "numeric",
+  month: "numeric",
   day: "numeric",
   hour: "numeric",
   minute: "2-digit"
@@ -39,13 +39,13 @@ export default function MaintenancePage() {
   });
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID" },
-    { field: "equipment", headerName: "Equipment" },
-    { field: "instance", headerName: "Instance" },
-    { field: "type", headerName: "Type" },
-    { field: "status", headerName: "Status" },
-    { field: "creator", headerName: "Creator" },
-    { field: "created", headerName: "Created" }
+    { field: "id", headerName: "ID", width: 10 },
+    { field: "equipment", headerName: "Equipment", width: 200 },
+    { field: "instance", headerName: "Instance", width: 200 },
+    { field: "type", headerName: "Type", width: 100 },
+    { field: "status", headerName: "Status", width: 100 },
+    { field: "creator", headerName: "Creator", width: 100 },
+    { field: "created", headerName: "Created", width: 200 }
   ];
 
   function handlePaginationModelChange(model: GridPaginationModel) {
@@ -81,7 +81,7 @@ export default function MaintenancePage() {
               type: ticket.type,
               status: ticket.status,
               creator: ticket.creator.ritUsername,
-              created: formatter.format(new Date(ticket.dateCreated))
+              created: formatter.format(new Date(Number(ticket.dateCreated)))
             }
           ))
 
