@@ -33,7 +33,7 @@ export default function NewTicketModal(props: NewTicketModalProps) {
   }
 
   const equipmentInstancesResult = useQuery(GET_EQUIPMENT_INSTANCES, { variables: { equipmentID: equipment?.id ?? -1 } });
-  const [createTicket] = useMutation(CREATE_MAINTENANCE_TICKET);
+  const [createTicket] = useMutation(CREATE_MAINTENANCE_TICKET, { refetchQueries: ["PaginatedMaintenanceTickets",] });
 
   const makerspace_equipments_2 = props.makerspace?.rooms.map((room) => (room.equipment))
   const makerspace_equipments = makerspace_equipments_2?.flat(1);
