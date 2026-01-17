@@ -619,20 +619,20 @@ export interface ReservationRow {
 }
 
 export enum MaintenanceTicketType {
-  "AUTOMATIC",
-  "REPORTED"
+  AUTOMATIC = "AUTOMATIC",
+  REPORTED = "REPORTED"
 }
 
 export enum MaintenanceTicketSeverity {
-  "HIGH",
-  "MEDIUM",
-  "LOW"
+  HIGH = "HIGH",
+  MEDIUM = "MEDIUM",
+  LOW = "LOW"
 }
 
 export enum MaintenanceTicketStatus {
-  "TODO",
-  "IN_PROGRESS",
-  "CLOSED"
+  TODO = "TODO",
+  IN_PROGESS = "IN_PROGRESS",
+  CLOSED = "CLOSED"
 }
 
 export interface MaintenanceTicketRow {

@@ -1,3 +1,4 @@
+import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
 import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../db/tables.js";
 
@@ -9,14 +10,19 @@ export async function createMaintenanceTicket(
   description: string,
   imageUrl?: string
 ): Promise<MaintenanceTicketRow> {
-  return await knex("MaintenanceTickets").insert({
+  const result = await knex("MaintenanceTickets").insert({
     type,
     severity,
     instanceID,
     userID,
     description,
     imageUrl
-  });
+  }).returning("*");
+  if (result.length > 0) {
+    return result[0];
+  } else {
+    throw new GraphQLError("Failed to create ticket")
+  }
 }
 
 export async function modifyMaintenanceTicketStatus(id: number, status: MaintenanceTicketStatus): Promise<number> {
@@ -66,7 +72,7 @@ export async function paginatedMaintenanceTickets(pagination: { page: number, pa
     .join("Rooms", "Equipment.roomID", "Rooms.id");
 
   // pagination
-  query = query.offset(pagination.pageSize * pagination.page).limit(pagination.pageSize);
+  query = query.select("MaintenanceTickets.*").offset(pagination.pageSize * pagination.page).limit(pagination.pageSize);
 
 
   return await query;

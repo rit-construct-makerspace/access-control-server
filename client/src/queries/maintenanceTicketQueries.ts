@@ -3,8 +3,8 @@ import { CurrentUser } from "../common/CurrentUserProvider";
 import { EquipmentInstance } from "./equipmentInstanceQueries";
 
 export enum MaintenanceTicketType {
-  "AUTOMATIC",
-  "REPORTED"
+  AUTOMATIC = "AUTOMATIC",
+  REPORTED = "REPORTED"
 }
 
 export enum MaintenanceTicketSeverity {
@@ -14,9 +14,9 @@ export enum MaintenanceTicketSeverity {
 }
 
 export enum MaintenanceTicketStatus {
-  "TODO",
-  "IN_PROGRESS",
-  "CLOSED"
+  TODO = "TODO",
+  IN_PROGRESS = "IN_PROGRESS",
+  CLOSED = "CLOSED"
 }
 
 export interface MaintenanceTicket {
