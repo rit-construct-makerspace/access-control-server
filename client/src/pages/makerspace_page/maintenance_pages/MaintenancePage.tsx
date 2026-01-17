@@ -40,12 +40,13 @@ export default function MaintenancePage() {
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 10 },
-    { field: "equipment", headerName: "Equipment", width: 200 },
-    { field: "instance", headerName: "Instance", width: 200 },
-    { field: "type", headerName: "Type", width: 100 },
-    { field: "status", headerName: "Status", width: 100 },
+    { field: "equipment", headerName: "Equipment", width: 350 },
+    { field: "instance", headerName: "Instance", width: 300 },
+    { field: "type", headerName: "Type", width: 110 },
+    { field: "status", headerName: "Status", width: 140 },
+    { field: "severity", headerName: "Severity", width: 140 },
     { field: "creator", headerName: "Creator", width: 100 },
-    { field: "created", headerName: "Created", width: 200 }
+    { field: "created", headerName: "Created", width: 180 }
   ];
 
   function handlePaginationModelChange(model: GridPaginationModel) {
@@ -80,6 +81,7 @@ export default function MaintenancePage() {
               instance: ticket.instance.name,
               type: ticket.type,
               status: ticket.status,
+              severity: ticket.severity,
               creator: ticket.creator.ritUsername,
               created: formatter.format(new Date(Number(ticket.dateCreated)))
             }
