@@ -5,7 +5,7 @@ import { useQuery } from "@apollo/client";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { DataGrid, GridRowsProp, GridColDef, GridFilterModel, GridPaginationModel, GridSortModel } from "@mui/x-data-grid";
 import { useState } from "react";
-import { MaintenanceTicket, PAGINATED_MAINTENANCE_TICKETS } from "../../../queries/maintenanceTicketQueries";
+import { MaintenanceTicket, MaintenanceTicketType, PAGINATED_MAINTENANCE_TICKETS } from "../../../queries/maintenanceTicketQueries";
 import NewTicketModal from "./NewTicketModal";
 import WarningIcon from '@mui/icons-material/Warning';
 
@@ -82,7 +82,7 @@ export default function MaintenancePage() {
               type: ticket.type,
               status: ticket.status,
               severity: ticket.severity,
-              creator: ticket.creator.ritUsername,
+              creator: ticket.type === MaintenanceTicketType.AUTOMATIC ? "SERVER" : ticket.creator?.ritUsername ?? "",
               created: formatter.format(new Date(Number(ticket.dateCreated)))
             }
           ))
