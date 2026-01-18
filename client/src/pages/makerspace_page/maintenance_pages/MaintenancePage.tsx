@@ -89,6 +89,7 @@ export default function MaintenancePage() {
 
           return (
             <Stack padding={"15px"} spacing={2}>
+              <title>{`${makerspace.name} Maintenance`}</title>
               <Stack direction={"row"} justifyContent={"space-between"}>
                 <Typography variant="h4">{`Maintenance Items for ${makerspace.name}`}</Typography>
                 <Button
