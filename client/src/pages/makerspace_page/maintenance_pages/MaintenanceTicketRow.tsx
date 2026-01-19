@@ -104,7 +104,7 @@ export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
                     startIcon={<TaskIcon />}
                     onClick={() => handleCloseTicket(ticket.id)}
                   >
-                    Close
+                    Close Ticket
                   </Button>
                   <Button
                     color="info"

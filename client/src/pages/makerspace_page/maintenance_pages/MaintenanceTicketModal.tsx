@@ -183,7 +183,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
                 startIcon={<TaskIcon />}
                 onClick={() => handleCloseTicket(props.ticket?.id ?? -1)}
               >
-                Close Tikcet
+                Close Ticket
               </Button>
           }
         </Stack>
