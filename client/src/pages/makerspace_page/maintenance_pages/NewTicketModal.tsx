@@ -12,6 +12,13 @@ import { CREATE_MAINTENANCE_TICKET, MaintenanceTicketSeverity } from "../../../q
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { justifyContent } from "@mui/system";
 import { toast } from "react-toastify";
+import FileUploadButton from "../../../common/FileUploadButton";
+import styled from "styled-components";
+import { makeCDNLink } from "../../../common/ImageFinder";
+
+const StyledImg = styled.img`
+  padding: 5px
+`;
 
 interface NewTicketModalProps {
   open: boolean,
@@ -27,6 +34,7 @@ export default function NewTicketModal(props: NewTicketModalProps) {
   const [instance, setInstance] = useState<EquipmentInstance>();
   const [description, setDescription] = useState("");
   const [severity, setSeverity] = useState<MaintenanceTicketSeverity>();
+  const [imageUrl, setImageUrl] = useState<string>();
 
   if (!(props.equipment || props.makerspace) || (props.equipment && props.makerspace)) {
     return;
@@ -43,6 +51,7 @@ export default function NewTicketModal(props: NewTicketModalProps) {
     setInstance(undefined);
     setDescription("");
     setSeverity(undefined);
+    setImageUrl(undefined);
 
     props.onClose();
   }
@@ -58,7 +67,8 @@ export default function NewTicketModal(props: NewTicketModalProps) {
           severity: severity,
           instanceID: Number(instance.id),
           userID: Number(user.id),
-          description: description
+          description: description,
+          imageUrl: imageUrl
         }
       })
     } catch (e) {
@@ -160,6 +170,11 @@ export default function NewTicketModal(props: NewTicketModalProps) {
           multiline
           minRows={3}
         />
+        {
+          imageUrl
+            ? <StyledImg src={makeCDNLink(imageUrl, "user-uploads/")} />
+            : null
+        }
         <Stack direction={"row"} justifyContent={"space-between"}>
           <Button
             color="error"
@@ -169,6 +184,12 @@ export default function NewTicketModal(props: NewTicketModalProps) {
           >
             Cancel
           </Button>
+          <FileUploadButton
+            color="info"
+            variant="contained"
+            text="Upload Image"
+            onUpload={(name: string) => setImageUrl(name)}
+          />
           <Button
             color="success"
             variant="contained"
