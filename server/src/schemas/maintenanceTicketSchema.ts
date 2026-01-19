@@ -41,7 +41,7 @@ export const MaintenanceTicketTypeDefs = gql`
 
   extend type Query {
     maintenanceTicket(id: Int!): MaintenanceTicket
-    maintenanceTickets(makerspaceIDs: [Int], equipmentIDs: [Int], instanceIDs: [Int], status: MaintenanceTicketStatus): [MaintenanceTicket]
+    maintenanceTickets(makerspaceIDs: [Int], equipmentIDs: [Int], instanceIDs: [Int], status: [MaintenanceTicketStatus]): [MaintenanceTicket]
     paginatedMaintenanceTickets(pagination: Pagination!): [MaintenanceTicket]
   }
 
@@ -54,6 +54,6 @@ export const MaintenanceTicketTypeDefs = gql`
       imageUrl: String
     ): MaintenanceTicket
 
-    modifyMaintenanceTicketClosed(id: Int!, status: MaintenanceTicketStatus!): Int
+    modifyMaintenanceTicketStatus(id: Int!, status: MaintenanceTicketStatus!): Int
   }
 `;

@@ -42,7 +42,7 @@ const MaintenanceTicketResolver = {
         makerspaceIDs?: number[],
         equipmentIDs?: number[],
         instanceIDs?: number[],
-        status?: MaintenanceTicketStatus
+        status?: MaintenanceTicketStatus[]
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
@@ -78,7 +78,7 @@ const MaintenanceTicketResolver = {
       await MaintenanceTicketRepo.createMaintenanceTicket(MaintenanceTicketType.REPORTED, args.severity, args.instanceID, args.description, args.userID, args.imageUrl)
     )),
 
-    modifyMaintenanceTicketClosed: async (
+    modifyMaintenanceTicketStatus: async (
       _parent: any,
       args: {
         id: number,
