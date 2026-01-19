@@ -105,3 +105,43 @@ export const CREATE_MAINTENANCE_TICKET = gql`
     }
   }
 `;
+
+export const GET_MAINTENANCE_TICKETS = gql`
+  query MaintenanceTickets(
+    $makerspaceIDs: [Int],
+    $equipmentIDs: [Int],
+    $instanceIDs: [Int],
+    $status: [MaintenanceTicketStatus]
+  ) {
+    maintenanceTickets(makerspaceIDs: $makerspaceIDs, equipmentIDs: $equipmentIDs, instanceIDs: $instanceIDs, status: $status) {
+      id
+      type
+      severity
+      status
+      description
+      imageUrl
+      dateCreated
+      dateClosed
+      creator {
+        id
+        ritUsername
+      }
+      instance {
+        id
+        name
+        equipment {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const MODIFY_MAINTENANCE_TICKET_STATUS = gql`
+  mutation ModifyMaintenanceTicketStatus($id: Int!, $status: MaintenanceTicketStatus!) {
+    modifyMaintenanceTicketStatus(id: $id, status: $status) {
+      id
+    }
+  }
+`;

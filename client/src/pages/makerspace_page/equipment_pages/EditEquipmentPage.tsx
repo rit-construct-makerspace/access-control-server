@@ -14,6 +14,9 @@ import HistoryIcon from '@mui/icons-material/History';
 import { isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import HandymanIcon from '@mui/icons-material/Handyman';
+import MaintenanceTicketRow from "../maintenance_pages/MaintenanceTicketRow";
+import WarningIcon from '@mui/icons-material/Warning';
+import NewTicketModal from "../maintenance_pages/NewTicketModal";
 
 export interface Equipment {
   id: number;
@@ -66,6 +69,8 @@ export default function EditEquipmentPage() {
 
   const [editEquipmentModal, setEditEquipmentModal] = useState(false);
 
+  const [newTicketModal, setNewTicketModal] = useState(false);
+
   function handleCloseNewInstance() {
     setNewInstanceModal(false);
     setNewInstanceName("");
@@ -83,9 +88,9 @@ export default function EditEquipmentPage() {
 
       return (
 
-        <Stack padding={"0 20px 15px"} spacing={3}>
+        <Stack padding={"0 20px 15px"}>
           <title>{`Edit ${equipment.name} | Make @ RIT`}</title>
-          <Stack>
+          <Stack spacing={2}>
             <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} padding={"10px"}>
               <Typography variant="h3">{`Edit ${equipment.name}`}</Typography>
               <Stack direction={"row"} spacing={1}>
@@ -111,7 +116,7 @@ export default function EditEquipmentPage() {
                 </Button>
               </Stack>
             </Stack>
-            <Stack direction="row" spacing={2} alignItems="center" padding="10px">
+            <Stack direction="row" spacing={2} alignItems="center">
               <Typography variant="h5">Instances</Typography>
               <Button variant="contained" startIcon={<AddIcon />} color="success" onClick={() => { setNewInstanceModal(true) }}>
                 Create New Instance
@@ -138,12 +143,25 @@ export default function EditEquipmentPage() {
                 </Stack>
               </Stack>
             </PrettyModal>
-            <InstanceGrid equipmentID={equipment.id ?? 0} isMobile={isMobile} />
+            <InstanceGrid equipmentID={equipment.id} isMobile={isMobile} />
+            <Stack direction={"row"} spacing={2}>
+              <Typography variant="h5">Maintenance Tickets</Typography>
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={() => setNewTicketModal(true)}
+                startIcon={<WarningIcon />}
+              >
+                Report Issue
+              </Button>
+            </Stack>
+            <MaintenanceTicketRow equipmentID={equipment.id} />
           </Stack>
           {/* Equipment Information Modal */}
           <PrettyModal open={editEquipmentModal} onClose={() => setEditEquipmentModal(false)} width={"90%"} elevation={8}>
             <EquipmentInformation equipment={equipment} />
           </PrettyModal>
+          <NewTicketModal open={newTicketModal} onClose={() => setNewTicketModal(false)} equipment={equipment} />
         </Stack>
       );
     }} />

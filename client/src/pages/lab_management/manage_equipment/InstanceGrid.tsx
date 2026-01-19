@@ -23,7 +23,7 @@ export default function InstanceGrid(props: InstanceGridProps) {
           : <Grid container>
             {
               instances.map((instance: EquipmentInstance) => (
-                <Grid margin="10px" key={instance.id}>
+                <Grid key={instance.id}>
                   <EquipmentInstanceCard instance={instance} />
                 </Grid>
               ))
