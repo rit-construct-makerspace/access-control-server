@@ -9,16 +9,24 @@ import ThemedMarkdown from "../../../common/ThemedMarkdown";
 interface TicketModalProps {
   open: boolean,
   onClose: () => void,
-  ticket: MaintenanceTicket
+  ticket: MaintenanceTicket | undefined
 }
 
 export default function MaintenanceTicketModal(props: TicketModalProps) {
+
+  if (props.ticket === undefined) {
+    return;
+  }
 
   const [editing, setEditing] = useState(false);
   const [description, setDescription] = useState(props.ticket.description);
   const [status, setStatus] = useState<MaintenanceTicketStatus>(props.ticket.status);
 
   function cancelEdit() {
+    if (props.ticket === undefined) {
+      return;
+    }
+
     setDescription(props.ticket.description);
     setStatus(props.ticket.status);
     setEditing(false);

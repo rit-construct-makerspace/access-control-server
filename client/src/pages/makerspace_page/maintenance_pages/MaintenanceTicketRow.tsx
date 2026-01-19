@@ -6,6 +6,8 @@ import TaskIcon from '@mui/icons-material/Task';
 import EditIcon from '@mui/icons-material/Edit';
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import { toast } from "react-toastify";
+import MaintenanceTicketModal from "./MaintenanceTicketModal";
+import { useState } from "react";
 
 interface MaintenanceTicketRowProps {
   equipmentID: number
@@ -37,6 +39,9 @@ export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
 
     toast.success("Closed ticket!")
   }
+
+  const [manageTicketModal, setManageTicketModal] = useState(false);
+  const [targetTicket, setTargetTicket] = useState<MaintenanceTicket>();
 
   return (
     <RequestWrapper2 result={maintenanceTickets} render={(data) => {
@@ -93,6 +98,7 @@ export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
                     color="info"
                     variant="contained"
                     startIcon={<EditIcon />}
+                    onClick={() => { setTargetTicket(ticket); setManageTicketModal(true) }}
                   >
                     Manage
                   </Button>
@@ -100,6 +106,7 @@ export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
               </Card>
             ))
           }
+          <MaintenanceTicketModal open={manageTicketModal} onClose={() => setManageTicketModal(false)} ticket={targetTicket} />
         </Stack>
       );
     }} />
