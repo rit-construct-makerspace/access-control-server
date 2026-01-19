@@ -58,7 +58,7 @@ export async function getMaintenanceTicketsFlexibly(
     query.whereIn("MaintenanceTickets.status", status);
   }
 
-  return await query.select("MaintenanceTickets.*").limit(200);
+  return await query.select("MaintenanceTickets.*").limit(200).orderByRaw("array_position(array['HIGH', 'MEDIUM', 'LOW'], severity)").orderBy("dateCreated", "asc");
 }
 
 export async function getMaintenanceTicket(id: number): Promise<MaintenanceTicketRow | undefined> {
