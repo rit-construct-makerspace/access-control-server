@@ -1,10 +1,13 @@
 import { Stack } from "@mui/system";
 import PrettyModal from "../../../common/PrettyModal";
-import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus } from "../../../queries/maintenanceTicketQueries";
+import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MODIFY_MAINTENANCE_TICKET_STATUS } from "../../../queries/maintenanceTicketQueries";
 import { Autocomplete, Button, Chip, IconButton, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
+import { useMutation } from "@apollo/client";
+import { toast } from "react-toastify";
+import TaskIcon from '@mui/icons-material/Task';
 
 interface TicketModalProps {
   open: boolean,
@@ -32,17 +35,37 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     setEditing(false);
   }
 
+  const [modifyTicketStatus] = useMutation(MODIFY_MAINTENANCE_TICKET_STATUS, { refetchQueries: ["MaintenanceTickets"] });
+
+  async function handleCloseTicket(ticketID: number) {
+    try {
+      await modifyTicketStatus({
+        variables: {
+          id: ticketID,
+          status: MaintenanceTicketStatus.CLOSED
+        }
+      })
+    } catch (e) {
+      toast.error("Failed to close ticket: " + e);
+      return;
+    }
+
+    toast.success("Closed ticket!");
+    props.onClose();
+  }
+
   return (
-    <PrettyModal open={props.open} onClose={props.onClose}>
+    <PrettyModal open={props.open} onClose={props.onClose} width={"500px"}>
       <Stack spacing={2}>
-        <Stack direction={"row"} justifyContent={"space-between"}>
+        <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
           <Typography variant="h5">{`Ticket #${props.ticket.id}`}</Typography>
-          <Stack spacing={2}>
+          <Stack spacing={2} direction={"row"}>
             {
               editing
                 ? <Button
                   color="error"
                   variant="contained"
+                  onClick={cancelEdit}
                 >
                   Cancel Editing
                 </Button>
@@ -59,9 +82,9 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
             </IconButton>
           </Stack>
         </Stack>
-        <Stack justifyContent={"space-between"}>
-          <Stack spacing={1}>
-            <Typography variant="body1">Severity:</Typography>
+        <Stack justifyContent={"space-between"} direction={"row"}>
+          <Stack spacing={1} direction={"row"} alignItems={"center"}>
+            <Typography variant="subtitle1">Severity:</Typography>
             <Chip
               color={props.ticket.severity === MaintenanceTicketSeverity.HIGH
                 ? "error"
@@ -90,9 +113,12 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
                 }
                 value={status}
                 onChange={(event, newValue) => (newValue ? setStatus(newValue) : null)}
+                sx={{
+                  minWidth: "200px"
+                }}
               />
-              : <Stack>
-                <Typography>Status</Typography>
+              : <Stack spacing={1} direction={"row"} alignItems={"center"}>
+                <Typography variant="subtitle1">Status: </Typography>
                 <Chip
                   color={
                     status === MaintenanceTicketStatus.TODO
@@ -121,6 +147,25 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
               </ThemedMarkdown>
             </Stack>
         }
+        <Stack direction={"row"} width={"100%"} justifyContent={"end"}>
+          {
+            editing
+              ? <Button
+                color="success"
+                variant="contained"
+              >
+                Save Changes
+              </Button>
+              : <Button
+                color="secondary"
+                variant="contained"
+                startIcon={<TaskIcon />}
+                onClick={() => handleCloseTicket(props.ticket?.id ?? -1)}
+              >
+                Close
+              </Button>
+          }
+        </Stack>
       </Stack>
     </PrettyModal>
   );
