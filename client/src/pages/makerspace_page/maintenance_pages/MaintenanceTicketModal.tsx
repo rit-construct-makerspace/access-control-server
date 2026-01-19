@@ -1,6 +1,6 @@
 import { Stack } from "@mui/system";
 import PrettyModal from "../../../common/PrettyModal";
-import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MODIFY_MAINTENANCE_TICKET_STATUS } from "../../../queries/maintenanceTicketQueries";
+import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
 import { Autocomplete, Button, Chip, IconButton, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
@@ -36,6 +36,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
   }
 
   const [modifyTicketStatus] = useMutation(MODIFY_MAINTENANCE_TICKET_STATUS, { refetchQueries: ["MaintenanceTickets"] });
+  const [updateTicket] = useMutation(UPDATE_MAINTENACE_TICKET, { refetchQueries: ["MaintenanceTickets"] })
 
   async function handleCloseTicket(ticketID: number) {
     try {
@@ -52,6 +53,25 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
 
     toast.success("Closed ticket!");
     props.onClose();
+  }
+
+  async function handleSaveTicket() {
+    try {
+      await updateTicket({
+        variables: {
+          id: props.ticket?.id,
+          severity: props.ticket?.severity,
+          status: status,
+          description: description
+        }
+      })
+    } catch (e) {
+      toast.error("Failed to save ticket: " + e);
+      return;
+    }
+
+    toast.success("Saved ticket!")
+    setEditing(false);
   }
 
   return (
@@ -153,6 +173,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
               ? <Button
                 color="success"
                 variant="contained"
+                onClick={handleSaveTicket}
               >
                 Save Changes
               </Button>
@@ -162,7 +183,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
                 startIcon={<TaskIcon />}
                 onClick={() => handleCloseTicket(props.ticket?.id ?? -1)}
               >
-                Close
+                Close Tikcet
               </Button>
           }
         </Stack>

@@ -77,3 +77,12 @@ export async function paginatedMaintenanceTickets(pagination: { page: number, pa
 
   return await query;
 }
+
+export async function updateMaintenanceTicket(
+  id: number,
+  severity: MaintenanceTicketSeverity,
+  status: MaintenanceTicketStatus,
+  description: string,
+): Promise<number> {
+  return await knex("MaintenanceTickets").update({ severity: severity, status: status, description: description }).where({ id: id });
+}

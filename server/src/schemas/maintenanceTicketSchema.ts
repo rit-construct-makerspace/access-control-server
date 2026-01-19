@@ -55,5 +55,7 @@ export const MaintenanceTicketTypeDefs = gql`
     ): MaintenanceTicket
 
     modifyMaintenanceTicketStatus(id: Int!, status: MaintenanceTicketStatus!): Int
+
+    updateMaintenanceTicket(id: Int!, severity: MaintenanceTicketSeverity!, status: MaintenanceTicketStatus!, description: String!): Int
   }
 `;

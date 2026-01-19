@@ -143,3 +143,9 @@ export const MODIFY_MAINTENANCE_TICKET_STATUS = gql`
     modifyMaintenanceTicketStatus(id: $id, status: $status)
   }
 `;
+
+export const UPDATE_MAINTENACE_TICKET = gql`
+  mutation UpdateMaintenanceTicket($id: Int!, $severity: MaintenanceTicketSeverity!, $status: MaintenanceTicketStatus!, $description: String!) {
+    updateMaintenanceTicket(id: $id, severity: $severity, status: $status, description: $description)
+  }
+`;

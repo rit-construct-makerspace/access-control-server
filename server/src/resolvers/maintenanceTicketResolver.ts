@@ -87,6 +87,19 @@ const MaintenanceTicketResolver = {
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
       await MaintenanceTicketRepo.modifyMaintenanceTicketStatus(args.id, args.status)
+    )),
+
+    updateMaintenanceTicket: async (
+      _parent: any,
+      args: {
+        id: number,
+        severity: MaintenanceTicketSeverity,
+        status: MaintenanceTicketStatus,
+        description: string
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff(async (user) => (
+      await MaintenanceTicketRepo.updateMaintenanceTicket(args.id, args.severity, args.status, args.description)
     ))
   }
 }
