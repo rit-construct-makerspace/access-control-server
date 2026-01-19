@@ -1,10 +1,11 @@
 import { Button, Card, CardActionArea, CardContent, Chip, Stack, Typography } from "@mui/material";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import { GET_MAINTENANCE_TICKETS, MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../../queries/maintenanceTicketQueries";
-import { useQuery } from "@apollo/client";
+import { GET_MAINTENANCE_TICKETS, MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, MODIFY_MAINTENANCE_TICKET_STATUS } from "../../../queries/maintenanceTicketQueries";
+import { useMutation, useQuery } from "@apollo/client";
 import TaskIcon from '@mui/icons-material/Task';
 import EditIcon from '@mui/icons-material/Edit';
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
+import { toast } from "react-toastify";
 
 interface MaintenanceTicketRowProps {
   equipmentID: number
@@ -18,6 +19,24 @@ export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
       status: [MaintenanceTicketStatus.TODO, MaintenanceTicketStatus.IN_PROGRESS]
     }
   });
+
+  const [modifyTicketStatus] = useMutation(MODIFY_MAINTENANCE_TICKET_STATUS, { refetchQueries: ["MaintenanceTickets"] });
+
+  async function handleCloseTicket(ticketID: number) {
+    try {
+      await modifyTicketStatus({
+        variables: {
+          id: ticketID,
+          status: MaintenanceTicketStatus.CLOSED
+        }
+      })
+    } catch (e) {
+      toast.error("Failed to close ticket: " + e);
+      return;
+    }
+
+    toast.success("Closed ticket!")
+  }
 
   return (
     <RequestWrapper2 result={maintenanceTickets} render={(data) => {
@@ -66,6 +85,7 @@ export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
                     color="secondary"
                     variant="contained"
                     startIcon={<TaskIcon />}
+                    onClick={() => handleCloseTicket(ticket.id)}
                   >
                     Close
                   </Button>

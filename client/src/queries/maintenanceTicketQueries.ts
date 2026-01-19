@@ -140,8 +140,6 @@ export const GET_MAINTENANCE_TICKETS = gql`
 
 export const MODIFY_MAINTENANCE_TICKET_STATUS = gql`
   mutation ModifyMaintenanceTicketStatus($id: Int!, $status: MaintenanceTicketStatus!) {
-    modifyMaintenanceTicketStatus(id: $id, status: $status) {
-      id
-    }
+    modifyMaintenanceTicketStatus(id: $id, status: $status)
   }
 `;
