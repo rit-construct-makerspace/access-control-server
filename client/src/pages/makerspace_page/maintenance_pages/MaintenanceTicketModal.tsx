@@ -15,6 +15,15 @@ interface TicketModalProps {
   ticket: MaintenanceTicket | undefined
 }
 
+const formatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit"
+});
+
 export default function MaintenanceTicketModal(props: TicketModalProps) {
 
   if (props.ticket === undefined) {
@@ -78,29 +87,14 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     <PrettyModal open={props.open} onClose={props.onClose} width={"500px"}>
       <Stack spacing={2}>
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
-          <Typography variant="h5">{`Ticket #${props.ticket.id}`}</Typography>
-          <Stack spacing={2} direction={"row"}>
-            {
-              editing
-                ? <Button
-                  color="error"
-                  variant="contained"
-                  onClick={cancelEdit}
-                >
-                  Cancel Editing
-                </Button>
-                : <Button
-                  color="info"
-                  variant="contained"
-                  onClick={() => setEditing(true)}
-                >
-                  Edit
-                </Button>
-            }
-            <IconButton onClick={props.onClose}>
-              <CloseIcon />
-            </IconButton>
-          </Stack>
+          <Typography variant="h5">{props.ticket.instance.name}</Typography>
+          <IconButton onClick={props.onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Stack>
+        <Stack direction={"row"} justifyContent={"space-between"}>
+          <Typography variant="subtitle1">{`Ticket #${props.ticket.id}`}</Typography>
+          <Typography variant="subtitle1">{`Created: ${formatter.format(Number(props.ticket.dateCreated))}`}</Typography>
         </Stack>
         <Stack justifyContent={"space-between"} direction={"row"}>
           <Stack spacing={1} direction={"row"} alignItems={"center"}>
@@ -167,7 +161,24 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
               </ThemedMarkdown>
             </Stack>
         }
-        <Stack direction={"row"} width={"100%"} justifyContent={"end"}>
+        <Stack direction={"row"} width={"100%"} justifyContent={"space-between"}>
+          {
+            editing
+              ? <Button
+                color="error"
+                variant="contained"
+                onClick={cancelEdit}
+              >
+                Cancel Editing
+              </Button>
+              : <Button
+                color="info"
+                variant="contained"
+                onClick={() => setEditing(true)}
+              >
+                Edit
+              </Button>
+          }
           {
             editing
               ? <Button
