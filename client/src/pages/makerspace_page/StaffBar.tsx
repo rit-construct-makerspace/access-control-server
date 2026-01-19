@@ -95,7 +95,7 @@ export default function StaffBar() {
             : null
         }
         <NavLink
-          primary={"Manage Trainings"}
+          primary={"Trainings"}
           to={`/makerspace/${makerspaceID}/trainings`}
           icon={<SchoolIcon />}
         />
