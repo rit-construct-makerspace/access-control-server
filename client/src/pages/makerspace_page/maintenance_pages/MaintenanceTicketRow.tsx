@@ -13,6 +13,15 @@ interface MaintenanceTicketRowProps {
   equipmentID: number
 }
 
+const formatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/New_York",
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit"
+});
+
 export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
 
   const maintenanceTickets = useQuery(GET_MAINTENANCE_TICKETS, {
@@ -52,9 +61,12 @@ export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
         <Stack width={"100%"} overflow={"auto"} direction={"row"} spacing={3}>
           {
             tickets.map((ticket) => (
-              <Card sx={{ minWidth: "450px", minHeight: "450px", padding: "20px" }}>
-                <Stack spacing={2} height={"93%"}>
-                  <Typography variant="h6">{ticket.instance.name}</Typography>
+              <Card sx={{ minWidth: "450px", minHeight: "400px", padding: "20px" }}>
+                <Stack spacing={2} height={"91%"}>
+                  <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
+                    <Typography variant="h5">{ticket.instance.name}</Typography>
+                    <Typography variant="subtitle1">{formatter.format(Number(ticket.dateCreated))}</Typography>
+                  </Stack>
                   <Typography variant="body1">{`Reported by: ${ticket.type === MaintenanceTicketType.AUTOMATIC ? "SERVER" : ticket.creator?.ritUsername ?? ""}`}</Typography>
                   <Stack direction={"row"} justifyContent={"space-between"}>
                     <Stack direction={"row"} spacing={1} alignItems={"center"}>
