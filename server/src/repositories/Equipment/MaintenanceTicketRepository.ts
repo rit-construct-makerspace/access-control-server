@@ -21,7 +21,7 @@ export async function createMaintenanceTicket(
   if (result.length > 0) {
     return result[0];
   } else {
-    throw new GraphQLError("Failed to create ticket")
+    throw new GraphQLError("Failed to create ticket");
   }
 }
 
@@ -65,7 +65,10 @@ export async function getMaintenanceTicket(id: number): Promise<MaintenanceTicke
   return await knex("MaintenanceTickets").where({ id: id }).first();
 }
 
-export async function paginatedMaintenanceTickets(pagination: { page: number, pageSize: number }): Promise<MaintenanceTicketRow[]> {
+export async function paginatedMaintenanceTickets(
+  pagination: { page: number, pageSize: number },
+  sort?: { target: string, dir: string }
+): Promise<MaintenanceTicketRow[]> {
   let query = knex("MaintenanceTickets")
     .join("EquipmentInstances", "MaintenanceTickets.instanceID", "EquipmentInstances.id")
     .join("Equipment", "EquipmentInstances.equipmentID", "Equipment.id")
@@ -74,6 +77,24 @@ export async function paginatedMaintenanceTickets(pagination: { page: number, pa
   // pagination
   query = query.select("MaintenanceTickets.*").offset(pagination.pageSize * pagination.page).limit(pagination.pageSize);
 
+  // sorting
+  if (sort) {
+    switch (sort.target) {
+      case "severity": {
+        query = query.orderByRaw(`array_position(array[${sort.dir === "desc" ? "'HIGH', 'MEDIUM', 'LOW'" : "'LOW', 'MEDIUM', 'HIGH'"}], "MaintenanceTickets"."severity")`)
+        break;
+      }
+      case "status": {
+        query = query.orderByRaw(`array_position(array[${sort.dir === "desc" ? "'CLOSED', 'IN_PROGRESS', 'TODO', 'UPCOMING'" : "'UPCOMING', 'TODO', 'IN_PROGRESS', 'CLOSED'"}], "MaintenanceTickets"."status")`)
+        break;
+      }
+      default: {
+        query = query.orderBy(`MaintenanceTickets.${sort.target}`, sort.dir);
+      }
+    }
+
+    console.log(query.toSQL());
+  }
 
   return await query;
 }

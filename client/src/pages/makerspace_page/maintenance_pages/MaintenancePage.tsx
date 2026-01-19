@@ -25,7 +25,7 @@ export default function MaintenancePage() {
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 100, });
   const [filterModel, setFilterModel] = useState<GridFilterModel>();
-  const [sortModel, setSortModel] = useState<GridSortModel>();
+  const [sortModel, setSortModel] = useState<GridSortModel>([]);
 
   const [newTicketModal, setNewTicketModal] = useState(false);
 
@@ -34,34 +34,37 @@ export default function MaintenancePage() {
       pagination: {
         page: paginationModel.page,
         pageSize: paginationModel.pageSize
-      }
+      },
+      sort: sortModel.length > 0 ? {
+        target: sortModel[0].field,
+        dir: sortModel[0].sort
+      } : undefined
     }
   });
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 10 },
-    { field: "equipment", headerName: "Equipment", width: 350 },
-    { field: "instance", headerName: "Instance", width: 300 },
-    { field: "type", headerName: "Type", width: 110 },
+    { field: "id", headerName: "ID", width: 10, filterable: false },
+    { field: "equipment", headerName: "Equipment", width: 350, sortable: false },
+    { field: "instance", headerName: "Instance", width: 300, sortable: false },
+    { field: "type", headerName: "Type", width: 110, sortable: false },
     { field: "status", headerName: "Status", width: 140 },
     { field: "severity", headerName: "Severity", width: 140 },
-    { field: "creator", headerName: "Creator", width: 100 },
-    { field: "created", headerName: "Created", width: 180 }
+    { field: "creator", headerName: "Creator", width: 100, sortable: false },
+    { field: "dateCreated", headerName: "Created", width: 180, filterable: false }
   ];
 
   function handlePaginationModelChange(model: GridPaginationModel) {
     setPaginationModel(model);
-    console.log(model);
+    getMaintenanceTickets.refetch();
   }
 
   function handleFilterModelChange(model: GridFilterModel) {
     setFilterModel(model);
-    console.log(model);
   }
 
   function handleSortModelChange(model: GridSortModel) {
     setSortModel(model);
-    console.log(model);
+    getMaintenanceTickets.refetch();
   }
 
   return (
@@ -83,7 +86,7 @@ export default function MaintenancePage() {
               status: ticket.status,
               severity: ticket.severity,
               creator: ticket.type === MaintenanceTicketType.AUTOMATIC ? "SERVER" : ticket.creator?.ritUsername ?? "",
-              created: formatter.format(new Date(Number(ticket.dateCreated)))
+              dateCreated: formatter.format(new Date(Number(ticket.dateCreated)))
             }
           ))
 

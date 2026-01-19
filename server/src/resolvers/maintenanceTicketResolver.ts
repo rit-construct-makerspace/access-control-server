@@ -55,11 +55,15 @@ const MaintenanceTicketResolver = {
         pagination: {
           page: number,
           pageSize: number
+        },
+        sort?: {
+          target: string,
+          dir: string
         }
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      await MaintenanceTicketRepo.paginatedMaintenanceTickets(args.pagination)
+      await MaintenanceTicketRepo.paginatedMaintenanceTickets(args.pagination, args.sort)
     ))
   },
 

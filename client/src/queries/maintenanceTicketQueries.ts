@@ -33,8 +33,8 @@ export interface MaintenanceTicket {
 }
 
 export const PAGINATED_MAINTENANCE_TICKETS = gql`
-  query PaginatedMaintenanceTickets($pagination: Pagination!) {
-    paginatedMaintenanceTickets(pagination: $pagination) {
+  query PaginatedMaintenanceTickets($pagination: Pagination!, $sort: Sort) {
+    paginatedMaintenanceTickets(pagination: $pagination, sort: $sort) {
       id
       type
       severity
