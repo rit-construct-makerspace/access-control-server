@@ -8,6 +8,8 @@ import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import TaskIcon from '@mui/icons-material/Task';
+import styled from "styled-components";
+import { makeCDNLink } from "../../../common/ImageFinder";
 
 interface TicketModalProps {
   open: boolean,
@@ -23,6 +25,11 @@ const formatter = new Intl.DateTimeFormat("en-US", {
   hour: "numeric",
   minute: "2-digit"
 });
+
+const StyledImg = styled.img`
+  padding: 5px
+  maxHeight: 200px
+`;
 
 export default function MaintenanceTicketModal(props: TicketModalProps) {
 
@@ -84,7 +91,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
   }
 
   return (
-    <PrettyModal open={props.open} onClose={props.onClose} width={"500px"}>
+    <PrettyModal open={props.open} onClose={props.onClose} width={"600px"}>
       <Stack spacing={2}>
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
           <Typography variant="h5">{props.ticket.instance.name}</Typography>
@@ -160,6 +167,11 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
                 {description}
               </ThemedMarkdown>
             </Stack>
+        }
+        {
+          props.ticket.imageUrl
+            ? <StyledImg src={makeCDNLink(props.ticket.imageUrl, "user-uploads/")} />
+            : null
         }
         <Stack direction={"row"} width={"100%"} justifyContent={"space-between"}>
           {

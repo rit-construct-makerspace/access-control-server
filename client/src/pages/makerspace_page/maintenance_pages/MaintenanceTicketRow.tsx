@@ -61,59 +61,69 @@ export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
         <Stack width={"100%"} overflow={"auto"} direction={"row"} spacing={3}>
           {
             tickets.map((ticket) => (
-              <Card sx={{ minWidth: "450px", minHeight: "400px", padding: "20px" }}>
-                <Stack spacing={2} height={"91%"}>
-                  <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
-                    <Typography variant="h5">{ticket.instance.name}</Typography>
-                    <Typography variant="subtitle1">{formatter.format(Number(ticket.dateCreated))}</Typography>
-                  </Stack>
-                  <Typography variant="body1">{`Reported by: ${ticket.type === MaintenanceTicketType.AUTOMATIC ? "SERVER" : ticket.creator?.ritUsername ?? ""}`}</Typography>
-                  <Stack direction={"row"} justifyContent={"space-between"}>
-                    <Stack direction={"row"} spacing={1} alignItems={"center"}>
-                      <Typography variant="body1">Severity:</Typography>
-                      <Chip
-                        color={ticket.severity === MaintenanceTicketSeverity.HIGH
-                          ? "error"
-                          : ticket.severity === MaintenanceTicketSeverity.MEDIUM
-                            ? "warning"
-                            : "info"
-                        }
-                        label={ticket.severity}
-                      />
+              <Card sx={{ minWidth: "450px", padding: "20px" }}>
+                <Stack height={"100%"} justifyContent={"space-between"}>
+                  <Stack spacing={2}>
+                    <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
+                      <Typography variant="h5">{ticket.instance.name}</Typography>
+                      <Typography variant="subtitle1">{formatter.format(Number(ticket.dateCreated))}</Typography>
                     </Stack>
-                    <Stack direction={"row"} spacing={1} alignItems={"center"}>
-                      <Typography>Status:</Typography>
-                      <Chip
-                        color={
-                          ticket.status === MaintenanceTicketStatus.TODO
-                            ? "info"
-                            : ticket.status === MaintenanceTicketStatus.IN_PROGRESS
+                    <Typography variant="body1">{`Reported by: ${ticket.type === MaintenanceTicketType.AUTOMATIC ? "SERVER" : ticket.creator?.ritUsername ?? ""}`}</Typography>
+                    <Stack direction={"row"} justifyContent={"space-between"}>
+                      <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                        <Typography variant="body1">Severity:</Typography>
+                        <Chip
+                          color={ticket.severity === MaintenanceTicketSeverity.HIGH
+                            ? "error"
+                            : ticket.severity === MaintenanceTicketSeverity.MEDIUM
                               ? "warning"
-                              : "error"
-                        }
-                        label={ticket.status}
-                      />
+                              : "info"
+                          }
+                          label={ticket.severity}
+                        />
+                      </Stack>
+                      <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                        <Typography>Status:</Typography>
+                        <Chip
+                          color={
+                            ticket.status === MaintenanceTicketStatus.TODO
+                              ? "info"
+                              : ticket.status === MaintenanceTicketStatus.IN_PROGRESS
+                                ? "warning"
+                                : "error"
+                          }
+                          label={ticket.status}
+                        />
+                      </Stack>
+                    </Stack>
+                    <ThemedMarkdown>{ticket.description}</ThemedMarkdown>
+                  </Stack>
+                  <Stack spacing={1}>
+                    {
+                      ticket.imageUrl
+                        ? <Typography textAlign={"center"} variant="body2" sx={{ fontStyle: "italic" }}>{"<This ticket has an attached image>"}</Typography>
+                        : null
+                    }
+                    <Stack justifyContent={"space-between"} direction={"row"}>
+                      <Button
+                        color="secondary"
+                        variant="contained"
+                        startIcon={<TaskIcon />}
+                        onClick={() => handleCloseTicket(ticket.id)}
+                      >
+                        Close Ticket
+                      </Button>
+                      <Button
+                        color="info"
+                        variant="contained"
+                        startIcon={<EditIcon />}
+                        onClick={() => { setTargetTicket(ticket); setManageTicketModal(true) }}
+                      >
+                        Manage
+                      </Button>
                     </Stack>
                   </Stack>
-                  <ThemedMarkdown>{ticket.description}</ThemedMarkdown>
-                </Stack>
-                <Stack justifyContent={"space-between"} direction={"row"}>
-                  <Button
-                    color="secondary"
-                    variant="contained"
-                    startIcon={<TaskIcon />}
-                    onClick={() => handleCloseTicket(ticket.id)}
-                  >
-                    Close Ticket
-                  </Button>
-                  <Button
-                    color="info"
-                    variant="contained"
-                    startIcon={<EditIcon />}
-                    onClick={() => { setTargetTicket(ticket); setManageTicketModal(true) }}
-                  >
-                    Manage
-                  </Button>
+
                 </Stack>
               </Card>
             ))
