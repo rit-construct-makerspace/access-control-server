@@ -1,6 +1,4 @@
 import ejs from "ejs"
-import { centsToDollarString } from "../currency/currency.js"
-import { getAccountOwner } from "../../repositories/Currency/CurrencyAccountsRepository.js";
 
 const templateSource: string = `
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
@@ -24,23 +22,20 @@ const templateSource: string = `
 <div class="email-body">
     <img src="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange_white_bg.png"
         alt="RIT SHED Logo" width="600px">
-    <h1>Account Hold Notice</h1>
-    <br>
-    <h2> A hold has been placed on your account.</h2>
-    <h4> Reason: <%= desc %> </h4>
+    <h2> A hold has been placed on your account for the following reason:</h2>
+    <blockquote> <%= desc %> </blockquote>
+    <p>
+        You wont be able to use makerspace equipment until the hold is resolved. Email <a href="mailto:make@rit.edu">make@rit.edu</a> to talk to professional staff for more information. 
+    </p>
 
-    <br>
-    <br>
-
-    Please see Makerspace staff to remove hold.
 
 </div>
 `
 
-let template = ejs.compile(templateSource, { async: false })
+const template = ejs.compile(templateSource, { async: false })
 
 function generateHTMLHold(desc: string) {
-    let data = {
+    const data = {
         desc: desc,
     };
     return template(data);

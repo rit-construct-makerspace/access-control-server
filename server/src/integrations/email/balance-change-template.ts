@@ -1,6 +1,5 @@
 import ejs from "ejs"
 import { centsToDollarString } from "../currency/currency.js"
-import { getAccountOwner } from "../../repositories/Currency/CurrencyAccountsRepository.js";
 
 const templateSource: string = `
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
@@ -27,23 +26,25 @@ const templateSource: string = `
 <div class="email-body">
     <img src="https://d1msoab4sbdxmc.cloudfront.net/email-images/SHED_all_horizontal_black_orange_white_bg.png"
         alt="RIT SHED Logo" width="600px">
-    <h1>Account Balance Modification Notice</h1>
+    <h1>Construct Credit Account Balance Modification Notice</h1>
     
+    <h2>
     <% if (info.type == "credit") { %>
-    <h2> Your balance has been credited <%= formatCents(info.amount) %></h2>
+    Your Construct Credit balance has been credited <%= formatCents(info.amount) %>.
     <% } else { %> 
-    <h2> Your balance has been charged <%= formatCents(info.amount) %></h2>
+    <h2> Your Construct Credit balance has been charged <%= formatCents(info.amount) %>.
     <% } %>
-
+    This is not your Tiger Bucks balance.
+    </h2>
     <h4> Reason: <%= info.desc %> </h4>
 
 </div>
 `
 
-let template = ejs.compile(templateSource, { async: false })
+const template = ejs.compile(templateSource, { async: false })
 
 function generateHTMLChange(desc:balChangeInfo) {
-    let data = {
+    const data = {
         info: desc,
         formatCents: centsToDollarString,
     };

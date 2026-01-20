@@ -15,12 +15,19 @@ type MessageSendResult = {
     status: number;
     details?: string;
 }
+const OVERRIDE_EMAIL_TARGET = process.env.OVERRIDE_EMAIL_TARGET;
+
+
 export async function send_generic_email(args: { fromAccount: string, to: string[], subject: string, htmlContent: string, textContent: string }): Promise<MessageSendResult> {
     if (process.env.NODE_ENV !== "development") {
+        let emailAddresses = args.to
+        if (OVERRIDE_EMAIL_TARGET) {
+            emailAddresses = [OVERRIDE_EMAIL_TARGET];
+        }
         return mg.messages.create(MAIL_DOMAIN, {
             from: `make@rit.edu <${args.fromAccount}@${MAIL_DOMAIN}>`,
             bcc: ((process.env.NODE_ENV !== "development") ? ['make@rit.edu'] : []),
-            to: args.to,
+            to: emailAddresses,
             subject: args.subject,
             text: args.textContent,
             html: args.htmlContent,
@@ -34,7 +41,6 @@ export async function send_generic_email(args: { fromAccount: string, to: string
     }
 }
 
-const OVERRIDE_RECEIPT_EMAIL = process.env.OVERRIDE_RECEIPT_EMAIL;
 
 /**
  * Send an email describing a transaction of tigerbucks and or construct credits
@@ -47,10 +53,8 @@ export async function send_transaction_email(transactionId: number) {
         console.error("Failed to create transaction receipt, id =", transactionId);
         return;
     }
-    let emailAddress = content.to;
-    if (OVERRIDE_RECEIPT_EMAIL) {
-        emailAddress = OVERRIDE_RECEIPT_EMAIL;
-    }
+    const emailAddress = content.to;
+
     await send_generic_email({
         fromAccount: 'receipts',
         to: [emailAddress],
@@ -77,7 +81,7 @@ export async function send_cc_balance_change_email(email: string, desc: balChang
     const content = generateBalanceChangeEmail(desc);
     send_generic_email({
         fromAccount: "cc",
-        to: [email],
+        to: [email], 
         subject: "RIT SHED: Account Balance Adjusted - " + new Date().toLocaleDateString(),
         textContent: content.text,
         htmlContent: content.html,
