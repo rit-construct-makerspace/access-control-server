@@ -2,7 +2,7 @@ import FormData from "form-data";
 import * as Mailgun from "mailgun.js"
 import { generateReceiptEmail } from "./receipt-template.js"
 import { generateExpiryEmail, ExpiryDescription } from "./training-expiry-template.js"
-import { balChangeInfo, generateBalanceChangeEmail } from "./balance-change-template.js";
+import { BalanceChangeInfo, generateBalanceChangeEmail } from "./balance-change-template.js";
 import { generateHoldPlacedEmail } from "./hold-placed-template.js";
 const mailgun = new Mailgun.default(FormData);
 const mg = mailgun.client({ username: 'api', key: process.env.MAILGUN_API_KEY || 'key-yourkeyhere' });
@@ -77,7 +77,7 @@ export async function send_training_expiry_email(email: string, desc: ExpiryDesc
     })
 }
 
-export async function send_cc_balance_change_email(email: string, desc: balChangeInfo) {
+export async function send_cc_balance_change_email(email: string, desc: BalanceChangeInfo) {
     const content = generateBalanceChangeEmail(desc);
     send_generic_email({
         fromAccount: "cc",

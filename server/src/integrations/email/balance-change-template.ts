@@ -43,7 +43,7 @@ const templateSource: string = `
 
 const template = ejs.compile(templateSource, { async: false })
 
-function generateHTMLChange(desc:balChangeInfo) {
+function generateHTMLChange(desc:BalanceChangeInfo) {
     const data = {
         info: desc,
         formatCents: centsToDollarString,
@@ -51,17 +51,17 @@ function generateHTMLChange(desc:balChangeInfo) {
     return template(data);
 }
 
-function generateTextChange(desc: balChangeInfo) {
+function generateTextChange(desc: BalanceChangeInfo) {
     return desc.type
 }
 
-export type balChangeInfo ={
+export type BalanceChangeInfo ={
     amount: number
     type: "credit" | "charge"
     desc: string
 }
 
-export function generateBalanceChangeEmail(desc: balChangeInfo): {text: string, html: string} {
+export function generateBalanceChangeEmail(desc: BalanceChangeInfo): {text: string, html: string} {
     const text = generateTextChange(desc);
     const html = generateHTMLChange(desc);
     return {text, html}
