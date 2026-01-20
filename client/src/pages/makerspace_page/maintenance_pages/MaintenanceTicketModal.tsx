@@ -6,11 +6,14 @@ import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { toast } from "react-toastify";
 import TaskIcon from '@mui/icons-material/Task';
 import styled from "styled-components";
 import { makeCDNLink } from "../../../common/ImageFinder";
+import { useParams } from "react-router-dom";
+import { GET_VALID_STAFF } from "../../../queries/makerspaceQueries";
+import { CurrentUser } from "../../../common/CurrentUserProvider";
 
 interface TicketModalProps {
   open: boolean,
@@ -33,10 +36,16 @@ const StyledImg = styled.img`
 `;
 
 export default function MaintenanceTicketModal(props: TicketModalProps) {
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const [editing, setEditing] = useState(false);
   const [description, setDescription] = useState(props.ticket.description);
   const [status, setStatus] = useState<MaintenanceTicketStatus>(props.ticket.status);
   const [severity, setSeverity] = useState<MaintenanceTicketSeverity>(props.ticket.severity);
+  const [assigned, setAssigned] = useState<CurrentUser>();
+
+  const validStaff = useQuery(GET_VALID_STAFF, { variables: { id: Number(makerspaceID) } });
+
+  const staffOptions: CurrentUser[] = validStaff.data?.getValidStaff ?? [];
 
   function cancelEdit() {
     if (props.ticket === undefined) {
@@ -128,7 +137,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
           <Typography variant="subtitle1">{`Ticket #${props.ticket.id}`}</Typography>
           <Typography variant="subtitle1">{`Created: ${formatter.format(Number(props.ticket.dateCreated))}`}</Typography>
         </Stack>
-        <Stack direction={"row"} justifyContent={"space-between"}>
+        <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
           <Typography variant="body1">{`Reported by: ${props.ticket.type === MaintenanceTicketType.REPORTED ? props.ticket.creator?.ritUsername ?? "" : "SERVER"}`}</Typography>
           {
             editing
@@ -137,15 +146,19 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
                   (params) => (
                     <TextField
                       {...params}
-                      label="Severity"
-                      placeholder="Select Severity..."
+                      label="Assign"
+                      placeholder="Select User..."
                       required
                     />
                   )
                 }
-                options={
-                  []
-                }
+                options={staffOptions}
+                getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.ritUsername})`}
+                value={assigned}
+                onChange={(event, newValue) => (setAssigned(newValue ?? undefined))}
+                sx={{
+                  minWidth: "300px"
+                }}
               />
               : <Typography variant="body1">
                 {`Assigned to: ${props.ticket.assigned ? props.ticket.assigned.ritUsername : "No one"}`}

@@ -129,6 +129,6 @@ export async function archiveMakerspace(id: number, archive = true): Promise<Mak
 }
 
 export async function getValidStaff(id: number): Promise<UserRow[]> {
-  return await knex("Users").join("Staff", "Users.id", "Staff.userID").join("Managers", "Users.id", "Managers.userID")
-    .where("Staff.makerspaceID", "=", id).orWhere("Managers.makerspaceID", "=", id).orWhere("admin").select("Users.*");
+  return await knex("Users").leftJoin("Staff", "Users.id", "Staff.userID").leftJoin("Managers", "Users.id", "Managers.userID")
+    .where("Staff.makerspaceID", "=", id).orWhere("Managers.makerspaceID", "=", id).orWhere("admin", "=", true).select("Users.*").distinct("Users.id");
 }
