@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { Alert, Stack, Typography } from "@mui/material";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { GET_MAINTENANCE_TICKETS, MaintenanceTicket, MaintenanceTicketStatus } from "../../../queries/maintenanceTicketQueries";
 import { useQuery } from "@apollo/client";
@@ -25,9 +25,11 @@ export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
       return (
         <Stack width={"100%"} overflow={"auto"} direction={"row"} spacing={3}>
           {
-            tickets.map((ticket) => (
-              <MaintenanceTicketCard ticket={ticket} />
-            ))
+            tickets.length > 0
+              ? tickets.map((ticket) => (
+                <MaintenanceTicketCard ticket={ticket} />
+              ))
+              : <Alert severity="success" variant="filled" sx={{ width: "100%" }}>No Open Tickets!</Alert>
           }
 
         </Stack>
