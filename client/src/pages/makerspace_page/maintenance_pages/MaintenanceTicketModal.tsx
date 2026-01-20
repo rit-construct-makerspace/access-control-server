@@ -4,6 +4,7 @@ import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, 
 import { Autocomplete, Button, Chip, IconButton, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
+import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
@@ -14,7 +15,7 @@ import { makeCDNLink } from "../../../common/ImageFinder";
 interface TicketModalProps {
   open: boolean,
   onClose: () => void,
-  ticket: MaintenanceTicket | undefined
+  ticket: MaintenanceTicket
 }
 
 const formatter = new Intl.DateTimeFormat("en-US", {
@@ -32,14 +33,10 @@ const StyledImg = styled.img`
 `;
 
 export default function MaintenanceTicketModal(props: TicketModalProps) {
-
-  if (props.ticket === undefined) {
-    return;
-  }
-
   const [editing, setEditing] = useState(false);
   const [description, setDescription] = useState(props.ticket.description);
   const [status, setStatus] = useState<MaintenanceTicketStatus>(props.ticket.status);
+  const [severity, setSeverity] = useState<MaintenanceTicketSeverity>(props.ticket.severity);
 
   function cancelEdit() {
     if (props.ticket === undefined) {
@@ -48,6 +45,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
 
     setDescription(props.ticket.description);
     setStatus(props.ticket.status);
+    setSeverity(props.ticket.severity);
     setEditing(false);
   }
 
@@ -55,6 +53,10 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
   const [updateTicket] = useMutation(UPDATE_MAINTENACE_TICKET, { refetchQueries: ["MaintenanceTickets"] })
 
   async function handleCloseTicket(ticketID: number) {
+    if (!confirm("Are you sure you want to close this ticket?")) {
+      return;
+    }
+
     try {
       await modifyTicketStatus({
         variables: {
@@ -67,16 +69,34 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
       return;
     }
 
+    setStatus(MaintenanceTicketStatus.CLOSED);
     toast.success("Closed ticket!");
     props.onClose();
+  }
+
+  async function handleInProgess(ticketID: number) {
+    try {
+      await modifyTicketStatus({
+        variables: {
+          id: ticketID,
+          status: MaintenanceTicketStatus.IN_PROGRESS
+        }
+      })
+    } catch (e) {
+      toast.error("Failed to mark ticket: " + e);
+      return;
+    }
+
+    setStatus(MaintenanceTicketStatus.IN_PROGRESS);
+    toast.success("Marked ticket as in progress!");
   }
 
   async function handleSaveTicket() {
     try {
       await updateTicket({
         variables: {
-          id: props.ticket?.id,
-          severity: props.ticket?.severity,
+          id: props.ticket.id,
+          severity: severity,
           status: status,
           description: description
         }
@@ -90,12 +110,17 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     setEditing(false);
   }
 
+  function handleClose() {
+    cancelEdit();
+    props.onClose();
+  }
+
   return (
-    <PrettyModal open={props.open} onClose={props.onClose} width={"600px"}>
+    <PrettyModal open={props.open} onClose={handleClose} width={"600px"}>
       <Stack spacing={2}>
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
           <Typography variant="h5">{props.ticket.instance.name}</Typography>
-          <IconButton onClick={props.onClose}>
+          <IconButton onClick={handleClose}>
             <CloseIcon />
           </IconButton>
         </Stack>
@@ -104,18 +129,41 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
           <Typography variant="subtitle1">{`Created: ${formatter.format(Number(props.ticket.dateCreated))}`}</Typography>
         </Stack>
         <Stack justifyContent={"space-between"} direction={"row"}>
-          <Stack spacing={1} direction={"row"} alignItems={"center"}>
-            <Typography variant="subtitle1">Severity:</Typography>
-            <Chip
-              color={props.ticket.severity === MaintenanceTicketSeverity.HIGH
-                ? "error"
-                : props.ticket.severity === MaintenanceTicketSeverity.MEDIUM
-                  ? "warning"
-                  : "info"
-              }
-              label={props.ticket.severity}
-            />
-          </Stack>
+          {
+            editing
+              ? <Autocomplete
+                renderInput={
+                  (params) => (
+                    <TextField
+                      {...params}
+                      label="Severity"
+                      placeholder="Select Severity..."
+                      required
+                    />
+                  )
+                }
+                options={
+                  [MaintenanceTicketSeverity.HIGH, MaintenanceTicketSeverity.MEDIUM, MaintenanceTicketSeverity.LOW]
+                }
+                value={severity}
+                onChange={(event, newValue) => (newValue ? setSeverity(newValue) : null)}
+                sx={{
+                  minWidth: "200px"
+                }}
+              />
+              : <Stack spacing={1} direction={"row"} alignItems={"center"}>
+                <Typography variant="subtitle1">Severity:</Typography>
+                <Chip
+                  color={props.ticket.severity === MaintenanceTicketSeverity.HIGH
+                    ? "error"
+                    : props.ticket.severity === MaintenanceTicketSeverity.MEDIUM
+                      ? "warning"
+                      : "info"
+                  }
+                  label={props.ticket.severity}
+                />
+              </Stack>
+          }
           {
             editing
               ? <Autocomplete
@@ -142,13 +190,13 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
                 <Typography variant="subtitle1">Status: </Typography>
                 <Chip
                   color={
-                    status === MaintenanceTicketStatus.TODO
+                    props.ticket.status === MaintenanceTicketStatus.TODO
                       ? "info"
-                      : status === MaintenanceTicketStatus.IN_PROGRESS
+                      : props.ticket.status === MaintenanceTicketStatus.IN_PROGRESS
                         ? "warning"
                         : "error"
                   }
-                  label={status}
+                  label={props.ticket.status}
                 />
               </Stack>
           }
@@ -200,14 +248,23 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
               >
                 Save Changes
               </Button>
-              : <Button
-                color="secondary"
-                variant="contained"
-                startIcon={<TaskIcon />}
-                onClick={() => handleCloseTicket(props.ticket?.id ?? -1)}
-              >
-                Close Ticket
-              </Button>
+              : props.ticket.status === MaintenanceTicketStatus.IN_PROGRESS
+                ? <Button
+                  color="secondary"
+                  variant="contained"
+                  startIcon={<TaskIcon />}
+                  onClick={() => handleCloseTicket(props.ticket.id)}
+                >
+                  Mark Closed
+                </Button>
+                : <Button
+                  color="warning"
+                  variant="contained"
+                  startIcon={<WatchLaterIcon />}
+                  onClick={() => handleInProgess(props.ticket.id)}
+                >
+                  Mark In-Progress
+                </Button>
           }
         </Stack>
       </Stack>
