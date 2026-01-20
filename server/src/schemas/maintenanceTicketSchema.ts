@@ -34,6 +34,7 @@ export const MaintenanceTicketTypeDefs = gql`
     assignedID: Int
     instance: EquipmentInstance!
     creator: User
+    assigned: User
   }
 
   input Pagination {
@@ -70,5 +71,6 @@ export const MaintenanceTicketTypeDefs = gql`
     modifyMaintenanceTicketStatus(id: Int!, status: MaintenanceTicketStatus!): Int
 
     updateMaintenanceTicket(id: Int!, severity: MaintenanceTicketSeverity!, status: MaintenanceTicketStatus!, description: String!, assignedID: Int): Int
+    assignMaintenanceTicket(id: Int!, assignedID: Int): Int
   }
 `;

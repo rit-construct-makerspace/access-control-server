@@ -3,6 +3,7 @@ import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatu
 import * as MaintenanceTicketRepo from "../repositories/Equipment/MaintenanceTicketRepository.js"
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js"
 import * as UserRepo from "../repositories/Users/UserRepository.js"
+import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js"
 
 const MaintenanceTicketResolver = {
   MaintenanceTicket: {
@@ -21,6 +22,16 @@ const MaintenanceTicketResolver = {
     ) => isStaff(async (user) => (
       parent.userID
         ? UserRepo.getUserByID(parent.userID)
+        : undefined
+    )),
+
+    assigned: async (
+      parent: MaintenanceTicketRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (user) => (
+      parent.assignedID
+        ? UserRepo.getUserByID(parent.assignedID)
         : undefined
     ))
   },
@@ -110,7 +121,30 @@ const MaintenanceTicketResolver = {
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
       await MaintenanceTicketRepo.updateMaintenanceTicket(args.id, args.severity, args.status, args.description, args.assignedID)
-    ))
+    )),
+
+    assignMaintenanceTicket: async (
+      _parent: any,
+      args: {
+        id: number,
+        assignedID: number | null
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff(async (user) => {
+      const result = await MaintenanceTicketRepo.assignMaintenanceTicket(args.id, args.assignedID);
+
+      if (args.assignedID) {
+        const assigned = await UserRepo.getUserByID(args.assignedID);
+        await AuditLogRepo.createLog(`{user} assigned ticket #${args.id} to {user}`, "admin",
+          { id: user.id, label: UserRepo.getUsersFullName(user) },
+          { id: assigned.id, label: UserRepo.getUsersFullName(assigned) }
+        );
+      } else {
+        await AuditLogRepo.createLog(`{user} unassigned ticket #${args.id}`, "admin",
+          { id: user.id, label: UserRepo.getUsersFullName(user) }
+        );
+      }
+    })
   }
 }
 

@@ -55,6 +55,10 @@ export const PAGINATED_MAINTENANCE_TICKETS = gql`
           name
         }
       }
+      assigned {
+        id
+        ritUsername
+      }
     }
   }
 `;
@@ -147,5 +151,11 @@ export const MODIFY_MAINTENANCE_TICKET_STATUS = gql`
 export const UPDATE_MAINTENACE_TICKET = gql`
   mutation UpdateMaintenanceTicket($id: Int!, $severity: MaintenanceTicketSeverity!, $status: MaintenanceTicketStatus!, $description: String!) {
     updateMaintenanceTicket(id: $id, severity: $severity, status: $status, description: $description)
+  }
+`;
+
+export const ASSIGN_MAINTENANCE_TICKET = gql`
+  mutation AssignMaintenanceTicket($id: Int!, $assignedID: Int) {
+    updateMaintenanceTicket(id: $id, assignedID: $assignedID)
   }
 `;

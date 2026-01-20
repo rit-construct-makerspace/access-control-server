@@ -133,3 +133,7 @@ export async function updateMaintenanceTicket(
 ): Promise<number> {
   return await knex("MaintenanceTickets").update({ severity: severity, status: status, description: description, assignedID: assignedID }).where({ id: id });
 }
+
+export async function assignMaintenanceTicket(id: number, assignedID: number | null): Promise<number> {
+  return await knex("MaintenanceTickets").update({ assignedID: assignedID }).where({ id: id });
+}
