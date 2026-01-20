@@ -6,6 +6,10 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.dropTableIfExists("MaintenanceLogs");
   await knex.schema.dropTableIfExists("MaintenanceTags");
 
+  if (await knex.schema.hasTable("MaintenanceTickets")) {
+    return;
+  }
+
   await knex.schema.createTable("MaintenanceTickets", (t) => {
     t.increments("id").primary();
     t.enu("severity", ["HIGH", "MEDIUM", "LOW"]).notNullable();
@@ -19,7 +23,8 @@ export async function up(knex: Knex): Promise<void> {
     t.string("imageUrl").nullable().defaultTo(null);
     t.timestamp("dateCreated").notNullable().defaultTo(knex.fn.now());
     t.timestamp("dateClosed").nullable();
-    t.integer("interval").nullable();
+    t.integer("intervalHours").nullable();
+    t.integer("assignedID").references("id").inTable("Users").nullable();
   })
 }
 
