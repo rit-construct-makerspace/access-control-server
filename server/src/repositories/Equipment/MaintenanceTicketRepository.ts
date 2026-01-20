@@ -67,12 +67,14 @@ export async function getMaintenanceTicket(id: number): Promise<MaintenanceTicke
 
 export async function paginatedMaintenanceTickets(
   pagination: { page: number, pageSize: number },
-  sort?: { target: string, dir: string }
+  sort?: { target: string, dir: string },
+  filter?: { target: string, op: string, value: string }
 ): Promise<MaintenanceTicketRow[]> {
   let query = knex("MaintenanceTickets")
     .join("EquipmentInstances", "MaintenanceTickets.instanceID", "EquipmentInstances.id")
     .join("Equipment", "EquipmentInstances.equipmentID", "Equipment.id")
-    .join("Rooms", "Equipment.roomID", "Rooms.id");
+    .join("Rooms", "Equipment.roomID", "Rooms.id")
+    .join("Users", "MaintenanceTickets.userID", "Users.id");
 
   // pagination
   query = query.select("MaintenanceTickets.*").offset(pagination.pageSize * pagination.page).limit(pagination.pageSize);
@@ -92,8 +94,27 @@ export async function paginatedMaintenanceTickets(
         query = query.orderBy(`MaintenanceTickets.${sort.target}`, sort.dir);
       }
     }
+  }
 
-    console.log(query.toSQL());
+  // filter
+  if (filter) {
+    switch (filter.target) {
+      case "equipment": {
+        query = query.whereILike(`Equipment.name`, `%${filter.value}%`);
+        break;
+      }
+      case "instance": {
+        query = query.whereILike(`EquipmentInstances.name`, `%${filter.value}%`);
+        break;
+      }
+      case "creator": {
+        query = query.whereILike(`Users.ritUsername`, `%${filter.value}%`);
+        break;
+      }
+      default: {
+        query = query.whereILike(`MaintenanceTickets.${filter.target}`, `%${filter.value}%`)
+      }
+    }
   }
 
   return await query;
