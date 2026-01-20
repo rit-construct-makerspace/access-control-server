@@ -29,7 +29,8 @@ export interface MaintenanceTicket {
   dateCreated: string,
   dateClosed: string | null,
   creator: CurrentUser | null,
-  instance: EquipmentInstance
+  instance: EquipmentInstance,
+  assigned: CurrentUser | null
 }
 
 export const PAGINATED_MAINTENANCE_TICKETS = gql`

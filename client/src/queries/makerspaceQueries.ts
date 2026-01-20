@@ -254,3 +254,14 @@ export const DELETE_SPECIAL_HOURS = gql`
     deleteSpecialHours(day: $day, makerspaceID: $makerspaceID)
   }
 `;
+
+export const GET_VALID_STAFF = gql`
+  query GetValidStaff($id: Int!) {
+    getValidStaff(id: $id) {
+      id
+      ritUsername
+      firstName
+      lastName
+    }
+  }
+`;

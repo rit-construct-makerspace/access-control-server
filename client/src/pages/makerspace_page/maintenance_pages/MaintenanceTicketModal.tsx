@@ -1,6 +1,6 @@
 import { Stack } from "@mui/system";
 import PrettyModal from "../../../common/PrettyModal";
-import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
+import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
 import { Autocomplete, Button, Chip, IconButton, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
@@ -127,6 +127,30 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
         <Stack direction={"row"} justifyContent={"space-between"}>
           <Typography variant="subtitle1">{`Ticket #${props.ticket.id}`}</Typography>
           <Typography variant="subtitle1">{`Created: ${formatter.format(Number(props.ticket.dateCreated))}`}</Typography>
+        </Stack>
+        <Stack direction={"row"} justifyContent={"space-between"}>
+          <Typography variant="body1">{`Reported by: ${props.ticket.type === MaintenanceTicketType.REPORTED ? props.ticket.creator?.ritUsername ?? "" : "SERVER"}`}</Typography>
+          {
+            editing
+              ? <Autocomplete
+                renderInput={
+                  (params) => (
+                    <TextField
+                      {...params}
+                      label="Severity"
+                      placeholder="Select Severity..."
+                      required
+                    />
+                  )
+                }
+                options={
+                  []
+                }
+              />
+              : <Typography variant="body1">
+                {`Assigned to: ${props.ticket.assigned ? props.ticket.assigned.ritUsername : "No one"}`}
+              </Typography>
+          }
         </Stack>
         <Stack justifyContent={"space-between"} direction={"row"}>
           {

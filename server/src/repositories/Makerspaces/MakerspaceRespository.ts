@@ -4,7 +4,7 @@
  */
 
 import { knex } from '../../db/index.js';
-import { TrainingModuleRow, MakerspaceRow } from '../../db/tables.js';
+import { TrainingModuleRow, MakerspaceRow, UserRow } from '../../db/tables.js';
 import { MakerspaceInput } from '../../schemas/makerspacesSchema.js';
 import * as ModuleRepo from '../Training/ModuleRepository.js';
 
@@ -126,4 +126,9 @@ export async function archiveMakerspace(id: number, archive = true): Promise<Mak
   } else {
     return undefined;
   }
+}
+
+export async function getValidStaff(id: number): Promise<UserRow[]> {
+  return await knex("Users").join("Staff", "Users.id", "Staff.userID").join("Managers", "Users.id", "Managers.userID")
+    .where("Staff.makerspaceID", "=", id).orWhere("Managers.makerspaceID", "=", id).orWhere("admin").select("Users.*");
 }
