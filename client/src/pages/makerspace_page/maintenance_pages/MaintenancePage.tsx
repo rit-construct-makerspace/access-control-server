@@ -53,7 +53,7 @@ export default function MaintenancePage() {
     { field: "id", headerName: "ID", width: 10, filterable: false },
     { field: "equipment", headerName: "Equipment", width: 350, sortable: false, filterOperators: containsOperator },
     { field: "instance", headerName: "Instance", width: 300, sortable: false, filterOperators: containsOperator },
-    { field: "type", headerName: "Type", width: 110, sortable: false, filterOperators: containsOperator },
+    { field: "type", headerName: "Type", width: 140, sortable: false, filterOperators: containsOperator },
     { field: "status", headerName: "Status", width: 140, filterOperators: containsOperator },
     { field: "severity", headerName: "Severity", width: 140, filterOperators: containsOperator },
     { field: "creator", headerName: "Creator", width: 100, sortable: false, filterOperators: containsOperator },
