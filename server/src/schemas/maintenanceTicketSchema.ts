@@ -30,6 +30,8 @@ export const MaintenanceTicketTypeDefs = gql`
     imageUrl: String
     dateCreated: String!
     dateClosed: String
+    intervalHours: Int
+    assignedID: Int
     instance: EquipmentInstance!
     creator: User
   }
@@ -67,6 +69,6 @@ export const MaintenanceTicketTypeDefs = gql`
 
     modifyMaintenanceTicketStatus(id: Int!, status: MaintenanceTicketStatus!): Int
 
-    updateMaintenanceTicket(id: Int!, severity: MaintenanceTicketSeverity!, status: MaintenanceTicketStatus!, description: String!): Int
+    updateMaintenanceTicket(id: Int!, severity: MaintenanceTicketSeverity!, status: MaintenanceTicketStatus!, description: String!, assignedID: Int): Int
   }
 `;

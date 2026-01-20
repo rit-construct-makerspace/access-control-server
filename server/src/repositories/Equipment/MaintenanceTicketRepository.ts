@@ -26,7 +26,11 @@ export async function createMaintenanceTicket(
 }
 
 export async function modifyMaintenanceTicketStatus(id: number, status: MaintenanceTicketStatus): Promise<number> {
-  return await knex("MaintenanceTickets").update({ status: status }).where({ id: id });
+  if (status === MaintenanceTicketStatus.CLOSED) {
+    return await knex("MaintenanceTickets").update({ status: status, dateClosed: knex.fn.now() }).where({ id: id });
+  } else {
+    return await knex("MaintenanceTickets").update({ status: status }).where({ id: id });
+  }
 }
 
 
@@ -125,6 +129,7 @@ export async function updateMaintenanceTicket(
   severity: MaintenanceTicketSeverity,
   status: MaintenanceTicketStatus,
   description: string,
+  assignedID: number | null
 ): Promise<number> {
-  return await knex("MaintenanceTickets").update({ severity: severity, status: status, description: description }).where({ id: id });
+  return await knex("MaintenanceTickets").update({ severity: severity, status: status, description: description, assignedID: assignedID }).where({ id: id });
 }

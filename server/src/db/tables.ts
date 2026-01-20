@@ -646,6 +646,8 @@ export interface MaintenanceTicketRow {
   imageUrl: string | null;
   dateCreated: string; // ISO 8601 date string, gotten via Date.toISOString()
   dateClosed: string | null; // ^
+  intervalHours: number | null;
+  assignedID: number | null;
 }
 
 declare module "knex/types/tables.js" {
