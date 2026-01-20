@@ -55,12 +55,13 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     setDescription(props.ticket.description);
     setStatus(props.ticket.status);
     setSeverity(props.ticket.severity);
+    setAssigned(props.ticket.assigned);
     setEditing(false);
   }
 
   const [modifyTicketStatus] = useMutation(MODIFY_MAINTENANCE_TICKET_STATUS, { refetchQueries: ["MaintenanceTickets"] });
   const [updateTicket] = useMutation(UPDATE_MAINTENACE_TICKET, { refetchQueries: ["MaintenanceTickets"] });
-  const [assignTicket] = useMutation(ASSIGN_MAINTENANCE_TICKET);
+  const [assignTicket] = useMutation(ASSIGN_MAINTENANCE_TICKET, { refetchQueries: ["MaintenanceTickets"] });
 
   async function handleCloseTicket(ticketID: number) {
     if (!confirm("Are you sure you want to close this ticket?")) {
