@@ -20,7 +20,7 @@ export default function InstanceGrid(props: InstanceGridProps) {
       return (
         instances.length === 0
           ? <Alert severity="info" variant="filled" sx={{ width: "max-content" }}>No Instances!</Alert>
-          : <Grid container>
+          : <Grid container spacing={2}>
             {
               instances.map((instance: EquipmentInstance) => (
                 <Grid key={instance.id}>

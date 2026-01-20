@@ -128,10 +128,9 @@ export async function updateMaintenanceTicket(
   id: number,
   severity: MaintenanceTicketSeverity,
   status: MaintenanceTicketStatus,
-  description: string,
-  assignedID: number | null
+  description: string
 ): Promise<number> {
-  return await knex("MaintenanceTickets").update({ severity: severity, status: status, description: description, assignedID: assignedID }).where({ id: id });
+  return await knex("MaintenanceTickets").update({ severity: severity, status: status, description: description }).where({ id: id });
 }
 
 export async function assignMaintenanceTicket(id: number, assignedID: number | null): Promise<number> {

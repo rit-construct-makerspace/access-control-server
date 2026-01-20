@@ -26,7 +26,16 @@ export default function MaintenanceTicketCard(props: { ticket: MaintenanceTicket
             <Typography variant="h5">{props.ticket.instance.name}</Typography>
             <Typography variant="subtitle1">{formatter.format(Number(props.ticket.dateCreated))}</Typography>
           </Stack>
-          <Typography variant="body1">{`Reported by: ${props.ticket.type === MaintenanceTicketType.AUTOMATIC ? "SERVER" : props.ticket.creator?.ritUsername ?? ""}`}</Typography>
+          <Stack direction={"row"} justifyContent={"space-between"}>
+            <Typography variant="body1">
+              {`Reported by: ${props.ticket.type === MaintenanceTicketType.AUTOMATIC ? "SERVER" : props.ticket.creator?.ritUsername ?? ""}`}
+            </Typography>
+            <Typography variant="body1">
+              {`Assigned to: ${props.ticket.assigned
+                ? `${props.ticket.assigned.firstName} (${props.ticket.assigned.ritUsername})`
+                : "No one"}`}
+            </Typography>
+          </Stack>
           <Stack direction={"row"} justifyContent={"space-between"}>
             <Stack direction={"row"} spacing={1} alignItems={"center"}>
               <Typography variant="body1">Severity:</Typography>

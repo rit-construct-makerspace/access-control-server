@@ -1,6 +1,6 @@
 import { Stack } from "@mui/system";
 import PrettyModal from "../../../common/PrettyModal";
-import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
+import { ASSIGN_MAINTENANCE_TICKET, MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
 import { Autocomplete, Button, Chip, IconButton, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
@@ -41,7 +41,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
   const [description, setDescription] = useState(props.ticket.description);
   const [status, setStatus] = useState<MaintenanceTicketStatus>(props.ticket.status);
   const [severity, setSeverity] = useState<MaintenanceTicketSeverity>(props.ticket.severity);
-  const [assigned, setAssigned] = useState<CurrentUser>();
+  const [assigned, setAssigned] = useState<CurrentUser | null>(props.ticket.assigned);
 
   const validStaff = useQuery(GET_VALID_STAFF, { variables: { id: Number(makerspaceID) } });
 
@@ -59,7 +59,8 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
   }
 
   const [modifyTicketStatus] = useMutation(MODIFY_MAINTENANCE_TICKET_STATUS, { refetchQueries: ["MaintenanceTickets"] });
-  const [updateTicket] = useMutation(UPDATE_MAINTENACE_TICKET, { refetchQueries: ["MaintenanceTickets"] })
+  const [updateTicket] = useMutation(UPDATE_MAINTENACE_TICKET, { refetchQueries: ["MaintenanceTickets"] });
+  const [assignTicket] = useMutation(ASSIGN_MAINTENANCE_TICKET);
 
   async function handleCloseTicket(ticketID: number) {
     if (!confirm("Are you sure you want to close this ticket?")) {
@@ -115,7 +116,16 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
       return;
     }
 
-    toast.success("Saved ticket!")
+    try {
+      if (props.ticket.assigned?.id !== assigned?.id) {
+        await assignTicket({ variables: { id: props.ticket.id, assignedID: assigned ? Number(assigned.id) : null } })
+      }
+    } catch (e) {
+      toast.error("Failed to assign user: " + e);
+      return;
+    }
+
+    toast.success("Saved ticket!");
     setEditing(false);
   }
 
@@ -155,7 +165,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
                 options={staffOptions}
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName} (${option.ritUsername})`}
                 value={assigned}
-                onChange={(event, newValue) => (setAssigned(newValue ?? undefined))}
+                onChange={(event, newValue) => (setAssigned(newValue ?? null))}
                 sx={{
                   minWidth: "300px"
                 }}

@@ -131,6 +131,12 @@ export const GET_MAINTENANCE_TICKETS = gql`
         id
         ritUsername
       }
+      assigned {
+        id
+        ritUsername
+        firstName
+        lastName
+      }
       instance {
         id
         name
@@ -157,6 +163,6 @@ export const UPDATE_MAINTENACE_TICKET = gql`
 
 export const ASSIGN_MAINTENANCE_TICKET = gql`
   mutation AssignMaintenanceTicket($id: Int!, $assignedID: Int) {
-    updateMaintenanceTicket(id: $id, assignedID: $assignedID)
+    assignMaintenanceTicket(id: $id, assignedID: $assignedID)
   }
 `;
