@@ -1,5 +1,6 @@
 import { ApolloContext } from "../context.js";
 import { CurrencyAccountsRow } from "../db/tables.js";
+import { send_cc_balance_change_email } from "../integrations/email/email.js";
 import * as CurrencyAccountRepo from "../repositories/Currency/CurrencyAccountsRepository.js"
 
 export const CurrencyAccountResolvers = {
@@ -45,6 +46,12 @@ export const CurrencyAccountResolvers = {
       },
       { isManager }: ApolloContext
     ) => {
+      const owner = await CurrencyAccountRepo.getAccountOwner(args.accountID);
+      send_cc_balance_change_email(owner?.username + "@rit.edu", {
+        amount: Math.abs(args.amount),
+        type: args.amount > 0 ? "credit" : "charge",
+        desc: args.description,
+      });
       return isManager(async (user) => (
         await CurrencyAccountRepo.adjustAccountBalanceCents(args.accountID, args.amount, "make-website", `adjustment by ${user.ritUsername}: ${args.description}`)
       ))
