@@ -84,12 +84,12 @@ const ReservationResolver = {
     ) => ifAuthenticated(async (user) => {
       const equipment = await EquipmentRepo.getEquipmentByID(args.equipmentID);
       const room = await RoomRepo.getRoomByID(equipment.roomID);
-      if (!equipment.schedulable && !(equipment.byReservationOnly && (user.manager.includes(room?.id ?? -1) || user.admin))) {
+      if (!equipment.schedulable && !(equipment.byReservationOnly && (user.manager.includes(room?.makerspaceID ?? -1) || user.admin))) {
         throw new GraphQLError("This equipment cannot be reserved");
       }
 
-      if (args.approved && !user.manager.includes(room?.makerspaceID ?? -1)) {
-        throw new GraphQLError("Only managers can create approved rservations");
+      if (args.approved && !(user.manager.includes(room?.makerspaceID ?? -1) || user.admin)) {
+        throw new GraphQLError("Only managers can create approved resrvations");
       }
 
       return await ReservationRepo.createReservation(args.userID, args.equipmentID, args.start, args.end, args.description, args.approved);
