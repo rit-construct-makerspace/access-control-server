@@ -41,8 +41,6 @@ import { EventsTypeDefs } from "./schemas/eventsSchema.js";
 import { EventsResolver } from "./resolvers/eventsResolver.js";
 import { TermsTypeDefs } from "./schemas/TermsSchema.js";
 import TermsResolver from "./resolvers/termsResolver.js";
-import { MaintenanceLogsTypeDefs } from "./schemas/maintenanceLogSchema.js";
-import MaintenanceLogsResolver from "./resolvers/maintenanceLogsResolver.js";
 import { EquipmentInstanceTypeDefs } from "./schemas/equipmentInstanceSchema.js";
 import EquipmentInstanceResolver from "./resolvers/equipmentInstanceResolver.js";
 import { ToolItemTypeDefs } from "./schemas/toolItemsSchema.js";
@@ -63,6 +61,8 @@ import { CustomUrlTypeDef } from "./schemas/customUrlSchema.js";
 import CustomUrlResolver from "./resolvers/customUrlResolver.js";
 import ReservationResolver from "./resolvers/reservationResolver.js";
 import { ReservationTypeDefs } from "./schemas/reservationSchema.js";
+import MaintenanceTicketResolver from "./resolvers/maintenanceTicketResolver.js";
+import { MaintenanceTicketTypeDefs } from "./schemas/maintenanceTicketSchema.js";
 
 // for custom scalars such as Date
 const resolveFunctions = {
@@ -95,14 +95,14 @@ export const schema = makeExecutableSchema({
     EquipmentSessionTypeDefs,
     EventsTypeDefs,
     TermsTypeDefs,
-    MaintenanceLogsTypeDefs,
     ToolItemTypeDefs,
     CurrencyAccountsTypeDefs,
     CartTypeDefs,
     CurrencyLedgerTypeDefs,
     OrganizationTypeDefs,
     CustomUrlTypeDef,
-    ReservationTypeDefs
+    ReservationTypeDefs,
+    MaintenanceTicketTypeDefs,
   ],
   resolvers: [
     resolveFunctions,
@@ -126,7 +126,6 @@ export const schema = makeExecutableSchema({
     EquipmentSessionsResolver,
     EventsResolver,
     TermsResolver,
-    MaintenanceLogsResolver,
     ToolItemResolver,
     RestrictionResolver,
     CurrencyAccountResolvers,
@@ -135,5 +134,6 @@ export const schema = makeExecutableSchema({
     OrganizationResolver,
     CustomUrlResolver,
     ReservationResolver,
+    MaintenanceTicketResolver,
   ]
 });

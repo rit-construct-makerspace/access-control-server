@@ -76,38 +76,6 @@ export interface EquipmentInstancesRow {
   readerID: number | null
 }
 
-export interface MaintenanceLogRow {
-  id: number;
-  authorID: number;
-  equipmentID: number;
-  timestamp: Date;
-  content: string;
-  tagID1: number;
-  tagID2: number;
-  tagID3: number;
-  instanceID: number;
-}
-
-export interface ResolutionLogRow {
-  id: number;
-  authorID: number;
-  equipmentID: number;
-  timestamp: Date;
-  issue: string;
-  content: string;
-  tagID1: number;
-  tagID2: number;
-  tagID3: number;
-  instanceID: number;
-}
-
-export interface MaintenanceTagRow {
-  id: number;
-  equipmentID: number;
-  label: string;
-  color: string;
-}
-
 export interface HoldRow {
   id: number;
   creatorID: number;
@@ -650,6 +618,38 @@ export interface ReservationRow {
   end: string; // ^
 }
 
+export enum MaintenanceTicketType {
+  AUTOMATIC = "AUTOMATIC",
+  REPORTED = "REPORTED"
+}
+
+export enum MaintenanceTicketSeverity {
+  HIGH = "HIGH",
+  MEDIUM = "MEDIUM",
+  LOW = "LOW"
+}
+
+export enum MaintenanceTicketStatus {
+  TODO = "TODO",
+  IN_PROGESS = "IN_PROGRESS",
+  CLOSED = "CLOSED"
+}
+
+export interface MaintenanceTicketRow {
+  id: number;
+  type: MaintenanceTicketType;
+  severity: MaintenanceTicketSeverity;
+  status: MaintenanceTicketStatus;
+  instanceID: number;
+  userID: number | undefined;
+  description: string;
+  imageUrl: string | null;
+  dateCreated: string; // ISO 8601 date string, gotten via Date.toISOString()
+  dateClosed: string | null; // ^
+  intervalHours: number | null;
+  assignedID: number | null;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -674,9 +674,6 @@ declare module "knex/types/tables.js" {
     DataPoints: DataPointsRow;
     EquipmentSessions: EquipmentSessionRow;
     InventoryLedger: InventoryLedgerRow;
-    MaintenanceLogs: MaintenanceLogRow;
-    ResolutionLogs: ResolutionLogRow;
-    MaintenanceTags: MaintenanceTagRow;
     ToolItemTypes: ToolItemTypesRow;
     ToolItemInstances: ToolItemInstancesRow;
     Managers: ManagerRow;
@@ -697,5 +694,6 @@ declare module "knex/types/tables.js" {
     RolesTemp: TempRolesRow;
     ExpressSessions: ExpressSessionRow;
     CustomURLs: CustomUrlRow;
+    MaintenanceTickets: MaintenanceTicketRow;
   }
 }

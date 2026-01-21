@@ -1,5 +1,5 @@
 import { ApolloContext } from "../context.js";
-import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getMakerspaceByID, getMakerspaces, getTrainingsByMakerspace, removeTrainingFromMakerspace, updateMakerspace } from "../repositories/Makerspaces/MakerspaceRespository.js";
+import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getMakerspaceByID, getMakerspaces, getTrainingsByMakerspace, getValidStaff, removeTrainingFromMakerspace, updateMakerspace } from "../repositories/Makerspaces/MakerspaceRespository.js";
 import { MakerspaceRow } from "../db/tables.js";
 import { getRoomsByMakerspace } from "../repositories/Rooms/RoomRepository.js";
 import { MakerspaceInput } from "../schemas/makerspacesSchema.js";
@@ -34,7 +34,7 @@ const MakerspacesResolver = {
     },
     items: async (
       parent: MakerspaceRow,
-      args: {storefrontVisible?: boolean},
+      args: { storefrontVisible?: boolean },
     ) => {
       return args.storefrontVisible == undefined
         ? getItems(parent.id)
@@ -66,6 +66,16 @@ const MakerspacesResolver = {
     ) => {
       return await getMakerspaceByID(args.id);
     },
+
+    getValidStaff: async (
+      _parent: any,
+      args: {
+        id: number
+      },
+      { isStaffFor }: ApolloContext
+    ) => isStaffFor(args.id, async (user) => (
+      await getValidStaff(args.id)
+    ))
   },
 
   Mutation: {
