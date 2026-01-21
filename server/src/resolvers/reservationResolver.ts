@@ -89,7 +89,7 @@ const ReservationResolver = {
       }
 
       if (args.approved && !(user.manager.includes(room?.makerspaceID ?? -1) || user.admin)) {
-        throw new GraphQLError("Only managers can create approved rservations");
+        throw new GraphQLError("Only managers can create approved resrvations");
       }
 
       return await ReservationRepo.createReservation(args.userID, args.equipmentID, args.start, args.end, args.description, args.approved);
