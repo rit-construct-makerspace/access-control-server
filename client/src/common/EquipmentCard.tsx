@@ -80,7 +80,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
               </Stack>
               <Stack direction="row" justifyContent="space-between" height="100%">
                 {/* Trainings & Access Check */}
-                <Stack width="100%" height={"135px"} overflow={"scroll"}>
+                <Stack width="100%" height={"135px"} overflow={"auto"}>
                   {hasNotTakenModule || (!hasApprovedAccessCheck && !props.equipment.byReservationOnly) ? (
                     <Typography paddingLeft={"10px"}>To access, complete:</Typography>
                   ) : null}
