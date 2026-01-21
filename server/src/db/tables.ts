@@ -56,6 +56,8 @@ export interface EquipmentRow {
   requiresTrainerApproval: boolean;
   /** Whether a piece of equipment requires an in person knowledge check to be completed before allowing access */
   requiresInPerson: boolean;
+  /** Whether or not a piece of equipment can be reserved */
+  schedulable: boolean;
 }
 
 /**
@@ -72,38 +74,6 @@ export interface EquipmentInstancesRow {
   status: string;
   /** Optional FK of the card reader associated with this instance */
   readerID: number | null
-}
-
-export interface MaintenanceLogRow {
-  id: number;
-  authorID: number;
-  equipmentID: number;
-  timestamp: Date;
-  content: string;
-  tagID1: number;
-  tagID2: number;
-  tagID3: number;
-  instanceID: number;
-}
-
-export interface ResolutionLogRow {
-  id: number;
-  authorID: number;
-  equipmentID: number;
-  timestamp: Date;
-  issue: string;
-  content: string;
-  tagID1: number;
-  tagID2: number;
-  tagID3: number;
-  instanceID: number;
-}
-
-export interface MaintenanceTagRow {
-  id: number;
-  equipmentID: number;
-  label: string;
-  color: string;
 }
 
 export interface HoldRow {
@@ -202,26 +172,6 @@ export interface ModulesForEquipmentRow {
   moduleID: number;
 }
 
-export interface ReservationEventRow {
-  id: number;
-  reservationID: number;
-  eventType: string;
-  userID: number;
-  dateTime: Date;
-  payload: string;
-}
-
-export interface ReservationRow {
-  id: number;
-  makerID: number;
-  createDate: Date;
-  startTime: Date;
-  endTime: Date;
-  equipmentID: number;
-  status: string;
-  lastUpdated: Date;
-}
-
 export interface RoomSwipeRow {
   id: number;
   dateTime: number;
@@ -273,6 +223,7 @@ export interface TrainingModuleItem {
   type: string;
   text: string;
   options?: ModuleItemOption[];
+  correctAnswers?: number;
   hint: string;
   affirmation: string;
 }
@@ -522,16 +473,16 @@ export interface ModulesForMakerspacesRow {
 export interface SpecialHoursRow {
   day: Date;
   makerspaceID: number;
-  open: String | null;
-  close: String | null;
+  open: string | null;
+  close: string | null;
   closed: boolean;
 }
 
 export interface DefaultHoursRow {
   dayOfWeek: number;
   makerspaceID: number;
-  open: String | null;
-  close: String | null;
+  open: string | null;
+  close: string | null;
   closed: boolean;
 }
 
@@ -557,6 +508,8 @@ export interface OrganizationsRow {
   username: string;
   /** Human readable name for the organization */
   displayname: string;
+  /** Notes about the organization for staff */
+  notes: string;
   /** Corresponding account for this groups money */
   accountID: number;
 }
@@ -650,9 +603,51 @@ export interface ExpressSessionRow {
 }
 
 export interface CustomUrlRow {
-  id:number;
+  id: number;
   shortUrl: string;
   longUrl: string;
+}
+
+export interface ReservationRow {
+  id: number;
+  equipmentID: number;
+  userID: number;
+  description: string;
+  approved: boolean;
+  start: string; // ISO 8601 date string, gotten via Date.toISOString()
+  end: string; // ^
+}
+
+export enum MaintenanceTicketType {
+  AUTOMATIC = "AUTOMATIC",
+  REPORTED = "REPORTED"
+}
+
+export enum MaintenanceTicketSeverity {
+  HIGH = "HIGH",
+  MEDIUM = "MEDIUM",
+  LOW = "LOW"
+}
+
+export enum MaintenanceTicketStatus {
+  TODO = "TODO",
+  IN_PROGESS = "IN_PROGRESS",
+  CLOSED = "CLOSED"
+}
+
+export interface MaintenanceTicketRow {
+  id: number;
+  type: MaintenanceTicketType;
+  severity: MaintenanceTicketSeverity;
+  status: MaintenanceTicketStatus;
+  instanceID: number;
+  userID: number | undefined;
+  description: string;
+  imageUrl: string | null;
+  dateCreated: string; // ISO 8601 date string, gotten via Date.toISOString()
+  dateClosed: string | null; // ^
+  intervalHours: number | null;
+  assignedID: number | null;
 }
 
 declare module "knex/types/tables.js" {
@@ -665,7 +660,6 @@ declare module "knex/types/tables.js" {
     InventoryTags: InventoryTagRow;
     ModuleSubmissions: ModuleSubmissionRow;
     ModulesForEquipment: ModulesForEquipmentRow;
-    ReservationEvents: ReservationEventRow;
     Reservations: ReservationRow;
     RoomSwipes: RoomSwipeRow;
     Rooms: RoomRow;
@@ -680,9 +674,6 @@ declare module "knex/types/tables.js" {
     DataPoints: DataPointsRow;
     EquipmentSessions: EquipmentSessionRow;
     InventoryLedger: InventoryLedgerRow;
-    MaintenanceLogs: MaintenanceLogRow;
-    ResolutionLogs: ResolutionLogRow;
-    MaintenanceTags: MaintenanceTagRow;
     ToolItemTypes: ToolItemTypesRow;
     ToolItemInstances: ToolItemInstancesRow;
     Managers: ManagerRow;
@@ -703,5 +694,6 @@ declare module "knex/types/tables.js" {
     RolesTemp: TempRolesRow;
     ExpressSessions: ExpressSessionRow;
     CustomURLs: CustomUrlRow;
+    MaintenanceTickets: MaintenanceTicketRow;
   }
 }

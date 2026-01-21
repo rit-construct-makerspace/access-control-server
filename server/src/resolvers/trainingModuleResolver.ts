@@ -104,6 +104,20 @@ const removeAnswersFromQuiz = (quiz: TrainingModuleItem[]) => {
   }
 };
 
+function countQuizCorrectOptions(quiz: TrainingModuleItem[]) {
+  for (const item of quiz) {
+    if (item.options) {
+      var count = 0;
+      for (const option of item.options) {
+        if (option.correct == true) {
+          count++;
+        }
+      }
+      item.correctAnswers = count;
+    }
+  }
+}
+
 /**
  * Determine if an array of submitted options for a question is correct
  * @param correct array of correct option IDs
@@ -215,6 +229,24 @@ const TrainingModuleResolvers = {
     ) => {
       return isStaff(async (_user: any) => {
         const module = await ModuleRepo.getModuleByID(args.id);
+        return module;
+      })
+    },
+
+    /**
+     * Finds a module based id of item. No restrictions on user. Only returns # of correct answers for options
+     * @argument id ID of TrainingModule
+     * @argument itemID id of item within TrainingModule
+     * @returns number of correct answers for a question
+     */
+    moduleWithAnswerCount: async (
+      _parent: any,
+      args: { id: number, itemID: string },
+      { ifAuthenticated }: ApolloContext
+    ) => {
+      return ifAuthenticated(async (_user: any) => {
+        const module = await ModuleRepo.getModuleByID(args.id);
+        countQuizCorrectOptions(module.quiz)
         return module;
       })
     },
@@ -478,7 +510,6 @@ const TrainingModuleResolvers = {
               (item) => item.itemID === question.id
             )?.optionIDs;
 
-
             //Increment correcct if submitted options match correct options (order doesn't matter)
             //Increment incorrect otherwise
             if (submittedOptionIDsCorrect(correctOptionIDs, submittedOptionIDs)) {
@@ -492,7 +523,7 @@ const TrainingModuleResolvers = {
           }
 
           //Calculate percentage grade
-          const grade = (correct / (incorrect + correct)) * 100;
+          const grade = Math.round((correct / (incorrect + correct)) * 100);
 
           //Insert submission record
           SubmissionRepo.addSubmission(
@@ -502,7 +533,7 @@ const TrainingModuleResolvers = {
             JSON.stringify(choiceSummary)
           ).then(async (id) => {
             await createLog(
-              `{user} submitted attempt of {module} with a grade of ${grade}.`,
+              `{user} submitted attempt of {module} with a grade of ${grade} (${correct}/${incorrect + correct}).`,
               "training",
               { id: user.id, label: getUsersFullName(user) },
               { id: args.moduleID, label: module.name }
@@ -512,7 +543,7 @@ const TrainingModuleResolvers = {
             if (grade >= MODULE_PASSING_THRESHOLD) {
               const associatedWorgroup = printerWorkgroupForModule(Number(args.moduleID));
               if (associatedWorgroup) {
-                  add3DPrinterOSUser(user.ritUsername, String(associatedWorgroup)).then(async function (result) {
+                add3DPrinterOSUser(user.ritUsername, String(associatedWorgroup)).then(async function (result) {
                   if (result) {
                     await createLog(
                       `{user} has been automatically added to 3DPrinterOS Workgroup ${associatedWorgroup}.`,

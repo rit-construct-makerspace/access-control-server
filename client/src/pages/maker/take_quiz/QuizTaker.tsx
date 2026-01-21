@@ -70,12 +70,13 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     .filter((item) => item.type === QuizItemType.MultipleChoice || item.type === QuizItemType.Checkboxes)
     .map((item) => ({ itemID: item.id, optionIDs: [] }));
 
+  const answerSheetReq = module.quiz
+    .filter((item) => item.type === QuizItemType.MultipleChoice || item.type === QuizItemType.Checkboxes)
+    .map((item) => ({ itemID: item.id, reqCount: item.correctAnswers }));
+
   const [answerSheet, setAnswerSheet] = useImmer<AnswerSheet>(initialAnswerSheet);
 
-  const [submitModule, result] = useMutation(SUBMIT_MODULE, {
-    variables: { moduleID: module.id, answerSheet },
-    refetchQueries: [{ query: GET_CURRENT_USER }, { query: GET_TRAINING_MODULES }],
-  });
+  const [submitModule, result] = useMutation(SUBMIT_MODULE);
 
   const selectMultipleChoiceOption = (itemID: string, optionID: string) => {
     setAnswerSheet((draft) => {
@@ -91,7 +92,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
 
       const optionIndex = draft[itemIndex].optionIDs.findIndex((o) => o === optionID);
 
-      if (optionIndex === -1){
+      if (optionIndex === -1) {
         draft[itemIndex].optionIDs.push(optionID)
       } else {
         draft[itemIndex].optionIDs.splice(optionIndex, 1);
@@ -100,6 +101,8 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     })
     setQuizProgressed(true);
   };
+
+  const checkAllAnswered = (element: any, index: number) => (element.optionIDs.length != answerSheetReq[index].reqCount);
 
   const trainingSubmissionAnimation = () => {
     toast.success("Training Module Submitted", {
@@ -130,9 +133,12 @@ export default function QuizTaker({ module }: QuizTakerProps) {
   const navigate = useNavigate();
 
   const submitAndViewResults = async () => {
-    await submitModule();
-    navigate(`results`);
-    trainingSubmissionAnimation();
+    await submitModule({
+      variables: { moduleID: module.id, answerSheet },
+      refetchQueries: [{ query: GET_CURRENT_USER }, { query: GET_TRAINING_MODULES }],
+      onCompleted() { navigate(`results`); trainingSubmissionAnimation(); }
+    });
+
   };
 
   const cancelQuiz = async () => {
@@ -149,7 +155,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
       return "";
     }
   });
-  
+
 
   return (
     <Stack spacing={4} sx={styles.strongerBolds}>
@@ -240,7 +246,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
           loading={result.loading}
           variant="contained"
           sx={{ alignSelf: "flex-end" }}
-          disabled={module.isLocked ?? false}
+          //disabled={(module.isLocked || (answerSheet.some(checkAllAnswered))) ?? false}
           onClick={() => submitAndViewResults()}
         >
           Submit

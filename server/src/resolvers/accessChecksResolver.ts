@@ -156,14 +156,14 @@ const AccessChecksResolver = {
      * @argument userID id of affected User
      * @argument equipmentID id of affected equipment
      * @returns new Access Check
-     * @throws GraphQLError if not MENTOR or STAFF or or hold
+     * @throws GraphQLError if not MANAGER or higher
      */
     createAccessCheck: async (
       _parent: any,
       args: { userID: number, equipmentID: number },
       { isManager }: ApolloContext) =>
       isManager(async () => {
-        const result = await createAccessCheck(args.userID, args.equipmentID);
+        const result = await createAccessCheck(args.userID, args.equipmentID, true);
         return true;
       }
       ),

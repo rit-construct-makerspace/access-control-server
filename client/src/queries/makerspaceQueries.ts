@@ -183,7 +183,7 @@ export const GET_MAKERSPACE_BY_ID = gql`
           byReservationOnly
           needsWelcome
           requiresInPerson
-
+          schedulable
           notes
           archived
         }
@@ -252,5 +252,16 @@ export const UPDATE_DEFAULT_HOURS = gql`
 export const DELETE_SPECIAL_HOURS = gql`
   mutation DeleteSpecialHours($day: DateTime!, $makerspaceID: ID!) {
     deleteSpecialHours(day: $day, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const GET_VALID_STAFF = gql`
+  query GetValidStaff($id: Int!) {
+    getValidStaff(id: $id) {
+      id
+      ritUsername
+      firstName
+      lastName
+    }
   }
 `;

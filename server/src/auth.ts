@@ -130,6 +130,7 @@ export function setupDevAuth(app: express.Application) {
   const callbackUrl = process.env.CALLBACK_URL;
   const entryPoint = process.env.ENTRY_POINT;
   const vite_url = process.env.VITE_URL;
+  let redir_url : any = process.env.VITE_URL;
 
   assert(issuer, "ISSUER env value is null");
   assert(callbackUrl, "CALLBACK_URL env value is null");
@@ -237,15 +238,24 @@ export function setupDevAuth(app: express.Application) {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
-  const authenticate = passport.authenticate("saml", {
-    failureFlash: true,
-    failureRedirect: "/login/fail",
-    successRedirect: vite_url,
+  app.get("/login", function (req, res, next) {
+    if (req.query.redir) {
+      redir_url = req.query.redir
+    }
+    passport.authenticate("saml", {
+      successRedirect: redir_url,
+      failureFlash: true,
+      failureRedirect: "/login/fail",
+  })(req, res) 
   });
 
-  app.get("/login", authenticate);
-
-  app.post("/login/callback", authenticate,
+  app.post("/login/callback", function (req, res, next) {
+    passport.authenticate("saml", {
+      successRedirect: redir_url,
+      failureFlash: true,
+      failureRedirect: "/login/fail",
+  })(req, res) 
+  },
     async (req, res) => {
       console.log("Logged in")
       if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {
@@ -286,6 +296,7 @@ export function setupSamlAuth(app: express.Application) {
   const callbackUrl = process.env.CALLBACK_URL;
   const entryPoint = process.env.ENTRY_POINT;
   const reactAppUrl = process.env.VITE_URL;
+  let redir_url : any = process.env.VITE_URL;
 
   assert(issuer, "ISSUER env value is null");
   assert(callbackUrl, "CALLBACK_URL env value is null");
@@ -468,16 +479,24 @@ export function setupSamlAuth(app: express.Application) {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
-  const authenticate = passport.authenticate("saml", {
-    failureFlash: true,
-    failureRedirect: "/login/fail",
-    successRedirect: reactAppUrl,
+  app.get("/login", function (req, res, next) {
+    if (req.query.redir) {
+      redir_url = req.query.redir
+    }
+    passport.authenticate("saml", {
+      successRedirect: redir_url,
+      failureFlash: true,
+      failureRedirect: "/login/fail",
+  })(req, res) 
   });
 
-  app.get("/login", authenticate);
-
-  app.post("/login/callback", authenticate,
-
+  app.post("/login/callback", function (req, res, next) {
+    passport.authenticate("saml", {
+      successRedirect: redir_url,
+      failureFlash: true,
+      failureRedirect: "/login/fail",
+  })(req, res) 
+  },
     async (req, res) => {
       console.log("Logged in")
       if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {

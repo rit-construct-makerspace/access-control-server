@@ -20,7 +20,7 @@ export async function getAccessChecks(): Promise<AccessCheckRow[]> {
  * @returns all relevant Access Checks
  */
 export async function getAccessChecksByUserID(userID: number): Promise<AccessCheckRow[] | undefined> {
-    return await knex("AccessChecks").select("AccessChecks.*").leftJoin("Equipment", "AccessChecks.equipmentID", "Equipment.id").where({userID: userID}).orderBy("AccessChecks.approved", "desc").orderBy("Equipment.name", "asc");
+    return await knex("AccessChecks").select("AccessChecks.*").leftJoin("Equipment", "AccessChecks.equipmentID", "Equipment.id").where({ userID: userID }).orderBy("AccessChecks.approved", "desc").orderBy("Equipment.name", "asc");
 }
 
 /**
@@ -29,7 +29,7 @@ export async function getAccessChecksByUserID(userID: number): Promise<AccessChe
  * @returns AccessCheck or undefined if ID not exist
  */
 export async function getAccessCheckByID(id: number): Promise<AccessCheckRow | undefined> {
-    return await knex("AccessChecks").select("*").first().where({id: id});
+    return await knex("AccessChecks").select("*").first().where({ id: id });
 }
 
 /**
@@ -39,7 +39,7 @@ export async function getAccessCheckByID(id: number): Promise<AccessCheckRow | u
  * @returns true if exists
  */
 export async function accessCheckExists(userID: number, equipmentID: number): Promise<boolean> {
-    return (await knex("AccessChecks").select("*").first().where({userID: userID, equipmentID: equipmentID})) != undefined;
+    return (await knex("AccessChecks").select("*").first().where({ userID: userID, equipmentID: equipmentID })) != undefined;
 }
 
 /**
@@ -49,7 +49,7 @@ export async function accessCheckExists(userID: number, equipmentID: number): Pr
  * @returns true if exists
  */
 export async function hasApprovedAccessCheck(userID: number, equipmentID: number): Promise<boolean | undefined> {
-    return (await knex("AccessChecks").select("*").first().where({userID: userID, equipmentID: equipmentID}))?.approved
+    return (await knex("AccessChecks").select("*").first().where({ userID: userID, equipmentID: equipmentID }))?.approved
 }
 
 /**
@@ -58,7 +58,7 @@ export async function hasApprovedAccessCheck(userID: number, equipmentID: number
  * @returns all matching Access Checks
  */
 export async function getAccessChecksByApproved(approved: boolean): Promise<AccessCheckRow[]> {
-    return await knex("AccessChecks").select("*").where({approved: approved});
+    return await knex("AccessChecks").select("*").where({ approved: approved });
 }
 
 /**
@@ -67,10 +67,11 @@ export async function getAccessChecksByApproved(approved: boolean): Promise<Acce
  * @param equipmentID equipment ID for the check
  * @returns creaated Access Check
  */
-export async function createAccessCheck(userID: number, equipmentID: number): Promise<AccessCheckRow> {
+export async function createAccessCheck(userID: number, equipmentID: number, approved?: boolean): Promise<AccessCheckRow> {
     return await knex("AccessChecks").insert({
         userID: userID,
-        equipmentID: equipmentID
+        equipmentID: equipmentID,
+        approved: approved ?? false
     });
 }
 
@@ -83,7 +84,7 @@ export async function createAccessCheck(userID: number, equipmentID: number): Pr
 export async function setAccessCheckApproval(id: number, approved: boolean): Promise<AccessCheckRow | undefined> {
     await knex("AccessChecks").update({
         approved: approved
-    }).where({id: id});
+    }).where({ id: id });
     return await getAccessCheckByID(id);
 }
 
@@ -94,7 +95,7 @@ export async function setAccessCheckApproval(id: number, approved: boolean): Pro
  * @returns true if exists
  */
 export async function isApproved(userID: number, equipmentID: number): Promise<boolean> {
-    const check = await knex("AccessChecks").select("*").where({userID: userID, equipmentID: equipmentID }).first();
+    const check = await knex("AccessChecks").select("*").where({ userID: userID, equipmentID: equipmentID }).first();
     if (check?.approved) return true;
     return false;
 }
@@ -105,6 +106,6 @@ export async function isApproved(userID: number, equipmentID: number): Promise<b
  * @returns true
  */
 export async function purgeUnapprovedAccessChecks(userID: number): Promise<boolean> {
-    await knex("AccessChecks").delete().where({userID, approved: false});
+    await knex("AccessChecks").delete().where({ userID, approved: false });
     return true;
 }

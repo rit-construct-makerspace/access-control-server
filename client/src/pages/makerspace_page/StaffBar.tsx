@@ -9,7 +9,8 @@ import PaidIcon from '@mui/icons-material/Paid';
 import PeopleIcon from "@mui/icons-material/People";
 import ScannerIcon from '@mui/icons-material/Scanner';
 import SchoolIcon from "@mui/icons-material/School";
-import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import HandymanIcon from '@mui/icons-material/Handyman';
 import { ButtonBase, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
@@ -87,14 +88,14 @@ export default function StaffBar() {
         {
           window.location.pathname.match(/\/app\/makerspace\/\d+\/.+/gm) !== null
             ? <NavLink
-              primary={"Home"}
+              primary={"Makerspace"}
               to={`/makerspace/${makerspaceID}`}
               icon={<ArrowBackIcon />}
             />
             : null
         }
         <NavLink
-          primary={"Manage Trainings"}
+          primary={"Trainings"}
           to={`/makerspace/${makerspaceID}/trainings`}
           icon={<SchoolIcon />}
         />
@@ -109,17 +110,12 @@ export default function StaffBar() {
           icon={<ArchitectureIcon />}
         />
         <NavLink
-          primary={"Orders"}
-          to={`/makerspace/${makerspaceID}/storefront/carts`}
-          icon={<ShoppingCartCheckoutIcon />}
-        />
-        <NavLink
           primary={"People"}
           to={`/makerspace/${makerspaceID}/people`}
           icon={<PeopleIcon />}
         />
         <NavLink
-          primary={"Organizations"}
+          primary={"Orgs"}
           to={`/makerspace/${makerspaceID}/organizations`}
           icon={<AccountBalanceIcon />}
         />
@@ -128,18 +124,38 @@ export default function StaffBar() {
           to={`/makerspace/${makerspaceID}/history`}
           icon={<HistoryIcon />}
         />
-        {isManager ? (
-          <NavLink
-            primary={"Readers"}
-            to={`/makerspace/${makerspaceID}/readers`}
-            icon={<ScannerIcon />}
-          />
-        ) : null}
         <NavLink
-          primary={"Finances"}
-          to={`/makerspace/${makerspaceID}/currency`}
-          icon={<PaidIcon />}
+          primary={"Maintenance"}
+          to={`/makerspace/${makerspaceID}/maintenance`}
+          icon={<HandymanIcon />}
         />
+        {
+          isManager
+            ? <NavLink
+              primary={"Reservations"}
+              to={`/makerspace/${makerspaceID}/reservations`}
+              icon={<CalendarMonthIcon />}
+            />
+            : null
+        }
+        {
+          isManager
+            ? <NavLink
+              primary={"Readers"}
+              to={`/makerspace/${makerspaceID}/readers`}
+              icon={<ScannerIcon />}
+            />
+            : null
+        }
+        {
+          isManager
+            ? <NavLink
+              primary={"Finances"}
+              to={`/makerspace/${makerspaceID}/currency`}
+              icon={<PaidIcon />}
+            />
+            : null
+        }
       </Stack>
     );
 

@@ -1,17 +1,21 @@
-import User from "./User";
+import { CurrentUser } from "../common/CurrentUserProvider";
 import Equipment from "./Equipment";
 
-export interface ReservationAttachment {
-  name: string;
-  url: string;
+export interface Reservation {
+  id: number,
+  start: string,
+  end: string,
+  description: string | null,
+  approved: boolean,
+  equipment: Equipment,
+  user: CurrentUser
 }
 
-export default interface Reservation {
-  id: number;
-  maker: User;
-  equipment: Equipment;
-  startTime: string;
-  endTime: string;
-  comment: string;
-  attachments: ReservationAttachment[];
+export interface ReservationEvent {
+  title: React.ReactNode,
+  start: Date,
+  end: Date,
+  isDraggable: boolean,
+  reservation: Reservation,
+  resourceId?: number
 }

@@ -5,7 +5,7 @@
  */
 
 import { WebClient } from "@slack/web-api";
-import { EquipmentInstancesRow, MaintenanceLogRow, ToolItemInstancesRow } from "../db/tables.js";
+import { EquipmentInstancesRow } from "../db/tables.js";
 import { getEquipmentByID } from "../repositories/Equipment/EquipmentRepository.js";
 import { getInstanceByID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
 

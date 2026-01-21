@@ -154,13 +154,7 @@ export default function StorefrontPage() {
 
   return (
     <RequestWrapper loading={loading} error={error}>
-      <Page title={"Store"} noPadding={isMobile} topRightAddons={
-        (isOnlyTrainer(currentUser) || isStaff(currentUser)) ? (
-          <Button variant="contained" color="secondary" startIcon={<ShoppingCartCheckoutIcon />} onClick={() => { navigate(`/makerspace/36/storefront/carts`) }}>
-            View Carts
-          </Button>
-        ) : null
-      }>
+      <Page title={"Store"} noPadding={isMobile}>
         <title>Storefront | Make @ RIT</title>
 
         {(currentUser.visitor==false && import.meta.env.VITE_DISABLE_STOREFRONT_CART === "false") && <ShoppingCart

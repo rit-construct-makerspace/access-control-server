@@ -6,6 +6,7 @@ interface PrettyModalProps {
   onClose: () => void;
   width?: number | string;
   children: ReactNode;
+  elevation?: number;
 }
 
 export default function PrettyModal({
@@ -13,10 +14,12 @@ export default function PrettyModal({
   open,
   onClose,
   children,
+  elevation = 1
 }: PrettyModalProps) {
   return (
     <Modal open={open} onClose={onClose}>
       <Card
+        elevation={elevation}
         sx={{
           position: "absolute",
           top: "50%",

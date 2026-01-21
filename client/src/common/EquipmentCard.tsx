@@ -68,19 +68,19 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                   isPriviledged
                     ? <Button
                       onClick={() => { navigate(`/makerspace/${makerspaceID}/equipment/${props.equipment.id}`) }}
-                    aria-label="edit button"
-                    sx={{ width: "40px", height: "40px" }}
-                    variant="contained"
-                    color="primary"
-                  >
-                    <ConstructionIcon />
-                  </Button>
+                      aria-label="edit button"
+                      sx={{ width: "40px", height: "40px" }}
+                      variant="contained"
+                      color="primary"
+                    >
+                      <ConstructionIcon />
+                    </Button>
                     : null
                 }
               </Stack>
               <Stack direction="row" justifyContent="space-between" height="100%">
                 {/* Trainings & Access Check */}
-                <Stack width="100%">
+                <Stack width="100%" height={"135px"} overflow={"scroll"}>
                   {hasNotTakenModule || (!hasApprovedAccessCheck && !props.equipment.byReservationOnly) ? (
                     <Typography paddingLeft={"10px"}>To access, complete:</Typography>
                   ) : null}
@@ -88,7 +88,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                     <ModuleStatusRow ms={ms} />
                   ))}
                   {props.equipment.requiresInPerson ? (
-                    <Stack direction={"row"} spacing={1} alignItems="center" padding="10px">
+                    <Stack direction={"row"} spacing={1} alignItems="center" padding="7px">
                       {user.visitor ? (
                         <RadioButtonUncheckedIcon color="secondary" />
                       ) : hasApprovedAccessCheck ? (
@@ -124,25 +124,41 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
               <ThemedMarkdown>{props.equipment.notes}</ThemedMarkdown>
             </Typography>
             <Stack direction={"row"} justifyContent={"space-between"}>
-              {props.equipment.byReservationOnly ? (
-                <Typography variant="subtitle1">
-                  Reservation only. Email{" "}
-                  <Link href={"mailto:make@rit.edu"} target={"_blank"}>
-                    {" "}
-                    make@rit.edu{" "}
-                  </Link>{" "}
-                  to schedule.
-                </Typography>
-              ) : <Typography/>}
-              <Button
-                size="small"
-                variant="contained"
-                color="info"
-                onClick={() => window.open(props.equipment.sopUrl, "_blank")}
-                sx={{ alignSelf: "flex-end" }}
-              >
-                Learn More
-              </Button>
+              {
+                props.equipment.byReservationOnly ? (
+                  <Typography variant="subtitle1">
+                    Reservation only. Email{" "}
+                    <Link href={"mailto:make@rit.edu"} target={"_blank"}>
+                      {" "}
+                      make@rit.edu{" "}
+                    </Link>{" "}
+                    to schedule.
+                  </Typography>
+                ) : <Typography />
+              }
+              <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                {
+                  props.equipment.schedulable ? (
+                    <Button
+                      color="secondary"
+                      variant="contained"
+                      size="small"
+                      onClick={() => navigate(`/makerspace/${makerspaceID}/reserve/${props.equipment.id}`)}
+                    >
+                      Reserve
+                    </Button>
+                  ) : null
+                }
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="info"
+                  onClick={() => window.open(props.equipment.sopUrl, "_blank")}
+                  sx={{ alignSelf: "flex-end" }}
+                >
+                  Learn More
+                </Button>
+              </Stack>
             </Stack>
           </Stack>
         </Stack>
