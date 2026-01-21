@@ -3,11 +3,12 @@ import { useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
 import { useQuery } from "@apollo/client";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import { DataGrid, GridRowsProp, GridColDef, GridFilterModel, GridPaginationModel, GridSortModel, getGridStringOperators } from "@mui/x-data-grid";
+import { DataGrid, GridRowsProp, GridColDef, GridFilterModel, GridPaginationModel, GridSortModel, getGridStringOperators, GridRenderCellParams } from "@mui/x-data-grid";
 import { useState } from "react";
 import { MaintenanceTicket, MaintenanceTicketType, PAGINATED_MAINTENANCE_TICKETS } from "../../../queries/maintenanceTicketQueries";
 import NewTicketModal from "./NewTicketModal";
 import WarningIcon from '@mui/icons-material/Warning';
+import MaintenanceTicketModal from "./MaintenanceTicketModal";
 
 const formatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
@@ -56,8 +57,31 @@ export default function MaintenancePage() {
     { field: "type", headerName: "Type", width: 140, sortable: false, filterOperators: containsOperator },
     { field: "status", headerName: "Status", width: 140, filterOperators: containsOperator },
     { field: "severity", headerName: "Severity", width: 140, filterOperators: containsOperator },
-    { field: "creator", headerName: "Creator", width: 100, sortable: false, filterOperators: containsOperator },
-    { field: "dateCreated", headerName: "Created", width: 180, filterable: false }
+    { field: "creator", headerName: "Creator", width: 140, sortable: false, filterOperators: containsOperator },
+    { field: "assigned", headerName: "Assigned", width: 140, sortable: false, filterOperators: containsOperator },
+    { field: "dateCreated", headerName: "Created", width: 180, filterable: false },
+    {
+      field: "manage", headerName: "Manage", width: 140, filterable: false, sortable: false, renderCell: (params: GridRenderCellParams<any, MaintenanceTicket>) => {
+        const [open, setOpen] = useState(false);
+
+        if (!params.value) {
+          return;
+        }
+
+        return (
+          <Stack height={"100%"} justifyContent={"center"}>
+            <Button
+              color="info"
+              variant="contained"
+              onClick={() => setOpen(true)}
+            >
+              View Ticket
+            </Button>
+            <MaintenanceTicketModal ticket={params.value} open={open} onClose={() => setOpen(false)} />
+          </Stack>
+        );
+      }
+    }
   ];
 
   function handlePaginationModelChange(model: GridPaginationModel) {
@@ -83,7 +107,9 @@ export default function MaintenancePage() {
       status: ticket.status,
       severity: ticket.severity,
       creator: ticket.type === MaintenanceTicketType.REPORTED ? ticket.creator?.ritUsername ?? "" : "SERVER",
-      dateCreated: formatter.format(new Date(Number(ticket.dateCreated)))
+      assigned: ticket.assigned?.ritUsername ?? "UNASSIGNED",
+      dateCreated: formatter.format(new Date(Number(ticket.dateCreated))),
+      manage: ticket
     }
   ))
 

@@ -59,6 +59,8 @@ export const PAGINATED_MAINTENANCE_TICKETS = gql`
       assigned {
         id
         ritUsername
+        firstName
+        lastName
       }
     }
   }
