@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import Equipment from "../../../types/Equipment";
 import { FullMakerspace } from "../../../queries/makerspaceQueries";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
 import { useMutation, useQuery } from "@apollo/client";
@@ -46,14 +46,13 @@ export default function NewTicketModal(props: NewTicketModalProps) {
   const EMPTY_ARRAY: EquipmentInstance[] = [];
   const instances: EquipmentInstance[] = equipmentInstancesResult.data?.equipmentInstances ?? EMPTY_ARRAY;
 
-  const reportedInstance: EquipmentInstance = useMemo(() => {
-    if (equipmentInstancesResult.data?.equipmentInstances && instances.length === 1) {
-      return equipmentInstancesResult.data.equipmentInstances[0];
+  const reportedInstance: EquipmentInstance | undefined = useMemo(() => {
+    if (instances.length === 1) {
+      return instances[0];
     } else {
       return instance;
     }
-  }, [instances, instance])
-
+  }, [instances, instance]);
 
 
   const makerspace_equipments_2 = props.makerspace?.rooms.map((room) => (room.equipment))
@@ -70,7 +69,7 @@ export default function NewTicketModal(props: NewTicketModalProps) {
   }
 
   async function handleCreateTicket() {
-    if (!(equipment && instance && (severity !== undefined))) {
+    if (!(equipment && reportedInstance && (severity !== undefined))) {
       toast.error("A required field is empty!");
       return;
     }
@@ -124,6 +123,7 @@ export default function NewTicketModal(props: NewTicketModalProps) {
         {
           equipment
             ? <Autocomplete
+              key={instances.length === 1 ? "auto-selected" : "manual-select"}
               renderInput={
                 (params) => (
                   <TextField
@@ -139,7 +139,6 @@ export default function NewTicketModal(props: NewTicketModalProps) {
               value={reportedInstance}
               onChange={(event, newValue) => setInstance(newValue ?? undefined)}
               readOnly={instances.length === 1}
-              loading={equipmentInstancesResult.loading}
             />
             : <Autocomplete
               renderInput={
