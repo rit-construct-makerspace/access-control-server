@@ -41,6 +41,7 @@ export const MakerspacesTypeDefs = gql`
   extend type Query {
     makerspaces(storefrontVisible: Boolean): [Makerspace]
     makerspaceByID(id: ID!): Makerspace
+    getValidStaff(id: Int!): [User]
   }
 
   extend type Mutation {

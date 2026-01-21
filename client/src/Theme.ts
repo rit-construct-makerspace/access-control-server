@@ -5,7 +5,7 @@ interface MakeTheme {
   getThemeString(): string;
 }
 
-class LightTheme implements MakeTheme {
+export class LightTheme implements MakeTheme {
   private static readonly theme = createTheme({
     palette: {
       primary: {

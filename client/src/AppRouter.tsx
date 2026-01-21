@@ -47,6 +47,9 @@ import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import ManageRoomPage from "./pages/makerspace_page/MonitorRoomPage";
 import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
 import EditEquipmentPage from "./pages/makerspace_page/equipment_pages/EditEquipmentPage";
+import ReservationRequestPage from "./pages/makerspace_page/reservation_pages/ReservationRequestPage";
+import ManageReservationsPage from "./pages/makerspace_page/reservation_pages/ManageReservationsPage";
+import MaintenancePage from "./pages/makerspace_page/maintenance_pages/MaintenancePage";
 
 function AppRoot() {
   return (
@@ -146,6 +149,8 @@ export const appRouter = createBrowserRouter(
 
                 { path: "/equipment/:equipmentID", element: <EquipmentRedirector /> },
 
+                { path: "/makerspace/:makerspaceID/reserve/:equipmentID", element: <ReservationRequestPage /> },
+
                 /* Routes for trainers + higher */
                 {
                   element: <TrainerRoute />,
@@ -180,6 +185,7 @@ export const appRouter = createBrowserRouter(
                             { path: "/makerspace/:makerspaceID/history", element: <AuditLogsPage /> },
                             { path: "/makerspace/:makerspaceID/readers", element: <ReadersPage /> },
                             { path: "/makerspace/:makerspaceID/organizations", element: <OrganizationsPage /> },
+                            { path: "/makerspace/:makerspaceID/maintenance", element: <MaintenancePage /> },
 
                             /* Routes for manager + higher */
                             {
@@ -188,6 +194,7 @@ export const appRouter = createBrowserRouter(
                                 { path: "/makerspace/:makerspaceID/edit", element: <ManageMakerspacePage /> },
                                 { path: "/makerspace/:makerspaceID/edit/room/:roomID", element: <ManageRoomPage /> },
                                 { path: "/makerspace/:makerspaceID/currency", element: <CurrencyPage /> },
+                                { path: "/makerspace/:makerspaceID/reservations", element: <ManageReservationsPage /> }
                               ],
                             },
                             /* End manager routes */

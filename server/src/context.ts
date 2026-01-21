@@ -19,6 +19,7 @@ export interface ApolloContext {
   logout: () => void;
   ifAuthenticated: (callback: (user: CurrentUser) => any) => any;
   ifStaffOrSelf: (targetedUserID: number, callback: (user: CurrentUser) => any) => any;
+  ifManagerOrSelf: (targetedUserID: number, callback: (user: CurrentUser) => any) => any;
   isAdmin: (callback: (user: CurrentUser) => any) => any;
   isManager: (callback: (user: CurrentUser) => any) => any;
   isStaff: (callback: (user: CurrentUser) => any) => any;
@@ -199,6 +200,21 @@ const ifAuthenticated =
       return callback(user);
     };
 
+const ifManagerOrSelf = (expressUser: Express.User | undefined) => (targetedUserID: number, callback: (user: CurrentUser) => any) => {
+  if (!expressUser) {
+    throw new GraphQLError("Unauthenticated");
+  }
+
+  const user = determineUser(expressUser);
+  if (user.id === targetedUserID) {
+    return callback(user);
+  } else if (user.manager.length > 0 || user.admin) {
+    return callback(user);
+  } else {
+    throw new GraphQLError(`Forbidden | Not User ${targetedUserID} or Manager`)
+  }
+}
+
 const context = async ({ req }: { req: any }) => ({
   user: req.user,
   logout: () => req.logout(),
@@ -210,7 +226,8 @@ const context = async ({ req }: { req: any }) => ({
   isStaffFor: isStaffFor(req.user),
   isTrainerFor: isTrainerFor(req.user),
   ifAuthenticated: ifAuthenticated(req.user),
-  ifStaffOrSelf: ifStaffOrSelf(req.user)
+  ifStaffOrSelf: ifStaffOrSelf(req.user),
+  ifManagerOrSelf: ifManagerOrSelf(req.user),
 });
 
 export default context;

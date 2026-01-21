@@ -1,0 +1,35 @@
+import type { Knex } from "knex";
+
+
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema.dropTableIfExists("ResolutionLogs");
+  await knex.schema.dropTableIfExists("MaintenanceLogs");
+  await knex.schema.dropTableIfExists("MaintenanceTags");
+
+  if (await knex.schema.hasTable("MaintenanceTickets")) {
+    return;
+  }
+
+  await knex.schema.createTable("MaintenanceTickets", (t) => {
+    t.increments("id").primary();
+    t.enu("severity", ["HIGH", "MEDIUM", "LOW"]).notNullable();
+    t.enu("type", ["AUTOMATIC", "REPORTED"]).notNullable();
+    t.enu("status", ["UPCOMING", "TODO", "IN_PROGRESS", "CLOSED"]).notNullable().defaultTo("TODO")
+    t.integer("instanceID").references("id").inTable("EquipmentInstances").notNullable()
+      .onUpdate("CASCADE").onDelete("CASCADE");
+    t.integer("userID").references("id").inTable("Users").nullable()
+      .onUpdate("CASCADE").onDelete("SET NULL");
+    t.string("description").notNullable().defaultTo("");
+    t.string("imageUrl").nullable().defaultTo(null);
+    t.timestamp("dateCreated").notNullable().defaultTo(knex.fn.now());
+    t.timestamp("dateClosed").nullable();
+    t.integer("intervalHours").nullable();
+    t.integer("assignedID").references("id").inTable("Users").nullable();
+  })
+}
+
+
+export async function down(knex: Knex): Promise<void> {
+  await knex.schema.dropTableIfExists("MaintenanceTickets");
+}
+

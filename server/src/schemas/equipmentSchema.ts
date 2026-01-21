@@ -16,6 +16,7 @@ export interface EquipmentInput {
   needsWelcome: boolean;
   requiresTrainerApproval: boolean;
   requiresInPerson: boolean;
+  schedulable: boolean;
 }
 
 export const EquipmentTypeDefs = gql`
@@ -36,6 +37,7 @@ export const EquipmentTypeDefs = gql`
     needsWelcome: Boolean
     requiresTrainerApproval: Boolean
     requiresInPerson: Boolean
+    schedulable: Boolean
   }
 
   input EquipmentInput {
@@ -49,6 +51,7 @@ export const EquipmentTypeDefs = gql`
     needsWelcome: Boolean
     requiresTrainerApproval: Boolean
     requiresInPerson: Boolean
+    schedulable: Boolean
   }
 
   extend type Query {

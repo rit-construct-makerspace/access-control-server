@@ -124,25 +124,41 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
               <ThemedMarkdown>{props.equipment.notes}</ThemedMarkdown>
             </Typography>
             <Stack direction={"row"} justifyContent={"space-between"}>
-              {props.equipment.byReservationOnly ? (
-                <Typography variant="subtitle1">
-                  Reservation only. Email{" "}
-                  <Link href={"mailto:make@rit.edu"} target={"_blank"}>
-                    {" "}
-                    make@rit.edu{" "}
-                  </Link>{" "}
-                  to schedule.
-                </Typography>
-              ) : <Typography />}
-              <Button
-                size="small"
-                variant="contained"
-                color="info"
-                onClick={() => window.open(props.equipment.sopUrl, "_blank")}
-                sx={{ alignSelf: "flex-end" }}
-              >
-                Learn More
-              </Button>
+              {
+                props.equipment.byReservationOnly ? (
+                  <Typography variant="subtitle1">
+                    Reservation only. Email{" "}
+                    <Link href={"mailto:make@rit.edu"} target={"_blank"}>
+                      {" "}
+                      make@rit.edu{" "}
+                    </Link>{" "}
+                    to schedule.
+                  </Typography>
+                ) : <Typography />
+              }
+              <Stack direction={"row"} spacing={1} alignItems={"center"}>
+                {
+                  props.equipment.schedulable ? (
+                    <Button
+                      color="secondary"
+                      variant="contained"
+                      size="small"
+                      onClick={() => navigate(`/makerspace/${makerspaceID}/reserve/${props.equipment.id}`)}
+                    >
+                      Reserve
+                    </Button>
+                  ) : null
+                }
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="info"
+                  onClick={() => window.open(props.equipment.sopUrl, "_blank")}
+                  sx={{ alignSelf: "flex-end" }}
+                >
+                  Learn More
+                </Button>
+              </Stack>
             </Stack>
           </Stack>
         </Stack>
