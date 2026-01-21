@@ -78,7 +78,6 @@ export async function paginatedMaintenanceTickets(
     .join("EquipmentInstances", "MaintenanceTickets.instanceID", "EquipmentInstances.id")
     .join("Equipment", "EquipmentInstances.equipmentID", "Equipment.id")
     .join("Rooms", "Equipment.roomID", "Rooms.id")
-    .join("Users", "MaintenanceTickets.userID", "Users.id");
 
   // pagination
   query = query.select("MaintenanceTickets.*").offset(pagination.pageSize * pagination.page).limit(pagination.pageSize);
@@ -98,6 +97,8 @@ export async function paginatedMaintenanceTickets(
         query = query.orderBy(`MaintenanceTickets.${sort.target}`, sort.dir);
       }
     }
+  } else {
+    query = query.orderBy("MaintenanceTickets.id", "asc")
   }
 
   // filter
@@ -112,7 +113,17 @@ export async function paginatedMaintenanceTickets(
         break;
       }
       case "creator": {
+        query = query.join("Users", "MaintenanceTickets.userID", "Users.id");
         query = query.whereILike(`Users.ritUsername`, `%${filter.value}%`);
+        break;
+      }
+      case "assigned": {
+        if (filter.value === "UNASSIGNED") {
+          query = query.whereNull("MaintenanceTickets.assignedID")
+        } else {
+          query = query.join("Users", "MaintenanceTickets.assignedID", "Users.id");
+          query = query.whereILike(`Users.ritUsername`, `%${filter.value}%`);
+        }
         break;
       }
       default: {
