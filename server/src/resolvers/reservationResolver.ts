@@ -88,7 +88,7 @@ const ReservationResolver = {
         throw new GraphQLError("This equipment cannot be reserved");
       }
 
-      if (args.approved && !user.manager.includes(room?.makerspaceID ?? -1)) {
+      if (args.approved && !(user.manager.includes(room?.makerspaceID ?? -1) || user.admin)) {
         throw new GraphQLError("Only managers can create approved rservations");
       }
 
