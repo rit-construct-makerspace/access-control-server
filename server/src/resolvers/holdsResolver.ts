@@ -4,6 +4,7 @@ import * as UsersRepo from "../repositories/Users/UserRepository.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { HoldRow } from "../db/tables.js";
+import { send_hold_placed_email } from "../integrations/email/email.js";
 
 const HoldsResolvers = {
   Hold: {
@@ -51,6 +52,7 @@ const HoldsResolvers = {
         );
 
         await UsersRepo.setActiveHold(Number(args.userID), true)
+        send_hold_placed_email(user.ritUsername + "@rit.edu", args.description);
         return HoldsRepo.createHold(user.id, Number(args.userID), args.description);
       }),
 
