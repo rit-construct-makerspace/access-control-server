@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import Equipment from "../../../types/Equipment";
 import { FullMakerspace } from "../../../queries/makerspaceQueries";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
 import { useMutation, useQuery } from "@apollo/client";
@@ -43,6 +43,19 @@ export default function NewTicketModal(props: NewTicketModalProps) {
   const equipmentInstancesResult = useQuery(GET_EQUIPMENT_INSTANCES, { variables: { equipmentID: equipment?.id ?? -1 } });
   const [createTicket] = useMutation(CREATE_MAINTENANCE_TICKET, { refetchQueries: ["PaginatedMaintenanceTickets", "MaintenanceTickets"] });
 
+  const EMPTY_ARRAY: EquipmentInstance[] = [];
+  const instances: EquipmentInstance[] = equipmentInstancesResult.data?.equipmentInstances ?? EMPTY_ARRAY;
+
+  const reportedInstance: EquipmentInstance = useMemo(() => {
+    if (equipmentInstancesResult.data?.equipmentInstances && instances.length === 1) {
+      return equipmentInstancesResult.data.equipmentInstances[0];
+    } else {
+      return instance;
+    }
+  }, [instances, instance])
+
+
+
   const makerspace_equipments_2 = props.makerspace?.rooms.map((room) => (room.equipment))
   const makerspace_equipments = makerspace_equipments_2?.flat(1);
 
@@ -65,7 +78,7 @@ export default function NewTicketModal(props: NewTicketModalProps) {
       await createTicket({
         variables: {
           severity: severity,
-          instanceID: Number(instance.id),
+          instanceID: Number(reportedInstance.id),
           userID: Number(user.id),
           description: description,
           imageUrl: imageUrl
@@ -110,29 +123,24 @@ export default function NewTicketModal(props: NewTicketModalProps) {
         />
         {
           equipment
-            ? <RequestWrapper2 result={equipmentInstancesResult} render={(data) => {
-
-              const instances: EquipmentInstance[] = data.equipmentInstances;
-
-              return (
-                <Autocomplete
-                  renderInput={
-                    (params) => (
-                      <TextField
-                        {...params}
-                        label="Instance"
-                        placeholder="Select Instance..."
-                        required
-                      />
-                    )
-                  }
-                  options={instances}
-                  getOptionLabel={(option) => (option?.name ?? "You shouldn't see this")}
-                  value={instance}
-                  onChange={(event, newValue) => setInstance(newValue ?? undefined)}
-                />
-              );
-            }} />
+            ? <Autocomplete
+              renderInput={
+                (params) => (
+                  <TextField
+                    {...params}
+                    label="Instance"
+                    placeholder="Select Instance..."
+                    required
+                  />
+                )
+              }
+              options={instances}
+              getOptionLabel={(option) => (option?.name ?? "You shouldn't see this")}
+              value={reportedInstance}
+              onChange={(event, newValue) => setInstance(newValue ?? undefined)}
+              readOnly={instances.length === 1}
+              loading={equipmentInstancesResult.loading}
+            />
             : <Autocomplete
               renderInput={
                 (params) => (
