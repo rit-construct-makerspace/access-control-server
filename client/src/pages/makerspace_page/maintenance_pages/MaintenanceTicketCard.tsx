@@ -19,7 +19,7 @@ export default function MaintenanceTicketCard(props: { ticket: MaintenanceTicket
   const [manageTicketModal, setManageTicketModal] = useState(false);
 
   return (
-    <Card sx={{ minWidth: "450px", padding: "20px" }}>
+    <Card sx={{ minWidth: "450px", height: "100%", padding: "20px" }}>
       <Stack height={"100%"} justifyContent={"space-between"}>
         <Stack spacing={2}>
           <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>

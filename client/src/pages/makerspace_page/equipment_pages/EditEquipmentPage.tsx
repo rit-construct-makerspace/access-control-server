@@ -14,7 +14,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import { isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import HandymanIcon from '@mui/icons-material/Handyman';
-import MaintenanceTicketRow from "../maintenance_pages/MaintenanceTicketRow";
+import MaintenanceTicketGrid from "../maintenance_pages/MaintenanceTicketGrid";
 import WarningIcon from '@mui/icons-material/Warning';
 import NewTicketModal from "../maintenance_pages/NewTicketModal";
 
@@ -155,7 +155,7 @@ export default function EditEquipmentPage() {
                 Report Issue
               </Button>
             </Stack>
-            <MaintenanceTicketRow equipmentID={equipment.id} />
+            <MaintenanceTicketGrid equipmentID={equipment.id} />
           </Stack>
           {/* Equipment Information Modal */}
           <PrettyModal open={editEquipmentModal} onClose={() => setEditEquipmentModal(false)} width={"90%"} elevation={8}>

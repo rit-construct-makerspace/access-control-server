@@ -1,14 +1,14 @@
-import { Alert, Stack, Typography } from "@mui/material";
+import { Alert, Grid, Stack, Typography } from "@mui/material";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { GET_MAINTENANCE_TICKETS, MaintenanceTicket, MaintenanceTicketStatus } from "../../../queries/maintenanceTicketQueries";
 import { useQuery } from "@apollo/client";
 import MaintenanceTicketCard from "./MaintenanceTicketCard";
 
-interface MaintenanceTicketRowProps {
+interface MaintenanceTicketGridProps {
   equipmentID: number
 }
 
-export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
+export default function MaintenanceTicketGrid(props: MaintenanceTicketGridProps) {
 
   const maintenanceTickets = useQuery(GET_MAINTENANCE_TICKETS, {
     variables: {
@@ -23,16 +23,18 @@ export default function MaintenanceTicketRow(props: MaintenanceTicketRowProps) {
       const tickets: MaintenanceTicket[] = data.maintenanceTickets;
 
       return (
-        <Stack width={"100%"} overflow={"auto"} direction={"row"} spacing={3}>
+        <Grid width={"100%"} container spacing={3}>
           {
             tickets.length > 0
               ? tickets.map((ticket) => (
-                <MaintenanceTicketCard ticket={ticket} />
+                <Grid key={ticket.id}>
+                  <MaintenanceTicketCard ticket={ticket} />
+                </Grid>
               ))
               : <Alert severity="success" variant="filled" sx={{ width: "100%" }}>No Open Tickets!</Alert>
           }
 
-        </Stack>
+        </Grid>
       );
     }} />
   );
