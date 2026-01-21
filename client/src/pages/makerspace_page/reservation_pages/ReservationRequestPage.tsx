@@ -152,7 +152,7 @@ export default function ReservationRequestPage() {
   const [targetReservation, setTargetReservation] = useState<Reservation>();
   const [reservationModal, setReservationModal] = useState(false);
   function handleEventSelect(event: ReservationEvent) {
-    if (event.title?.toString().includes("Draft")) {
+    if (event.title?.toString().includes("Draft") || (event.reservation.user ?? undefined) === undefined) {
       return;
     }
 
