@@ -56,7 +56,7 @@ export const MaintenanceTicketTypeDefs = gql`
   extend type Query {
     maintenanceTicket(id: Int!): MaintenanceTicket
     maintenanceTickets(makerspaceIDs: [Int], equipmentIDs: [Int], instanceIDs: [Int], status: [MaintenanceTicketStatus]): [MaintenanceTicket]
-    paginatedMaintenanceTickets(pagination: Pagination!, sort: Sort, filter: Filter): [MaintenanceTicket]
+    paginatedMaintenanceTickets(pagination: Pagination!, sort: Sort, filter: Filter, makerspaceID: Int): [MaintenanceTicket]
   }
 
   extend type Mutation {

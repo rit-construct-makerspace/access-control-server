@@ -44,7 +44,8 @@ export default function MaintenancePage() {
         target: filterModel.items[0].field,
         op: filterModel.items[0].operator,
         value: filterModel.items[0].value ?? ""
-      } : undefined
+      } : undefined,
+      makerspaceID: Number(makerspaceID)
     }
   });
 

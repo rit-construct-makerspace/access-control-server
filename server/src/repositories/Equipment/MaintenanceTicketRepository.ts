@@ -72,7 +72,8 @@ export async function getMaintenanceTicket(id: number): Promise<MaintenanceTicke
 export async function paginatedMaintenanceTickets(
   pagination: { page: number, pageSize: number },
   sort?: { target: string, dir: string },
-  filter?: { target: string, op: string, value: string }
+  filter?: { target: string, op: string, value: string },
+  makerspaceID?: number
 ): Promise<MaintenanceTicketRow[]> {
   let query = knex("MaintenanceTickets")
     .join("EquipmentInstances", "MaintenanceTickets.instanceID", "EquipmentInstances.id")
@@ -130,6 +131,11 @@ export async function paginatedMaintenanceTickets(
         query = query.whereILike(`MaintenanceTickets.${filter.target}`, `%${filter.value}%`)
       }
     }
+  }
+
+  // makerspace
+  if (makerspaceID) {
+    query = query.where("Rooms.makerspaceID", "=", makerspaceID)
   }
 
   return await query;

@@ -75,11 +75,12 @@ const MaintenanceTicketResolver = {
           target: string,
           op: string,
           value: string
-        }
+        },
+        makerspaceID?: number
       },
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => (
-      await MaintenanceTicketRepo.paginatedMaintenanceTickets(args.pagination, args.sort, args.filter)
+      await MaintenanceTicketRepo.paginatedMaintenanceTickets(args.pagination, args.sort, args.filter, args.makerspaceID)
     ))
   },
 
