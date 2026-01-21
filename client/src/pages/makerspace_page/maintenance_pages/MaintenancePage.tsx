@@ -9,6 +9,7 @@ import { MaintenanceTicket, MaintenanceTicketType, PAGINATED_MAINTENANCE_TICKETS
 import NewTicketModal from "./NewTicketModal";
 import WarningIcon from '@mui/icons-material/Warning';
 import MaintenanceTicketModal from "./MaintenanceTicketModal";
+import { useDebounce } from "../../../common/useDebounce";
 
 const formatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
@@ -28,6 +29,8 @@ export default function MaintenancePage() {
   const [filterModel, setFilterModel] = useState<GridFilterModel>();
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
 
+  const debouncedFilter = useDebounce(filterModel, 300);
+
   const [newTicketModal, setNewTicketModal] = useState(false);
 
   const getMaintenanceTickets = useQuery(PAGINATED_MAINTENANCE_TICKETS, {
@@ -40,10 +43,10 @@ export default function MaintenancePage() {
         target: sortModel[0].field,
         dir: sortModel[0].sort
       } : undefined,
-      filter: (filterModel && filterModel.items.length > 0) ? {
-        target: filterModel.items[0].field,
-        op: filterModel.items[0].operator,
-        value: filterModel.items[0].value ?? ""
+      filter: (debouncedFilter && debouncedFilter.items.length > 0) ? {
+        target: debouncedFilter.items[0].field,
+        op: debouncedFilter.items[0].operator,
+        value: debouncedFilter.items[0].value ?? ""
       } : undefined,
       makerspaceID: Number(makerspaceID)
     }
