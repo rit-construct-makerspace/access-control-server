@@ -72,7 +72,7 @@ export const MaintenanceTicketTypeDefs = gql`
       severity: MaintenanceTicketSeverity,
       instanceID: Int!,
       description: String!,
-      startDate: string,
+      startDate: String!,
       intervalHours: Int!,
       imageUrl: String
     ): MaintenanceTicket
