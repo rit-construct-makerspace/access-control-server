@@ -1,9 +1,8 @@
-import React from "react";
-import { ObjectSummary } from "../../../types/Common";
 import { IconButton, Stack, Typography } from "@mui/material";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import CloseIcon from "@mui/icons-material/Close";
 import { useParams } from "react-router-dom";
+import { ObjectSummary } from "../types/Common";
 
 interface AttachedModuleProps {
   module: ObjectSummary;
