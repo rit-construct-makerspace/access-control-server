@@ -166,7 +166,17 @@ const MaintenanceTicketResolver = {
           { id: user.id, label: UserRepo.getUsersFullName(user) }
         );
       }
-    })
+    }),
+
+    deleteMaintenanceTicket: async (
+      _parent: any,
+      args: {
+        id: number
+      },
+      { isManager }: ApolloContext
+    ) => isManager(async (user) => (
+      await MaintenanceTicketRepo.deleteMaintenanceTicket(args.id)
+    ))
   }
 }
 

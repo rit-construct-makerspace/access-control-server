@@ -204,3 +204,7 @@ export async function advanceIntervalTickets(): Promise<MaintenanceTicketRow[]> 
     .where("status", "=", MaintenanceTicketStatus.UPCOMING).andWhere("dateCreated", "<=", knex.fn.now())
     .returning("*");
 }
+
+export async function deleteMaintenanceTicket(id: number): Promise<number> {
+  return await knex("MaintenanceTickets").delete().where("id", "=", id);
+}
