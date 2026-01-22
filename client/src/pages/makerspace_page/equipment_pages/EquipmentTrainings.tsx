@@ -1,5 +1,5 @@
 import { Autocomplete, Divider, Stack, TextField, Typography } from "@mui/material";
-import AttachedModule from "../../lab_management/manage_equipment/AttachedModule";
+import AttachedModule from "../../../common/AttachedModule";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { ObjectSummary } from "../../../types/Common";
 import GET_TRAINING_MODULES from "../../../queries/trainingQueries";
