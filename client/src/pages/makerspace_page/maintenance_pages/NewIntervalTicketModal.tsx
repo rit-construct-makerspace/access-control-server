@@ -1,4 +1,4 @@
-import { Autocomplete, Button, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, IconButton, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import CloseIcon from '@mui/icons-material/Close';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
@@ -13,6 +13,8 @@ import { toast } from "react-toastify";
 import FileUploadButton from "../../../common/FileUploadButton";
 import styled from "styled-components";
 import { makeCDNLink } from "../../../common/ImageFinder";
+import { format, parse } from "date-fns";
+import { DatePicker } from "@mui/x-date-pickers";
 
 const StyledImg = styled.img`
   padding: 5px
@@ -51,6 +53,16 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
   const makerspace_equipments_2 = props.makerspace?.rooms.map((room) => (room.equipment))
   const makerspace_equipments = makerspace_equipments_2?.flat(1);
 
+  const [startDate, setStartDate] = useState(new Date());
+  const [scale, setScale] = useState("days");
+  const [interval, setInterval] = useState("1");
+
+  function handleChangeScale(_event: React.MouseEvent<HTMLElement>, value: string) {
+    if (value !== null && value !== scale) {
+      setScale(value);
+    }
+  }
+
   function handleClose() {
     setEquipment(undefined);
     setInstance(undefined);
@@ -62,7 +74,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
   }
 
   async function handleCreateTicket() {
-    if (!(equipment && reportedInstance && (severity !== undefined))) {
+    if (!(equipment && reportedInstance && severity && !Number.isNaN(Number(interval)))) {
       toast.error("A required field is empty!");
       return;
     }
@@ -163,7 +175,40 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
           onChange={(event, newValue) => setSeverity(newValue ?? undefined)}
         />
         <Stack direction={"row"} justifyContent={"space-between"}>
-
+          <DatePicker
+            value={startDate}
+            onChange={(newValue) => newValue ? setStartDate(newValue) : null}
+          />
+          <Stack direction={"row"} spacing={1}>
+            <TextField
+              type="text"
+              label={"Interval"}
+              value={interval}
+              onChange={(e) => { setInterval(e.target.value); console.log(Number(e.target.value)) }}
+              error={Number.isNaN(Number(interval))}
+              required
+              slotProps={{
+                htmlInput: {
+                  pattern: "\d+"
+                }
+              }}
+              sx={{
+                width: "120px"
+              }}
+            />
+            <ToggleButtonGroup
+              exclusive
+              value={scale}
+              onChange={handleChangeScale}
+            >
+              <ToggleButton value="days">
+                Days
+              </ToggleButton>
+              <ToggleButton value="weeks">
+                Weeks
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Stack>
         </Stack>
         <TextField
           label={"Description"}
@@ -171,6 +216,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
           onChange={(e) => setDescription(e.target.value)}
           multiline
           minRows={3}
+          required
         />
         {
           imageUrl
