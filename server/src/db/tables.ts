@@ -630,6 +630,7 @@ export enum MaintenanceTicketSeverity {
 }
 
 export enum MaintenanceTicketStatus {
+  UPCOMING = "UPCOMING",
   TODO = "TODO",
   IN_PROGESS = "IN_PROGRESS",
   CLOSED = "CLOSED"
