@@ -20,7 +20,7 @@ import ReportProblemIcon from '@mui/icons-material/ReportProblemSharp';
 import StarsIcon from '@mui/icons-material/Stars';
 import PendingIcon from '@mui/icons-material/Pending';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
-import AuditLogEntity from "../audit_logs/AuditLogEntity";
+import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
 
 interface EquipmentInstanceCardProps {
     instance: EquipmentInstance;

@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import EquipmentInformation from "./EquipmentInformation";
 import PrettyModal from "../../../common/PrettyModal";
-import InstanceGrid from "../../lab_management/manage_equipment/InstanceGrid";
+import InstanceGrid from "./InstanceGrid";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
