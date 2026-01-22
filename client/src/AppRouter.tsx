@@ -21,7 +21,6 @@ import HoursDisplay from "./pages/signage/HoursDisplay";
 import TopNav from "./top_nav/TopNav";
 import QuizPage from "./pages/maker/take_quiz/QuizPage";
 import QuizResults from "./pages/maker/take_quiz/QuizResults";
-import InventoryPreviewPage from "./pages/maker/inventory_preview/InventoryPreviewPage";
 import InventoryPage from "./pages/lab_management/inventory/InventoryPage";
 import AnnouncementsPage from "./pages/lab_management/announcements/AnnouncementsPage";
 import EditAnnouncement from "./pages/lab_management/announcements/EditAnnouncement";
