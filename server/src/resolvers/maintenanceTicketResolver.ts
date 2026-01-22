@@ -99,6 +99,28 @@ const MaintenanceTicketResolver = {
       await MaintenanceTicketRepo.createMaintenanceTicket(MaintenanceTicketType.REPORTED, args.severity, args.instanceID, args.description, args.userID, args.imageUrl)
     )),
 
+    createIntervalMaintenanceTicket: async (
+      _parent: any,
+      args: {
+        severity: MaintenanceTicketSeverity,
+        instanceID: number,
+        description: string,
+        startDate: string,
+        intervalHours: number,
+        imageUrl?: string
+      },
+      { isManager }: ApolloContext // should perhaps be ifManagerFor
+    ) => isManager(async (user) => (
+      await MaintenanceTicketRepo.createIntervalMaintenanceTicket(
+        args.severity,
+        args.instanceID,
+        args.description,
+        args.startDate,
+        args.intervalHours,
+        args.imageUrl
+      )
+    )),
+
     modifyMaintenanceTicketStatus: async (
       _parent: any,
       args: {
