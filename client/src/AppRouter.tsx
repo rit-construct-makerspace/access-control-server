@@ -221,8 +221,6 @@ export const appRouter = createBrowserRouter(
                 { path: "/maker/training/:id/results/", element: <QuizResults /> },
                 { path: "/maker/training/:id/results/:submissionID", element: <QuizResults /> },
 
-                { path: "/maker/materials", element: <InventoryPreviewPage /> },
-
                 { path: "/admin/inventory", element: <InventoryPage /> },
               ],
             },
