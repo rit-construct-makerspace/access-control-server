@@ -6,6 +6,8 @@ import { IsMobileProvider } from "./common/IsMobileProvider";
 import { useState } from "react";
 import { appRouter } from "./AppRouter";
 import { ToastContainer, Slide } from "react-toastify";
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV2';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 
 const apolloClient = new ApolloClient({
   uri: import.meta.env.VITE_GRAPHQL_URL ?? "http://localhost:3000/graphql",
@@ -20,15 +22,17 @@ export default function App() {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
           <IsMobileProvider>
             <>
               <RouterProvider router={appRouter} />
               <ToastContainer position="bottom-left" transition={Slide} />
             </>
           </IsMobileProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </LocalizationProvider>
     </ApolloProvider>
   );
 }

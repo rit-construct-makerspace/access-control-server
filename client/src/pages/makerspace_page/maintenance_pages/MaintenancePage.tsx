@@ -10,6 +10,10 @@ import NewTicketModal from "./NewTicketModal";
 import WarningIcon from '@mui/icons-material/Warning';
 import MaintenanceTicketModal from "./MaintenanceTicketModal";
 import { useDebounce } from "../../../common/useDebounce";
+import WatchLaterIcon from '@mui/icons-material/WatchLater';
+import NewIntervalTicketModal from "./NewIntervalTicketModal";
+import { isManager } from "../../../common/PrivilegeUtils";
+import { useCurrentUser } from "../../../common/CurrentUserProvider";
 
 const formatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
@@ -22,6 +26,7 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 
 export default function MaintenancePage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
+  const user = useCurrentUser();
 
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
@@ -32,6 +37,7 @@ export default function MaintenancePage() {
   const debouncedFilter = useDebounce(filterModel, 300);
 
   const [newTicketModal, setNewTicketModal] = useState(false);
+  const [timeTicketModal, setTimeTicketModal] = useState(false);
 
   const getMaintenanceTickets = useQuery(PAGINATED_MAINTENANCE_TICKETS, {
     variables: {
@@ -136,6 +142,17 @@ export default function MaintenancePage() {
               Report Issue
             </Button>
           </Stack>
+          <Stack direction={"row"} spacing={2}>
+            <Button
+              color="secondary"
+              variant="contained"
+              startIcon={<WatchLaterIcon />}
+              onClick={() => setTimeTicketModal(true)}
+              disabled={!isManager(user)}
+            >
+              Create Time Ticket
+            </Button>
+          </Stack>
           <DataGrid
             columns={columns}
             rows={rows}
@@ -152,6 +169,7 @@ export default function MaintenancePage() {
             rowCount={-1}
           />
           <NewTicketModal open={newTicketModal} onClose={() => setNewTicketModal(false)} makerspace={makerspace} />
+          <NewIntervalTicketModal open={timeTicketModal} onClose={() => setTimeTicketModal(false)} makerspace={makerspace} />
         </Stack>
       );
     }} />

@@ -13,7 +13,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { Equipment } from "./EditEquipmentPage";
+import { Equipment } from "./ManageEquipmentPage";
 import {
   ARCHIVE_EQUIPMENT,
   GET_EQUIPMENT_BY_ID,
