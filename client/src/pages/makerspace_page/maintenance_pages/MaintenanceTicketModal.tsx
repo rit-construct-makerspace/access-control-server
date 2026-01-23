@@ -14,7 +14,8 @@ import styled from "styled-components";
 import { makeCDNLink } from "../../../common/ImageFinder";
 import { useParams } from "react-router-dom";
 import { GET_VALID_STAFF } from "../../../queries/makerspaceQueries";
-import { CurrentUser } from "../../../common/CurrentUserProvider";
+import { CurrentUser, useCurrentUser } from "../../../common/CurrentUserProvider";
+import { isManager } from "../../../common/PrivilegeUtils";
 
 interface TicketModalProps {
   open: boolean,
@@ -38,6 +39,8 @@ const StyledImg = styled.img`
 
 export default function MaintenanceTicketModal(props: TicketModalProps) {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
+  const user = useCurrentUser();
+
   const [editing, setEditing] = useState(false);
   const [description, setDescription] = useState(props.ticket.description);
   const [status, setStatus] = useState<MaintenanceTicketStatus>(props.ticket.status);
@@ -150,7 +153,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
           <Typography variant="h5">{props.ticket.instance.name}</Typography>
           <Stack direction={"row"} spacing={2}>
             {
-              editing
+              editing && isManager(user)
                 ? <IconButton onClick={() => confirm("Delete Ticket?") ? deleteTicket() : null} color="error">
                   <DeleteIcon />
                 </IconButton>
