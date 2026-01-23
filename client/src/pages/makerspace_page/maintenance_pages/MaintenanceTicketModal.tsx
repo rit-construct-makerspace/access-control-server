@@ -1,11 +1,12 @@
 import { Stack } from "@mui/system";
 import PrettyModal from "../../../common/PrettyModal";
-import { ASSIGN_MAINTENANCE_TICKET, MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
+import { ASSIGN_MAINTENANCE_TICKET, DELETE_MAINTENACE_TICKET, MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
 import { Autocomplete, Button, Chip, IconButton, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useMutation, useQuery } from "@apollo/client";
 import { toast } from "react-toastify";
 import TaskIcon from '@mui/icons-material/Task';
@@ -62,6 +63,13 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
   const [modifyTicketStatus] = useMutation(MODIFY_MAINTENANCE_TICKET_STATUS, { refetchQueries: ["MaintenanceTickets", "PaginatedMaintenanceTickets"] });
   const [updateTicket] = useMutation(UPDATE_MAINTENACE_TICKET, { refetchQueries: ["MaintenanceTickets", "PaginatedMaintenanceTickets"] });
   const [assignTicket] = useMutation(ASSIGN_MAINTENANCE_TICKET, { refetchQueries: ["MaintenanceTickets", "PaginatedMaintenanceTickets"] });
+
+  const [deleteTicket] = useMutation(DELETE_MAINTENACE_TICKET, {
+    refetchQueries: ["MaintenanceTickets", "PaginatedMaintenanceTickets"],
+    variables: {
+      id: props.ticket.id
+    }
+  })
 
   async function handleCloseTicket(ticketID: number) {
     if (!confirm("Are you sure you want to close this ticket?")) {
@@ -140,9 +148,18 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
       <Stack spacing={2}>
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
           <Typography variant="h5">{props.ticket.instance.name}</Typography>
-          <IconButton onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
+          <Stack direction={"row"} spacing={2}>
+            {
+              editing
+                ? <IconButton onClick={() => confirm("Delete Ticket?") ? deleteTicket() : null} color="error">
+                  <DeleteIcon />
+                </IconButton>
+                : null
+            }
+            <IconButton onClick={handleClose}>
+              <CloseIcon />
+            </IconButton>
+          </Stack>
         </Stack>
         <Stack direction={"row"} justifyContent={"space-between"}>
           <Typography variant="subtitle1">{`Ticket #${props.ticket.id}`}</Typography>
