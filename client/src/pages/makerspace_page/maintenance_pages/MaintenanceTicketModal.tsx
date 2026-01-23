@@ -7,6 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import DeleteIcon from '@mui/icons-material/Delete';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import { useMutation, useQuery } from "@apollo/client";
 import { toast } from "react-toastify";
 import TaskIcon from '@mui/icons-material/Task';
@@ -113,7 +114,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     toast.success("Marked ticket as in progress!");
   }
 
-  async function handleSaveTicket() {
+  async function handleSaveTicket(user: CurrentUser | null = assigned) {
     try {
       await updateTicket({
         variables: {
@@ -129,8 +130,8 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     }
 
     try {
-      if (props.ticket.assigned?.id !== assigned?.id) {
-        await assignTicket({ variables: { id: props.ticket.id, assignedID: assigned ? Number(assigned.id) : null } })
+      if (props.ticket.assigned?.id !== user?.id) {
+        await assignTicket({ variables: { id: props.ticket.id, assignedID: user ? Number(user.id) : null } })
       }
     } catch (e) {
       toast.error("Failed to assign user: " + e);
@@ -144,6 +145,53 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
   function handleClose() {
     cancelEdit();
     props.onClose();
+  }
+
+  function progressButton() {
+    if (props.ticket.status === MaintenanceTicketStatus.CLOSED) {
+      return null;
+    }
+
+    if (props.ticket.assigned === null) {
+      return (
+        <Button
+          color="primary"
+          variant="contained"
+          startIcon={<AssignmentIcon />}
+          onClick={() => { setAssigned(user); handleSaveTicket(user) }}
+        >
+          Claim Ticket
+        </Button>
+      );
+    }
+
+    switch (props.ticket.status) {
+      case MaintenanceTicketStatus.UPCOMING:
+      case MaintenanceTicketStatus.TODO:
+        return (
+          <Button
+            color="warning"
+            variant="contained"
+            startIcon={<WatchLaterIcon />}
+            onClick={() => handleInProgess(props.ticket.id)}
+          >
+            Mark In-Progress
+          </Button>
+        );
+      case MaintenanceTicketStatus.IN_PROGRESS:
+        return (
+          <Button
+            color="secondary"
+            variant="contained"
+            startIcon={<TaskIcon />}
+            onClick={() => handleCloseTicket(props.ticket.id)}
+          >
+            Mark Closed
+          </Button>
+        );
+      default:
+        return null;
+    }
   }
 
   return (
@@ -312,27 +360,11 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
               ? <Button
                 color="success"
                 variant="contained"
-                onClick={handleSaveTicket}
+                onClick={() => handleSaveTicket()}
               >
                 Save Changes
               </Button>
-              : props.ticket.status === MaintenanceTicketStatus.IN_PROGRESS
-                ? <Button
-                  color="secondary"
-                  variant="contained"
-                  startIcon={<TaskIcon />}
-                  onClick={() => handleCloseTicket(props.ticket.id)}
-                >
-                  Mark Closed
-                </Button>
-                : <Button
-                  color="warning"
-                  variant="contained"
-                  startIcon={<WatchLaterIcon />}
-                  onClick={() => handleInProgess(props.ticket.id)}
-                >
-                  Mark In-Progress
-                </Button>
+              : progressButton()
           }
         </Stack>
       </Stack>
