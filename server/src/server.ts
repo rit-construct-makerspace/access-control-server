@@ -29,7 +29,7 @@ import * as Emailer from "./integrations/email/email.js"
 import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
-import { deletePastSpecialHours, purge_images } from "./periodicActions.js";
+import { advanceTimeTickets, deletePastSpecialHours, purge_images } from "./periodicActions.js";
 import { getCustomUrl } from "./repositories/Links/customUrlRepository.js";
 import { InventoryItemRow } from "./db/tables.js";
 
@@ -162,12 +162,12 @@ async function startServer() {
   //   res.redirect("/app");
   // });
 
-  app.get("/link/:link", async function (req, res){
+  app.get("/link/:link", async function (req, res) {
     const customUrl = await getCustomUrl((req.params.link));
-    if(customUrl == null ){
+    if (customUrl == null) {
       return res.status(404).send();
     }
-    res.redirect( customUrl?.longUrl);
+    res.redirect(customUrl?.longUrl);
   });
 
   /** ===============================================================================================
@@ -535,6 +535,9 @@ async function startServer() {
 
     // Delete past special hours
     await deletePastSpecialHours();
+
+    // Advance any time-based maintennace tickets from UPCOMING -> TODO
+    await advanceTimeTickets();
   });
 
 
