@@ -14,6 +14,7 @@ export const MaintenanceTicketTypeDefs = gql`
   }
 
   enum MaintenanceTicketStatus {
+    UPCOMING
     TODO
     IN_PROGRESS
     CLOSED
@@ -68,9 +69,19 @@ export const MaintenanceTicketTypeDefs = gql`
       imageUrl: String
     ): MaintenanceTicket
 
+    createIntervalMaintenanceTicket(
+      severity: MaintenanceTicketSeverity,
+      instanceID: Int!,
+      description: String!,
+      startDate: String!,
+      intervalHours: Int!,
+      imageUrl: String
+    ): MaintenanceTicket
+
     modifyMaintenanceTicketStatus(id: Int!, status: MaintenanceTicketStatus!): Int
 
     updateMaintenanceTicket(id: Int!, severity: MaintenanceTicketSeverity!, status: MaintenanceTicketStatus!, description: String!): Int
     assignMaintenanceTicket(id: Int!, assignedID: Int): Int
+    deleteMaintenanceTicket(id: Int!): Int
   }
 `;

@@ -14,6 +14,7 @@ export enum MaintenanceTicketSeverity {
 }
 
 export enum MaintenanceTicketStatus {
+  UPCOMING = "UPCOMING",
   TODO = "TODO",
   IN_PROGRESS = "IN_PROGRESS",
   CLOSED = "CLOSED"
@@ -30,7 +31,8 @@ export interface MaintenanceTicket {
   dateClosed: string | null,
   creator: CurrentUser | null,
   instance: EquipmentInstance,
-  assigned: CurrentUser | null
+  assigned: CurrentUser | null,
+  intervalHours: number | null
 }
 
 export const PAGINATED_MAINTENANCE_TICKETS = gql`
@@ -44,6 +46,7 @@ export const PAGINATED_MAINTENANCE_TICKETS = gql`
       imageUrl
       dateCreated
       dateClosed
+      intervalHours
       creator {
         id
         ritUsername
@@ -129,6 +132,7 @@ export const GET_MAINTENANCE_TICKETS = gql`
       imageUrl
       dateCreated
       dateClosed
+      intervalHours
       creator {
         id
         ritUsername
@@ -166,5 +170,33 @@ export const UPDATE_MAINTENACE_TICKET = gql`
 export const ASSIGN_MAINTENANCE_TICKET = gql`
   mutation AssignMaintenanceTicket($id: Int!, $assignedID: Int) {
     assignMaintenanceTicket(id: $id, assignedID: $assignedID)
+  }
+`;
+
+export const CREATE_INTERVAL_MAINTENANCE_TICKET = gql`
+  mutation CreateIntervalMaintenanceTicket(
+    $severity: MaintenanceTicketSeverity,
+    $instanceID: Int!,
+    $description: String!,
+    $startDate: String!,
+    $intervalHours: Int!,
+    $imageUrl: String
+  ) {
+    createIntervalMaintenanceTicket(
+      severity: $severity,
+      instanceID: $instanceID,
+      description: $description,
+      startDate: $startDate,
+      intervalHours: $intervalHours,
+      imageUrl: $imageUrl
+    ) {
+      id
+    }
+  }
+`;
+
+export const DELETE_MAINTENACE_TICKET = gql`
+  mutation DeleteMaintenanceTicket($id: Int!) {
+    deleteMaintenanceTicket(id: $id)
   }
 `;

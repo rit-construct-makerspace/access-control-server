@@ -43,7 +43,7 @@ import ManageMakerspacePage from "./pages/makerspace_page/ManageMakerspacePage";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import ManageRoomPage from "./pages/makerspace_page/MonitorRoomPage";
 import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
-import EditEquipmentPage from "./pages/makerspace_page/equipment_pages/EditEquipmentPage";
+import ManageEquipmentPage from "./pages/makerspace_page/equipment_pages/ManageEquipmentPage";
 import ReservationRequestPage from "./pages/makerspace_page/reservation_pages/ReservationRequestPage";
 import ManageReservationsPage from "./pages/makerspace_page/reservation_pages/ManageReservationsPage";
 import MaintenancePage from "./pages/makerspace_page/maintenance_pages/MaintenancePage";
@@ -171,7 +171,7 @@ export const appRouter = createBrowserRouter(
                             { path: "/makerspace/:makerspaceID/training/:id", element: <EditActiveModulePage /> },
 
                             { path: "/makerspace/:makerspaceID/equipment/new", element: <NewEquipmentPage /> },
-                            { path: "/makerspace/:makerspaceID/equipment/:equipmentID", element: <EditEquipmentPage /> },
+                            { path: "/makerspace/:makerspaceID/equipment/:equipmentID", element: <ManageEquipmentPage /> },
 
                             { path: "/makerspace/:makerspaceID/tools", element: <ToolItemPage /> },
                             { path: "/makerspace/:makerspaceID/tools/type/:typeid", element: <ToolItemPage /> },
