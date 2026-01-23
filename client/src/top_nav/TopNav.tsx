@@ -42,7 +42,7 @@ export default function TopNav() {
     setAnchorEl(null);
   };
 
-  const [labTraining, setLabTraining] = useState(!(localStorage.getItem("showLabTraining") === "false"));
+  const [labTraining, setLabTraining] = useState(!(localStorage.getItem("showLabTraining2") === "false"));
 
   const [mobileDrawer, setMobileDrawer] = useState(false);
 
@@ -67,13 +67,13 @@ export default function TopNav() {
           </Alert>
           : null
       }
-    { // Lab training Alert
+      { // Lab training Alert
         labTraining
           ? <Alert variant="filled" severity="info" onClose={handleDismissLabTraining} sx={{ borderRadius: 0 }}>
-            All Makerspace users must complete the <a href="https://make.rit.edu/link/ehs">Shop Safety training course</a> before using any equipment.
+            All Makerspace users must complete the <a href="https://make.rit.edu/link/ehs" rel="noopener noreferrer" target="_blank">Shop Safety training course</a> before using any equipment.
           </Alert>
           : null
-    }
+      }
     </Stack>
 
   const navlinks = [
