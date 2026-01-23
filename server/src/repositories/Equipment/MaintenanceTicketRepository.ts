@@ -1,7 +1,7 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
 import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../db/tables.js";
-import { addHours } from "date-fns"
+import { addHours, endOfDay } from "date-fns"
 
 export async function createMaintenanceTicket(
   type: MaintenanceTicketType,
@@ -201,7 +201,7 @@ export async function assignMaintenanceTicket(id: number, assignedID: number | n
 
 export async function advanceIntervalTickets(): Promise<MaintenanceTicketRow[]> {
   return await knex("MaintenanceTickets").update({ status: MaintenanceTicketStatus.TODO })
-    .where("status", "=", MaintenanceTicketStatus.UPCOMING).andWhere("dateCreated", "<=", knex.fn.now())
+    .where("status", "=", MaintenanceTicketStatus.UPCOMING).andWhere("dateCreated", "<=", endOfDay(new Date()).toISOString()) // TODO: normalize this to timezone
     .returning("*");
 }
 
