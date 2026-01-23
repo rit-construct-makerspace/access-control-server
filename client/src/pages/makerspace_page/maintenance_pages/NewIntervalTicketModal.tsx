@@ -7,7 +7,7 @@ import { FullMakerspace } from "../../../queries/makerspaceQueries";
 import { useMemo, useState } from "react";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
 import { useMutation, useQuery } from "@apollo/client";
-import { CREATE_MAINTENANCE_TICKET, MaintenanceTicketSeverity } from "../../../queries/maintenanceTicketQueries";
+import { CREATE_INTERVAL_MAINTENANCE_TICKET, CREATE_MAINTENANCE_TICKET, MaintenanceTicketSeverity } from "../../../queries/maintenanceTicketQueries";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { toast } from "react-toastify";
 import FileUploadButton from "../../../common/FileUploadButton";
@@ -36,7 +36,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
   const [imageUrl, setImageUrl] = useState<string>();
 
   const equipmentInstancesResult = useQuery(GET_EQUIPMENT_INSTANCES, { variables: { equipmentID: equipment?.id ?? -1 } });
-  const [createTicket] = useMutation(CREATE_MAINTENANCE_TICKET, { refetchQueries: ["PaginatedMaintenanceTickets", "MaintenanceTickets"] });
+  const [createTicket] = useMutation(CREATE_INTERVAL_MAINTENANCE_TICKET, { refetchQueries: ["PaginatedMaintenanceTickets", "MaintenanceTickets"] });
 
   const EMPTY_ARRAY: EquipmentInstance[] = [];
   const instances: EquipmentInstance[] = equipmentInstancesResult.data?.equipmentInstances ?? EMPTY_ARRAY;
@@ -69,6 +69,9 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
     setDescription("");
     setSeverity(undefined);
     setImageUrl(undefined);
+    setStartDate(new Date());
+    setScale("days");
+    setInterval("1");
 
     props.onClose();
   }
@@ -83,9 +86,10 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
         variables: {
           severity: severity,
           instanceID: Number(reportedInstance.id),
-          userID: Number(user.id),
           description: description,
-          imageUrl: imageUrl
+          startDate: startDate.toISOString(),
+          imageUrl: imageUrl,
+          intervalHours: scale === "days" ? Number(interval) * 24 : Number(interval) * 168
         }
       })
     } catch (e) {

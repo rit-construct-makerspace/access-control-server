@@ -14,6 +14,7 @@ export const MaintenanceTicketTypeDefs = gql`
   }
 
   enum MaintenanceTicketStatus {
+    UPCOMING
     TODO
     IN_PROGRESS
     CLOSED

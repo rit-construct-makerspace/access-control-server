@@ -178,7 +178,7 @@ export const CREATE_INTERVAL_MAINTENANCE_TICKET = gql`
     $severity: MaintenanceTicketSeverity,
     $instanceID: Int!,
     $description: String!,
-    $startDate: string,
+    $startDate: String!,
     $intervalHours: Int!,
     $imageUrl: String
   ) {
