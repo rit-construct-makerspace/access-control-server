@@ -17,10 +17,10 @@ const ReservationResolver = {
     user: async (
       parent: ReservationRow,
       _args: any,
-      { ifManagerOrSelf }: ApolloContext
+      { ifStaffOrSelf }: ApolloContext
     ) => {
       try {
-        return ifManagerOrSelf(parent.userID, async (user) => (
+        return ifStaffOrSelf(parent.userID, async (user) => (
           await UserRepo.getUserByID(parent.userID)
         ))
       } catch (e) {
@@ -31,10 +31,10 @@ const ReservationResolver = {
     description: async (
       parent: ReservationRow,
       _args: any,
-      { ifManagerOrSelf }: ApolloContext
+      { ifStaffOrSelf }: ApolloContext
     ) => {
       try {
-        return ifManagerOrSelf(parent.userID, async (user) => (
+        return ifStaffOrSelf(parent.userID, async (user) => (
           parent.description
         ))
       } catch {
