@@ -1,7 +1,7 @@
-import { Box, Button, Card, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
+import { Button, Card, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { Calendar, dateFnsLocalizer, SlotInfo, Event } from "react-big-calendar";
-import withDragAndDrop, { EventInteractionArgs } from "react-big-calendar/lib/addons/dragAndDrop";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import format from 'date-fns/format'
 import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
@@ -19,10 +19,9 @@ import { CREATE_RESERVATION, GET_RESERVATIONS_FLEXIBLY } from "../../../queries/
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { toast } from "react-toastify";
 import { Reservation, ReservationEvent } from "../../../types/Reservation";
-import { border, style } from "@mui/system";
 import ReservationModal from "./ReservationModal";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
-import { isManager, isManagerOrSelf } from "../../../common/PrivilegeUtils";
+import { isStaff, isStaffOrSelf } from "../../../common/PrivilegeUtils";
 import Equipment from "../../../types/Equipment";
 
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -172,9 +171,9 @@ export default function ReservationRequestPage() {
           const liveReservationEvents: ReservationEvent[] = data.reservations.map(
             (reservation: Reservation) => {
               return {
-                title: isManagerOrSelf(user, Number(reservation.user?.id ?? -1))
+                title: isStaffOrSelf(user, Number(reservation.user?.id ?? -1))
                   ? <Stack>
-                    <Typography variant="body1">{isManager(user) ? reservation.user.ritUsername : reservation.user.firstName}</Typography>
+                    <Typography variant="body1">{`${reservation.user.firstName}${isStaff(user) ? " (" + reservation.user.ritUsername + ")" : ""}`}</Typography>
                     <Typography variant="subtitle1">{reservation.approved ? "[Approved]" : "(Pending)"}</Typography>
                     <Typography variant="body2">{reservation.description}</Typography>
                   </Stack>
