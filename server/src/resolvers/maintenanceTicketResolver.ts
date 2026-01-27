@@ -4,6 +4,7 @@ import * as MaintenanceTicketRepo from "../repositories/Equipment/MaintenanceTic
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js"
 import * as UserRepo from "../repositories/Users/UserRepository.js"
 import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js"
+import { notifyNewMaintenanceTicket } from "../integrations/slack/slack.js"
 
 const MaintenanceTicketResolver = {
   MaintenanceTicket: {
@@ -95,9 +96,11 @@ const MaintenanceTicketResolver = {
         imageUrl?: string
       },
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
-      await MaintenanceTicketRepo.createMaintenanceTicket(MaintenanceTicketType.REPORTED, args.severity, args.instanceID, args.description, args.userID, args.imageUrl)
-    )),
+    ) => isStaff(async (user) => {
+      const result = await MaintenanceTicketRepo.createMaintenanceTicket(MaintenanceTicketType.REPORTED, args.severity, args.instanceID, args.description, args.userID, args.imageUrl)
+      notifyNewMaintenanceTicket(result);
+      return result;
+    }),
 
     createIntervalMaintenanceTicket: async (
       _parent: any,
