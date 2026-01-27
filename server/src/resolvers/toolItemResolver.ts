@@ -12,7 +12,7 @@ import { ToolItemInstanceInput, ToolItemTypeInput } from "../schemas/toolItemsSc
 import { getRoomByID } from "../repositories/Rooms/RoomRepository.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { GraphQLError } from "graphql";
-import { notifyToolItemMarked } from "../slack/slack.js";
+import { notifyToolItemMarked } from "../integrations/slack/slack.js";
 
 const ToolItemResolver = {
   ToolItemType: {
