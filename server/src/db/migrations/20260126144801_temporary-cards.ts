@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<void> {
     t.increments("id").primary();
     t.integer("userID").references("id").inTable("Users").notNullable();
     t.string("cardTagID").notNullable();
-    t.timestamp("loanedDate").notNullable().defaultTo(knex.fn.now());
+    t.timestamp("issuedDate").notNullable().defaultTo(knex.fn.now());
     t.timestamp("returnedDate").nullable();
   });
 }
