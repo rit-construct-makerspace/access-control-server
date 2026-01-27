@@ -20,6 +20,7 @@ import { toast } from "react-toastify";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import CloseIcon from '@mui/icons-material/Close';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
+import { isManager } from "../../../common/PrivilegeUtils";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 const locales = {
@@ -147,6 +148,10 @@ export default function ManageReservationsPage() {
 
   function handleSlotSelect(selection: SlotInfo) {
     if (view == Views.MONTH) {
+      return;
+    }
+
+    if (!isManager(user)) {
       return;
     }
 

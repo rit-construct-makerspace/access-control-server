@@ -2,7 +2,7 @@ import { Button, Card, Stack, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import { Reservation } from "../../../types/Reservation";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { isManager, isManagerOrSelf } from "../../../common/PrivilegeUtils";
+import { isManager, isManagerOrSelf, isStaffOrSelf } from "../../../common/PrivilegeUtils";
 import { useMutation } from "@apollo/client";
 import { DELETE_RESERVATION, SET_RESERVATION_APPROVAL } from "../../../queries/reservationQueries";
 import { toast } from "react-toastify";
@@ -75,7 +75,7 @@ export default function ReservationModal(props: ReservationModalProps) {
     <PrettyModal open={props.open} onClose={props.onClose} width={"500px"}>
       <Stack spacing={2}>
         {
-          isManagerOrSelf(user, Number(props.reservation.user.id))
+          isStaffOrSelf(user, Number(props.reservation.user.id))
             ? <Typography variant="h5">{`${props.reservation.user.firstName}'s (${props.reservation.user.ritUsername}) ${props.reservation.equipment.name} Reservation`}</Typography>
             : <Typography variant="h5">{`${props.reservation.equipment.name} Reservation`}</Typography>
         }
@@ -92,7 +92,7 @@ export default function ReservationModal(props: ReservationModalProps) {
           </Stack>
         </Card>
         {
-          (isManagerOrSelf(user, Number(props.reservation.user.id)) && props.reservation.description !== "")
+          (isStaffOrSelf(user, Number(props.reservation.user.id)) && props.reservation.description !== "")
             ? <Stack>
               <Typography variant="subtitle1">Description:</Typography>
               <Typography>{props.reservation.description}</Typography>

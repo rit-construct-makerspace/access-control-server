@@ -138,16 +138,26 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
               }
               <Stack direction={"row"} spacing={1} alignItems={"center"}>
                 {
-                  props.equipment.schedulable ? (
-                    <Button
+                  props.equipment.schedulable
+                    ? <Button
                       color="secondary"
                       variant="contained"
                       size="small"
                       onClick={() => navigate(`/makerspace/${makerspaceID}/reserve/${props.equipment.id}`)}
+                      disabled={hasNotTakenModule || (props.equipment.requiresInPerson && !hasApprovedAccessCheck)}
                     >
                       Reserve
                     </Button>
-                  ) : null
+                    : props.equipment.byReservationOnly
+                      ? <Button
+                        color="primary"
+                        variant="contained"
+                        size="small"
+                        onClick={() => navigate(`/makerspace/${makerspaceID}/reserve/${props.equipment.id}`)}
+                      >
+                        Calendar
+                      </Button>
+                      : null
                 }
                 <Button
                   size="small"

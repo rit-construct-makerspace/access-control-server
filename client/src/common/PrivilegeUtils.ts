@@ -65,3 +65,13 @@ export function isManagerOrSelf(user: CurrentUser, targetId: Number) {
 
     return false;
 }
+
+export function isStaffOrSelf(user: CurrentUser, targetId: Number) {
+    if (isStaff(user)) {
+        return true;
+    } else if (Number(user.id) === targetId) {
+        return true;
+    }
+
+    return false;
+}
