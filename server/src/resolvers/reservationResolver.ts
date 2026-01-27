@@ -6,6 +6,7 @@ import * as UserRepo from "../repositories/Users/UserRepository.js";
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
 import * as AccessCheckRepo from "../repositories/Equipment/AccessChecksRepository.js"
 import { GraphQLError } from "graphql";
+import { notifyReservationRequest } from "../integrations/slack/slack.js";
 
 const ReservationResolver = {
   Reservation: {
@@ -109,7 +110,11 @@ const ReservationResolver = {
         throw new GraphQLError("User attempting to make reservation has incomplete trainings or access checks");
       }
 
-      return await ReservationRepo.createReservation(args.userID, args.equipmentID, args.start, args.end, args.description, args.approved);
+      const result = await ReservationRepo.createReservation(args.userID, args.equipmentID, args.start, args.end, args.description, args.approved);
+      if (!result.approved) {
+        notifyReservationRequest(result, equipment, room?.makerspaceID ?? -1, user);
+      }
+      return result;
     }),
 
     setReservationApproval: async (
