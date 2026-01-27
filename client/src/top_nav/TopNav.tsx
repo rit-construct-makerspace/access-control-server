@@ -48,7 +48,7 @@ export default function TopNav() {
 
   function handleDismissLabTraining() {
     setLabTraining(false);
-    localStorage.setItem("showLabTraining", "false");
+    localStorage.setItem("showLabTraining2", "false");
   }
 
   const makeAlerts =
