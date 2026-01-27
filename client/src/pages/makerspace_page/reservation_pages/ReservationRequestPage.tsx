@@ -23,6 +23,7 @@ import ReservationModal from "./ReservationModal";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
 import { isStaff, isStaffOrSelf } from "../../../common/PrivilegeUtils";
 import Equipment from "../../../types/Equipment";
+import NotFoundPage from "../../../pages/NotFoundPage";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -74,6 +75,10 @@ export default function ReservationRequestPage() {
   const [description, setDescription] = useState("");
 
   function handleSlotSelect(selection: SlotInfo) {
+    if (getEquipmentById.data?.equipment.byReservationOnly) {
+      return;
+    }
+
     if (selection.action === "select") {
       setDraftReservation({ ...draftReservation, start: selection.start, end: selection.end })
     }
@@ -163,8 +168,8 @@ export default function ReservationRequestPage() {
     <RequestWrapper2 result={getEquipmentById} render={(data) => {
       const equipment: Equipment = data.equipment;
 
-      if (!equipment.schedulable) {
-        navigate(`/makerspace/${makerspaceID}`)
+      if (!equipment.schedulable && !equipment.byReservationOnly) {
+        return <NotFoundPage />
       }
       return (
         <RequestWrapper2 result={getReservationsResult} render={(data) => {
@@ -193,7 +198,7 @@ export default function ReservationRequestPage() {
               <title>{`Reserve ${equipment.name} | Make @ RIT`}</title>
               <Stack width={"20%"} spacing={2}>
                 <Typography variant="h5" textAlign={"center"}>
-                  Requesting a reservation for:
+                  {equipment.schedulable ? "Requesting a reservation for:" : "Availability for:"}
                   <Typography variant="inherit">
                     {equipment.name}
                   </Typography>
