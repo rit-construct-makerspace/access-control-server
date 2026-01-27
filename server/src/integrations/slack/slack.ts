@@ -1,8 +1,9 @@
 import { ChatPostMessageArguments, WebClient } from "@slack/web-api";
-import { MaintenanceTicketRow, ReservationRow, UserRow } from "../../db/tables.js";
+import { EquipmentRow, MaintenanceTicketRow, MakerspaceRow, ReservationRow, UserRow } from "../../db/tables.js";
 import * as EquipmentInstanceRepo from "../../repositories/Equipment/EquipmentInstancesRepository.js";
 import * as EquipmentRepo from "../../repositories/Equipment/EquipmentRepository.js";
 import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
+import { format } from "date-fns";
 
 // Read a token from the environment variables
 const token = process.env.SLACK_TOKEN;
@@ -84,6 +85,25 @@ export async function notifyNewMaintenanceTicket(ticket: MaintenanceTicketRow) {
   });
 }
 
-export async function notifyReservationRequest(reservation: ReservationRow) {
-
+export async function notifyReservationRequest(reservation: ReservationRow, equipment: EquipmentRow, makerspaceID: Number, creator: UserRow) {
+  return await sendSlackMessage({
+    text: `Reservation requested for <${process.env.VITE_URL}/makerspace/${makerspaceID}/reservations|${equipment.name}> at ${format(new Date(Number(reservation.start)), "dd/MM/yyyy hh:mm")} from ${creator.firstName} ${creator.lastName} (${creator.ritUsername})`,
+    blocks: [
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `Reservation requested for <${process.env.VITE_URL}/makerspace/${makerspaceID}/reservations|${equipment.name}> at ${format(new Date(Number(reservation.start)), "dd/MM/yyyy hh:mm")} from ${creator.firstName} ${creator.lastName} (${creator.ritUsername})`,
+        }
+      },
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": `> ${reservation.description}`
+        }
+      },
+    ],
+    channel: conversationId,
+  });
 }
