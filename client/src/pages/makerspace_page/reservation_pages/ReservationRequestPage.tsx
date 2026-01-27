@@ -75,10 +75,6 @@ export default function ReservationRequestPage() {
   const [description, setDescription] = useState("");
 
   function handleSlotSelect(selection: SlotInfo) {
-    if (getEquipmentById.data?.equipment.byReservationOnly) {
-      return;
-    }
-
     if (selection.action === "select") {
       setDraftReservation({ ...draftReservation, start: selection.start, end: selection.end })
     }
@@ -171,6 +167,7 @@ export default function ReservationRequestPage() {
       if (!equipment.schedulable && !equipment.byReservationOnly) {
         return <NotFoundPage />
       }
+
       return (
         <RequestWrapper2 result={getReservationsResult} render={(data) => {
           const liveReservationEvents: ReservationEvent[] = data.reservations.map(
@@ -203,6 +200,21 @@ export default function ReservationRequestPage() {
                     {equipment.name}
                   </Typography>
                 </Typography>
+                {
+                  equipment.schedulable
+                    ? <Typography
+                      variant="body1"
+                      textAlign={"center"}
+                      sx={{
+                        fontStyle: "italic"
+                      }}
+                    >
+                      To request a reservation, click and drag on the calender to select the time period you would like to reserve.
+                      Reservations must be made at least 3 days in advance.
+                      Once your request has been submitted, it will be approved or denied by staff.
+                    </Typography>
+                    : null
+                }
                 {
                   selectionMade ?
                     <Stack spacing={2}>
@@ -270,7 +282,7 @@ export default function ReservationRequestPage() {
                       height: 800
                     }}
                     eventPropGetter={eventPropGetter}
-                    onSelectSlot={handleSlotSelect}
+                    onSelectSlot={equipment.schedulable ? handleSlotSelect : undefined}
                     events={[...liveReservationEvents, { ...draftReservation, isDraggable: true }]}
                     onSelectEvent={handleEventSelect}
                     onRangeChange={handleRangeChange}
