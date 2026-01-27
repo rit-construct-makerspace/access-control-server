@@ -85,6 +85,11 @@ const ReservationResolver = {
     ) => ifAuthenticated(async (user) => {
       const equipment = await EquipmentRepo.getEquipmentByID(args.equipmentID);
       const room = await RoomRepo.getRoomByID(equipment.roomID);
+
+      if (user.archived) {
+        throw new GraphQLError("Arhcived users cannot create reservations");
+      }
+
       if (!equipment.schedulable && !(equipment.byReservationOnly && (user.manager.includes(room?.makerspaceID ?? -1) || user.admin))) {
         throw new GraphQLError("This equipment cannot be reserved");
       }
