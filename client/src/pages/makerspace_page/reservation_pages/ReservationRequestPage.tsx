@@ -1,4 +1,4 @@
-import { Button, Card, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
+import { Alert, AlertTitle, Button, Card, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { Calendar, dateFnsLocalizer, SlotInfo, Event } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
@@ -24,6 +24,7 @@ import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
 import { isStaff, isStaffOrSelf } from "../../../common/PrivilegeUtils";
 import Equipment from "../../../types/Equipment";
 import NotFoundPage from "../../../pages/NotFoundPage";
+import { addDays, endOfDay, isAfter, startOfDay } from "date-fns";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -92,8 +93,20 @@ export default function ReservationRequestPage() {
     }
   }
 
+  function validDates(): boolean {
+    if (draftReservation.start === undefined) {
+      return false;
+    }
+
+    return isAfter(startOfDay(draftReservation.start), endOfDay(addDays(new Date(), 2)));
+  }
+
   async function handleSubmitReservation() {
     if (!selectionMade) return;
+    if (!validDates()) {
+      toast.error("Reservations must be made at least 3 days in advance!")
+      return;
+    }
     try {
       await createReservation({
         variables: {
@@ -228,6 +241,14 @@ export default function ReservationRequestPage() {
                             <Typography fontWeight={"bold"}>To:</Typography>
                             <Typography>{formatter.format(draftReservation.end)}</Typography>
                           </Stack>
+                          {
+                            validDates()
+                              ? null
+                              : <Alert severity="error" variant="filled">
+                                <AlertTitle>Invalid Dates</AlertTitle>
+                                Reservations must be made at least 3 days in advance!
+                              </Alert>
+                          }
                         </Stack>
                       </Card>
                       <TextField
