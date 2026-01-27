@@ -4,6 +4,7 @@ import * as ReservationRepo from "../repositories/Equipment/ReservationRepositor
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as UserRepo from "../repositories/Users/UserRepository.js";
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
+import * as AccessCheckRepo from "../repositories/Equipment/AccessChecksRepository.js"
 import { GraphQLError } from "graphql";
 
 const ReservationResolver = {
@@ -90,6 +91,17 @@ const ReservationResolver = {
 
       if (args.approved && !(user.manager.includes(room?.makerspaceID ?? -1) || user.admin)) {
         throw new GraphQLError("Only managers can create approved resrvations");
+      }
+
+      if (!(user.manager.includes(room?.makerspaceID ?? -1) || user.admin)
+        && (
+          !(await EquipmentRepo.hasTrainingModules(user, args.equipmentID))
+          || (
+            equipment.requiresInPerson && !(await AccessCheckRepo.hasApprovedAccessCheck(user.id, args.equipmentID))
+          )
+        )
+      ) {
+        throw new GraphQLError("User attempting to make reservation has incomplete trainings or access checks");
       }
 
       return await ReservationRepo.createReservation(args.userID, args.equipmentID, args.start, args.end, args.description, args.approved);
