@@ -144,6 +144,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                       variant="contained"
                       size="small"
                       onClick={() => navigate(`/makerspace/${makerspaceID}/reserve/${props.equipment.id}`)}
+                      disabled={hasNotTakenModule || (props.equipment.requiresInPerson && !hasApprovedAccessCheck)}
                     >
                       Reserve
                     </Button>
