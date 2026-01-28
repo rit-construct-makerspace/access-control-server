@@ -121,7 +121,7 @@ export async function getMaintenanceTicket(id: number): Promise<MaintenanceTicke
 export async function paginatedMaintenanceTickets(
   pagination: { page: number, pageSize: number },
   sort?: { target: string, dir: string },
-  filter?: { target: string, op: string, value: string },
+  filter?: { equipment: number[], severity: MaintenanceTicketSeverity[], status: MaintenanceTicketStatus[] },
   makerspaceID?: number
 ): Promise<MaintenanceTicketRow[]> {
   let query = knex("MaintenanceTickets")
@@ -153,32 +153,16 @@ export async function paginatedMaintenanceTickets(
 
   // filter
   if (filter) {
-    switch (filter.target) {
-      case "equipment": {
-        query = query.whereILike(`Equipment.name`, `%${filter.value}%`);
-        break;
-      }
-      case "instance": {
-        query = query.whereILike(`EquipmentInstances.name`, `%${filter.value}%`);
-        break;
-      }
-      case "creator": {
-        query = query.join("Users", "MaintenanceTickets.userID", "Users.id");
-        query = query.whereILike(`Users.ritUsername`, `%${filter.value}%`);
-        break;
-      }
-      case "assigned": {
-        if (filter.value === "UNASSIGNED") {
-          query = query.whereNull("MaintenanceTickets.assignedID")
-        } else {
-          query = query.join("Users", "MaintenanceTickets.assignedID", "Users.id");
-          query = query.whereILike(`Users.ritUsername`, `%${filter.value}%`);
-        }
-        break;
-      }
-      default: {
-        query = query.whereILike(`MaintenanceTickets.${filter.target}`, `%${filter.value}%`)
-      }
+    if (filter.equipment.length > 0) {
+      query = query.whereIn("Equipment.id", filter.equipment);
+    }
+
+    if (filter.severity.length > 0) {
+      query = query.whereIn("MaintenanceTickets.severity", filter.severity);
+    }
+
+    if (filter.status.length > 0) {
+      query = query.whereIn("MaintenanceTickets.status", filter.status);
     }
   }
 
