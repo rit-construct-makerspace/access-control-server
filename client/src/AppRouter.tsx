@@ -21,10 +21,7 @@ import HoursDisplay from "./pages/signage/HoursDisplay";
 import TopNav from "./top_nav/TopNav";
 import QuizPage from "./pages/maker/take_quiz/QuizPage";
 import QuizResults from "./pages/maker/take_quiz/QuizResults";
-import InventoryPreviewPage from "./pages/maker/inventory_preview/InventoryPreviewPage";
 import InventoryPage from "./pages/lab_management/inventory/InventoryPage";
-import ResolutionLogPage from "./pages/lab_management/manage_equipment/ResolutionLog";
-import EditTermsPage from "./pages/lab_management/policy/EditTermsPage";
 import AnnouncementsPage from "./pages/lab_management/announcements/AnnouncementsPage";
 import EditAnnouncement from "./pages/lab_management/announcements/EditAnnouncement";
 import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnouncementPage";
@@ -46,7 +43,7 @@ import ManageMakerspacePage from "./pages/makerspace_page/ManageMakerspacePage";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import ManageRoomPage from "./pages/makerspace_page/MonitorRoomPage";
 import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
-import EditEquipmentPage from "./pages/makerspace_page/equipment_pages/EditEquipmentPage";
+import ManageEquipmentPage from "./pages/makerspace_page/equipment_pages/ManageEquipmentPage";
 import ReservationRequestPage from "./pages/makerspace_page/reservation_pages/ReservationRequestPage";
 import ManageReservationsPage from "./pages/makerspace_page/reservation_pages/ManageReservationsPage";
 import MaintenancePage from "./pages/makerspace_page/maintenance_pages/MaintenancePage";
@@ -174,7 +171,7 @@ export const appRouter = createBrowserRouter(
                             { path: "/makerspace/:makerspaceID/training/:id", element: <EditActiveModulePage /> },
 
                             { path: "/makerspace/:makerspaceID/equipment/new", element: <NewEquipmentPage /> },
-                            { path: "/makerspace/:makerspaceID/equipment/:equipmentID", element: <EditEquipmentPage /> },
+                            { path: "/makerspace/:makerspaceID/equipment/:equipmentID", element: <ManageEquipmentPage /> },
 
                             { path: "/makerspace/:makerspaceID/tools", element: <ToolItemPage /> },
                             { path: "/makerspace/:makerspaceID/tools/type/:typeid", element: <ToolItemPage /> },
@@ -186,6 +183,7 @@ export const appRouter = createBrowserRouter(
                             { path: "/makerspace/:makerspaceID/readers", element: <ReadersPage /> },
                             { path: "/makerspace/:makerspaceID/organizations", element: <OrganizationsPage /> },
                             { path: "/makerspace/:makerspaceID/maintenance", element: <MaintenancePage /> },
+                            { path: "/makerspace/:makerspaceID/reservations", element: <ManageReservationsPage /> },
 
                             /* Routes for manager + higher */
                             {
@@ -194,7 +192,6 @@ export const appRouter = createBrowserRouter(
                                 { path: "/makerspace/:makerspaceID/edit", element: <ManageMakerspacePage /> },
                                 { path: "/makerspace/:makerspaceID/edit/room/:roomID", element: <ManageRoomPage /> },
                                 { path: "/makerspace/:makerspaceID/currency", element: <CurrencyPage /> },
-                                { path: "/makerspace/:makerspaceID/reservations", element: <ManageReservationsPage /> }
                               ],
                             },
                             /* End manager routes */
@@ -223,13 +220,7 @@ export const appRouter = createBrowserRouter(
                 { path: "/maker/training/:id/results/", element: <QuizResults /> },
                 { path: "/maker/training/:id/results/:submissionID", element: <QuizResults /> },
 
-                { path: "/maker/materials", element: <InventoryPreviewPage /> },
-
-                { path: "/admin/equipment/logs/:logid", element: <ResolutionLogPage /> },
-
                 { path: "/admin/inventory", element: <InventoryPage /> },
-
-                { path: "/admin/terms", element: <EditTermsPage /> },
               ],
             },
             /* END OF PROTECTED ROUTES */

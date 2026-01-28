@@ -1,11 +1,13 @@
 import { Stack } from "@mui/system";
 import PrettyModal from "../../../common/PrettyModal";
-import { ASSIGN_MAINTENANCE_TICKET, MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
+import { ASSIGN_MAINTENANCE_TICKET, DELETE_MAINTENACE_TICKET, MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
 import { Autocomplete, Button, Chip, IconButton, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
+import DeleteIcon from '@mui/icons-material/Delete';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import { useMutation, useQuery } from "@apollo/client";
 import { toast } from "react-toastify";
 import TaskIcon from '@mui/icons-material/Task';
@@ -13,7 +15,8 @@ import styled from "styled-components";
 import { makeCDNLink } from "../../../common/ImageFinder";
 import { useParams } from "react-router-dom";
 import { GET_VALID_STAFF } from "../../../queries/makerspaceQueries";
-import { CurrentUser } from "../../../common/CurrentUserProvider";
+import { CurrentUser, useCurrentUser } from "../../../common/CurrentUserProvider";
+import { isManager } from "../../../common/PrivilegeUtils";
 
 interface TicketModalProps {
   open: boolean,
@@ -37,6 +40,8 @@ const StyledImg = styled.img`
 
 export default function MaintenanceTicketModal(props: TicketModalProps) {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
+  const user = useCurrentUser();
+
   const [editing, setEditing] = useState(false);
   const [description, setDescription] = useState(props.ticket.description);
   const [status, setStatus] = useState<MaintenanceTicketStatus>(props.ticket.status);
@@ -62,6 +67,13 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
   const [modifyTicketStatus] = useMutation(MODIFY_MAINTENANCE_TICKET_STATUS, { refetchQueries: ["MaintenanceTickets", "PaginatedMaintenanceTickets"] });
   const [updateTicket] = useMutation(UPDATE_MAINTENACE_TICKET, { refetchQueries: ["MaintenanceTickets", "PaginatedMaintenanceTickets"] });
   const [assignTicket] = useMutation(ASSIGN_MAINTENANCE_TICKET, { refetchQueries: ["MaintenanceTickets", "PaginatedMaintenanceTickets"] });
+
+  const [deleteTicket] = useMutation(DELETE_MAINTENACE_TICKET, {
+    refetchQueries: ["MaintenanceTickets", "PaginatedMaintenanceTickets"],
+    variables: {
+      id: props.ticket.id
+    }
+  })
 
   async function handleCloseTicket(ticketID: number) {
     if (!confirm("Are you sure you want to close this ticket?")) {
@@ -102,7 +114,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     toast.success("Marked ticket as in progress!");
   }
 
-  async function handleSaveTicket() {
+  async function handleSaveTicket(user: CurrentUser | null = assigned) {
     try {
       await updateTicket({
         variables: {
@@ -118,8 +130,8 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     }
 
     try {
-      if (props.ticket.assigned?.id !== assigned?.id) {
-        await assignTicket({ variables: { id: props.ticket.id, assignedID: assigned ? Number(assigned.id) : null } })
+      if (props.ticket.assigned?.id !== user?.id) {
+        await assignTicket({ variables: { id: props.ticket.id, assignedID: user ? Number(user.id) : null } })
       }
     } catch (e) {
       toast.error("Failed to assign user: " + e);
@@ -135,14 +147,70 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     props.onClose();
   }
 
+  function progressButton() {
+    if (props.ticket.status === MaintenanceTicketStatus.CLOSED) {
+      return null;
+    }
+
+    if (props.ticket.assigned === null) {
+      return (
+        <Button
+          color="primary"
+          variant="contained"
+          startIcon={<AssignmentIcon />}
+          onClick={() => { setAssigned(user); handleSaveTicket(user) }}
+        >
+          Claim Ticket
+        </Button>
+      );
+    }
+
+    switch (props.ticket.status) {
+      case MaintenanceTicketStatus.UPCOMING:
+      case MaintenanceTicketStatus.TODO:
+        return (
+          <Button
+            color="warning"
+            variant="contained"
+            startIcon={<WatchLaterIcon />}
+            onClick={() => handleInProgess(props.ticket.id)}
+          >
+            Mark In-Progress
+          </Button>
+        );
+      case MaintenanceTicketStatus.IN_PROGRESS:
+        return (
+          <Button
+            color="secondary"
+            variant="contained"
+            startIcon={<TaskIcon />}
+            onClick={() => handleCloseTicket(props.ticket.id)}
+          >
+            Mark Closed
+          </Button>
+        );
+      default:
+        return null;
+    }
+  }
+
   return (
     <PrettyModal open={props.open} onClose={handleClose} width={"600px"}>
       <Stack spacing={2}>
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
           <Typography variant="h5">{props.ticket.instance.name}</Typography>
-          <IconButton onClick={handleClose}>
-            <CloseIcon />
-          </IconButton>
+          <Stack direction={"row"} spacing={2}>
+            {
+              editing && isManager(user)
+                ? <IconButton onClick={() => confirm("Delete Ticket?") ? deleteTicket() : null} color="error">
+                  <DeleteIcon />
+                </IconButton>
+                : null
+            }
+            <IconButton onClick={handleClose}>
+              <CloseIcon />
+            </IconButton>
+          </Stack>
         </Stack>
         <Stack direction={"row"} justifyContent={"space-between"}>
           <Typography variant="subtitle1">{`Ticket #${props.ticket.id}`}</Typography>
@@ -292,27 +360,11 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
               ? <Button
                 color="success"
                 variant="contained"
-                onClick={handleSaveTicket}
+                onClick={() => handleSaveTicket()}
               >
                 Save Changes
               </Button>
-              : props.ticket.status === MaintenanceTicketStatus.IN_PROGRESS
-                ? <Button
-                  color="secondary"
-                  variant="contained"
-                  startIcon={<TaskIcon />}
-                  onClick={() => handleCloseTicket(props.ticket.id)}
-                >
-                  Mark Closed
-                </Button>
-                : <Button
-                  color="warning"
-                  variant="contained"
-                  startIcon={<WatchLaterIcon />}
-                  onClick={() => handleInProgess(props.ticket.id)}
-                >
-                  Mark In-Progress
-                </Button>
+              : progressButton()
           }
         </Stack>
       </Stack>

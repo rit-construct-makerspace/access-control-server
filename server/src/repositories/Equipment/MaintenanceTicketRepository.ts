@@ -1,6 +1,7 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
 import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../db/tables.js";
+import { addHours, endOfDay } from "date-fns"
 
 export async function createMaintenanceTicket(
   type: MaintenanceTicketType,
@@ -25,8 +26,52 @@ export async function createMaintenanceTicket(
   }
 }
 
+export async function createIntervalMaintenanceTicket(
+  severity: MaintenanceTicketSeverity,
+  instanceID: number,
+  description: string,
+  startDate: string,
+  intervalHours: number,
+  imageUrl?: string
+): Promise<MaintenanceTicketRow> {
+  const result = await knex("MaintenanceTickets").insert({
+    type: MaintenanceTicketType.AUTOMATIC,
+    severity,
+    status: MaintenanceTicketStatus.UPCOMING,
+    instanceID,
+    description,
+    dateCreated: startDate,
+    intervalHours,
+    imageUrl
+  }).returning("*");
+
+  if (result.length > 0) {
+    return result[0];
+  } else {
+    throw new GraphQLError("Failed to create ticket");
+  }
+}
+
 export async function modifyMaintenanceTicketStatus(id: number, status: MaintenanceTicketStatus): Promise<number> {
+  const ticket = await getMaintenanceTicket(id);
+
+  if (!ticket) {
+    throw new GraphQLError("Attempted to modify non-existent ticket");
+  }
+
   if (status === MaintenanceTicketStatus.CLOSED) {
+
+    if (ticket.type === MaintenanceTicketType.AUTOMATIC) {
+
+      const newTargetDate = addHours(new Date(), ticket.intervalHours ?? 0);
+      await createIntervalMaintenanceTicket(
+        ticket.severity,
+        ticket.instanceID,
+        ticket.description,
+        newTargetDate.toISOString(), ticket.intervalHours ?? 0
+      )
+    }
+
     return await knex("MaintenanceTickets").update({ status: status, dateClosed: knex.fn.now() }).where({ id: id });
   } else {
     return await knex("MaintenanceTickets").update({ status: status }).where({ id: id });
@@ -152,4 +197,14 @@ export async function updateMaintenanceTicket(
 
 export async function assignMaintenanceTicket(id: number, assignedID: number | null): Promise<number> {
   return await knex("MaintenanceTickets").update({ assignedID: assignedID }).where({ id: id });
+}
+
+export async function advanceIntervalTickets(): Promise<MaintenanceTicketRow[]> {
+  return await knex("MaintenanceTickets").update({ status: MaintenanceTicketStatus.TODO })
+    .where("status", "=", MaintenanceTicketStatus.UPCOMING).andWhere("dateCreated", "<=", endOfDay(new Date()).toISOString()) // TODO: normalize this to timezone
+    .returning("*");
+}
+
+export async function deleteMaintenanceTicket(id: number): Promise<number> {
+  return await knex("MaintenanceTickets").delete().where("id", "=", id);
 }

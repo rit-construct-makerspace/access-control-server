@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import EquipmentInformation from "./EquipmentInformation";
 import PrettyModal from "../../../common/PrettyModal";
-import InstanceGrid from "../../lab_management/manage_equipment/InstanceGrid";
+import InstanceGrid from "./InstanceGrid";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
@@ -48,7 +48,7 @@ export interface Equipment {
 
 }
 
-export default function EditEquipmentPage() {
+export default function ManageEquipmentPage() {
   const { makerspaceID, equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
@@ -89,10 +89,10 @@ export default function EditEquipmentPage() {
       return (
 
         <Stack padding={"0 20px 15px"}>
-          <title>{`Edit ${equipment.name} | Make @ RIT`}</title>
+          <title>{`Manage ${equipment.name} | Make @ RIT`}</title>
           <Stack spacing={2}>
             <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} padding={"10px"}>
-              <Typography variant="h3">{`Edit ${equipment.name}`}</Typography>
+              <Typography variant="h3">{`Manage ${equipment.name}`}</Typography>
               <Stack direction={"row"} spacing={1}>
                 <Button
                   color="secondary"
