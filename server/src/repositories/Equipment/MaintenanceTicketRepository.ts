@@ -59,6 +59,10 @@ export async function modifyMaintenanceTicketStatus(id: number, status: Maintena
     throw new GraphQLError("Attempted to modify non-existent ticket");
   }
 
+  if (ticket.status === status) {
+    return 0; // don't update the status to the same thing
+  }
+
   if (status === MaintenanceTicketStatus.CLOSED) {
 
     if (ticket.type === MaintenanceTicketType.AUTOMATIC) {
@@ -192,7 +196,8 @@ export async function updateMaintenanceTicket(
   status: MaintenanceTicketStatus,
   description: string
 ): Promise<number> {
-  return await knex("MaintenanceTickets").update({ severity: severity, status: status, description: description }).where({ id: id });
+  await modifyMaintenanceTicketStatus(id, status);
+  return await knex("MaintenanceTickets").update({ severity: severity, description: description }).where({ id: id });
 }
 
 export async function assignMaintenanceTicket(id: number, assignedID: number | null): Promise<number> {
