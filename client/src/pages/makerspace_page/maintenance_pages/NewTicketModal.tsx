@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteRenderInputParams, Button, IconButton, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, AutocompleteRenderInputParams, Button, IconButton, InputAdornment, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import CloseIcon from '@mui/icons-material/Close';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
@@ -176,6 +176,12 @@ export default function NewTicketModal(props: NewTicketModalProps) {
           onChange={(e) => setDescription(e.target.value)}
           multiline
           minRows={3}
+          slotProps={{
+            htmlInput: {
+              maxLength: 255
+            }
+          }}
+          helperText={<Typography variant="body2" sx={{ fontStyle: "italic" }} textAlign={"end"}>{`${description.length}/255`}</Typography>}
         />
         {
           imageUrl
