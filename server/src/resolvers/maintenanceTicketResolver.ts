@@ -73,9 +73,9 @@ const MaintenanceTicketResolver = {
           dir: string
         },
         filter?: {
-          target: string,
-          op: string,
-          value: string
+          equipment: number[],
+          severity: MaintenanceTicketSeverity[],
+          status: MaintenanceTicketStatus[]
         },
         makerspaceID?: number
       },

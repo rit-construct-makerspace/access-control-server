@@ -4,6 +4,7 @@ import { useCurrentUser } from "./CurrentUserProvider";
 import { ModuleStatus, moduleStatusMapper } from "./TrainingModuleUtils";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useNavigate, useParams } from "react-router-dom";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import ModuleStatusRow from "./ModuleStatusRow";
@@ -155,7 +156,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                         size="small"
                         onClick={() => navigate(`/makerspace/${makerspaceID}/reserve/${props.equipment.id}`)}
                       >
-                        Calendar
+                        <CalendarMonthIcon />
                       </Button>
                       : null
                 }
@@ -164,7 +165,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                   variant="contained"
                   color="info"
                   onClick={() => window.open(props.equipment.sopUrl, "_blank")}
-                  sx={{ alignSelf: "flex-end" }}
+                  sx={{ alignSelf: "flex-end", height: "100%" }}
                 >
                   Learn More
                 </Button>

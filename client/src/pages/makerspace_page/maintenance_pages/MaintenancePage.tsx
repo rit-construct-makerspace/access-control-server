@@ -1,11 +1,11 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Autocomplete, Button, Stack, TextField, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
 import { useQuery } from "@apollo/client";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { DataGrid, GridRowsProp, GridColDef, GridFilterModel, GridPaginationModel, GridSortModel, getGridStringOperators, GridRenderCellParams } from "@mui/x-data-grid";
 import { useState } from "react";
-import { MaintenanceTicket, MaintenanceTicketType, PAGINATED_MAINTENANCE_TICKETS } from "../../../queries/maintenanceTicketQueries";
+import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, PAGINATED_MAINTENANCE_TICKETS } from "../../../queries/maintenanceTicketQueries";
 import NewTicketModal from "./NewTicketModal";
 import WarningIcon from '@mui/icons-material/Warning';
 import MaintenanceTicketModal from "./MaintenanceTicketModal";
@@ -14,6 +14,7 @@ import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import NewIntervalTicketModal from "./NewIntervalTicketModal";
 import { isManager } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import Equipment from "../../../types/Equipment";
 
 const formatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
@@ -31,13 +32,12 @@ export default function MaintenancePage() {
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 100, });
-  const [filterModel, setFilterModel] = useState<GridFilterModel>();
   const [sortModel, setSortModel] = useState<GridSortModel>([]);
-
-  const debouncedFilter = useDebounce(filterModel, 300);
-
   const [newTicketModal, setNewTicketModal] = useState(false);
   const [timeTicketModal, setTimeTicketModal] = useState(false);
+  const [equipmentFilter, setEquipmentFilter] = useState<Equipment[]>([]);
+  const [statusFilter, setStatusFilter] = useState<MaintenanceTicketStatus[]>([MaintenanceTicketStatus.TODO, MaintenanceTicketStatus.IN_PROGRESS]);
+  const [severityFilter, setSeverityFilter] = useState<MaintenanceTicketSeverity[]>([]);
 
   const getMaintenanceTickets = useQuery(PAGINATED_MAINTENANCE_TICKETS, {
     variables: {
@@ -49,11 +49,11 @@ export default function MaintenancePage() {
         target: sortModel[0].field,
         dir: sortModel[0].sort
       } : undefined,
-      filter: (debouncedFilter && debouncedFilter.items.length > 0) ? {
-        target: debouncedFilter.items[0].field,
-        op: debouncedFilter.items[0].operator,
-        value: debouncedFilter.items[0].value ?? ""
-      } : undefined,
+      filter: {
+        equipment: equipmentFilter.map((equipment) => (Number(equipment.id))),
+        status: statusFilter,
+        severity: severityFilter
+      },
       makerspaceID: Number(makerspaceID)
     }
   });
@@ -61,15 +61,15 @@ export default function MaintenancePage() {
   const containsOperator = getGridStringOperators().filter((operator) => operator.value === "contains");
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 10, filterable: false },
-    { field: "equipment", headerName: "Equipment", width: 350, sortable: false, filterOperators: containsOperator },
-    { field: "instance", headerName: "Instance", width: 300, sortable: false, filterOperators: containsOperator },
-    { field: "type", headerName: "Type", width: 140, sortable: false, filterOperators: containsOperator },
-    { field: "status", headerName: "Status", width: 140, filterOperators: containsOperator },
-    { field: "severity", headerName: "Severity", width: 140, filterOperators: containsOperator },
-    { field: "creator", headerName: "Creator", width: 140, sortable: false, filterOperators: containsOperator },
-    { field: "assigned", headerName: "Assigned", width: 140, sortable: false, filterOperators: containsOperator },
-    { field: "dateCreated", headerName: "Created", width: 180, filterable: false },
+    { field: "id", headerName: "ID", width: 10, filterable: false, resizable: false, hideable: false },
+    { field: "equipment", headerName: "Equipment", width: 350, sortable: false, filterable: false, resizable: false },
+    { field: "instance", headerName: "Instance", width: 300, sortable: false, filterable: false, resizable: false },
+    { field: "type", headerName: "Type", width: 140, sortable: false, filterable: false, resizable: false },
+    { field: "status", headerName: "Status", width: 140, filterable: false, resizable: false },
+    { field: "severity", headerName: "Severity", width: 140, filterable: false, resizable: false },
+    { field: "creator", headerName: "Creator", width: 140, sortable: false, filterable: false, resizable: false },
+    { field: "assigned", headerName: "Assigned", width: 140, sortable: false, filterable: false, resizable: false },
+    { field: "dateCreated", headerName: "Created", width: 180, filterable: false, resizable: false },
     {
       field: "manage", headerName: "Manage", width: 140, filterable: false, sortable: false, renderCell: (params: GridRenderCellParams<any, MaintenanceTicket>) => {
         const [open, setOpen] = useState(false);
@@ -98,10 +98,6 @@ export default function MaintenancePage() {
     setPaginationModel(model);
   }
 
-  function handleFilterModelChange(model: GridFilterModel) {
-    setFilterModel(model);
-  }
-
   function handleSortModelChange(model: GridSortModel) {
     setSortModel(model);
   }
@@ -128,6 +124,9 @@ export default function MaintenancePage() {
 
       const makerspace: FullMakerspace = data.makerspaceByID;
 
+      const bumpy_equipment = makerspace.rooms.map((room) => (room.equipment));
+      const makerspace_equipment = bumpy_equipment.flat(1);
+
       return (
         <Stack padding={"15px"} spacing={2}>
           <title>{`${makerspace.name} Maintenance`}</title>
@@ -153,6 +152,63 @@ export default function MaintenancePage() {
               Create Time Ticket
             </Button>
           </Stack>
+          <Stack
+            direction={"row"}
+            spacing={2}
+          >
+            <Autocomplete
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Equipment"
+                  placeholder="Select Equipment..."
+                />
+              )}
+              options={makerspace_equipment}
+              getOptionLabel={(equipment) => (equipment.name)}
+              multiple
+              value={equipmentFilter}
+              onChange={(e, newValue) => setEquipmentFilter(newValue)}
+              limitTags={1}
+              sx={{
+                width: "400px"
+              }}
+            />
+            <Autocomplete
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Status"
+                  placeholder="Select Status..."
+                />
+              )}
+              options={[MaintenanceTicketStatus.UPCOMING, MaintenanceTicketStatus.TODO, MaintenanceTicketStatus.IN_PROGRESS, MaintenanceTicketStatus.CLOSED]}
+              multiple
+              value={statusFilter}
+              onChange={(e, newValue) => setStatusFilter(newValue)}
+              limitTags={1}
+              sx={{
+                width: "250px"
+              }}
+            />
+            <Autocomplete
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Severity"
+                  placeholder="Select Severity..."
+                />
+              )}
+              options={[MaintenanceTicketSeverity.HIGH, MaintenanceTicketSeverity.MEDIUM, MaintenanceTicketSeverity.LOW]}
+              multiple
+              value={severityFilter}
+              onChange={(e, newValue) => setSeverityFilter(newValue)}
+              limitTags={1}
+              sx={{
+                width: "250px"
+              }}
+            />
+          </Stack>
           <DataGrid
             columns={columns}
             rows={rows}
@@ -161,8 +217,6 @@ export default function MaintenancePage() {
             paginationModel={paginationModel}
             onPaginationModelChange={handlePaginationModelChange}
             filterMode="server"
-            filterModel={filterModel}
-            onFilterModelChange={handleFilterModelChange}
             sortingMode="server"
             sortModel={sortModel}
             onSortModelChange={handleSortModelChange}
