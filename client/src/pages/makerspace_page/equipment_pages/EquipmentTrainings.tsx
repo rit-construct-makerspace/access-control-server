@@ -20,6 +20,7 @@ export default function EquipmentTrainings(props: EquipmentTrainingProps) {
 
       const possibleModules = data.modules.filter((m: ObjectSummary) => (
         !props.equipmentModules.some((eMod) => m.id === eMod.id) // TODO: filter to this makerspace's + global trainings
+        && !m.archived
       ));
 
       return (
