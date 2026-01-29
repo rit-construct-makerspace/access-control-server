@@ -15,6 +15,7 @@ import { accessCheckExists, createAccessCheck, hasApprovedAccessCheck } from "..
 import { createTrainingHold, getTrainingHoldByUserForModule } from "../repositories/Training/TrainingHoldsRespository.js";
 import * as PassedModuleRepo from "../repositories/Training/PassedRepository.js";
 import * as TrainingModuleReo from "../repositories/Training/ModuleRepository.js";
+import { GraphQLError } from "graphql";
 
 /**
  * IDs of quizzes that will grant access to 3DPrinterOS Workgroups
@@ -438,8 +439,12 @@ const TrainingModuleResolvers = {
       args: { id: string },
       { isManager }: ApolloContext
     ) => isManager(async (user: any) => {
-
       const module = await ModuleRepo.getModuleByID(Number(args.id));
+
+      if (!module.archived) {
+        throw new GraphQLError("Cannot delete published (non-archived) trainings");
+      }
+
       await createLog(
         "{user} deleted {module} module.",
         "admin",
