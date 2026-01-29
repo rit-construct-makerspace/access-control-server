@@ -118,7 +118,13 @@ export default function ManageEquipmentPage() {
             </Stack>
             <Stack direction="row" spacing={2} alignItems="center">
               <Typography variant="h5">Instances</Typography>
-              <Button variant="contained" startIcon={<AddIcon />} color="success" onClick={() => { setNewInstanceModal(true) }}>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                color="success"
+                onClick={() => { setNewInstanceModal(true) }}
+                disabled={!isManagerFor(user, Number(makerspaceID ?? -1))}
+              >
                 Create New Instance
               </Button>
             </Stack>
