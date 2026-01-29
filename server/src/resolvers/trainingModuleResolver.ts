@@ -391,9 +391,9 @@ const TrainingModuleResolvers = {
     archiveModule: async (
       _parent: any,
       args: { id: string },
-      { isStaff }: ApolloContext
+      { isManager }: ApolloContext
     ) =>
-      isStaff(async (user: any) => {
+      isManager(async (user: any) => {
         const module = await ModuleRepo.setModuleArchived(Number(args.id), true);
 
         await createLog(
@@ -415,9 +415,9 @@ const TrainingModuleResolvers = {
     publishModule: async (
       _parent: any,
       args: { id: string },
-      { isStaff }: ApolloContext
+      { isManager }: ApolloContext
     ) =>
-      isStaff(async (user: any) => {
+      isManager(async (user: any) => {
         const module = await ModuleRepo.setModuleArchived(Number(args.id), false);
 
         await createLog(
@@ -436,8 +436,8 @@ const TrainingModuleResolvers = {
     deleteModule: async (
       _parent: any,
       args: { id: string },
-      { isStaff }: ApolloContext
-    ) => isStaff(async (user: any) => {
+      { isManager }: ApolloContext
+    ) => isManager(async (user: any) => {
 
       const module = await ModuleRepo.getModuleByID(Number(args.id));
       await createLog(
