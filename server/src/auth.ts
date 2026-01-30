@@ -238,9 +238,6 @@ export function setupDevAuth(app: express.Application) {
   app.use(express.json());
 
   app.get("/login", function (req, res, next) {
-    if (req.query.redir) {
-      req.query.RelayState = req.query.redir
-    }
     const relayState = typeof req.query.redir === "string" ? req.query.redir : process.env.VITE_URL;
     passport.authenticate("saml", {
       // @ts-expect-error this field not in TS definition, but does work
