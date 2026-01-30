@@ -35,7 +35,7 @@ export default function TopNav() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(anchorEl);
 
-  const [themeString, setThemeString] = useState(localStorage.getItem("themeMode") ?? "");
+  const [themeString, setThemeString] = useState(ThemeController.activeTheme.getThemeString());
   ThemeController.addStringWatcher(setThemeString);
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
