@@ -60,7 +60,7 @@ function AppRoot() {
 function AuthedRoute() {
   const user = useCurrentUser();
   if (user.visitor) {
-    window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/");
+    window.location.replace(import.meta.env.VITE_LOGIN_URL + "?redir=" + import.meta.env.VITE_ORIGIN + window.location.pathname);
     return <></>;
   } else {
     return <Outlet />;
