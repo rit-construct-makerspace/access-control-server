@@ -21,28 +21,19 @@ interface MakerspaceCardProps {
 export default function MakerspaceCard(props: MakerspaceCardProps) {
   const navigate = useNavigate();
 
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
     <Card
       sx={{ width: props.isMobile ? "350px" : "500px" }}
-      elevation={isHovered ? undefined : 8}
-      onMouseEnter={() => {
-        setIsHovered(true);
-      }}
-      onMouseLeave={() => {
-        setIsHovered(false);
-      }}
     >
       <CardActionArea
         onClick={
           props.clickable === true || props.clickable === undefined
             ? () => {
-                navigate(`/makerspace/${props.id}`);
-              }
+              navigate(`/makerspace/${props.id}`);
+            }
             : () => {
-                /* Do nothing */
-              }
+              /* Do nothing */
+            }
         }
       >
         <CardMedia
@@ -65,7 +56,7 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
           </Typography>
 
           <Stack direction={"row"} justifyContent={"space-between"} spacing={"20px"}>
-            <CurrentHours times = {props.hours} fillLine = {props.isMobile} showDay={true}/>
+            <CurrentHours times={props.hours} fillLine={props.isMobile} showDay={true} />
             {!props.isMobile && (
               <Button
                 variant="contained"
