@@ -129,15 +129,11 @@ export default function StaffBar() {
           to={`/makerspace/${makerspaceID}/maintenance`}
           icon={<HandymanIcon />}
         />
-        {
-          isManager
-            ? <NavLink
-              primary={"Reservations"}
-              to={`/makerspace/${makerspaceID}/reservations`}
-              icon={<CalendarMonthIcon />}
-            />
-            : null
-        }
+        <NavLink
+          primary={"Reservations"}
+          to={`/makerspace/${makerspaceID}/reservations`}
+          icon={<CalendarMonthIcon />}
+        />
         {
           isManager
             ? <NavLink

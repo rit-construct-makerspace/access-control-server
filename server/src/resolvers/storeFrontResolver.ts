@@ -5,7 +5,7 @@ import { deleteInventoryItem } from "../repositories/Store/InventoryRepository.j
 import { createLedger, deleteLedger, getLedgers } from "../repositories/Store/InventoryLedgerRepository.js";
 import { GraphQLError } from "graphql";
 import { getUserByID, getUserByIDOrUndefined } from "../repositories/Users/UserRepository.js";
-import { notifyInventoryItemBelowThreshold } from "../slack/slack.js";
+import { notifyInventoryItemBelowThreshold } from "../integrations/slack/slack.js";
 import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
 import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";

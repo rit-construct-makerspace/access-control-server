@@ -22,9 +22,9 @@ export async function getModules(): Promise<TrainingModuleRow[]> {
  */
 export async function getModulesWhereArchived(archived: boolean): Promise<TrainingModuleRow[]> {
   return knex("TrainingModule")
-          .select()
-          .where({ archived: archived })
-          .orderBy("name", "asc");
+    .select()
+    .where({ archived: archived })
+    .orderBy("name", "asc");
 }
 
 /**
@@ -64,12 +64,12 @@ export async function getModuleIDsByEquipmentID(equipmentID: number): Promise<Pi
  */
 export async function getModuleByIDWhereArchived(id: number, archived: boolean): Promise<TrainingModuleRow> {
   const trainingModule = await knex("TrainingModule")
-                                .first()
-                                .where({
-                                  id: id,
-                                  archived: archived
-                                })
-                                .orderBy("name", "asc");  
+    .first()
+    .where({
+      id: id,
+      archived: archived
+    })
+    .orderBy("name", "asc");
 
   if (!trainingModule)
     throw new EntityNotFound(`Training module #${id} not found`);
@@ -85,12 +85,13 @@ export async function getModuleByIDWhereArchived(id: number, archived: boolean):
  */
 export async function setModuleArchived(id: number, archived: boolean): Promise<TrainingModuleRow> {
   const updatedModules: TrainingModuleRow[] = await knex("TrainingModule")
-                                                      .where({ id: id })
-                                                      .update({ archived: archived })
-                                                      .returning("*");
+    .where({ id: id })
+    .update({ archived: archived })
+    .returning("*");
 
-  // TODO: Detatch equipment that require this module?
-  await knex("ModulesForEquipment").delete().where({moduleID: id});
+  await knex("ModulesForEquipment").delete().where({ moduleID: id });
+  await knex("ModulesForMakerspaces").delete().where({ moduleID: id });
+  await knex("ModulesForRooms").delete().where({ moduleID: id });
 
   if (updatedModules.length < 1) throw new EntityNotFound(`Training module #${id} not found`);
 
@@ -107,13 +108,13 @@ export async function addModule(name: string, quiz: object, makerspaceID: number
 
 
   const addedModule: TrainingModuleRow[] = await knex("TrainingModule")
-                      .insert(
-                        {
-                          name: name,
-                          quiz: JSON.stringify(quiz) as unknown as TrainingModuleItem[], //quiz has same format as TrainingModuleItem, (updateModule does  as unknown as TrainingModuleItem[] behind the scene somewhere but I cannot find how to do that)
-                          makerspaceID: makerspaceID,
-                          archived: archived,
-                        }, "*");
+    .insert(
+      {
+        name: name,
+        quiz: JSON.stringify(quiz) as unknown as TrainingModuleItem[], //quiz has same format as TrainingModuleItem, (updateModule does  as unknown as TrainingModuleItem[] behind the scene somewhere but I cannot find how to do that)
+        makerspaceID: makerspaceID,
+        archived: archived,
+      }, "*");
 
   if (addedModule.length < 1) throw new EntityNotFound(`Could not add module ${name}`);
   return addedModule[0];
@@ -178,7 +179,7 @@ export async function getPassedModulesByUser(
 export async function hasPassedModule(
   userID: number,
   moduleID: number
-) : Promise<boolean> {
+): Promise<boolean> {
   return (await knex("PassedModules").select("*").where("userID", userID).andWhere("moduleID", moduleID)).length > 0;
 }
 
@@ -191,7 +192,7 @@ export async function hasPassedModule(
 export async function getEquipmentIDsByModuleID(
   moduleID: number
 ): Promise<ModulesForEquipmentRow[]> {
-  return await knex("ModulesForEquipment").select("*").where({moduleID: moduleID});
+  return await knex("ModulesForEquipment").select("*").where({ moduleID: moduleID });
 }
 
 /**
@@ -213,7 +214,7 @@ export async function getEquipmentsByModuleID(
 export async function getModulesIDsByEquipmentID(
   equipmentID: number
 ): Promise<ModulesForEquipmentRow[]> {
-  return await knex("ModulesForEquipment").select("*").where({equipmentID: equipmentID});
+  return await knex("ModulesForEquipment").select("*").where({ equipmentID: equipmentID });
 }
 
 /**
@@ -240,7 +241,7 @@ export async function getPassedEquipmentIDsByModuleID(
   const equipmentIdRows = await getEquipmentIDsByModuleID(moduleID);
 
   const equipmentPassed: number[] = [];
-  
+
   for (let i = 0; i <= equipmentIdRows.length; i++) {
     const equipmentID = equipmentIdRows[i] != undefined ? equipmentIdRows[i].equipmentID : -1;
     if (equipmentID === -1) continue;

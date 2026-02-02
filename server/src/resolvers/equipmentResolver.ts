@@ -6,6 +6,7 @@
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as EquipmentInstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
+import * as ModuleRepo from "../repositories/Training/ModuleRepository.js"
 import { ApolloContext, CurrentUser } from "../context.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
@@ -129,6 +130,13 @@ const EquipmentResolvers = {
           throw new GraphQLError(`No Privilege for Makerspace ${room?.makerspaceID ?? -1}`);
         }
 
+        for (let i = 0; i < args.equipment.moduleIDs.length; i++) {
+          const module = await ModuleRepo.getModuleByID(Number(args.equipment.moduleIDs[i]));
+          if (module.archived) {
+            throw new GraphQLError(`Cannot assign module ${args.equipment.moduleIDs[i]}`)
+          }
+        }
+
         const equipment = await EquipmentRepo.addEquipment(args.equipment);
 
         await createLog(
@@ -157,6 +165,14 @@ const EquipmentResolvers = {
         if (!user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
           throw new GraphQLError(`Insufficent Privilege for Makerspace ${room?.makerspaceID}`)
         }
+
+        for (let i = 0; i < args.equipment.moduleIDs.length; i++) {
+          const module = await ModuleRepo.getModuleByID(Number(args.equipment.moduleIDs[i]));
+          if (module.archived) {
+            throw new GraphQLError(`Cannot assign module ${args.equipment.moduleIDs[i]}`)
+          }
+        }
+
         return await EquipmentRepo.updateEquipment(Number(args.id), args.equipment);
       }),
 

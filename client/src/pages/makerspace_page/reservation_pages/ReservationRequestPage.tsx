@@ -1,7 +1,7 @@
-import { Box, Button, Card, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
+import { Alert, AlertTitle, Button, Card, Link, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { Calendar, dateFnsLocalizer, SlotInfo, Event } from "react-big-calendar";
-import withDragAndDrop, { EventInteractionArgs } from "react-big-calendar/lib/addons/dragAndDrop";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import format from 'date-fns/format'
 import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
@@ -19,11 +19,12 @@ import { CREATE_RESERVATION, GET_RESERVATIONS_FLEXIBLY } from "../../../queries/
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { toast } from "react-toastify";
 import { Reservation, ReservationEvent } from "../../../types/Reservation";
-import { border, style } from "@mui/system";
 import ReservationModal from "./ReservationModal";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
-import { isManager, isManagerOrSelf } from "../../../common/PrivilegeUtils";
+import { isStaff, isStaffOrSelf } from "../../../common/PrivilegeUtils";
 import Equipment from "../../../types/Equipment";
+import NotFoundPage from "../../../pages/NotFoundPage";
+import { addDays, endOfDay, isAfter, startOfDay } from "date-fns";
 
 const DnDCalendar = withDragAndDrop(Calendar);
 
@@ -92,8 +93,20 @@ export default function ReservationRequestPage() {
     }
   }
 
+  function validDates(): boolean {
+    if (draftReservation.start === undefined) {
+      return false;
+    }
+
+    return isAfter(startOfDay(draftReservation.start), endOfDay(addDays(new Date(), 2)));
+  }
+
   async function handleSubmitReservation() {
     if (!selectionMade) return;
+    if (!validDates()) {
+      toast.error("Reservations must be made at least 3 days in advance!")
+      return;
+    }
     try {
       await createReservation({
         variables: {
@@ -164,17 +177,18 @@ export default function ReservationRequestPage() {
     <RequestWrapper2 result={getEquipmentById} render={(data) => {
       const equipment: Equipment = data.equipment;
 
-      if (!equipment.schedulable) {
-        navigate(`/makerspace/${makerspaceID}`)
+      if (!equipment.schedulable && !equipment.byReservationOnly) {
+        return <NotFoundPage />
       }
+
       return (
         <RequestWrapper2 result={getReservationsResult} render={(data) => {
           const liveReservationEvents: ReservationEvent[] = data.reservations.map(
             (reservation: Reservation) => {
               return {
-                title: isManagerOrSelf(user, Number(reservation.user?.id ?? -1))
+                title: isStaffOrSelf(user, Number(reservation.user?.id ?? -1))
                   ? <Stack>
-                    <Typography variant="body1">{isManager(user) ? reservation.user.ritUsername : reservation.user.firstName}</Typography>
+                    <Typography variant="body1">{`${reservation.user.firstName}${isStaff(user) ? " (" + reservation.user.ritUsername + ")" : ""}`}</Typography>
                     <Typography variant="subtitle1">{reservation.approved ? "[Approved]" : "(Pending)"}</Typography>
                     <Typography variant="body2">{reservation.description}</Typography>
                   </Stack>
@@ -194,11 +208,34 @@ export default function ReservationRequestPage() {
               <title>{`Reserve ${equipment.name} | Make @ RIT`}</title>
               <Stack width={"20%"} spacing={2}>
                 <Typography variant="h5" textAlign={"center"}>
-                  Requesting a reservation for:
+                  {equipment.schedulable ? "Requesting a reservation for:" : "Reservations for:"}
                   <Typography variant="inherit">
                     {equipment.name}
                   </Typography>
                 </Typography>
+                {
+                  equipment.schedulable
+                    ? <Typography
+                      variant="body1"
+                      textAlign={"center"}
+                      sx={{
+                        fontStyle: "italic"
+                      }}
+                    >
+                      To request a reservation, click and drag on the calender to select the time period you would like to reserve.
+                      Reservations must be made at least 3 days in advance.
+                      Once your request has been submitted, it will be approved or denied by staff.
+                    </Typography>
+                    : <Typography
+                      variant="body1"
+                      textAlign={"center"}
+                      sx={{
+                        fontStyle: "italic"
+                      }}
+                    >
+                      Calendar for reference only, please email <Link href="mailto:make@rit.edu" color="primary" rel="noopener noreferrer">make@rit.edu</Link> to schedule this equipment.
+                    </Typography>
+                }
                 {
                   selectionMade ?
                     <Stack spacing={2}>
@@ -212,6 +249,14 @@ export default function ReservationRequestPage() {
                             <Typography fontWeight={"bold"}>To:</Typography>
                             <Typography>{formatter.format(draftReservation.end)}</Typography>
                           </Stack>
+                          {
+                            validDates()
+                              ? null
+                              : <Alert severity="error" variant="filled">
+                                <AlertTitle>Invalid Dates</AlertTitle>
+                                Reservations must be made at least 3 days in advance!
+                              </Alert>
+                          }
                         </Stack>
                       </Card>
                       <TextField
@@ -266,7 +311,7 @@ export default function ReservationRequestPage() {
                       height: 800
                     }}
                     eventPropGetter={eventPropGetter}
-                    onSelectSlot={handleSlotSelect}
+                    onSelectSlot={equipment.schedulable ? handleSlotSelect : undefined}
                     events={[...liveReservationEvents, { ...draftReservation, isDraggable: true }]}
                     onSelectEvent={handleEventSelect}
                     onRangeChange={handleRangeChange}

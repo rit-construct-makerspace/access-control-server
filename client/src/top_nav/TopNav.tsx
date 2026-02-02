@@ -18,6 +18,7 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import ArticleIcon from '@mui/icons-material/Article';
 import TuneIcon from '@mui/icons-material/Tune';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { ThemeController } from "../Theme";
 
 const StyledLogo = styled.img`
   padding: 12px;
@@ -34,6 +35,9 @@ export default function TopNav() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(anchorEl);
 
+  const [themeString, setThemeString] = useState(ThemeController.activeTheme.getThemeString());
+  ThemeController.addStringWatcher(setThemeString);
+
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   }
@@ -48,7 +52,7 @@ export default function TopNav() {
 
   function handleDismissLabTraining() {
     setLabTraining(false);
-    localStorage.setItem("showLabTraining", "false");
+    localStorage.setItem("showLabTraining2", "false");
   }
 
   const makeAlerts =
@@ -162,7 +166,7 @@ export default function TopNav() {
       {isMobile
         ? <AppBar position="static">
           <Stack direction="row" justifyContent="space-between">
-            <StyledLogo width="65%" src={(localStorage.getItem("themeMode") === "dark") ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" onClick={() => { navigate(`/`); }} />
+            <StyledLogo width="65%" src={(themeString === "dark") ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" onClick={() => { navigate(`/`); }} />
             <IconButton onClick={() => setMobileDrawer(true)}>
               <MenuIcon />
             </IconButton>

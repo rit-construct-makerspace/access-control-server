@@ -1,4 +1,4 @@
-import { Button, Card, CardActions, CardContent, Typography, useTheme } from "@mui/material";
+import { Button, Card, CardActions, CardContent, Stack, Typography, useTheme } from "@mui/material";
 import { Announcement } from "../../../queries/announcementsQueries";
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
 
@@ -9,8 +9,8 @@ interface AnnouncementCardProps {
 export default function AnnouncementCard(props: AnnouncementCardProps) {
   const theme = useTheme();
   return (
-    <Card sx={{ height: "100%" }}>
-      <CardContent>
+    <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <CardContent sx={{ flexGrow: 1 }}>
         <Typography color={theme.palette.primary.main} variant="h5">
           {props.announcement.title}
         </Typography>

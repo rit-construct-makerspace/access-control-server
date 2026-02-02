@@ -221,6 +221,12 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
           multiline
           minRows={3}
           required
+          slotProps={{
+            htmlInput: {
+              maxLength: 255
+            }
+          }}
+          helperText={<Typography variant="body2" sx={{ fontStyle: "italic" }} textAlign={"end"}>{`${description.length}/255`}</Typography>}
         />
         {
           imageUrl

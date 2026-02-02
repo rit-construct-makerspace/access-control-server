@@ -49,9 +49,9 @@ export const MaintenanceTicketTypeDefs = gql`
   }
 
   input Filter {
-    target: String!
-    op: String!
-    value: String!
+    equipment: [Int]!
+    severity: [MaintenanceTicketSeverity]!
+    status: [MaintenanceTicketStatus]!
   }
 
   extend type Query {

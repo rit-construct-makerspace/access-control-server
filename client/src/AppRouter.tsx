@@ -60,7 +60,7 @@ function AppRoot() {
 function AuthedRoute() {
   const user = useCurrentUser();
   if (user.visitor) {
-    window.location.replace(import.meta.env.VITE_LOGIN_URL ?? "/");
+    window.location.replace(import.meta.env.VITE_LOGIN_URL + "?redir=" + import.meta.env.VITE_ORIGIN + window.location.pathname);
     return <></>;
   } else {
     return <Outlet />;
@@ -183,6 +183,7 @@ export const appRouter = createBrowserRouter(
                             { path: "/makerspace/:makerspaceID/readers", element: <ReadersPage /> },
                             { path: "/makerspace/:makerspaceID/organizations", element: <OrganizationsPage /> },
                             { path: "/makerspace/:makerspaceID/maintenance", element: <MaintenancePage /> },
+                            { path: "/makerspace/:makerspaceID/reservations", element: <ManageReservationsPage /> },
 
                             /* Routes for manager + higher */
                             {
@@ -191,7 +192,6 @@ export const appRouter = createBrowserRouter(
                                 { path: "/makerspace/:makerspaceID/edit", element: <ManageMakerspacePage /> },
                                 { path: "/makerspace/:makerspaceID/edit/room/:roomID", element: <ManageRoomPage /> },
                                 { path: "/makerspace/:makerspaceID/currency", element: <CurrencyPage /> },
-                                { path: "/makerspace/:makerspaceID/reservations", element: <ManageReservationsPage /> }
                               ],
                             },
                             /* End manager routes */

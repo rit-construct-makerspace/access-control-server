@@ -324,6 +324,12 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
               onChange={(e) => setDescription(e.target.value)}
               multiline
               label="Description"
+              slotProps={{
+                htmlInput: {
+                  maxLength: 255
+                }
+              }}
+              helperText={<Typography variant="body2" sx={{ fontStyle: "italic" }} textAlign={"end"}>{`${description.length}/255`}</Typography>}
             />
             : <Stack spacing={1}>
               <Typography variant="subtitle1">Description</Typography>
