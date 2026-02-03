@@ -37,7 +37,7 @@ async function authenticateDevice(device: ReaderRow, submittedKey: string): Prom
 
 export function registerEndpoints(app: express.Application) {
   // Authenticate any devices using the devices endpoint
-  app.all("/api/devices", async function (req, res, next) {
+  app.use("/api/devices", async function (req, res, next) {
     const SNHeader = 'device-sn';
     const KeyHeader = 'device-key';
     if (!req.headers[SNHeader] || !req.headers[KeyHeader]) { return res.sendStatus(401); }
@@ -51,7 +51,7 @@ export function registerEndpoints(app: express.Application) {
 
     const authed = authenticateDevice(device, Key);
     if (!authed) { return res.sendStatus(403); }
-
+    console.log("AUTHED!")
     // @ts-expect-error we are adding a field to req, so TS doesn't know its there and gets upset
     req.device = device;
 

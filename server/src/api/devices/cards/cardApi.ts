@@ -21,10 +21,10 @@ export function registerEndpoints(app: express.Application) {
   app.post("/api/devices/cards/associate", async function (req, res) {
 
     if (req.body.universityID === undefined) { return res.status(400).json({ error: "Missing universityID" }).send(); }
-    if (req.body.cardTagID === undefined) { return res.status(400).json({ error: "Missing cardTagID" }).send(); }
+    if (req.body.cardTag === undefined) { return res.status(400).json({ error: "Missing cardTag" }).send(); }
 
     const universityID: string = req.body.universityID;
-    const cardTagID: string = req.body.cardTagID;
+    const cardTag: string = req.body.cardTag;
 
     const username = await Atrium.getRitEmailByUID(CurrencySource.Website, universityID);
     if (username === undefined) {
@@ -42,16 +42,16 @@ export function registerEndpoints(app: express.Application) {
     }
 
     try {
-      const cardUsers = await TempCardRepo.getUserFromTempCardTag(cardTagID);
+      const cardUsers = await TempCardRepo.getUserFromTempCardTag(cardTag);
       if (cardUsers !== undefined) {
-        return res.status(409).json({ error: "A user has already been loaned the given cardTagID" }).send();
+        return res.status(409).json({ error: "A user has already been loaned the given cardTag" }).send();
       }
     } catch (e) {
-      return res.status(500).json({ error: "cardTagID already has multiple users" }).send();
+      return res.status(500).json({ error: "cardTag already has multiple users" }).send();
     }
 
     try {
-      await TempCardRepo.IssueCard(user.id, cardTagID);
+      await TempCardRepo.IssueCard(user.id, cardTag);
       return res.sendStatus(200);
     } catch {
       return res.status(500).json({ error: "Failed to issue card" }).send();
@@ -59,19 +59,19 @@ export function registerEndpoints(app: express.Application) {
   });
 
   app.post("/api/devices/cards/disassociate", async function (req, res) {
-    if (req.body.cardTagID === undefined) { return res.status(400).json({ error: "Missing cardTagID" }).send(); }
-    const cardTagID: string = req.body.cardTagID;
+    if (req.body.cardTag === undefined) { return res.status(400).json({ error: "Missing cardTag" }).send(); }
+    const cardTag: string = req.body.cardTagID;
 
     try {
-      const cardUsers = await TempCardRepo.getUserFromTempCardTag(cardTagID);
+      const cardUsers = await TempCardRepo.getUserFromTempCardTag(cardTag);
       if (cardUsers === undefined) {
-        return res.status(409).json({ error: "the given cardTagID has not been loaned" }).send();
+        return res.status(409).json({ error: "the given cardTag has not been loaned" }).send();
       }
     } catch (e) {
-      return res.status(500).json({ error: "cardTagID already has multiple users" }).send();
+      return res.status(500).json({ error: "cardTag already has multiple users" }).send();
     }
 
-    const returnedCards = await TempCardRepo.ReturnCard(cardTagID);
+    const returnedCards = await TempCardRepo.ReturnCard(cardTag);
     if (returnedCards.length === 0) {
       return res.status(500).json({ error: "Failed to return card" }).send();
     } else if (returnedCards.length === 1) {
