@@ -3,7 +3,6 @@ import * as Atrium from "../../../integrations/atrium-integration/atrium.js";
 import { CurrencySource } from "../../../integrations/currency/types.js";
 import * as UserRepo from "../../../repositories/Users/UserRepository.js";
 import * as TempCardRepo from "../../../repositories/Users/TempCardRepository.js";
-import { error } from "console";
 
 export function registerEndpoints(app: express.Application) {
 

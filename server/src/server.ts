@@ -32,6 +32,7 @@ import { isStaff } from "./privilege.js";
 import { advanceTimeTickets, deletePastSpecialHours, purge_images } from "./periodicActions.js";
 import { getCustomUrl } from "./repositories/Links/customUrlRepository.js";
 import { InventoryItemRow } from "./db/tables.js";
+import * as API from "./api/api.js";
 
 const require = createRequire(import.meta.url);
 
@@ -122,7 +123,8 @@ async function startServer() {
   app.use("/app/", express.static(path.join(__dirname, '../../client/build')));
 
 
-  papercut.registerEndpoints(app)
+  papercut.registerEndpoints(app);
+  API.registerEndpoints(app);
 
   /**
    * REGEX QUERY:
