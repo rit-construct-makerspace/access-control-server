@@ -7,12 +7,12 @@ export async function IssueCard(userID: number, cardTagID: string): Promise<Temp
 }
 
 export async function ReturnCard(cardTagID: string): Promise<TempCardRow[]> {
-  return await knex("TemporaryCards").update({ returnedDate: knex.fn.now() }).where("cardTagID", "=", cardTagID).andWhere("returnedDate", "=", null).returning("*");
+  return await knex("TemporaryCards").update({ returnedDate: knex.fn.now() }).where("cardTagID", "=", cardTagID).whereNull("returnedDate").returning("*");
 }
 
 export async function getUserFromTempCardTag(cardTag: string): Promise<UserRow | undefined> {
-  const result: UserRow[] = await knex("Users").join("TemporaryCards", "Users.id", "TemporaryCards.userID").select("Users.*")
-    .where("TemporaryCards.cardTagID", "=", cardTag).andWhere("returnedDate", "=", null);
+  const result: UserRow[] = await knex("TemporaryCards").join("Users", "TemporaryCards.userID", "Users.id").select("Users.*")
+    .where("TemporaryCards.cardTagID", "=", cardTag).whereNull("returnedDate");
 
   if (result.length === 1) {
     return result[0];
@@ -24,5 +24,5 @@ export async function getUserFromTempCardTag(cardTag: string): Promise<UserRow |
 }
 
 export async function getActiveUserCards(userID: number): Promise<TempCardRow[]> {
-  return await knex("TemporaryCards").select("*").where("userID", "=", userID).andWhere("returnedDate", "=", null);
+  return await knex("TemporaryCards").select("*").where("userID", "=", userID).whereNull("returnedDate");
 }

@@ -19,12 +19,14 @@ export function registerEndpoints(app: express.Application) {
 
   // Endpoint for associating cards
   app.post("/api/devices/cards/associate", async function (req, res) {
+    const universityID = req.body.universityID;
+    const cardTag = req.body.cardTag;
 
-    if (req.body.universityID === undefined) { return res.status(400).json({ error: "Missing universityID" }).send(); }
-    if (req.body.cardTag === undefined) { return res.status(400).json({ error: "Missing cardTag" }).send(); }
+    if (universityID === undefined) { return res.status(400).json({ error: "Missing universityID" }).send(); }
+    if (cardTag === undefined) { return res.status(400).json({ error: "Missing cardTag" }).send(); }
 
-    const universityID: string = req.body.universityID;
-    const cardTag: string = req.body.cardTag;
+    if (typeof universityID !== "string") { return res.status(400).json({ error: "universityID was not a string" }).send(); }
+    if (typeof cardTag !== "string") { return res.status(400).json({ error: "cardTag was not a string" }).send(); }
 
     const username = await Atrium.getRitEmailByUID(CurrencySource.Website, universityID);
     if (username === undefined) {
@@ -59,8 +61,9 @@ export function registerEndpoints(app: express.Application) {
   });
 
   app.post("/api/devices/cards/disassociate", async function (req, res) {
-    if (req.body.cardTag === undefined) { return res.status(400).json({ error: "Missing cardTag" }).send(); }
-    const cardTag: string = req.body.cardTagID;
+    const cardTag = req.body.cardTag;
+    if (cardTag === undefined) { return res.status(400).json({ error: "Missing cardTag" }).send(); }
+    if (typeof cardTag !== "string") { return res.status(400).json({ error: "cardTag was not a string" }).send(); }
 
     try {
       const cardUsers = await TempCardRepo.getUserFromTempCardTag(cardTag);
