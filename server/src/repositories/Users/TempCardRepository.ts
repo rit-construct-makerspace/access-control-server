@@ -22,3 +22,7 @@ export async function getUserFromTempCardTag(cardTag: string): Promise<UserRow |
     throw new GraphQLError("Found multiple users with the same card outstanding: " + cardTag);
   }
 }
+
+export async function getActiveUserCards(userID: number): Promise<TempCardRow[]> {
+  return await knex("TemporaryCards").select("*").where("userID", "=", userID).andWhere("returnedDate", "=", null);
+}
