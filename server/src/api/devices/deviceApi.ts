@@ -52,6 +52,9 @@ export function registerEndpoints(app: express.Application) {
     const authed = authenticateDevice(device, Key);
     if (!authed) { return res.sendStatus(403); }
 
+    // @ts-expect-error we are adding a field to req, so TS doesn't know its there and gets upset
+    req.device = device;
+
     return next();
   })
 

@@ -3,6 +3,17 @@ import * as Atrium from "../../../integrations/atrium-integration/atrium.js";
 import { CurrencySource } from "../../../integrations/currency/types.js";
 import * as UserRepo from "../../../repositories/Users/UserRepository.js";
 import * as TempCardRepo from "../../../repositories/Users/TempCardRepository.js";
+import { ReaderRow } from "../../../db/tables.js";
+
+enum DispenserStatus {
+  CARD_CHANGE = "CARD_CHANGE",
+  DISPENSER_ERROR = "DISPENSER_ERROR"
+}
+
+enum DispenserError {
+  CARD_STUCK = "CARD_STUCK",
+  OUT_OF_CARDS = "OUT_OF_CARDS"
+}
 
 export function registerEndpoints(app: express.Application) {
 
@@ -68,5 +79,38 @@ export function registerEndpoints(app: express.Application) {
     } else {
       return res.status(200).json({ error: "Card was returned multiple times when it should have been returned once" }).send();
     }
-  })
+  });
+
+  app.post("/api/devices/cards/status", async function (req, res) {
+    // @ts-ignore Using a field we added ourselves, so TS doesn't know about it
+    const device: ReaderRow | undefined = req.device;
+    // return 500 because req.device should have been set by us earlier, if it is undefined it is a server error
+    if (device === undefined) { return res.sendStatus(500); }
+
+    const status = req.body.status;
+    if (status === undefined) { return res.status(400).json({ error: "Missing status" }).send(); }
+    if (typeof status !== "string") { return res.status(400).json({ error: "status was not a string" }).send(); }
+
+    if (!Object.values(DispenserStatus).some((possible_status) => possible_status === status)) {
+      return res.status(400).json({ error: "status is not a valid DispenserStatus" }).send();
+    }
+
+    switch (status) {
+      case DispenserStatus.CARD_CHANGE:
+        // TODO: Care about the dispenser status
+        return res.sendStatus(200);
+      case DispenserStatus.DISPENSER_ERROR:
+        const error = req.body.error;
+        if (error === undefined) { return res.status(400).json({ error: "error not present but DISPENSER_ERROR indicated" }).send(); }
+        if (typeof error !== "string") { return res.status(400).json({ error: "error was not a string" }).send(); }
+        if (!Object.values(DispenserError).some((possible_error) => possible_error === error)) {
+          return res.status(400).json({ error: "error is not a valid DispenserError" }).send();
+        }
+
+        // TODO: Care about the dispenser error
+        return res.sendStatus(200);
+      default:
+        return res.sendStatus(500);
+    }
+  });
 }
