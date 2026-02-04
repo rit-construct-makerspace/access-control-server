@@ -51,7 +51,7 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
   }, [props.imageUrl, imgUrl, handleUpdateMakerspace])
 
   return (
-    <Stack spacing={3} alignItems={"center"}>
+    <Stack spacing={3} alignItems={"center"} width={isMobile ? "100%" : undefined}>
       <Typography variant="h5" fontWeight={"bold"} alignSelf={"flex-start"}>Makerspace Information</Typography>
       <MakerspaceCard
         id={props.id}
@@ -63,13 +63,14 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
         isMobile={isMobile}
         clickable={false}
       />
-      <Stack direction={"row"} spacing={2} width={"100%"} alignItems={"center"} justifyContent={"center"}>
-        <TextField label="Name" value={makerspaceName} onChange={(e) => (setMakerspaceName(e.target.value))} sx={{ width: "50%" }} />
+      <Stack direction={isMobile ? "column" : "row"} spacing={2} width={"100%"} alignItems={"center"} justifyContent={"center"}>
+        <TextField label="Name" value={makerspaceName} onChange={(e) => (setMakerspaceName(e.target.value))} sx={{ width: isMobile ? "100%" : "50%" }} />
         <FileUploadButton
           variant="contained"
           text="Upload Image"
           color="info"
           onUpload={(fileName: string) => setImgUrl(fileName)}
+          width={isMobile ? "100%" : undefined}
         />
         <Button
           color="primary"
@@ -79,14 +80,36 @@ export default function ManageMakerspaceInformation(props: MakerspaceInforamtion
             const changed = makerspaceName !== props.name || makerspaceLocation !== props.location || makerspaceSubtitle !== props.subtitle || docsLink !== props.docsLink || description !== props.description;
             if (changed) handleUpdateMakerspace();
           }}
+          fullWidth={isMobile}
         >
           Save
         </Button>
       </Stack>
-      <TextField label="Subtitle" value={makerspaceSubtitle} onChange={(e) => (setMakerspaceSubtitle(e.target.value))} sx={{ width: "90%" }} />
-      <TextField label="Location" value={makerspaceLocation} onChange={(e) => (setMakerspaceLocation(e.target.value))} sx={{ width: "90%" }} />
-      <TextField label="Docs URL" value={docsLink} onChange={(e) => (setDocsLink(e.target.value))} sx={{ width: "90%" }} />
-      <TextField multiline label="Description (Supports Markdown)" value={description} onChange={(e) => (setDescription(e.target.value))} sx={{ width: "90%" }} />
+      <TextField
+        label="Subtitle"
+        value={makerspaceSubtitle}
+        onChange={(e) => (setMakerspaceSubtitle(e.target.value))}
+        sx={{ width: isMobile ? "100%" : "90%" }}
+      />
+      <TextField
+        label="Location"
+        value={makerspaceLocation}
+        onChange={(e) => (setMakerspaceLocation(e.target.value))}
+        sx={{ width: isMobile ? "100%" : "90%" }}
+      />
+      <TextField
+        label="Docs URL"
+        value={docsLink}
+        onChange={(e) => (setDocsLink(e.target.value))}
+        sx={{ width: isMobile ? "100%" : "90%" }}
+      />
+      <TextField
+        multiline
+        label="Description (Supports Markdown)"
+        value={description}
+        onChange={(e) => (setDescription(e.target.value))}
+        sx={{ width: isMobile ? "100%" : "90%" }}
+      />
     </Stack>
   );
 }
