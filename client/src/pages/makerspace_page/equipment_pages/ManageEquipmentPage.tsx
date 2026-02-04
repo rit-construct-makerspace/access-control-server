@@ -157,13 +157,14 @@ export default function ManageEquipmentPage() {
               </Stack>
             </PrettyModal>
             <InstanceGrid equipmentID={equipment.id} isMobile={isMobile} />
-            <Stack direction={"row"} spacing={2}>
+            <Stack direction={isMobile ? "column" : "row"} spacing={2}>
               <Typography variant="h5">Maintenance Tickets</Typography>
               <Button
                 color="primary"
                 variant="contained"
                 onClick={() => setNewTicketModal(true)}
                 startIcon={<WarningIcon />}
+                fullWidth={isMobile}
               >
                 Report Issue
               </Button>

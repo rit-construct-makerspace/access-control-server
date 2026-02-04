@@ -3,12 +3,14 @@ import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { GET_MAINTENANCE_TICKETS, MaintenanceTicket, MaintenanceTicketStatus } from "../../../queries/maintenanceTicketQueries";
 import { useQuery } from "@apollo/client";
 import MaintenanceTicketCard from "./MaintenanceTicketCard";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 interface MaintenanceTicketGridProps {
   equipmentID: number
 }
 
 export default function MaintenanceTicketGrid(props: MaintenanceTicketGridProps) {
+  const isMobile = useIsMobile();
 
   const maintenanceTickets = useQuery(GET_MAINTENANCE_TICKETS, {
     variables: {
@@ -27,7 +29,7 @@ export default function MaintenanceTicketGrid(props: MaintenanceTicketGridProps)
           {
             tickets.length > 0
               ? tickets.map((ticket) => (
-                <Grid key={ticket.id}>
+                <Grid key={ticket.id} width={isMobile ? "100%" : "24%"}>
                   <MaintenanceTicketCard ticket={ticket} />
                 </Grid>
               ))

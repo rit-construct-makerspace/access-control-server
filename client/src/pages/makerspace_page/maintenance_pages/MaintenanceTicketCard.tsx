@@ -4,6 +4,7 @@ import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import EditIcon from '@mui/icons-material/Edit';
 import { useState } from "react";
 import MaintenanceTicketModal from "./MaintenanceTicketModal";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 const formatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
@@ -15,11 +16,12 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 });
 
 export default function MaintenanceTicketCard(props: { ticket: MaintenanceTicket }) {
+  const isMobile = useIsMobile();
 
   const [manageTicketModal, setManageTicketModal] = useState(false);
 
   return (
-    <Card sx={{ width: "450px", height: "100%", padding: "20px" }}>
+    <Card sx={{ height: "100%", padding: "20px" }}>
       <Stack height={"100%"} justifyContent={"space-between"}>
         <Stack spacing={2}>
           <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
@@ -27,17 +29,17 @@ export default function MaintenanceTicketCard(props: { ticket: MaintenanceTicket
             <Typography variant="subtitle1">{formatter.format(Number(props.ticket.dateCreated))}</Typography>
           </Stack>
           <Stack direction={"row"} justifyContent={"space-between"}>
-            <Typography variant="body1">
-              {`Reported by: ${props.ticket.type === MaintenanceTicketType.AUTOMATIC ? "SERVER" : props.ticket.creator?.ritUsername ?? ""}`}
+            <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
+              {`Reported by:${isMobile ? "\n" : " "}${props.ticket.type === MaintenanceTicketType.AUTOMATIC ? "SERVER" : props.ticket.creator?.ritUsername ?? ""}`}
             </Typography>
-            <Typography variant="body1">
-              {`Assigned to: ${props.ticket.assigned
+            <Typography variant="body1" sx={{ whiteSpace: "pre-line" }}>
+              {`Assigned to:${isMobile ? "\n" : " "}${props.ticket.assigned
                 ? `${props.ticket.assigned.firstName} (${props.ticket.assigned.ritUsername})`
                 : "No one"}`}
             </Typography>
           </Stack>
           <Stack direction={"row"} justifyContent={"space-between"}>
-            <Stack direction={"row"} spacing={1} alignItems={"center"}>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1} alignItems={isMobile ? undefined : "center"}>
               <Typography variant="body1">Severity:</Typography>
               <Chip
                 color={props.ticket.severity === MaintenanceTicketSeverity.HIGH
@@ -49,7 +51,7 @@ export default function MaintenanceTicketCard(props: { ticket: MaintenanceTicket
                 label={props.ticket.severity}
               />
             </Stack>
-            <Stack direction={"row"} spacing={1} alignItems={"center"}>
+            <Stack direction={isMobile ? "column" : "row"} spacing={1} alignItems={isMobile ? undefined : "center"}>
               <Typography>Status:</Typography>
               <Chip
                 color={
