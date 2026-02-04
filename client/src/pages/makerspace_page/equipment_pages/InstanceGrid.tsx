@@ -23,7 +23,7 @@ export default function InstanceGrid(props: InstanceGridProps) {
           : <Grid container spacing={2}>
             {
               instances.map((instance: EquipmentInstance) => (
-                <Grid key={instance.id}>
+                <Grid key={instance.id} width={props.isMobile ? "100%" : "280px"}>
                   <EquipmentInstanceCard instance={instance} />
                 </Grid>
               ))

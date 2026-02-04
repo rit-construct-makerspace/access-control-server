@@ -40,7 +40,7 @@ export function Dashboard() {
           return (
             <Grid
               container
-              marginTop="30px"
+              marginTop={isMobile ? "15px" : "30px"}
               justifyContent={isMobile ? "center" : "space-evenly"}
               alignItems="center"
               spacing={2}
@@ -48,7 +48,7 @@ export function Dashboard() {
               marginLeft="0px"
             >
               {sortedSpaces.map((space: MakerspaceWithHours) => (
-                <Grid gap={2}>
+                <Grid>
                   <MakerspaceCard
                     id={space.id}
                     name={space.name}
@@ -87,11 +87,11 @@ export function Dashboard() {
               </Stack>
               <Grid
                 container
-                margin="0px 20px 20px 20px"
-                direction={isMobile ? "column" : "row"}
-                alignItems="stretch"
-                justifyContent="flex-start"
+                alignItems={isMobile ? "center" : "stretch"}
+                justifyContent={isMobile ? "center" : "flex-start"}
                 width="auto"
+                marginLeft={isMobile ? "0px" : "20px"}
+                spacing={2}
               >
                 {announcements.length === 0 ? (
                   <Typography variant="body1" textAlign="center">
@@ -99,7 +99,7 @@ export function Dashboard() {
                   </Typography>
                 ) : (
                   announcements.map((thisAnnouncement: Announcement) => (
-                    <Grid width="400px" margin="10px">
+                    <Grid>
                       <AnnouncementCard announcement={thisAnnouncement} />
                     </Grid>
                   ))

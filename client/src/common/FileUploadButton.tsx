@@ -19,6 +19,7 @@ interface FileUploadProps {
   variant?: ButtonOwnProps["variant"];
   text?: string;
   onUpload: (name: string) => void;
+  width?: string;
 }
 
 export default function FileUploadButton(props: FileUploadProps) {
@@ -56,6 +57,9 @@ export default function FileUploadButton(props: FileUploadProps) {
       variant={props.variant}
       tabIndex={-1}
       startIcon={<CloudUploadIcon />}
+      sx={{
+        width: props.width,
+      }}
     >
       {props.text ?? "Upload files"}
       <VisuallyHiddenInput

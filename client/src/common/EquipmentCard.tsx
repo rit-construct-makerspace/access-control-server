@@ -47,7 +47,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
     >
       <CardContent sx={{ width: "100%", height: "100%" }}>
         <Stack height={"100%"}>
-          <Stack direction="row" height="200px">
+          <Stack direction="row" height={props.isMobile ? undefined : "200px"}>
             {props.isMobile ? null :
               <Stack alignItems="center">
                 <Box width="150px" height="200px">
@@ -79,10 +79,14 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                     : null
                 }
               </Stack>
-              <Stack direction="row" justifyContent="space-between" height="100%">
+              <Stack
+                direction={props.isMobile ? "column" : "row"}
+                justifyContent={props.isMobile ? undefined : "space-between"}
+                height="100%"
+              >
                 {/* Trainings & Access Check */}
-                <Stack width="100%" height={"135px"} overflow={"auto"}>
-                  {hasNotTakenModule || (!hasApprovedAccessCheck && !props.equipment.byReservationOnly) ? (
+                <Stack width="100%" height={props.isMobile ? undefined : "135px"} overflow={"auto"}>
+                  {hasNotTakenModule || (!hasApprovedAccessCheck && props.equipment.requiresInPerson && !props.equipment.byReservationOnly) ? (
                     <Typography paddingLeft={"10px"}>To access, complete:</Typography>
                   ) : null}
                   {moduleStatuses.map((ms: ModuleStatus) => (
@@ -102,32 +106,35 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                   ) : null}
                 </Stack>
                 {/* Num available */}
-                <Stack width="120px" height="100%" justifyContent={"center"} alignItems={"center"}>
-                  {props.equipment.numAvailable + props.equipment.numInUse > 0 ? (
-                    <Stack height="100%" justifyContent="center" alignItems="center">
-                      <Typography variant="subtitle1" align="center" fontWeight="bold">
-                        Machines Available
-                      </Typography>
-                      <Typography variant="subtitle1" align="center">
-                        {`${props.equipment.numAvailable} / ${props.equipment.numAvailable + props.equipment.numInUse}`}
-                      </Typography>
+                {
+                  props.equipment.numAvailable + props.equipment.numInUse > 0 ?
+                    <Stack
+                      width={props.isMobile ? "100%" : "120px"}
+                      height={props.isMobile ? undefined : "100%"}
+                      justifyContent={"center"}
+                      alignItems={"center"}
+                    >
+                      <Stack height={props.isMobile ? undefined : "100%"} justifyContent="center" alignItems="center" direction={props.isMobile ? "row" : "column"} spacing={props.isMobile ? 1 : undefined}>
+                        <Typography variant="subtitle1" align="center" fontWeight="bold">
+                          Machines Available{props.isMobile ? ":" : ""}
+                        </Typography>
+                        <Typography variant="subtitle1" align="center">
+                          {`${props.equipment.numAvailable} / ${props.equipment.numAvailable + props.equipment.numInUse}`}
+                        </Typography>
+                      </Stack>
                     </Stack>
-                  ) : (
-                    <></>
-                  )}
-                </Stack>
+                    : null
+                }
               </Stack>
             </Stack>
           </Stack>
           {/* Desc && reservation only? && learn more */}
           <Stack justifyContent={"space-between"} height={"inherit"}>
-            <Typography>
-              <ThemedMarkdown>{props.equipment.notes}</ThemedMarkdown>
-            </Typography>
-            <Stack direction={"row"} justifyContent={"space-between"}>
+            <ThemedMarkdown>{props.equipment.notes}</ThemedMarkdown>
+            <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
               {
                 props.equipment.byReservationOnly ? (
-                  <Typography variant="subtitle1">
+                  <Typography variant="subtitle1" textAlign={props.isMobile ? "center" : undefined}>
                     Reservation only. Email{" "}
                     <Link href={"mailto:make@rit.edu"} target={"_blank"}>
                       {" "}
@@ -137,7 +144,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                   </Typography>
                 ) : <Typography />
               }
-              <Stack direction={"row"} spacing={1} alignItems={"center"}>
+              <Stack direction={props.isMobile ? "column" : "row"} spacing={1} alignItems={"center"}>
                 {
                   props.equipment.schedulable
                     ? <Button
@@ -146,6 +153,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                       size="small"
                       onClick={() => navigate(`/makerspace/${makerspaceID}/reserve/${props.equipment.id}`)}
                       disabled={hasNotTakenModule || (props.equipment.requiresInPerson && !hasApprovedAccessCheck)}
+                      fullWidth={props.isMobile}
                     >
                       Reserve
                     </Button>
@@ -155,6 +163,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                         variant="contained"
                         size="small"
                         onClick={() => navigate(`/makerspace/${makerspaceID}/reserve/${props.equipment.id}`)}
+                        fullWidth={props.isMobile}
                       >
                         <CalendarMonthIcon />
                       </Button>
@@ -174,7 +183,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
           </Stack>
         </Stack>
       </CardContent>
-    </Card>
+    </Card >
   );
 });
 export default EquipmentCard;
