@@ -91,8 +91,14 @@ export default function ManageEquipmentPage() {
         <Stack padding={"0 20px 15px"}>
           <title>{`Manage ${equipment.name} | Make @ RIT`}</title>
           <Stack spacing={2}>
-            <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} padding={"10px"}>
-              <Typography variant="h3">{`Manage ${equipment.name}`}</Typography>
+            <Stack
+              direction={isMobile ? "column" : "row"}
+              justifyContent={isMobile ? undefined : "space-between"}
+              alignItems={"center"}
+              padding={"10px"}
+              spacing={isMobile ? 1 : undefined}
+            >
+              <Typography variant={isMobile ? "h5" : "h3"}>{`Manage ${equipment.name}`}</Typography>
               <Stack direction={"row"} spacing={1}>
                 <Button
                   color="secondary"
@@ -116,7 +122,7 @@ export default function ManageEquipmentPage() {
                 </Button>
               </Stack>
             </Stack>
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction={isMobile ? "column" : "row"} spacing={isMobile ? 1 : 2} alignItems="center">
               <Typography variant="h5">Instances</Typography>
               <Button
                 variant="contained"
@@ -124,6 +130,7 @@ export default function ManageEquipmentPage() {
                 color="success"
                 onClick={() => { setNewInstanceModal(true) }}
                 disabled={!isManagerFor(user, Number(makerspaceID ?? -1))}
+                fullWidth={isMobile}
               >
                 Create New Instance
               </Button>
