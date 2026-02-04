@@ -90,7 +90,7 @@ export function Dashboard() {
                 alignItems={isMobile ? "center" : "stretch"}
                 justifyContent={isMobile ? "center" : "flex-start"}
                 width="auto"
-                marginLeft={"0px"}
+                marginLeft={isMobile ? "0px" : "20px"}
                 spacing={2}
               >
                 {announcements.length === 0 ? (
