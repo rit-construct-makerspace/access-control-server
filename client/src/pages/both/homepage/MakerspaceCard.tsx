@@ -36,26 +36,30 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
             }
         }
       >
-        <CardMedia
-          component="img"
-          height={props.isMobile ? "197px" : "281px"}
-          image={makeCDNLink(props.imageUrl, "user-uploads/")}
-        />
+        {
+          props.isMobile
+            ? null
+            : <CardMedia
+              component="img"
+              height={props.isMobile ? "197px" : "281px"}
+              image={makeCDNLink(props.imageUrl, "user-uploads/")}
+            />
+        }
         <CardContent sx={{ justifyContent: "center", display: "flex", flexDirection: "column" }}>
-          <Stack direction={"row"} justifyContent={"space-between"} alignItems={"end"}>
-            <Typography variant="h4">{props.name}</Typography>
+          <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
+            <Typography variant={props.isMobile ? "h5" : "h4"}>{props.name}</Typography>
             {!props.isMobile && (
-              <Typography variant="h6" color="textSecondary" alignSelf={"center"}>
+              <Typography variant="h6" color="textSecondary">
                 {props.location}
               </Typography>
             )}
           </Stack>
 
-          <Typography variant="h5" color="textSecondary">
+          <Typography variant={props.isMobile ? "subtitle1" : "h5"} color="textSecondary">
             {props.subtitle}
           </Typography>
 
-          <Stack direction={"row"} justifyContent={"space-between"} spacing={"20px"}>
+          <Stack direction={"row"} justifyContent={"space-between"}>
             <CurrentHours times={props.hours} fillLine={props.isMobile} showDay={true} />
             {!props.isMobile && (
               <Button
@@ -68,7 +72,7 @@ export default function MakerspaceCard(props: MakerspaceCardProps) {
             )}
           </Stack>
           {props.isMobile && (
-            <Stack direction="row" justifyContent={"space-between"} paddingTop={"10px"}>
+            <Stack direction="row" justifyContent={"space-between"}>
               <Typography variant="h6" color="textSecondary" alignSelf={"center"}>
                 {props.location}
               </Typography>
