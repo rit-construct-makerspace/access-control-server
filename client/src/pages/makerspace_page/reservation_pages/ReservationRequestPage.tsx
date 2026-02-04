@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Button, Card, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
+import { Alert, AlertTitle, Button, Card, Link, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { Calendar, dateFnsLocalizer, SlotInfo, Event } from "react-big-calendar";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
@@ -208,7 +208,7 @@ export default function ReservationRequestPage() {
               <title>{`Reserve ${equipment.name} | Make @ RIT`}</title>
               <Stack width={"20%"} spacing={2}>
                 <Typography variant="h5" textAlign={"center"}>
-                  {equipment.schedulable ? "Requesting a reservation for:" : "Availability for:"}
+                  {equipment.schedulable ? "Requesting a reservation for:" : "Reservations for:"}
                   <Typography variant="inherit">
                     {equipment.name}
                   </Typography>
@@ -226,7 +226,15 @@ export default function ReservationRequestPage() {
                       Reservations must be made at least 3 days in advance.
                       Once your request has been submitted, it will be approved or denied by staff.
                     </Typography>
-                    : null
+                    : <Typography
+                      variant="body1"
+                      textAlign={"center"}
+                      sx={{
+                        fontStyle: "italic"
+                      }}
+                    >
+                      Calendar for reference only, please email <Link href="mailto:make@rit.edu" color="primary" rel="noopener noreferrer">make@rit.edu</Link> to schedule this equipment.
+                    </Typography>
                 }
                 {
                   selectionMade ?

@@ -651,6 +651,14 @@ export interface MaintenanceTicketRow {
   assignedID: number | null;
 }
 
+export interface TempCardRow {
+  id: number;
+  userID: number;
+  cardTagID: string;
+  issuedDate: number; // timestamp, but gets returned from the DB as a number
+  returnedDate: number; // ^
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -696,5 +704,6 @@ declare module "knex/types/tables.js" {
     ExpressSessions: ExpressSessionRow;
     CustomURLs: CustomUrlRow;
     MaintenanceTickets: MaintenanceTicketRow;
+    TemporaryCards: TempCardRow;
   }
 }

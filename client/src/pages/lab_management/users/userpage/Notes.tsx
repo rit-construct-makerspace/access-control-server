@@ -3,6 +3,7 @@ import { isManager } from "../../../../common/PrivilegeUtils"
 import { useCurrentUser } from "../../../../common/CurrentUserProvider"
 import { ChangeEvent, useState } from "react";
 import { gql, useMutation } from "@apollo/client";
+import { toast } from "react-toastify";
 
 
 const SET_NOTES = gql`
@@ -21,15 +22,26 @@ export default function Notes(props: NotesProps) {
   const currentUser = useCurrentUser();
 
   const [notes, setNotes] = useState<string>();
-    
-  const [setNotesMutation, setNotesResult] = useMutation(SET_NOTES);
-  
 
-  
+  const [setNotesMutation, setNotesResult] = useMutation(SET_NOTES);
+
+
+
   const handleNotesChanged = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setNotes(event.target.value)
   };
-  
+
+  async function handleSaveNotes() {
+    try {
+      await setNotesMutation({ variables: { userID: props.user.id, notes: notes } });
+    } catch (e) {
+      toast.error("Failed to add note: " + e);
+      return;
+    }
+
+    toast.success("Note saved!")
+  }
+
   return (
     <Stack>
       {
@@ -44,14 +56,14 @@ export default function Notes(props: NotesProps) {
             placeholder="Notes"
             value={notes}
             onChange={handleNotesChanged}
-            onSubmit={() => setNotesMutation({ variables: { userID: props.user.id, notes: notes } })}
+            onSubmit={handleSaveNotes}
             multiline
             minRows={2}
           />
           <Button
             variant="contained"
             loading={setNotesResult.loading}
-            onClick={() => setNotesMutation({ variables: { userID: props.user.id, notes: notes } })}
+            onClick={handleSaveNotes}
             sx={{ alignSelf: "flex-end" }}
           >
             Update Notes

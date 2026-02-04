@@ -130,7 +130,6 @@ export function setupDevAuth(app: express.Application) {
   const callbackUrl = process.env.CALLBACK_URL;
   const entryPoint = process.env.ENTRY_POINT;
   const vite_url = process.env.VITE_URL;
-  let redir_url : any = process.env.VITE_URL;
 
   assert(issuer, "ISSUER env value is null");
   assert(callbackUrl, "CALLBACK_URL env value is null");
@@ -239,22 +238,21 @@ export function setupDevAuth(app: express.Application) {
   app.use(express.json());
 
   app.get("/login", function (req, res, next) {
-    if (req.query.redir) {
-      redir_url = req.query.redir
-    }
+    const relayState = typeof req.query.redir === "string" ? req.query.redir : process.env.VITE_URL;
     passport.authenticate("saml", {
-      successRedirect: redir_url,
+      // @ts-expect-error this field not in TS definition, but does work
+      additionalParams: { 'RelayState': relayState },
       failureFlash: true,
       failureRedirect: "/login/fail",
-  })(req, res) 
+    })(req, res)
   });
 
   app.post("/login/callback", function (req, res, next) {
     passport.authenticate("saml", {
-      successRedirect: redir_url,
+      successRedirect: req.body.RelayState ?? process.env.VITE_URL,
       failureFlash: true,
       failureRedirect: "/login/fail",
-  })(req, res) 
+    })(req, res)
   },
     async (req, res) => {
       console.log("Logged in")
@@ -296,7 +294,6 @@ export function setupSamlAuth(app: express.Application) {
   const callbackUrl = process.env.CALLBACK_URL;
   const entryPoint = process.env.ENTRY_POINT;
   const reactAppUrl = process.env.VITE_URL;
-  let redir_url : any = process.env.VITE_URL;
 
   assert(issuer, "ISSUER env value is null");
   assert(callbackUrl, "CALLBACK_URL env value is null");
@@ -480,22 +477,21 @@ export function setupSamlAuth(app: express.Application) {
   app.use(express.json());
 
   app.get("/login", function (req, res, next) {
-    if (req.query.redir) {
-      redir_url = req.query.redir
-    }
+    const relayState = typeof req.query.redir === "string" ? req.query.redir : process.env.VITE_URL;
     passport.authenticate("saml", {
-      successRedirect: redir_url,
+      // @ts-expect-error this field not in TS definition, but does work
+      additionalParams: { 'RelayState': relayState },
       failureFlash: true,
       failureRedirect: "/login/fail",
-  })(req, res) 
+    })(req, res)
   });
 
   app.post("/login/callback", function (req, res, next) {
     passport.authenticate("saml", {
-      successRedirect: redir_url,
+      successRedirect: req.body.RelayState ?? process.env.VITE_URL,
       failureFlash: true,
       failureRedirect: "/login/fail",
-  })(req, res) 
+    })(req, res)
   },
     async (req, res) => {
       console.log("Logged in")
