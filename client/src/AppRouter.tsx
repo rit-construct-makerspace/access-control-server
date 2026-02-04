@@ -47,6 +47,7 @@ import ManageEquipmentPage from "./pages/makerspace_page/equipment_pages/ManageE
 import ReservationRequestPage from "./pages/makerspace_page/reservation_pages/ReservationRequestPage";
 import ManageReservationsPage from "./pages/makerspace_page/reservation_pages/ManageReservationsPage";
 import MaintenancePage from "./pages/makerspace_page/maintenance_pages/MaintenancePage";
+import { Box } from "@mui/material";
 
 function AppRoot() {
   return (
@@ -154,7 +155,7 @@ export const appRouter = createBrowserRouter(
                   children: [
                     {
                       path: "/makerspace/:makerspaceID",
-                      element: <StaffBar />,
+                      element: <Box padding={"0px 10px"}><StaffBar /></Box>,
                       children: [
                         { path: "/makerspace/:makerspaceID/people", element: <UsersPage /> },
                         { path: "/makerspace/:makerspaceID/people/:userID", element: <UserPage /> },

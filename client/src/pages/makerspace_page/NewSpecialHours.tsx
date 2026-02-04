@@ -4,6 +4,7 @@ import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import gql from "graphql-tag";
 import { useMutation } from "@apollo/client";
 import { useParams } from "react-router-dom";
+import { useIsMobile } from "../../common/IsMobileProvider";
 
 const ADD_SPECIAL_HOURS = gql`
   mutation AddSpecialHours($hours: SpecialHoursInput!) {
@@ -13,6 +14,7 @@ const ADD_SPECIAL_HOURS = gql`
 
 export default function NewSpecialHoursBlock() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
+  const isMobile = useIsMobile();
 
   const [closed, setClosed] = useState(true);
   const [open, setOpen] = useState("");
@@ -27,7 +29,7 @@ export default function NewSpecialHoursBlock() {
   });
 
   return (
-    <Stack alignItems={"center"} spacing={1} padding={"15px"} width={"14vw"}>
+    <Stack alignItems={"center"} spacing={1} padding={"15px"} width={isMobile ? "100%" : "14vw"}>
       <TextField
         label="Day"
         type="date"

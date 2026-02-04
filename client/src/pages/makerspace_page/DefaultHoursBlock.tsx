@@ -6,13 +6,14 @@ import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import { UPDATE_DEFAULT_HOURS } from "../../queries/makerspaceQueries";
+import { useIsMobile } from "../../common/IsMobileProvider";
 
 interface DefaultHoursBlockProps {
   hours: MakerspaceDefaultHours;
 }
 
 export default function DefaultHoursBlock(props: DefaultHoursBlockProps) {
-
+  const isMobile = useIsMobile();
 
   const [closed, setClosed] = useState(props.hours.closed);
   const [open, setOpen] = useState(props.hours.open?.substring(0, 5));
@@ -30,7 +31,7 @@ export default function DefaultHoursBlock(props: DefaultHoursBlockProps) {
   });
 
   return (
-    <Stack alignItems={"center"} spacing={1} padding={"15px"} width={"14vw"}>
+    <Stack alignItems={"center"} spacing={1} padding={"15px"} width={isMobile ? "100%" : "14vw"}>
       <Typography fontWeight={"bold"} color="primary">{TimeUtils.dayToString(props.hours.dayOfWeek)}</Typography>
       <TextField
         label="Open"
