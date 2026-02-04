@@ -40,7 +40,7 @@ export function Dashboard() {
           return (
             <Grid
               container
-              marginTop="30px"
+              marginTop={isMobile ? "15px" : "30px"}
               justifyContent={isMobile ? "center" : "space-evenly"}
               alignItems="center"
               spacing={2}
