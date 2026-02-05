@@ -100,9 +100,6 @@ export interface InventoryItemRow {
   storefrontVisible: boolean;
   notes: string;
   description: string;
-  tagID1: number | null;
-  tagID2: number | null;
-  tagID3: number | null;
   makerspaceID?: number;
 }
 
@@ -659,6 +656,11 @@ export interface TempCardRow {
   returnedDate: number; // ^
 }
 
+export interface InventoryItemTagRelationsRow {
+  itemID: number;
+  tagID: number;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -705,5 +707,6 @@ declare module "knex/types/tables.js" {
     CustomURLs: CustomUrlRow;
     MaintenanceTickets: MaintenanceTicketRow;
     TemporaryCards: TempCardRow;
+    InventoryItemTagRelations: InventoryItemTagRelationsRow;
   }
 }

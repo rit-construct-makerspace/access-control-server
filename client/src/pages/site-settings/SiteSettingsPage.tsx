@@ -111,7 +111,6 @@ export default function SiteSettingsPage() {
               Create Custom Link
             </Button>
           </Stack>
-          <Typography>Pages requiring user authentication may not work properly (see issue # 667). Please check that the links work.</Typography>
         </Stack>
         <RequestWrapper2 result={getCustomUrlsResult} render={(data) => {
           return (

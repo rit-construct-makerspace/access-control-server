@@ -33,6 +33,11 @@ export async function getItemsByID(itemIds: number[]): Promise<InventoryItemRow[
   return (await knexResult);
 }
 
+export async function getItemsByTagID(tagID: number): Promise<InventoryItemRow[]> {
+  return await knex("InventoryItemTagRelations").join("InventoryItem", "InventoryItemTagRealtions.itemID", "InventoryItem.id")
+    .select("InventoryItem.*").where("InventoryItemTagRealtions.tagID", "=", tagID);
+}
+
 /**
  * Fetch Inventory Items by "staffOnly" column
  * @param staffOnly whether to fetch staffOnly items or not staffOnly items
@@ -281,12 +286,8 @@ export async function getTagByID(id: number): Promise<InventoryTagRow | null> {
  * @returns true or false if max amount of tags already
  */
 export async function addTagToItem(itemID: number, tagID: number): Promise<boolean> {
-  const item = await knex("InventoryItem").select().where({ id: itemID }).first();
-  if (!item?.tagID1) await knex("InventoryItem").update({ tagID1: tagID }).where({ id: itemID });
-  else if (!item?.tagID2) await knex("InventoryItem").update({ tagID2: tagID }).where({ id: itemID });
-  else if (!item?.tagID3) await knex("InventoryItem").update({ tagID3: tagID }).where({ id: itemID });
-  else return false;
-  return true;
+  const result = await knex("InventoryItemTagRelations").insert({ itemID: itemID, tagID: tagID }).returning("*");
+  return result.length > 0;
 }
 
 /**
@@ -296,11 +297,13 @@ export async function addTagToItem(itemID: number, tagID: number): Promise<boole
  * @returns true
  */
 export async function removeTagFromItem(itemID: number, tagID: number): Promise<boolean> {
-  const item = await knex("InventoryItem").select().where({ id: itemID }).first();
-  if (item?.tagID1 == tagID) await knex("InventoryItem").update({ tagID1: null }).where({ id: itemID });
-  else if (item?.tagID2 == tagID) await knex("InventoryItem").update({ tagID2: null }).where({ id: itemID });
-  else if (item?.tagID3 == tagID) await knex("InventoryItem").update({ tagID3: null }).where({ id: itemID });
-  return true;
+  const result = await knex("InventoryItemTagRelations").where({ itemID: itemID, tagID: tagID }).delete();
+  return result > 0;
+}
+
+export async function getItemTags(itemID: number): Promise<InventoryTagRow[]> {
+  return await knex("InventoryItemTagRelations").join("InventoryTags", "InventoryItemTagRelations.tagID", "InventoryTags.id")
+    .select("InventoryTags.*").where({ itemID: itemID });
 }
 
 /**
