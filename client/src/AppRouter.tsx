@@ -21,7 +21,7 @@ import HoursDisplay from "./pages/signage/HoursDisplay";
 import TopNav from "./top_nav/TopNav";
 import QuizPage from "./pages/maker/take_quiz/QuizPage";
 import QuizResults from "./pages/maker/take_quiz/QuizResults";
-import InventoryPage from "./pages/lab_management/inventory/InventoryPage";
+import AdminInventoryPage from "./pages/lab_management/inventory/AdminInventoryPage";
 import AnnouncementsPage from "./pages/lab_management/announcements/AnnouncementsPage";
 import EditAnnouncement from "./pages/lab_management/announcements/EditAnnouncement";
 import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnouncementPage";
@@ -159,7 +159,7 @@ export const appRouter = createBrowserRouter(
                       children: [
                         { path: "/makerspace/:makerspaceID/people", element: <UsersPage /> },
                         { path: "/makerspace/:makerspaceID/people/:userID", element: <UserPage /> },
-                        { path: "/makerspace/:makerspaceID/inventory", element: <InventoryPage /> },
+                        { path: "/makerspace/:makerspaceID/inventory", element: <AdminInventoryPage /> },
                         { path: "/makerspace/:makerspaceID/storefront/carts", element: <CartListPage /> },
                         { path: "/makerspace/:makerspaceID/storefront/carts/:cartID", element: <CartPage /> },
 
@@ -221,7 +221,7 @@ export const appRouter = createBrowserRouter(
                 { path: "/maker/training/:id/results/", element: <QuizResults /> },
                 { path: "/maker/training/:id/results/:submissionID", element: <QuizResults /> },
 
-                { path: "/admin/inventory", element: <InventoryPage /> },
+                { path: "/admin/inventory", element: <AdminInventoryPage /> },
               ],
             },
             /* END OF PROTECTED ROUTES */
