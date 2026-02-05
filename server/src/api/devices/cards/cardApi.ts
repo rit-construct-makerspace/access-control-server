@@ -28,7 +28,7 @@ export function registerEndpoints(app: express.Application) {
     if (typeof universityID !== "string") { return res.status(400).json({ error: "universityID was not a string" }).send(); }
     if (typeof cardTag !== "string") { return res.status(400).json({ error: "cardTag was not a string" }).send(); }
 
-    const username = await Atrium.getRitEmailByUID(CurrencySource.Website, universityID);
+    const username = await Atrium.getRitEmailByUID(CurrencySource.Store, universityID);
     if (username === undefined) {
       return res.status(404).json({ error: "No user found with the given universityID" }).send();
     }
