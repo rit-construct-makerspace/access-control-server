@@ -33,6 +33,11 @@ export async function getItemsByID(itemIds: number[]): Promise<InventoryItemRow[
   return (await knexResult);
 }
 
+export async function getItemsByTagID(tagID: number): Promise<InventoryItemRow[]> {
+  return await knex("InventoryItemTagRelations").join("InventoryItem", "InventoryItemTagRealtions.itemID", "InventoryItem.id")
+    .select("InventoryItem.*").where("InventoryItemTagRealtions.tagID", "=", tagID);
+}
+
 /**
  * Fetch Inventory Items by "staffOnly" column
  * @param staffOnly whether to fetch staffOnly items or not staffOnly items
