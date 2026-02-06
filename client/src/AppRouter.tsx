@@ -49,6 +49,7 @@ import ManageReservationsPage from "./pages/makerspace_page/reservation_pages/Ma
 import MaintenancePage from "./pages/makerspace_page/maintenance_pages/MaintenancePage";
 import { Box } from "@mui/material";
 import InventoryPage from "./pages/makerspace_page/inventory_pages/InventoryPage";
+import QuickEditInventoryPage from "./pages/makerspace_page/inventory_pages/QuickEditInventoryPage";
 
 function AppRoot() {
   return (
@@ -160,7 +161,6 @@ export const appRouter = createBrowserRouter(
                       children: [
                         { path: "/makerspace/:makerspaceID/people", element: <UsersPage /> },
                         { path: "/makerspace/:makerspaceID/people/:userID", element: <UserPage /> },
-                        { path: "/makerspace/:makerspaceID/inventory", element: <InventoryPage /> },
                         { path: "/makerspace/:makerspaceID/storefront/carts", element: <CartListPage /> },
                         { path: "/makerspace/:makerspaceID/storefront/carts/:cartID", element: <CartPage /> },
 
@@ -174,6 +174,10 @@ export const appRouter = createBrowserRouter(
 
                             { path: "/makerspace/:makerspaceID/equipment/new", element: <NewEquipmentPage /> },
                             { path: "/makerspace/:makerspaceID/equipment/:equipmentID", element: <ManageEquipmentPage /> },
+
+                            { path: "/makerspace/:makerspaceID/inventory", element: <InventoryPage /> },
+                            { path: "/makerspace/:makerspaceID/inventory/quick/item/:invID", element: <QuickEditInventoryPage fromTag={false} /> },
+                            { path: "/makerspace/:makerspaceID/inventory/quick/tag/:invID", element: <QuickEditInventoryPage fromTag={true} /> },
 
                             { path: "/makerspace/:makerspaceID/tools", element: <ToolItemPage /> },
                             { path: "/makerspace/:makerspaceID/tools/type/:typeid", element: <ToolItemPage /> },

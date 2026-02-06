@@ -34,8 +34,8 @@ export async function getItemsByID(itemIds: number[]): Promise<InventoryItemRow[
 }
 
 export async function getItemsByTagID(tagID: number): Promise<InventoryItemRow[]> {
-  return await knex("InventoryItemTagRelations").join("InventoryItem", "InventoryItemTagRealtions.itemID", "InventoryItem.id")
-    .select("InventoryItem.*").where("InventoryItemTagRealtions.tagID", "=", tagID);
+  return await knex("InventoryItemTagRelations").join("InventoryItem", "InventoryItemTagRelations.itemID", "InventoryItem.id")
+    .select("InventoryItem.*").where("InventoryItemTagRelations.tagID", "=", tagID);
 }
 
 /**
