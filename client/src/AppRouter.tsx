@@ -48,6 +48,7 @@ import ReservationRequestPage from "./pages/makerspace_page/reservation_pages/Re
 import ManageReservationsPage from "./pages/makerspace_page/reservation_pages/ManageReservationsPage";
 import MaintenancePage from "./pages/makerspace_page/maintenance_pages/MaintenancePage";
 import { Box } from "@mui/material";
+import InventoryPage from "./pages/makerspace_page/inventory_pages/InventoryPage";
 
 function AppRoot() {
   return (
@@ -159,7 +160,7 @@ export const appRouter = createBrowserRouter(
                       children: [
                         { path: "/makerspace/:makerspaceID/people", element: <UsersPage /> },
                         { path: "/makerspace/:makerspaceID/people/:userID", element: <UserPage /> },
-                        { path: "/makerspace/:makerspaceID/inventory", element: <AdminInventoryPage /> },
+                        { path: "/makerspace/:makerspaceID/inventory", element: <InventoryPage /> },
                         { path: "/makerspace/:makerspaceID/storefront/carts", element: <CartListPage /> },
                         { path: "/makerspace/:makerspaceID/storefront/carts/:cartID", element: <CartPage /> },
 
@@ -211,6 +212,8 @@ export const appRouter = createBrowserRouter(
                     { path: "/admin/announcements/:id", element: <EditAnnouncement /> },
                     { path: "/admin/announcements/new", element: <NewAnnouncementPage /> },
 
+                    { path: "/admin/inventory", element: <AdminInventoryPage /> },
+
                     { path: "/admin/newreader", element: <NewReaderPage /> },
                     { path: "/admin/settings", element: <SiteSettingsPage /> },
                   ],
@@ -220,8 +223,6 @@ export const appRouter = createBrowserRouter(
                 { path: "/maker/training/:id", element: <QuizPage /> },
                 { path: "/maker/training/:id/results/", element: <QuizResults /> },
                 { path: "/maker/training/:id/results/:submissionID", element: <QuizResults /> },
-
-                { path: "/admin/inventory", element: <AdminInventoryPage /> },
               ],
             },
             /* END OF PROTECTED ROUTES */
