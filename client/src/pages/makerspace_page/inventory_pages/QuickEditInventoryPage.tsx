@@ -55,7 +55,8 @@ export default function QuickEditInventoryPage(props: QuickEditInventoryPageProp
   }, [debouncedQuantity])
 
   return (
-    <Stack spacing={4}>
+    <Stack spacing={4} justifyContent={"center"}>
+      <title>Quick Edit Inventory</title>
       <Typography variant={isMobile ? "h5" : "h3"}>Quick Manage Item{invItems.length > 1 ? "s" : ""}</Typography>
       <Autocomplete
         key={invItems.length}
