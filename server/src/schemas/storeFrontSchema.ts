@@ -115,6 +115,7 @@ export const StoreFrontTypeDefs = gql`
     Labels: [String]
     Ledgers(startDate: DateTime, stopDate: DateTime, searchText: String, limit: Int): [InventoryLedger]
     inventoryTags: [InventoryTag]
+    inventoryItemsByTag(tagID: Int!): [InventoryItem]
   }
 
   extend type Mutation {
@@ -123,6 +124,7 @@ export const StoreFrontTypeDefs = gql`
     updateInventoryItem(itemId: ID!, item: InventoryItemInput): InventoryItem
     addItemAmount(itemId: ID!, count: Int!): InventoryItem
     removeItemAmount(itemId: ID!, count: Int!): InventoryItem
+    setItemAmount(itemID: Int!, count: Int!): InventoryItem
     createLabel(label: String): String
     archiveLabel(label: String): String
     deleteInventoryItem(id: ID!): Boolean

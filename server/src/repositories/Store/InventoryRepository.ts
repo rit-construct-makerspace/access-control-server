@@ -16,7 +16,7 @@ import {
  * @returns all InventoryItems
  */
 export async function getItems(makerspaceID?: number): Promise<InventoryItemRow[]> {
-  let query = knex("InventoryItem").select().where('archived', false);
+  let query = knex("InventoryItem").select();
   if (makerspaceID) {
     query = query.where('makerspaceID', makerspaceID);
   }
@@ -34,8 +34,8 @@ export async function getItemsByID(itemIds: number[]): Promise<InventoryItemRow[
 }
 
 export async function getItemsByTagID(tagID: number): Promise<InventoryItemRow[]> {
-  return await knex("InventoryItemTagRelations").join("InventoryItem", "InventoryItemTagRealtions.itemID", "InventoryItem.id")
-    .select("InventoryItem.*").where("InventoryItemTagRealtions.tagID", "=", tagID);
+  return await knex("InventoryItemTagRelations").join("InventoryItem", "InventoryItemTagRelations.itemID", "InventoryItem.id")
+    .select("InventoryItem.*").where("InventoryItemTagRelations.tagID", "=", tagID);
 }
 
 /**

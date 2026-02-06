@@ -114,6 +114,16 @@ const StorefrontResolvers = {
         return await InventoryRepo.getTags();
       })
     },
+
+    inventoryItemsByTag: async (
+      _parnet: any,
+      args: {
+        tagID: number
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff((user) => (
+      InventoryRepo.getItemsByTagID(args.tagID)
+    )),
   },
 
   Mutation: {
@@ -230,6 +240,17 @@ const StorefrontResolvers = {
         return result;
       })
     },
+
+    setItemAmount: async (
+      _parent: any,
+      args: {
+        itemID: number,
+        count: number
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff(async (user) => (
+      await InventoryRepo.setItemAmount(args.itemID, args.count)
+    )),
 
     /**
      * Mark an InventoryItem as archived
