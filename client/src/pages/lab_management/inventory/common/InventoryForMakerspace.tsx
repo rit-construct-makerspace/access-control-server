@@ -78,25 +78,23 @@ export function InventoryForMakerspace(props: InventoryForMakerspaceProps) {
   ];
 
   return (
-    <Box>
-      <PageSectionHeader>{props.makerspace.name}</PageSectionHeader>
-      <Box sx={{ width: "100%", overflowX: "scroll" }}>
-        <DataGrid
-          rows={matchingItems}
-          columns={columns}
-          rowHeight={70}
-          initialState={{
-            pagination: {
-              paginationModel: {
-                pageSize: 50,
-              },
+    <Box sx={{ width: "100%" }}>
+      <DataGrid
+        rows={matchingItems}
+        columns={columns}
+        rowHeight={70}
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 50,
             },
-          }}
-          pageSizeOptions={[50]}
-          //checkboxSelection
-          disableRowSelectionOnClick
-        />
-      </Box>
+          },
+        }}
+        pageSizeOptions={[50]}
+        //checkboxSelection
+        disableRowSelectionOnClick
+        disableColumnResize
+      />
     </Box>
   )
 }

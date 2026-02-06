@@ -16,7 +16,7 @@ import {
  * @returns all InventoryItems
  */
 export async function getItems(makerspaceID?: number): Promise<InventoryItemRow[]> {
-  let query = knex("InventoryItem").select().where('archived', false);
+  let query = knex("InventoryItem").select();
   if (makerspaceID) {
     query = query.where('makerspaceID', makerspaceID);
   }
