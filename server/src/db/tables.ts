@@ -74,6 +74,8 @@ export interface EquipmentInstancesRow {
   status: string;
   /** Optional FK of the card reader associated with this instance */
   readerID: number | null
+  /** Optional FK of the access controller associated with this instance */
+  accessControllerID: number | null
 }
 
 export interface HoldRow {
@@ -307,6 +309,7 @@ export interface ReaderRow {
 export interface MakerspaceWelcomeReaderRow {
   makerspaceID: number;
   readerID: number;
+  deviceID: number;
 }
 
 export interface ReaderLogRow {
@@ -661,6 +664,49 @@ export interface InventoryItemTagRelationsRow {
   tagID: number;
 }
 
+export interface DeviceRow {
+  id: number;
+  name: string;
+  SN: string;
+  pairTime: Date;
+  hardwareVersion: string | null;
+  firmwareVersion: string | null;
+  targetFirmware: string | null;
+}
+
+export enum CoreInputMode {
+  INSERT = "INSERT",
+  TEMP = "TEMP",
+  TOGGLE = "TOGGLE"
+}
+
+export interface CoreRow {
+  deviceID: number;
+  channels: number;
+  inputMode: CoreInputMode;
+  tempDuration: number;
+}
+
+export enum AccessControllerState {
+  IDLE = "IDLE",
+  UNLOCKED = "UNLOCKED",
+  ALWAYS_ON = "ALWAYS_ON",
+  LOCKED_OUT = "LOCKED_OUT",
+  FAULT = "FAULT"
+}
+
+export interface AccessControllerRow {
+  id: number;
+  deviceID: number;
+  channelID: number;
+  state: AccessControllerState | null;
+}
+
+export interface DispenserRow {
+  deviceID: number;
+  cardsLeft: number;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -708,5 +754,9 @@ declare module "knex/types/tables.js" {
     MaintenanceTickets: MaintenanceTicketRow;
     TemporaryCards: TempCardRow;
     InventoryItemTagRelations: InventoryItemTagRelationsRow;
+    Devices: DeviceRow;
+    Cores: CoreRow;
+    AccessControllers: AccessControllerRow;
+    Dispensers: DispenserRow;
   }
 }
