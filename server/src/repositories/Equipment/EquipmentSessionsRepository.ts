@@ -14,7 +14,7 @@ import { EquipmentSessionRow } from "../../db/tables.js";
  * @returns created Equipment Session
  */
 export async function createEquipmentSession(equipmentID: number, userID: number, readerSlug?: string): Promise<EquipmentSessionRow> {
-    return knex("EquipmentSessions").insert({equipmentID, userID, readerSlug});
+    return knex("EquipmentSessions").insert({ equipmentID, userID, readerSlug });
 }
 
 /**
@@ -32,15 +32,15 @@ export async function getEquipmentSessions(): Promise<EquipmentSessionRow[]> {
  * @param readerSlug readerSlug to filter by
  * @returns updated Equipment Session
  */
-export async function setLatestEquipmentSessionLength(equipmentID: number, sessionLength: number, readerSlug: string) {
+export async function endLatestEquipmentSession(equipmentID: number, readerSlug: string) {
     const latest = await knex("EquipmentSessions").select()
-        .where({equipmentID, readerSlug})
+        .where({ equipmentID, readerSlug })
         .orderBy("start", "desc")
         .first();
     if (latest == undefined) return undefined;
     return await knex("EquipmentSessions")
-        .update({sessionLength})
-        .where({id: latest.id});
+        .update({ sessionLength: Math.floor(((new Date()).getTime() - latest.start.getTime()) / 1000) })
+        .where({ id: latest.id });
 }
 
 /**

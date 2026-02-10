@@ -1,3 +1,4 @@
+import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
 import { AccessControllerRow } from "../../db/tables.js";
 import { AccessController } from "../../models/devices/accessController.js";
@@ -9,4 +10,15 @@ export async function getAccessControllersByDeviceID(deviceID: number): Promise<
     coolRows.push(new AccessController(rawRows[i]));
   }
   return coolRows;
+}
+
+export async function updateAccessController(newRow: AccessControllerRow): Promise<AccessController | undefined> {
+  const rawResult = await knex("AccessControllers").where("id", newRow.id).update(newRow).returning("*");
+  if (rawResult.length < 1) {
+    return undefined;
+  } else if (rawResult.length > 1) {
+    throw new GraphQLError("Updates the status of two cores simoultaneously");
+  }
+
+  return new AccessController(rawResult[0]);
 }

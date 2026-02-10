@@ -1,3 +1,4 @@
+import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
 import { DeviceRow, MakerspaceRow } from "../../db/tables.js";
 import { Device } from "../../models/devices/device.js";
@@ -35,4 +36,15 @@ export async function getDeviceBySN(SN: string): Promise<DeviceRow | undefined> 
 export async function getMakerspaceOfWelcomeDevice(id: number): Promise<MakerspaceRow | undefined> {
   return await knex("MakerspaceWelcomeReaders").join("Makerspaces", "Makerspaces.id", "MakerspaceWelcomeReaders.makerspaceID").select("Makerspaces.*")
     .where("MakerspaceWelcomeReaders.deviceID", "=", id).first();
+}
+
+export async function updateDevie(deviceRow: DeviceRow): Promise<Device | undefined> {
+  const rawResult = await knex("Devices").where({ id: deviceRow.id }).update(deviceRow).returning("*");
+  if (rawResult.length < 1) {
+    return undefined;
+  } else if (rawResult.length > 1) {
+    throw new GraphQLError("Updated the status of two devices simoultaneously");
+  }
+
+  return new Device(rawResult[0]);
 }

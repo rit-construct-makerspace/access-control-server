@@ -5,7 +5,7 @@ import { EquipmentInstancesRow, EquipmentRow, UserRow, MakerspaceRow, AccessCont
 import { getEquipmentByID, getMissingTrainingModules, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
-import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
+import { createEquipmentSession, endLatestEquipmentSession } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { getRoomByID, getRoomsByMakerspace, hasRoomTrainings, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
 import { getInstanceByAccessControllerID, getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstancesRepository.js";
@@ -825,7 +825,6 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
   if (core?.lastStatusTime) {
     let offlineMs = new Date().getTime() - core.lastStatusTime.getTime();
     offlineForSec = Math.floor(offlineMs / 1000);
-
   }
   // submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), {
   //   "WsEvent": "open",
@@ -844,19 +843,11 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
   }
 
   // update with new info
-  await updateReaderStatus({
-    id: reader.id,
-    temp: 0,
-    state: newState,
-    currentUID: "",
-    recentSessionLength: reader.recentSessionLength,
-    lastStatusReason: reader.lastStatusReason,
-    scheduledStatusFreq: reader.scheduledStatusFreq,
-    BEVer: message.BEVer ?? message.FWVersion ?? undefined,
-    FEVer: message.FEVer ?? message.FWVersion ?? undefined,
-    HWVer: message.HWVersion ?? undefined,
-    SN: message.SerialNumber,
-  });
+  await DeviceRepo.updateDevie(device);
+  if (core !== undefined) {
+    await CoreRepo.updateCore(core);
+  }
+  await AccessControllerRepo.updateAccessController(controller);
 
   return true;
 }
@@ -931,7 +922,7 @@ async function handleStateUpdateMessage(device: DeviceRow, newState: string, act
         }
       } else {
         // Update equipment session that was created when we authed
-        await setLatestEquipmentSessionLength(equipment.id, reader.recentSessionLength, reader.name);
+        await endLatestEquipmentSession(equipment.id, device.name);
         if (user != null) {
           await createLog(`{user} signed out of {equipment}`, "status", { id: user.id, label: getUsersFullName(user) }, label);
         }
@@ -939,7 +930,9 @@ async function handleStateUpdateMessage(device: DeviceRow, newState: string, act
     }
   }
 
-  await updateReaderStatus(reader);
+  await DeviceRepo.updateDevie(device);
+  await CoreRepo.updateCore(core);
+  await AccessControllerRepo.updateAccessController(controller);
 
 }
 /**

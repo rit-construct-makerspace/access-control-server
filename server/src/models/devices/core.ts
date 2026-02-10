@@ -1,6 +1,7 @@
 import { CoreInputMode, CoreRow, DeviceRow } from "../../db/tables.js";
 import { Device } from "./device.js";
 import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
+import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 
 export class Core extends Device implements CoreRow {
@@ -29,10 +30,6 @@ export class Core extends Device implements CoreRow {
     const deviceRow = await DeviceRepo.getDeviceByID(coreRow.deviceID);
     if (deviceRow === undefined) { throw EntityNotFound; }
     return new Core(coreRow, deviceRow);
-  }
-
-  async updateStatus(coreRow: CoreRow) {
-
   }
 
 }
