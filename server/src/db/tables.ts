@@ -669,9 +669,10 @@ export interface DeviceRow {
   name: string;
   SN: string;
   pairTime: Date;
-  hardwareVersion: string | null;
-  firmwareVersion: string | null;
-  targetFirmware: string | null;
+  hardwareVersion: string | undefined;
+  firmwareVersion: string | undefined;
+  targetFirmware: string | undefined;
+  keyCyle: number
 }
 
 export enum CoreInputMode {
@@ -685,6 +686,10 @@ export interface CoreRow {
   channels: number;
   inputMode: CoreInputMode;
   tempDuration: number;
+  currentCardtag: string | undefined;
+  lastStatusReason: string; // ENUM ?
+  lastStatusTime: Date;
+  sessionStartTime: Date;
 }
 
 export enum AccessControllerState {
@@ -699,7 +704,7 @@ export interface AccessControllerRow {
   id: number;
   deviceID: number;
   channelID: number;
-  state: AccessControllerState | null;
+  state: AccessControllerState;
 }
 
 export interface DispenserRow {

@@ -44,6 +44,15 @@ export async function getInstanceByReaderID(readerID: number): Promise<Equipment
     return await knex("EquipmentInstances").select().where({ readerID }).first();
 }
 
+/**
+ * Fetch an EquipmentInstance by its associate reader ID
+ * @param id unique id of reader
+ * @returns EquipmentInstance or undefined if not exist
+ */
+export async function getInstanceByAccessControllerID(accessControllerID: number): Promise<EquipmentInstancesRow | undefined> {
+    return await knex("EquipmentInstances").where("accessControllerID", "=", accessControllerID).first();
+}
+
 export async function getReaderByInstanceId(instanceID: number): Promise<ReaderRow | undefined> {
     // look up by v2 shlug
     return await knex("Readers").select("Readers.*")

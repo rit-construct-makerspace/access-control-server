@@ -13,6 +13,7 @@ export async function up(knex: Knex): Promise<void> {
     t.string("hardwareVersion").nullable();
     t.string("firmwareVersion").nullable();
     t.string("targetFirmware").nullable();
+    t.integer("keyCyle").notNullable().defaultTo(0);
   });
 
   await knex.schema.createTable("Cores", (t) => {
@@ -22,6 +23,10 @@ export async function up(knex: Knex): Promise<void> {
     t.integer("channels").notNullable();
     t.enum("inputMode", ["INSERT", "TEMP", "TOGGLE"]).notNullable();
     t.integer("tempDuration");
+    t.string("currentCardTag").nullable().defaultTo(null);
+    t.string("lastStatusReason").nullable(); // ENUM ?
+    t.timestamp("lastStatusTime").nullable();
+    t.timestamp("sessionStartTime").nullable();
   });
 
   await knex.schema.createTable("AccessControllers", (t) => {
@@ -53,7 +58,7 @@ export async function up(knex: Knex): Promise<void> {
       SN: reader.SN,
       pairTime: reader.pairTime,
       hardwareVersion: reader.HWVer,
-      firmwareVersion: null,
+      firmwareVersion: reader.BEVer,
       targetFirmware: reader.targetFirmwareVersion
     }).returning("*"))[0];
 
@@ -78,6 +83,10 @@ export async function up(knex: Knex): Promise<void> {
       t.dropPrimary();
       t.primary(["makerspaceID", "deviceID"]);
       t.dropColumn("readerID");
+    })
+
+    await knex.schema.alterTable("ReaderLogs", (t) => {
+      t.dropForeign("readerID");
     })
   }
 }
