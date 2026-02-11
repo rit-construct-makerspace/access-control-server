@@ -248,9 +248,26 @@ const StorefrontResolvers = {
         count: number
       },
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
-      await InventoryRepo.setItemAmount(args.itemID, args.count)
-    )),
+    ) => isStaff(async (user) => {
+      const orig = await InventoryRepo.getItemById(args.itemID);
+      if (orig === null) { return null; }
+
+      if (args.count < 0) { args.count = 0; }
+
+      const result = await InventoryRepo.setItemAmount(args.itemID, args.count)
+      if (result === null) { return null; }
+      const diff = result.count - orig.count;
+      if (diff < 0) {
+        if (result.count < result.threshold && orig.count >= result.threshold) {
+          await notifyInventoryItemBelowThreshold(result.name, result.count);
+        }
+        await createLedger(user.id, "Modify", result.pricePerUnit * Math.abs(diff), undefined, "", [{ name: result.name, quantity: diff }]);
+      } else if (diff > 0) {
+        await createLedger(user.id, "Modify", result.pricePerUnit * Math.abs(diff), undefined, "", [{ name: result.name, quantity: diff }]);
+      }
+
+      return result;
+    }),
 
     /**
      * Mark an InventoryItem as archived
