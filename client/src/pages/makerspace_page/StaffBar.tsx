@@ -100,8 +100,8 @@ export default function StaffBar() {
           icon={<SchoolIcon />}
         />
         <NavLink
-          primary={"Materials"}
-          to={"/admin/inventory"}
+          primary={"Inventory"}
+          to={`/makerspace/${makerspaceID}/inventory`}
           icon={<InventoryIcon />}
         />
         <NavLink

@@ -55,7 +55,7 @@ export default function RoomSection(props: RoomSectionProps) {
                     <Divider orientation="horizontal" variant="fullWidth" flexItem />
                 </Stack>
             }
-            <Grid container spacing={3} justifyContent="center">
+            <Grid container spacing={isMobile ? 2 : 3} justifyContent="center">
                 {
                     liveEquipment.map((equipment: Equipment) => (
                         <Grid key={equipment.id}>

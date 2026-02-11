@@ -4,12 +4,14 @@ import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import { useMutation } from "@apollo/client";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DELETE_SPECIAL_HOURS } from "../../queries/makerspaceQueries";
+import { useIsMobile } from "../../common/IsMobileProvider";
 
 interface SpecialHoursBlockProps {
   hours: MakerspaceHours;
 }
 
 export default function SpecialHoursBlock(props: SpecialHoursBlockProps) {
+  const isMobile = useIsMobile();
 
   const dateFormatter = new Intl.DateTimeFormat("en-US", {
     month: "long",
@@ -29,7 +31,7 @@ export default function SpecialHoursBlock(props: SpecialHoursBlockProps) {
   })
 
   return (
-    <Stack alignItems={"center"} spacing={1} padding={"15px"} width={"14vw"}>
+    <Stack alignItems={"center"} spacing={1} padding={"15px"} width={isMobile ? "100%" : "14vw"}>
       <Typography fontWeight={"bold"} color="primary">{dateFormatter.format(new Date(props.hours.day))}</Typography>
       <TextField
         label="Open"

@@ -32,6 +32,32 @@ export const GET_INVENTORY_ITEMS = gql`
 export const GET_INVENTORY_ITEM = gql`
   query GetInventoryItem($id: ID!) {
     InventoryItem(id: $id) {
+      id
+      name
+      unit
+      pluralUnit
+      pricePerUnit
+      count
+      threshold
+      staffOnly
+      storefrontVisible
+      image
+      makerspaceID
+      notes
+      description
+      tags {
+        id
+        label
+        color
+      }
+    }
+  }
+`;
+
+export const GET_INVENTORY_ITEMS_BY_TAG = gql`
+  query InventoryItemsByTag($tagID: Int!) {
+    inventoryItemsByTag(tagID: $tagID) {
+      id
       name
       unit
       pluralUnit
@@ -176,5 +202,13 @@ export const UPDATE_INVENTORY_TAG = gql`
 export const UPDATE_MAKERSPACE = gql`
   mutation UpdateMakerspaceForItem($id: ID!, $makerspaceID: ID!) {
     updateMakerspaceForItem(id: $id, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const SET_ITEM_AMOUNT = gql`
+  mutation SetItemAmount($itemID: Int!, $count: Int!) {
+    setItemAmount(itemID: $itemID, count: $count) {
+      id
+    }
   }
 `;

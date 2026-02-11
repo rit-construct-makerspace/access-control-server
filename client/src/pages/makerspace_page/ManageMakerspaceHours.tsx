@@ -6,6 +6,7 @@ import MakerspaceHours, { MakerspaceDefaultHours } from "../../types/MakerspaceH
 import DefaultHoursBlock from "./DefaultHoursBlock";
 import SpecialHoursBlock from "./SpecialHoursBlock";
 import NewSpecialHoursBlock from "./NewSpecialHours";
+import { useIsMobile } from "../../common/IsMobileProvider";
 
 interface ManageMakerspaceHoursProps {
   makerspaceID: number;
@@ -36,6 +37,8 @@ export const GET_MAKERSPACE_SPECIAL_HOURS = gql`
 `;
 
 export default function ManageMakerspaceHours(props: ManageMakerspaceHoursProps) {
+  const isMobile = useIsMobile();
+
   const defaultHoursResult = useQuery(GET_MAKERSPACE_DEFAULT_HOURS, { variables: { makerspaceID: props.makerspaceID } });
   const specialHoursResult = useQuery(GET_MAKERSPACE_SPECIAL_HOURS, { variables: { makerspaceID: props.makerspaceID } });
 
@@ -47,7 +50,11 @@ export default function ManageMakerspaceHours(props: ManageMakerspaceHoursProps)
         const defaultHours: MakerspaceDefaultHours[] = data.makerspaceDefaultHours;
 
         return (
-          <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"center"}>
+          <Stack
+            direction={isMobile ? "column" : "row"}
+            divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />}
+            justifyContent={"center"}
+          >
             {
               defaultHours.map((hours) => {
 
@@ -65,7 +72,12 @@ export default function ManageMakerspaceHours(props: ManageMakerspaceHoursProps)
         const specialHours: MakerspaceHours[] = data.makerspaceSpecialHours;
 
         return (
-          <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"center"} sx={{ flexWrap: "wrap" }}>
+          <Stack
+            direction={isMobile ? "column" : "row"}
+            divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />}
+            justifyContent={"center"}
+            sx={{ flexWrap: "wrap" }}
+          >
             {
               specialHours.map((hours) => (<SpecialHoursBlock hours={hours} />))
             }

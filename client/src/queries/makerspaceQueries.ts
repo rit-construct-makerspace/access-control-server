@@ -41,10 +41,6 @@ export interface FullMakerspace {
 export interface MakerspaceWithItems {
   id: number;
   name: string;
-  subtitle: string | null;
-  location: string | null;
-  description: string;
-  docsLink: string;
   items: InventoryItem[];
 }
 
@@ -146,6 +142,40 @@ export const GET_MAKERSPACES_WITH_ITEMS = gql`
     }
   }
  }
+`;
+
+export const GET_MAKERSPACE_WITH_ITEMS = gql`
+  query GetMakerspaceByID($id: ID!) {
+    makerspaceByID(id: $id) {
+      id
+      name
+      items {
+        id
+        image
+        name
+        labels
+        unit
+        pluralUnit
+        count
+        pricePerUnit
+        threshold
+        staffOnly
+        storefrontVisible
+        notes
+        description
+        makerspaceID
+        makerspace {
+          id
+          name
+        }
+        tags {
+          id
+          label
+          color
+        }
+      }
+    }
+  }
 `;
 
 export const GET_MAKERSPACE_BY_ID = gql`

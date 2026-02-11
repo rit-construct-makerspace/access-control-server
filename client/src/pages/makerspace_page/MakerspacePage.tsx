@@ -28,7 +28,7 @@ export default function MakerspacePage() {
 
   const staffMode = isStaffFor(user, Number(makerspaceID))
   const [showHidden, setShowHidden] = useState(false);
-  
+
   const setUrlParam = (paramName: string, paramValue: string) => {
     const params = new URLSearchParams(location.search);
     params.set(paramName, paramValue);
@@ -52,16 +52,22 @@ export default function MakerspacePage() {
       const makerspaceTrainings = fullSpace.trainingModules.map(moduleStatusMapper(user.passedModules, user.trainingHolds));
 
       return (
-        <Stack spacing={"2"} padding={"0 20px 20px"} divider={<Divider orientation="horizontal" flexItem />}>
+        <Stack spacing={"2"} padding={isMobile ? "0 10px 10px" : "0 20px 20px"} divider={<Divider orientation="horizontal" flexItem />}>
           <title>{`${fullSpace.name} | Make @ RIT`}</title>
           <StaffBar />
-          {ExpandableHeader({makerspace: fullSpace, makerspaceTrainings})}
-          <Stack padding={"10px"} direction="row" justifyContent={isMobile ? "space-between" : "flex-start"} spacing={2}>
+          {ExpandableHeader({ makerspace: fullSpace, makerspaceTrainings })}
+          <Stack
+            padding={"10px"}
+            direction={isMobile ? "column" : "row"}
+            justifyContent={isMobile ? undefined : "flex-start"}
+            spacing={2}
+            alignItems={"center"}
+          >
             <SearchBar
               placeholder="Search Equipment"
               value={equipmentSearch}
-              onChange={(e) =>  setEquipmentSearch(e.target.value)}
-              onSubmit={() => setUrlParam("a", equipmentSearch) }
+              onChange={(e) => setEquipmentSearch(e.target.value)}
+              onSubmit={() => setUrlParam("a", equipmentSearch)}
               onClear={() => setUrlParam("a", "")}
             />
             {

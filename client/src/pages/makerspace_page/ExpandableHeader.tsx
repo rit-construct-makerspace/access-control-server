@@ -91,17 +91,22 @@ function TitleRow(
   hasExpiring: boolean,
   user: any
 ) {
-  const title = <Typography variant="h3">{name}</Typography>;
+  const title = <Typography variant={isMobile ? "h4" : "h3"}>{name}</Typography>;
 
-  const editIcon = canEdit ? (
-    <IconButton
-      onClick={() => {
-        navigate(`/makerspace/${id}/edit`);
-      }}
-      sx={{ color: "gray" }}
-    >
-      <EditIcon />
-    </IconButton>
+  const editButton = canEdit ? (
+    isMobile
+      ? <Button color="secondary" variant="outlined" onClick={() => navigate(`/makerspace/${id}/edit`)} fullWidth>
+        Manage Makerspace
+      </Button>
+      : <IconButton
+        onClick={
+          () => {
+            navigate(`/makerspace/${id}/edit`);
+          }}
+        sx={{ color: "gray" }}
+      >
+        <EditIcon />
+      </IconButton >
   ) : null;
 
   const alert = user.visitor ? (
@@ -136,8 +141,8 @@ function TitleRow(
   );
 
   const titleAndEdit = (
-    <Stack direction={"row"}>
-      {title} {editIcon}
+    <Stack direction={isMobile ? "column" : "row"} alignItems={"center"} spacing={1}>
+      {title} {editButton}
     </Stack>
   );
 
@@ -193,7 +198,7 @@ export default function ExpandableHeader({ makerspace, makerspaceTrainings }: Ex
 
       <AccordionDetails>
         {makerspaceTrainings.length > 0 && (
-          <Stack direction={isMobile ? "column" : "row"} spacing={5} justifyContent="space-around" flexGrow={0}>
+          <Stack direction={isMobile ? "column" : "row"} spacing={isMobile ? 2 : 5} justifyContent="space-around" flexGrow={0}>
             {AboutCard(makerspace)}
             {HoursCard(makerspace.hours)}
             {MakerspaceTrainingCard(makerspaceTrainings, user)}

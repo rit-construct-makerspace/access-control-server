@@ -16,7 +16,7 @@ import LowInventory from "./common/LowInventory";
 import StaffBar from "../../makerspace_page/StaffBar";
 
 
-export default function InventoryPage() {
+export default function AdminInventoryPage() {
   const [searchText, setSearchText] = useState<string>("");
   const [modalItemId, setModalItemId] = useState<string>("");
   const [tagsModalOpen, setTagsModalOpen] = useState<boolean>(false);
@@ -38,7 +38,7 @@ export default function InventoryPage() {
 
     setSearchText(queryString)
   }, [location.search]);
-  
+
   return (
     <RequestWrapper loading={makerspacesWithItemsResult.loading} error={makerspacesWithItemsResult.error}>
       <AdminPage>
@@ -55,7 +55,7 @@ export default function InventoryPage() {
               placeholder="Search inventory"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              onSubmit={() =>  setUrlParam("a", searchText)}
+              onSubmit={() => setUrlParam("a", searchText)}
               onClear={() => setSearchText("")}
             />
             <Button

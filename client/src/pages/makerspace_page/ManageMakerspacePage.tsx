@@ -53,8 +53,14 @@ export default function ManageMakerspacePage() {
               <Typography variant="h4" align="center">{`Manage ${space.name} [ID: ${space.id}]`}</Typography>
             </Stack>
             <ManageMakerspaceHours makerspaceID={Number(makerspaceID)} />
-            <Stack direction={"row"} divider={<Divider orientation="vertical" flexItem />} justifyContent={"space-between"} width={"100%"}>
-              <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />} width={"48%"}>
+            <Stack
+              direction={isMobile ? "column" : "row"}
+              divider={<Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />}
+              justifyContent={"space-between"}
+              width={"100%"}
+              spacing={isMobile ? 2 : undefined}
+            >
+              <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />} width={isMobile ? "100%" : "48%"}>
                 <ManageMakerspaceInformation
                   id={Number(makerspaceID)}
                   name={space.name}
@@ -93,7 +99,7 @@ export default function ManageMakerspacePage() {
                   }
                 </Stack>
               </Stack>
-              <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />} width={"48%"}>
+              <Stack spacing={2} divider={<Divider orientation="horizontal" flexItem />} width={isMobile ? "100%" : "48%"}>
                 <ManageWelcomReadersCard makerspaceId={Number(makerspaceID)} />
                 <ManageMakerspaceTrainings makerspaceID={Number(makerspaceID)} trainings={space.trainingModules} />
               </Stack>

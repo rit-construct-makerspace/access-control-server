@@ -14,12 +14,7 @@ const StorefrontResolvers = {
   InventoryItem: {
     //Map field tags to array of InventoryTags from tagID1, tagID2, tagID3 columns
     tags: async (parent: InventoryItemRow) => {
-      var tags = [];
-      if (parent.id == 104) console.log(parent)
-      if (parent.tagID1) tags.push(await InventoryRepo.getTagByID(parent.tagID1));
-      if (parent.tagID2) tags.push(await InventoryRepo.getTagByID(parent.tagID2));
-      if (parent.tagID3) tags.push(await InventoryRepo.getTagByID(parent.tagID3));
-      return tags;
+      return await InventoryRepo.getItemTags(parent.id);
     },
     //Map field makerspace to corresponding makerspace row, if any
     makerspace: async (parent: InventoryItemRow) => {
@@ -119,6 +114,16 @@ const StorefrontResolvers = {
         return await InventoryRepo.getTags();
       })
     },
+
+    inventoryItemsByTag: async (
+      _parnet: any,
+      args: {
+        tagID: number
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff((user) => (
+      InventoryRepo.getItemsByTagID(args.tagID)
+    )),
   },
 
   Mutation: {
@@ -235,6 +240,17 @@ const StorefrontResolvers = {
         return result;
       })
     },
+
+    setItemAmount: async (
+      _parent: any,
+      args: {
+        itemID: number,
+        count: number
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff(async (user) => (
+      await InventoryRepo.setItemAmount(args.itemID, args.count)
+    )),
 
     /**
      * Mark an InventoryItem as archived
