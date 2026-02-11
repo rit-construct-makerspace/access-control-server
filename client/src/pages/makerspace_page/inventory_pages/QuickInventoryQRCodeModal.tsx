@@ -105,7 +105,7 @@ export default function QuickInventoryQRCodeModal(props: QuickInventoryQRCodeMod
           )}
           value={target}
           options={mode === "item" ? items : tags}
-          disabled={mode === undefined}
+          disabled={mode === undefined || mode === null}
           onChange={(_e, newValue) => setTarget(newValue ?? undefined)}
           // @ts-expect-error
           getOptionLabel={(option) => option.label ?? option.name}
@@ -115,7 +115,7 @@ export default function QuickInventoryQRCodeModal(props: QuickInventoryQRCodeMod
           target
             ? <Box padding={"15px"} sx={{ backgroundColor: "white" }}>
               <QRCode
-                value={`${import.meta.env.VITE_ORIGIN}/app/makerspace/${makerspaceID}/inventory/${mode}/${target.id}`}
+                value={`${import.meta.env.VITE_ORIGIN}/app/makerspace/${makerspaceID}/inventory/quick/${mode}/${target.id}`}
                 ref={svgRef}
               />
             </Box>

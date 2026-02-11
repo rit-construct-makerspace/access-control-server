@@ -81,7 +81,7 @@ export default function QuickEditInventoryPage(props: QuickEditInventoryPageProp
           disabled={evaluatedItem === undefined}
           variant="contained"
           size="large"
-          onClick={() => setQuantity(quantity - 1)}
+          onClick={() => setQuantity(quantity <= 0 ? 0 : quantity - 1)}
         >
           <RemoveIcon />
         </Button>
