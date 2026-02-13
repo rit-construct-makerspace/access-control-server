@@ -107,18 +107,18 @@ export async function up(knex: Knex): Promise<void> {
     }).returning("*"))[0];
 
     await knex("EquipmentInstances").insert({ accessControllerID: accessController.id }).where("readerID", "=", reader.id);
-
-    await knex.schema.alterTable("MakerspaceWelcomeReaders", (t) => {
-      t.integer("deviceID").references("id").inTable("Devices");
-      t.dropPrimary();
-      t.primary(["makerspaceID", "deviceID"]);
-      t.dropColumn("readerID");
-    })
-
-    await knex.schema.alterTable("ReaderLogs", (t) => {
-      t.dropForeign("readerID");
-    })
   }
+
+  await knex.schema.alterTable("MakerspaceWelcomeReaders", (t) => {
+    t.integer("deviceID").references("id").inTable("Devices");
+    t.dropPrimary();
+    t.primary(["makerspaceID", "deviceID"]);
+    t.dropColumn("readerID");
+  })
+
+  await knex.schema.alterTable("ReaderLogs", (t) => {
+    t.dropForeign("readerID");
+  })
 }
 
 
