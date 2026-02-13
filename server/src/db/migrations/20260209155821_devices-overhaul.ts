@@ -1,6 +1,28 @@
 import type { Knex } from "knex";
-import { CoreInputMode } from "../tables.js";
+import { CoreInputMode, ReaderRow } from "../tables.js";
 import * as ReaderRepo from "../../repositories/Readers/ReaderRepository.js"
+import * as EquipmentInstanceRepo from "../../repositories/Equipment/EquipmentInstancesRepository.js"
+import * as EquipmentRepo from "../../repositories/Equipment/EquipmentRepository.js";
+import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
+import { DispenserError } from "../../api/devices/cards/cardApi.js";
+
+async function getMakerspaceOfReader(reader: ReaderRow): Promise<number | undefined> {
+  const status = await ReaderRepo.getReaderPairStatus(reader.id);
+
+  if (status === ReaderRepo.PairStatus.PairedAsWelcomer) {
+    return (await ReaderRepo.getMakerspaceOfWelcomeReader(status))?.id ?? undefined;
+  } else if (status === ReaderRepo.PairStatus.PairedAsInstance) {
+    const instance = await EquipmentInstanceRepo.getInstanceByReaderID(reader.id);
+    if (instance === undefined) { return undefined; }
+    const equipment = await EquipmentRepo.getEquipmentByID(instance.equipmentID);
+    if (equipment === undefined) { return undefined; }
+    const room = await RoomRepo.getRoomByID(equipment.roomID);
+    if (room === undefined || room === null) { return undefined; }
+    return room.makerspaceID ?? undefined;
+  }
+
+  return undefined;
+}
 
 export async function up(knex: Knex): Promise<void> {
   if (await knex.schema.hasTable("Devices")) { return; }
@@ -14,6 +36,7 @@ export async function up(knex: Knex): Promise<void> {
     t.string("firmwareVersion").nullable();
     t.string("targetFirmware").nullable();
     t.integer("keyCyle").notNullable().defaultTo(0);
+    t.integer("makerspaceID").references("id").inTable("Makerspaces").notNullable();
   });
 
   await knex.schema.createTable("Cores", (t) => {
@@ -44,6 +67,7 @@ export async function up(knex: Knex): Promise<void> {
       .onUpdate("CASCADE")
       .onDelete("CASCADE")
     t.integer("cardsLeft").notNullable().defaultTo(0);
+    t.enum("error", [DispenserError.CARD_STUCK, DispenserError.OUT_OF_CARDS]).nullable().defaultTo(null);
   });
 
   await knex.schema.alterTable("EquipmentInstances", (t) => {
@@ -53,13 +77,20 @@ export async function up(knex: Knex): Promise<void> {
   const readers = await knex("Readers").select("*");
   for (let i = 0; i < readers.length; i++) {
     let reader = readers[i];
+    const makerspaceID = await getMakerspaceOfReader(reader);
+
+    if (makerspaceID === undefined) {
+      continue;
+    }
+
     const device = (await knex("Devices").insert({
       name: reader.name,
       SN: reader.SN,
       pairTime: reader.pairTime,
       hardwareVersion: reader.HWVer,
       firmwareVersion: reader.BEVer,
-      targetFirmware: reader.targetFirmwareVersion
+      targetFirmware: reader.targetFirmwareVersion,
+      makerspaceID: makerspaceID
     }).returning("*"))[0];
 
     const readerMakerspace = await ReaderRepo.getMakerspaceOfWelcomeReader(reader.id);
@@ -68,7 +99,7 @@ export async function up(knex: Knex): Promise<void> {
       deviceID: device.id,
       channels: 1,
       inputMode: readerMakerspace === undefined ? CoreInputMode.INSERT : CoreInputMode.TEMP,
-      tempDuration: readerMakerspace === undefined ? undefined : 250
+      tempDuration: readerMakerspace === undefined ? undefined : 0
     }).returning("*");
 
     const accessController = (await knex("AccessControllers").insert({

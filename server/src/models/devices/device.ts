@@ -9,6 +9,7 @@ export class Device implements DeviceRow {
   firmwareVersion: string | undefined;
   targetFirmware: string | undefined;
   keyCyle: number;
+  makerspaceID: number;
 
   constructor(row: DeviceRow) {
     this.id = row.id;
@@ -19,6 +20,7 @@ export class Device implements DeviceRow {
     this.firmwareVersion = row.firmwareVersion;
     this.targetFirmware = row.targetFirmware;
     this.keyCyle = row.keyCyle;
+    this.makerspaceID = row.makerspaceID;
   }
 
 }

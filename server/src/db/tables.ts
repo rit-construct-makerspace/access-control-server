@@ -672,7 +672,8 @@ export interface DeviceRow {
   hardwareVersion: string | undefined;
   firmwareVersion: string | undefined;
   targetFirmware: string | undefined;
-  keyCyle: number
+  keyCyle: number;
+  makerspaceID: number;
 }
 
 export enum CoreInputMode {
