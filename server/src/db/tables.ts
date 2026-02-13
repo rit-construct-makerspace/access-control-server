@@ -4,6 +4,7 @@
  * This contains the definitions for the objects every knex select operation will map to.
  */
 
+import { DispenserError } from "../api/devices/cards/cardApi.js";
 import { CurrencySource, CurrencyType } from "../integrations/currency/types.js";
 
 /**
@@ -688,9 +689,9 @@ export interface CoreRow {
   inputMode: CoreInputMode;
   tempDuration: number;
   currentCardtag: string | undefined;
-  lastStatusReason: string; // ENUM ?
-  lastStatusTime: Date;
-  sessionStartTime: Date;
+  lastStatusReason: string | undefined; // ENUM ?
+  lastStatusTime: Date | undefined;
+  sessionStartTime: Date | undefined;
 }
 
 export enum AccessControllerState {
@@ -711,6 +712,7 @@ export interface AccessControllerRow {
 export interface DispenserRow {
   deviceID: number;
   cardsLeft: number;
+  error: DispenserError;
 }
 
 declare module "knex/types/tables.js" {

@@ -18,7 +18,7 @@ export async function getDeviceByID(id: number): Promise<Device | undefined> {
  * @param name the name of the device to get
  * @returns the DeviceRow for the device or undefined if no device was found
  */
-export async function getDeviceByName(name: string): Promise<DeviceRow | undefined> {
+export async function getDeviceByName(name: string): Promise<Device | undefined> {
   const rawRow = await knex("Devices").where("name", "=", name).first();
   return rawRow ? new Device(rawRow) : undefined
 }
@@ -28,7 +28,7 @@ export async function getDeviceByName(name: string): Promise<DeviceRow | undefin
  * @param SN the serial number of the device to get
  * @returns the DeviceRow for the device or undefined if no device was found
  */
-export async function getDeviceBySN(SN: string): Promise<DeviceRow | undefined> {
+export async function getDeviceBySN(SN: string): Promise<Device | undefined> {
   const rawRow = await knex("Devices").where("SN", "=", SN).first()
   return rawRow ? new Device(rawRow) : undefined
 }
@@ -47,4 +47,15 @@ export async function updateDevie(deviceRow: DeviceRow): Promise<Device | undefi
   }
 
   return new Device(rawResult[0]);
+}
+
+export async function getMakerspaceDevices(makerspaceID: number): Promise<Device[]> {
+  const rawDevices = await knex("Devices").where({ makerspaceID: makerspaceID }).orderBy("name", "desc");
+  return rawDevices.map((raw) => (new Device(raw)));
+}
+
+export async function getMakerspaceGenericDevices(makerspaceID: number): Promise<Device[]> {
+  const rawDevices = await knex("Devices").where({ makerspaceID: makerspaceID })
+    .whereNotExists(knex("Cores").where("Cores.deviceID", "=", "Devices.id")).orderBy("name", "desc");
+  return rawDevices.map((raw) => new Device(raw));
 }

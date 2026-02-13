@@ -18,3 +18,9 @@ export async function updateCore(coreRow: CoreRow): Promise<Core | undefined> {
 
   return await Core.buid(rawResult[0]);
 }
+
+export async function getMakerspaceCores(makerspaceID: number): Promise<Core[]> {
+  const rawCores = await knex("Cores").join("Devices", "Devices.id", "Cores.deviceID")
+    .where({ makerspaceID: makerspaceID }).select("Cores.*").orderBy("Devices.name", "desc");
+  return await Promise.all(rawCores.map(async (raw) => (await Core.buid(raw))));
+}
