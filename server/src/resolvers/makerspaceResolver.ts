@@ -7,6 +7,9 @@ import * as HoursRepo from "../repositories/Makerspaces/MakerspaceHoursRepositor
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { getItems, getItemsWhereStorefront } from "../repositories/Store/InventoryRepository.js";
+import * as DeviceRepo from "../repositories/Devices/DeviceRepository.js";
+import * as CoreRepo from "../repositories/Devices/CoreRepository.js";
+import * as DispenserRepo from "../repositories/Devices/DispenserRepository.js";
 
 const MakerspacesResolver = {
   Makerspace: {
@@ -39,7 +42,39 @@ const MakerspacesResolver = {
       return args.storefrontVisible == undefined
         ? getItems(parent.id)
         : getItemsWhereStorefront(args.storefrontVisible, parent.id);
-    }
+    },
+
+    devcies: async (
+      parent: MakerspaceRow,
+      _args: any,
+      { isStaffFor }: ApolloContext
+    ) => isStaffFor(parent.id, async (user) => (
+      await DeviceRepo.getMakerspaceDevices(parent.id)
+    )),
+
+    genericDevices: async (
+      parent: MakerspaceRow,
+      _args: any,
+      { isStaffFor }: ApolloContext
+    ) => isStaffFor(parent.id, async (user) => (
+      await DeviceRepo.getMakerspaceGenericDevices(parent.id)
+    )),
+
+    cores: async (
+      parent: MakerspaceRow,
+      _args: any,
+      { isStaffFor }: ApolloContext
+    ) => isStaffFor(parent.id, async (user) => (
+      await CoreRepo.getMakerspaceCores(parent.id)
+    )),
+
+    dispensers: async (
+      parent: MakerspaceRow,
+      _args: any,
+      { isStaffFor }: ApolloContext
+    ) => isStaffFor(parent.id, async (user) => (
+      await DispenserRepo.getMakerspaceDispensers(parent.id)
+    ))
   },
 
   Query: {
