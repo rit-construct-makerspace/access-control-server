@@ -295,3 +295,22 @@ export const GET_VALID_STAFF = gql`
     }
   }
 `;
+
+export const GET_MAKERSPACE_WITH_DEVICES = gql`
+  query GetMakerspaceWithDevices($id: ID!) {
+    getMakerspaceByID(id: $id) {
+      id
+      name
+      devices {
+
+      }
+      genericDevices
+      cores {
+
+      }
+      dispensers {
+        
+      }
+    }
+  }
+`;

@@ -44,7 +44,7 @@ const MakerspacesResolver = {
         : getItemsWhereStorefront(args.storefrontVisible, parent.id);
     },
 
-    devcies: async (
+    devices: async (
       parent: MakerspaceRow,
       _args: any,
       { isStaffFor }: ApolloContext

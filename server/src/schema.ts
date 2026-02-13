@@ -63,6 +63,8 @@ import ReservationResolver from "./resolvers/reservationResolver.js";
 import { ReservationTypeDefs } from "./schemas/reservationSchema.js";
 import MaintenanceTicketResolver from "./resolvers/maintenanceTicketResolver.js";
 import { MaintenanceTicketTypeDefs } from "./schemas/maintenanceTicketSchema.js";
+import { DeviceTypeDefs } from "./schemas/deviceSchema.js";
+import DeviceResolver from "./resolvers/deviceResolver.js";
 
 // for custom scalars such as Date
 const resolveFunctions = {
@@ -103,6 +105,7 @@ export const schema = makeExecutableSchema({
     CustomUrlTypeDef,
     ReservationTypeDefs,
     MaintenanceTicketTypeDefs,
+    DeviceTypeDefs,
   ],
   resolvers: [
     resolveFunctions,
@@ -135,5 +138,6 @@ export const schema = makeExecutableSchema({
     CustomUrlResolver,
     ReservationResolver,
     MaintenanceTicketResolver,
+    DeviceResolver,
   ]
 });

@@ -27,6 +27,7 @@ export const DeviceTypeDefs = gql`
     currentCardtag: String
     lastStatusTime: DateTime
     sessionStartTime: DateTime
+    device: Device!
   }
 
   enum DispenserError {
@@ -38,5 +39,6 @@ export const DeviceTypeDefs = gql`
     deviceID: Int!
     cardsLeft: Int!
     error: DispenserError
+    device: Device!
   }
 `;
