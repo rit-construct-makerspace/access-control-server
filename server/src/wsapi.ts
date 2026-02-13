@@ -888,7 +888,6 @@ async function handleStateUpdateMessage(device: DeviceRow, newState: string, act
   controller.state = stringStateToEnumState(newState);
   core.currentCardtag = activeUID;
   core.lastStatusTime = timeOfChange;
-  core.lastStatusReason = "websocket-poll";
 
   const user = await getUserByCardTagID(oldUID ?? "");
   const instance = await getInstanceByAccessControllerID(controller.id);

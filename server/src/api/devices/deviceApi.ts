@@ -1,6 +1,6 @@
 import express from "express";
-import { ReaderRow } from "../../db/tables.js";
-import * as ReaderRepo from "../../repositories/Readers/ReaderRepository.js"
+import { DeviceRow, ReaderRow } from "../../db/tables.js";
+import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js"
 import { createCipheriv, scryptSync } from "crypto";
 import * as CardAPI from "./cards/cardApi.js";
 
@@ -27,10 +27,10 @@ export async function generateDeviceKey(pairTime: Date, SN: string, keyCycle: nu
   return encrypted;
 }
 
-async function authenticateDevice(device: ReaderRow, submittedKey: string): Promise<boolean> {
-  if (device.pairTime === undefined || device.SN === undefined || device.readerKeyCycle === undefined) { return false; }
+export async function authenticateDevice(device: DeviceRow, submittedKey: string): Promise<boolean> {
+  if (device.pairTime === undefined || device.SN === undefined || device.keyCyle === undefined) { return false; }
 
-  const keyToMatch = await generateDeviceKey(device.pairTime, device.SN, device.readerKeyCycle);
+  const keyToMatch = await generateDeviceKey(device.pairTime, device.SN, device.keyCyle);
 
   return submittedKey === keyToMatch;
 }
@@ -46,7 +46,7 @@ export function registerEndpoints(app: express.Application) {
     const Key = req.headers[KeyHeader];
     if (typeof SN !== "string" || typeof Key !== "string") { return res.status(401).send(); }
 
-    const device = await ReaderRepo.getReaderBySN(SN);
+    const device = await DeviceRepo.getDeviceBySN(SN);
     if (device === undefined) { return res.sendStatus(404); }
 
     const authed = authenticateDevice(device, Key);
