@@ -70,7 +70,7 @@ export async function up(knex: Knex): Promise<void> {
   });
 
   await knex.schema.alterTable("EquipmentInstances", (t) => {
-    t.integer("accessControllerID").references("id").inTable("AccessController").nullable().defaultTo(null);
+    t.integer("accessControllerID").references("id").inTable("AccessControllers").nullable().defaultTo(null);
   })
 
   const readers = await knex("Readers").select("*");
