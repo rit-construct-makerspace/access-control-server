@@ -47,7 +47,6 @@ export async function up(knex: Knex): Promise<void> {
     t.enum("inputMode", ["INSERT", "TEMP", "TOGGLE"]).notNullable();
     t.integer("tempDuration");
     t.string("currentCardTag").nullable().defaultTo(null);
-    t.string("lastStatusReason").nullable(); // ENUM ?
     t.timestamp("lastStatusTime").nullable();
     t.timestamp("sessionStartTime").nullable();
   });

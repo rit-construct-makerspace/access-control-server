@@ -25,7 +25,6 @@ export const DeviceTypeDefs = gql`
     inputMode: CoreInputMode!
     tempDuration: Int!
     currentCardtag: String
-    lastStatusReason: String
     lastStatusTime: DateTime
     sessionStartTime: DateTime
   }

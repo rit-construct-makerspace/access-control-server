@@ -689,7 +689,6 @@ export interface CoreRow {
   inputMode: CoreInputMode;
   tempDuration: number;
   currentCardtag: string | undefined;
-  lastStatusReason: string | undefined; // ENUM ?
   lastStatusTime: Date | undefined;
   sessionStartTime: Date | undefined;
 }

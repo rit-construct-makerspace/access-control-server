@@ -9,7 +9,6 @@ export class Core extends Device implements CoreRow {
   inputMode: CoreInputMode;
   tempDuration: number;
   currentCardtag: string | undefined;
-  lastStatusReason: string | undefined;
   lastStatusTime: Date | undefined;
   sessionStartTime: Date | undefined;
 
@@ -20,7 +19,6 @@ export class Core extends Device implements CoreRow {
     this.inputMode = coreRow.inputMode;
     this.tempDuration = coreRow.tempDuration;
     this.currentCardtag = coreRow.currentCardtag;
-    this.lastStatusReason = coreRow.lastStatusReason;
     this.lastStatusTime = coreRow.lastStatusTime;
     this.sessionStartTime = coreRow.sessionStartTime;
   }
