@@ -9,9 +9,9 @@ export class Core extends Device implements CoreRow {
   inputMode: CoreInputMode;
   tempDuration: number;
   currentCardtag: string | undefined;
-  lastStatusReason: string;
-  lastStatusTime: Date;
-  sessionStartTime: Date;
+  lastStatusReason: string | undefined;
+  lastStatusTime: Date | undefined;
+  sessionStartTime: Date | undefined;
 
   constructor(coreRow: CoreRow, deviceRow: DeviceRow) {
     super(deviceRow);
