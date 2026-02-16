@@ -56,6 +56,6 @@ export async function getMakerspaceDevices(makerspaceID: number): Promise<Device
 
 export async function getMakerspaceGenericDevices(makerspaceID: number): Promise<Device[]> {
   const rawDevices = await knex("Devices").where({ makerspaceID: makerspaceID })
-    .whereNotExists(knex("Cores").where("Cores.deviceID", "=", "Devices.id")).orderBy("name", "desc");
+    .whereNotExists(knex("Cores").where("Cores.deviceID", "=", knex.ref("Devices.id"))).orderBy("name", "desc");
   return rawDevices.map((raw) => new Device(raw));
 }
