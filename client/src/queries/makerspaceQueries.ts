@@ -298,18 +298,28 @@ export const GET_VALID_STAFF = gql`
 
 export const GET_MAKERSPACE_WITH_DEVICES = gql`
   query GetMakerspaceWithDevices($id: ID!) {
-    getMakerspaceByID(id: $id) {
+    makerspaceByID(id: $id) {
       id
       name
-      devices {
-
+      genericDevices {
+        id
+        name
+        SN
       }
-      genericDevices
       cores {
-
+        channels
+        lastStatusTime
+        device {
+          id
+          name
+          SN
+          hardwareVersion
+          firmwareVersion
+          targetFirmware
+        }
       }
       dispensers {
-        
+        cardsLeft
       }
     }
   }

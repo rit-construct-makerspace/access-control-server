@@ -50,6 +50,7 @@ import MaintenancePage from "./pages/makerspace_page/maintenance_pages/Maintenan
 import { Box } from "@mui/material";
 import InventoryPage from "./pages/makerspace_page/inventory_pages/InventoryPage";
 import QuickEditInventoryPage from "./pages/makerspace_page/inventory_pages/QuickEditInventoryPage";
+import DevicesPage from "./pages/makerspace_page/device_pages/DevicesPage";
 
 function AppRoot() {
   return (
@@ -186,10 +187,11 @@ export const appRouter = createBrowserRouter(
                             { path: "/makerspace/:makerspaceID/tools/instance/", element: <ToolItemPage /> },
 
                             { path: "/makerspace/:makerspaceID/history", element: <AuditLogsPage /> },
-                            { path: "/makerspace/:makerspaceID/readers", element: <ReadersPage /> },
                             { path: "/makerspace/:makerspaceID/organizations", element: <OrganizationsPage /> },
                             { path: "/makerspace/:makerspaceID/maintenance", element: <MaintenancePage /> },
                             { path: "/makerspace/:makerspaceID/reservations", element: <ManageReservationsPage /> },
+
+                            { path: "/makerspace/:makerspaceID/devices", element: <DevicesPage /> },
 
                             /* Routes for manager + higher */
                             {
