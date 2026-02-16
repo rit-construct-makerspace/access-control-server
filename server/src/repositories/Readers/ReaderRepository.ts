@@ -54,17 +54,17 @@ export async function getReaders(makerspaceID: number | null = null): Promise<Re
     }
 
     const res = await knex("Readers as r")
-    .select('r.*', knex.raw('case when state = \'Fault\' then 0 when (z.id is null and rz.id is null) then 2 else 1 end as "faultOrder"'))
-    .leftOuterJoin("MakerspaceWelcomeReaders as mwr", "mwr.readerID", "r.id")
-    .leftJoin("Makerspaces as z", "z.id", "mwr.makerspaceID")
-    .leftOuterJoin("EquipmentInstances as ei", "ei.readerID", "r.id")
-    .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
-    .leftJoin("Rooms as rs", "rs.id", "e.roomID")
-    .leftJoin("Makerspaces as rz", "rz.id", "rs.makerspaceID")
-    .where("z.id", "=", makerspaceID).orWhere("rz.id", "=", makerspaceID).orWhere(knex.raw("z.id is null and rz.id is null"))
-    .orderBy("faultOrder", "asc")
-    .orderBy("e.name", "asc")
-    .orderBy("id", "asc") as ReaderRowWithPairings[]; 
+        .select('r.*', knex.raw('case when state = \'Fault\' then 0 when (z.id is null and rz.id is null) then 2 else 1 end as "faultOrder"'))
+        .leftOuterJoin("MakerspaceWelcomeReaders as mwr", "mwr.readerID", "r.id")
+        .leftJoin("Makerspaces as z", "z.id", "mwr.makerspaceID")
+        .leftOuterJoin("EquipmentInstances as ei", "ei.readerID", "r.id")
+        .leftJoin("Equipment as e", "ei.equipmentID", "e.id")
+        .leftJoin("Rooms as rs", "rs.id", "e.roomID")
+        .leftJoin("Makerspaces as rz", "rz.id", "rs.makerspaceID")
+        .where("z.id", "=", makerspaceID).orWhere("rz.id", "=", makerspaceID).orWhere(knex.raw("z.id is null and rz.id is null"))
+        .orderBy("faultOrder", "asc")
+        .orderBy("e.name", "asc")
+        .orderBy("id", "asc") as ReaderRowWithPairings[];
 
     return res;
 }

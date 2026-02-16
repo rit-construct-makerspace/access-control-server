@@ -6,17 +6,26 @@ import * as EquipmentRepo from "../../repositories/Equipment/EquipmentRepository
 import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
 import { DispenserError } from "../../api/devices/cards/cardApi.js";
 
-async function getMakerspaceOfReader(reader: ReaderRow): Promise<number | undefined> {
-  const status = await ReaderRepo.getReaderPairStatus(reader.id);
+async function getMakerspaceOfReader(reader: ReaderRow, knex: Knex): Promise<number | undefined> {
+  let status = ReaderRepo.PairStatus.Unpaired
+  const instances = await knex("EquipmentInstances").select("*").where("readerID", "=", reader.id);
+  if (instances.length > 0) {
+    status = ReaderRepo.PairStatus.PairedAsInstance;
+  } else {
+    const makerspaces = await knex("MakerspaceWelcomeReaders").where("readerID", "=", reader.id);
+    if (makerspaces.length > 0) {
+      status = ReaderRepo.PairStatus.PairedAsWelcomer;
+    }
+  }
 
   if (status === ReaderRepo.PairStatus.PairedAsWelcomer) {
-    return (await ReaderRepo.getMakerspaceOfWelcomeReader(status))?.id ?? undefined;
+    return (await knex("MakerspaceWelcomeReaders").first().where({ readerID: reader.id }).select("makerspaceID"))?.makerspaceID;
   } else if (status === ReaderRepo.PairStatus.PairedAsInstance) {
-    const instance = await EquipmentInstanceRepo.getInstanceByReaderID(reader.id);
+    const instance = await knex("EquipmentInstances").select().where({ readerID: reader.id }).first();
     if (instance === undefined) { return undefined; }
-    const equipment = await EquipmentRepo.getEquipmentByID(instance.equipmentID);
+    const equipment = await knex("Equipment").where({ id: instance.equipmentID }).first();
     if (equipment === undefined) { return undefined; }
-    const room = await RoomRepo.getRoomByID(equipment.roomID);
+    const room = await knex.first("id", "name", "archived", "makerspaceID").from("Rooms").where("id", equipment.roomID);
     if (room === undefined || room === null) { return undefined; }
     return room.makerspaceID ?? undefined;
   }
@@ -71,12 +80,16 @@ export async function up(knex: Knex): Promise<void> {
 
   await knex.schema.alterTable("EquipmentInstances", (t) => {
     t.integer("accessControllerID").references("id").inTable("AccessControllers").nullable().defaultTo(null);
-  })
+  });
+
+  await knex.schema.alterTable("MakerspaceWelcomeReaders", (t) => {
+    t.integer("deviceID").references("id").inTable("Devices");
+  });
 
   const readers = await knex("Readers").select("*");
   for (let i = 0; i < readers.length; i++) {
     let reader = readers[i];
-    const makerspaceID = await getMakerspaceOfReader(reader);
+    const makerspaceID = await getMakerspaceOfReader(reader, knex);
 
     if (makerspaceID === undefined) {
       continue;
@@ -92,7 +105,7 @@ export async function up(knex: Knex): Promise<void> {
       makerspaceID: makerspaceID
     }).returning("*"))[0];
 
-    const readerMakerspace = await ReaderRepo.getMakerspaceOfWelcomeReader(reader.id);
+    const readerMakerspace = (await knex("MakerspaceWelcomeReaders").first().where({ readerID: reader.id }))?.makerspaceID;
 
     const core = await knex("Cores").insert({
       deviceID: device.id,
@@ -101,16 +114,19 @@ export async function up(knex: Knex): Promise<void> {
       tempDuration: readerMakerspace === undefined ? undefined : 0
     }).returning("*");
 
+    if (readerMakerspace) {
+      await knex("MakerspaceWelcomeReaders").update({ deviceID: device.id }).where({ readerID: reader.id });
+    }
+
     const accessController = (await knex("AccessControllers").insert({
       deviceID: device.id,
       channelID: 0
     }).returning("*"))[0];
 
-    await knex("EquipmentInstances").insert({ accessControllerID: accessController.id }).where("readerID", "=", reader.id);
+    await knex("EquipmentInstances").update({ accessControllerID: accessController.id }).where("readerID", "=", reader.id);
   }
 
   await knex.schema.alterTable("MakerspaceWelcomeReaders", (t) => {
-    t.integer("deviceID").references("id").inTable("Devices");
     t.dropPrimary();
     t.primary(["makerspaceID", "deviceID"]);
     t.dropColumn("readerID");
