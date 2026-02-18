@@ -45,7 +45,12 @@ export function CoreCard(props: CoreCardProps) {
                   ? <Typography variant="body1"><b>Makerspace:</b> <Link href={`/app/makerspace/${props.core.welcomeSpace.id}`}>{props.core.welcomeSpace.name}</Link></Typography>
                   : <Typography variant="body1" fontWeight={"bold"}>Unpaired</Typography>
             }
-            <Typography variant="body1"><b>User:</b> user</Typography>
+            <Typography variant="body1"><b>User:</b> {
+              props.core.activeUser !== undefined && props.core.activeUser !== null
+                ? <Link href={`/app/makerspace/${makerspaceID}/people/${props.core.activeUser.id}`}>{props.core.activeUser.ritUsername}</Link>
+                : "No One"
+            }
+            </Typography>
           </Stack>
           <Stack sx={{ width: "300px" }}>
             <Typography variant="body1"><b>State:</b> state</Typography>

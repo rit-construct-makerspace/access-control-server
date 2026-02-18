@@ -329,6 +329,10 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
           id
           name
         }
+        activeUser {
+          id
+          ritUsername
+        }
       }
       dispensers {
         cardsLeft

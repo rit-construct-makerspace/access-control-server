@@ -1,3 +1,4 @@
+import { CurrentUser } from "../common/CurrentUserProvider";
 import { EquipmentInstance } from "./equipmentInstanceQueries";
 import { FullMakerspace } from "./makerspaceQueries";
 
@@ -30,6 +31,7 @@ export interface Core {
   device: Device;
   instance: EquipmentInstance | undefined;
   welcomeSpace: FullMakerspace | undefined;
+  activeUser: CurrentUser | undefined;
 }
 
 enum DispenserError {

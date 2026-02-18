@@ -30,6 +30,7 @@ export const DeviceTypeDefs = gql`
     device: Device!
     instance: EquipmentInstance
     welcomeSpace: Makerspace
+    activeUser: User
   }
 
   enum DispenserError {

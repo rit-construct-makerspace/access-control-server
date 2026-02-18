@@ -7,6 +7,7 @@ import { createLog } from "../AuditLogs/AuditLogRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import { UserRow } from "../../db/tables.js";
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js";
+import * as TempCardRepo from "./TempCardRepository.js";
 
 
 /**
@@ -98,8 +99,15 @@ export async function getUserByRitUsername(
 export async function getUserByCardTagID(
   cardTagID: string
 ): Promise<UserRow | undefined> {
-  if (!cardTagID || cardTagID == "0" || cardTagID == "null" || cardTagID == "undefined") return undefined;
-  return knex("Users").first().where("cardTagID", cardTagID);
+  if (!cardTagID || cardTagID == "0" || cardTagID == "null" || cardTagID == "undefined") { return undefined; }
+
+  const tempUser = await TempCardRepo.getUserFromTempCardTag(cardTagID);
+  console.log(tempUser);
+  if (tempUser !== undefined) { return tempUser; }
+
+  const result = knex("Users").first().where("cardTagID", cardTagID);
+  console.log(result);
+  return result;
 }
 
 /**

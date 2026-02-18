@@ -688,7 +688,7 @@ export interface CoreRow {
   channels: number;
   inputMode: CoreInputMode;
   tempDuration: number;
-  currentCardtag: string | undefined;
+  currentCardTag: string | undefined;
   lastStatusTime: Date | undefined;
   sessionStartTime: Date | undefined;
 }

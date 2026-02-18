@@ -3,6 +3,7 @@ import { CoreRow, DispenserRow } from "../db/tables.js";
 import * as DeviceRepo from "../repositories/Devices/DeviceRepository.js";
 import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
+import * as UserRepo from "../repositories/Users/UserRepository.js";
 
 const DeviceResolver = {
   Core: {
@@ -30,7 +31,19 @@ const DeviceResolver = {
       { isStaff }: ApolloContext
     ) => isStaff(async (_user) => (
       await DeviceRepo.getMakerspaceOfWelcomeDevice(parent.deviceID)
-    ))
+    )),
+
+    activeUser: async (
+      parent: CoreRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => {
+      if (parent.currentCardTag !== undefined) {
+        return await UserRepo.getUserByCardTagID(parent.currentCardTag)
+      }
+
+      return undefined;
+    })
   },
 
   Dispenser: {
