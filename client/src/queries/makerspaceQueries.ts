@@ -317,6 +317,18 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
           firmwareVersion
           targetFirmware
         }
+        instance {
+          id
+          name
+          equipment {
+            id
+            name
+          }
+        }
+        welcomeSpace {
+          id
+          name
+        }
       }
       dispensers {
         cardsLeft

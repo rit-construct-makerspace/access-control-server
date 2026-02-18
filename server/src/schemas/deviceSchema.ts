@@ -28,6 +28,8 @@ export const DeviceTypeDefs = gql`
     lastStatusTime: DateTime
     sessionStartTime: DateTime
     device: Device!
+    instance: EquipmentInstance
+    welcomeSpace: Makerspace
   }
 
   enum DispenserError {
