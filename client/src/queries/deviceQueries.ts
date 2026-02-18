@@ -1,3 +1,5 @@
+import { EquipmentInstance } from "./equipmentInstanceQueries";
+import { FullMakerspace } from "./makerspaceQueries";
 
 export interface Device {
   id: number;
@@ -26,6 +28,8 @@ export interface Core {
   lastStatusTime: Date;
   sessionStartTime: Date;
   device: Device;
+  instance: EquipmentInstance | undefined;
+  welcomeSpace: FullMakerspace | undefined;
 }
 
 enum DispenserError {

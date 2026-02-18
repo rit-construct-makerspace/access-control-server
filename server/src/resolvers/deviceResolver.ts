@@ -20,8 +20,8 @@ const DeviceResolver = {
       { isStaff }: ApolloContext
     ) => isStaff(async (_user) => {
       const controllers = await ACRepo.getAccessControllersByDeviceID(parent.deviceID);
-      if (controllers.length > 1 || controllers.length === 0) { return undefined; }
-      return await InstanceRepo.getInstanceByAccessControllerID(controllers[1].id);
+      if (controllers.length !== 1) { return undefined; }
+      return await InstanceRepo.getInstanceByAccessControllerID(controllers[0].id);
     }),
 
     welcomeSpace: async (

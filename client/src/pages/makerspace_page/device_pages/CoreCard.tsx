@@ -1,14 +1,16 @@
-import { Autocomplete, Button, Card, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, Card, IconButton, Link, Stack, TextField, Typography } from "@mui/material";
 import { Core } from "../../../queries/deviceQueries";
 import TimeAgo from "react-timeago";
 import LanIcon from '@mui/icons-material/Lan';
 import SendIcon from '@mui/icons-material/Send';
+import { useParams } from "react-router-dom";
 
 interface CoreCardProps {
   core: Core;
 }
 
 export function CoreCard(props: CoreCardProps) {
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
   return (
     <Card variant="outlined">
@@ -34,9 +36,15 @@ export function CoreCard(props: CoreCardProps) {
             <Typography variant="body1"><b>FW:</b> {props.core.device.firmwareVersion}</Typography>
             <Typography variant="body1"><b>Target FW:</b> {props.core.device.targetFirmware}</Typography>
           </Stack>
-          <Stack sx={{ width: "400px" }}>
+          <Stack sx={{ width: "500px" }}>
             <Typography variant="body1"><b>Last Online:</b> <TimeAgo date={props.core.lastStatusTime} /></Typography>
-            <Typography variant="body1"><b>Machine:</b> osillyscope</Typography>
+            {
+              (props.core.instance !== undefined && props.core.instance !== null)
+                ? <Typography variant="body1"><b>Instance:</b> <Link href={`/app/makerspace/${makerspaceID}/equipment/${props.core.instance.equipment.id}`}>{`${props.core.instance.equipment.name} | ${props.core.instance.name}`}</Link></Typography>
+                : props.core.welcomeSpace !== undefined
+                  ? <Typography variant="body1"><b>Makerspace:</b> <Link href={`/app/makerspace/${props.core.welcomeSpace.id}`}>{props.core.welcomeSpace.name}</Link></Typography>
+                  : <Typography variant="body1" fontWeight={"bold"}>Unpaired</Typography>
+            }
             <Typography variant="body1"><b>User:</b> user</Typography>
           </Stack>
           <Stack sx={{ width: "300px" }}>
