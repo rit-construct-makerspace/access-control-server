@@ -1,7 +1,8 @@
-import { Autocomplete, Button, Card, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, Card, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { Core } from "../../../queries/deviceQueries";
 import TimeAgo from "react-timeago";
 import LanIcon from '@mui/icons-material/Lan';
+import SendIcon from '@mui/icons-material/Send';
 
 interface CoreCardProps {
   core: Core;
@@ -40,15 +41,22 @@ export function CoreCard(props: CoreCardProps) {
           </Stack>
           <Stack sx={{ width: "300px" }}>
             <Typography variant="body1"><b>State:</b> state</Typography>
-            <Autocomplete
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                />
-              )}
-              options={[]}
-              fullWidth
-            />
+            <Stack direction={"row"} spacing={1} alignItems={"center"}>
+              <Autocomplete
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                  />
+                )}
+                options={[]}
+                fullWidth
+              />
+              <IconButton
+                color="success"
+              >
+                <SendIcon />
+              </IconButton>
+            </Stack>
           </Stack>
         </Stack>
         <Button
