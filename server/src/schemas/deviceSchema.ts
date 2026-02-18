@@ -19,6 +19,14 @@ export const DeviceTypeDefs = gql`
     TOGGLE
   }
 
+  enum AccessControllerState {
+    IDLE
+    UNLOCKED
+    ALWAYS_ON
+    LOCKED_OUT
+    FAULT
+  }
+
   type Core {
     deviceID: Int!
     channels: Int!
@@ -31,6 +39,7 @@ export const DeviceTypeDefs = gql`
     instance: EquipmentInstance
     welcomeSpace: Makerspace
     activeUser: User
+    state: AccessControllerState!
   }
 
   enum DispenserError {

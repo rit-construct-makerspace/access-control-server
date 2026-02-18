@@ -4,6 +4,7 @@ import * as DeviceRepo from "../repositories/Devices/DeviceRepository.js";
 import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import * as UserRepo from "../repositories/Users/UserRepository.js";
+import * as CoreRepo from "../repositories/Devices/CoreRepository.js";
 
 const DeviceResolver = {
   Core: {
@@ -43,7 +44,14 @@ const DeviceResolver = {
       }
 
       return undefined;
-    })
+    }),
+    state: async (
+      parent: CoreRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => (
+      CoreRepo.getCoreState(parent.deviceID)
+    ))
   },
 
   Dispenser: {

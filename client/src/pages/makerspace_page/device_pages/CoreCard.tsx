@@ -53,7 +53,7 @@ export function CoreCard(props: CoreCardProps) {
             </Typography>
           </Stack>
           <Stack sx={{ width: "300px" }}>
-            <Typography variant="body1"><b>State:</b> state</Typography>
+            <Typography variant="body1"><b>State:</b> {props.core.state}</Typography>
             <Stack direction={"row"} spacing={1} alignItems={"center"}>
               <Autocomplete
                 renderInput={(params) => (

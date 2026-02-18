@@ -20,6 +20,14 @@ enum CoreInputMode {
   TOGGLE = "TOGGLE"
 }
 
+enum AccessControllerState {
+  IDLE = "IDLE",
+  UNLOCKED = "UNLOCKED",
+  ALWAYS_ON = "ALWAYS_ON",
+  LOCKED_OUT = "LOCKED_OUT",
+  FAULT = "FAULT"
+}
+
 export interface Core {
   deviceID: number;
   channels: number;
@@ -32,6 +40,7 @@ export interface Core {
   instance: EquipmentInstance | undefined;
   welcomeSpace: FullMakerspace | undefined;
   activeUser: CurrentUser | undefined;
+  state: AccessControllerState;
 }
 
 enum DispenserError {

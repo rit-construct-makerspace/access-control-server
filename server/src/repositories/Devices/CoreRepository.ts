@@ -1,7 +1,8 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
-import { CoreRow } from "../../db/tables.js";
+import { AccessControllerState, CoreRow } from "../../db/tables.js";
 import { Core } from "../../models/devices/core.js";
+import * as ACRepo from "./AccessControllerRepository.js";
 
 export async function getCoreByDeviceID(deviceID: number): Promise<Core | undefined> {
   const rawRow = await knex("Cores").where("deviceID", deviceID).first();
@@ -23,4 +24,19 @@ export async function getMakerspaceCores(makerspaceID: number): Promise<Core[]> 
   const rawCores = await knex("Cores").join("Devices", "Devices.id", "Cores.deviceID")
     .where({ makerspaceID: makerspaceID }).select("Cores.*").orderBy("Devices.name", "desc");
   return await Promise.all(rawCores.map(async (raw) => (await Core.buid(raw))));
+}
+
+export async function getCoreState(deviceID: number): Promise<AccessControllerState> {
+  const stateRankings = [AccessControllerState.IDLE, AccessControllerState.LOCKED_OUT, AccessControllerState.UNLOCKED, AccessControllerState.ALWAYS_ON, AccessControllerState.FAULT];
+
+  const controllers = await ACRepo.getAccessControllersByDeviceID(deviceID);
+  let highState = stateRankings[0];
+
+  for (let i = 0; i < controllers.length; i++) {
+    if (stateRankings.indexOf(controllers[i].state) > stateRankings.indexOf(highState)) {
+      highState = controllers[i].state;
+    }
+  }
+
+  return highState;
 }
