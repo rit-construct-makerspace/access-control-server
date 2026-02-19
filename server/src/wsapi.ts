@@ -136,13 +136,30 @@ async function getSimpleController(deviceID: number): Promise<AccessControllerRo
   return accessControllers[0];
 }
 
+function stateEnumToOldString(newState: AccessControllerState) {
+  switch (newState) {
+    case AccessControllerState.IDLE:
+      return "Idle";
+    case AccessControllerState.ALWAYS_ON:
+      return "AlwaysOn";
+    case AccessControllerState.LOCKED_OUT:
+      return "Lockout";
+    case AccessControllerState.FAULT:
+      return "Fault";
+    case AccessControllerState.UNLOCKED:
+      return "Unlocked";
+    default:
+      return "Startup";
+  }
+}
+
 /**
  * Sends a state to a shlug
  * @param readerId reader to send the state to
  * @param state the string representing the target state
  * @returns text description of success or failure
  */
-export async function sendState(executingUser: UserRow, deviceID: number, state: string): Promise<string> {
+export async function sendState(executingUser: UserRow, deviceID: number, state: AccessControllerState): Promise<string> {
   let connData = slugPool.get(deviceID);
   if (connData == null) {
     console.error(`WSACS: Couldn't find shlug with id ${deviceID} \n in pool ${stringSlugPool()}`)
@@ -176,7 +193,7 @@ export async function sendState(executingUser: UserRow, deviceID: number, state:
     );
   }
 
-  sendToShlugUnprompted(connData, { "State": state });
+  sendToShlugUnprompted(connData, { "State": stateEnumToOldString(state) });
   return "success";
 }
 
@@ -883,10 +900,10 @@ async function handleStateUpdateMessage(device: DeviceRow, newState: string, act
   if (core === undefined) { return; }
 
   const oldState = controller.state;
-  const oldUID = core?.currentCardtag;
+  const oldUID = core?.currentCardTag;
 
   controller.state = stringStateToEnumState(newState);
-  core.currentCardtag = activeUID;
+  core.currentCardTag = activeUID;
   core.lastStatusTime = timeOfChange;
 
   const user = await getUserByCardTagID(oldUID ?? "");
@@ -909,7 +926,7 @@ async function handleStateUpdateMessage(device: DeviceRow, newState: string, act
 
     if (oldState == AccessControllerState.UNLOCKED) {
       // end last session normally
-      core.currentCardtag = activeUID ?? '';
+      core.currentCardTag = activeUID ?? '';
 
       if (instance == null || equipment == null) {
         if (user != null) {

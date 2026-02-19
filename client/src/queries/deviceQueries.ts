@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { CurrentUser } from "../common/CurrentUserProvider";
 import { EquipmentInstance } from "./equipmentInstanceQueries";
 import { FullMakerspace } from "./makerspaceQueries";
@@ -20,7 +21,7 @@ enum CoreInputMode {
   TOGGLE = "TOGGLE"
 }
 
-enum AccessControllerState {
+export enum AccessControllerState {
   IDLE = "IDLE",
   UNLOCKED = "UNLOCKED",
   ALWAYS_ON = "ALWAYS_ON",
@@ -54,3 +55,9 @@ export interface Dispenser {
   error: DispenserError;
   device: Device;
 }
+
+export const SET_CORE_STATE = gql`
+  mutation SetCoreState($deviceID: Int!, $targetState: CoreStateInput) {
+    setCoreState(deviceID: $deviceID, targetState: $targetState)
+  }
+`;

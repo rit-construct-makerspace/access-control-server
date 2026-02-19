@@ -53,4 +53,14 @@ export const DeviceTypeDefs = gql`
     error: DispenserError
     device: Device!
   }
+
+  enum CoreStateInput {
+    IDLE
+    ALWAYS_ON
+    LOCKED_OUT
+  }
+
+  extend type Mutation {
+    setCoreState(deviceID: Int!, targetState: CoreStateInput): Boolean
+  }
 `;
