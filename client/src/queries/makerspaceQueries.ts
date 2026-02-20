@@ -341,3 +341,12 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
     }
   }
 `;
+
+export const GET_SMALL_MAKERSPACE = gql`
+  query GetSmallMakerspace($id: ID!) {
+    makerspaceByID(id: $id) {
+      id
+      name
+    }
+  }
+`;

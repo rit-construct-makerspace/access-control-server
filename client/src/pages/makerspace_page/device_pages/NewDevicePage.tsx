@@ -1,20 +1,28 @@
-import { Alert, AlertTitle, Button, Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import { useState } from "react";
+import { Alert, AlertTitle, Button, Skeleton, Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ManualDevicePairModal from "./ManualDevicePairModal";
+import { GET_SMALL_MAKERSPACE } from "../../../queries/makerspaceQueries";
+import { useQuery } from "@apollo/client";
 
 export default function NewDevicePage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
+
+  const makerspaceResult = useQuery(GET_SMALL_MAKERSPACE, { variables: { id: Number(makerspaceID) } });
 
   const [deviceType, setDeviceType] = useState<"generic" | "core" | "dispenser" | null>(null);
   const [manualModal, setManualModal] = useState(false);
 
   const serialSupported = "serial" in navigator;
 
+  useEffect(() => {
+    console.log(makerspaceResult.data)
+  }, [makerspaceResult.data])
+
   return (
     <Stack spacing={2} padding={"10px 15px"}>
       <title>Pair Device</title>
-      <Typography variant="h3">Pairing Device with</Typography>
+      <Typography variant="h3">{makerspaceResult.loading ? <Skeleton /> : `Pairing Device with ${makerspaceResult.data?.makerspaceByID.name ?? ""}`}</Typography>
       <Stack spacing={1}>
         <Typography variant="subtitle1">Device Type</Typography>
         <ToggleButtonGroup
