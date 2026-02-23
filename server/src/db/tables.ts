@@ -673,7 +673,7 @@ export interface DeviceRow {
   hardwareVersion: string | undefined;
   firmwareVersion: string | undefined;
   targetFirmware: string | undefined;
-  keyCyle: number;
+  keyCycle: number;
   makerspaceID: number;
 }
 

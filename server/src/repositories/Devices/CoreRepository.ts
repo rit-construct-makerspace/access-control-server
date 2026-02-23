@@ -1,8 +1,9 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
-import { AccessControllerState, CoreRow } from "../../db/tables.js";
+import { AccessControllerState, CoreInputMode, CoreRow } from "../../db/tables.js";
 import { Core } from "../../models/devices/core.js";
 import * as ACRepo from "./AccessControllerRepository.js";
+import * as DeviceRepo from "./DeviceRepository.js";
 
 export async function getCoreByDeviceID(deviceID: number): Promise<Core | undefined> {
   const rawRow = await knex("Cores").where("deviceID", deviceID).first();
@@ -39,4 +40,16 @@ export async function getCoreState(deviceID: number): Promise<AccessControllerSt
   }
 
   return highState;
+}
+
+export async function pairNewCore(SN: string, makerspaceID: number): Promise<Core> {
+  const newDevice = await DeviceRepo.pairNewDevice(SN, makerspaceID);
+  const newCore = await knex("Cores").insert({
+    deviceID: newDevice.id,
+    channels: 0,
+    inputMode: CoreInputMode.INSERT,
+    tempDuration: 0
+  }).returning("*");
+
+  return await Core.buid(newCore[0]);
 }

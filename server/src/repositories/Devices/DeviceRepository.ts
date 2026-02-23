@@ -2,6 +2,8 @@ import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
 import { DeviceRow, MakerspaceRow } from "../../db/tables.js";
 import { Device } from "../../models/devices/device.js";
+import { generateRandomHumanName } from "../../data/humanReadableNames.js";
+import { randomInt } from "crypto";
 
 /**
  * Get the DeviceRow for the device with the given ID
@@ -58,4 +60,23 @@ export async function getMakerspaceGenericDevices(makerspaceID: number): Promise
   const rawDevices = await knex("Devices").where({ makerspaceID: makerspaceID })
     .whereNotExists(knex("Cores").where("Cores.deviceID", "=", knex.ref("Devices.id"))).orderBy("name", "desc");
   return rawDevices.map((raw) => new Device(raw));
+}
+
+async function generateUniqueHumanName() {
+  const RANDOM_TRIES = 10;
+  for (var i = 0; i < RANDOM_TRIES; i++) {
+    const name = generateRandomHumanName();
+    if ((await getDeviceByName(name)) == null) {
+      return name;
+    }
+  }
+  return `${generateRandomHumanName()}-${randomInt(1000)}`
+}
+
+export async function pairNewDevice(SN: string, makerspaceID: number): Promise<Device> {
+  const newName = await generateUniqueHumanName();
+
+  const newDevice = await knex("Devices").insert({ SN: SN, name: newName, makerspaceID: makerspaceID }).returning("*");
+
+  return new Device(newDevice[0]);
 }
