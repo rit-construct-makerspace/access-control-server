@@ -19,6 +19,34 @@ export default function NewDevicePage() {
     console.log(makerspaceResult.data)
   }, [makerspaceResult.data])
 
+  if (!serialSupported) {
+    return (
+      <Stack spacing={2} padding={"10px 15px"}>
+        <title>Pair Device</title>
+        <Typography variant="h3">{makerspaceResult.loading ? <Skeleton /> : `Pairing Device with ${makerspaceResult.data?.makerspaceByID.name ?? ""}`}</Typography>
+        <Alert
+          variant="filled"
+          severity="error"
+          action={
+            <Button
+              color="inherit"
+              onClick={() => setManualModal(true)}
+            >
+              MANUALLY PAIR DEVICE
+            </Button>
+          }
+          sx={{
+            whiteSpace: "pre-line"
+          }}
+        >
+          <AlertTitle>WebSerial Unsupported</AlertTitle>
+          {`The WebSerial API is unsupported in this browser.\nPlease switch to Chrome or Edge to streamline the device pairing process.`}
+        </Alert>
+        <ManualDevicePairModal open={manualModal} onClose={() => setManualModal(false)} />
+      </Stack>
+    );
+  }
+
   return (
     <Stack spacing={2} padding={"10px 15px"}>
       <title>Pair Device</title>
@@ -50,28 +78,6 @@ export default function NewDevicePage() {
           </ToggleButton>
         </ToggleButtonGroup>
       </Stack>
-      {
-        serialSupported
-          ? "Serial Supported :)"
-          : <Alert
-            variant="filled"
-            severity="error"
-            action={
-              <Button
-                color="inherit"
-                onClick={() => setManualModal(true)}
-              >
-                MANUALLY PAIR DEVICE
-              </Button>
-            }
-            sx={{
-              whiteSpace: "pre-line"
-            }}
-          >
-            <AlertTitle>WebSerial Unsupported</AlertTitle>
-            {`The WebSerial API is unsupported in this browser.\nPlease switch to Chrome or Edge to streamline the device pairing process.`}
-          </Alert>
-      }
       <ManualDevicePairModal open={manualModal} onClose={() => setManualModal(false)} />
     </Stack>
   );

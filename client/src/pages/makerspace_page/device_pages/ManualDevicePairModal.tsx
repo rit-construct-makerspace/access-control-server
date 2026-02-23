@@ -24,7 +24,11 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
   }
 
   function handleClose() {
+    setDevice(null);
+    setSN("");
     setUseWifi(false);
+    setSsid("");
+    setPassword("");
 
     props.onClose();
   }
