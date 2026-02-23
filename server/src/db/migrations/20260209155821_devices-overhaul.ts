@@ -103,7 +103,7 @@ export async function up(knex: Knex): Promise<void> {
       firmwareVersion: reader.BEVer,
       targetFirmware: reader.targetFirmwareVersion,
       makerspaceID: makerspaceID,
-      keyCyle: reader.readerKeyCycle
+      keyCycle: reader.readerKeyCycle
     }).returning("*"))[0];
 
     const readerMakerspace = (await knex("MakerspaceWelcomeReaders").first().where({ readerID: reader.id }))?.makerspaceID;
