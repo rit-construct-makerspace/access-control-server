@@ -64,7 +64,7 @@ export async function up(knex: Knex): Promise<void> {
     t.string("hardwareVersion").nullable();
     t.string("firmwareVersion").nullable();
     t.string("targetFirmware").nullable();
-    t.integer("keyCyle").notNullable().defaultTo(0);
+    t.integer("keyCycle").notNullable().defaultTo(0);
     t.integer("makerspaceID").references("id").inTable("Makerspaces").notNullable();
   });
 
