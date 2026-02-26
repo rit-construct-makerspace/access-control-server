@@ -93,12 +93,13 @@ export default function TopNav() {
       icon={<ArticleIcon />}
       newTab={true}
     />,
-    <NavLink
-      to="/storefront"
-      primary="Storefront"
-      icon={<StorefrontIcon />}
-      newTab={false}
-    />
+//Commented out 2-24-26 until we can get the storefront payments working -@jim
+//    <NavLink
+//      to="/storefront"
+//      primary="Storefront"
+//      icon={<StorefrontIcon />}
+//      newTab={false}
+//    />
   ];
 
   const userProfileButton = currentUser.visitor

@@ -8,13 +8,14 @@ import { ApolloContext, CurrentUser } from "../context.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUserByCardTagID, getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
-import { ReaderLogRow, ReaderRow } from "../db/tables.js";
+import { AccessControllerState, ReaderLogRow, ReaderRow } from "../db/tables.js";
 import * as ShlugControl from "../wsapi.js"
 
 import { createCipheriv, randomInt, scryptSync } from "crypto";
 import { generateRandomHumanName } from "../data/humanReadableNames.js";
 import { getInstanceByID, getInstanceByReaderID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import { getEquipmentByID } from "../repositories/Equipment/EquipmentRepository.js";
+import { oldStateToStateEnum } from "../db/migrations/20260209155821_devices-overhaul.js";
 const serverApiPass = process.env.SERVER_API_PASSWORD ?? 'unsecure_server_password';
 const serverKey = scryptSync(serverApiPass, 'makerspace-salt¯\_(ツ)_/¯', 24);
 const algorithm = 'aes-192-cbc';
@@ -110,7 +111,7 @@ const ReadersResolver = {
      */
     readers: async (
       _parent: any,
-      args: {makerspaceID: number},
+      args: { makerspaceID: number },
       { isStaff }: ApolloContext) =>
       isStaff(async (user: CurrentUser) => {
         return await ReaderRepo.getReaders(args.makerspaceID ? Number(args.makerspaceID) : null);
@@ -268,7 +269,7 @@ const ReadersResolver = {
       isStaffFor(args.makerspaceID, async (user) => {
         const success = await ReaderRepo.pairReaderAsMakerspaceWelcomer(args.readerID, args.makerspaceID);
         if (success) {
-          ShlugControl.sendState(user, Number(args.readerID), "Welcoming");
+          ShlugControl.sendState(user, Number(args.readerID), AccessControllerState.WELCOMING);
         }
         return success;
       }),
@@ -279,7 +280,7 @@ const ReadersResolver = {
       { isStaffFor }: ApolloContext
     ) =>
       isStaffFor(args.makerspaceID, async (user) => {
-        ShlugControl.sendState(user, Number(args.readerID), "Idle");
+        ShlugControl.sendState(user, Number(args.readerID), AccessControllerState.IDLE);
         return ReaderRepo.unpairReaderAsMakerspaceWelcomer(args.readerID, args.makerspaceID);
       }),
 
@@ -318,33 +319,33 @@ const ReadersResolver = {
     ) =>
       isStaff(async (executingUser: any) => {
         try {
-          return ShlugControl.sendState(executingUser, Number(args.id), args.state);
+          return ShlugControl.sendState(executingUser, Number(args.id), oldStateToStateEnum(args.state));
         } catch (e) {
           return `failed to parse id: ${e}`;
         }
       }),
-    
-      restartAllReaders: async (
-        _parent: any,
-        args: { makerspaceID: number },
-        { isManagerFor }: ApolloContext
-      ) =>
-        isManagerFor(Number(args.makerspaceID), async (executingUser: any) => {
-          if (isNaN(Number(args.makerspaceID))){
-            return false;
-          }
-          try {
-            const readers = await ReaderRepo.getReaders(args.makerspaceID);
-            readers?.forEach((reader) =>{
-              ShlugControl.sendState(executingUser, reader.id, "Restart");
-            });
-            return true;
-          } catch (e) {
-            return false;
-          }
-        }),
 
-        identifyReader: async (
+    restartAllReaders: async (
+      _parent: any,
+      args: { makerspaceID: number },
+      { isManagerFor }: ApolloContext
+    ) =>
+      isManagerFor(Number(args.makerspaceID), async (executingUser: any) => {
+        if (isNaN(Number(args.makerspaceID))) {
+          return false;
+        }
+        try {
+          const readers = await ReaderRepo.getReaders(args.makerspaceID);
+          readers?.forEach((reader) => {
+            ShlugControl.sendState(executingUser, reader.id, "Restart");
+          });
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }),
+
+    identifyReader: async (
       _parent: any,
       args: { id: number, doIdentify: boolean },
       { isStaff }: ApolloContext

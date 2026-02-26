@@ -97,10 +97,12 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
       options.push({ name: props.instance.reader.name + " (Active)", id: props.instance.reader.id });
       options.push({ name: "Unpair From " + props.instance.reader.name, id: undefined });
     }
+
     if (unpairedReaders) {
       const asOptions = unpairedReaders.map((reader: Reader) => ({ id: reader.id, name: reader.name }));
       options.push(...asOptions);
     }
+
     return options;
   }
 

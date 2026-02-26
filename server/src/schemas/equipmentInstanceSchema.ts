@@ -3,7 +3,7 @@
  * GraphQL declarations for EquipmentInstances
  */
 
-import {gql} from "graphql-tag";
+import { gql } from "graphql-tag";
 
 export const EquipmentInstanceTypeDefs = gql`
     type EquipmentInstance {
@@ -12,6 +12,7 @@ export const EquipmentInstanceTypeDefs = gql`
         name: String!
         status: String
         reader: Reader
+        accessController: AccessController
     }
     type Reader {
         id: ID!

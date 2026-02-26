@@ -4,6 +4,7 @@
  * This contains the definitions for the objects every knex select operation will map to.
  */
 
+import { DispenserError } from "../api/devices/cards/cardApi.js";
 import { CurrencySource, CurrencyType } from "../integrations/currency/types.js";
 
 /**
@@ -74,6 +75,8 @@ export interface EquipmentInstancesRow {
   status: string;
   /** Optional FK of the card reader associated with this instance */
   readerID: number | null
+  /** Optional FK of the access controller associated with this instance */
+  accessControllerID: number | null
 }
 
 export interface HoldRow {
@@ -307,6 +310,7 @@ export interface ReaderRow {
 export interface MakerspaceWelcomeReaderRow {
   makerspaceID: number;
   readerID: number;
+  deviceID: number;
 }
 
 export interface ReaderLogRow {
@@ -661,6 +665,56 @@ export interface InventoryItemTagRelationsRow {
   tagID: number;
 }
 
+export interface DeviceRow {
+  id: number;
+  name: string;
+  SN: string;
+  pairTime: Date;
+  hardwareVersion: string | undefined;
+  firmwareVersion: string | undefined;
+  targetFirmware: string | undefined;
+  keyCycle: number;
+  makerspaceID: number;
+}
+
+export enum CoreInputMode {
+  INSERT = "INSERT",
+  TEMP = "TEMP",
+  TOGGLE = "TOGGLE"
+}
+
+export interface CoreRow {
+  deviceID: number;
+  channels: number;
+  inputMode: CoreInputMode;
+  tempDuration: number;
+  currentCardTag: string | undefined;
+  lastStatusTime: Date | undefined;
+  sessionStartTime: Date | undefined;
+}
+
+export enum AccessControllerState {
+  IDLE = "IDLE",
+  UNLOCKED = "UNLOCKED",
+  ALWAYS_ON = "ALWAYS_ON",
+  LOCKED_OUT = "LOCKED_OUT",
+  FAULT = "FAULT",
+  WELCOMING = "WELCOMING"
+}
+
+export interface AccessControllerRow {
+  id: number;
+  deviceID: number;
+  channelID: number;
+  state: AccessControllerState;
+}
+
+export interface DispenserRow {
+  deviceID: number;
+  cardsLeft: number;
+  error: DispenserError;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -708,5 +762,9 @@ declare module "knex/types/tables.js" {
     MaintenanceTickets: MaintenanceTicketRow;
     TemporaryCards: TempCardRow;
     InventoryItemTagRelations: InventoryItemTagRelationsRow;
+    Devices: DeviceRow;
+    Cores: CoreRow;
+    AccessControllers: AccessControllerRow;
+    Dispensers: DispenserRow;
   }
 }
