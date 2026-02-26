@@ -134,7 +134,7 @@ async function getSimpleController(deviceID: number): Promise<AccessControllerRo
   return accessControllers[0];
 }
 
-function stateEnumToOldString(newState: AccessControllerState) {
+export function stateEnumToOldString(newState: AccessControllerState) {
   switch (newState) {
     case AccessControllerState.IDLE:
       return "Idle";
@@ -159,7 +159,7 @@ function stateEnumToOldString(newState: AccessControllerState) {
  * @param state the string representing the target state
  * @returns text description of success or failure
  */
-export async function sendState(executingUser: UserRow, deviceID: number, state: AccessControllerState): Promise<string> {
+export async function sendState(executingUser: UserRow, deviceID: number, state: AccessControllerState | "Restart"): Promise<string> {
   let connData = slugPool.get(deviceID);
   if (connData == null) {
     console.error(`WSACS: Couldn't find shlug with id ${deviceID} \n in pool ${stringSlugPool()}`)
@@ -193,7 +193,7 @@ export async function sendState(executingUser: UserRow, deviceID: number, state:
     );
   }
 
-  sendToShlugUnprompted(connData, { "State": stateEnumToOldString(state) });
+  sendToShlugUnprompted(connData, { "State": state === "Restart" ? "Restart" : stateEnumToOldString(state) });
   return "success";
 }
 

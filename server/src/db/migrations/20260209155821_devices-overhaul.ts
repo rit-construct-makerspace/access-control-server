@@ -6,7 +6,7 @@ import * as EquipmentRepo from "../../repositories/Equipment/EquipmentRepository
 import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
 import { DispenserError } from "../../api/devices/cards/cardApi.js";
 
-function oldStateToStateEnum(oldState: string) {
+export function oldStateToStateEnum(oldState: string) {
   switch (oldState) {
     case "Welcoming":
       return AccessControllerState.WELCOMING;
