@@ -914,7 +914,7 @@ async function handleStateUpdateMessage(device: DeviceRow, newState: string, act
   const label: { id: number, label: string } = (equipment == null) ? { id: device.id, label: device.name } : { id: equipment.id, label: equipment.name ?? "unknown equipment" }
 
 
-  if (oldState != oldStateToStateEnum(newState)) {
+  if (oldState != oldStateToStateEnum(newState) && newState != "Welcoming") {
     if (user == null) {
       wsApiLog(`State of ${tag} changed: ${oldState} -> ${newState}`, "state", label);
     } else {
