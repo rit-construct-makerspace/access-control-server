@@ -863,7 +863,7 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
   // update with new info
   await DeviceRepo.updateDevie(device);
   if (core !== undefined) {
-    await CoreRepo.updateCore(core);
+    await CoreRepo.updateCore(core.getRow());
   }
   await AccessControllerRepo.updateAccessController(controller);
 
@@ -948,7 +948,7 @@ async function handleStateUpdateMessage(device: DeviceRow, newState: string, act
   }
 
   await DeviceRepo.updateDevie(device);
-  await CoreRepo.updateCore(core);
+  await CoreRepo.updateCore(core.getRow());
   await AccessControllerRepo.updateAccessController(controller);
 
 }
