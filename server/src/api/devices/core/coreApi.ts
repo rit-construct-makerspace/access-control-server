@@ -1,8 +1,9 @@
-import express from "express";
+import expressWs from 'express-ws';
 import { Device } from "../../../models/devices/device.js";
 import * as CoreRepo from "../../../repositories/Devices/CoreRepository.js"
+import * as AccessAPI from "./access/access.js";
 
-export function registerEndpoints(app: express.Application) {
+export function registerEndpoints(app: expressWs.Application) {
   app.use("/api/devices/cores", async function (req, res, next) {
     // @ts-expect-error using a field we added
     const device: Device = req.device;
@@ -15,4 +16,6 @@ export function registerEndpoints(app: express.Application) {
 
     return next();
   })
+
+  AccessAPI.registerEndpoints(app);
 }
