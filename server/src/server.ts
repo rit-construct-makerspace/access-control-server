@@ -33,6 +33,8 @@ import { advanceTimeTickets, deletePastSpecialHours, purge_images } from "./peri
 import { getCustomUrl } from "./repositories/Links/customUrlRepository.js";
 import { InventoryItemRow } from "./db/tables.js";
 import * as API from "./api/api.js";
+import { getDeviceBySN } from "./repositories/Devices/DeviceRepository.js";
+import { authenticateDevice } from "./api/devices/deviceApi.js";
 
 const require = createRequire(import.meta.url);
 
@@ -202,12 +204,12 @@ async function startServer() {
       return res.status(401).send();
     }
 
-    const reader = await getReaderBySN(SN);
-    if (reader == null) {
+    const device = await getDeviceBySN(SN);
+    if (device == null) {
       return res.status(404).send();
     }
 
-    const ok = await authenticateReader(reader, Key);
+    const ok = await authenticateDevice(device, Key);
     if (!ok) {
       wsApiLog("Declining API file to unauthed shlug with SN " + SN, "file");
       return res.status(403).send();

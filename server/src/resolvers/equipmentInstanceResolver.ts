@@ -1,6 +1,7 @@
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
-import * as RoomRepo from "../repositories/Rooms/RoomRepository.js"
+import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
+import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import { ApolloContext } from "../context.js";
 import { EquipmentInstancesRow } from "../db/tables.js";
 import { createInstance, deleteInstance, getInstanceByID, getInstancesByEquipment, setInstanceName, setInstanceStatus } from "../repositories/Equipment/EquipmentInstancesRepository.js";
@@ -25,6 +26,15 @@ const EquipmentInstanceResolver = {
       _context: ApolloContext) => {
       return getReaderByID(Number(parent.readerID));
     },
+
+    accessController: async (
+      parent: EquipmentInstancesRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => {
+      if (parent.accessControllerID === null || parent.accessControllerID === undefined) { return undefined; }
+      return await ACRepo.getAccessControllerByID(parent.accessControllerID);
+    })
   },
 
   Query: {

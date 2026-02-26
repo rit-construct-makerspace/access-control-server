@@ -10,7 +10,7 @@ enum DispenserStatus {
   DISPENSER_ERROR = "DISPENSER_ERROR"
 }
 
-enum DispenserError {
+export enum DispenserError {
   CARD_STUCK = "CARD_STUCK",
   OUT_OF_CARDS = "OUT_OF_CARDS"
 }

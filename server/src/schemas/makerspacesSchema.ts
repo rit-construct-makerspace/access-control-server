@@ -27,6 +27,10 @@ export const MakerspacesTypeDefs = gql`
     items: [InventoryItem]
     imageUrl: String
     trainingModules: [TrainingModule]
+    devices: [Device]
+    genericDevices: [Device]
+    cores: [Core]
+    dispensers: [Dispenser]
   }
 
   input MakerspaceInput {

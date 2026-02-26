@@ -295,3 +295,58 @@ export const GET_VALID_STAFF = gql`
     }
   }
 `;
+
+export const GET_MAKERSPACE_WITH_DEVICES = gql`
+  query GetMakerspaceWithDevices($id: ID!) {
+    makerspaceByID(id: $id) {
+      id
+      name
+      genericDevices {
+        id
+        name
+        SN
+      }
+      cores {
+        channels
+        lastStatusTime
+        device {
+          id
+          name
+          SN
+          hardwareVersion
+          firmwareVersion
+          targetFirmware
+        }
+        instance {
+          id
+          name
+          equipment {
+            id
+            name
+          }
+        }
+        welcomeSpace {
+          id
+          name
+        }
+        activeUser {
+          id
+          ritUsername
+        }
+        state
+      }
+      dispensers {
+        cardsLeft
+      }
+    }
+  }
+`;
+
+export const GET_SMALL_MAKERSPACE = gql`
+  query GetSmallMakerspace($id: ID!) {
+    makerspaceByID(id: $id) {
+      id
+      name
+    }
+  }
+`;

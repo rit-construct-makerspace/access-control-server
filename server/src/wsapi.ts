@@ -1,27 +1,29 @@
 import { Request } from "express";
 import * as ws from "ws";
 import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
-import { createReaderFromSN, getMakerspaceOfWelcomeReader, getReaderByID, getReaderByName, getReaderBySN, getReaderPairStatus, PairStatus, submitReaderLog, submitReaderLogWithInstance, updateReaderStatus } from "./repositories/Readers/ReaderRepository.js";
-import { EquipmentInstancesRow, EquipmentRow, ReaderRow, UserRow, MakerspaceRow } from "./db/tables.js";
+import { EquipmentInstancesRow, EquipmentRow, UserRow, MakerspaceRow, AccessControllerRow, AccessControllerState, DeviceRow } from "./db/tables.js";
 import { getEquipmentByID, getMissingTrainingModules, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
 import { EntityNotFound } from "./EntityNotFound.js";
-import { createEquipmentSession, setLatestEquipmentSessionLength } from "./repositories/Equipment/EquipmentSessionsRepository.js";
+import { createEquipmentSession, endLatestEquipmentSession } from "./repositories/Equipment/EquipmentSessionsRepository.js";
 import { getRoomByID, getRoomsByMakerspace, hasRoomTrainings, hasSwipedToday, swipeIntoRoom } from "./repositories/Rooms/RoomRepository.js";
 import { isApproved } from "./repositories/Equipment/AccessChecksRepository.js";
-import { getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstancesRepository.js";
+import { getInstanceByAccessControllerID, getInstanceByReaderID } from "./repositories/Equipment/EquipmentInstancesRepository.js";
 import { randomInt } from "crypto";
 import { generateRandomHumanName } from "./data/humanReadableNames.js";
 import { generateShlugKey } from "./resolvers/readersResolver.js";
 import { hasActiveHolds } from "./repositories/Holds/HoldsRepository.js";
 import { hasRestriction } from "./repositories/Restrictions/RestrictionsRepository.js";
 import { getMakerspaceByID, hasMakerspaceTrainings } from "./repositories/Makerspaces/MakerspaceRespository.js";
-
+import * as DeviceRepo from "./repositories/Devices/DeviceRepository.js";
+import * as AccessControllerRepo from "./repositories/Devices/AccessControllerRepository.js";
+import * as CoreRepo from "./repositories/Devices/CoreRepository.js";
+import { GraphQLError } from "graphql";
+import { submitReaderLog } from "./repositories/Readers/ReaderRepository.js";
 
 const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
 
 const MIN_SESSION_LENGTH = 15
-
 
 enum WSAPIError {
   Protocol = 4000,
@@ -37,7 +39,7 @@ var slugPool: Map<number, ConnectionData> = new Map();
 
 function stringSlugPool() {
   var entries = Array.from(slugPool.entries());
-  var entriesNoWs = entries.map(([_, data]) => ({ "id": data?.readerId, "state": data?.currentState }));
+  var entriesNoWs = entries.map(([_, data]) => ({ "id": data?.deviceID, "state": data?.currentState }));
   return JSON.stringify(entriesNoWs)
 }
 
@@ -62,11 +64,11 @@ function pairedLabel(instance?: EquipmentInstancesRow, machine?: EquipmentRow | 
  * @param connData connection data associated with the shlug
  */
 async function addOrUpdateConnection(connData: ConnectionData) {
-  if (connData.readerId == null) {
-    console.error(`WSACS: Attempting to add invalid connection to active connections\n\tState: ${connData.currentState}\n\tID: ${connData.readerId}\n\tSeqNum: ${connData.toShlugSeqNum}`)
+  if (connData.deviceID == null) {
+    console.error(`WSACS: Attempting to add invalid connection to active connections\n\tState: ${connData.currentState}\n\tID: ${connData.deviceID}\n\tSeqNum: ${connData.toShlugSeqNum}`)
     return;
   }
-  slugPool.set(connData.readerId, connData);
+  slugPool.set(connData.deviceID, connData);
 }
 /**
  * removes a shlug connection from the pool
@@ -74,26 +76,26 @@ async function addOrUpdateConnection(connData: ConnectionData) {
  * @returns true if the item was removed. false if it wasn't found
  */
 function removeConnection(connData: ConnectionData): boolean {
-  if (connData.readerId == null) {
+  if (connData.deviceID == null) {
     console.error(`WSACS: Attempting to remove invalid connection to shlug from pool\nData: ${JSON.stringify(connData)}\nPool:${stringSlugPool()}`);
     return false;
-  } else if (!slugPool.has(connData.readerId)) {
+  } else if (!slugPool.has(connData.deviceID)) {
     console.error(`WSACS: Attempting to remove nonexistent connection to shlug from pool\nData: ${JSON.stringify(connData)}\nPool:${stringSlugPool()}`);
     return false;
   }
-  return slugPool.delete(connData.readerId);
+  return slugPool.delete(connData.deviceID);
 }
 
-export async function identifyReader(executingUser: UserRow, readerId: number, doIdentify: boolean): Promise<boolean> {
-  let connData = slugPool.get(readerId);
+export async function identifyReader(executingUser: UserRow, deviceID: number, doIdentify: boolean): Promise<boolean> {
+  let connData = slugPool.get(deviceID);
   if (connData == null) {
-    console.error(`WSACS: Couldn't find shlug with id ${readerId} \n in pool ${stringSlugPool()}`)
+    console.error(`WSACS: Couldn't find shlug with id ${deviceID} \n in pool ${stringSlugPool()}`)
     return false;
   }
 
-  const reader = await getReaderByID(readerId);
+  const device = await DeviceRepo.getDeviceByID(deviceID);
   if (doIdentify) {
-    wsApiLog("{user} identified {access_device}", "status", { id: executingUser.id, label: getUsersFullName(executingUser) }, { id: readerId, label: reader?.name ?? "unknown reader" });
+    wsApiLog("{user} identified {access_device}", "status", { id: executingUser.id, label: getUsersFullName(executingUser) }, { id: deviceID, label: device?.name ?? "unknown device" });
   }
 
   sendToShlugUnprompted(connData, { "Identify": doIdentify });
@@ -122,6 +124,34 @@ export async function requestOTA(executingUser: UserRow, readerIds: number[], ot
   );;
 }
 
+async function getSimpleController(deviceID: number): Promise<AccessControllerRow> {
+  const accessControllers = await AccessControllerRepo.getAccessControllersByDeviceID(deviceID);
+  if (accessControllers.length < 1) {
+    throw EntityNotFound;
+  } else if (accessControllers.length > 1) {
+    throw new GraphQLError("Too many access controllers for old wsapi");
+  }
+  return accessControllers[0];
+}
+
+export function stateEnumToOldString(newState: AccessControllerState) {
+  switch (newState) {
+    case AccessControllerState.IDLE:
+      return "Idle";
+    case AccessControllerState.ALWAYS_ON:
+      return "AlwaysOn";
+    case AccessControllerState.LOCKED_OUT:
+      return "Lockout";
+    case AccessControllerState.FAULT:
+      return "Fault";
+    case AccessControllerState.UNLOCKED:
+      return "Unlocked";
+    case AccessControllerState.WELCOMING:
+      return "Welcoming";
+    default:
+      return "Startup";
+  }
+}
 
 /**
  * Sends a state to a shlug
@@ -129,21 +159,23 @@ export async function requestOTA(executingUser: UserRow, readerIds: number[], ot
  * @param state the string representing the target state
  * @returns text description of success or failure
  */
-export async function sendState(executingUser: UserRow, readerId: number, state: string): Promise<string> {
-  let connData = slugPool.get(readerId);
+export async function sendState(executingUser: UserRow, deviceID: number, state: AccessControllerState | "Restart"): Promise<string> {
+  let connData = slugPool.get(deviceID);
   if (connData == null) {
-    console.error(`WSACS: Couldn't find shlug with id ${readerId} \n in pool ${stringSlugPool()}`)
+    console.error(`WSACS: Couldn't find shlug with id ${deviceID} \n in pool ${stringSlugPool()}`)
     return "not found";
   }
 
-  const reader = await getReaderByID(readerId);
-  if (reader == undefined) {
+  const device = await DeviceRepo.getDeviceByID(deviceID);
+  if (device == undefined) {
     throw EntityNotFound;
   }
 
-  const instance = await getInstanceByReaderID(readerId);
+  const controller = await getSimpleController(device.id);
+
+  const instance = await getInstanceByReaderID(controller.id);
   const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
-  const makerspaceForWhomeIWelcome = await getMakerspaceOfWelcomeReader(reader.id);
+  const makerspaceForWhomeIWelcome = await DeviceRepo.getMakerspaceOfWelcomeDevice(device.id);
   const [paired, tag, label] = pairedLabel(instance, equipment, makerspaceForWhomeIWelcome);
 
   if (!paired) {
@@ -151,7 +183,7 @@ export async function sendState(executingUser: UserRow, readerId: number, state:
       `{user} commanded unpaired {access_device}'s state to ${state}.`,
       "admin",
       { id: executingUser.id, label: getUsersFullName(executingUser) },
-      { id: reader.id, label: reader.name }
+      { id: device.id, label: device.name }
     );
   } else {
     await createLog(
@@ -161,7 +193,7 @@ export async function sendState(executingUser: UserRow, readerId: number, state:
     );
   }
 
-  sendToShlugUnprompted(connData, { "State": state });
+  sendToShlugUnprompted(connData, { "State": state === "Restart" ? "Restart" : stateEnumToOldString(state) });
   return "success";
 }
 
@@ -182,7 +214,7 @@ interface ConnectionData {
   ws: ws.WebSocket
   currentState: string
 
-  readerId?: number
+  deviceID?: number
 
   alreadyComplainedAboutInvalidReader: boolean;
   toShlugSeqNum: number
@@ -238,15 +270,15 @@ function initConnectionData(ws: ws.WebSocket): ConnectionData {
  * @param inResponse the response so far to add to
  * @returns the response message
  */
-async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
+async function authorizeUIDToUnlock(uid: string, deviceID: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
   try {
     // We should always return Auth to show we are an auth response
     inResponse.Auth = uid;
     inResponse.AuthTo = "Unlocked";
 
-    const reader = await getReaderByID(readerId);
-    if (reader == null) {
-      submitReaderLog(null, new Date(), { "WsEvent": "CantProcessUnlock", "CantProcessReason": "reader not found" });
+    const device = await DeviceRepo.getDeviceByID(deviceID);
+    if (device === undefined) {
+      //submitReaderLog(null, new Date(), { "WsEvent": "CantProcessUnlock", "CantProcessReason": "reader not found" });
 
       inResponse.Verified = 0;
       inResponse.Error = "Failed to retrieve info about reader";
@@ -256,7 +288,8 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     // Find User
     const user = await getUserByCardTagID(uid);
     // Find Machine Instance
-    const machineInst = await getInstanceByReaderID(readerId);
+    const controller = await getSimpleController(device.id);
+    const machineInst = await getInstanceByAccessControllerID(controller.id);
 
     var machine: EquipmentRow | undefined = undefined;
     if (machineInst) {
@@ -268,7 +301,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     }
 
     if (user == null) {
-      wsApiLog("UID {conceal} failed to activate {machine} - {equipment} with error '{error}'", "auth", { id: 0, label: uid ?? "undefined_uid" }, { id: reader.id, label: reader.name ?? "undefined" }, { id: machine?.id, label: machine?.name ?? "unknown machine" }, { id: 406, label: "User does not exist" });
+      wsApiLog("UID {conceal} failed to activate {machine} - {equipment} with error '{error}'", "auth", { id: 0, label: uid ?? "undefined_uid" }, { id: device.id, label: device.name ?? "undefined" }, { id: machine?.id, label: machine?.name ?? "unknown machine" }, { id: 406, label: "User does not exist" });
 
       inResponse.Error = "User does not exist";
       inResponse.Reason = "unknown-uid";
@@ -277,27 +310,27 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
 
     // Find Machine
     if (machineInst === undefined || machine === undefined) {
-      wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: readerId, label: reader?.name });
+      wsApiLog("{user} failed to swipe into a machine: Reader {access_device} is not paired with a machine instance", "auth", { id: user.id, label: getUsersFullName(user) }, { id: deviceID, label: device?.name });
       inResponse.Error = "Reader not paired with a machine instance";
       inResponse.Reason = "unknown-machine";
       return inResponse;
     }
 
     const room = (await getRoomByID(machine.roomID));
-    const makerspaceID =room?.makerspaceID ?? -1;
+    const makerspaceID = room?.makerspaceID ?? -1;
 
     const canUnlockBcAdmin = user.admin;
     const canUnlockBcManager = makerspaceID ? (await getUserManagerPerms(user.id)).includes(makerspaceID) : false;
     const canUnlockBcStaff = makerspaceID ? (await getUserStaffPerms(user.id)).includes(makerspaceID) : false
     const canUnlock = canUnlockBcAdmin || canUnlockBcManager || canUnlockBcStaff;
     inResponse.Role = canUnlockBcAdmin ? "ADMIN" : (canUnlockBcManager ? "MANAGER" : (canUnlockBcStaff ? "STAFF" : (canUnlock ? "MAKER" : "UNKNOWN")));
-  
+
 
 
     //Admin bypass. Skip Welcome and training check.
     if (canUnlockBcAdmin) {
-      wsApiLog("{user} has activated {access_device} - {equipment} with ADMIN access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
-      createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
+      wsApiLog("{user} has activated {access_device} - {equipment} with ADMIN access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: device?.id, label: device?.name }, { id: machine.id, label: machine.name });
+      createEquipmentSession(machine.id, user.id, device.name ?? undefined);
       inResponse.Verified = 1;
       return inResponse;
     }
@@ -305,7 +338,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     if (user.archived) {
       wsApiLog("{user} failed to swipe into {access_device} - {euipment} due to being archived", "auth",
         { id: user.id, label: getUsersFullName(user) },
-        { id: reader?.id, label: reader?.name },
+        { id: device?.id, label: device?.name },
         { id: machine.id, label: machine.name }
       );
 
@@ -320,7 +353,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     if (await hasActiveHolds(user.id)) {
       wsApiLog("{user} failed to swipe into {access_device} - {equipment} due to an active hold", "auth",
         { id: user.id, label: getUsersFullName(user) },
-        { id: reader?.id, label: reader?.name },
+        { id: device?.id, label: device?.name },
         { id: machine.id, label: machine.name }
       )
 
@@ -334,7 +367,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     if (await hasRestriction(user.id, makerspaceID)) {
       wsApiLog("{user} failed to swipe into {access_device} - {equipment} due to an active restriction", "auth",
         { id: user.id, label: getUsersFullName(user) },
-        { id: reader?.id, label: reader?.name },
+        { id: device?.id, label: device?.name },
         { id: machine.id, label: machine.name }
       )
       inResponse.Verified = 0;
@@ -344,11 +377,11 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     }
 
     // Manager bypass. Skip welcome and training check.
-      if (canUnlockBcManager) {
-        wsApiLog("{user} has activated {access_device} - {equipment} with MANAGER access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: reader?.id, label: reader?.name }, { id: machine.id, label: machine.name });
-        createEquipmentSession(machine.id, user.id, reader.name ?? undefined);
-        inResponse.Verified = 1;
-        return inResponse;
+    if (canUnlockBcManager) {
+      wsApiLog("{user} has activated {access_device} - {equipment} with MANAGER access", "auth", { id: user.id, label: getUsersFullName(user) }, { id: device?.id, label: device?.name }, { id: machine.id, label: machine.name });
+      createEquipmentSession(machine.id, user.id, device.name ?? undefined);
+      inResponse.Verified = 1;
+      return inResponse;
     }
 
     //If needs welcome, check that room swipe has occured in the makerspace today
@@ -357,7 +390,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
       if (!welcomed) {
         wsApiLog("{user} failed to swipe into {machine} -{equipment} with error '{error}'", "auth",
           { id: user.id, label: getUsersFullName(user) },
-          { id: reader.id, label: reader?.name ?? "undefined" },
+          { id: device.id, label: device?.name ?? "undefined" },
           { id: machine.id, label: machine.name },
           { id: 401, label: "User requires Welcome" });
 
@@ -372,7 +405,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasMakerspaceTrainings(makerspaceID, user.id))) {
       wsApiLog(`{user} failed to swipe into {machine} - {equipment} due to incomplete makerspace trainings`, "auth",
         { id: user.id, label: getUsersFullName(user) },
-        { id: machine.id, label: reader.name ?? "undefined" },
+        { id: machine.id, label: device.name ?? "undefined" },
         { id: machine.id, label: machine.name }
       );
 
@@ -386,7 +419,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasRoomTrainings(machine.roomID, user.id))) {
       wsApiLog(`{user} failed to swipe into {machine} - {equipment} due to incomplete room trainings`, "auth",
         { id: user.id, label: getUsersFullName(user) },
-        { id: machine.id, label: reader.name ?? "undefined" },
+        { id: machine.id, label: device.name ?? "undefined" },
         { id: machine.id, label: machine.name }
       );
 
@@ -406,7 +439,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
       });
       wsApiLog(`{user} failed to swipe into {machine} - {equipment} with error '{error}' [${incompleteTrainingsStr}]`, "auth",
         { id: user.id, label: getUsersFullName(user) },
-        { id: machine.id, label: reader.name ?? "undefined" },
+        { id: machine.id, label: device.name ?? "undefined" },
         { id: machine.id, label: machine.name },
         { id: 401, label: "Incomplete trainings" });
 
@@ -420,7 +453,7 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     if (!(process.env.GLOBAL_ACCESS_CHECK_BYPASS == "TRUE") && (machine.requiresInPerson) && !(await isApproved(user.id, machine.id))) {
       wsApiLog("{user} failed to swipe into {machine} - {equipment} with error '{error}'", "auth",
         { id: user.id, label: getUsersFullName(user) },
-        { id: machine.id, label: reader.name },
+        { id: machine.id, label: device.name },
         { id: machine.id, label: machine.name ?? "undefined" },
         { id: 401, label: "Missing Staff Approval" });
       inResponse.Verified = 0;
@@ -432,14 +465,14 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
     // Success
     wsApiLog("{user} has activated {machine} - {equipment}", "auth",
       { id: user.id, label: getUsersFullName(user) },
-      { id: reader.id, label: reader.name ?? "undefined" },
+      { id: device.id, label: device.name ?? "undefined" },
       { id: machine.id, label: machine.name });
 
-    createEquipmentSession(machine.id, user.id, reader.name);
+    createEquipmentSession(machine.id, user.id, device.name);
     inResponse.Verified = 1;
     return inResponse;
   } catch (err) {
-    wsApiLog(`Unhandled error when authorizing on {access_device} - ${err}`, "auth", { id: readerId, label: (await getReaderByID(readerId))?.name ?? "unknown device" })
+    wsApiLog(`Unhandled error when authorizing on {access_device} - ${err}`, "auth", { id: deviceID, label: (await DeviceRepo.getDeviceByID(deviceID))?.name ?? "unknown device" })
     inResponse.Role = "unknown role";
     inResponse.Verified = 0;
     inResponse.Error = "Unknown Error";
@@ -448,16 +481,16 @@ async function authorizeUIDToUnlock(uid: string, readerId: number, inResponse: S
   }
 }
 
-async function welcomeUID(uid: string, readerID: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
+async function welcomeUID(uid: string, deviceID: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
   inResponse.Auth = uid;
   inResponse.AuthTo = "Welcomed";
 
-  const reader = await getReaderByID(readerID);
+  const device = await DeviceRepo.getDeviceByID(deviceID);
   const user = await getUserByCardTagID(uid);
 
-  const makerspace = await getMakerspaceOfWelcomeReader(readerID);
+  const makerspace = await DeviceRepo.getMakerspaceOfWelcomeDevice(deviceID);
   if (makerspace == null) {
-    await wsApiLog("failed to welcome {user} with {access_device}. Reader not paired with makerspace. MisconfigurationPossible ?", "status", { id: user?.id ?? 0, label: user ? getUsersFullName(user) : "Unknown User" }, { id: readerID, label: reader?.name ?? "unknown reader" });
+    await wsApiLog("failed to welcome {user} with {access_device}. Reader not paired with makerspace. MisconfigurationPossible ?", "status", { id: user?.id ?? 0, label: user ? getUsersFullName(user) : "Unknown User" }, { id: deviceID, label: device?.name ?? "unknown reader" });
     inResponse.Error = "Not paired with makerspace";
     inResponse.Verified = 0;
     return inResponse;
@@ -488,7 +521,7 @@ async function welcomeUID(uid: string, readerID: number, inResponse: ShlugRespon
   return inResponse;
 }
 
-async function authorizeUidToStateChange(uid: string, toState: string, readerId: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
+async function authorizeUidToStateChange(uid: string, toState: string, deviceID: number, inResponse: ShlugResponse): Promise<ShlugResponse> {
   inResponse.Auth = uid;
   const user = await getUserByCardTagID(uid);
 
@@ -499,7 +532,7 @@ async function authorizeUidToStateChange(uid: string, toState: string, readerId:
     return inResponse;
   }
   const ulabel = { id: user.id, label: getUsersFullName(user) };
-  const reader = await getReaderByID(readerId);
+  const reader = await DeviceRepo.getDeviceByID(deviceID);
   if (reader == null) {
     inResponse.Error = "Reader not found";
     inResponse.Verified = 0;
@@ -515,7 +548,8 @@ async function authorizeUidToStateChange(uid: string, toState: string, readerId:
     return inResponse;
   }
 
-  const instance = await getInstanceByReaderID(readerId);
+  const controller = await getSimpleController(deviceID);
+  const instance = await getInstanceByAccessControllerID(controller.id);
   if (instance == null) {
     inResponse.Error = "Not paired with instance";
     inResponse.Verified = 0;
@@ -596,9 +630,9 @@ export async function getAvailableFirmwareTags(): Promise<string[]> {
   })
 }
 
-async function lookupGitTagForShlug(reader: ReaderRow): Promise<string | null> {
-  const currentVer = reader.BEVer;
-  const track = reader.targetFirmwareVersion ?? "stable";
+async function lookupGitTagForShlug(device: DeviceRow): Promise<string | null> {
+  const currentVer = device.hardwareVersion;
+  const track = device.targetFirmware ?? "stable";
 
   if (track == "no-ota") {
     return "";
@@ -612,7 +646,7 @@ async function lookupGitTagForShlug(reader: ReaderRow): Promise<string | null> {
   }
 
   // the track is just a github tag
-  return reader.targetFirmwareVersion ?? null;
+  return device.targetFirmware ?? null;
 }
 
 /**
@@ -622,7 +656,7 @@ async function lookupGitTagForShlug(reader: ReaderRow): Promise<string | null> {
  * @returns response containing those keys
  */
 async function handleRequest(connData: ConnectionData | undefined, requested_values: string[], currentFWVersion: string): Promise<ShlugResponse> {
-  const reader: ReaderRow | undefined = await getReaderByID(connData?.readerId ?? 0);
+  const device = await DeviceRepo.getDeviceByID(connData?.deviceID ?? 0);
 
   var obj: ShlugResponse = { Seq: -1 };
   for (let value of requested_values) {
@@ -631,16 +665,17 @@ async function handleRequest(connData: ConnectionData | undefined, requested_val
         obj.Time = Math.floor(Date.now() / 1000);
         break;
       case "State":
-        if (reader?.id == null) {
-          wsApiLog(`Couldn't find requested reader information for id ${connData?.readerId}. Telling Idle`, "State")
+        if (device?.id === undefined) {
+          wsApiLog(`Couldn't find requested reader information for id ${connData?.deviceID}. Telling Idle`, "State")
           obj.State = "Idle";
         } else {
-          const pairStatus: PairStatus = await getReaderPairStatus(reader.id);
-          if (pairStatus == PairStatus.PairedAsWelcomer) {
+          const welcomeSpace = await DeviceRepo.getMakerspaceOfWelcomeDevice(device.id);
+          const controller = await getSimpleController(device.id);
+          if (welcomeSpace !== undefined) {
             obj.State = "Welcoming";
-          } else if (reader.state) {
-            if (["Lockout", "Welcoming"].includes(reader.state)) {
-              obj.State = reader.state;
+          } else if (controller.state) {
+            if ([AccessControllerState.LOCKED_OUT].includes(controller.state)) {
+              obj.State = "Lockout";
             } else {
               obj.State = "Idle"
             }
@@ -649,16 +684,16 @@ async function handleRequest(connData: ConnectionData | undefined, requested_val
         }
         break;
       case "OTATag":
-        if (reader == null) {
+        if (device === undefined) {
           break;
         }
-        const gittag: string | null = await lookupGitTagForShlug(reader);
+        const gittag: string | null = await lookupGitTagForShlug(device);
         if (gittag && gittag != currentFWVersion) {
           obj.OTATag = gittag;
         }
         break;
       default:
-        console.error(`Invalid request from Shlug ${connData?.readerId}:`, value);
+        console.error(`Invalid request from Shlug ${connData?.deviceID}:`, value);
     }
   }
   return obj;
@@ -737,7 +772,7 @@ async function generateUniqueHumanName() {
   const RANDOM_TRIES = 10;
   for (var i = 0; i < RANDOM_TRIES; i++) {
     const name = generateRandomHumanName();
-    if ((await getReaderByName(name)) == null) {
+    if ((await DeviceRepo.getDeviceByName(name)) == null) {
       return name;
     }
   }
@@ -746,26 +781,21 @@ async function generateUniqueHumanName() {
 
 /**
  * Checks if a shlug is valid, paired, and authenticated
- * @param reader the machine that is trying to authenticate
+ * @param device the machine that is trying to authenticate
  * @param submittedKey Key associated with that SN that a client gave
  * @returns true if that is a valid, paired shlug
  */
-export async function authenticateReader(reader: ReaderRow, submittedKey: string): Promise<boolean> {
-  if (!reader || !submittedKey) {
+export async function authenticateReader(device: DeviceRow, submittedKey: string): Promise<boolean> {
+  if (!device || !submittedKey) {
     return false;
   }
-  if (reader?.pairTime == null || reader?.SN == null || reader?.readerKeyCycle == null) {
-    return false;
 
-  }
-  const keyToMatch = await generateShlugKey(reader.pairTime, reader.SN, reader.readerKeyCycle);
+  const keyToMatch = await generateShlugKey(device.pairTime, device.SN, device.keyCycle);
   if (submittedKey != keyToMatch) {
     return false;
   }
   return true;
 }
-
-
 
 /**
  * Parses and handles the initial informational message sent by the shlug identifying itself
@@ -780,88 +810,80 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
       message.Key = "<sanitized>";
     }
     console.error(`WSACS: Missing fields in boot message from ${srcIp}. Got ${JSON.stringify(message)}`);
-    submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "missing fields", "ReaderIP": srcIp, "message": message });
+    //submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "missing fields", "ReaderIP": srcIp, "message": message });
     ws.close(WSAPIError.InvalidMessageFormat, "Invalid Fields");
     return false;
   }
-  var reader: ReaderRow | undefined = await getReaderBySN(message.SerialNumber ?? "");
-  if (reader?.pairTime == null || reader?.SN == null) {
-    wsApiLog(`WSACS: Request from unpaired shlug ${srcIp} (SN: ${reader?.SN}). Denying`, "status");
+  var device = await DeviceRepo.getDeviceBySN(message.SerialNumber ?? "");
+  if (device?.pairTime === undefined || device?.SN === undefined) {
+    wsApiLog(`WSACS: Request from unpaired shlug ${srcIp} (SN: ${device?.SN}). Denying`, "status");
     console.error(`WSACS: Request from unpaired shlug ${srcIp}. Denying`);
-    submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "unpaired", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
+    //submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "unpaired", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
     ws.close(WSAPIError.Protocol, "Unpaired Reader. Rejected");
     return false;
-
   }
 
-  if (!authenticateReader(reader, message.Key)) {
-    wsApiLog(`WSACS: Invalid key from SN ${reader?.SN} on connect. Was it paired correctly?`, "status");
+  if (!authenticateReader(device, message.Key)) {
+    wsApiLog(`WSACS: Invalid key from SN ${device?.SN} on connect. Was it paired correctly?`, "status");
     message.Key = "<sanitized>";
-    await submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "wrong key", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
-    console.error(`WSACS: Invalid key from SN ${reader?.SN} on connect.`);
+    //await submitReaderLog(null, new Date(), { "WsEvent": "bad boot msg", "BadBootMsgReason": "wrong key", "ReaderIP": srcIp, "ReaderSN": reader?.SN, "message": message });
+    console.error(`WSACS: Invalid key from SN ${device?.SN} on connect.`);
     ws.close(WSAPIError.Unauthenticated, "Invalid Key. Rejected")
     return false;
   }
 
+  connData.deviceID = device?.id;
 
-  connData.readerId = reader?.id;
-  if (reader == null) {
-    reader = await createReaderFromSN({
-      SN: message.SerialNumber, name: await generateUniqueHumanName(),
-    });
-    console.log("WSACS: Creating new Reader for SN ", message.SerialNumber);
-    connData.readerId = reader?.id;
-
-
-    if (reader == undefined) {
-      wsApiLog("Failed to create new access device. Error '{error}'", "status", { id: 400, label: "Reader does not exist" });
-      return false;
-    }
-    else {
-      wsApiLog("New Access Device {access_device} registered", "status", { id: reader?.id, label: reader?.name })
-    }
-  }
-
-  const instance = await getInstanceByReaderID(reader.id);
+  const controller = await getSimpleController(device.id);
+  const instance = await getInstanceByAccessControllerID(controller.id);
   const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
+  const core = await CoreRepo.getCoreByDeviceID(device.id);
   let offlineForSec = null;
-  if (reader?.lastStatusTime) {
-    let offlineMs = new Date().getTime() - reader.lastStatusTime.getTime();
+  if (core?.lastStatusTime) {
+    let offlineMs = new Date().getTime() - core.lastStatusTime.getTime();
     offlineForSec = Math.floor(offlineMs / 1000);
-
   }
-  submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), {
-    "WsEvent": "open",
-    "ReaderIP": srcIp,
-    "OfflineFor": offlineForSec,
-  });
+  // submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), {
+  //   "WsEvent": "open",
+  //   "ReaderIP": srcIp,
+  //   "OfflineFor": offlineForSec,
+  // });
 
 
-  connData.readerId = reader.id;
+  connData.deviceID = device.id;
 
-  let newState: string = message.State ?? reader.state;
+  let newState: string = message.State ?? controller.state ?? "";
   if ((message?.Request ?? []).includes("State")) {
     // If requesting a new state, don't blindly accept a new one
     // Wait for request handler to do logic about this
-    newState = reader.state;
+    newState = controller.state ?? "";
   }
 
   // update with new info
-  await updateReaderStatus({
-    id: reader.id,
-    temp: 0,
-    state: newState,
-    currentUID: "",
-    recentSessionLength: reader.recentSessionLength,
-    lastStatusReason: reader.lastStatusReason,
-    scheduledStatusFreq: reader.scheduledStatusFreq,
-    BEVer: message.BEVer ?? message.FWVersion ?? undefined,
-    FEVer: message.FEVer ?? message.FWVersion ?? undefined,
-    HWVer: message.HWVersion ?? undefined,
-    SN: message.SerialNumber,
-  });
+  await DeviceRepo.updateDevie(device);
+  if (core !== undefined) {
+    await CoreRepo.updateCore(core);
+  }
+  await AccessControllerRepo.updateAccessController(controller);
 
   return true;
+}
+
+function stringStateToEnumState(oldState: string): AccessControllerState {
+  switch (oldState) {
+    case "Idle":
+      return AccessControllerState.IDLE;
+    case "Unlocked":
+      return AccessControllerState.UNLOCKED;
+    case "AlwaysOn":
+      return AccessControllerState.ALWAYS_ON;
+    case "Lockout":
+      return AccessControllerState.LOCKED_OUT;
+    case "Fault":
+      return AccessControllerState.FAULT;
+    default:
+      return AccessControllerState.IDLE;
+  }
 }
 
 /**
@@ -870,25 +892,25 @@ async function handleBootupMessage(connData: ConnectionData, message: ShlugMessa
  * @param newState the state the shlug changed to
  * @param activeUID the active UID if there is one. null if no card inserted
  */
-async function handleStateUpdateMessage(reader: ReaderRow, newState: string, activeUID: string | undefined, temp: number | undefined, nextAppVersion: string | undefined) {
+async function handleStateUpdateMessage(device: DeviceRow, newState: string, activeUID: string | undefined, temp: number | undefined, nextAppVersion: string | undefined) {
   const timeOfChange: Date = new Date();
-  const oldState = reader.state;
-  const oldUID = reader.currentUID;
+  const core = await CoreRepo.getCoreByDeviceID(device.id);
+  const controller = await getSimpleController(device.id);
 
-  reader.state = newState;
-  reader.currentUID = activeUID ?? "";
-  reader.lastStatusTime = timeOfChange;
-  reader.lastStatusReason = "websocket-poll";
+  if (core === undefined) { return; }
 
-  if (reader.recentSessionLength == null) {
-    reader.recentSessionLength = 0;
-  }
+  const oldState = controller.state;
+  const oldUID = core?.currentCardTag;
+
+  controller.state = stringStateToEnumState(newState);
+  core.currentCardTag = activeUID;
+  core.lastStatusTime = timeOfChange;
 
   const user = await getUserByCardTagID(oldUID ?? "");
-  const instance = await getInstanceByReaderID(reader.id);
+  const instance = await getInstanceByAccessControllerID(controller.id);
   const equipment = instance ? await getEquipmentByID(instance.equipmentID) : null;
   const tag = (equipment == null) ? "reader {access_device} (unpaired)" : ("{equipment} instance " + (instance?.name ?? "unknown instance"))
-  const label: { id: number, label: string } = (equipment == null) ? { id: reader.id, label: reader.name } : { id: equipment.id, label: equipment.name ?? "unknown equipment" }
+  const label: { id: number, label: string } = (equipment == null) ? { id: device.id, label: device.name } : { id: equipment.id, label: equipment.name ?? "unknown equipment" }
 
 
   if (oldState != newState) {
@@ -897,39 +919,36 @@ async function handleStateUpdateMessage(reader: ReaderRow, newState: string, act
     } else {
       wsApiLog(`{user} changed state of ${tag}: ${oldState} -> ${newState}`, "state", { id: user.id ?? 0, label: user ? getUsersFullName(user) : "NULL" }, label);
     }
-    submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), { "ACSEvent": "StateChange", "From": oldState, "To": newState, "User": user?.id })
+    // submitReaderLogWithInstance(reader.id, instance?.id ?? null, new Date(), { "ACSEvent": "StateChange", "From": oldState, "To": newState, "User": user?.id })
     if (newState == "Unlocked") {
-      reader.sessionStartTime = new Date();
-      reader.recentSessionLength = 0;
+      core.sessionStartTime = new Date();
     }
 
-    if (oldState == "Unlocked" && reader.recentSessionLength > MIN_SESSION_LENGTH) {
+    if (oldState == AccessControllerState.UNLOCKED) {
       // end last session normally
-      reader.currentUID = activeUID ?? '';
-      const timeString = new Date(reader.recentSessionLength * 1000).toISOString().slice(11, 19);
+      core.currentCardTag = activeUID ?? '';
 
       if (instance == null || equipment == null) {
         if (user != null) {
-          await createLog(`{user} signed out of {access_device} that was not paired with any instance (Unpaired while in use) (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, { id: reader.id, label: reader.name ?? "undefined" });
+          await createLog(
+            `{user} signed out of {access_device} that was not paired with any instance (Unpaired while in use)`, "status",
+            { id: user.id, label: getUsersFullName(user) },
+            { id: device.id, label: device.name ?? "undefined" }
+          );
         }
       } else {
         // Update equipment session that was created when we authed
-        await setLatestEquipmentSessionLength(equipment.id, reader.recentSessionLength, reader.name);
+        await endLatestEquipmentSession(equipment.id, device.name);
         if (user != null) {
-          await createLog(`{user} signed out of {equipment} (Session: ${timeString})`, "status", { id: user.id, label: getUsersFullName(user) }, label);
+          await createLog(`{user} signed out of {equipment}`, "status", { id: user.id, label: getUsersFullName(user) }, label);
         }
       }
     }
   }
-  if (newState == "Unlocked") {
-    const now = new Date();
-    const then = reader.sessionStartTime ?? new Date(); // if not there, set to 0
-    const elapsedSeconds = Math.floor((now.getTime() - then.getTime()) / 1000);
-    reader.recentSessionLength = elapsedSeconds;
-  }
-  reader.temp = temp ?? reader.temp;
-  reader.FEVer = nextAppVersion ?? reader.FEVer;
-  await updateReaderStatus(reader);
+
+  await DeviceRepo.updateDevie(device);
+  await CoreRepo.updateCore(core);
+  await AccessControllerRepo.updateAccessController(controller);
 
 }
 /**
@@ -953,18 +972,18 @@ function isReplyWorthSending(resp: ShlugResponse): boolean {
 export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
   var connData: ConnectionData = initConnectionData(ws);
   console.log(`WSACS: Websocket opened to ${req.ip}`);
-  submitReaderLog(null, new Date(), { "WsEvent": "initial connect", "IP": req.ip })
+  // submitReaderLog(null, new Date(), { "WsEvent": "initial connect", "IP": req.ip })
   try {
     ws.onclose = async function (ev: ws.CloseEvent) {
       try {
-        if (connData.readerId == null) {
+        if (connData.deviceID == null) {
           // Connection was never associated with a real reader (boot message never sent, probably something fishy)
           console.error(`WSACS: Websocket from non-reader ${req.ip} closed with code ${ev.code} ${ev.reason}`);
-          submitReaderLog(null, new Date(), { "WsEvent": "close nonreader", "IP": req.ip, "WsCloseCode": ev.code, "WsCloseReason": ev.reason });
+          // submitReaderLog(null, new Date(), { "WsEvent": "close nonreader", "IP": req.ip, "WsCloseCode": ev.code, "WsCloseReason": ev.reason });
           return;
         }
-        let reader: ReaderRow | undefined = await getReaderByID(connData.readerId);
-        if (reader == null) {
+        let device = await DeviceRepo.getDeviceByID(connData.deviceID);
+        if (device === undefined) {
           await submitReaderLog(null, new Date(), {
             "WsEvent": "closed",
             "WsClosedCode": ev.code,
@@ -972,7 +991,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
             "IP": req.ip,
           });
         } else {
-          await submitReaderLog(reader.id, new Date(), {
+          await submitReaderLog(device.id, new Date(), {
             "WsEvent": "closed",
             "WsClosedCode": ev.code,
             "WsClosedReason": ev.reason,
@@ -987,7 +1006,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
 
     ws.onerror = async function (ev: ws.ErrorEvent) {
 
-      await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "error", "WsErrorMsg": ev.message });
+      await submitReaderLog(connData.deviceID ?? null, new Date(), { "WsEvent": "error", "WsErrorMsg": ev.message });
       console.error(`WSACS: websocket error ${ev.error} - ${ev.type}: ${ev.message}`)
       ws.close(WSAPIError.Protocol, "got unrecoverable error");
     }
@@ -997,7 +1016,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
         const shlugMessage: ShlugMessage | undefined = validateShlugMessage(ev, req);
         if (shlugMessage == null) {
           console.error(`Invalid Shlug Message: ${JSON.stringify(ev.data)}. Forcing reconnect`);
-          await submitReaderLog(connData.readerId ?? null, new Date(), { "WsEvent": "invalid message", "Data": ev.data });
+          await submitReaderLog(connData.deviceID ?? null, new Date(), { "WsEvent": "invalid message", "Data": ev.data });
 
           ws.close(WSAPIError.InvalidMessageFormat, "Invalid Message");
           return;
@@ -1014,7 +1033,7 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
             return;
           }
         }
-        if (connData.readerId == null) {
+        if (connData.deviceID == null) {
           console.error("WSACS: Can not process WSAPI message -> forcing disconnect. Null reader ID: ")
           submitReaderLog(null, new Date(), { "WsEvent": "cant process", "CantProcessReason": "NullReaderID", "message": ev.data });
           ws.close(WSAPIError.Protocol, "Server couldnt process due to null reader id");
@@ -1023,47 +1042,52 @@ export async function ws_acs_api(ws: ws.WebSocket, req: Request) {
 
         addOrUpdateConnection(connData);
         // Get reader that was setup by handleBootupMessage
-        var reader = await getReaderByID(connData.readerId ?? 0);
-        if (reader == null) {
-          submitReaderLog(null, new Date(), { "WsEvent": "undefined reader", "ReaderIP": req.ip, "ReaderID": connData?.readerId });
-          console.error(`Failed to find entry for device. Forcing Reconnect. ID: ${connData.readerId}, Last State: ${connData.currentState}. IP: ${req.ip}: ${JSON.stringify(shlugMessage)}`);
+        var device = await DeviceRepo.getDeviceByID(connData.deviceID ?? -1);
+        if (device === undefined) {
+          submitReaderLog(null, new Date(), { "WsEvent": "undefined reader", "ReaderIP": req.ip, "ReaderID": connData?.deviceID });
+          console.error(`Failed to find entry for device. Forcing Reconnect. ID: ${connData.deviceID}, Last State: ${connData.currentState}. IP: ${req.ip}: ${JSON.stringify(shlugMessage)}`);
           // Closing the websocket will make it reauth and hopefully tell us its id
           ws.close(WSAPIError.Protocol, "No Device Found");
           return;
         }
-        var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [], reader.BEVer);
+        var response: ShlugResponse = await handleRequest(connData, shlugMessage.Request || [], device.firmwareVersion ?? "");
         if (shlugMessage.Seq == 0) {
           // always send a response back on connect
           response.Connected = true;
         }
         if (shlugMessage.Message) {
-          const instance = await getInstanceByReaderID(reader.id);
+          const controller = await getSimpleController(device.id);
+          const instance = await getInstanceByAccessControllerID(controller.id);
           const machine = instance ? await getEquipmentByID(instance.equipmentID) : undefined;
-          const makerspaceForWhomeIWelcome = await getMakerspaceOfWelcomeReader(reader.id);
+          const makerspaceForWhomeIWelcome = await DeviceRepo.getMakerspaceOfWelcomeDevice(device.id);
           const [paired, tag, label] = pairedLabel(instance, machine, makerspaceForWhomeIWelcome);
           if (paired) {
-            wsApiLog(`{access_device} - ${tag} message: ${shlugMessage.Message}`, "message", label, { id: reader.id, label: reader.name })
+            wsApiLog(`{access_device} - ${tag} message: ${shlugMessage.Message}`, "message", label, { id: device.id, label: device.name })
           } else {
-            wsApiLog(`{access_device} (unpaired) message: ${shlugMessage.Message}`, "message", { id: reader.id, label: reader.name }, { id: reader.id, label: reader.name })
+            wsApiLog(
+              `{access_device} (unpaired) message: ${shlugMessage.Message}`, "message",
+              { id: device.id, label: device.name },
+              { id: device.id, label: device.name }
+            );
           }
         }
         if (shlugMessage.Log) {
           try {
-            await submitReaderLog(connData.readerId ?? null, new Date(), shlugMessage.Log);
+            await submitReaderLog(connData.deviceID ?? null, new Date(), shlugMessage.Log);
           } catch (e: any) {
             wsApiLog(`Unable to submit Reader Log '${JSON.stringify(shlugMessage.Log)}': ${e}`, "status");
           }
         }
         if (shlugMessage.State) {
-          await handleStateUpdateMessage(reader, shlugMessage.State, shlugMessage.UID, shlugMessage?.Temp, shlugMessage?.FEVer)
+          await handleStateUpdateMessage(device, shlugMessage.State, shlugMessage.UID, shlugMessage?.Temp, shlugMessage?.FEVer)
         }
 
         if (shlugMessage.Auth && (shlugMessage.AuthTo == null || shlugMessage.AuthTo == "Unlocked")) {
-          response = await authorizeUIDToUnlock(shlugMessage?.Auth, connData.readerId ?? 0, response)
+          response = await authorizeUIDToUnlock(shlugMessage?.Auth, connData.deviceID ?? 0, response)
         } else if (shlugMessage.Auth && shlugMessage.AuthTo === "Welcomed" && shlugMessage.Auth) {
-          response = await welcomeUID(shlugMessage.Auth, connData.readerId, response)
+          response = await welcomeUID(shlugMessage.Auth, connData.deviceID, response)
         } else if (shlugMessage.Auth && shlugMessage.AuthTo) {
-          response = await authorizeUidToStateChange(shlugMessage.Auth, shlugMessage.AuthTo, connData.readerId, response);
+          response = await authorizeUidToStateChange(shlugMessage.Auth, shlugMessage.AuthTo, connData.deviceID, response);
         }
         if (isReplyWorthSending(response)) {
           replyToShlug(connData, response, shlugMessage.Seq);
