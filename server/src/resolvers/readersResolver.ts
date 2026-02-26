@@ -10,6 +10,8 @@ import { getUserByCardTagID, getUsersFullName } from "../repositories/Users/User
 import { EntityNotFound } from "../EntityNotFound.js";
 import { AccessControllerState, ReaderLogRow, ReaderRow } from "../db/tables.js";
 import * as ShlugControl from "../wsapi.js"
+import * as EquipmentInstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
+import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 
 import { createCipheriv, randomInt, scryptSync } from "crypto";
 import { generateRandomHumanName } from "../data/humanReadableNames.js";
@@ -318,8 +320,12 @@ const ReadersResolver = {
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (executingUser: any) => {
+        const instance = await EquipmentInstanceRepo.getInstanceByReaderID(Number(args.id));
+        if (instance === undefined || instance.accessControllerID === null) { return `failed to parse ID`; }
+        const ac = await ACRepo.getAccessControllerByID(instance.accessControllerID);
+        if (ac === undefined) { return `failed to parse ID`; }
         try {
-          return ShlugControl.sendState(executingUser, Number(args.id), oldStateToStateEnum(args.state));
+          return ShlugControl.sendState(executingUser, ac.deviceID, oldStateToStateEnum(args.state));
         } catch (e) {
           return `failed to parse id: ${e}`;
         }
