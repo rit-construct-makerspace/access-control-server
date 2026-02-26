@@ -4,6 +4,10 @@ import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import * as ShlugControl from "../../wsapi.js"
 import { CurrentUser } from "../../context.js";
+import WSACSController from "../api/WSACSController.js";
+import { AccessController } from "./accessController.js";
+import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
+import { WSACSServerRequest } from "../api/WSACSFormats.js";
 
 export class Core extends Device implements CoreRow {
   deviceID: number;
@@ -38,7 +42,25 @@ export class Core extends Device implements CoreRow {
       console.log(`failed to parse id: ${e}`);
       return false;
     }
+
+    const controllers = await this.getAccessControllers();
+    const request: WSACSServerRequest = {
+      command: {
+        toState: []
+      }
+    };
+
+    for (let i = 0; i < controllers.length; i++) {
+      request.command?.toState?.push({ id: controllers[i].channelID, state: targetState });
+    }
+
+    WSACSController.sendCoreMessage(request, this.deviceID);
+
     return true;
+  }
+
+  async getAccessControllers(): Promise<AccessController[]> {
+    return await ACRepo.getAccessControllersByDeviceID(this.deviceID);
   }
 
   getRow(): CoreRow {

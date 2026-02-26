@@ -1,6 +1,6 @@
 import * as ws from "ws";
 import { Request } from "express";
-import { ServerRequest } from "./WSACSFormats.js";
+import { WSACSServerRequest } from "./WSACSFormats.js";
 
 type ConnectionData = {
   ws: ws.WebSocket;
@@ -68,7 +68,7 @@ export default class WSACSController {
     ws.onmessage = (event) => this.handleWsMessage(event, deviceID);
   }
 
-  static sendCoreMessage(payload: ServerRequest, deviceID: number) {
+  static sendCoreMessage(payload: WSACSServerRequest, deviceID: number) {
     const connection = this.corePool.get(deviceID);
     if (connection === undefined) { return; }
     connection.ws.send(JSON.stringify(payload));

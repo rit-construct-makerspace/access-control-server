@@ -16,7 +16,7 @@ export enum CoreFiles {
   OFFLINE_LIST = "OFFLINE_LIST"
 }
 
-export interface CoreRequest {
+export interface WSACSCoreRequest {
   authTo?: {
     state: AccessControllerState;
     cardTagID: string;
@@ -30,7 +30,11 @@ export interface CoreRequest {
   };
 }
 
-export interface ServerResponse {
+export enum WSACSServerError {
+  PARSE_FAIL = "PARSE_FAIL",
+}
+
+export interface WSACSServerResponse {
   response: {
     authTo?: {
       channels: {
@@ -45,11 +49,12 @@ export interface ServerResponse {
       time?: number;
       state?: AccessControllerState;
       otaTag?: string;
-    }
+    },
+    error?: WSACSServerError;
   }
 }
 
-export interface ServerRequest {
+export interface WSACSServerRequest {
   command?: {
     toState?: {
       id: number,
