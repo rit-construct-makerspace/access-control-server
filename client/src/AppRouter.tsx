@@ -38,7 +38,6 @@ import NewEquipmentPage from "./pages/makerspace_page/equipment_pages/NewEquipme
 import { ToolItemPage } from "./pages/lab_management/inventory/ToolItemPage";
 import AuditLogsPage from "./pages/lab_management/audit_logs/AuditLogsPage";
 import OrganizationsPage from "./pages/lab_management/organizations/OrganizationsPage";
-import ReadersPage from "./pages/lab_management/readers/ReadersPage";
 import ManageMakerspacePage from "./pages/makerspace_page/ManageMakerspacePage";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import ManageRoomPage from "./pages/makerspace_page/MonitorRoomPage";
