@@ -1,10 +1,30 @@
 import type { Knex } from "knex";
-import { CoreInputMode, ReaderRow } from "../tables.js";
+import { AccessControllerState, CoreInputMode, ReaderRow } from "../tables.js";
 import * as ReaderRepo from "../../repositories/Readers/ReaderRepository.js"
 import * as EquipmentInstanceRepo from "../../repositories/Equipment/EquipmentInstancesRepository.js"
 import * as EquipmentRepo from "../../repositories/Equipment/EquipmentRepository.js";
 import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
 import { DispenserError } from "../../api/devices/cards/cardApi.js";
+
+function oldStateToStateEnum(oldState: string) {
+  switch (oldState) {
+    case "Welcoming":
+      return AccessControllerState.WELCOMING;
+    case "Idle":
+      return AccessControllerState.IDLE;
+    case "Unlocked":
+      return AccessControllerState.UNLOCKED;
+    case "AlwaysOn":
+      return AccessControllerState.ALWAYS_ON;
+    case "Lockout":
+      return AccessControllerState.LOCKED_OUT;
+    case "Fault":
+      return AccessControllerState.FAULT;
+    default:
+      return AccessControllerState.IDLE;
+  }
+}
+
 
 async function getMakerspaceOfReader(reader: ReaderRow, knex: Knex): Promise<number | undefined> {
   let status = ReaderRepo.PairStatus.Unpaired
@@ -121,7 +141,8 @@ export async function up(knex: Knex): Promise<void> {
 
     const accessController = (await knex("AccessControllers").insert({
       deviceID: device.id,
-      channelID: 0
+      channelID: 0,
+      state: oldStateToStateEnum(reader.state)
     }).returning("*"))[0];
 
     await knex("EquipmentInstances").update({ accessControllerID: accessController.id }).where("readerID", "=", reader.id);
