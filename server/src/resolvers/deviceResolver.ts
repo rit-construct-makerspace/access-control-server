@@ -1,5 +1,5 @@
 import { ApolloContext } from "../context.js";
-import { AccessControllerState, CoreRow, DispenserRow } from "../db/tables.js";
+import { AccessControllerRow, AccessControllerState, CoreRow, DispenserRow } from "../db/tables.js";
 import * as DeviceRepo from "../repositories/Devices/DeviceRepository.js";
 import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
@@ -62,6 +62,16 @@ const DeviceResolver = {
     ) => isStaff(async (user) => (
       await DeviceRepo.getDeviceByID(parent.deviceID)
     )),
+  },
+
+  AccessController: {
+    device: async (
+      parent: AccessControllerRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => (
+      await DeviceRepo.getDeviceByID(parent.deviceID)
+    ))
   },
 
   Mutation: {

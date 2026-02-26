@@ -54,6 +54,14 @@ export const DeviceTypeDefs = gql`
     device: Device!
   }
 
+  type AccessController {
+    id: Int!
+    deviceID: Int!
+    channelID: Int!
+    state: AccessControllerState!
+    device: Device!
+  }
+
   enum CoreStateInput {
     IDLE
     ALWAYS_ON

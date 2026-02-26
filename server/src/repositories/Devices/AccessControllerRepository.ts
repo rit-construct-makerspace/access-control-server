@@ -22,3 +22,9 @@ export async function updateAccessController(newRow: AccessControllerRow): Promi
 
   return new AccessController(rawResult[0]);
 }
+
+export async function getAccessControllerByID(accessControllerID: number): Promise<AccessController | undefined> {
+  const result = await knex("AccessControllers").where({ id: accessControllerID }).first();
+  if (result === undefined) { return undefined; }
+  return new AccessController(result);
+}
