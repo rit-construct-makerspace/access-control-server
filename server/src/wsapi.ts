@@ -20,6 +20,7 @@ import * as AccessControllerRepo from "./repositories/Devices/AccessControllerRe
 import * as CoreRepo from "./repositories/Devices/CoreRepository.js";
 import { GraphQLError } from "graphql";
 import { submitReaderLog } from "./repositories/Readers/ReaderRepository.js";
+import { oldStateToStateEnum } from "./db/migrations/20260209155821_devices-overhaul.js";
 
 const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
 
@@ -913,7 +914,7 @@ async function handleStateUpdateMessage(device: DeviceRow, newState: string, act
   const label: { id: number, label: string } = (equipment == null) ? { id: device.id, label: device.name } : { id: equipment.id, label: equipment.name ?? "unknown equipment" }
 
 
-  if (oldState != newState) {
+  if (oldState != oldStateToStateEnum(newState)) {
     if (user == null) {
       wsApiLog(`State of ${tag} changed: ${oldState} -> ${newState}`, "state", label);
     } else {
