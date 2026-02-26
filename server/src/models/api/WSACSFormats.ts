@@ -51,7 +51,10 @@ export interface ServerResponse {
 
 export interface ServerRequest {
   command?: {
-    toState?: AccessControllerState;
+    toState?: {
+      id: number,
+      state: AccessControllerState
+    }[];
     action?: CoreActions;
   },
   update?: {

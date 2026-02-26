@@ -1,10 +1,10 @@
 import * as ws from "ws";
 import { Request } from "express";
+import { ServerRequest } from "./WSACSFormats.js";
 
 type ConnectionData = {
   ws: ws.WebSocket;
   deviceID: number;
-  toCoreSeqNum: number;
 }
 
 enum WSAPIError {
@@ -60,12 +60,17 @@ export default class WSACSController {
 
     this.corePool.set(deviceID, {
       ws: ws,
-      deviceID: deviceID,
-      toCoreSeqNum: 0
+      deviceID: deviceID
     });
 
     ws.onclose = (event) => this.handleWsClose(event, deviceID);
     ws.onerror = (event) => this.handleWsError(event, deviceID);
     ws.onmessage = (event) => this.handleWsMessage(event, deviceID);
+  }
+
+  static sendCoreMessage(payload: ServerRequest, deviceID: number) {
+    const connection = this.corePool.get(deviceID);
+    if (connection === undefined) { return; }
+    connection.ws.send(JSON.stringify(payload));
   }
 }
