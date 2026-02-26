@@ -67,7 +67,7 @@ export async function up(knex: Knex): Promise<void> {
       .onDelete("CASCADE");
     t.integer("channelID").notNullable();
     t.unique(["deviceID", "channelID"]);
-    t.enum("state", ["IDLE", "UNLOCKED", "ALWAYS_ON", "LOCKED_OUT", "FAULT"]);
+    t.enum("state", ["IDLE", "UNLOCKED", "ALWAYS_ON", "LOCKED_OUT", "FAULT", "WELCOMING"]);
   });
 
   await knex.schema.createTable("Dispensers", (t) => {

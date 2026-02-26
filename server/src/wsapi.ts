@@ -21,11 +21,9 @@ import * as CoreRepo from "./repositories/Devices/CoreRepository.js";
 import { GraphQLError } from "graphql";
 import { submitReaderLog } from "./repositories/Readers/ReaderRepository.js";
 
-
 const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
 
 const MIN_SESSION_LENGTH = 15
-
 
 enum WSAPIError {
   Protocol = 4000,
@@ -148,6 +146,8 @@ function stateEnumToOldString(newState: AccessControllerState) {
       return "Fault";
     case AccessControllerState.UNLOCKED:
       return "Unlocked";
+    case AccessControllerState.WELCOMING:
+      return "Welcoming";
     default:
       return "Startup";
   }
@@ -790,7 +790,7 @@ export async function authenticateReader(device: DeviceRow, submittedKey: string
     return false;
   }
 
-  const keyToMatch = await generateShlugKey(device.pairTime, device.SN, device.keyCyle);
+  const keyToMatch = await generateShlugKey(device.pairTime, device.SN, device.keyCycle);
   if (submittedKey != keyToMatch) {
     return false;
   }

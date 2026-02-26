@@ -698,7 +698,8 @@ export enum AccessControllerState {
   UNLOCKED = "UNLOCKED",
   ALWAYS_ON = "ALWAYS_ON",
   LOCKED_OUT = "LOCKED_OUT",
-  FAULT = "FAULT"
+  FAULT = "FAULT",
+  WELCOMING = "WELCOMING"
 }
 
 export interface AccessControllerRow {
