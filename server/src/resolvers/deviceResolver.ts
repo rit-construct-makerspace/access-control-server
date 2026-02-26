@@ -76,6 +76,18 @@ const DeviceResolver = {
       const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
       if (core === undefined) { return false; }
       return await core.setState(user, args.targetState);
+    }),
+
+    pairCore: async (
+      _parent: any,
+      args: {
+        SN: string,
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (_user) => {
+      const newCore = await CoreRepo.pairNewCore(args.SN, args.makerspaceID);
+      return await newCore.generateKey();
     })
   }
 };

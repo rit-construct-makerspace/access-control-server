@@ -62,5 +62,6 @@ export const DeviceTypeDefs = gql`
 
   extend type Mutation {
     setCoreState(deviceID: Int!, targetState: CoreStateInput): Boolean
+    pairCore(SN: String!, makerspaceID: Int!): String!
   }
 `;

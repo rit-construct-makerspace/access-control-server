@@ -2,6 +2,8 @@ import { Button, Checkbox, FormControlLabel, Stack, TextField, ToggleButton, Tog
 import PrettyModal from "../../../common/PrettyModal";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useMutation } from "@apollo/client";
+import { PAIR_CORE } from "../../../queries/deviceQueries";
 
 interface ManualDevicePairModalProps {
   open: boolean;
@@ -17,10 +19,19 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
   const [ssid, setSsid] = useState("");
   const [password, setPassword] = useState("");
 
+
+  const [pairCore, pairResult] = useMutation(PAIR_CORE);
+
   const allowPair = device !== null && SN !== "" && ((useWifi && ssid !== "") || !useWifi);
 
-  function handlePair() {
-    console.log(device);
+  async function handlePair() {
+    await pairCore({
+      variables: {
+        SN: SN,
+        makerspaceID: Number(makerspaceID)
+      }
+    })
+    console.log(pairResult);
   }
 
   function handleClose() {

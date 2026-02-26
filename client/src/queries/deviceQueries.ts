@@ -61,3 +61,9 @@ export const SET_CORE_STATE = gql`
     setCoreState(deviceID: $deviceID, targetState: $targetState)
   }
 `;
+
+export const PAIR_CORE = gql`
+  mutation PairCore($SN: String!, $makerspaceID: Int!) {
+    pairCore(SN: $SN, makerspaceID: $makerspaceID)
+  }
+`;
