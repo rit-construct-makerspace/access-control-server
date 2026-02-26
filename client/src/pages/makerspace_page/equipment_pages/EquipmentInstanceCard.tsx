@@ -49,42 +49,11 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   const [status, setStatus] = useState<InstanceStatus>(props.instance.status);
   const [reader, setReader] = useState<{ id: number, name: string } | null>(props.instance.reader);
 
-  const [isOffline, setIsOffline] = useState<boolean>(false);
-
-  function calcIsOffline(lastStatusTime: string) {
-    if (lastStatusTime != null) {
-      const OFFLINE_CUTOFF_MS = 30 * 1000;
-      const msSinceLastStatus = Date.now() - new Date(lastStatusTime).getTime()
-      if (msSinceLastStatus > OFFLINE_CUTOFF_MS) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   const currentReaderResult = useQuery(GET_READER_BY_ID, {
     pollInterval: 2000,
     variables: { id: props.instance.reader?.id },
   });
   const currentReader: Reader | undefined = currentReaderResult.data?.reader;
-
-
-
-  useEffect(() => {
-    function updateOfflineness() {
-      if (!currentReader?.lastStatusReason) {
-        setIsOffline(true);
-        return;
-      }
-      const off = calcIsOffline(currentReader?.lastStatusTime);
-      setIsOffline(off)
-    }
-    const interval = setInterval(updateOfflineness, 2000)
-
-    return (() => { // cleanup function to stop pollin
-      clearInterval(interval)
-    })
-  }, [currentReader])
 
 
   const [sendCommandedState] = useMutation(SET_READER_STATE);
@@ -123,40 +92,13 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   }
   function setStateClicked(_e: any) {
     if (reader != null) {
-      if (currentReader?.state === "Unlocked") {
-        if (window.confirm("This machine is currently in use. Continue?")) {
-          sendCommandedState({ variables: { id: reader.id, state: commandedState } });
-        }
-      } else {
-        sendCommandedState({ variables: { id: reader.id, state: commandedState } });
-      }
+      sendCommandedState({ variables: { id: reader.id, state: commandedState } });
     }
   }
 
 
   async function handleDeleteInstance() {
     await deleteInstance({ variables: { id: props.instance.id } });
-  }
-
-  function renderCurrentState() {
-    switch (currentReader?.state) {
-      case "Idle":
-        return <Tooltip title="Idle"><HourglassFullIcon color="warning" /></Tooltip>;
-      case "Unlocked":
-        return <Tooltip title="Unlocked"><LockOpenIcon color="success" /></Tooltip>;
-      case "Lockout":
-        return <Tooltip title="Lockout"><LockIcon color="error" /></Tooltip>;
-      case "Restart":
-        return <Tooltip title="Restart"><RestartAltIcon color="info" /></Tooltip>;
-      case "Fault":
-        return <Tooltip title="Fault"><ReportProblemIcon color="error" /></Tooltip>;
-      case "AlwaysOn":
-        return <Tooltip title="AlwaysOn"><StarsIcon color="success" /></Tooltip>;
-      case "Startup":
-        return <Tooltip title="Startup"><PendingIcon color="info" /></Tooltip>;
-      default:
-        return <Tooltip title="Unknown State"><QuestionMarkIcon color="secondary" /></Tooltip>
-    }
   }
 
   function activeUserDisplay() {
@@ -219,25 +161,17 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
                 : <Alert severity="warning" variant="filled">No Reader Paired</Alert>}
             </Typography>
         }
-        {
-          isOffline ?
-            <Alert severity="warning" variant="filled" icon={<WifiOffIcon />}>Offline</Alert>
-            :
-            <Stack direction="row" justifyContent="space-between" alignItems={"center"} spacing={1}>
-              {
-                renderCurrentState()
-              }
-              <Select disabled={allowEdit || reader == null} size="small" defaultValue={currentReader?.state ?? "Idle"} value={commandedState} onChange={handleStateChange} fullWidth>
-                <MenuItem value="Idle">Idle</MenuItem>
-                <MenuItem value="Lockout">Lockout</MenuItem>
-                <MenuItem value="AlwaysOn">Always On</MenuItem>
-                <MenuItem value="Restart">Restart</MenuItem>
-              </Select>
-              <IconButton disabled={allowEdit || reader == null} onClick={setStateClicked} color="secondary">
-                <SendIcon />
-              </IconButton>
-            </Stack>
-        }
+        <Stack direction="row" justifyContent="space-between" alignItems={"center"} spacing={1}>
+          <Select disabled={allowEdit || reader == null} size="small" defaultValue={currentReader?.state ?? "Idle"} value={commandedState} onChange={handleStateChange} fullWidth>
+            <MenuItem value="Idle">Idle</MenuItem>
+            <MenuItem value="Lockout">Lockout</MenuItem>
+            <MenuItem value="AlwaysOn">Always On</MenuItem>
+            <MenuItem value="Restart">Restart</MenuItem>
+          </Select>
+          <IconButton disabled={allowEdit || reader == null} onClick={setStateClicked} color="secondary">
+            <SendIcon />
+          </IconButton>
+        </Stack>
         {
           allowEdit
             ? <Stack direction="row" justifyContent="space-between">
