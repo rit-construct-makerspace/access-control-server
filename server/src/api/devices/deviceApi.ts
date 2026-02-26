@@ -1,6 +1,7 @@
 import express from "express";
 import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js"
 import * as CardAPI from "./cards/cardApi.js";
+import * as CoreAPI from "./core/coreApi.js";
 import { Device } from "../../models/devices/device.js";
 
 export async function authenticateDevice(device: Device, submittedKey: string): Promise<boolean> {
@@ -35,4 +36,5 @@ export function registerEndpoints(app: express.Application) {
   })
 
   CardAPI.registerEndpoints(app);
+  CoreAPI.registerEndpoints(app);
 }
