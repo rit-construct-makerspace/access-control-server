@@ -41,4 +41,16 @@ export class Core extends Device implements CoreRow {
     return true;
   }
 
+  getRow(): CoreRow {
+    return {
+      deviceID: this.deviceID,
+      channels: this.channels,
+      inputMode: this.inputMode,
+      tempDuration: this.tempDuration,
+      currentCardTag: this.currentCardTag,
+      lastStatusTime: this.lastStatusTime,
+      sessionStartTime: this.sessionStartTime
+    }
+  }
+
 }
