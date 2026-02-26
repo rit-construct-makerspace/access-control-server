@@ -10,9 +10,10 @@ import * as ModuleRepo from "../repositories/Training/ModuleRepository.js"
 import { ApolloContext, CurrentUser } from "../context.js";
 import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
-import { EquipmentRow } from "../db/tables.js";
+import { AccessControllerState, EquipmentRow } from "../db/tables.js";
 import { EquipmentInput } from "../schemas/equipmentSchema.js";
 import { getNumUnavailableReadersByEquipment, getNumIdleReadersByEquipment } from "../repositories/Readers/ReaderRepository.js";
+import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import { GraphQLError } from "graphql";
 
 
@@ -31,12 +32,28 @@ const EquipmentResolvers = {
 
     //Set numAvailable to number of ACS Readers that are Idle and responding
     numAvailable: async (parent: EquipmentRow) => {
-      return await getNumIdleReadersByEquipment(parent.id)
+      const instances = await EquipmentInstanceRepo.getInstancesByEquipment(parent.id);
+      let avail = 0;
+      for (let i = 0; i < instances.length; i++) {
+        if (instances[i].accessControllerID === null || instances[i].accessControllerID === undefined) { continue; }
+        let controller = await ACRepo.getAccessControllerByID(instances[i].accessControllerID ?? -1)
+        if (controller === undefined) { continue; }
+        if (controller.state === AccessControllerState.IDLE) { avail++; }
+      }
+      return avail;
     },
 
     //Set numInUse to number of ACS Readers that are NOT idle or are not responding
     numInUse: async (parent: EquipmentRow) => {
-      return await getNumUnavailableReadersByEquipment(parent.id)
+      const instances = await EquipmentInstanceRepo.getInstancesByEquipment(parent.id);
+      let inUse = 0;
+      for (let i = 0; i < instances.length; i++) {
+        if (instances[i].accessControllerID === null || instances[i].accessControllerID === undefined) { continue; }
+        let controller = await ACRepo.getAccessControllerByID(instances[i].accessControllerID ?? -1)
+        if (controller === undefined) { continue; }
+        if (controller.state !== AccessControllerState.IDLE) { inUse++; }
+      }
+      return inUse;
     },
   },
 
