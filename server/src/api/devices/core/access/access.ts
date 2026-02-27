@@ -1,31 +1,33 @@
 import expressWs from 'express-ws';
 import WSACSController from '../../../../models/api/WSACSController.js';
-import { CoreInfoRequests, WSACSCoreRequest, WSACSServerError, WSACSServerResponse } from '../../../../models/api/WSACSFormats.js';
+import { WSACSCoreRequest, WSACSServerError, WSACSServerResponse } from '../../../../models/api/WSACSFormats.js';
 import * as CoreRepo from "../../../../repositories/Devices/CoreRepository.js";
+import * as UserRepo from "../../../../repositories/Users/UserRepository.js";
 
 export function registerEndpoints(app: expressWs.Application) {
   app.ws("/api/devices/cores/access/ws", WSACSController.initConnection);
 }
 
-export async function handleCoreInfoRequest(request: WSACSCoreRequest, deviceID: number): Promise<WSACSServerResponse> {
-  const response: WSACSServerResponse = { response: { info: {} } }
-  if (request.info === undefined || response.response.info === undefined) {
-    response.response.error = WSACSServerError.PARSE_FAIL;
+export async function handleCoreAuthToRequest(request: WSACSCoreRequest, deviceID: number): Promise<WSACSServerResponse> {
+  const response: WSACSServerResponse = { response: { authTo: { channels: [], cardTagID: "" } } }
+  if (request.authTo === undefined || response.response.authTo === undefined) {
+    response.response.error = WSACSServerError.SERVER_ERROR;
     return response;
   }
 
-  for (let i = 0; i < request.info.fields.length; i++) {
-    switch (request.info.fields[i]) {
-      case CoreInfoRequests.TIME:
-        response.response.info.time = Date.now();
-        continue;
-      case CoreInfoRequests.OTA_TAG:
-        // TODO
-        continue;
-      case CoreInfoRequests.STATE:
-        response.response.info.state = await CoreRepo.getCoreState(deviceID);
-    }
+  response.response.authTo.cardTagID = request.authTo.cardTagID;
+
+  const core = await CoreRepo.getCoreByDeviceID(deviceID);
+  if (core === undefined) {
+    response.response.error = WSACSServerError.DEVICE_NOT_FOUND;
+    return response;
   }
 
-  return response;
+  const user = await UserRepo.getUserByCardTagID(request.authTo.cardTagID);
+  if (user === undefined) {
+    response.response.error = WSACSServerError.USER_NOT_FOUND;
+    return response;
+  }
+
+  const controllers = await core.getAccessControllers();
 }

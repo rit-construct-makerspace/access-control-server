@@ -102,11 +102,9 @@ export async function getUserByCardTagID(
   if (!cardTagID || cardTagID == "0" || cardTagID == "null" || cardTagID == "undefined") { return undefined; }
 
   const tempUser = await TempCardRepo.getUserFromTempCardTag(cardTagID);
-  console.log(tempUser);
   if (tempUser !== undefined) { return tempUser; }
 
   const result = knex("Users").first().where("cardTagID", cardTagID);
-  console.log(result);
   return result;
 }
 

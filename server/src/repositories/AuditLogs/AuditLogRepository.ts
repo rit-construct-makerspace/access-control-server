@@ -4,6 +4,7 @@
 
 import { knex } from "../../db/index.js";
 import { AuditLogRow } from "../../db/tables.js";
+import { AuditLogEntity } from "../../models/logs/AuditLogs.js";
 
 
 //Options to filter by log type
@@ -29,7 +30,7 @@ export interface Filters {
 export async function createLog(
   message: string,
   category: string | undefined,
-  ...entities: { id: any; label: string }[]
+  ...entities: AuditLogEntity[]
 ) {
   let formattedMessage = message;
 
@@ -96,26 +97,26 @@ export async function getLogs(
   );
 
   //Create WHERE rule content to only grab entries matcching one of the applied filters
-  const filterSQL = `"category" = ANY (ARRAY[${filterString.substring(0, filterString.length-2)}])` + (filters?.uncategorized ? ` OR "category" IS NULL` : "");
+  const filterSQL = `"category" = ANY (ARRAY[${filterString.substring(0, filterString.length - 2)}])` + (filters?.uncategorized ? ` OR "category" IS NULL` : "");
 
   const knexResult = (filterString && filterString != "")
-  //If filters exist, use filterSQL
-  ? await knex("AuditLogs")
-  .select()
-  .whereRaw(`("dateTime" at time zone 'UTC') BETWEEN TIMESTAMP '${new Date(startDate).toISOString().replace("T", " ").replace("Z", "")}' AND TIMESTAMP '${new Date(stopDate).toISOString().replace("T", " ").replace("Z", "")}'`)
-  .whereRaw(filterSQL)
-  .where("message", "ilike", `%${searchText}%`)
-  .whereRaw((filters?.errors != "both" ? `message ${filters?.errors == "no-errors" ? "NOT " : ""} ilike '%<error:%'` : "TRUE"))
-  .orderBy("dateTime", "DESC")
-  .limit(100)
-  //else, don't use filterSQL
-  : await knex("AuditLogs")
-  .select()
-  .whereRaw(`("dateTime" at time zone 'UTC') BETWEEN TIMESTAMP '${new Date(startDate).toISOString().replace("T", " ").replace("Z", "")}' AND TIMESTAMP '${new Date(stopDate).toISOString().replace("T", " ").replace("Z", "")}'`)
-  .where("message", "ilike", `%${searchText}%`)
-  .whereRaw((filters?.errors != "both" ? `message ${filters?.errors == "no-errors" ? "NOT " : ""} ilike '%<error:%'` : "TRUE"))
-  .orderBy("dateTime", "DESC")
-  .limit(100)
+    //If filters exist, use filterSQL
+    ? await knex("AuditLogs")
+      .select()
+      .whereRaw(`("dateTime" at time zone 'UTC') BETWEEN TIMESTAMP '${new Date(startDate).toISOString().replace("T", " ").replace("Z", "")}' AND TIMESTAMP '${new Date(stopDate).toISOString().replace("T", " ").replace("Z", "")}'`)
+      .whereRaw(filterSQL)
+      .where("message", "ilike", `%${searchText}%`)
+      .whereRaw((filters?.errors != "both" ? `message ${filters?.errors == "no-errors" ? "NOT " : ""} ilike '%<error:%'` : "TRUE"))
+      .orderBy("dateTime", "DESC")
+      .limit(100)
+    //else, don't use filterSQL
+    : await knex("AuditLogs")
+      .select()
+      .whereRaw(`("dateTime" at time zone 'UTC') BETWEEN TIMESTAMP '${new Date(startDate).toISOString().replace("T", " ").replace("Z", "")}' AND TIMESTAMP '${new Date(stopDate).toISOString().replace("T", " ").replace("Z", "")}'`)
+      .where("message", "ilike", `%${searchText}%`)
+      .whereRaw((filters?.errors != "both" ? `message ${filters?.errors == "no-errors" ? "NOT " : ""} ilike '%<error:%'` : "TRUE"))
+      .orderBy("dateTime", "DESC")
+      .limit(100)
 
   //Map rows
   return knexResult;

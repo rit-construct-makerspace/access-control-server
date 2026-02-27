@@ -1,4 +1,5 @@
 import { AccessControllerState, CoreInputMode } from "../../db/tables.js";
+import { AuditLog } from "../logs/AuditLogs.js";
 
 export enum CoreInfoRequests {
   TIME = "TIME",
@@ -25,13 +26,16 @@ export interface WSACSCoreRequest {
     fields: CoreInfoRequests[];
   };
   message?: {
-    content: string;
-    auditLog: boolean
+    content: AuditLog | string;
+    auditLog: boolean;
   };
 }
 
 export enum WSACSServerError {
-  PARSE_FAIL = "PARSE_FAIL",
+  SERVER_ERROR = "SERVER_ERROR",
+  BAD_REQUEST = "BAD_REQUEST",
+  DEVICE_NOT_FOUND = "DEVICE_NOT_FOUND",
+  USER_NOT_FOUND = "USER_NOT_FOUND"
 }
 
 export interface WSACSServerResponse {
@@ -50,6 +54,9 @@ export interface WSACSServerResponse {
       state?: AccessControllerState;
       otaTag?: string;
     },
+    message?: {
+      logged: boolean
+    }
     error?: WSACSServerError;
   }
 }
@@ -69,25 +76,5 @@ export interface WSACSServerRequest {
       targetOta?: string;
     },
     getFiles?: CoreFiles[];
-  }
-}
-
-// I don't think we need this? tracking it would also be messy imo
-export interface CoreResponse {
-  response: {
-    command?: {
-      toState?: {
-        success: boolean;
-      },
-      action?: {
-        success: boolean;
-      }
-    },
-    update?: {
-      config?: {
-
-      },
-
-    }
   }
 }
