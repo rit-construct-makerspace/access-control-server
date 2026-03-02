@@ -4,6 +4,7 @@ import { CoreInfoRequests, WSACSCoreRequest, WSACSServerError, WSACSServerReques
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import * as UserRepo from "../../repositories/Users/UserRepository.js";
 import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
+import { AccessControllerState } from "../../db/tables.js";
 
 type ConnectionData = {
   ws: ws.WebSocket;
@@ -42,18 +43,35 @@ export default class WSACSController {
     }
   }
 
-  private static handleWsMessage(event: ws.MessageEvent, deviceID: number) {
-    const connData = this.corePool.get(deviceID);
+  private static async handleWsMessage(event: ws.MessageEvent, deviceID: number) {
     try {
       if (event.type !== "text") {
         const response: WSACSServerResponse = { response: { error: WSACSServerError.BAD_REQUEST } };
-        return response;
+        WSACSController.sendCoreResponse(response, deviceID);
+        return;
       }
 
       const request = parseRequest(event.data);
+      if (request.authTo !== undefined) {
+        WSACSController.sendCoreResponse(await handleCoreAuthToRequest(request, deviceID), deviceID);
+      } else if (request.info !== undefined) {
+        WSACSController.sendCoreResponse(await handleCoreInfoRequest(request, deviceID), deviceID);
+      } else if (request.message !== undefined) {
+        // A message request does not require a response from the server
+        handleCoreMessageRequest(request, deviceID);
+      } else if (request.status !== undefined) {
+        // A status requets does not require a response from the server
+        handleCoreStatusRequest(request, deviceID);
+      } else {
+        const response: WSACSServerResponse = { response: { error: WSACSServerError.BAD_REQUEST } };
+        WSACSController.sendCoreResponse(response, deviceID);
+        return;
+      }
 
     } catch (e) {
       console.error(`WSACS: Message Exception: ${e}`) //TODO: put in DB
+      const response: WSACSServerResponse = { response: { error: WSACSServerError.SERVER_ERROR } };
+      WSACSController.sendCoreResponse(response, deviceID);
     }
   }
 
@@ -77,7 +95,13 @@ export default class WSACSController {
     ws.onmessage = (event) => this.handleWsMessage(event, deviceID);
   }
 
-  static sendCoreMessage(payload: WSACSServerRequest, deviceID: number) {
+  static sendCoreRequest(payload: WSACSServerRequest, deviceID: number) {
+    const connection = this.corePool.get(deviceID);
+    if (connection === undefined) { return; }
+    connection.ws.send(JSON.stringify(payload));
+  }
+
+  static sendCoreResponse(payload: WSACSServerResponse, deviceID: number) {
     const connection = this.corePool.get(deviceID);
     if (connection === undefined) { return; }
     connection.ws.send(JSON.stringify(payload));
@@ -111,9 +135,34 @@ async function handleCoreAuthToRequest(request: WSACSCoreRequest, deviceID: numb
   }
 
   const controllers = await core.getAccessControllers();
+
+  if (request.authTo.state === AccessControllerState.UNLOCKED) {
+
+    for (let i = 0; i < controllers.length; i++) {
+      const accessAttempt = await controllers[i].canUnlock(user.id);
+      response.response.authTo.channels.push({
+        id: controllers[i].channelID,
+        state: accessAttempt.hasAccess ? AccessControllerState.UNLOCKED : controllers[i].state,
+        approved: accessAttempt.hasAccess,
+        reason: accessAttempt.reason
+      });
+    }
+
+    return response;
+  } else if (
+    request.authTo.state === AccessControllerState.ALWAYS_ON
+    || request.authTo.state === AccessControllerState.LOCKED_OUT
+    || request.authTo.state === AccessControllerState.IDLE
+  ) {
+    // TODO
+    return response;
+  } else {
+    response.response.error = WSACSServerError.BAD_REQUEST;
+    return response;
+  }
 }
 
-export async function handleCoreInfoRequest(request: WSACSCoreRequest, deviceID: number): Promise<WSACSServerResponse> {
+async function handleCoreInfoRequest(request: WSACSCoreRequest, deviceID: number): Promise<WSACSServerResponse> {
   const response: WSACSServerResponse = { response: { info: {} } }
   if (request.info === undefined || response.response.info === undefined) {
     response.response.error = WSACSServerError.SERVER_ERROR;
@@ -125,37 +174,37 @@ export async function handleCoreInfoRequest(request: WSACSCoreRequest, deviceID:
       case CoreInfoRequests.TIME:
         response.response.info.time = Date.now();
         continue;
-      case CoreInfoRequests.OTA_TAG:
-        // TODO
-        continue;
       case CoreInfoRequests.STATE:
         response.response.info.state = await CoreRepo.getCoreState(deviceID);
+        continue;
+      default:
+        response.response.error = WSACSServerError.BAD_REQUEST;
+        continue;
     }
   }
 
   return response;
 }
 
-export async function handleCoreMessageRequest(request: WSACSCoreRequest, deviceID: number): Promise<WSACSServerResponse> {
-  const response: WSACSServerResponse = { response: { message: { logged: false } } }
-  if (request.message === undefined || response.response.message === undefined) {
-    response.response.error = WSACSServerError.SERVER_ERROR;
-    return response;
+async function handleCoreMessageRequest(request: WSACSCoreRequest, deviceID: number): Promise<void> {
+  if (request.message === undefined) {
+    return;
   }
 
   if (!request.message.auditLog) {
-    // TODO: just put in DB
-    response.response.message.logged = false; // Make true when it actually is being logged
-    return response;
+    // TODO: just put in DB, the message is not an audit log
+    return;
   }
 
-  // The message is an auditlog
+  // The message is an auditlog, should not be string
   if (typeof request.message.content === "string") {
-    response.response.error = WSACSServerError.BAD_REQUEST;
-    return response;
+    return;
   }
 
   await AuditLogRepo.createLog(request.message.content.message, request.message.content.category, ...request.message.content.entities);
-  response.response.message.logged = true;
-  return response;
+  return;
+}
+
+async function handleCoreStatusRequest(request: WSACSCoreRequest, deviceID: number): Promise<void> {
+
 }

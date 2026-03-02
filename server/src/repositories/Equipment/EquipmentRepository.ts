@@ -48,6 +48,10 @@ export async function getEquipmentByID(id: number): Promise<EquipmentRow> {
   return equipment;
 }
 
+export async function getEquipmentOrUndefinedByID(equipmentID: number): Promise<EquipmentRow | undefined> {
+  return await knex("Equipment").first().where({ id: equipmentID });
+}
+
 /**
  * Fetch Equipment entry by unique ID, filtering by specifically archived or not archived
  * @param id unique ID of equipment entry to fetch
@@ -124,14 +128,14 @@ export async function getModulesByEquipment(
  * @returns true if all trainings needed are passed
  */
 export async function hasTrainingModules(
-  user: UserRow,
+  userID: number,
   equipmentID: number
 ): Promise<boolean> {
   let modules = await getModulesByEquipment(equipmentID);
   let hasTraining = true;
   // get last submission from maker for every module
   for (let i = 0; i < modules.length; i++) {
-    if (await ModuleRepo.hasPassedModule(user.id, modules[i].id)) {
+    if (await ModuleRepo.hasPassedModule(userID, modules[i].id)) {
       continue;
     }
     else {
@@ -205,7 +209,7 @@ export async function hasAccessByID(
   const user = await UserRepo.getUserByID(userID);   // Get user for this university ID
   return user !== undefined &&                              // Ensure user exists
     !(await HoldsRepo.hasActiveHolds(user.id)) &&           // Ensure user has no holds
-    (await hasTrainingModules(user, equipmentID));            // Ensure user has completed necessary training
+    (await hasTrainingModules(user.id, equipmentID));            // Ensure user has completed necessary training
 }
 
 /**

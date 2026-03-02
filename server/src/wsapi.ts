@@ -431,7 +431,7 @@ async function authorizeUIDToUnlock(uid: string, deviceID: number, inResponse: S
     }
 
     //Check that all required equipment trainings are passed
-    if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasTrainingModules(user, machine.id))) {
+    if (!(process.env.GLOBAL_TRAINING_BYPASS == "TRUE") && !(await hasTrainingModules(user.id, machine.id))) {
       const incompleteTrainings = await getMissingTrainingModules(user, machine.id);
       var incompleteTrainingsStr = ""
       incompleteTrainings.forEach((module, i) => {

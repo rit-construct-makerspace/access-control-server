@@ -54,7 +54,7 @@ export class Core extends Device implements CoreRow {
       request.command?.toState?.push({ id: controllers[i].channelID, state: targetState });
     }
 
-    WSACSController.sendCoreMessage(request, this.deviceID);
+    WSACSController.sendCoreRequest(request, this.deviceID);
 
     return true;
   }

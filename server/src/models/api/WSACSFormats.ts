@@ -3,8 +3,7 @@ import { AuditLog } from "../logs/AuditLogs.js";
 
 export enum CoreInfoRequests {
   TIME = "TIME",
-  STATE = "STATE",
-  OTA_TAG = "OTA_TAG"
+  STATE = "STATE"
 }
 
 export enum CoreActions {
@@ -15,6 +14,13 @@ export enum CoreActions {
 export enum CoreFiles {
   CERT = "CERT",
   OFFLINE_LIST = "OFFLINE_LIST"
+}
+
+export enum CoreStateChangeReason {
+  AUTHED = "AUTHED",
+  OVER_TEMP = "OVER_TEMP",
+  CARD_REMOVED = "CARD_REMOVED",
+  COMMANDED = "COMMANDED"
 }
 
 export interface WSACSCoreRequest {
@@ -28,6 +34,23 @@ export interface WSACSCoreRequest {
   message?: {
     content: AuditLog | string;
     auditLog: boolean;
+  };
+  status?: {
+    regular?: {
+      currentCardTag: string,
+      currentStates: {
+        state: AccessControllerState,
+        channelID: number
+      }[]
+    },
+    stateChange?: {
+      channels: {
+        fromState: AccessControllerState,
+        toState: AccessControllerState,
+        reason: CoreStateChangeReason,
+        channelID: number
+      }
+    }
   };
 }
 
@@ -53,9 +76,6 @@ export interface WSACSServerResponse {
       time?: number;
       state?: AccessControllerState;
       otaTag?: string;
-    },
-    message?: {
-      logged: boolean
     }
     error?: WSACSServerError;
   }
