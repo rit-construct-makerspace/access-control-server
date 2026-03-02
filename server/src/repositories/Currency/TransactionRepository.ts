@@ -102,14 +102,14 @@ export async function getLastChargesForTransactionById(transactionId: number): P
         )
         .leftJoin("CurrencyLedger as cl", "cl.transactionEntryId", "te.id")
         .where("te.transactionID", "=", transactionId)
-        .orderBy("te.dateTime", "desc").debug(true) as Row[];
+        .orderBy("te.dateTime", "desc") as Row[];
 
     const rowsNotIncludingEmptyEntries = rows.filter(r => r.CLID !== null);
     if (rowsNotIncludingEmptyEntries.length == 0) {
         // dont even have the transaction entry (weird and bad)
         return undefined;
     }
- 
+
     const entryIdWeCareAbout = rowsNotIncludingEmptyEntries[0].transactionEntryId;
     const justLastCharges = rowsNotIncludingEmptyEntries.filter(r => r.amount < 0 && r.transactionEntryId == entryIdWeCareAbout); // we don't want the last refund
 
