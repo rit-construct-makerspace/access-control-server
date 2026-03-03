@@ -154,7 +154,17 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
     || request.authTo.state === AccessControllerState.LOCKED_OUT
     || request.authTo.state === AccessControllerState.IDLE
   ) {
-    // TODO
+
+    for (let i = 0; i < controllers.length; i++) {
+      const controlAttempt = await controllers[i].canControl(user.id);
+      response.authTo.channels.push({
+        id: controllers[i].channelID,
+        state: controlAttempt.canControl ? request.authTo.state : controllers[i].state,
+        approved: controlAttempt.canControl,
+        reason: controlAttempt.reason
+      });
+    }
+
     return response;
   } else {
     response.error = WSACSServerError.BAD_REQUEST;
@@ -195,9 +205,7 @@ async function handleCoreMessageRequest(request: WSACSCoreUnprompted, deviceID: 
     // TODO: just put in DB, the message is not an audit log
     return;
   }
-
-  // The message is an auditlog, should not be string
-  if (typeof request.message.content === "string") {
+  if (typeof request.message.content === "string") { // The message is an auditlog, should not be string
     return;
   }
 

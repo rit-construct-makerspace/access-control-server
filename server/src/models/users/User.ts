@@ -46,7 +46,7 @@ export class User implements UserRow {
     this.forceArchive = row.forceArchive;
   }
 
-  async hasHolds(): Promise<Boolean> {
+  async hasHolds(): Promise<boolean> {
     return await HoldsRepo.hasActiveHolds(this.id);
   }
 
@@ -58,28 +58,41 @@ export class User implements UserRow {
     return await UserRepo.getUserManagerPerms(this.id);
   }
 
-  async isManagerOf(makerspaceID: number): Promise<Boolean> {
+  async getStaffPerms(): Promise<number[]> {
+    return await UserRepo.getUserStaffPerms(this.id);
+  }
+
+  async isManagerOf(makerspaceID: number): Promise<boolean> {
+    if (this.admin) { return true; }
+
     const managerPerms = await this.getManagerPerms();
     return managerPerms.includes(makerspaceID);
   }
 
-  async wasWelcomedToday(roomID: number): Promise<Boolean> {
+  async isStaffOf(makerspaceID: number): Promise<boolean> {
+    if (await this.isManagerOf(makerspaceID)) { return true; }
+
+    const staffPerms = await this.getStaffPerms();
+    return staffPerms.includes(makerspaceID);
+  }
+
+  async wasWelcomedToday(roomID: number): Promise<boolean> {
     return await RoomRepo.hasSwipedToday(roomID, this.id);
   }
 
-  async hasMakerspaceTrainings(makerspaceID: number): Promise<Boolean> {
+  async hasMakerspaceTrainings(makerspaceID: number): Promise<boolean> {
     return await MakerspaceRepo.hasMakerspaceTrainings(makerspaceID, this.id);
   }
 
-  async hasRoomTrainings(roomID: number): Promise<Boolean> {
+  async hasRoomTrainings(roomID: number): Promise<boolean> {
     return await RoomRepo.hasRoomTrainings(roomID, this.id);
   }
 
-  async hasEquipmentTrainings(equipmentID: number): Promise<Boolean> {
+  async hasEquipmentTrainings(equipmentID: number): Promise<boolean> {
     return await EquipmentRepo.hasTrainingModules(this.id, equipmentID);
   }
 
-  async hasAccessCheck(equipmentID: number): Promise<Boolean> {
+  async hasAccessCheck(equipmentID: number): Promise<boolean> {
     return (await AccessCheckRepo.hasApprovedAccessCheck(this.id, equipmentID)) ?? false;
   }
 }
