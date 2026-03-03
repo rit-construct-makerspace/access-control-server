@@ -37,7 +37,6 @@ export interface WSACSCoreRequest {
   };
   status?: {
     regular?: {
-      currentCardTag: string,
       currentStates: {
         state: AccessControllerState,
         channelID: number
@@ -49,8 +48,9 @@ export interface WSACSCoreRequest {
         toState: AccessControllerState,
         reason: CoreStateChangeReason,
         channelID: number
-      }
-    }
+      }[]
+    },
+    currentCardTag: string;
   };
 }
 

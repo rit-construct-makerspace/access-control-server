@@ -53,3 +53,7 @@ export async function pairNewCore(SN: string, makerspaceID: number): Promise<Cor
 
   return await Core.buid(newCore[0]);
 }
+
+export async function coreStatusUpdate(deviceID: number, cardTagID: string | undefined) {
+  await knex("Cores").update({ currentCardTag: cardTagID, lastStatusTime: knex.fn.now() }).where({ deviceID: deviceID });
+}

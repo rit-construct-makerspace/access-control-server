@@ -206,5 +206,20 @@ async function handleCoreMessageRequest(request: WSACSCoreRequest, deviceID: num
 }
 
 async function handleCoreStatusRequest(request: WSACSCoreRequest, deviceID: number): Promise<void> {
+  const core = await CoreRepo.getCoreByDeviceID(deviceID);
+  if (request.status === undefined || core === undefined) {
+    return;
+  }
 
+  if (request.status.regular !== undefined) {
+    await core.statusUpdate(request.status.currentCardTag === "" ? undefined : request.status.currentCardTag);
+    // Update AC
+    return;
+  }
+
+  if (request.status.stateChange !== undefined) {
+    await core.statusUpdate(request.status.currentCardTag === "" ? undefined : request.status.currentCardTag)
+    // Update AC
+    return;
+  }
 }

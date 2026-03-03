@@ -8,6 +8,7 @@ import WSACSController from "../api/WSACSController.js";
 import { AccessController } from "./accessController.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
 import { WSACSServerRequest } from "../api/WSACSFormats.js";
+import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 
 export class Core extends Device implements CoreRow {
   deviceID: number;
@@ -73,6 +74,10 @@ export class Core extends Device implements CoreRow {
       lastStatusTime: this.lastStatusTime,
       sessionStartTime: this.sessionStartTime
     }
+  }
+
+  async statusUpdate(curCardTag: string | undefined): Promise<void> {
+    await CoreRepo.coreStatusUpdate(this.deviceID, curCardTag);
   }
 
 }
