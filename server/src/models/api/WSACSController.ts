@@ -1,6 +1,6 @@
 import * as ws from "ws";
 import { Request } from "express";
-import { CoreInfoRequests, WSACSCoreRequest, WSACSServerError, WSACSServerRequest, WSACSServerResponse } from "./WSACSFormats.js";
+import { CoreInfoRequests, WSACSCoreUnprompted, WSACSServerError, WSACSServerUnprompted, WSACSServerPrompted } from "./WSACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import * as UserRepo from "../../repositories/Users/UserRepository.js";
 import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
@@ -46,7 +46,7 @@ export default class WSACSController {
   private static async handleWsMessage(event: ws.MessageEvent, deviceID: number) {
     try {
       if (event.type !== "text") {
-        const response: WSACSServerResponse = { response: { error: WSACSServerError.BAD_REQUEST } };
+        const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
         WSACSController.sendCoreResponse(response, deviceID);
         return;
       }
@@ -63,14 +63,14 @@ export default class WSACSController {
         // A status requets does not require a response from the server
         handleCoreStatusRequest(request, deviceID);
       } else {
-        const response: WSACSServerResponse = { response: { error: WSACSServerError.BAD_REQUEST } };
+        const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
         WSACSController.sendCoreResponse(response, deviceID);
         return;
       }
 
     } catch (e) {
       console.error(`WSACS: Message Exception: ${e}`) //TODO: put in DB
-      const response: WSACSServerResponse = { response: { error: WSACSServerError.SERVER_ERROR } };
+      const response: WSACSServerPrompted = { error: WSACSServerError.SERVER_ERROR };
       WSACSController.sendCoreResponse(response, deviceID);
     }
   }
@@ -95,42 +95,42 @@ export default class WSACSController {
     ws.onmessage = (event) => this.handleWsMessage(event, deviceID);
   }
 
-  static sendCoreRequest(payload: WSACSServerRequest, deviceID: number) {
+  static sendCoreRequest(payload: WSACSServerUnprompted, deviceID: number) {
     const connection = this.corePool.get(deviceID);
     if (connection === undefined) { return; }
     connection.ws.send(JSON.stringify(payload));
   }
 
-  static sendCoreResponse(payload: WSACSServerResponse, deviceID: number) {
+  static sendCoreResponse(payload: WSACSServerPrompted, deviceID: number) {
     const connection = this.corePool.get(deviceID);
     if (connection === undefined) { return; }
     connection.ws.send(JSON.stringify(payload));
   }
 }
 
-function parseRequest(data: ws.Data): WSACSCoreRequest {
+function parseRequest(data: ws.Data): WSACSCoreUnprompted {
   const json = JSON.parse(data.toString());
-  return json as WSACSCoreRequest;
+  return json as WSACSCoreUnprompted;
 }
 
-async function handleCoreAuthToRequest(request: WSACSCoreRequest, deviceID: number): Promise<WSACSServerResponse> {
-  const response: WSACSServerResponse = { response: { authTo: { channels: [], cardTagID: "" } } }
-  if (request.authTo === undefined || response.response.authTo === undefined) {
-    response.response.error = WSACSServerError.SERVER_ERROR;
+async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: number): Promise<WSACSServerPrompted> {
+  const response: WSACSServerPrompted = { authTo: { channels: [], cardTagID: "" } }
+  if (request.authTo === undefined || response.authTo === undefined) {
+    response.error = WSACSServerError.SERVER_ERROR;
     return response;
   }
 
-  response.response.authTo.cardTagID = request.authTo.cardTagID;
+  response.authTo.cardTagID = request.authTo.cardTagID;
 
   const core = await CoreRepo.getCoreByDeviceID(deviceID);
   if (core === undefined) {
-    response.response.error = WSACSServerError.DEVICE_NOT_FOUND;
+    response.error = WSACSServerError.DEVICE_NOT_FOUND;
     return response;
   }
 
   const user = await UserRepo.getUserByCardTagID(request.authTo.cardTagID);
   if (user === undefined) {
-    response.response.error = WSACSServerError.USER_NOT_FOUND;
+    response.error = WSACSServerError.USER_NOT_FOUND;
     return response;
   }
 
@@ -140,7 +140,7 @@ async function handleCoreAuthToRequest(request: WSACSCoreRequest, deviceID: numb
 
     for (let i = 0; i < controllers.length; i++) {
       const accessAttempt = await controllers[i].canUnlock(user.id);
-      response.response.authTo.channels.push({
+      response.authTo.channels.push({
         id: controllers[i].channelID,
         state: accessAttempt.hasAccess ? AccessControllerState.UNLOCKED : controllers[i].state,
         approved: accessAttempt.hasAccess,
@@ -157,28 +157,28 @@ async function handleCoreAuthToRequest(request: WSACSCoreRequest, deviceID: numb
     // TODO
     return response;
   } else {
-    response.response.error = WSACSServerError.BAD_REQUEST;
+    response.error = WSACSServerError.BAD_REQUEST;
     return response;
   }
 }
 
-async function handleCoreInfoRequest(request: WSACSCoreRequest, deviceID: number): Promise<WSACSServerResponse> {
-  const response: WSACSServerResponse = { response: { info: {} } }
-  if (request.info === undefined || response.response.info === undefined) {
-    response.response.error = WSACSServerError.SERVER_ERROR;
+async function handleCoreInfoRequest(request: WSACSCoreUnprompted, deviceID: number): Promise<WSACSServerPrompted> {
+  const response: WSACSServerPrompted = { info: {} }
+  if (request.info === undefined || response.info === undefined) {
+    response.error = WSACSServerError.SERVER_ERROR;
     return response;
   }
 
   for (let i = 0; i < request.info.fields.length; i++) {
     switch (request.info.fields[i]) {
       case CoreInfoRequests.TIME:
-        response.response.info.time = Date.now();
+        response.info.time = Date.now();
         continue;
       case CoreInfoRequests.STATE:
-        response.response.info.state = await CoreRepo.getCoreState(deviceID);
+        response.info.state = await CoreRepo.getCoreState(deviceID);
         continue;
       default:
-        response.response.error = WSACSServerError.BAD_REQUEST;
+        response.error = WSACSServerError.BAD_REQUEST;
         continue;
     }
   }
@@ -186,7 +186,7 @@ async function handleCoreInfoRequest(request: WSACSCoreRequest, deviceID: number
   return response;
 }
 
-async function handleCoreMessageRequest(request: WSACSCoreRequest, deviceID: number): Promise<void> {
+async function handleCoreMessageRequest(request: WSACSCoreUnprompted, deviceID: number): Promise<void> {
   if (request.message === undefined) {
     return;
   }
@@ -205,7 +205,7 @@ async function handleCoreMessageRequest(request: WSACSCoreRequest, deviceID: num
   return;
 }
 
-async function handleCoreStatusRequest(request: WSACSCoreRequest, deviceID: number): Promise<void> {
+async function handleCoreStatusRequest(request: WSACSCoreUnprompted, deviceID: number): Promise<void> {
   const core = await CoreRepo.getCoreByDeviceID(deviceID);
   if (request.status === undefined || core === undefined) {
     return;
@@ -213,13 +213,18 @@ async function handleCoreStatusRequest(request: WSACSCoreRequest, deviceID: numb
 
   if (request.status.regular !== undefined) {
     await core.statusUpdate(request.status.currentCardTag === "" ? undefined : request.status.currentCardTag);
-    // Update AC
-    return;
+    for (let i = 0; i < request.status.regular.currentStates.length; i++) {
+      core.updateControllerState(request.status.regular.currentStates[i].channelID, request.status.regular.currentStates[i].state);
+    }
+  } else if (request.status.stateChange !== undefined) {
+    await core.statusUpdate(request.status.currentCardTag === "" ? undefined : request.status.currentCardTag);
+    for (let i = 0; i < request.status.stateChange.channels.length; i++) {
+      core.updateControllerState(request.status.stateChange.channels[i].channelID, request.status.stateChange.channels[i].toState);
+    }
+    // TODO: Log state change
   }
 
-  if (request.status.stateChange !== undefined) {
-    await core.statusUpdate(request.status.currentCardTag === "" ? undefined : request.status.currentCardTag)
-    // Update AC
-    return;
+  if (request.status.config !== undefined) {
+    // Update recorded config
   }
 }

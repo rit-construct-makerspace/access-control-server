@@ -8,12 +8,13 @@ export enum CoreInfoRequests {
 
 export enum CoreActions {
   RESTART = "RESTART",
-  LOCK_WHEN_IDLE = "LOCK_WHEN_IDLE"
+  SEAL = "SEAL"
 }
 
 export enum CoreFiles {
   CERT = "CERT",
-  OFFLINE_LIST = "OFFLINE_LIST"
+  OFFLINE_LIST = "OFFLINE_LIST",
+  OTA = "OTA"
 }
 
 export enum CoreStateChangeReason {
@@ -23,7 +24,7 @@ export enum CoreStateChangeReason {
   COMMANDED = "COMMANDED"
 }
 
-export interface WSACSCoreRequest {
+export interface WSACSCoreUnprompted {
   authTo?: {
     state: AccessControllerState;
     cardTagID: string;
@@ -50,7 +51,11 @@ export interface WSACSCoreRequest {
         channelID: number
       }[]
     },
-    currentCardTag: string;
+    currentCardTag: string,
+    config?: {
+      channels: number;
+      inputMode: CoreInputMode;
+    }
   };
 }
 
@@ -61,27 +66,24 @@ export enum WSACSServerError {
   USER_NOT_FOUND = "USER_NOT_FOUND"
 }
 
-export interface WSACSServerResponse {
-  response: {
-    authTo?: {
-      channels: {
-        id: number;
-        state: AccessControllerState;
-        approved: boolean;
-        reason: string;
-      }[];
-      cardTagID: string;
-    },
-    info?: {
-      time?: number;
-      state?: AccessControllerState;
-      otaTag?: string;
-    }
-    error?: WSACSServerError;
+export interface WSACSServerPrompted {
+  authTo?: {
+    channels: {
+      id: number;
+      state: AccessControllerState;
+      approved: boolean;
+      reason: string;
+    }[];
+    cardTagID: string;
+  },
+  info?: {
+    time?: number;
+    state?: AccessControllerState;
   }
+  error?: WSACSServerError;
 }
 
-export interface WSACSServerRequest {
+export interface WSACSServerUnprompted {
   command?: {
     toState?: {
       id: number,
@@ -93,7 +95,6 @@ export interface WSACSServerRequest {
     config?: {
       inputMode?: CoreInputMode;
       tempDuration?: number;
-      targetOta?: string;
     },
     getFiles?: CoreFiles[];
   }

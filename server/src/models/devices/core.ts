@@ -7,7 +7,7 @@ import { CurrentUser } from "../../context.js";
 import WSACSController from "../api/WSACSController.js";
 import { AccessController } from "./accessController.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
-import { WSACSServerRequest } from "../api/WSACSFormats.js";
+import { WSACSServerUnprompted } from "../api/WSACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 
 export class Core extends Device implements CoreRow {
@@ -45,7 +45,7 @@ export class Core extends Device implements CoreRow {
     }
 
     const controllers = await this.getAccessControllers();
-    const request: WSACSServerRequest = {
+    const request: WSACSServerUnprompted = {
       command: {
         toState: []
       }
@@ -61,7 +61,9 @@ export class Core extends Device implements CoreRow {
   }
 
   async getAccessControllers(): Promise<AccessController[]> {
-    return await ACRepo.getAccessControllersByDeviceID(this.deviceID);
+    const controllers = await ACRepo.getAccessControllersByDeviceID(this.deviceID);
+
+    return controllers.sort((a, b) => (a.channelID - b.channelID));
   }
 
   getRow(): CoreRow {
@@ -78,6 +80,10 @@ export class Core extends Device implements CoreRow {
 
   async statusUpdate(curCardTag: string | undefined): Promise<void> {
     await CoreRepo.coreStatusUpdate(this.deviceID, curCardTag);
+  }
+
+  async updateControllerState(channelID: number, newState: AccessControllerState) {
+    await ACRepo.updateAccessControllerStateByDeviceAndChannelID(this.deviceID, channelID, newState);
   }
 
 }
