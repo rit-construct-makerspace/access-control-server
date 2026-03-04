@@ -5,6 +5,7 @@ import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import * as UserRepo from "../../repositories/Users/UserRepository.js";
 import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
 import { AccessControllerState } from "../../db/tables.js";
+import { AccessAttemptReason } from "../devices/accessController.js";
 
 type ConnectionData = {
   ws: ws.WebSocket;
@@ -138,6 +139,25 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
 
   if (request.authTo.state === AccessControllerState.UNLOCKED) {
 
+    // If this is a welcome reader, instead we welcome the user and return early
+    const welcomeSpace = await core.getWelcomeMakerspace();
+    if (welcomeSpace !== undefined) {
+
+      await welcomeSpace.welcome(user.id);
+
+      for (let i = 0; i < controllers.length; i++) {
+        response.authTo.channels.push({
+          id: controllers[i].channelID,
+          state: AccessControllerState.UNLOCKED,
+          approved: true,
+          reason: AccessAttemptReason.WELCOME,
+        });
+      }
+
+      return response;
+    }
+
+    // Not a welcome reader so we check access on every channel
     for (let i = 0; i < controllers.length; i++) {
       const accessAttempt = await controllers[i].canUnlock(user.id);
       response.authTo.channels.push({

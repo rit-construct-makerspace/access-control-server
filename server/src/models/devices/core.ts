@@ -9,6 +9,7 @@ import { AccessController } from "./accessController.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
 import { WSACSServerUnprompted } from "../api/WSACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
+import { Makerspace } from "../makerspaces/makerspace.js";
 
 export class Core extends Device implements CoreRow {
   deviceID: number;
@@ -84,6 +85,11 @@ export class Core extends Device implements CoreRow {
 
   async updateControllerState(channelID: number, newState: AccessControllerState) {
     await ACRepo.updateAccessControllerStateByDeviceAndChannelID(this.deviceID, channelID, newState);
+  }
+
+  async getWelcomeMakerspace(): Promise<Makerspace | undefined> {
+    const rawRow = await DeviceRepo.getMakerspaceOfWelcomeDevice(this.id);
+    return rawRow === undefined ? undefined : new Makerspace(rawRow);
   }
 
 }
