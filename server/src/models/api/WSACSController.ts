@@ -125,12 +125,14 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
 
   const core = await CoreRepo.getCoreByDeviceID(deviceID);
   if (core === undefined) {
+    // TODO: LOG
     response.error = WSACSServerError.DEVICE_NOT_FOUND;
     return response;
   }
 
   const user = await UserRepo.getUserByCardTagID(request.authTo.cardTagID);
   if (user === undefined) {
+    // TODO: LOG
     response.error = WSACSServerError.USER_NOT_FOUND;
     return response;
   }
@@ -214,7 +216,22 @@ async function handleCoreInfoRequest(request: WSACSCoreUnprompted, deviceID: num
         response.info.time = Date.now();
         continue;
       case CoreInfoRequests.STATE:
-        response.info.state = await CoreRepo.getCoreState(deviceID);
+        const channelStates: { id: number, state: AccessControllerState }[] = [];
+        const core = await CoreRepo.getCoreByDeviceID(deviceID);
+        if (core === undefined) {
+          response.info.state = channelStates;
+          continue;
+        }
+
+        const channels = await core.getAccessControllers();
+        for (let i = 0; i < channels.length; i++) {
+          channelStates.push({
+            id: channels[i].channelID,
+            state: channels[i].state
+          })
+        }
+
+        response.info.state = channelStates;
         continue;
       default:
         response.error = WSACSServerError.BAD_REQUEST;

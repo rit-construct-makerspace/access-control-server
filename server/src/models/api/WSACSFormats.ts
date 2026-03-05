@@ -1,14 +1,21 @@
 import { AccessControllerState, CoreInputMode } from "../../db/tables.js";
 import { AuditLog } from "../logs/AuditLogs.js";
 
+/**
+ * TIME: Current time
+ * STATE: State the channels should be in
+ * HMI: Information intended for human consumption
+ */
 export enum CoreInfoRequests {
   TIME = "TIME",
-  STATE = "STATE"
+  STATE = "STATE",
+  HMI = "HMI"
 }
 
 export enum CoreActions {
   RESTART = "RESTART",
-  SEAL = "SEAL"
+  SEAL = "SEAL",
+  IDENTIFY = "IDENTIFY"
 }
 
 export enum CoreFiles {
@@ -59,6 +66,11 @@ export interface WSACSCoreUnprompted {
   };
 }
 
+export enum CoreRole {
+  WELCOME = "WELCOME",
+  EQUIPMENT = "EQUIPMENT"
+}
+
 export enum WSACSServerError {
   SERVER_ERROR = "SERVER_ERROR",
   BAD_REQUEST = "BAD_REQUEST",
@@ -78,7 +90,18 @@ export interface WSACSServerPrompted {
   },
   info?: {
     time?: number;
-    state?: AccessControllerState;
+    state?: {
+      id: number;
+      state: AccessControllerState
+    }[];
+    hmi?: {
+      role: CoreRole;
+      makerspace: string;
+      channels: {
+        channelID: number;
+        pairedEntity: string;
+      }[];
+    }
   }
   error?: WSACSServerError;
 }
@@ -90,6 +113,7 @@ export interface WSACSServerUnprompted {
       state: AccessControllerState
     }[];
     action?: CoreActions;
+    identifyChannel?: number
   },
   update?: {
     config?: {
