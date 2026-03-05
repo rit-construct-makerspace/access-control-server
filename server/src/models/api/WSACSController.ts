@@ -154,6 +154,15 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
         });
       }
 
+      if (response.authTo.channels.length === 0) {
+        response.authTo.channels.push({
+          id: 0,
+          state: AccessControllerState.UNLOCKED,
+          approved: true,
+          reason: AccessAttemptReason.WELCOME
+        });
+      }
+
       return response;
     }
 

@@ -573,8 +573,7 @@ async function startServer() {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     )
-  }
-  );
+  });
 }
 
 startServer();
