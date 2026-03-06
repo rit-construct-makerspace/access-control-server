@@ -61,7 +61,10 @@ export interface WSACSCoreUnprompted {
     },
     currentCardTag: string,
     config?: {
-      channels: number;
+      channels: {
+        id: number;
+        tempDuration: number;
+      }[];
       inputMode: CoreInputMode;
       deployment: ACSDeployment;
     }
