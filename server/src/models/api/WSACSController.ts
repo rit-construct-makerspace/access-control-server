@@ -210,6 +210,12 @@ async function handleCoreInfoRequest(request: WSACSCoreUnprompted, deviceID: num
     return response;
   }
 
+  const core = await CoreRepo.getCoreByDeviceID(deviceID);
+  if (core === undefined) {
+    response.error = WSACSServerError.SERVER_ERROR;
+    return response;
+  }
+
   for (let i = 0; i < request.info.fields.length; i++) {
     switch (request.info.fields[i]) {
       case CoreInfoRequests.TIME:
@@ -217,11 +223,6 @@ async function handleCoreInfoRequest(request: WSACSCoreUnprompted, deviceID: num
         continue;
       case CoreInfoRequests.STATE:
         const channelStates: { id: number, state: AccessControllerState }[] = [];
-        const core = await CoreRepo.getCoreByDeviceID(deviceID);
-        if (core === undefined) {
-          response.info.state = channelStates;
-          continue;
-        }
 
         const channels = await core.getAccessControllers();
         for (let i = 0; i < channels.length; i++) {
@@ -232,6 +233,9 @@ async function handleCoreInfoRequest(request: WSACSCoreUnprompted, deviceID: num
         }
 
         response.info.state = channelStates;
+        continue;
+      case CoreInfoRequests.HMI:
+        // TODO: GATHER THIS INFO
         continue;
       default:
         response.error = WSACSServerError.BAD_REQUEST;

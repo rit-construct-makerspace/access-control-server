@@ -1,5 +1,6 @@
 import { AccessControllerState, CoreInputMode } from "../../db/tables.js";
 import { AuditLog } from "../logs/AuditLogs.js";
+import { ACSDeployment } from "../ACS/deployment.js";
 
 /**
  * TIME: Current time
@@ -62,6 +63,7 @@ export interface WSACSCoreUnprompted {
     config?: {
       channels: number;
       inputMode: CoreInputMode;
+      deployment: ACSDeployment;
     }
   };
 }
@@ -118,7 +120,10 @@ export interface WSACSServerUnprompted {
   update?: {
     config?: {
       inputMode?: CoreInputMode;
-      tempDuration?: number;
+      channels?: {
+        id: number;
+        tempDuration?: number;
+      }[];
     },
     getFiles?: CoreFiles[];
   }
