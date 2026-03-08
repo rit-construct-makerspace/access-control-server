@@ -102,7 +102,7 @@ export async function getLastChargesForTransactionById(transactionId: number): P
         )
         .leftJoin("CurrencyLedger as cl", "cl.transactionEntryId", "te.id")
         .where("te.transactionID", "=", transactionId)
-        .orderBy("te.dateTime", "desc").debug(true) as Row[];
+        .orderBy("te.dateTime", "desc") as Row[];
 
     const rowsNotIncludingEmptyEntries = rows.filter(r => r.CLID !== null);
     if (rowsNotIncludingEmptyEntries.length == 0) {
