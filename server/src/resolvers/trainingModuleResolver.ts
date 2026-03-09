@@ -449,7 +449,7 @@ const TrainingModuleResolvers = {
         "{user} deleted {module} module.",
         "admin",
         { id: user.id, label: getUsersFullName(user) },
-        { id: args.id, label: module.name ?? "undefined" }
+        { id: Number(args.id), label: module.name ?? "undefined" }
       );
 
       await ModuleRepo.deleteModule(Number(args.id));
@@ -541,7 +541,7 @@ const TrainingModuleResolvers = {
               `{user} submitted attempt of {module} with a grade of ${grade} (${correct}/${incorrect + correct}).`,
               "training",
               { id: user.id, label: getUsersFullName(user) },
-              { id: args.moduleID, label: module.name }
+              { id: Number(args.moduleID), label: module.name }
             );
 
             //If all trainings for equipment done, add access check for all passed equipment
