@@ -46,6 +46,20 @@ export async function createLog(
   await knex("AuditLogs").insert({ message: formattedMessage, category });
 }
 
+export async function createAuditLog(message: string, category?: string, makerspaceID?: number, ...entities: AuditLogEntity[]) {
+  let formattedMessage = message;
+  // "{user} reserved {equipment}" -> "<user:3:Matt> reserved <equipment:12:Table Saw>"
+  entities.forEach(({ id, label }) => {
+    const entityType = formattedMessage.match(/{(\w+)}/)?.[1];
+    formattedMessage = formattedMessage.replace(
+      /{\w+}/,
+      `<${entityType}:${id}:${label}>`
+    );
+  });
+
+  await knex("AuditLogs").insert({ message: formattedMessage, category: category, makerspaceID: makerspaceID });
+}
+
 /**
  * Create an AuditLog and append it to the table
  * @param message String verb description of the Log entry (i.e. reserved, deleted)

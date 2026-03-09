@@ -1,6 +1,8 @@
 import { MakerspaceRow } from "../../db/tables.js";
 import { Room } from "../rooms/room.js";
 import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
+import * as UserRepo from "../../repositories/Users/UserRepository.js";
+import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
 
 export class Makerspace implements MakerspaceRow {
   id: number;
@@ -29,6 +31,15 @@ export class Makerspace implements MakerspaceRow {
   }
 
   async welcome(userID: number) {
+    const user = await UserRepo.getUserByID(userID);
+    AuditLogRepo.createAuditLog(
+      `{user} signed into {makerspace}`,
+      "welcome",
+      this.id,
+      { id: user.id, label: `${user.firstName, user.lastName}` },
+      { id: this.id, label: this.name }
+    );
+
     const rooms = await this.getRooms();
     rooms.forEach((room) => room.welcome(userID));
   }

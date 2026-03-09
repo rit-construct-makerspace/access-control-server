@@ -7,6 +7,7 @@ import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.j
 import { AccessControllerState, DeviceLogSeverity } from "../../db/tables.js";
 import { AccessAttemptReason } from "../devices/accessController.js";
 import * as DeviceLogRepo from "../../repositories/Logs/DeviceLogsRepository.js";
+import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 
 type ConnectionData = {
   ws: ws.WebSocket;
@@ -145,6 +146,14 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
 
   const user = await UserRepo.getUserByCardTagID(request.authTo.cardTagID);
   if (user === undefined) {
+    const device = await DeviceRepo.getDeviceByID(deviceID);
+    AuditLogRepo.createAuditLog(
+      `Unknown cardTag {conceal} failed to activate device {device}`,
+      "auth",
+      device?.makerspaceID,
+      { id: 0, label: request.authTo.cardTagID },
+      { id: deviceID, label: device?.name ?? "UNKNOWN DEVICE" }
+    );
     DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-auth-user-not-found", request: request });
     response.error = WSACSServerError.USER_NOT_FOUND;
     return response;
@@ -183,7 +192,7 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
 
     // Not a welcome reader so we check access on every channel
     for (let i = 0; i < controllers.length; i++) {
-      const accessAttempt = await controllers[i].canUnlock(user.id);
+      const accessAttempt = await controllers[i].canUnlock(user.id, true);
       response.authTo.channels.push({
         id: controllers[i].channelID,
         state: accessAttempt.hasAccess ? AccessControllerState.UNLOCKED : controllers[i].state,

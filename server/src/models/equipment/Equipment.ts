@@ -102,8 +102,15 @@ export class Equipment implements EquipmentRow {
       }
     }
 
-
     // SUCCESS!
     return { hasAccess: true, reason: AccessAttemptReason.APPROVED };
+  }
+
+  async getMakerspaceID(): Promise<number | undefined> {
+    const room = await RoomRepo.getRoomByID(this.roomID);
+    if (room === null || room === undefined) {
+      return undefined;
+    }
+    return room.makerspaceID ?? undefined;
   }
 }
