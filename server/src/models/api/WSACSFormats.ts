@@ -32,13 +32,19 @@ export enum CoreStateChangeReason {
   COMMANDED = "COMMANDED"
 }
 
+export interface CoreFlags {
+  lockoutWhenIdle: boolean;
+  restartWhenIdle: boolean;
+}
+
 export interface CoreConfig {
-  channels: {
+  channels?: {
     id: number;
     tempDuration: number;
   }[];
-  inputMode: CoreInputMode;
-  deployment: ACSDeployment;
+  inputMode?: CoreInputMode;
+  deployment?: ACSDeployment;
+  flags?: CoreFlags;
 }
 
 export interface WSACSCoreUnprompted {
@@ -120,7 +126,8 @@ export interface WSACSServerUnprompted {
       state: AccessControllerState
     }[];
     action?: CoreActions;
-    identifyChannel?: number
+    identifyChannel?: number;
+    flags?: CoreFlags;
   },
   update?: {
     config?: {

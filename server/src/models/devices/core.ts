@@ -7,7 +7,7 @@ import { CurrentUser } from "../../context.js";
 import WSACSController from "../api/WSACSController.js";
 import { AccessController } from "./accessController.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
-import { CoreConfig, WSACSServerUnprompted } from "../api/WSACSFormats.js";
+import { CoreConfig, CoreFlags, WSACSServerUnprompted } from "../api/WSACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
 
@@ -68,6 +68,16 @@ export class Core extends Device implements CoreRow {
     return true;
   }
 
+  async setFlags(executingUser: CurrentUser, targetFlags: CoreFlags) {
+    const request: WSACSServerUnprompted = {
+      command: {
+        flags: targetFlags
+      }
+    }
+
+    WSACSController.sendCoreRequest(request, this.deviceID);
+  }
+
   async getAccessControllers(): Promise<AccessController[]> {
     const controllers = await ACRepo.getAccessControllersByDeviceID(this.deviceID);
 
@@ -105,11 +115,22 @@ export class Core extends Device implements CoreRow {
 
   async updateConfiguration(config: CoreConfig): Promise<void> {
 
-    for (let i = 0; i < config.channels.length; i++) {
-      await ACRepo.updateAccessControllerDurationByDeviceAndChannelID(this.deviceID, config.channels[i].id, config.channels[i].tempDuration);
+    if (config.channels !== undefined) {
+      for (let i = 0; i < config.channels.length; i++) {
+        await ACRepo.updateAccessControllerDurationByDeviceAndChannelID(this.deviceID, config.channels[i].id, config.channels[i].tempDuration);
+      }
     }
 
-    await CoreRepo.updateCoreInputMode(this.deviceID, config.inputMode);
-    await CoreRepo.updateCoreDeployment(this.deviceID, config.deployment);
+    if (config.inputMode !== undefined) {
+      await CoreRepo.updateCoreInputMode(this.deviceID, config.inputMode);
+    }
+
+    if (config.deployment !== undefined) {
+      await CoreRepo.updateCoreDeployment(this.deviceID, config.deployment);
+    }
+
+    if (config.flags !== undefined) {
+      await CoreRepo.setCoreFlags(this.deviceID, config.flags);
+    }
   }
 }

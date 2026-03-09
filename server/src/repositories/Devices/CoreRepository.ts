@@ -4,6 +4,7 @@ import { AccessControllerState, CoreInputMode, CoreRow } from "../../db/tables.j
 import { Core } from "../../models/devices/core.js";
 import * as ACRepo from "./AccessControllerRepository.js";
 import * as DeviceRepo from "./DeviceRepository.js";
+import { CoreFlags } from "../../models/api/WSACSFormats.js";
 
 export async function getCoreByDeviceID(deviceID: number): Promise<Core | undefined> {
   const rawRow = await knex("Cores").where("deviceID", deviceID).first();
@@ -68,4 +69,8 @@ export async function sealCoreDeployment(deviceID: number): Promise<void> {
 
 export async function updateCoreInputMode(deviceID: number, mode: CoreInputMode): Promise<void> {
   await knex("Cores").update({ inputMode: mode }).where({ deviceID: deviceID });
+}
+
+export async function setCoreFlags(deviceID: number, flags: CoreFlags): Promise<void> {
+  await knex("Cores").update({ flags: flags }).where({ deviceID: deviceID });
 }
