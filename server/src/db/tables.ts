@@ -20,6 +20,7 @@ export interface AuditLogRow {
   dateTime: Date;
   message: string;
   category: string;
+  makerspaceID: number | undefined;
 }
 /**
  * A description of a piece of equipment.
@@ -691,6 +692,9 @@ export interface CoreRow {
   currentCardTag: string | undefined;
   lastStatusTime: Date | undefined;
   sessionStartTime: Date | undefined;
+  flags: object;
+  sealedDeployment: object | undefined;
+  reportedDeployment: object | undefined;
 }
 
 export enum AccessControllerState {
@@ -713,6 +717,36 @@ export interface DispenserRow {
   deviceID: number;
   cardsLeft: number;
   error: DispenserError;
+}
+
+export enum DeviceLogSeverity {
+  HIGH = "HIGH",
+  MEDIUM = "MEDIUM",
+  LOW = "LOW"
+}
+
+export interface DeviceLogRow {
+  id: number;
+  dateTime: Date;
+  deviceID: number | undefined;
+  severity: DeviceLogSeverity;
+  log: object;
+}
+
+export interface UnlockAttemptLogRow {
+  id: number;
+  dateTime: Date;
+  equipmentID: number | undefined;
+  equipmentName: string;
+  userID: number | undefined;
+  username: string;
+  success: boolean;
+  reason: string;
+}
+
+export interface FirmwareLocationRow {
+  hardwareVersion: string;
+  firmwareURL: string;
 }
 
 declare module "knex/types/tables.js" {
@@ -766,5 +800,8 @@ declare module "knex/types/tables.js" {
     Cores: CoreRow;
     AccessControllers: AccessControllerRow;
     Dispensers: DispenserRow;
+    DeviceLogs: DeviceLogRow;
+    UnlockAttemptLogs: UnlockAttemptLogRow;
+    FirmwareLocations: FirmwareLocationRow;
   }
 }

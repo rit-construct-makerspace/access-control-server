@@ -1,5 +1,12 @@
 import type { Knex } from "knex";
 
+function formatAlterTableEnumSql(tableName: string, columnName: string, enums: string[]) {
+  const constraintName = `${tableName}_${columnName}_check`;
+  return [
+    `ALTER TABLE "${tableName}" DROP CONSTRAINT IF EXISTS "${constraintName}";`,
+    `ALTER TABLE "${tableName}" ADD CONSTRAINT "${constraintName}" CHECK ("${columnName}" = ANY (ARRAY[${enums.map(e => `'${e}'::text`).join(',')}]));`
+  ].join('\n');
+}
 
 export async function up(knex: Knex): Promise<void> {
   if (!(await knex.schema.hasTable("DeviceLogs"))) {
