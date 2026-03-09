@@ -131,6 +131,7 @@ export async function up(knex: Knex): Promise<void> {
     const core = await knex("Cores").insert({
       deviceID: device.id,
       channels: 1,
+      // @ts-expect-error retroactive due ot change in input modes
       inputMode: readerMakerspace === undefined ? CoreInputMode.INSERT : CoreInputMode.TEMP,
       tempDuration: readerMakerspace === undefined ? undefined : 0
     }).returning("*");

@@ -52,7 +52,8 @@ export async function up(knex: Knex): Promise<void> {
       t.jsonb("reportedDeployment").nullable().defaultTo(null);
     })
 
-    await knex.raw(formatAlterTableEnumSql("Cores", "inputMode", ["INSERT", "TEMP_PRESENT", "TEMP_REMOVE", "TOGGLE"]))
+    // TEMP has to be left for legacy reasons, remove in future migration
+    await knex.raw(formatAlterTableEnumSql("Cores", "inputMode", ["INSERT", "TEMP_PRESENT", "TEMP_REMOVE", "TOGGLE", "TEMP"]))
   }
 
   if ((await knex.schema.hasColumn("AccessControllers", "tempDuration"))) {
