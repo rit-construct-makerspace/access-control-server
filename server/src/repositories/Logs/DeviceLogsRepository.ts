@@ -1,7 +1,7 @@
 import { DeviceLogRow, DeviceLogSeverity } from "../../db/tables.js";
 import { knex } from "../../db/index.js";
 
-export async function createDeviceLog(deviceID: number, severity: DeviceLogSeverity, log: object): Promise<DeviceLogRow> {
+export async function createDeviceLog(deviceID: number | undefined, severity: DeviceLogSeverity, log: object): Promise<DeviceLogRow> {
   if (severity === DeviceLogSeverity.HIGH) {
     console.error(`HIGH severity log for device ${deviceID}: ${JSON.stringify(log, undefined, 2)}`);
   }

@@ -4,8 +4,9 @@ import { CoreInfoRequests, WSACSCoreUnprompted, WSACSServerError, WSACSServerUnp
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import * as UserRepo from "../../repositories/Users/UserRepository.js";
 import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
-import { AccessControllerState } from "../../db/tables.js";
+import { AccessControllerState, DeviceLogSeverity } from "../../db/tables.js";
 import { AccessAttemptReason } from "../devices/accessController.js";
+import * as DeviceLogRepo from "../../repositories/Logs/DeviceLogsRepository.js";
 
 type ConnectionData = {
   ws: ws.WebSocket;
@@ -25,22 +26,24 @@ export default class WSACSController {
   private static handleWsClose(event: ws.CloseEvent, deviceID: number) {
     const connData = this.corePool.get(deviceID);
     try {
-      //TODO: put in DB
+      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-close", event: event });
       if (connData) {
         this.corePool.delete(deviceID);
       }
-    } catch (e) {
-      console.error(`WSACS: Close Exception: ${e}`) //TODO: put in DB
+    } catch (e: any) {
+      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-close-error", error: e });
+      console.error(`WSACS: Close Exception: ${e}`)
     }
   }
 
   private static handleWsError(event: ws.ErrorEvent, deviceID: number) {
     const connData = this.corePool.get(deviceID);
     try {
-      //TODO: put in DB
-      console.error(`WSACS: websocket error: ${event.error} - ${event.type}: ${event.message}`)
+      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-error", event: event });
+      console.error(`WSACS: websocket error: ${event.error} - ${event.type}: ${event.message}`);
     } catch (e) {
-      console.error(`WSACS: Error Handle Exception: ${e}`) //TODO: put in DB
+      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-handle-error-error", error: e, event: event });
+      console.error(`WSACS: Error Handle Exception: ${e}`);
     }
   }
 
@@ -49,6 +52,7 @@ export default class WSACSController {
       if (event.type !== "text") {
         const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
         WSACSController.sendCoreResponse(response, deviceID);
+        await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-nontext-message", event: event });
         return;
       }
 
@@ -64,13 +68,17 @@ export default class WSACSController {
         // A status requets does not require a response from the server
         handleCoreStatusRequest(request, deviceID);
       } else {
+        DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-message-unknown-type", event: event });
         const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
         WSACSController.sendCoreResponse(response, deviceID);
         return;
       }
 
+      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", event: event });
+
     } catch (e) {
-      console.error(`WSACS: Message Exception: ${e}`) //TODO: put in DB
+      console.error(`WSACS: Message Exception: ${e}`)
+      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message-error", error: e, event: event });
       const response: WSACSServerPrompted = { error: WSACSServerError.SERVER_ERROR };
       WSACSController.sendCoreResponse(response, deviceID);
     }
@@ -79,10 +87,15 @@ export default class WSACSController {
   static initConnection(ws: ws.WebSocket, req: Request) {
     // @ts-expect-error using our own added field
     const deviceID = req.core?.deviceID;
-    if (deviceID === undefined) { ws.close(WSAPIError.Protocol); return; }
+    if (deviceID === undefined) {
+      ws.close(WSAPIError.Protocol);
+      DeviceLogRepo.createDeviceLog(undefined, DeviceLogSeverity.MEDIUM, { type: "ws-unknown-device-connect", request: req });
+      return;
+    }
     const connData = this.corePool.get(deviceID);
     if (connData !== undefined) {
       connData.ws.close(WSAPIError.Protocol, "Core is attempting to reconnect");
+      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-reconnect" });
       this.corePool.delete(deviceID);
     }
 
@@ -125,14 +138,14 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
 
   const core = await CoreRepo.getCoreByDeviceID(deviceID);
   if (core === undefined) {
-    // TODO: LOG
+    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-auth-core-not-found", request: request });
     response.error = WSACSServerError.DEVICE_NOT_FOUND;
     return response;
   }
 
   const user = await UserRepo.getUserByCardTagID(request.authTo.cardTagID);
   if (user === undefined) {
-    // TODO: LOG
+    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-auth-user-not-found", request: request });
     response.error = WSACSServerError.USER_NOT_FOUND;
     return response;
   }
@@ -252,7 +265,7 @@ async function handleCoreMessageRequest(request: WSACSCoreUnprompted, deviceID: 
   }
 
   if (!request.message.auditLog) {
-    // TODO: just put in DB, the message is not an audit log
+    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", message: request.message.content });
     return;
   }
   if (typeof request.message.content === "string") { // The message is an auditlog, should not be string
@@ -279,7 +292,7 @@ async function handleCoreStatusRequest(request: WSACSCoreUnprompted, deviceID: n
     for (let i = 0; i < request.status.stateChange.channels.length; i++) {
       core.updateControllerState(request.status.stateChange.channels[i].channelID, request.status.stateChange.channels[i].toState);
     }
-    // TODO: Log state change
+    // TODO: Log state change in state change table
   }
 
   if (request.status.config !== undefined) {
