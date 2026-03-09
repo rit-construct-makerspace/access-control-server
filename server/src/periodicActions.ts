@@ -57,7 +57,7 @@ export async function purge_images(): Promise<void> {
 
 export async function deletePastSpecialHours(): Promise<void> {
 	try {
-		await knex("SpecialHours").where("day", "<", knex.raw("(DATE(NOW()) - INTERVAL 1 DAY)")).del();
+		await knex("SpecialHours").where("day", "<=", knex.raw("(DATE(NOW()) - INTERVAL '1 DAY')")).del();
 	} catch (e) {
 		console.error("Could not delete past special hours: ", e);
 	}
