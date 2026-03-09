@@ -190,6 +190,7 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
         approved: accessAttempt.hasAccess,
         reason: accessAttempt.reason
       });
+
     }
 
     return response;

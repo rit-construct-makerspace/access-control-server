@@ -5,6 +5,7 @@ import * as UserRepo from "../../repositories/Users/UserRepository.js";
 import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
 import { Equipment } from "../equipment/Equipment.js";
 import { User } from "../users/User.js";
+import * as UnlockAttemptRepo from "../../repositories/Logs/UnlockAtemptRepository.js";
 
 export enum AccessAttemptReason {
   APPROVED = "APPROVED",
@@ -36,25 +37,32 @@ export class AccessController implements AccessControllerRow {
     this.state = rawRow.state;
   }
 
-  async canUnlock(userID: number): Promise<{ hasAccess: boolean, reason: AccessAttemptReason }> {
+  async canUnlock(userID: number, log?: boolean): Promise<{ hasAccess: boolean, reason: AccessAttemptReason }> {
     const rawUser = await UserRepo.getUserByIDOrUndefined(userID);
     if (rawUser === undefined) {
+      if (log) { UnlockAttemptRepo.createUnlockAttemptLog(undefined, "NO_USER", undefined, "UNKOWN_USER", false, AccessAttemptReason.UNKNOWN_USER); }
       return { hasAccess: false, reason: AccessAttemptReason.UNKNOWN_USER };
     }
     const user = new User(rawUser)
 
     const instance = await EquipmentInstanceRepo.getInstanceByAccessControllerID(this.id);
     if (instance === undefined) {
+      if (log) { UnlockAttemptRepo.createUnlockAttemptLog(undefined, "UNPAIRED", user.id, user.ritUsername, false, AccessAttemptReason.UNPAIRED); }
       return { hasAccess: false, reason: AccessAttemptReason.UNPAIRED };
     }
 
     const rawEquipment = await EquipmentRepo.getEquipmentOrUndefinedByID(instance.id);
     if (rawEquipment === undefined) {
+      if (log) { UnlockAttemptRepo.createUnlockAttemptLog(undefined, "UNPAIRED", user.id, user.ritUsername, false, AccessAttemptReason.UNPAIRED); }
       return { hasAccess: false, reason: AccessAttemptReason.UNPAIRED };
     }
     const equipment = new Equipment(rawEquipment);
 
-    return await equipment.hasAccess(user);
+    const result = await equipment.hasAccess(user);
+    if (log) {
+      UnlockAttemptRepo.createUnlockAttemptLog(equipment.id, equipment.name, user.id, user.ritUsername, result.hasAccess, result.reason);
+    }
+    return result;
   }
 
   /**
