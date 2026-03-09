@@ -297,6 +297,6 @@ async function handleCoreStatusRequest(request: WSACSCoreUnprompted, deviceID: n
   }
 
   if (request.status.config !== undefined) {
-    // Update recorded config
+    await core.updateConfiguration(request.status.config);
   }
 }
