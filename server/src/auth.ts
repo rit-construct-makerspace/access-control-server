@@ -260,6 +260,7 @@ export function setupDevAuth(app: express.Application) {
         await createLog(
           `{user} logged in.`,
           "server",
+          // @ts-expect-error
           { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
         );
       }
@@ -499,6 +500,7 @@ export function setupSamlAuth(app: express.Application) {
         await createLog(
           `{user} logged in.`,
           "server",
+          // @ts-expect-error
           { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
         );
       }
