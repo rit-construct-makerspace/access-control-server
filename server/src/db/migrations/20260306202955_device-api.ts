@@ -51,6 +51,14 @@ export async function up(knex: Knex): Promise<void> {
       t.jsonb("sealedDeployment").nullable().defaultTo(null);
       t.jsonb("reportedDeployment").nullable().defaultTo(null);
     })
+
+    await knex.raw(formatAlterTableEnumSql("Cores", "inputMode", ["INSERT", "TEMP_PRESENT", "TEMP_REMOVE", "TOGGLE"]))
+  }
+
+  if ((await knex.schema.hasColumn("AccessControllers", "tempDuration"))) {
+    await knex.schema.alterTable("AccessControllers", (t) => {
+      t.integer("tempDuration").notNullable().defaultTo(0);
+    })
   }
 
 }

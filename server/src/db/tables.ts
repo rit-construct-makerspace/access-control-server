@@ -680,7 +680,8 @@ export interface DeviceRow {
 
 export enum CoreInputMode {
   INSERT = "INSERT",
-  TEMP = "TEMP",
+  TEMP_PRESENT = "TEMP_PRESENT",
+  TEMP_REMOVE = "TEMP_REMOVE",
   TOGGLE = "TOGGLE"
 }
 
@@ -711,6 +712,7 @@ export interface AccessControllerRow {
   deviceID: number;
   channelID: number;
   state: AccessControllerState;
+  tempDuration: number;
 }
 
 export interface DispenserRow {

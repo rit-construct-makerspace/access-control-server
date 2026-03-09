@@ -32,6 +32,15 @@ export enum CoreStateChangeReason {
   COMMANDED = "COMMANDED"
 }
 
+export interface CoreConfig {
+  channels: {
+    id: number;
+    tempDuration: number;
+  }[];
+  inputMode: CoreInputMode;
+  deployment: ACSDeployment;
+}
+
 export interface WSACSCoreUnprompted {
   authTo?: {
     state: AccessControllerState;
@@ -60,14 +69,7 @@ export interface WSACSCoreUnprompted {
       }[]
     },
     currentCardTag: string,
-    config?: {
-      channels: {
-        id: number;
-        tempDuration: number;
-      }[];
-      inputMode: CoreInputMode;
-      deployment: ACSDeployment;
-    }
+    config?: CoreConfig
   };
 }
 

@@ -7,7 +7,7 @@ import { CurrentUser } from "../../context.js";
 import WSACSController from "../api/WSACSController.js";
 import { AccessController } from "./accessController.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
-import { WSACSServerUnprompted } from "../api/WSACSFormats.js";
+import { CoreConfig, WSACSServerUnprompted } from "../api/WSACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
 
@@ -19,6 +19,9 @@ export class Core extends Device implements CoreRow {
   currentCardTag: string | undefined;
   lastStatusTime: Date | undefined;
   sessionStartTime: Date | undefined;
+  flags: object;
+  sealedDeployment: object | undefined;
+  reportedDeployment: object | undefined;
 
   constructor(coreRow: CoreRow, deviceRow: DeviceRow) {
     super(deviceRow);
@@ -29,7 +32,11 @@ export class Core extends Device implements CoreRow {
     this.currentCardTag = coreRow.currentCardTag;
     this.lastStatusTime = coreRow.lastStatusTime;
     this.sessionStartTime = coreRow.sessionStartTime;
+    this.flags = coreRow.flags;
+    this.sealedDeployment = coreRow.sealedDeployment;
+    this.reportedDeployment = coreRow.reportedDeployment;
   }
+
 
   static async buid(coreRow: CoreRow) {
     const deviceRow = await DeviceRepo.getDeviceByID(coreRow.deviceID);
@@ -75,7 +82,10 @@ export class Core extends Device implements CoreRow {
       tempDuration: this.tempDuration,
       currentCardTag: this.currentCardTag,
       lastStatusTime: this.lastStatusTime,
-      sessionStartTime: this.sessionStartTime
+      sessionStartTime: this.sessionStartTime,
+      flags: this.flags,
+      sealedDeployment: this.sealedDeployment,
+      reportedDeployment: this.reportedDeployment
     }
   }
 
@@ -92,4 +102,14 @@ export class Core extends Device implements CoreRow {
     return rawRow === undefined ? undefined : new Makerspace(rawRow);
   }
 
+
+  async updateConfiguration(config: CoreConfig): Promise<void> {
+
+    for (let i = 0; i < config.channels.length; i++) {
+      await ACRepo.updateAccessControllerDurationByDeviceAndChannelID(this.deviceID, config.channels[i].id, config.channels[i].tempDuration);
+    }
+
+    await CoreRepo.updateCoreInputMode(this.deviceID, config.inputMode);
+    await CoreRepo.updateCoreDeployment(this.deviceID, config.deployment);
+  }
 }

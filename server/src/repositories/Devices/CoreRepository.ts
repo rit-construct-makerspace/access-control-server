@@ -57,3 +57,15 @@ export async function pairNewCore(SN: string, makerspaceID: number): Promise<Cor
 export async function coreStatusUpdate(deviceID: number, cardTagID: string | undefined) {
   await knex("Cores").update({ currentCardTag: cardTagID, lastStatusTime: knex.fn.now() }).where({ deviceID: deviceID });
 }
+
+export async function updateCoreDeployment(deviceID: number, deployment: object): Promise<void> {
+  await knex("Cores").update({ reportedDeployment: deployment }).where({ deviceID: deviceID });
+}
+
+export async function sealCoreDeployment(deviceID: number): Promise<void> {
+  await knex("Cores").update({ sealedDeployment: knex.ref("reportedDeployment") }).where({ deviceID: deviceID });
+}
+
+export async function updateCoreInputMode(deviceID: number, mode: CoreInputMode): Promise<void> {
+  await knex("Cores").update({ inputMode: mode }).where({ deviceID: deviceID });
+}
