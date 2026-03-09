@@ -280,7 +280,7 @@ const UsersResolvers = {
             `{user} archived {user}'s profile.`,
             "admin",
             { id: user.id, label: getUsersFullName(user) },
-            { id: args.userID, label: getUsersFullName(userSubject) }
+            { id: Number(args.userID), label: getUsersFullName(userSubject) }
           );
 
           return await UserRepo.archiveUser(Number(args.userID), true);
