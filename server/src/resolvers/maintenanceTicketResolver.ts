@@ -4,7 +4,9 @@ import * as MaintenanceTicketRepo from "../repositories/Equipment/MaintenanceTic
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js"
 import * as UserRepo from "../repositories/Users/UserRepository.js"
 import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js"
+import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import { notifyNewMaintenanceTicket } from "../integrations/slack/slack.js"
+import { Equipment } from "../models/equipment/Equipment.js"
 
 const MaintenanceTicketResolver = {
   MaintenanceTicket: {
@@ -157,15 +159,23 @@ const MaintenanceTicketResolver = {
       { isStaff }: ApolloContext
     ) => isStaff(async (user) => {
       const result = await MaintenanceTicketRepo.assignMaintenanceTicket(args.id, args.assignedID);
-
+      const instance = await InstanceRepo.getInstanceByID(result.instanceID);
+      const equipRow = instance ? await EquipmentRepo.getEquipmentOrUndefinedByID(instance.equipmentID) : undefined;
+      const makerspaceID = equipRow ? await (new Equipment(equipRow)).getMakerspaceID() : undefined;
       if (args.assignedID) {
         const assigned = await UserRepo.getUserByID(args.assignedID);
-        await AuditLogRepo.createUnassocaitedAuditLog(`{user} assigned ticket #${args.id} to {user}`, "admin",
+        await AuditLogRepo.createAuditLog(
+          `{user} assigned ticket #${args.id} to {user}`,
+          "admin",
+          makerspaceID,
           { id: user.id, label: UserRepo.getUsersFullName(user) },
           { id: assigned.id, label: UserRepo.getUsersFullName(assigned) }
         );
       } else {
-        await AuditLogRepo.createUnassocaitedAuditLog(`{user} unassigned ticket #${args.id}`, "admin",
+        await AuditLogRepo.createAuditLog(
+          `{user} unassigned ticket #${args.id}`,
+          "admin",
+          makerspaceID,
           { id: user.id, label: UserRepo.getUsersFullName(user) }
         );
       }
