@@ -98,7 +98,7 @@ export class Equipment implements EquipmentRow {
     // SIGN-OFF CHECK
     if (!(process.env.GLOBAL_ACCESS_CHECK_BYPASS == "TRUE") && this.requiresInPerson) {
       if (!(await user.hasAccessCheck(this.id))) {
-        return { hasAccess: false, reason: AccessAttemptReason.SIGN_OFF };
+        return { hasAccess: false, reason: AccessAttemptReason.MISSING_SIGN_OFF };
       }
     }
 

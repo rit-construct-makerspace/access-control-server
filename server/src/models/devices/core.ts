@@ -10,6 +10,7 @@ import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.j
 import { CoreConfig, CoreFlags, WSACSServerUnprompted } from "../api/WSACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
+import { ACSDeployment } from "../ACS/deployment.js";
 
 export class Core extends Device implements CoreRow {
   deviceID: number;
@@ -19,9 +20,9 @@ export class Core extends Device implements CoreRow {
   currentCardTag: string | undefined;
   lastStatusTime: Date | undefined;
   sessionStartTime: Date | undefined;
-  flags: object;
-  sealedDeployment: object | undefined;
-  reportedDeployment: object | undefined;
+  flags: CoreFlags;
+  sealedDeployment: ACSDeployment | undefined;
+  reportedDeployment: ACSDeployment | undefined;
 
   constructor(coreRow: CoreRow, deviceRow: DeviceRow) {
     super(deviceRow);
