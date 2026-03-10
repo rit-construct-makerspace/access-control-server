@@ -110,16 +110,18 @@ export default class WSACSController {
     ws.onmessage = (event) => this.handleWsMessage(event, deviceID);
   }
 
-  static sendCoreRequest(payload: WSACSServerUnprompted, deviceID: number) {
+  static sendCoreRequest(payload: WSACSServerUnprompted, deviceID: number): boolean {
     const connection = this.corePool.get(deviceID);
-    if (connection === undefined) { return; }
+    if (connection === undefined) { return false; }
     connection.ws.send(JSON.stringify(payload));
+    return true;
   }
 
-  static sendCoreResponse(payload: WSACSServerPrompted, deviceID: number) {
+  static sendCoreResponse(payload: WSACSServerPrompted, deviceID: number): boolean {
     const connection = this.corePool.get(deviceID);
-    if (connection === undefined) { return; }
+    if (connection === undefined) { return false; }
     connection.ws.send(JSON.stringify(payload));
+    return true;
   }
 }
 
