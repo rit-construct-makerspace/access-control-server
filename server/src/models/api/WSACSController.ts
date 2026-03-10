@@ -307,6 +307,7 @@ async function handleCoreStatusRequest(request: WSACSCoreUnprompted, deviceID: n
       core.updateControllerState(request.status.stateChange.channels[i].channelID, request.status.stateChange.channels[i].toState);
     }
     // TODO: Log state change in state change table
+    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "state-change", request: request })
   }
 
   if (request.status.config !== undefined) {
