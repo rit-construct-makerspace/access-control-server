@@ -66,7 +66,7 @@ export default class WSACSController {
         // A message request does not require a response from the server
         handleCoreMessageRequest(request, deviceID);
       } else if (request.status !== undefined) {
-        // A status requets does not require a response from the server
+        // A status request does not require a response from the server
         handleCoreStatusRequest(request, deviceID);
       } else {
         DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-message-unknown-type", event: event });
