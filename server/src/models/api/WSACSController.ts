@@ -180,6 +180,8 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
         });
       }
 
+      // If there are no channels, we have to add at least one channel in so
+      // the core knows if the person was welcomed
       if (response.authTo.channels.length === 0) {
         response.authTo.channels.push({
           id: 0,
