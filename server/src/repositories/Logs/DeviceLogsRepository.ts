@@ -9,6 +9,6 @@ export async function createDeviceLog(deviceID: number | undefined, severity: De
   return result[0];
 }
 
-export async function getRecentDeviceLogs(): Promise<DeviceLogRow[]> {
-  return await knex("DeviceLogs").orderBy("dateTime", "desc").limit(100);
+export async function getRecentDeviceLogs(limit: number = 100): Promise<DeviceLogRow[]> {
+  return await knex("DeviceLogs").orderBy("dateTime", "desc").limit(limit);
 }
