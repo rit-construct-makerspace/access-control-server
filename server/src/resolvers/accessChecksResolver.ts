@@ -7,10 +7,11 @@ import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
 import { ApolloContext } from "../context.js";
 import { accessCheckExists, createAccessCheck, getAccessCheckByID, getAccessChecks, getAccessChecksByApproved, getAccessChecksByUserID, purgeUnapprovedAccessChecks, setAccessCheckApproval } from "../repositories/Equipment/AccessChecksRepository.js";
-import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createAuditLog, createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUserByID, getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { GraphQLError } from "graphql";
 import { AccessCheckRow } from "../db/tables.js";
+import { Equipment } from "../models/equipment/Equipment.js";
 
 const AccessChecksResolver = {
   AccessCheck: {
@@ -114,7 +115,11 @@ const AccessChecksResolver = {
         if (!affectedUser) throw new GraphQLError("User does not exist");
 
         if (Number(user.id) === Number(check.userID)) {
-          await createUnassocaitedAuditLog(`{user} attempted to self-approve access check for {equipment}`, "admin",
+          const equipObj = new Equipment(equipment);
+          await createAuditLog(
+            `{user} attempted to self-approve access check for {equipment}`,
+            "admin",
+            await equipObj.getMakerspaceID(),
             { id: user.id, label: getUsersFullName(user) },
             { id: equipment.id, label: equipment.name }
           );
