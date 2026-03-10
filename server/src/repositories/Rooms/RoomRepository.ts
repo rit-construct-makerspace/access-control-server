@@ -37,12 +37,8 @@ export async function getRooms(): Promise<Room[]> {
  */
 export async function getRoomsByMakerspace(makerspaceID: number): Promise<Room[]> {
   const rawRooms = await knex("Rooms").select("id", "name", "archived", "makerspaceID").where({ makerspaceID: makerspaceID });
-  let rooms: Room[] = [];
-  for (let i = 0; i < rooms.length; i++) {
-    rooms.push(new Room(rawRooms[i]));
-  }
 
-  return rooms;
+  return rawRooms.map((raw) => new Room(raw));
 }
 
 /**
