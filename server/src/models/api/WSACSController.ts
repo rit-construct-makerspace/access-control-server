@@ -282,7 +282,7 @@ async function handleCoreMessageRequest(request: WSACSCoreUnprompted, deviceID: 
     return;
   }
 
-  await AuditLogRepo.createLog(request.message.content.message, request.message.content.category, ...request.message.content.entities);
+  await AuditLogRepo.createUnassocaitedAuditLog(request.message.content.message, request.message.content.category, ...request.message.content.entities);
   return;
 }
 

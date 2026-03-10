@@ -1,7 +1,7 @@
 import { knex } from "../../db/index.js";
 import { CurrencyLedgerRow, TransactionEntryRow, TransactionRow } from "../../db/tables.js";
 import { CurrencySource, CurrencyType } from "../../integrations/currency/types.js";
-import { createLog } from "../AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../AuditLogs/AuditLogRepository.js";
 
 /**
  * Create the parent element of a transaction
@@ -115,7 +115,7 @@ export async function getLastChargesForTransactionById(transactionId: number): P
 
     if (justLastCharges.length > 2) {
         // something has gone terribly wrong, we somehow charged 3 times with 2 currencies
-        await createLog(`Strange Currency Bug That You Will Have To Fix Manually. Could not find history for transaction ID: ${transactionId}`, "currency")
+        await createUnassocaitedAuditLog(`Strange Currency Bug That You Will Have To Fix Manually. Could not find history for transaction ID: ${transactionId}`, "currency")
         return undefined;
     }
     let atrium: { amount: number, txid: number, currencyLedgerId: number } | undefined = undefined;

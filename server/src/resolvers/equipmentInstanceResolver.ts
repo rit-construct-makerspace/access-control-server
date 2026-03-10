@@ -5,7 +5,7 @@ import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import { ApolloContext } from "../context.js";
 import { EquipmentInstancesRow } from "../db/tables.js";
 import { createInstance, deleteInstance, getInstanceByID, getInstancesByEquipment, setInstanceName, setInstanceStatus } from "../repositories/Equipment/EquipmentInstancesRepository.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { GraphQLError } from "graphql";
 import { getReaderByID } from "../repositories/Readers/ReaderRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
@@ -85,7 +85,7 @@ const EquipmentInstanceResolver = {
       isManager(async (user) => {
         const equipment = await EquipmentRepo.getEquipmentByID(args.equipmentID);
         if (!equipment) throw new GraphQLError("Equipment does not exist");
-        await createLog(`{user} created instance "${args.name}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
+        await createUnassocaitedAuditLog(`{user} created instance "${args.name}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
         return await createInstance(args.equipmentID, args.name)
       }),
 
@@ -112,11 +112,11 @@ const EquipmentInstanceResolver = {
         const newInstance = await InstanceRepo.updateInstance(args.id, args.name, args.status, args.readerID);
 
         if (instance?.name != newInstance?.name) {
-          await createLog(`{user} renamed instance '${instance?.name}' of equipment {equipment} to '${newInstance?.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
+          await createUnassocaitedAuditLog(`{user} renamed instance '${instance?.name}' of equipment {equipment} to '${newInstance?.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
         }
 
         if (instance?.status != newInstance?.status) {
-          await createLog(`{user} changed status of '${newInstance?.name}' of equipment {equipment} to '${newInstance?.status}'`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
+          await createUnassocaitedAuditLog(`{user} changed status of '${newInstance?.name}' of equipment {equipment} to '${newInstance?.status}'`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
         }
 
         var oldReader = null;
@@ -131,9 +131,9 @@ const EquipmentInstanceResolver = {
           newReader = await getReaderByID(args.readerID);
         }
         if (newReader == null && oldReader != null) {
-          await createLog(`{user} unpaired {access_device} from instance {equipment}: ${newInstance?.name}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: oldReader.id, label: oldReader?.name ?? "unknown reader" }, { id: equipment.id, label: equipment.name });
+          await createUnassocaitedAuditLog(`{user} unpaired {access_device} from instance {equipment}: ${newInstance?.name}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: oldReader.id, label: oldReader?.name ?? "unknown reader" }, { id: equipment.id, label: equipment.name });
         } else if (newReader != null && oldReader?.id != newReader?.id) {
-          await createLog(`{user} paired {access_device} to {equipment}: ${newInstance?.name}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: newReader?.id, label: newReader?.name ?? "unknown reader" }, { id: equipment.id, label: equipment.name });
+          await createUnassocaitedAuditLog(`{user} paired {access_device} to {equipment}: ${newInstance?.name}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: newReader?.id, label: newReader?.name ?? "unknown reader" }, { id: equipment.id, label: equipment.name });
         }
 
         if (newInstance?.readerID) {
@@ -163,7 +163,7 @@ const EquipmentInstanceResolver = {
         if (!user.staff.includes(room?.makerspaceID ?? -1) && !user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
           throw new GraphQLError(`Not Privileged for Makerspace ${room?.makerspaceID}`);
         }
-        await createLog(`{user} changed instance "${orig.name}" status to "${args.status}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
+        await createUnassocaitedAuditLog(`{user} changed instance "${orig.name}" status to "${args.status}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
         return await setInstanceStatus(args.id, args.status)
       }),
 
@@ -187,7 +187,7 @@ const EquipmentInstanceResolver = {
         if (!user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
           throw new GraphQLError(`Not Privileged for Makerspace ${room?.makerspaceID}`);
         }
-        await createLog(`{user} changed instance "${orig.name}" name to "${args.name}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
+        await createUnassocaitedAuditLog(`{user} changed instance "${orig.name}" name to "${args.name}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
         return await setInstanceName(args.id, args.name)
       }),
 
@@ -210,7 +210,7 @@ const EquipmentInstanceResolver = {
         if (!user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
           throw new GraphQLError(`Not Privileged for Makerspace ${room?.makerspaceID}`);
         }
-        await createLog(`{user} deleted instance "${orig.name}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
+        await createUnassocaitedAuditLog(`{user} deleted instance "${orig.name}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
         return await deleteInstance(args.id)
       }),
     assignReaderToEquipmentInstance: async (

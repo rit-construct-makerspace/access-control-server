@@ -6,7 +6,7 @@ import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
 import * as RestrictionRepo from "../repositories/Restrictions/RestrictionsRepository.js";
 import * as CurrencyAccountRepo from "../repositories/Currency/CurrencyAccountsRepository.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { ApolloContext, CurrentUser } from "../context.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { getActiveTrainingHoldsByUser } from "../repositories/Training/TrainingHoldsRespository.js";
@@ -236,7 +236,7 @@ const UsersResolvers = {
       isStaff(async (executingUser: any) => {
         const userSubject = await UserRepo.setCardTagID(Number(args.userID), args.cardTagID);
 
-        await createLog(
+        await createUnassocaitedAuditLog(
           `{user} updated {user}'s Card Tag ID.`,
           "admin",
           { id: executingUser.id, label: getUsersFullName(executingUser) },
@@ -276,7 +276,7 @@ const UsersResolvers = {
 
           const userSubject = await UserRepo.getUserByID(Number(args.userID));
 
-          await createLog(
+          await createUnassocaitedAuditLog(
             `{user} archived {user}'s profile.`,
             "admin",
             { id: user.id, label: getUsersFullName(user) },
@@ -293,7 +293,7 @@ const UsersResolvers = {
       { isAdmin }: ApolloContext
     ) => isAdmin(async (user: CurrentUser) => {
       const target = await UserRepo.getUserByID(Number(args.userID));
-      await createLog(
+      await createUnassocaitedAuditLog(
         `{user} ${args.admin ? "granted" : "revoked"} ADMIN access ${args.admin ? "to" : "from"} {user}`,
         "admin",
         { id: user.id, label: getUsersFullName(user) },
@@ -312,7 +312,7 @@ const UsersResolvers = {
       if (makerspace === undefined) {
         throw new EntityNotFound(`Makerspace ${args.makerspaceID} Not Found`);
       }
-      await createLog(
+      await createUnassocaitedAuditLog(
         `{user} granted MANAGER access for {makerspace} to {user}`,
         "admin",
         { id: user.id, label: getUsersFullName(user) },
@@ -332,7 +332,7 @@ const UsersResolvers = {
       if (makerspace === undefined) {
         throw new EntityNotFound(`Makerspace ${args.makerspaceID} Not Found`);
       }
-      await createLog(
+      await createUnassocaitedAuditLog(
         `{user} granted STAFF access for {makerspace} to {user}`,
         "admin",
         { id: user.id, label: getUsersFullName(user) },
@@ -351,7 +351,7 @@ const UsersResolvers = {
       const room = await RoomRepo.getRoomByID(equipment.roomID);
       return await isManagerFor(room?.makerspaceID ?? -1, async (user: CurrentUser) => {
         const target = await UserRepo.getUserByID(args.userID);
-        await createLog(
+        await createUnassocaitedAuditLog(
           `{user} granted TRAINER access for {equipment} to {user}`,
           "admin",
           { id: user.id, label: getUsersFullName(user) },
@@ -372,7 +372,7 @@ const UsersResolvers = {
       if (makerspace === undefined) {
         throw new EntityNotFound(`Makerspace ${args.makerspaceID} Not Found`);
       }
-      await createLog(
+      await createUnassocaitedAuditLog(
         `{user} revoked MANAGER access for {makerspace} from {user}`,
         "admin",
         { id: user.id, label: getUsersFullName(user) },
@@ -392,7 +392,7 @@ const UsersResolvers = {
       if (makerspace === undefined) {
         throw new EntityNotFound(`Makerspace ${args.makerspaceID} Not Found`);
       }
-      await createLog(
+      await createUnassocaitedAuditLog(
         `{user} revoked STAFF access for {makerspace} from {user}`,
         "admin",
         { id: user.id, label: getUsersFullName(user) },
@@ -411,7 +411,7 @@ const UsersResolvers = {
       const room = await RoomRepo.getRoomByID(equipment.roomID);
       return await isManagerFor(room?.makerspaceID ?? -1, async (user: CurrentUser) => {
         const target = await UserRepo.getUserByID(args.userID);
-        await createLog(
+        await createUnassocaitedAuditLog(
           `{user} revoked TRAINER access for {equipment} from {user}`,
           "admin",
           { id: user.id, label: getUsersFullName(user) },

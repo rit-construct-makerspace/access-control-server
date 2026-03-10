@@ -160,12 +160,12 @@ const MaintenanceTicketResolver = {
 
       if (args.assignedID) {
         const assigned = await UserRepo.getUserByID(args.assignedID);
-        await AuditLogRepo.createLog(`{user} assigned ticket #${args.id} to {user}`, "admin",
+        await AuditLogRepo.createUnassocaitedAuditLog(`{user} assigned ticket #${args.id} to {user}`, "admin",
           { id: user.id, label: UserRepo.getUsersFullName(user) },
           { id: assigned.id, label: UserRepo.getUsersFullName(assigned) }
         );
       } else {
-        await AuditLogRepo.createLog(`{user} unassigned ticket #${args.id}`, "admin",
+        await AuditLogRepo.createUnassocaitedAuditLog(`{user} unassigned ticket #${args.id}`, "admin",
           { id: user.id, label: UserRepo.getUsersFullName(user) }
         );
       }

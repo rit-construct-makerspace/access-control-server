@@ -7,7 +7,7 @@ import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
 import { ApolloContext } from "../context.js";
 import { accessCheckExists, createAccessCheck, getAccessCheckByID, getAccessChecks, getAccessChecksByApproved, getAccessChecksByUserID, purgeUnapprovedAccessChecks, setAccessCheckApproval } from "../repositories/Equipment/AccessChecksRepository.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUserByID, getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { GraphQLError } from "graphql";
 import { AccessCheckRow } from "../db/tables.js";
@@ -114,13 +114,13 @@ const AccessChecksResolver = {
         if (!affectedUser) throw new GraphQLError("User does not exist");
 
         if (Number(user.id) === Number(check.userID)) {
-          await createLog(`{user} attempted to self-approve access check for {equipment}`, "admin",
+          await createUnassocaitedAuditLog(`{user} attempted to self-approve access check for {equipment}`, "admin",
             { id: user.id, label: getUsersFullName(user) },
             { id: equipment.id, label: equipment.name }
           );
           throw new GraphQLError("Self-approve disallowed");
         }
-        await createLog(`{user} approved the {equipment} access check for {user}`, `admin`,
+        await createUnassocaitedAuditLog(`{user} approved the {equipment} access check for {user}`, `admin`,
           { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name }, { id: affectedUser.id, label: getUsersFullName(affectedUser) });
         return await setAccessCheckApproval(args.id, true);
       }),
@@ -146,7 +146,7 @@ const AccessChecksResolver = {
         }
         const affectedUser = await getUserByID(check.userID);
         if (!affectedUser) throw new GraphQLError("User does not exist");
-        await createLog(`{user} unapproved the {equipment} access check for {user}`, `admin`,
+        await createUnassocaitedAuditLog(`{user} unapproved the {equipment} access check for {user}`, `admin`,
           { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name }, { id: affectedUser.id, label: getUsersFullName(affectedUser) });
         return await setAccessCheckApproval(args.id, false);
       }),

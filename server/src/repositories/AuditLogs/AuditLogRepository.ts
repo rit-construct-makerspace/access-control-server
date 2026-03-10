@@ -27,7 +27,7 @@ export interface Filters {
  * @param message String verb description of the Log entry (i.e. reserved, deleted)
  * @param entities items involved in log {id, label}
  */
-export async function createLog(
+export async function createUnassocaitedAuditLog(
   message: string,
   category: string | undefined,
   ...entities: AuditLogEntity[]

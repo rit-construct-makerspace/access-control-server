@@ -6,7 +6,7 @@
 import * as ModuleRepo from "../repositories/Training/ModuleRepository.js";
 import { AccessProgress, AnswerInput } from "../schemas/trainingModuleSchema.js";
 import { ApolloContext } from "../context.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import * as SubmissionRepo from "../repositories/Training/SubmissionRepository.js";
 import { MODULE_PASSING_THRESHOLD } from "../constants.js";
@@ -342,7 +342,7 @@ const TrainingModuleResolvers = {
           true, // default to archived to avoid pollution
         );
 
-        await createLog(
+        await createUnassocaitedAuditLog(
           "{user} created the {module} module.",
           "admin",
           { id: user.id, label: getUsersFullName(user) },
@@ -375,7 +375,7 @@ const TrainingModuleResolvers = {
           args.makerspaceID,
         );
 
-        await createLog(
+        await createUnassocaitedAuditLog(
           "{user} updated the {module} module.",
           "admin",
           { id: user.id, label: getUsersFullName(user) },
@@ -397,7 +397,7 @@ const TrainingModuleResolvers = {
       isManager(async (user: any) => {
         const module = await ModuleRepo.setModuleArchived(Number(args.id), true);
 
-        await createLog(
+        await createUnassocaitedAuditLog(
           "{user} archived the {module} module.",
           "admin",
           { id: user.id, label: getUsersFullName(user) },
@@ -421,7 +421,7 @@ const TrainingModuleResolvers = {
       isManager(async (user: any) => {
         const module = await ModuleRepo.setModuleArchived(Number(args.id), false);
 
-        await createLog(
+        await createUnassocaitedAuditLog(
           "{user} unarchived the {module} module.",
           "admin",
           { id: user.id, label: getUsersFullName(user) },
@@ -445,7 +445,7 @@ const TrainingModuleResolvers = {
         throw new GraphQLError("Cannot delete published (non-archived) trainings");
       }
 
-      await createLog(
+      await createUnassocaitedAuditLog(
         "{user} deleted {module} module.",
         "admin",
         { id: user.id, label: getUsersFullName(user) },
@@ -537,7 +537,7 @@ const TrainingModuleResolvers = {
             grade >= MODULE_PASSING_THRESHOLD,
             JSON.stringify(choiceSummary)
           ).then(async (id) => {
-            await createLog(
+            await createUnassocaitedAuditLog(
               `{user} submitted attempt of {module} with a grade of ${grade} (${correct}/${incorrect + correct}).`,
               "training",
               { id: user.id, label: getUsersFullName(user) },
@@ -550,13 +550,13 @@ const TrainingModuleResolvers = {
               if (associatedWorgroup) {
                 add3DPrinterOSUser(user.ritUsername, String(associatedWorgroup)).then(async function (result) {
                   if (result) {
-                    await createLog(
+                    await createUnassocaitedAuditLog(
                       `{user} has been automatically added to 3DPrinterOS Workgroup ${associatedWorgroup}.`,
                       "server",
                       { id: user.id, label: getUsersFullName(user) }
                     );
                   } else {
-                    await createLog(
+                    await createUnassocaitedAuditLog(
                       `{user} has failed to be added to 3DPrinterOS Workgroup ${associatedWorgroup}. Check server logs.`,
                       "server",
                       { id: user.id, label: getUsersFullName(user) }
@@ -578,7 +578,7 @@ const TrainingModuleResolvers = {
             } else {
               //If max daily attempts reached. Create a training hold on this module
               if (Number(process.env.TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK) && (await SubmissionRepo.getFailedSubmissionsTodayByModuleAndUser(Number(args.moduleID), user.id)).length >= Number(process.env.TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK)) {
-                await createLog("Daily attempt limit reached. A hold has been placed on training {module} for {user}", "server", { id: module.id, label: module.name }, { id: user.id, label: getUsersFullName(user) });
+                await createUnassocaitedAuditLog("Daily attempt limit reached. A hold has been placed on training {module} for {user}", "server", { id: module.id, label: module.name }, { id: user.id, label: getUsersFullName(user) });
                 await createTrainingHold(user.id, Number(args.moduleID));
               }
             }

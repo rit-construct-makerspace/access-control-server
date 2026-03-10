@@ -1,6 +1,6 @@
 import { Request } from "express";
 import * as ws from "ws";
-import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { EquipmentInstancesRow, EquipmentRow, UserRow, MakerspaceRow, AccessControllerRow, AccessControllerState, DeviceRow } from "./db/tables.js";
 import { getEquipmentByID, getMissingTrainingModules, hasTrainingModules } from "./repositories/Equipment/EquipmentRepository.js";
 import { getUserByCardTagID, getUserManagerPerms, getUsersFullName, getUserStaffPerms } from "./repositories/Users/UserRepository.js";
@@ -180,14 +180,14 @@ export async function sendState(executingUser: UserRow, deviceID: number, state:
   const [paired, tag, label] = pairedLabel(instance, equipment, makerspaceForWhomeIWelcome);
 
   if (!paired) {
-    await createLog(
+    await createUnassocaitedAuditLog(
       `{user} commanded unpaired {access_device}'s state to ${state}.`,
       "admin",
       { id: executingUser.id, label: getUsersFullName(executingUser) },
       { id: device.id, label: device.name }
     );
   } else {
-    await createLog(
+    await createUnassocaitedAuditLog(
       `{user} commanded ${tag}'s state to ${state}.`,
       "admin",
       { id: executingUser.id, label: getUsersFullName(executingUser) }, label
@@ -207,7 +207,7 @@ export async function wsApiLog(
   if (!API_NORMAL_LOGGING) {
     return;
   }
-  createLog(message, category, ...entities);
+  createUnassocaitedAuditLog(message, category, ...entities);
 }
 
 
@@ -931,7 +931,7 @@ async function handleStateUpdateMessage(device: DeviceRow, newState: string, act
 
       if (instance == null || equipment == null) {
         if (user != null) {
-          await createLog(
+          await createUnassocaitedAuditLog(
             `{user} signed out of {access_device} that was not paired with any instance (Unpaired while in use)`, "status",
             { id: user.id, label: getUsersFullName(user) },
             { id: device.id, label: device.name ?? "undefined" }
@@ -941,7 +941,7 @@ async function handleStateUpdateMessage(device: DeviceRow, newState: string, act
         // Update equipment session that was created when we authed
         await endLatestEquipmentSession(equipment.id, device.name);
         if (user != null) {
-          await createLog(`{user} signed out of {equipment}`, "status", { id: user.id, label: getUsersFullName(user) }, label);
+          await createUnassocaitedAuditLog(`{user} signed out of {equipment}`, "status", { id: user.id, label: getUsersFullName(user) }, label);
         }
       }
     }

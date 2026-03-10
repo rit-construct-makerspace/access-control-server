@@ -8,7 +8,7 @@ import * as EquipmentInstanceRepo from "../repositories/Equipment/EquipmentInsta
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
 import * as ModuleRepo from "../repositories/Training/ModuleRepository.js"
 import { ApolloContext, CurrentUser } from "../context.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { AccessControllerState, EquipmentRow } from "../db/tables.js";
 import { EquipmentInput } from "../schemas/equipmentSchema.js";
@@ -156,7 +156,7 @@ const EquipmentResolvers = {
 
         const equipment = await EquipmentRepo.addEquipment(args.equipment);
 
-        await createLog(
+        await createUnassocaitedAuditLog(
           "{user} created the {equipment} equipment.",
           "admin",
           { id: user.id, label: getUsersFullName(user) },
