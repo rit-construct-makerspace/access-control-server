@@ -246,5 +246,34 @@ export const CREATE_EQUIPMENT = gql`
   }
 `;
 
+export const GET_EQUIPMENT_TRAININGS_BY_ID = gql`
+  query GetEquipmentTrainingsByID($id: ID!) {
+    equipment(id: $id) {
+      id
+      name
+      requiresInPerson
+      trainingModules {
+        id
+        name
+      }
+      room {
+        id
+        name
+        trainingModules {
+          id
+          name
+        }
+        makerspace {
+          id
+          name
+          trainingModules {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`;
 
 export default GET_EQUIPMENTS;

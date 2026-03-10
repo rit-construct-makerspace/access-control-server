@@ -9,9 +9,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import ModuleStatusRow from "./ModuleStatusRow";
 import ThemedMarkdown from "./ThemedMarkdown";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { makeCDNLink } from "./ImageFinder.js";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import EquipmentTrainingModal from "./EquipmentTrainingModal";
 
 interface EquipmentCardProps {
   equipment: Equipment;
@@ -36,6 +37,8 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
    * @return {boolean} True if a module has not been taken; False if all modules have been taken.
    */
   const hasNotTakenModule = moduleStatuses.some((ms: { status: string }) => ms.status === "Not taken");
+
+  const [trainingModal, setTrainingModal] = useState(false);
 
   return (
     <Card
@@ -85,8 +88,10 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                 height="100%"
               >
                 {/* Trainings & Access Check */}
-                <Stack width="100%" height={props.isMobile ? undefined : "135px"} overflow={"auto"}>
-                  {hasNotTakenModule || (!hasApprovedAccessCheck && props.equipment.requiresInPerson && !props.equipment.byReservationOnly) ? (
+                <Stack width="100%" height={props.isMobile ? undefined : "135px"}>
+                  <Button onClick={() => setTrainingModal(true)}>training modal</Button>
+                  <EquipmentTrainingModal equipmentID={props.equipment.id} open={trainingModal} onClose={() => setTrainingModal(false)} />
+                  {/* {hasNotTakenModule || (!hasApprovedAccessCheck && props.equipment.requiresInPerson && !props.equipment.byReservationOnly) ? (
                     <Typography paddingLeft={"10px"}>To access, complete:</Typography>
                   ) : null}
                   {moduleStatuses.map((ms: ModuleStatus) => (
@@ -103,7 +108,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                       )}
                       <Typography variant="body2">Staff Sign-Off</Typography>
                     </Stack>
-                  ) : null}
+                  ) : null} */}
                 </Stack>
                 {/* Num available */}
                 {
