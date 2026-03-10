@@ -260,7 +260,7 @@ export function setupDevAuth(app: express.Application) {
         await createUnassocaitedAuditLog(
           `{user} logged in.`,
           "server",
-          // @ts-expect-error
+          // @ts-expect-error - this code never runs and should be removed
           { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
         );
       }
@@ -500,7 +500,7 @@ export function setupSamlAuth(app: express.Application) {
         await createUnassocaitedAuditLog(
           `{user} logged in.`,
           "server",
-          // @ts-expect-error
+          // @ts-expect-error - this code never runs and should be removed
           { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
         );
       }
