@@ -282,7 +282,7 @@ async function handleCoreMessageRequest(request: WSACSCoreUnprompted, deviceID: 
     DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", message: request.message.content });
     return;
   }
-  if (typeof request.message.content === "string") { // The message is an auditlog, should not be string
+  if (typeof request.message.content !== "object") { // The message is an auditlog, should be an object
     return;
   }
 
