@@ -56,13 +56,9 @@ export class Core extends Device implements CoreRow {
     const controllers = await this.getAccessControllers();
     const request: WSACSServerUnprompted = {
       command: {
-        toState: []
+        toState: controllers.map((controller) => ({ id: controller.channelID, state: targetState }))
       }
     };
-
-    for (let i = 0; i < controllers.length; i++) {
-      request.command?.toState?.push({ id: controllers[i].channelID, state: targetState });
-    }
 
     WSACSController.sendCoreRequest(request, this.deviceID);
 
