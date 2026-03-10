@@ -6,6 +6,8 @@
 
 import { DispenserError } from "../api/devices/cards/cardApi.js";
 import { CurrencySource, CurrencyType } from "../integrations/currency/types.js";
+import { ACSDeployment } from "../models/ACS/deployment.js";
+import { CoreFlags } from "../models/api/WSACSFormats.js";
 
 /**
  * Audit logs are automatically made reports of various actions on the server and by machine activations.
@@ -693,9 +695,9 @@ export interface CoreRow {
   currentCardTag: string | undefined;
   lastStatusTime: Date | undefined;
   sessionStartTime: Date | undefined;
-  flags: object;
-  sealedDeployment: object | undefined;
-  reportedDeployment: object | undefined;
+  flags: CoreFlags;
+  sealedDeployment: ACSDeployment | undefined;
+  reportedDeployment: ACSDeployment | undefined;
 }
 
 export enum AccessControllerState {
