@@ -1,6 +1,6 @@
 import { ApolloContext } from "../context.js";
 import { OrganizationsRow } from "../db/tables.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import * as OrgRepo from "../repositories/Users/OrganizationRepository.js";
 import * as CurrencyAccountRepo from "../repositories/Currency/CurrencyAccountsRepository.js"
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
@@ -33,7 +33,7 @@ export const OrganizationResolver = {
       args: {
         id: number
       },
-      { isStaff }: ApolloContext  
+      { isStaff }: ApolloContext
     ) => {
       return isStaff(async () => {
         return await OrgRepo.getOrganizationByOrgID(args.id);
@@ -54,7 +54,7 @@ export const OrganizationResolver = {
       return await isManager(async (user) => {
         const result = await OrgRepo.createOrganization(args.username, args.notes, args.displayname);
 
-        createLog("{user} created the {organization} organization", "admin",
+        createUnassocaitedAuditLog("{user} created the {organization} organization", "admin",
           { id: user.id, label: getUsersFullName(user) },
           { id: result.id, label: args.displayname }
         );
@@ -72,7 +72,7 @@ export const OrganizationResolver = {
       { isManager }: ApolloContext
     ) => {
       return isManager(async (user) => {
-        const result =  await OrgRepo.editOrganizationNotes(args.orgID, args.notes);
+        const result = await OrgRepo.editOrganizationNotes(args.orgID, args.notes);
 
         return result;
       })
@@ -93,7 +93,7 @@ export const OrganizationResolver = {
           return false;
         }
 
-        createLog(`{user} deleted the ${org?.displayname} organization`, "admin",
+        createUnassocaitedAuditLog(`{user} deleted the ${org?.displayname} organization`, "admin",
           { id: user.id, label: getUsersFullName(user) }
         )
 

@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../db/index.js";
-import { AccessControllerRow } from "../../db/tables.js";
+import { AccessControllerRow, AccessControllerState } from "../../db/tables.js";
 import { AccessController } from "../../models/devices/accessController.js";
 
 export async function getAccessControllersByDeviceID(deviceID: number): Promise<AccessController[]> {
@@ -27,4 +27,12 @@ export async function getAccessControllerByID(accessControllerID: number): Promi
   const result = await knex("AccessControllers").where({ id: accessControllerID }).first();
   if (result === undefined) { return undefined; }
   return new AccessController(result);
+}
+
+export async function updateAccessControllerStateByDeviceAndChannelID(deviceID: number, channelID: number, newState: AccessControllerState): Promise<void> {
+  await knex("AccessControllers").update({ state: newState }).where({ deviceID: deviceID, channelID: channelID });
+}
+
+export async function updateAccessControllerDurationByDeviceAndChannelID(deviceID: number, channelID: number, tempDuration: number): Promise<void> {
+  await knex("AccessControllers").update({ tempDuration: tempDuration }).where({ deviceID: deviceID, channelID: channelID });
 }

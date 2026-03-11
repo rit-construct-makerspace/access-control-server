@@ -1,22 +1,29 @@
 import { Box, Button, Card, CardContent, CardMedia, Link, Stack, Typography, useTheme } from "@mui/material";
 import Equipment from "../types/Equipment";
 import { useCurrentUser } from "./CurrentUserProvider";
-import { ModuleStatus, moduleStatusMapper } from "./TrainingModuleUtils";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CloseIcon from "@mui/icons-material/Close";
+import { moduleStatusMapper, TrainingModule } from "./TrainingModuleUtils";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useNavigate, useParams } from "react-router-dom";
 import ConstructionIcon from "@mui/icons-material/Construction";
-import ModuleStatusRow from "./ModuleStatusRow";
 import ThemedMarkdown from "./ThemedMarkdown";
-import { memo } from "react";
+import { memo, useState } from "react";
 import { makeCDNLink } from "./ImageFinder.js";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import EquipmentTrainingModal from "./EquipmentTrainingModal";
 
 interface EquipmentCardProps {
   equipment: Equipment;
   isMobile: boolean;
   staffMode: boolean;
+  makerspaceTrainings: {
+    id: number;
+    name: string;
+    trainingModules: TrainingModule[];
+  },
+  roomTrainings: {
+    id: number;
+    name: string;
+    trainingModules: TrainingModule[];
+  }
 }
 
 const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
@@ -36,6 +43,8 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
    * @return {boolean} True if a module has not been taken; False if all modules have been taken.
    */
   const hasNotTakenModule = moduleStatuses.some((ms: { status: string }) => ms.status === "Not taken");
+
+  const [trainingModal, setTrainingModal] = useState(false);
 
   return (
     <Card
@@ -85,25 +94,17 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                 height="100%"
               >
                 {/* Trainings & Access Check */}
-                <Stack width="100%" height={props.isMobile ? undefined : "135px"} overflow={"auto"}>
-                  {hasNotTakenModule || (!hasApprovedAccessCheck && props.equipment.requiresInPerson && !props.equipment.byReservationOnly) ? (
-                    <Typography paddingLeft={"10px"}>To access, complete:</Typography>
-                  ) : null}
-                  {moduleStatuses.map((ms: ModuleStatus) => (
-                    <ModuleStatusRow ms={ms} />
-                  ))}
-                  {props.equipment.requiresInPerson ? (
-                    <Stack direction={"row"} spacing={1} alignItems="center" padding="7px">
-                      {user.visitor ? (
-                        <RadioButtonUncheckedIcon color="secondary" />
-                      ) : hasApprovedAccessCheck ? (
-                        <CheckCircleIcon color="success" />
-                      ) : (
-                        <CloseIcon color="error" />
-                      )}
-                      <Typography variant="body2">Staff Sign-Off</Typography>
-                    </Stack>
-                  ) : null}
+                <Stack width="100%" height={props.isMobile ? undefined : "100%"}>
+                  <EquipmentTrainingModal
+                    makerspaceTrainings={props.makerspaceTrainings}
+                    roomTrainings={props.roomTrainings}
+                    equipmentTrainings={{
+                      id: props.equipment.id,
+                      name: props.equipment.name,
+                      trainingModules: props.equipment.trainingModules,
+                    }}
+                    requiresInPerson={props.equipment.requiresInPerson}
+                  />
                 </Stack>
                 {/* Num available */}
                 {

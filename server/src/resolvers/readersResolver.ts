@@ -5,7 +5,7 @@
 
 import * as ReaderRepo from "../repositories/Readers/ReaderRepository.js";
 import { ApolloContext, CurrentUser } from "../context.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUserByCardTagID, getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
 import { AccessControllerState, ReaderLogRow, ReaderRow } from "../db/tables.js";
@@ -258,7 +258,7 @@ const ReadersResolver = {
           throw EntityNotFound;
         }
 
-        createLog(`{user} Paired with new reader ${reader.name} (SN ${args.SN})`, "status", { id: user.id, label: getUsersFullName(user) });
+        createUnassocaitedAuditLog(`{user} Paired with new reader ${reader.name} (SN ${args.SN})`, "status", { id: user.id, label: getUsersFullName(user) });
 
         return { readerKey: newKey, name: reader.name, siteName: process.env.READER_API_URL, certs: certCa }
       }),
@@ -306,7 +306,7 @@ const ReadersResolver = {
         }
         await ReaderRepo.setReaderName(Number(args.id), args.name);
 
-        await createLog(
+        await createUnassocaitedAuditLog(
           `{user} set {reader}'s name to ${args.name}.`,
           "admin",
           { id: user.id, label: getUsersFullName(user) },

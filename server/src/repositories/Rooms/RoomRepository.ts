@@ -19,7 +19,7 @@ export async function getRoomByID(roomID: number): Promise<Room | null> {
   if (knexResult === undefined) {
     return null;
   }
-  return knexResult;
+  return new Room(knexResult);
 }
 
 /**
@@ -36,7 +36,9 @@ export async function getRooms(): Promise<Room[]> {
  * @returns {Room[]} rooms
  */
 export async function getRoomsByMakerspace(makerspaceID: number): Promise<Room[]> {
-  return await knex("Rooms").select("id", "name", "archived", "makerspaceID").where({ makerspaceID: makerspaceID });
+  const rawRooms = await knex("Rooms").select("id", "name", "archived", "makerspaceID").where({ makerspaceID: makerspaceID });
+
+  return rawRooms.map((raw) => new Room(raw));
 }
 
 /**
@@ -66,11 +68,11 @@ export async function addRoom(room: Room): Promise<Room> {
  * @throws EntityNotFound on nonexisting ID
  */
 export async function archiveRoom(roomID: number): Promise<Room | null> {
-  const updatedRooms: Room[] = await knex("Rooms").where({ id: roomID }).update({ archived: true }).returning("*");
+  const updatedRooms = await knex("Rooms").where({ id: roomID }).update({ archived: true }).returning("*");
 
   if (updatedRooms.length < 1) throw new EntityNotFound(`Could not find room #${roomID}`);
 
-  return updatedRooms[0];
+  return new Room(updatedRooms[0]);
 }
 
 /**
@@ -80,11 +82,11 @@ export async function archiveRoom(roomID: number): Promise<Room | null> {
  * @throws EntityNotFound on nonexisting ID
  */
 export async function unarchiveRoom(roomID: number): Promise<Room | null> {
-  const updatedRooms: Room[] = await knex("Rooms").where({ id: roomID }).update({ archived: false }).returning("*");
+  const updatedRooms = await knex("Rooms").where({ id: roomID }).update({ archived: false }).returning("*");
 
   if (updatedRooms.length < 1) throw new EntityNotFound(`Could not find room #${roomID}`);
 
-  return updatedRooms[0];
+  return new Room(updatedRooms[0]);
 }
 
 /**

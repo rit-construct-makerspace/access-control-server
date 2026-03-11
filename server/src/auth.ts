@@ -26,7 +26,7 @@ import {
 } from "./repositories/Users/UserRepository.js";
 import { getHoldsByUser } from "./repositories/Holds/HoldsRepository.js";
 import { CurrentUser } from "./context.js";
-import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import path from "path";
 import { insertTempRole } from './repositories/tempRolesRepo.js';
 import { generateAtriumToken } from './integrations/atrium-integration/atrium.js';
@@ -257,9 +257,10 @@ export function setupDevAuth(app: express.Application) {
     async (req, res) => {
       console.log("Logged in")
       if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {
-        await createLog(
+        await createUnassocaitedAuditLog(
           `{user} logged in.`,
           "server",
+          // @ts-expect-error - this code never runs and should be removed
           { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
         );
       }
@@ -496,9 +497,10 @@ export function setupSamlAuth(app: express.Application) {
     async (req, res) => {
       console.log("Logged in")
       if (req.user && 'id' in req.user && 'firstName' in req.user && 'lastName' in req.user) {
-        await createLog(
+        await createUnassocaitedAuditLog(
           `{user} logged in.`,
           "server",
+          // @ts-expect-error - this code never runs and should be removed
           { id: req.user.id, label: `${req.user.firstName} ${req.user.lastName}` }
         );
       }

@@ -3,7 +3,7 @@
  */
 
 import { knex } from "../../db/index.js";
-import { createLog } from "../AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../AuditLogs/AuditLogRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import { UserRow } from "../../db/tables.js";
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js";
@@ -102,11 +102,9 @@ export async function getUserByCardTagID(
   if (!cardTagID || cardTagID == "0" || cardTagID == "null" || cardTagID == "undefined") { return undefined; }
 
   const tempUser = await TempCardRepo.getUserFromTempCardTag(cardTagID);
-  console.log(tempUser);
   if (tempUser !== undefined) { return tempUser; }
 
   const result = knex("Users").first().where("cardTagID", cardTagID);
-  console.log(result);
   return result;
 }
 
@@ -148,7 +146,7 @@ export async function updateStudentProfile(args: {
   const user = await getUserByID(args.userID);
 
   if (!user.setupComplete) {
-    await createLog("{user} has joined The SHED!",
+    await createUnassocaitedAuditLog("{user} has joined The SHED!",
       "server",
       {
         id: args.userID,
@@ -174,7 +172,7 @@ export async function updateStudentProfile(args: {
  */
 export async function updateUserName(id: number, firstName: string, lastName: string) {
   await knex("Users").update({ firstName, lastName }).where({ id });
-  await createLog("{user}'s profile info has been automatically updated", "server", { id: id, label: (firstName + " " + lastName) });
+  await createUnassocaitedAuditLog("{user}'s profile info has been automatically updated", "server", { id: id, label: (firstName + " " + lastName) });
 }
 
 /**

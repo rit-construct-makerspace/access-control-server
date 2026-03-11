@@ -86,7 +86,18 @@ export default function MakerspacePage() {
           </Stack>
 
           {liveRooms.map((room: Room) => (
-            <RoomSection room={room} equipmentSearch={equipmentSearch} isMobile={isMobile} staffMode={staffMode} showHidden={showHidden} />
+            <RoomSection
+              room={room}
+              equipmentSearch={equipmentSearch}
+              isMobile={isMobile}
+              staffMode={staffMode}
+              showHidden={showHidden}
+              makerspaceTrainings={{
+                id: fullSpace.id,
+                name: fullSpace.name,
+                trainingModules: fullSpace.trainingModules,
+              }}
+            />
           ))}
         </Stack>
       );
