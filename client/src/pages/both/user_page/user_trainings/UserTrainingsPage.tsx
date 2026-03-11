@@ -82,62 +82,6 @@ export default function UserTraingingsPage() {
           );
         }}
       />
-      {/* Equipment */}
-      <RequestWrapper2
-        result={getAccessChecks}
-        render={({ accessChecksByUserID }) => {
-          const unarchived = accessChecksByUserID.filter(
-            (ac: AccessCheck) => !ac.equipment.archived
-          );
-
-          const approved = unarchived.filter((ac: AccessCheck) => ac.approved);
-
-          const unapproved = unarchived.filter(
-            (ac: AccessCheck) => !ac.approved && !ac.equipment.byReservationOnly
-          );
-
-          return (
-            <Stack spacing={1}>
-              <Typography variant="h4">Approved Equipment</Typography>
-              <Grid
-                container
-                justifyContent="space-around"
-                width="fit-content"
-                rowSpacing={2}
-              >
-                {approved.map((ac: AccessCheck) => (
-                  <Grid key={ac.equipment.id}>
-                    <EquipmentCard
-                      equipment={ac.equipment}
-                      isMobile={isMobile}
-                      staffMode={false}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-              <Typography variant="h4">
-                Awaiting Staff Sign-Off
-              </Typography>
-              <Grid
-                container
-                justifyContent="space-around"
-                width="fit-content"
-                rowSpacing={2}
-              >
-                {unapproved.map((ac: AccessCheck) => (
-                  <Grid key={ac.equipment.id}>
-                    <EquipmentCard
-                      equipment={ac.equipment}
-                      isMobile={isMobile}
-                      staffMode={false}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </Stack>
-          );
-        }}
-      />
       <title>{`${user.firstName}'s Trainings | Make @ RIT`}</title>
     </Stack>
   );

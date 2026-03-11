@@ -11,6 +11,7 @@ import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import CircularProgressWithContent from "./CircularProgressWithContent";
 import CheckIcon from '@mui/icons-material/Check';
 import { useIsMobile } from "./IsMobileProvider";
+import { toast } from "react-toastify";
 
 interface EquipmentTrainingModalProps {
   makerspaceTrainings: {
@@ -29,6 +30,7 @@ interface EquipmentTrainingModalProps {
     trainingModules: TrainingModule[];
   };
   requiresInPerson: boolean;
+  preview?: boolean;
 }
 
 export default function EquipmentTrainingModal(props: EquipmentTrainingModalProps) {
@@ -65,7 +67,7 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
     <Stack width={"100%"} height={"100%"} justifyContent={"center"} alignItems={"center"}>
       <Stack width={"max-content"} alignItems={"center"} justifyContent={"center"} spacing={2}>
         <Button
-          onClick={() => setOpen(true)}
+          onClick={props.preview ? () => toast.info("Preview Only!") : () => setOpen(true)}
           startIcon={
             totalReqsComplete !== totalRequirements
               ? <CloseIcon />
@@ -123,7 +125,7 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
             </Stack>
         }
       </Stack>
-      <PrettyModal open={open} onClose={() => setOpen(false)} width={isMobile ? "95%" : "200px"}>
+      <PrettyModal open={open} onClose={() => setOpen(false)} width={isMobile ? "95%" : "1000px"}>
         <Stack spacing={2}>
           <Stack direction={"row"} justifyContent={"space-between"} alignItems={isMobile ? "start" : "center"}>
             <Typography variant="h5">{props.equipmentTrainings.name} Training Checklist</Typography>
