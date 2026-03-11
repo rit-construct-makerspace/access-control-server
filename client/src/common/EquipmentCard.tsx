@@ -24,6 +24,7 @@ interface EquipmentCardProps {
     name: string;
     trainingModules: TrainingModule[];
   }
+  preview?: boolean;
 }
 
 const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
@@ -104,6 +105,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                       trainingModules: props.equipment.trainingModules,
                     }}
                     requiresInPerson={props.equipment.requiresInPerson}
+                    preview={props.preview}
                   />
                 </Stack>
                 {/* Num available */}

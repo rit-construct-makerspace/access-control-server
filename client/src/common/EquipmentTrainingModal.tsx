@@ -10,6 +10,8 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import CircularProgressWithContent from "./CircularProgressWithContent";
 import CheckIcon from '@mui/icons-material/Check';
+import { useIsMobile } from "./IsMobileProvider";
+import { toast } from "react-toastify";
 
 interface EquipmentTrainingModalProps {
   makerspaceTrainings: {
@@ -28,12 +30,15 @@ interface EquipmentTrainingModalProps {
     trainingModules: TrainingModule[];
   };
   requiresInPerson: boolean;
+  preview?: boolean;
 }
 
 export default function EquipmentTrainingModal(props: EquipmentTrainingModalProps) {
   const user = useCurrentUser();
+  const isMobile = useIsMobile();
+  console.log("isMobile: " + isMobile);
 
-  if (props.equipmentTrainings.trainingModules.length === 0) {
+  if (props.equipmentTrainings.trainingModules.length === 0 && !props.requiresInPerson) {
     return;
   }
 
@@ -54,7 +59,7 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
   const totalRequirements = makerspaceStatuses.length + roomStatuses.length + equipmentStatuses.length + (props.requiresInPerson ? 1 : 0);
   const totalReqsComplete = makerspaceReqsComplete + roomReqsComplete + equipmentReqsComplete;
 
-  const percentComplete: number = Math.ceil(totalReqsComplete / totalRequirements * 100);
+  const percentComplete: number = Math.round(totalReqsComplete / totalRequirements * 100);
 
   const [open, setOpen] = useState(false);
 
@@ -62,7 +67,7 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
     <Stack width={"100%"} height={"100%"} justifyContent={"center"} alignItems={"center"}>
       <Stack width={"max-content"} alignItems={"center"} justifyContent={"center"} spacing={2}>
         <Button
-          onClick={() => setOpen(true)}
+          onClick={props.preview ? () => toast.info("Preview Only!") : () => setOpen(true)}
           startIcon={
             totalReqsComplete !== totalRequirements
               ? <CloseIcon />
@@ -120,9 +125,9 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
             </Stack>
         }
       </Stack>
-      <PrettyModal open={open} onClose={() => setOpen(false)} width={"1000px"}>
+      <PrettyModal open={open} onClose={() => setOpen(false)} width={isMobile ? "95%" : "1000px"}>
         <Stack spacing={2}>
-          <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
+          <Stack direction={"row"} justifyContent={"space-between"} alignItems={isMobile ? "start" : "center"}>
             <Typography variant="h5">{props.equipmentTrainings.name} Training Checklist</Typography>
             <IconButton
               onClick={() => setOpen(false)}
@@ -130,8 +135,8 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
               <CloseIcon />
             </IconButton>
           </Stack>
-          <Stack direction={"row"} justifyContent={"space-between"}>
-            <Stack sx={{ width: "69%" }} spacing={2}>
+          <Stack direction={isMobile ? "column" : "row"} justifyContent={"space-between"} spacing={isMobile ? 2 : undefined}>
+            <Stack sx={{ width: isMobile ? "100%" : "69%" }} spacing={2}>
               {
                 props.makerspaceTrainings.trainingModules.length > 0
                   ? <Stack>
@@ -178,8 +183,8 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
               }
 
             </Stack>
-            <Divider orientation="vertical" flexItem />
-            <Stack sx={{ width: "29%" }} alignItems={"center"} spacing={2} justifyContent={"center"}>
+            <Divider orientation={isMobile ? "horizontal" : "vertical"} flexItem />
+            <Stack sx={{ width: isMobile ? "100%" : "29%" }} alignItems={"center"} spacing={2} justifyContent={"center"}>
               <CircularProgressWithContent
                 enableTrackSlot
                 variant="determinate"
