@@ -4,7 +4,6 @@ import { ModuleStatus } from "./TrainingModuleUtils";
 import WarningIcon from "@mui/icons-material/Warning";
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import LockClockIcon from "@mui/icons-material/LockClock";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import { format } from "date-fns";
 import { useQuery } from "@apollo/client";

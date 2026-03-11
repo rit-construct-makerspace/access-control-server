@@ -1,17 +1,13 @@
 import { Box, Button, Card, CardContent, CardMedia, Link, Stack, Typography, useTheme } from "@mui/material";
 import Equipment from "../types/Equipment";
 import { useCurrentUser } from "./CurrentUserProvider";
-import { ModuleStatus, moduleStatusMapper, TrainingModule } from "./TrainingModuleUtils";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CloseIcon from "@mui/icons-material/Close";
+import { moduleStatusMapper, TrainingModule } from "./TrainingModuleUtils";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useNavigate, useParams } from "react-router-dom";
 import ConstructionIcon from "@mui/icons-material/Construction";
-import ModuleStatusRow from "./ModuleStatusRow";
 import ThemedMarkdown from "./ThemedMarkdown";
 import { memo, useState } from "react";
 import { makeCDNLink } from "./ImageFinder.js";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import EquipmentTrainingModal from "./EquipmentTrainingModal";
 
 interface EquipmentCardProps {

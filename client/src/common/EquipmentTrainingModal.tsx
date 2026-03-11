@@ -1,10 +1,7 @@
-import { useQuery } from "@apollo/client";
-import { GET_EQUIPMENT_TRAININGS_BY_ID } from "../queries/equipmentQueries";
 import PrettyModal from "./PrettyModal";
-import { Button, CircularProgress, Divider, IconButton, LinearProgress, Stack, Typography } from "@mui/material";
+import { Button, Divider, IconButton, LinearProgress, Stack, Typography } from "@mui/material";
 import { ModuleStatus, moduleStatusMapper, TrainingModule } from "./TrainingModuleUtils";
 import { useCurrentUser } from "./CurrentUserProvider";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import ModuleStatusRow from "./ModuleStatusRow";
