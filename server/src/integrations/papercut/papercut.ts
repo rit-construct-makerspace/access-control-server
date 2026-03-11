@@ -1,7 +1,7 @@
 import express from "express";
 import xmlparser from "express-xml-bodyparser";
 import * as xml2js from "xml2js"
-import { createLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as Currency from "../currency/currency.js"
 import { NewTransaction, UpdateTransaction } from "../currency/transactions.js";
 import { getAccountIDByUsername } from "../../repositories/Currency/CurrencyAccountsRepository.js";
@@ -103,11 +103,11 @@ async function papercut_getUserAccountBalance(res: any, params: XMLRPCValue[]) {
     return;
   }
   // 0$ if you don't exist
-  if ((await getAccountIDByUsername(username)) === undefined){
+  if ((await getAccountIDByUsername(username)) === undefined) {
     xmlrpcRespond(res, [0]);
     return;
   }
-  
+
   try {
     const result = await Currency.getAccountBalance(username);
     if (typeof result === "number") { // number result
@@ -255,7 +255,7 @@ async function papercut_adjustUserAccountBalanceIfAvailable(res: any, params: XM
     return;
   }
   // Blindly accecpt changes of $0 (won't even be recorded)
-  if (adjustment == 0){
+  if (adjustment == 0) {
     xmlrpcRespond(res, [true]);
     return;
   }
@@ -365,12 +365,12 @@ function xmlrpcRespondFault(response: any, fault: number, faultString: string) {
 export function registerEndpoints(app: express.Application) {
   if (PAPERCUT_SECURITY_SECRET === undefined) {
     console.error("PAPERCUT: COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK");
-    createLog("COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK", "server");
+    createUnassocaitedAuditLog("COULD NOT FIND SECRET, PAPERCUT 3DPRINTER OS WONT WORK", "server");
     return;
   }
   if (FREE_3D_PRINTS) {
     console.error("PAPERCUT: Free 3D Printing is turned on");
-    createLog("Free 3D Printing is enabled", "server");
+    createUnassocaitedAuditLog("Free 3D Printing is enabled", "server");
   }
   const handlers: Map<string, Function> = new Map();
   handlers.set("api.getUserAccountBalance", papercut_getUserAccountBalance);

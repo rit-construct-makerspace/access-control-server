@@ -1,7 +1,7 @@
 import { knex } from "../../db/index.js";
 import { CurrencyLedgerRow, TransactionEntryRow, TransactionRow } from "../../db/tables.js";
 import { CurrencySource, CurrencyType } from "../../integrations/currency/types.js";
-import { createLog } from "../AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../AuditLogs/AuditLogRepository.js";
 
 /**
  * Create the parent element of a transaction
@@ -102,20 +102,20 @@ export async function getLastChargesForTransactionById(transactionId: number): P
         )
         .leftJoin("CurrencyLedger as cl", "cl.transactionEntryId", "te.id")
         .where("te.transactionID", "=", transactionId)
-        .orderBy("te.dateTime", "desc").debug(true) as Row[];
+        .orderBy("te.dateTime", "desc") as Row[];
 
     const rowsNotIncludingEmptyEntries = rows.filter(r => r.CLID !== null);
     if (rowsNotIncludingEmptyEntries.length == 0) {
         // dont even have the transaction entry (weird and bad)
         return undefined;
     }
- 
+
     const entryIdWeCareAbout = rowsNotIncludingEmptyEntries[0].transactionEntryId;
     const justLastCharges = rowsNotIncludingEmptyEntries.filter(r => r.amount < 0 && r.transactionEntryId == entryIdWeCareAbout); // we don't want the last refund
 
     if (justLastCharges.length > 2) {
         // something has gone terribly wrong, we somehow charged 3 times with 2 currencies
-        await createLog(`Strange Currency Bug That You Will Have To Fix Manually. Could not find history for transaction ID: ${transactionId}`, "currency")
+        await createUnassocaitedAuditLog(`Strange Currency Bug That You Will Have To Fix Manually. Could not find history for transaction ID: ${transactionId}`, "currency")
         return undefined;
     }
     let atrium: { amount: number, txid: number, currencyLedgerId: number } | undefined = undefined;

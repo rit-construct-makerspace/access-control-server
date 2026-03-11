@@ -2,7 +2,7 @@ import { knex } from "./db/index.js";
 import { listObjects } from "./integrations/aws/s3.js"
 import { send_generic_email } from "./integrations/email/email.js";
 import { notifyNewMaintenanceTicket } from "./integrations/slack/slack.js";
-import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { advanceIntervalTickets } from "./repositories/Equipment/MaintenanceTicketRepository.js";
 
 /**
@@ -67,7 +67,7 @@ export async function advanceTimeTickets(): Promise<void> {
 	try {
 		const result = await advanceIntervalTickets();
 		if (result.length > 0) {
-			createLog(`Advanced ${result.length} time-based maintenance tickets`, "server");
+			createUnassocaitedAuditLog(`Advanced ${result.length} time-based maintenance tickets`, "server");
 		}
 
 		result.forEach((ticket) => {

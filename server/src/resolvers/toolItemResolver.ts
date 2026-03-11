@@ -10,7 +10,7 @@ import { createToolItemType, deleteToolItemType, getToolItemTypeByID, getToolIte
 import { getUserByID, getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { ToolItemInstanceInput, ToolItemTypeInput } from "../schemas/toolItemsSchema.js";
 import { getRoomByID } from "../repositories/Rooms/RoomRepository.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { GraphQLError } from "graphql";
 import { notifyToolItemMarked } from "../integrations/slack/slack.js";
 
@@ -199,7 +199,7 @@ const ToolItemResolver = {
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user) => {
-        await createLog(`{user} created tool item type '${args.toolItemType.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
+        await createUnassocaitedAuditLog(`{user} created tool item type '${args.toolItemType.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
         return await createToolItemType(args.toolItemType.name, args.toolItemType.defaultLocationRoomID,
           args.toolItemType.defaultLocationDescription, args.toolItemType.description, args.toolItemType.checkoutNote,
           args.toolItemType.checkinNote, args.toolItemType.allowCheckout);
@@ -221,7 +221,7 @@ const ToolItemResolver = {
       isStaff(async (user) => {
         const orig = await getToolItemTypeByID(args.id);
         if (!orig) throw new GraphQLError("Type does not exist");
-        await createLog(`{user} updated tool item type '${orig.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
+        await createUnassocaitedAuditLog(`{user} updated tool item type '${orig.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
         return updateToolItemType(
           args.id,
           args.toolItemType.name,
@@ -248,7 +248,7 @@ const ToolItemResolver = {
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user) => {
-        await createLog(`{user} created tool item instance '${args.toolItemInstance.uniqueIdentifier}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
+        await createUnassocaitedAuditLog(`{user} created tool item instance '${args.toolItemInstance.uniqueIdentifier}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
         return createToolItemInstance(Number(args.toolItemInstance.typeID), args.toolItemInstance.uniqueIdentifier,
           Number(args.toolItemInstance.locationRoomID), args.toolItemInstance.locationDescription, args.toolItemInstance.condition,
           args.toolItemInstance.status, args.toolItemInstance.notes);
@@ -284,7 +284,7 @@ const ToolItemResolver = {
         ) {
           await notifyToolItemMarked(args.toolItemInstance.uniqueIdentifier, makerspace?.id ?? 0, orig.id, orig.typeID, args.toolItemInstance.condition);
         }
-        await createLog(`{user} updated tool item instance '${orig.uniqueIdentifier}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
+        await createUnassocaitedAuditLog(`{user} updated tool item instance '${orig.uniqueIdentifier}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
         return updateToolItemInstance(args.id, args.toolItemInstance.typeID, args.toolItemInstance.uniqueIdentifier,
           args.toolItemInstance.locationRoomID, args.toolItemInstance.locationDescription, args.toolItemInstance.condition,
           args.toolItemInstance.status, args.toolItemInstance.notes);
@@ -308,7 +308,7 @@ const ToolItemResolver = {
         if (!reciever) throw new GraphQLError("Recieving User does not exist");
         const orig = await getToolItemInstanceByID(args.instanceID);
         if (!orig) throw new GraphQLError("Type does not exist");
-        await createLog(`{user} loaned tool item '${orig.uniqueIdentifier}' to {user}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: reciever.id, label: getUsersFullName(reciever) });
+        await createUnassocaitedAuditLog(`{user} loaned tool item '${orig.uniqueIdentifier}' to {user}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: reciever.id, label: getUsersFullName(reciever) });
         return borrowItem(args.userID, args.instanceID);
       }
       ),
@@ -329,7 +329,7 @@ const ToolItemResolver = {
         if (!orig) throw new GraphQLError("Type does not exist");
         const reciever = orig.borrowerUserID ? await getUserByID(orig.borrowerUserID) : undefined;
         if (!reciever) throw new GraphQLError("Returning User does not exist");
-        await createLog(`{user} returned tool item '${orig.uniqueIdentifier}' from {user}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: reciever.id, label: getUsersFullName(reciever) });
+        await createUnassocaitedAuditLog(`{user} returned tool item '${orig.uniqueIdentifier}' from {user}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: reciever.id, label: getUsersFullName(reciever) });
         return returnItem(args.instanceID)
       }
       ),
@@ -348,7 +348,7 @@ const ToolItemResolver = {
       isStaff(async (user) => {
         const orig = await getToolItemTypeByID(args.id);
         if (!orig) throw new GraphQLError("Type does not exist");
-        await createLog(`{user} deleted tool item type '${orig.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
+        await createUnassocaitedAuditLog(`{user} deleted tool item type '${orig.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
         return deleteToolItemType(args.id);
       }
       ),
@@ -367,7 +367,7 @@ const ToolItemResolver = {
       isStaff(async (user) => {
         const orig = await getToolItemInstanceByID(args.id);
         if (!orig) throw new GraphQLError("Instance does not exist");
-        await createLog(`{user} deleted tool item instance '${orig.uniqueIdentifier}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
+        await createUnassocaitedAuditLog(`{user} deleted tool item instance '${orig.uniqueIdentifier}'`, 'admin', { id: user.id, label: getUsersFullName(user) });
         return deleteToolItemInstance(args.id);
       }
       ),

@@ -6,6 +6,8 @@
 
 import { DispenserError } from "../api/devices/cards/cardApi.js";
 import { CurrencySource, CurrencyType } from "../integrations/currency/types.js";
+import { ACSDeployment } from "../models/ACS/deployment.js";
+import { CoreFlags } from "../models/api/WSACSFormats.js";
 
 /**
  * Audit logs are automatically made reports of various actions on the server and by machine activations.
@@ -20,6 +22,7 @@ export interface AuditLogRow {
   dateTime: Date;
   message: string;
   category: string;
+  makerspaceID: number | undefined;
 }
 /**
  * A description of a piece of equipment.
@@ -679,7 +682,8 @@ export interface DeviceRow {
 
 export enum CoreInputMode {
   INSERT = "INSERT",
-  TEMP = "TEMP",
+  TEMP_PRESENT = "TEMP_PRESENT",
+  TEMP_REMOVE = "TEMP_REMOVE",
   TOGGLE = "TOGGLE"
 }
 
@@ -691,6 +695,9 @@ export interface CoreRow {
   currentCardTag: string | undefined;
   lastStatusTime: Date | undefined;
   sessionStartTime: Date | undefined;
+  flags: CoreFlags;
+  sealedDeployment: ACSDeployment | undefined;
+  reportedDeployment: ACSDeployment | undefined;
 }
 
 export enum AccessControllerState {
@@ -707,12 +714,43 @@ export interface AccessControllerRow {
   deviceID: number;
   channelID: number;
   state: AccessControllerState;
+  tempDuration: number;
 }
 
 export interface DispenserRow {
   deviceID: number;
   cardsLeft: number;
   error: DispenserError;
+}
+
+export enum DeviceLogSeverity {
+  HIGH = "HIGH",
+  MEDIUM = "MEDIUM",
+  LOW = "LOW"
+}
+
+export interface DeviceLogRow {
+  id: number;
+  dateTime: Date;
+  deviceID: number | undefined;
+  severity: DeviceLogSeverity;
+  log: object;
+}
+
+export interface UnlockAttemptLogRow {
+  id: number;
+  dateTime: Date;
+  equipmentID: number | undefined;
+  equipmentName: string;
+  userID: number | undefined;
+  username: string;
+  success: boolean;
+  reason: string;
+}
+
+export interface FirmwareLocationRow {
+  hardwareVersion: string;
+  firmwareURL: string;
 }
 
 declare module "knex/types/tables.js" {
@@ -766,5 +804,8 @@ declare module "knex/types/tables.js" {
     Cores: CoreRow;
     AccessControllers: AccessControllerRow;
     Dispensers: DispenserRow;
+    DeviceLogs: DeviceLogRow;
+    UnlockAttemptLogs: UnlockAttemptLogRow;
+    FirmwareLocations: FirmwareLocationRow;
   }
 }
