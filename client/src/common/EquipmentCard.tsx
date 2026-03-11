@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, CardMedia, Link, Stack, Typography, useTheme } from "@mui/material";
 import Equipment from "../types/Equipment";
 import { useCurrentUser } from "./CurrentUserProvider";
-import { ModuleStatus, moduleStatusMapper } from "./TrainingModuleUtils";
+import { ModuleStatus, moduleStatusMapper, TrainingModule } from "./TrainingModuleUtils";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -18,6 +18,16 @@ interface EquipmentCardProps {
   equipment: Equipment;
   isMobile: boolean;
   staffMode: boolean;
+  makerspaceTrainings: {
+    id: number;
+    name: string;
+    trainingModules: TrainingModule[];
+  },
+  roomTrainings: {
+    id: number;
+    name: string;
+    trainingModules: TrainingModule[];
+  }
 }
 
 const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
@@ -90,25 +100,18 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                 {/* Trainings & Access Check */}
                 <Stack width="100%" height={props.isMobile ? undefined : "135px"}>
                   <Button onClick={() => setTrainingModal(true)}>training modal</Button>
-                  <EquipmentTrainingModal equipmentID={props.equipment.id} open={trainingModal} onClose={() => setTrainingModal(false)} />
-                  {/* {hasNotTakenModule || (!hasApprovedAccessCheck && props.equipment.requiresInPerson && !props.equipment.byReservationOnly) ? (
-                    <Typography paddingLeft={"10px"}>To access, complete:</Typography>
-                  ) : null}
-                  {moduleStatuses.map((ms: ModuleStatus) => (
-                    <ModuleStatusRow ms={ms} />
-                  ))}
-                  {props.equipment.requiresInPerson ? (
-                    <Stack direction={"row"} spacing={1} alignItems="center" padding="7px">
-                      {user.visitor ? (
-                        <RadioButtonUncheckedIcon color="secondary" />
-                      ) : hasApprovedAccessCheck ? (
-                        <CheckCircleIcon color="success" />
-                      ) : (
-                        <CloseIcon color="error" />
-                      )}
-                      <Typography variant="body2">Staff Sign-Off</Typography>
-                    </Stack>
-                  ) : null} */}
+                  <EquipmentTrainingModal
+                    open={trainingModal}
+                    onClose={() => setTrainingModal(false)}
+                    makerspaceTrainings={props.makerspaceTrainings}
+                    roomTrainings={props.roomTrainings}
+                    equipmentTrainings={{
+                      id: props.equipment.id,
+                      name: props.equipment.name,
+                      trainingModules: props.equipment.trainingModules,
+                    }}
+                    requiresInPerson={props.equipment.requiresInPerson}
+                  />
                 </Stack>
                 {/* Num available */}
                 {

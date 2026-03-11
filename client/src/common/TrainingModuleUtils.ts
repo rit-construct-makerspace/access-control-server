@@ -25,55 +25,19 @@ export interface TrainingModule {
 export const moduleStatusMapper =
   (passedModules: PassedModule[], trainingHolds: TrainingHold[]) =>
     (module: TrainingModule): ModuleStatus => {
-      try {
-        const passedModule = passedModules.find((pm) => pm.moduleID === module.id);
-        const hold = trainingHolds.find((hold) => hold.moduleID === module.id);
+      const passedModule = passedModules.find((pm) => pm.moduleID === module.id);
+      const hold = trainingHolds.find((hold) => hold.moduleID === module.id);
 
-        if ((hold || module.isLocked) && !passedModule)
-          return {
-            moduleID: module.id,
-            moduleName: module.name,
-            archived: module.archived,
-            status: "Locked",
-            submissionDate: "",
-            expirationDate: "",
-          };
-        if (!passedModule)
-          return {
-            moduleID: module.id,
-            moduleName: module.name,
-            archived: module.archived,
-            status: "Not taken",
-            submissionDate: "",
-            expirationDate: "",
-          };
-
-        const submissionDate = parseISO(passedModule.passedDate);
-        const expirationDate = new Date(submissionDate);
-        expirationDate.setFullYear(submissionDate.getFullYear() + 1);
-        const expiringSoon = differenceInMonths(expirationDate, new Date()) <= 1; // differenceInMonths(new Date(), submissionDate) > 11 && differenceInMonths(new Date(), submissionDate) < 12;
-        const expired = differenceInYears(submissionDate, new Date()) > 0;
-
-        if (expiringSoon)
-          return {
-            moduleID: module.id,
-            moduleName: module.name,
-            archived: module.archived,
-            status: "Expiring Soon",
-            submissionDate: submissionDate.toDateString(),
-            expirationDate: expirationDate.toDateString(),
-          };
-
+      if ((hold || module.isLocked) && !passedModule)
         return {
           moduleID: module.id,
           moduleName: module.name,
           archived: module.archived,
-          status: expired ? "Expired" : "Passed",
-          submissionDate: submissionDate.toDateString(),
-          expirationDate: expirationDate.toDateString(),
+          status: "Locked",
+          submissionDate: "",
+          expirationDate: "",
         };
-      } catch (e) {
-        console.error(e);
+      if (!passedModule)
         return {
           moduleID: module.id,
           moduleName: module.name,
@@ -82,5 +46,29 @@ export const moduleStatusMapper =
           submissionDate: "",
           expirationDate: "",
         };
-      }
+
+      const submissionDate = parseISO(passedModule.passedDate);
+      const expirationDate = new Date(submissionDate);
+      expirationDate.setFullYear(submissionDate.getFullYear() + 1);
+      const expiringSoon = differenceInMonths(expirationDate, new Date()) <= 1; // differenceInMonths(new Date(), submissionDate) > 11 && differenceInMonths(new Date(), submissionDate) < 12;
+      const expired = differenceInYears(submissionDate, new Date()) > 0;
+
+      if (expiringSoon)
+        return {
+          moduleID: module.id,
+          moduleName: module.name,
+          archived: module.archived,
+          status: "Expiring Soon",
+          submissionDate: submissionDate.toDateString(),
+          expirationDate: expirationDate.toDateString(),
+        };
+
+      return {
+        moduleID: module.id,
+        moduleName: module.name,
+        archived: module.archived,
+        status: expired ? "Expired" : "Passed",
+        submissionDate: submissionDate.toDateString(),
+        expirationDate: expirationDate.toDateString(),
+      };
     };

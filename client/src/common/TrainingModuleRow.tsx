@@ -38,20 +38,20 @@ export default function TrainingModuleRow({
         >
           {
             moduleStatus.status === "Locked"
-            ? "Locked Until Tomorrow"
-            : moduleStatus.status
+              ? "Locked Until Tomorrow"
+              : moduleStatus.status
           }
         </Typography>
 
         <Typography>{moduleStatus.moduleName}</Typography>
-        
-        {moduleStatus.status === "Expiring Soon"  && (
+
+        {moduleStatus.status === "Expiring Soon" && (
           <Stack sx={{ ml: "auto !important" }} >
             <Typography variant="body2"
-            sx={{ ml: "auto !important" }}>Exp Date:</Typography>
+              sx={{ ml: "auto !important" }}>Exp Date:</Typography>
             <Typography
-            variant="body2"
-            sx={{ ml: "auto !important" }}
+              variant="body2"
+              sx={{ ml: "auto !important" }}
             >
               {format(parseISO(moduleStatus.expirationDate), "MM/dd/yyyy")}
             </Typography>

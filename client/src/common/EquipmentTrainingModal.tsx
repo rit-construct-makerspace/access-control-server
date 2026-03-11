@@ -2,99 +2,97 @@ import { useQuery } from "@apollo/client";
 import { GET_EQUIPMENT_TRAININGS_BY_ID } from "../queries/equipmentQueries";
 import PrettyModal from "./PrettyModal";
 import { Divider, LinearProgress, Stack, Typography } from "@mui/material";
-import TrainingModuleRow from "./TrainingModuleRow";
 import { moduleStatusMapper, TrainingModule } from "./TrainingModuleUtils";
 import { useCurrentUser } from "./CurrentUserProvider";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import ModuleStatusRow from "./ModuleStatusRow";
 
 interface EquipmentTrainingModalProps {
-  equipmentID: number;
   open: boolean;
   onClose: () => void;
+  makerspaceTrainings: {
+    id: number;
+    name: string;
+    trainingModules: TrainingModule[];
+  };
+  roomTrainings: {
+    id: number;
+    name: string;
+    trainingModules: TrainingModule[];
+  };
+  equipmentTrainings: {
+    id: number;
+    name: string;
+    trainingModules: TrainingModule[];
+  };
+  requiresInPerson: boolean;
 }
 
 export default function EquipmentTrainingModal(props: EquipmentTrainingModalProps) {
   const user = useCurrentUser();
 
-  const equipmentTrainingsResult = useQuery(GET_EQUIPMENT_TRAININGS_BY_ID, { variables: { id: props.equipmentID } });
-
-  const equipmentTrainings: TrainingModule[] = equipmentTrainingsResult.data?.equipment.trainingModules ?? [];
-  const roomTrainings: TrainingModule[] = equipmentTrainingsResult.data?.equipment.room.trainingModules ?? [];
-  const makerspaceTrainings: TrainingModule[] = equipmentTrainingsResult.data?.equipment.room.makerspace.trainingModules ?? [];
-
-  const hasApprovedAccessCheck: boolean = user.accessChecks.some((ac) => Number(ac.equipmentID) === Number(props.equipmentID) && ac.approved)
+  const hasApprovedAccessCheck: boolean = user.accessChecks.some((ac) => Number(ac.equipmentID) === Number(props.equipmentTrainings.id) && ac.approved)
 
   return (
-    <PrettyModal open={props.open} onClose={props.onClose}>
-      <Stack direction={"row"} width={"600px"}>
-        {
-          equipmentTrainingsResult.loading
-            ? <LinearProgress color="primary" />
-            : null
-        }
-        <Stack sx={{ width: "70%" }}>
+    <PrettyModal open={props.open} onClose={props.onClose} width={"1000px"}>
+      <Stack direction={"row"} justifyContent={"space-between"}>
+        <Stack sx={{ width: "69%" }} spacing={2}>
           {
-            makerspaceTrainings.length > 0
+            props.makerspaceTrainings.trainingModules.length > 0
               ? <Stack>
-                <Typography variant="h3">{equipmentTrainingsResult.data?.equipment.room.makerspace.name ?? "Loading Makerspace"} Trainings</Typography>
-                <Divider orientation="horizontal" />
+                <Typography variant="h5">{props.makerspaceTrainings.name} Requirements</Typography>
                 {
-                  makerspaceTrainings.map(moduleStatusMapper(user.passedModules, user.trainingHolds))
-                    .map((moduleStatus) => <TrainingModuleRow moduleStatus={moduleStatus} />)
+                  props.makerspaceTrainings.trainingModules.map(moduleStatusMapper(user.passedModules, user.trainingHolds))
+                    .map((moduleStatus) => <ModuleStatusRow ms={moduleStatus} />)
                 }
               </Stack>
               : null
           }
           {
-            roomTrainings.length > 0
+            props.roomTrainings.trainingModules.length > 0
               ? <Stack>
-                <Typography variant="h3">{equipmentTrainingsResult.data?.equipment.room.name ?? "Loading Room"} Trainings</Typography>
-                <Divider orientation="horizontal" />
+                <Typography variant="h5">{props.roomTrainings.name} Requirements</Typography>
                 {
-                  roomTrainings.map(moduleStatusMapper(user.passedModules, user.trainingHolds))
-                    .map((moduleStatus) => <TrainingModuleRow moduleStatus={moduleStatus} />)
+                  props.roomTrainings.trainingModules.map(moduleStatusMapper(user.passedModules, user.trainingHolds))
+                    .map((moduleStatus) => <ModuleStatusRow ms={moduleStatus} />)
                 }
               </Stack>
               : null
           }
           {
-            equipmentTrainings.length > 0
+            (props.equipmentTrainings.trainingModules.length > 0 || props.requiresInPerson)
               ? <Stack>
-                <Typography variant="h3">{equipmentTrainingsResult.data?.equipment.name ?? "Loading Equipment"} Trainings</Typography>
-                <Divider orientation="horizontal" />
+                <Typography variant="h5">{props.equipmentTrainings.name} Requirements</Typography>
                 {
-                  equipmentTrainings.map(moduleStatusMapper(user.passedModules, user.trainingHolds))
-                    .map((moduleStatus) => <TrainingModuleRow moduleStatus={moduleStatus} />)
+                  props.equipmentTrainings.trainingModules.map(moduleStatusMapper(user.passedModules, user.trainingHolds))
+                    .map((moduleStatus) => <ModuleStatusRow ms={moduleStatus} />)
+                }
+                {
+                  props.requiresInPerson
+                    ? <Stack direction={"row"} spacing={1} alignItems="center" padding="7px">
+                      {user.visitor ? (
+                        <RadioButtonUncheckedIcon color="secondary" />
+                      ) : hasApprovedAccessCheck ? (
+                        <CheckCircleIcon color="success" />
+                      ) : (
+                        <CloseIcon color="error" />
+                      )}
+                      <Typography variant="body2">Staff Sign-Off</Typography>
+                    </Stack>
+                    : null
                 }
               </Stack>
               : null
           }
-          {
-            equipmentTrainingsResult.data?.equipment.requiresInPerson
-              ? <Stack>
-                <Typography variant="h3">{equipmentTrainingsResult.data?.equipment.name ?? "Loading Equipment"} Check</Typography>
-                <Divider orientation="horizontal" />
-                <Stack direction={"row"} spacing={1} alignItems="center" padding="7px">
-                  {user.visitor ? (
-                    <RadioButtonUncheckedIcon color="secondary" />
-                  ) : hasApprovedAccessCheck ? (
-                    <CheckCircleIcon color="success" />
-                  ) : (
-                    <CloseIcon color="error" />
-                  )}
-                  <Typography variant="body2">Staff Sign-Off</Typography>
-                </Stack>{
 
-                }
-              </Stack>
-              : null
-          }
         </Stack>
-        <Divider orientation="vertical" />
-        <Stack sx={{ width: "30%" }}>
-
+        <Divider orientation="vertical" flexItem />
+        <Stack sx={{ width: "29%" }}>
+          {
+            <Typography textAlign={"center"}>you can use this :)</Typography>
+          }
         </Stack>
       </Stack>
     </PrettyModal>
