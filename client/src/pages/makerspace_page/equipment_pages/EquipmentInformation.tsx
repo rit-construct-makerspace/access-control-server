@@ -309,6 +309,17 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             }}
             isMobile={isMobile}
             staffMode={false}
+            makerspaceTrainings={{
+              id: -1,
+              name: "boo",
+              trainingModules: []
+            }}
+            roomTrainings={{
+              id: -1,
+              name: "hiss",
+              trainingModules: []
+            }}
+            preview={true}
           />
         </Box>
       </Stack>
