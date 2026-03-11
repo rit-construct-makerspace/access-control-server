@@ -184,8 +184,9 @@ export async function updateMaintenanceTicket(
   return await knex("MaintenanceTickets").update({ severity: severity, description: description }).where({ id: id });
 }
 
-export async function assignMaintenanceTicket(id: number, assignedID: number | null): Promise<number> {
-  return await knex("MaintenanceTickets").update({ assignedID: assignedID }).where({ id: id });
+export async function assignMaintenanceTicket(id: number, assignedID: number | null): Promise<MaintenanceTicketRow> {
+  const result = await knex("MaintenanceTickets").update({ assignedID: assignedID }).where({ id: id }).returning("*");
+  return result[0];
 }
 
 export async function advanceIntervalTickets(): Promise<MaintenanceTicketRow[]> {

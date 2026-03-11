@@ -4,7 +4,7 @@ import { MakerspaceRow } from "../db/tables.js";
 import { getRoomsByMakerspace } from "../repositories/Rooms/RoomRepository.js";
 import { MakerspaceInput } from "../schemas/makerspacesSchema.js";
 import * as HoursRepo from "../repositories/Makerspaces/MakerspaceHoursRepository.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { getItems, getItemsWhereStorefront } from "../repositories/Store/InventoryRepository.js";
 import * as DeviceRepo from "../repositories/Devices/DeviceRepository.js";
@@ -182,7 +182,7 @@ const MakerspacesResolver = {
       },
       { isAdmin }: ApolloContext
     ) => isAdmin(async (user) => {
-      createLog(`{user} archived makerspace ${args.id}`, "admin",
+      createUnassocaitedAuditLog(`{user} archived makerspace ${args.id}`, "admin",
         { id: user.id, label: getUsersFullName(user) }
       )
       return await archiveMakerspace(args.id);

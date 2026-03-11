@@ -101,7 +101,7 @@ const ReservationResolver = {
 
       if (!(user.manager.includes(room?.makerspaceID ?? -1) || user.admin)
         && (
-          !(await EquipmentRepo.hasTrainingModules(user, args.equipmentID))
+          !(await EquipmentRepo.hasTrainingModules(user.id, args.equipmentID))
           || (
             equipment.requiresInPerson && !(await AccessCheckRepo.hasApprovedAccessCheck(user.id, args.equipmentID))
           )

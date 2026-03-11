@@ -15,7 +15,7 @@ import context, { determineUser } from "./context.js";
 import path from "path";
 import * as schedule from "node-schedule";
 import { getUserByCardTagID, getUsersFullName } from "./repositories/Users/UserRepository.js";
-import { createLog } from "./repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { getReaderBySN, getReaderCertCA } from "./repositories/Readers/ReaderRepository.js";
 import morgan from "morgan"; //Log provider
 import { createRequire } from "module";
@@ -288,7 +288,7 @@ async function startServer() {
 
       if (fetchType === "internal" || fetchType === "staff" || fetchType === "all") {
         if (req.body.Key != process.env.INV_API_KEY) {
-          if (API_DEBUG_LOGGING) createLog("Inventory Get request failed with error '{error}'", "inventory", { id: 403, label: "Invalid Key" });
+          if (API_DEBUG_LOGGING) createUnassocaitedAuditLog("Inventory Get request failed with error '{error}'", "inventory", { id: 403, label: "Invalid Key" });
           return res.status(403).json({ error: "Invalid Key" }).send();
         }
 
@@ -357,7 +357,7 @@ async function startServer() {
       const user = req.body.UID ? await getUserByCardTagID(req.body.UID) : undefined;
 
       if (req.body.Key != process.env.INV_API_KEY) {
-        if (API_DEBUG_LOGGING) createLog("Inventory Add request failed with error '{error}'", "inventory", { id: 403, label: "Invalid Key" });
+        if (API_DEBUG_LOGGING) createUnassocaitedAuditLog("Inventory Add request failed with error '{error}'", "inventory", { id: 403, label: "Invalid Key" });
         return res.status(403).json({ error: "Invalid Key" }).send();
       }
 
@@ -373,18 +373,18 @@ async function startServer() {
         if (count > 0) {
           if (user) {
             await createLedger(user.id, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
-            await createLog(`{user} added ${count} ${count === 1 ? item.unit : item.pluralUnit} to the {inventory} inventory`, "inventory", { id: user.id, label: getUsersFullName(user) }, { id: item.id, label: item.name });
+            await createUnassocaitedAuditLog(`{user} added ${count} ${count === 1 ? item.unit : item.pluralUnit} to the {inventory} inventory`, "inventory", { id: user.id, label: getUsersFullName(user) }, { id: item.id, label: item.name });
           } else {
             await createLedger(undefined, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
-            await createLog(`User added ${count} ${count === 1 ? item.unit : item.pluralUnit} to the {inventory} inventory`, "inventory", { id: item.id, label: item.name });
+            await createUnassocaitedAuditLog(`User added ${count} ${count === 1 ? item.unit : item.pluralUnit} to the {inventory} inventory`, "inventory", { id: item.id, label: item.name });
           }
         } else {
           if (user) {
             await createLedger(user.id, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
-            await createLog(`{user} removed ${count * -1} ${count === 1 ? item.unit : item.pluralUnit} from the {inventory} inventory`, "inventory", { id: user.id, label: getUsersFullName(user) }, { id: item.id, label: item.name });
+            await createUnassocaitedAuditLog(`{user} removed ${count * -1} ${count === 1 ? item.unit : item.pluralUnit} from the {inventory} inventory`, "inventory", { id: user.id, label: getUsersFullName(user) }, { id: item.id, label: item.name });
           } else {
             await createLedger(undefined, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
-            await createLog(`User removed ${count * -1} ${count === 1 ? item.unit : item.pluralUnit} from the {inventory} inventory`, "inventory", { id: item.id, label: item.name });
+            await createUnassocaitedAuditLog(`User removed ${count * -1} ${count === 1 ? item.unit : item.pluralUnit} from the {inventory} inventory`, "inventory", { id: item.id, label: item.name });
           }
         }
       }
@@ -414,7 +414,7 @@ async function startServer() {
       const user = req.body.UID ? await getUserByCardTagID(req.body.UID) : undefined;
 
       if (req.body.Key != process.env.INV_API_KEY) {
-        if (API_DEBUG_LOGGING) createLog("Inventory Set request failed with error '{error}'", "inventory", { id: 403, label: "Invalid Key" });
+        if (API_DEBUG_LOGGING) createUnassocaitedAuditLog("Inventory Set request failed with error '{error}'", "inventory", { id: 403, label: "Invalid Key" });
         return res.status(403).json({ error: "Invalid Key" }).send();
       }
 
@@ -427,10 +427,10 @@ async function startServer() {
         await setItemAmount(id, count);
         if (user) {
           await createLedger(user.id, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
-          await createLog(`{user} set ${count} ${count === 1 ? item.unit : item.pluralUnit} as the {inventory} inventory`, "inventory", { id: user.id, label: getUsersFullName(user) }, { id: item.id, label: item.name });
+          await createUnassocaitedAuditLog(`{user} set ${count} ${count === 1 ? item.unit : item.pluralUnit} as the {inventory} inventory`, "inventory", { id: user.id, label: getUsersFullName(user) }, { id: item.id, label: item.name });
         } else {
           await createLedger(undefined, "Modify", item.pricePerUnit * count, undefined, "", [{ name: item.name, quantity: Number(count) }]);
-          await createLog(`User set ${count} ${count === 1 ? item.unit : item.pluralUnit} as the {inventory} inventory`, "inventory", { id: item.id, label: item.name });
+          await createUnassocaitedAuditLog(`User set ${count} ${count === 1 ? item.unit : item.pluralUnit} as the {inventory} inventory`, "inventory", { id: item.id, label: item.name });
         }
       } else {
         return res.status(403).json({ error: "Cannot have negative count" }).send();
@@ -508,7 +508,7 @@ async function startServer() {
 
     const numNotified = expiryNotices.length
 
-    createLog(`Trainings: Sent ${numNotified} expiry notices, and purged ${numPurged} expired trainings.`, "server")
+    createUnassocaitedAuditLog(`Trainings: Sent ${numNotified} expiry notices, and purged ${numPurged} expired trainings.`, "server")
 
   }
   /**
@@ -528,8 +528,8 @@ async function startServer() {
 
   const dailyJob = schedule.scheduleJob("0 0 4 * * *", async function () {
     console.log('Wiping daily records...');
-    if (API_DEBUG_LOGGING) await createLog('It is now 4:00am. Wiping Daily Temp Records...', "server")
-    await setDataPointValue(1, 0).then(async () => await createLog('Daily Visits reset.', "server"));
+    if (API_DEBUG_LOGGING) await createUnassocaitedAuditLog('It is now 4:00am. Wiping Daily Temp Records...', "server")
+    await setDataPointValue(1, 0).then(async () => await createUnassocaitedAuditLog('Daily Visits reset.', "server"));
 
     handleTrainingExpiriesAndEmails();
     //await pruneNullLengthEquipmentSessions().then(async () => await createLog('Unfinished Equipment Sessions pruned.', "server"));;
@@ -573,8 +573,7 @@ async function startServer() {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     )
-  }
-  );
+  });
 }
 
 startServer();

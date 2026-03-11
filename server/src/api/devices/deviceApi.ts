@@ -1,6 +1,8 @@
-import express from "express";
+import expressWs from 'express-ws';
 import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js"
 import * as CardAPI from "./cards/cardApi.js";
+import * as CoreAPI from "./core/coreApi.js";
+import * as FileAPI from "./files/fileApi.js";
 import { Device } from "../../models/devices/device.js";
 
 export async function authenticateDevice(device: Device, submittedKey: string): Promise<boolean> {
@@ -11,7 +13,7 @@ export async function authenticateDevice(device: Device, submittedKey: string): 
   return submittedKey === keyToMatch;
 }
 
-export function registerEndpoints(app: express.Application) {
+export function registerEndpoints(app: expressWs.Application) {
   // Authenticate any devices using the devices endpoint
   app.use("/api/devices", async function (req, res, next) {
     const SNHeader = 'device-sn';
@@ -35,4 +37,6 @@ export function registerEndpoints(app: express.Application) {
   })
 
   CardAPI.registerEndpoints(app);
+  CoreAPI.registerEndpoints(app);
+  FileAPI.registerEndpoints(app);
 }
