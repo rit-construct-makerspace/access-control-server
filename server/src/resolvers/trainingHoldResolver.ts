@@ -5,7 +5,7 @@
 
 import { ApolloContext } from "../context.js";
 import { TrainingHoldsRow } from "../db/tables.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getModuleByID } from "../repositories/Training/ModuleRepository.js";
 import { deleteTrainingHold, getTrainingHoldByID } from "../repositories/Training/TrainingHoldsRespository.js";
 import { getUserByID, getUsersFullName } from "../repositories/Users/UserRepository.js";
@@ -52,7 +52,7 @@ export const TrainingHoldResolver = {
         if (!recipient) throw Error("Recipient User does not exist.");
         const module = await getModuleByID(hold.moduleID)
         if (!module) throw Error("Held Module does not exist.");
-        await createLog("{user} has removed a hold on training {module} for {user}", "admin", {id: user.id, label: getUsersFullName(user)}, {id: module.id, label: module.name}, {id: recipient.id, label: getUsersFullName(recipient)});
+        await createUnassocaitedAuditLog("{user} has removed a hold on training {module} for {user}", "admin", { id: user.id, label: getUsersFullName(user) }, { id: module.id, label: module.name }, { id: recipient.id, label: getUsersFullName(recipient) });
         return await deleteTrainingHold(args.id);
       }),
   }

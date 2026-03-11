@@ -1,7 +1,7 @@
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as UserRepo from "../repositories/Users/UserRepository.js";
-import { createLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import assert from "assert";
 import { Room } from "../models/rooms/room.js";
@@ -72,7 +72,7 @@ const RoomResolvers = {
       isManagerFor(args.room.makerspaceID ?? -1, async (user: any) => {
         const newRoom = await RoomRepo.addRoom(args.room);
 
-        await createLog(
+        await createUnassocaitedAuditLog(
           "{user} created the {room} room.",
           "admin",
           { id: user.id, label: getUsersFullName(user) },
@@ -157,7 +157,7 @@ const RoomResolvers = {
 
       await RoomRepo.swipeIntoRoom(Number(args.roomID), user.id);
 
-      await createLog(
+      await createUnassocaitedAuditLog(
         "{user} was manually signed into {room}.",
         "welcome",
         { id: user.id, label: getUsersFullName(user) },

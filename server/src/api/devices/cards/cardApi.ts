@@ -1,4 +1,4 @@
-import express from "express";
+import expressWs from 'express-ws';
 import * as Atrium from "../../../integrations/atrium-integration/atrium.js";
 import { CurrencySource } from "../../../integrations/currency/types.js";
 import * as UserRepo from "../../../repositories/Users/UserRepository.js";
@@ -15,7 +15,7 @@ export enum DispenserError {
   OUT_OF_CARDS = "OUT_OF_CARDS"
 }
 
-export function registerEndpoints(app: express.Application) {
+export function registerEndpoints(app: expressWs.Application) {
 
   // Endpoint for associating cards
   app.post("/api/devices/cards/associate", async function (req, res) {
