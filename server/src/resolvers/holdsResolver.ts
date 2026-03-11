@@ -52,7 +52,7 @@ const HoldsResolvers = {
         );
 
         await UsersRepo.setActiveHold(Number(args.userID), true)
-        send_hold_placed_email(user.ritUsername + "@rit.edu", args.description);
+        send_hold_placed_email(userWithHold.ritUsername + "@rit.edu", args.description);
         return HoldsRepo.createHold(user.id, Number(args.userID), args.description);
       }),
 
