@@ -99,10 +99,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
               >
                 {/* Trainings & Access Check */}
                 <Stack width="100%" height={props.isMobile ? undefined : "135px"}>
-                  <Button onClick={() => setTrainingModal(true)}>training modal</Button>
                   <EquipmentTrainingModal
-                    open={trainingModal}
-                    onClose={() => setTrainingModal(false)}
                     makerspaceTrainings={props.makerspaceTrainings}
                     roomTrainings={props.roomTrainings}
                     equipmentTrainings={{
