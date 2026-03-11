@@ -38,7 +38,7 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
   const isMobile = useIsMobile();
   console.log("isMobile: " + isMobile);
 
-  if (props.equipmentTrainings.trainingModules.length === 0) {
+  if (props.equipmentTrainings.trainingModules.length === 0 && !props.requiresInPerson) {
     return;
   }
 
