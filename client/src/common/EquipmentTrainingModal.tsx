@@ -61,7 +61,7 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
 
   return (
     <Stack width={"100%"} height={"100%"} justifyContent={"center"} alignItems={"center"}>
-      <Stack width={"max-content"} alignItems={"center"} spacing={2}>
+      <Stack width={"max-content"} alignItems={"center"} justifyContent={"center"} spacing={2}>
         <Button
           onClick={() => setOpen(true)}
           startIcon={
@@ -86,25 +86,40 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
           sx={{
             width: "max-content"
           }}
+          disabled={user.visitor}
         >
           Training Checklist
         </Button>
-        <LinearProgress
-          variant="determinate"
-          value={percentComplete}
-          color={
-            totalReqsComplete !== totalRequirements
-              ? "primary"
-              : byExpiry.length > 0 && byExpiry[0].status === "Expiring Soon"
-                ? "warning"
-                : "success"
-          }
-          sx={{
-            width: "95%",
-            height: "8px"
-          }}
-        />
-        <Typography variant="subtitle1" fontWeight={"bold"}>{percentComplete}% Complete</Typography>
+        {
+          user.visitor
+            ? <Typography variant="subtitle1" fontWeight={"bold"}>Sign In to View Training Progress</Typography>
+            : <Stack alignItems={"center"} width={"100%"}>
+              <LinearProgress
+                variant="determinate"
+                value={percentComplete}
+                color={
+                  totalReqsComplete !== totalRequirements
+                    ? "primary"
+                    : byExpiry.length > 0 && byExpiry[0].status === "Expiring Soon"
+                      ? "warning"
+                      : "success"
+                }
+                sx={{
+                  width: "95%",
+                  height: "16px"
+                }}
+              />
+              <Typography variant="subtitle1" fontWeight={"bold"}>
+                {
+                  totalReqsComplete !== totalRequirements
+                    ? `${percentComplete}% Complete`
+                    : byExpiry.length > 0 && byExpiry[0].status === "Expiring Soon"
+                      ? "Expiring Soon!"
+                      : "All Set!"
+                }
+              </Typography>
+            </Stack>
+        }
       </Stack>
       <PrettyModal open={open} onClose={() => setOpen(false)} width={"1000px"}>
         <Stack spacing={2}>

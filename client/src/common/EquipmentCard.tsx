@@ -98,7 +98,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                 height="100%"
               >
                 {/* Trainings & Access Check */}
-                <Stack width="100%" height={props.isMobile ? undefined : "135px"}>
+                <Stack width="100%" height={props.isMobile ? undefined : "100%"}>
                   <EquipmentTrainingModal
                     makerspaceTrainings={props.makerspaceTrainings}
                     roomTrainings={props.roomTrainings}
