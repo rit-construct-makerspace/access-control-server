@@ -11,6 +11,8 @@ import ModuleStatusRow from "./ModuleStatusRow";
 import { useState } from "react";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
+import CircularProgressWithContent from "./CircularProgressWithContent";
+import CheckIcon from '@mui/icons-material/Check';
 
 interface EquipmentTrainingModalProps {
   makerspaceTrainings: {
@@ -69,7 +71,7 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
               ? <CloseIcon />
               : byExpiry.length > 0 && byExpiry[0].status === "Expiring Soon"
                 ? <HourglassBottomIcon />
-                : <CheckCircleIcon />
+                : <CheckIcon />
           }
           endIcon={
             <ArrowForwardIosIcon />
@@ -166,7 +168,7 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
                           {user.visitor ? (
                             <RadioButtonUncheckedIcon color="secondary" />
                           ) : hasApprovedAccessCheck ? (
-                            <CheckCircleIcon color="success" />
+                            <CheckIcon color="success" />
                           ) : (
                             <CloseIcon color="error" />
                           )}
@@ -181,7 +183,8 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
             </Stack>
             <Divider orientation="vertical" flexItem />
             <Stack sx={{ width: "29%" }} alignItems={"center"} spacing={2} justifyContent={"center"}>
-              <CircularProgress
+              <CircularProgressWithContent
+                enableTrackSlot
                 variant="determinate"
                 value={percentComplete}
                 color={
@@ -192,6 +195,14 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
                       : "success"
                 }
                 size={"125px"}
+                icon={
+                  totalReqsComplete !== totalRequirements
+                    ? <CloseIcon sx={{ width: "70%", height: "70%" }} color="error" />
+                    : byExpiry.length > 0 && byExpiry[0].status === "Expiring Soon"
+                      ? <HourglassBottomIcon sx={{ width: "70%", height: "70%" }} color="warning" />
+                      : <CheckIcon sx={{ width: "70%", height: "70%" }} color="success" />
+
+                }
               />
               <Stack alignItems={"center"} spacing={1}>
                 <Typography variant="subtitle1">

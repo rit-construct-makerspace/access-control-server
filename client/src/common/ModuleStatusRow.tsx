@@ -11,6 +11,7 @@ import { useQuery } from "@apollo/client";
 import { GET_PASSED_SUBMISSION } from "../queries/getSubmissions";
 import { useCurrentUser } from "./CurrentUserProvider.js";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import CheckIcon from '@mui/icons-material/Check';
 
 interface ModuleStatusRowProps {
   ms: ModuleStatus;
@@ -30,7 +31,7 @@ export default function ModuleStatusRow(props: ModuleStatusRowProps) {
         {user.visitor ? (
           <RadioButtonUncheckedIcon color="secondary" />
         ) : props.ms.status === "Passed" ? (
-          <CheckCircleIcon color="success" />
+          <CheckIcon color="success" />
         ) : props.ms.status === "Not taken" ? (
           <CloseIcon color="error" />
         ) : props.ms.status === "Expired" ? (
