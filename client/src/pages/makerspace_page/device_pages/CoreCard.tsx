@@ -1,12 +1,8 @@
-import { Autocomplete, Button, Card, IconButton, Link, Stack, TextField, Typography } from "@mui/material";
-import { AccessControllerState, Core, SET_CORE_STATE } from "../../../queries/deviceQueries";
+import { Button, Card, Link, Stack, Typography } from "@mui/material";
+import { Core } from "../../../queries/deviceQueries";
 import TimeAgo from "react-timeago";
 import LanIcon from '@mui/icons-material/Lan';
-import SendIcon from '@mui/icons-material/Send';
 import { useParams } from "react-router-dom";
-import { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { toast } from "react-toastify";
 
 interface CoreCardProps {
   core: Core;
@@ -14,19 +10,6 @@ interface CoreCardProps {
 
 export function CoreCard(props: CoreCardProps) {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
-
-  const [targetState, setTargetState] = useState<AccessControllerState | null>(null);
-  const [sendState] = useMutation(SET_CORE_STATE, { refetchQueries: ["GetMakerspaceWithDevices"] });
-
-  async function handleSendState() {
-    if (targetState === null) { return; }
-    try {
-      await sendState({ variables: { deviceID: props.core.device.id, targetState: targetState } });
-    } catch (e) {
-      toast.error("Failed to send state: " + e);
-      return;
-    }
-  }
 
   return (
     <Card variant="outlined">
