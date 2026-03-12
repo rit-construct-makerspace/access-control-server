@@ -1,7 +1,6 @@
-import { Accordion, AccordionDetails, AccordionSummary, Alert, Button, Card, CardContent, IconButton, Link, Typography } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Button, Card, CardContent, IconButton, Link, Typography } from "@mui/material";
 import { ModuleStatus } from "../../common/TrainingModuleUtils";
 import { Box, Stack } from "@mui/system";
-import ModuleStatusRow from "../../common/ModuleStatusRow";
 import { isManagerFor } from "../../common/PrivilegeUtils";
 import EditIcon from "@mui/icons-material/Edit";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";

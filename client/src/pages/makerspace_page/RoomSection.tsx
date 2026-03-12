@@ -1,11 +1,9 @@
-import { Alert, Divider, Grid, Stack, Typography } from "@mui/material";
+import { Grid, Stack, Typography } from "@mui/material";
 import Room from "../../types/Room";
 import Equipment from "../../types/Equipment";
 import EquipmentCard from "../../common/EquipmentCard";
-import { useCurrentUser } from "../../common/CurrentUserProvider";
-import { ModuleStatus, moduleStatusMapper, TrainingModule } from "../../common/TrainingModuleUtils";
+import { TrainingModule } from "../../common/TrainingModuleUtils";
 import { useIsMobile } from "../../common/IsMobileProvider";
-import ModuleStatusRow from "../../common/ModuleStatusRow";
 
 interface RoomSectionProps {
   room: Room;
@@ -21,7 +19,6 @@ interface RoomSectionProps {
 }
 
 export default function RoomSection(props: RoomSectionProps) {
-  const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
   const roomEquipment = props.room.equipment;
 
