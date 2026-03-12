@@ -162,7 +162,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                     </Button>
                     : props.equipment.byReservationOnly
                       ? <Button
-                        color="primary"
+                        color="secondary"
                         variant="contained"
                         size="small"
                         onClick={() => navigate(`/makerspace/${makerspaceID}/reserve/${props.equipment.id}`)}
@@ -172,15 +172,20 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                       </Button>
                       : null
                 }
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="info"
-                  onClick={() => window.open(props.equipment.sopUrl, "_blank")}
-                  sx={{ alignSelf: "flex-end", height: "100%" }}
-                >
-                  Learn More
-                </Button>
+                {
+                  props.equipment.sopUrl !== ""
+                    ? <Button
+                      size="small"
+                      variant="contained"
+                      color="info"
+                      onClick={() => window.open(props.equipment.sopUrl, "_blank")}
+                      sx={{ alignSelf: "flex-end", height: "100%" }}
+                    >
+                      Learn More
+                    </Button>
+                    : null
+                }
+
               </Stack>
             </Stack>
           </Stack>
