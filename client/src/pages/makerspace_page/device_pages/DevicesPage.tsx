@@ -16,7 +16,7 @@ export default function DevicesPage() {
   const dispensers: Dispenser[] = makerspaceWithDevicesResult.data?.makerspaceByID.dispensers ?? [];
 
   return (
-    <Stack>
+    <Stack padding={"10px"}>
       <title>{`${makerspaceWithDevicesResult.data?.makerspaceByID.name ? `${makerspaceWithDevicesResult.data.makerspaceByID.name}'s` : "Loading"} Devices`}</title>
       <Typography variant="h4">{`${makerspaceWithDevicesResult.data?.makerspaceByID.name ? `${makerspaceWithDevicesResult.data.makerspaceByID.name}'s` : "Loading"} Devices`}</Typography>
       <Typography variant="h5">Cores</Typography>
