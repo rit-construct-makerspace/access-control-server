@@ -3,6 +3,8 @@ import { Core } from "../../../queries/deviceQueries";
 import TimeAgo from "react-timeago";
 import LanIcon from '@mui/icons-material/Lan';
 import { useParams } from "react-router-dom";
+import { useState } from "react";
+import CoreDeploymentModal from "./CoreDeploymentModal";
 
 interface CoreCardProps {
   core: Core;
@@ -10,6 +12,8 @@ interface CoreCardProps {
 
 export function CoreCard(props: CoreCardProps) {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
+
+  const [open, setOpen] = useState(false);
 
   return (
     <Card variant="outlined">
@@ -53,9 +57,11 @@ export function CoreCard(props: CoreCardProps) {
           sx={{
             height: "min-content",
           }}
+          onClick={() => setOpen(true)}
         >
           Manage Deployment
         </Button>
+        <CoreDeploymentModal core={props.core} open={open} onClose={() => setOpen(false)} />
       </Stack>
     </Card>
   );
