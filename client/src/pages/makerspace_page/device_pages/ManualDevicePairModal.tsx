@@ -1,6 +1,6 @@
-import { Button, Checkbox, FormControlLabel, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Button, Checkbox, Divider, FormControlLabel, LinearProgress, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { PAIR_CORE } from "../../../queries/deviceQueries";
@@ -19,10 +19,11 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
   const [ssid, setSsid] = useState("");
   const [password, setPassword] = useState("");
 
+  const [paired, setPaired] = useState(false);
 
   const [pairCore, pairResult] = useMutation(PAIR_CORE);
 
-  const allowPair = device !== null && SN !== "" && ((useWifi && ssid !== "") || !useWifi);
+  const allowPair = device !== null && SN !== "" && ((useWifi && ssid !== "") || !useWifi) && !paired;
 
   async function handlePair() {
     await pairCore({
@@ -30,8 +31,9 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
         SN: SN,
         makerspaceID: Number(makerspaceID)
       }
-    })
-    console.log(pairResult);
+    });
+
+    setPaired(true);
   }
 
   function handleClose() {
@@ -41,15 +43,19 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
     setSsid("");
     setPassword("");
 
+    setPaired(false);
+
     props.onClose();
   }
+
+  useEffect(() => console.log(pairResult.data), [pairResult.data])
 
   return (
     <PrettyModal open={props.open} onClose={handleClose} width={"800px"}>
       <Stack width={"100%"} spacing={2}>
         <Typography variant="h4" textAlign={"center"}>Manually Pair Device</Typography>
         <Stack
-          spacing={1}
+          spacing={2}
         >
           <Typography variant="subtitle1">Hardware Identification</Typography>
           <ToggleButtonGroup
@@ -145,6 +151,26 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
             Cancel
           </Button>
         </Stack>
+        <Divider orientation="horizontal" flexItem />
+        {
+          paired
+            ? pairResult.data
+              ? <Typography>{
+                JSON.stringify({
+                  key: pairResult.data.pairCore,
+                  wifi: useWifi ? {
+                    ssid: ssid,
+                    password: password
+                  } : {
+                    ssid: "",
+                    password: ""
+                  },
+                  certCheckSum: ""
+                }, undefined, 2)
+              }</Typography>
+              : null
+            : <LinearProgress color="primary" />
+        }
       </Stack>
     </PrettyModal>
   );
