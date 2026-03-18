@@ -5,6 +5,7 @@ import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import * as UserRepo from "../repositories/Users/UserRepository.js";
 import * as CoreRepo from "../repositories/Devices/CoreRepository.js";
+import * as DispenserRepo from "../repositories/Devices/DispenserRepository.js";
 
 const DeviceResolver = {
   Core: {
@@ -88,6 +89,18 @@ const DeviceResolver = {
       return await core.setState(user, args.targetState);
     }),
 
+    pairGenericDevice: async (
+      _parent: any,
+      args: {
+        SN: string,
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (_user) => {
+      const device = await DeviceRepo.pairNewDevice(args.SN, args.makerspaceID);
+      return await device.generateKey();
+    }),
+
     pairCore: async (
       _parent: any,
       args: {
@@ -98,6 +111,18 @@ const DeviceResolver = {
     ) => isManagerFor(args.makerspaceID, async (_user) => {
       const newCore = await CoreRepo.pairNewCore(args.SN, args.makerspaceID);
       return await newCore.generateKey();
+    }),
+
+    pairDispenser: async (
+      _parent: any,
+      args: {
+        SN: string,
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (_user) => {
+      const newDispenser = await DispenserRepo.pairNewDispenser(args.SN, args.makerspaceID);
+      return await newDispenser.generateKey();
     })
   }
 };

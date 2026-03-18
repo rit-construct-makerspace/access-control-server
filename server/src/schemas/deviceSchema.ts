@@ -70,6 +70,8 @@ export const DeviceTypeDefs = gql`
 
   extend type Mutation {
     setCoreState(deviceID: Int!, targetState: CoreStateInput): Boolean
+    pairGenericDevice(SN: String!, makerspaceID: Int!): String!
     pairCore(SN: String!, makerspaceID: Int!): String!
+    pairDispenser(SN: String!, makerspaceID: Int!): String!
   }
 `;
