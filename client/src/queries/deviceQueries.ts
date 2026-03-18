@@ -68,9 +68,9 @@ export const PAIR_CORE = gql`
   }
 `;
 
-export const PAIR_GENERIC = gql`
-  mutation PairGeneric($SN: String!, $makerspaceID: Int!) {
-    pairGeneric(SN: $SN, makerspaceID: $makerspaceID)
+export const PAIR_GENERIC_DEVICE = gql`
+  mutation PairGenericDevice($SN: String!, $makerspaceID: Int!) {
+    pairGenericDevice(SN: $SN, makerspaceID: $makerspaceID)
   }
 `;
 

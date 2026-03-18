@@ -1,9 +1,9 @@
 import { Button, Checkbox, Divider, FormControlLabel, LinearProgress, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation } from "@apollo/client";
-import { PAIR_CORE, PAIR_DISPENSER, PAIR_GENERIC } from "../../../queries/deviceQueries";
+import { PAIR_CORE, PAIR_DISPENSER, PAIR_GENERIC_DEVICE } from "../../../queries/deviceQueries";
 
 interface ManualDevicePairModalProps {
   open: boolean;
@@ -21,7 +21,7 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
 
   const [paired, setPaired] = useState(false);
 
-  const [pairGeneric, pairGenericResult] = useMutation(PAIR_GENERIC);
+  const [pairGeneric, pairGenericResult] = useMutation(PAIR_GENERIC_DEVICE);
   const [pairCore, pairCoreResult] = useMutation(PAIR_CORE);
   const [pairDispenser, pairDispenserResult] = useMutation(PAIR_DISPENSER);
 
@@ -54,7 +54,7 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
   const pairedKey = useMemo(() => {
     switch (device) {
       case "generic":
-        return pairGenericResult.data?.pairGeneric;
+        return pairGenericResult.data?.pairGenericDevice;
       case "core":
         return pairCoreResult.data?.pairCore;
       case "dispenser":
