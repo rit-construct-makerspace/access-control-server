@@ -154,7 +154,7 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
         <Divider orientation="horizontal" flexItem />
         {
           paired
-            ? pairResult.data
+            ? (pairResult.data || pairResult.loading)
               ? <Typography>{
                 JSON.stringify({
                   key: pairResult.data.pairCore,
@@ -168,8 +168,8 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
                   certCheckSum: ""
                 }, undefined, 2)
               }</Typography>
-              : null
-            : <LinearProgress color="primary" />
+              : <LinearProgress color="primary" />
+            : null
         }
       </Stack>
     </PrettyModal>
