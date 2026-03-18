@@ -67,3 +67,15 @@ export const PAIR_CORE = gql`
     pairCore(SN: $SN, makerspaceID: $makerspaceID)
   }
 `;
+
+export const PAIR_GENERIC = gql`
+  mutation PairGeneric($SN: String!, $makerspaceID: Int!) {
+    pairGeneric(SN: $SN, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const PAIR_DISPENSER = gql`
+  mutation PairDispenser($SN: String!, $makerspaceID: Int!) {
+    pairDispenser(SN: $SN, makerspaceID: $makerspaceID)
+  }
+`;

@@ -1,9 +1,9 @@
 import { Button, Checkbox, Divider, FormControlLabel, LinearProgress, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useMutation } from "@apollo/client";
-import { PAIR_CORE } from "../../../queries/deviceQueries";
+import { PAIR_CORE, PAIR_DISPENSER, PAIR_GENERIC } from "../../../queries/deviceQueries";
 
 interface ManualDevicePairModalProps {
   open: boolean;
@@ -21,12 +21,15 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
 
   const [paired, setPaired] = useState(false);
 
-  const [pairCore, pairResult] = useMutation(PAIR_CORE);
+  const [pairGeneric, pairGenericResult] = useMutation(PAIR_GENERIC);
+  const [pairCore, pairCoreResult] = useMutation(PAIR_CORE);
+  const [pairDispenser, pairDispenserResult] = useMutation(PAIR_DISPENSER);
 
   const allowPair = device !== null && SN !== "" && ((useWifi && ssid !== "") || !useWifi) && !paired;
 
   async function handlePair() {
-    await pairCore({
+    const pairFunction = device === "generic" ? pairGeneric : device === "core" ? pairCore : pairDispenser;
+    await pairFunction({
       variables: {
         SN: SN,
         makerspaceID: Number(makerspaceID)
@@ -48,7 +51,18 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
     props.onClose();
   }
 
-  useEffect(() => console.log(pairResult.data), [pairResult.data])
+  const pairedKey = useMemo(() => {
+    switch (device) {
+      case "generic":
+        return pairGenericResult.data?.pairGeneric;
+      case "core":
+        return pairCoreResult.data?.pairCore;
+      case "dispenser":
+        return pairDispenserResult.data?.pairDispenser;
+      default:
+        return undefined;
+    }
+  }, [pairGenericResult.data, pairCoreResult.data, pairDispenserResult.data])
 
   return (
     <PrettyModal open={props.open} onClose={handleClose} width={"800px"}>
@@ -63,10 +77,10 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
             onChange={(_e, newValue) => setDevice(newValue ?? null)}
             color="primary"
             exclusive
+            disabled={paired}
           >
             <ToggleButton
               value={"generic"}
-              disabled
               fullWidth
             >
               Generic
@@ -79,7 +93,6 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
             </ToggleButton>
             <ToggleButton
               value={"dispenser"}
-              disabled
               fullWidth
             >
               Dispenser
@@ -91,6 +104,7 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
             fullWidth
             value={SN}
             onChange={(e) => setSN(e.target.value)}
+            disabled={paired}
           />
         </Stack>
         <Stack
@@ -102,6 +116,7 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
               <Checkbox
                 checked={useWifi}
                 onChange={(_e, checked) => setUseWifi(checked)}
+                disabled={paired}
               />
             }
             label={"Use WiFi"}
@@ -154,10 +169,10 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
         <Divider orientation="horizontal" flexItem />
         {
           paired
-            ? (pairResult.data || pairResult.loading)
+            ? (pairedKey && (!pairGenericResult.loading || !pairDispenserResult.loading || !pairCoreResult.loading))
               ? <Typography>{
                 JSON.stringify({
-                  key: pairResult.data.pairCore,
+                  key: pairedKey,
                   wifi: useWifi ? {
                     ssid: ssid,
                     password: password
