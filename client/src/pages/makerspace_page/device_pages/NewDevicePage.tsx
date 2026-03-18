@@ -50,7 +50,20 @@ export default function NewDevicePage() {
   return (
     <Stack spacing={2} padding={"10px 15px"}>
       <title>Pair Device</title>
-      <Typography variant="h3">{makerspaceResult.loading ? <Skeleton /> : `Pairing Device with ${makerspaceResult.data?.makerspaceByID.name ?? ""}`}</Typography>
+      <Stack
+        direction={"row"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
+        <Typography variant="h3">{makerspaceResult.loading ? <Skeleton /> : `Pairing Device with ${makerspaceResult.data?.makerspaceByID.name ?? ""}`}</Typography>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={() => setManualModal(true)}
+        >
+          Manually Pair Device
+        </Button>
+      </Stack>
       <Stack spacing={1}>
         <Typography variant="subtitle1">Device Type</Typography>
         <ToggleButtonGroup
