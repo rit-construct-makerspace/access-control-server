@@ -24,32 +24,41 @@ enum WSAPIError {
 export default class WSACSController {
   private static corePool: Map<number, ConnectionData> = new Map();
 
-  private static handleWsClose(event: ws.CloseEvent, deviceID: number) {
+  private static async handleWsClose(event: ws.CloseEvent, deviceID: number) {
     const connData = WSACSController.corePool.get(deviceID);
     try {
-      console.log("deviceID: ", deviceID);
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-close", event: event });
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-close", event: event });
       if (connData) {
         WSACSController.corePool.delete(deviceID);
       }
     } catch (e: any) {
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-close-error", error: e });
-      console.error(`WSACS: Close Exception: ${e}`)
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-close-error", error: e });
+      console.error(`WSACS: Device ${deviceID} Close Exception: ${e}`)
     }
   }
 
-  private static handleWsError(event: ws.ErrorEvent, deviceID: number) {
+  private static async handleWsError(event: ws.ErrorEvent, deviceID: number) {
     const connData = WSACSController.corePool.get(deviceID);
     try {
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-error", event: event });
-      console.error(`WSACS: websocket error: ${event.error} - ${event.type}: ${event.message}`);
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-error", event: event });
+      console.error(`WSACS: Device ${deviceID} websocket error: ${event.error} - ${event.type}: ${event.message}`);
     } catch (e) {
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-handle-error-error", error: e, event: event });
-      console.error(`WSACS: Error Handle Exception: ${e}`);
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-handle-error-error", error: e, event: event });
+      console.error(`WSACS: Device ${deviceID} Error Handle Exception: ${e}`);
     }
   }
 
   private static async handleWsMessage(event: ws.MessageEvent, deviceID: number) {
+
+    if (event.data === undefined || event.data === null || event.data === "null") {
+      const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
+      WSACSController.sendCoreResponse(response, deviceID);
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-empty-message", event: event });
+      return;
+    }
+
+    console.log("data: ", event.data);
+
     try {
       const request = parseRequest(event.data);
       if (request.authTo !== undefined) {
@@ -58,10 +67,10 @@ export default class WSACSController {
         WSACSController.sendCoreResponse(await handleCoreInfoRequest(request, deviceID), deviceID);
       } else if (request.message !== undefined) {
         // A message request does not require a response from the server
-        handleCoreMessageRequest(request, deviceID);
+        await handleCoreMessageRequest(request, deviceID);
       } else if (request.status !== undefined) {
         // A status request does not require a response from the server
-        handleCoreStatusRequest(request, deviceID);
+        await handleCoreStatusRequest(request, deviceID);
       } else {
         DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-message-unknown-type", event: event });
         const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
@@ -69,13 +78,11 @@ export default class WSACSController {
         return;
       }
 
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", event: event });
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", event: event });
 
     } catch (e) {
-      console.log("deviceID: ", deviceID)
-      console.log(`WSACS: Message Exception: ${e}`)
-      console.log(event);
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message-error", error: e, event: event });
+      console.error(`WSACS: Device ${deviceID} Message Exception: ${e}`)
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message-error", error: e, event: event });
       const response: WSACSServerPrompted = { error: WSACSServerError.SERVER_ERROR };
       WSACSController.sendCoreResponse(response, deviceID);
     }
@@ -86,7 +93,7 @@ export default class WSACSController {
     const deviceID = req.core?.deviceID;
     if (deviceID === undefined) {
       ws.close(WSAPIError.Protocol);
-      // DeviceLogRepo.createDeviceLog(undefined, DeviceLogSeverity.MEDIUM, { type: "ws-unknown-device-connect", request: req });
+      DeviceLogRepo.createDeviceLog(undefined, DeviceLogSeverity.MEDIUM, { type: "ws-unknown-device-connect", request: req });
       return;
     }
 
@@ -277,7 +284,7 @@ async function handleCoreMessageRequest(request: WSACSCoreUnprompted, deviceID: 
   }
 
   if (!request.message.auditLog) {
-    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", message: request.message.content });
+    await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", message: request.message.content });
     return;
   }
   if (typeof request.message.content !== "object") { // The message is an auditlog, should be an object
