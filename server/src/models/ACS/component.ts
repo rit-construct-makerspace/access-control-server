@@ -1,5 +1,6 @@
 
 export enum ACSComponentType {
+  LEGACY = 0b000,
   SWITCH_1_CHANNEL = 0b001,
   SWITCH_2_CHANNEL = 0b010,
   SWITCH_3_CHANNEL = 0b011,
