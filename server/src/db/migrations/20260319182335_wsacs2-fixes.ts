@@ -1,0 +1,24 @@
+import type { Knex } from "knex";
+
+
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema.alterTable("DeviceLogs", (t) => {
+    t.dropPrimary();
+    t.dropColumn("id");
+  });
+  await knex.schema.alterTable("DeviceLogs", (t) => {
+    t.increments("id").primary();
+  });
+}
+
+
+export async function down(knex: Knex): Promise<void> {
+  await knex.schema.alterTable("DeviceLogs", (t) => {
+    t.dropPrimary();
+    t.dropColumn("id");
+  });
+  await knex.schema.alterTable("DeviceLogs", (t) => {
+    t.integer("id").primary();
+  });
+}
+
