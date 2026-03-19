@@ -25,11 +25,12 @@ export default class WSACSController {
   private static corePool: Map<number, ConnectionData> = new Map();
 
   private static handleWsClose(event: ws.CloseEvent, deviceID: number) {
-    const connData = this.corePool.get(deviceID);
+    const connData = WSACSController.corePool.get(deviceID);
     try {
+      console.log("deviceID: ", deviceID);
       DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-close", event: event });
       if (connData) {
-        this.corePool.delete(deviceID);
+        WSACSController.corePool.delete(deviceID);
       }
     } catch (e: any) {
       DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-close-error", error: e });
@@ -38,7 +39,7 @@ export default class WSACSController {
   }
 
   private static handleWsError(event: ws.ErrorEvent, deviceID: number) {
-    const connData = this.corePool.get(deviceID);
+    const connData = WSACSController.corePool.get(deviceID);
     try {
       DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-error", event: event });
       console.error(`WSACS: websocket error: ${event.error} - ${event.type}: ${event.message}`);
@@ -78,7 +79,9 @@ export default class WSACSController {
       DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", event: event });
 
     } catch (e) {
-      console.error(`WSACS: Message Exception: ${e}`)
+      console.log("deviceID: ", deviceID)
+      console.log(`WSACS: Message Exception: ${e}`)
+      console.log(event);
       DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message-error", error: e, event: event });
       const response: WSACSServerPrompted = { error: WSACSServerError.SERVER_ERROR };
       WSACSController.sendCoreResponse(response, deviceID);
@@ -90,35 +93,37 @@ export default class WSACSController {
     const deviceID = req.core?.deviceID;
     if (deviceID === undefined) {
       ws.close(WSAPIError.Protocol);
-      DeviceLogRepo.createDeviceLog(undefined, DeviceLogSeverity.MEDIUM, { type: "ws-unknown-device-connect", request: req });
+      // DeviceLogRepo.createDeviceLog(undefined, DeviceLogSeverity.MEDIUM, { type: "ws-unknown-device-connect", request: req });
       return;
     }
-    const connData = this.corePool.get(deviceID);
+
+    const connData = WSACSController.corePool.get(deviceID);
+
     if (connData !== undefined) {
       connData.ws.close(WSAPIError.Protocol, "Core is attempting to reconnect");
       DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-reconnect" });
-      this.corePool.delete(deviceID);
+      WSACSController.corePool.delete(deviceID);
     }
 
-    this.corePool.set(deviceID, {
+    WSACSController.corePool.set(deviceID, {
       ws: ws,
       deviceID: deviceID
     });
 
-    ws.onclose = (event) => this.handleWsClose(event, deviceID);
-    ws.onerror = (event) => this.handleWsError(event, deviceID);
-    ws.onmessage = (event) => this.handleWsMessage(event, deviceID);
+    ws.onclose = (event) => WSACSController.handleWsClose(event, deviceID);
+    ws.onerror = (event) => WSACSController.handleWsError(event, deviceID);
+    ws.onmessage = (event) => WSACSController.handleWsMessage(event, deviceID);
   }
 
   static sendCoreRequest(payload: WSACSServerUnprompted, deviceID: number): boolean {
-    const connection = this.corePool.get(deviceID);
+    const connection = WSACSController.corePool.get(deviceID);
     if (connection === undefined) { return false; }
     connection.ws.send(JSON.stringify(payload));
     return true;
   }
 
   static sendCoreResponse(payload: WSACSServerPrompted, deviceID: number): boolean {
-    const connection = this.corePool.get(deviceID);
+    const connection = WSACSController.corePool.get(deviceID);
     if (connection === undefined) { return false; }
     connection.ws.send(JSON.stringify(payload));
     return true;
