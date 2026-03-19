@@ -51,13 +51,6 @@ export default class WSACSController {
 
   private static async handleWsMessage(event: ws.MessageEvent, deviceID: number) {
     try {
-      if (event.type !== "text") {
-        const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
-        WSACSController.sendCoreResponse(response, deviceID);
-        await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-nontext-message", event: event });
-        return;
-      }
-
       const request = parseRequest(event.data);
       if (request.authTo !== undefined) {
         WSACSController.sendCoreResponse(await handleCoreAuthToRequest(request, deviceID), deviceID);
