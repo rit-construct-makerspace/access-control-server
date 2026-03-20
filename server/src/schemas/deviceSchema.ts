@@ -81,12 +81,17 @@ export const DeviceTypeDefs = gql`
     SEAL
   }
 
+  input CoreFlagInput {
+    lockoutWhenIdle: Boolean!
+    restartWhenIdle: Boolean!
+  }
+
   extend type Mutation {
     setCoreState(deviceID: Int!, targetState: CoreStateInput): Boolean
     pairGenericDevice(SN: String!, makerspaceID: Int!): String!
     pairCore(SN: String!, makerspaceID: Int!): String!
     pairDispenser(SN: String!, makerspaceID: Int!): String!
     sendCoreAction(deviceID: Int!, action: CoreAction!): Boolean
-    sendCoreFlags(deviceID: Int!, flags: CoreFlags!): Boolean
+    sendCoreFlags(deviceID: Int!, flags: CoreFlagInput!): Boolean
   }
 `;
