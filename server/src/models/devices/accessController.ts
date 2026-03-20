@@ -46,9 +46,9 @@ export class AccessController implements AccessControllerRow {
     const rawUser = await UserRepo.getUserByIDOrUndefined(userID);
     if (rawUser === undefined) {
       if (log) {
-        UnlockAttemptRepo.createUnlockAttemptLog(undefined, "", undefined, "", false, AccessAttemptReason.UNKNOWN_USER);
+        await UnlockAttemptRepo.createUnlockAttemptLog(undefined, "", undefined, "", false, AccessAttemptReason.UNKNOWN_USER);
         const device = await this.getDevice();
-        AuditLogRepo.createAuditLog(
+        await AuditLogRepo.createAuditLog(
           `Unknown user failed to activate device {device}`,
           "auth",
           device?.makerspaceID,
@@ -62,9 +62,9 @@ export class AccessController implements AccessControllerRow {
     const instance = await EquipmentInstanceRepo.getInstanceByAccessControllerID(this.id);
     if (instance === undefined) {
       if (log) {
-        UnlockAttemptRepo.createUnlockAttemptLog(undefined, "", user.id, user.ritUsername, false, AccessAttemptReason.UNPAIRED);
+        await UnlockAttemptRepo.createUnlockAttemptLog(undefined, "", user.id, user.ritUsername, false, AccessAttemptReason.UNPAIRED);
         const device = await this.getDevice();
-        AuditLogRepo.createAuditLog(
+        await AuditLogRepo.createAuditLog(
           `{user} failed to activate unpaired device {device}`,
           "auth",
           device?.makerspaceID,
@@ -78,9 +78,9 @@ export class AccessController implements AccessControllerRow {
     const rawEquipment = await EquipmentRepo.getEquipmentOrUndefinedByID(instance.id);
     if (rawEquipment === undefined) {
       if (log) {
-        UnlockAttemptRepo.createUnlockAttemptLog(undefined, "", user.id, user.ritUsername, false, AccessAttemptReason.UNPAIRED);
+        await UnlockAttemptRepo.createUnlockAttemptLog(undefined, "", user.id, user.ritUsername, false, AccessAttemptReason.UNPAIRED);
         const device = await this.getDevice();
-        AuditLogRepo.createAuditLog(
+        await AuditLogRepo.createAuditLog(
           `{user} failed to activate unpaired device {device}`,
           "auth",
           device?.makerspaceID,
@@ -94,8 +94,8 @@ export class AccessController implements AccessControllerRow {
 
     const result = await equipment.hasAccess(user);
     if (log) {
-      UnlockAttemptRepo.createUnlockAttemptLog(equipment.id, equipment.name, user.id, user.ritUsername, result.hasAccess, result.reason);
-      AuditLogRepo.createAuditLog(
+      await UnlockAttemptRepo.createUnlockAttemptLog(equipment.id, equipment.name, user.id, user.ritUsername, result.hasAccess, result.reason);
+      await AuditLogRepo.createAuditLog(
         `{user} ${result.hasAccess ? "activated" : "failed to activate"} {equipment}${result.hasAccess ? "" : `with reason ${result.reason}`}`,
         "auth",
         await equipment.getMakerspaceID(),

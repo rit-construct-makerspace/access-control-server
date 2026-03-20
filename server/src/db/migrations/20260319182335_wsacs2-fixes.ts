@@ -9,6 +9,15 @@ export async function up(knex: Knex): Promise<void> {
     t.increments("id").primary();
   });
 
+  await knex.schema.alterTable("UnlockAttemptLogs", (t) => {
+    t.dropPrimary();
+    t.dropColumn("id");
+  });
+
+  await knex.schema.alterTable("UnlockAttemptLogs", (t) => {
+    t.increments("id").primary();
+  });
+
   if (!(await knex.schema.hasColumn("AccessControllers", "tempDuration"))) {
     await knex.schema.alterTable("AccessControllers", (t) => {
       t.integer("tempDuration").notNullable().defaultTo(0);

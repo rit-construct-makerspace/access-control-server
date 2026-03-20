@@ -57,8 +57,6 @@ export default class WSACSController {
       return;
     }
 
-    console.log("data: ", event.data);
-
     try {
       const request = parseRequest(event.data);
       if (request.authTo !== undefined) {
@@ -72,7 +70,7 @@ export default class WSACSController {
         // A status request does not require a response from the server
         await handleCoreStatusRequest(request, deviceID);
       } else {
-        DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-message-unknown-type", event: event });
+        await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-message-unknown-type", event: event });
         const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
         WSACSController.sendCoreResponse(response, deviceID);
         return;
@@ -146,7 +144,7 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
 
   const core = await CoreRepo.getCoreByDeviceID(deviceID);
   if (core === undefined) {
-    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-auth-core-not-found", request: request });
+    await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-auth-core-not-found", request: request });
     response.error = WSACSServerError.DEVICE_NOT_FOUND;
     return response;
   }
@@ -154,14 +152,14 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
   const user = await UserRepo.getUserByCardTagID(request.authTo.cardTagID);
   if (user === undefined) {
     const device = await DeviceRepo.getDeviceByID(deviceID);
-    AuditLogRepo.createAuditLog(
+    await AuditLogRepo.createAuditLog(
       `Unknown cardTag {conceal} failed to activate device {device}`,
       "auth",
       device?.makerspaceID,
       { id: 0, label: request.authTo.cardTagID },
       { id: deviceID, label: device?.name ?? "UNKNOWN DEVICE" }
     );
-    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-auth-user-not-found", request: request });
+    await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-auth-user-not-found", request: request });
     response.error = WSACSServerError.USER_NOT_FOUND;
     return response;
   }
@@ -309,10 +307,10 @@ async function handleCoreStatusRequest(request: WSACSCoreUnprompted, deviceID: n
   } else if (request.status.stateChange !== undefined) {
     await core.statusUpdate(request.status.currentCardTag === "" ? undefined : request.status.currentCardTag);
     for (let i = 0; i < request.status.stateChange.channels.length; i++) {
-      core.updateControllerState(request.status.stateChange.channels[i].channelID, request.status.stateChange.channels[i].toState);
+      await core.updateControllerState(request.status.stateChange.channels[i].channelID, request.status.stateChange.channels[i].toState);
     }
     // TODO: Log state change in state change table
-    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "state-change", request: request })
+    await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "state-change", request: request })
   }
 
   if (request.status.config !== undefined) {
