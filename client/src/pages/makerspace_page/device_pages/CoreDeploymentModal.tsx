@@ -1,6 +1,6 @@
 import { Autocomplete, Button, Checkbox, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
-import { Core, CoreActions, CoreInputMode, SEND_CORE_ACTION } from "../../../queries/deviceQueries";
+import { Core, CoreActions, CoreInputMode, SEND_CORE_ACTION, SEND_CORE_FLAGS } from "../../../queries/deviceQueries";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import { useState } from "react";
@@ -17,10 +17,11 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
 
   const [inputMode, setInputMode] = useState<CoreInputMode>(props.core.inputMode);
 
-  const [lockoutWhenIdle, setLockoutWhenIdle] = useState<boolean | undefined>(props.core.flags.lockWhenIdle);
+  const [lockWhenIdle, setLockWhenIdle] = useState<boolean | undefined>(props.core.flags.lockWhenIdle);
   const [restartWhenIdle, setRestartWhenIdle] = useState<boolean | undefined>(props.core.flags.restartWhenIdle);
 
   const [sendCoreAction] = useMutation(SEND_CORE_ACTION);
+  const [sendCoreFlags] = useMutation(SEND_CORE_FLAGS);
 
   async function handleSendCoreAction(action: CoreActions) {
     try {
@@ -33,6 +34,23 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
       toast.success("Command Sent!");
     } catch (e) {
       toast.error(`Failed to send command: ${e}`);
+    }
+  }
+
+  async function hanldeSendCoreFlags() {
+    try {
+      await sendCoreFlags({
+        variables: {
+          deviceID: props.core.device.id,
+          flags: {
+            lockWhenIdle: lockWhenIdle ?? false,
+            restartWhenIdle: restartWhenIdle ?? false
+          }
+        }
+      });
+      toast.success("Flags Sent!");
+    } catch (e) {
+      toast.error(`Failed to send flags: ${e}`);
     }
   }
 
@@ -75,8 +93,8 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={lockoutWhenIdle}
-                  onChange={(_e, checked) => setLockoutWhenIdle(checked)}
+                  checked={lockWhenIdle}
+                  onChange={(_e, checked) => setLockWhenIdle(checked)}
                   color="primary"
                 />
               }
@@ -96,6 +114,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
               variant="contained"
               color="secondary"
               endIcon={<SendIcon />}
+              onClick={hanldeSendCoreFlags}
             >
               Send Flags
             </Button>

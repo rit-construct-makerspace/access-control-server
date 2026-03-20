@@ -98,3 +98,9 @@ export const SEND_CORE_ACTION = gql`
     sendCoreAction(deviceID: $deviceID, action: $action)
   }
 `;
+
+export const SEND_CORE_FLAGS = gql`
+  mutation SendCoreFlags($deviceID: Int!, $flags: CoreFlags!) {
+    sendCoreFlags(deviceID: $deviceID, flags: $flags)
+  }
+`;
