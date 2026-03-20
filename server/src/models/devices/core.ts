@@ -49,8 +49,7 @@ export class Core extends Device implements CoreRow {
     try {
       await ShlugControl.sendState(executingUser, this.deviceID, targetState)
     } catch (e) {
-      console.log(`failed to parse id: ${e}`);
-      return false;
+      console.log(`failed to parse id for old wsacs: ${e}`);
     }
 
     const controllers = await this.getAccessControllers();
@@ -60,7 +59,7 @@ export class Core extends Device implements CoreRow {
       }
     };
 
-    WSACSController.sendCoreRequest(request, this.deviceID);
+    const success = WSACSController.sendCoreRequest(request, this.deviceID);
 
     return true;
   }

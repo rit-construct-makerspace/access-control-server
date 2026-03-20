@@ -29,7 +29,10 @@ export enum CoreStateChangeReason {
   AUTHED = "AUTHED",
   OVER_TEMP = "OVER_TEMP",
   CARD_REMOVED = "CARD_REMOVED",
-  COMMANDED = "COMMANDED"
+  COMMANDED = "COMMANDED",
+  LOCAL = "LOCAL",
+  INTEGRITY_FAIL = "INTEGRITY_FAIL",
+  FAULT = "FAULT"
 }
 
 export interface CoreFlags {

@@ -22,6 +22,7 @@ import PendingIcon from '@mui/icons-material/Pending';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
 import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { SET_CORE_STATE } from "../../../queries/deviceQueries";
 
 interface EquipmentInstanceCardProps {
   instance: EquipmentInstance;
@@ -56,8 +57,8 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   const currentReader: Reader | undefined = currentReaderResult.data?.reader;
 
 
-  const [sendCommandedState] = useMutation(SET_READER_STATE);
-  const [commandedState, setCommandedState] = useState<string>("Idle");
+  const [sendCommandedState] = useMutation(SET_CORE_STATE);
+  const [commandedState, setCommandedState] = useState<string>("IDLE");
 
   function generateDropdownOptions(): { id: number | undefined, name: string }[] {
     const options: { id: number | undefined, name: string }[] = [];
@@ -92,7 +93,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   }
   function setStateClicked(_e: any) {
     if (reader != null) {
-      sendCommandedState({ variables: { id: reader.id, state: commandedState } });
+      sendCommandedState({ variables: { deviceID: props.instance.accessController.device?.id, targetState: commandedState } });
     }
   }
 
@@ -163,10 +164,10 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
         }
         <Stack direction="row" justifyContent="space-between" alignItems={"center"} spacing={1}>
           <Select disabled={allowEdit || reader == null} size="small" defaultValue={currentReader?.state ?? "Idle"} value={commandedState} onChange={handleStateChange} fullWidth>
-            <MenuItem value="Idle">Idle</MenuItem>
-            <MenuItem value="Lockout">Lockout</MenuItem>
-            <MenuItem value="AlwaysOn">Always On</MenuItem>
-            <MenuItem value="Restart">Restart</MenuItem>
+            <MenuItem value="IDLE">Idle</MenuItem>
+            <MenuItem value="LOCKED_OUT">Lockout</MenuItem>
+            <MenuItem value="ALWAYS_ON">Always On</MenuItem>
+            <MenuItem value="RESTART">Restart</MenuItem>
           </Select>
           <IconButton disabled={allowEdit || reader == null} onClick={setStateClicked} color="secondary">
             <SendIcon />
