@@ -36,7 +36,7 @@ export enum CoreStateChangeReason {
 }
 
 export interface CoreFlags {
-  lockoutWhenIdle: boolean;
+  lockWhenIdle: boolean;
   restartWhenIdle: boolean;
 }
 

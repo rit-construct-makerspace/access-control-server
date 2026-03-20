@@ -3,8 +3,9 @@ import PrettyModal from "../../../common/PrettyModal";
 import { Core, CoreActions, CoreInputMode, SEND_CORE_ACTION } from "../../../queries/deviceQueries";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
+import SendIcon from '@mui/icons-material/Send';
 
 interface CoreDeploymentModalProps {
   core: Core;
@@ -15,6 +16,9 @@ interface CoreDeploymentModalProps {
 export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
 
   const [inputMode, setInputMode] = useState<CoreInputMode>(props.core.inputMode);
+
+  const [lockoutWhenIdle, setLockoutWhenIdle] = useState<boolean | undefined>(props.core.flags.lockWhenIdle);
+  const [restartWhenIdle, setRestartWhenIdle] = useState<boolean | undefined>(props.core.flags.restartWhenIdle);
 
   const [sendCoreAction] = useMutation(SEND_CORE_ACTION);
 
@@ -58,17 +62,43 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
               onChange={(e, newValue) => newValue !== null ? setInputMode(newValue) : {}}
               disableClearable
             />
+            <Button
+              variant="contained"
+              color="secondary"
+              endIcon={<SendIcon />}
+            >
+              Send Config
+            </Button>
           </Stack>
           <Stack spacing={1}>
             <Typography variant="subtitle1">Flags</Typography>
             <FormControlLabel
-              control={<Checkbox checked={props.core.flags.lockoutWhenIdle} color="primary" />}
+              control={
+                <Checkbox
+                  checked={lockoutWhenIdle}
+                  onChange={(_e, checked) => setLockoutWhenIdle(checked)}
+                  color="primary"
+                />
+              }
               label="Lockout When Idle"
             />
             <FormControlLabel
-              control={<Checkbox checked={props.core.flags.restartWhenIdle} color="primary" />}
+              control={
+                <Checkbox
+                  checked={restartWhenIdle}
+                  onChange={(_e, checked) => setRestartWhenIdle(checked)}
+                  color="primary"
+                />
+              }
               label="Restart When Idle"
             />
+            <Button
+              variant="contained"
+              color="secondary"
+              endIcon={<SendIcon />}
+            >
+              Send Flags
+            </Button>
           </Stack>
           <Stack spacing={1}>
             <Typography variant="subtitle1">Actions</Typography>
