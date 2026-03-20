@@ -149,6 +149,8 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
     return response;
   }
 
+  const controllers = await core.getAccessControllers();
+
   const user = await UserRepo.getUserByCardTagID(request.authTo.cardTagID);
   if (user === undefined) {
     const device = await DeviceRepo.getDeviceByID(deviceID);
@@ -160,11 +162,16 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
       { id: deviceID, label: device?.name ?? "UNKNOWN DEVICE" }
     );
     await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-auth-user-not-found", request: request });
-    response.error = WSACSServerError.USER_NOT_FOUND;
+
+    response.authTo.channels = controllers.map((controller) => ({
+      id: controller.channelID,
+      state: request.authTo?.state ?? AccessControllerState.FAULT,
+      approved: false,
+      reason: AccessAttemptReason.UNKNOWN_USER
+    }))
+
     return response;
   }
-
-  const controllers = await core.getAccessControllers();
 
   if (request.authTo.state === AccessControllerState.UNLOCKED) {
 
@@ -202,7 +209,7 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
       const accessAttempt = await controllers[i].canUnlock(user.id, true);
       response.authTo.channels.push({
         id: controllers[i].channelID,
-        state: accessAttempt.hasAccess ? AccessControllerState.UNLOCKED : controllers[i].state,
+        state: AccessControllerState.UNLOCKED,
         approved: accessAttempt.hasAccess,
         reason: accessAttempt.reason
       });
@@ -220,7 +227,7 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
       const controlAttempt = await controllers[i].canControl(user.id);
       response.authTo.channels.push({
         id: controllers[i].channelID,
-        state: controlAttempt.canControl ? request.authTo.state : controllers[i].state,
+        state: request.authTo.state,
         approved: controlAttempt.canControl,
         reason: controlAttempt.reason
       });
