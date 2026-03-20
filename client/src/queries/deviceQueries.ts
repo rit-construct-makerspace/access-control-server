@@ -15,9 +15,10 @@ export interface Device {
   makerspaceID: number;
 }
 
-enum CoreInputMode {
+export enum CoreInputMode {
   INSERT = "INSERT",
-  TEMP = "TEMP",
+  TEMP_PRESENT = "TEMP_PRESENT",
+  TEMP_REMOVE = "TEMP_REMOVE",
   TOGGLE = "TOGGLE"
 }
 

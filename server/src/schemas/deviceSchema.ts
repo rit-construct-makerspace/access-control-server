@@ -15,7 +15,8 @@ export const DeviceTypeDefs = gql`
 
   enum CoreInputMode {
     INSERT
-    TEMP
+    TEMP_PRESENT
+    TEMP_REMOVE
     TOGGLE
   }
 
