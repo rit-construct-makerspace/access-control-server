@@ -6,7 +6,7 @@ import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepos
 import * as UserRepo from "../repositories/Users/UserRepository.js";
 import * as CoreRepo from "../repositories/Devices/CoreRepository.js";
 import * as DispenserRepo from "../repositories/Devices/DispenserRepository.js";
-import { CoreActions, WSACSServerUnprompted } from "../models/api/WSACSFormats.js";
+import { CoreActions, CoreFlags, WSACSServerUnprompted } from "../models/api/WSACSFormats.js";
 import { EntityNotFound } from "../EntityNotFound.js";
 import WSACSController from "../models/api/WSACSController.js";
 
@@ -149,7 +149,30 @@ const DeviceResolver = {
         };
         return WSACSController.sendCoreRequest(command, args.deviceID);
       })
-    }
+    },
+
+    sendCoreFlags: async (
+      _parent: any,
+      args: {
+        deviceID: number,
+        flags: CoreFlags
+      },
+      { isManagerFor }: ApolloContext
+    ) => {
+      const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
+      if (core === undefined) {
+        throw new EntityNotFound(`Core with ID: ${args.deviceID} not found`);
+      }
+
+      return isManagerFor(core.makerspaceID, (_user) => {
+        const command: WSACSServerUnprompted = {
+          command: {
+            flags: args.flags
+          }
+        };
+        return WSACSController.sendCoreRequest(command, args.deviceID);
+      })
+    },
   }
 };
 

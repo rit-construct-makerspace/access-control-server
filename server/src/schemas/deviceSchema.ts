@@ -87,5 +87,6 @@ export const DeviceTypeDefs = gql`
     pairCore(SN: String!, makerspaceID: Int!): String!
     pairDispenser(SN: String!, makerspaceID: Int!): String!
     sendCoreAction(deviceID: Int!, action: CoreAction!): Boolean
+    sendCoreFlags(deviceID: Int!, flags: CoreFlags!): Boolean
   }
 `;
