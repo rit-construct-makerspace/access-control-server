@@ -29,7 +29,7 @@ export const DeviceTypeDefs = gql`
   }
 
   type CoreFlags {
-    lockoutWhenIdle: Boolean
+    lockWhenIdle: Boolean
     restartWhenIdle: Boolean
   }
 
@@ -82,7 +82,7 @@ export const DeviceTypeDefs = gql`
   }
 
   input CoreFlagInput {
-    lockoutWhenIdle: Boolean!
+    lockWhenIdle: Boolean!
     restartWhenIdle: Boolean!
   }
 
