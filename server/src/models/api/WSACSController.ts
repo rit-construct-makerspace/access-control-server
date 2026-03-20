@@ -302,7 +302,7 @@ async function handleCoreStatusRequest(request: WSACSCoreUnprompted, deviceID: n
   if (request.status.regular !== undefined) {
     await core.statusUpdate(request.status.currentCardTag === "" ? undefined : request.status.currentCardTag);
     for (let i = 0; i < request.status.regular.currentStates.length; i++) {
-      core.updateControllerState(request.status.regular.currentStates[i].channelID, request.status.regular.currentStates[i].state);
+      await core.updateControllerState(request.status.regular.currentStates[i].channelID, request.status.regular.currentStates[i].state);
     }
   } else if (request.status.stateChange !== undefined) {
     await core.statusUpdate(request.status.currentCardTag === "" ? undefined : request.status.currentCardTag);

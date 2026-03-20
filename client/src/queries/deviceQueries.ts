@@ -56,6 +56,12 @@ export interface Dispenser {
   device: Device;
 }
 
+export enum CoreActions {
+  RESTART = "RESTART",
+  SEAL = "SEAL",
+  IDENTIFY = "IDENTIFY"
+}
+
 export const SET_CORE_STATE = gql`
   mutation SetCoreState($deviceID: Int!, $targetState: CoreStateInput) {
     setCoreState(deviceID: $deviceID, targetState: $targetState)
@@ -77,5 +83,11 @@ export const PAIR_GENERIC_DEVICE = gql`
 export const PAIR_DISPENSER = gql`
   mutation PairDispenser($SN: String!, $makerspaceID: Int!) {
     pairDispenser(SN: $SN, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const SEND_CORE_ACTION = gql`
+  mutation SendCoreAction($deviceID: Int!, $action: CoreAction!) {
+    sendCoreAction(deviceID: $deviceID, action: $action)
   }
 `;
