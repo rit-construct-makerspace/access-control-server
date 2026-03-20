@@ -131,7 +131,13 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
         </Stack>
         {/* Deployment */}
         <Stack width={"66%"}>
-
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleSendCoreAction(CoreActions.SEAL)}
+          >
+            SEAL
+          </Button>
         </Stack>
       </Stack>
     </PrettyModal>
