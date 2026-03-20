@@ -28,6 +28,11 @@ export const DeviceTypeDefs = gql`
     FAULT
   }
 
+  type CoreFlags {
+    lockoutWhenIdle: Boolean!
+    restartWhenIdle: Boolean!
+  }
+
   type Core {
     deviceID: Int!
     channels: Int!
@@ -41,6 +46,7 @@ export const DeviceTypeDefs = gql`
     welcomeSpace: Makerspace
     activeUser: User
     state: AccessControllerState!
+    flags: CoreFlags!
   }
 
   enum DispenserError {
