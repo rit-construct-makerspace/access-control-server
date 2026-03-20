@@ -334,6 +334,10 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
           ritUsername
         }
         state
+        flags {
+          lockoutWhenIdle
+          restartWhenIdle
+        }
       }
       dispensers {
         cardsLeft

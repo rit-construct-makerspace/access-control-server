@@ -1,4 +1,4 @@
-import { Autocomplete, Button, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, Checkbox, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import { Core, CoreActions, CoreInputMode, SEND_CORE_ACTION } from "../../../queries/deviceQueries";
 import { useMutation } from "@apollo/client";
@@ -32,8 +32,6 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
     }
   }
 
-  useEffect(() => console.log(inputMode), [inputMode])
-
   return (
     <PrettyModal open={props.open} onClose={props.onClose} width={"800px"}>
       <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
@@ -63,6 +61,14 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
           </Stack>
           <Stack spacing={1}>
             <Typography variant="subtitle1">Flags</Typography>
+            <FormControlLabel
+              control={<Checkbox checked={props.core.flags.lockoutWhenIdle} color="primary" />}
+              label="Lockout When Idle"
+            />
+            <FormControlLabel
+              control={<Checkbox checked={props.core.flags.restartWhenIdle} color="primary" />}
+              label="Restart When Idle"
+            />
           </Stack>
           <Stack spacing={1}>
             <Typography variant="subtitle1">Actions</Typography>

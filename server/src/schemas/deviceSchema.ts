@@ -29,8 +29,8 @@ export const DeviceTypeDefs = gql`
   }
 
   type CoreFlags {
-    lockoutWhenIdle: Boolean!
-    restartWhenIdle: Boolean!
+    lockoutWhenIdle: Boolean
+    restartWhenIdle: Boolean
   }
 
   type Core {

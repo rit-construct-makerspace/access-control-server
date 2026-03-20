@@ -30,6 +30,11 @@ export enum AccessControllerState {
   FAULT = "FAULT"
 }
 
+export interface CoreFlags {
+  lockoutWhenIdle: boolean;
+  restartWhenIdle: boolean;
+}
+
 export interface Core {
   deviceID: number;
   channels: number;
@@ -43,6 +48,7 @@ export interface Core {
   welcomeSpace: FullMakerspace | undefined;
   activeUser: CurrentUser | undefined;
   state: AccessControllerState;
+  flags: CoreFlags;
 }
 
 enum DispenserError {
