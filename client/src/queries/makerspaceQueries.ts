@@ -335,7 +335,7 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
         }
         state
         flags {
-          lockoutWhenIdle
+          lockWhenIdle
           restartWhenIdle
         }
       }
