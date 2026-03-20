@@ -98,7 +98,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
                   color="primary"
                 />
               }
-              label="Lockout When Idle"
+              label="Lock When Idle"
             />
             <FormControlLabel
               control={
