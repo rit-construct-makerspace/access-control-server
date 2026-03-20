@@ -75,7 +75,7 @@ export class AccessController implements AccessControllerRow {
       return { hasAccess: false, reason: AccessAttemptReason.UNPAIRED };
     }
 
-    const rawEquipment = await EquipmentRepo.getEquipmentOrUndefinedByID(instance.id);
+    const rawEquipment = await EquipmentRepo.getEquipmentOrUndefinedByID(instance.equipmentID);
     if (rawEquipment === undefined) {
       if (log) {
         await UnlockAttemptRepo.createUnlockAttemptLog(undefined, "", user.id, user.ritUsername, false, AccessAttemptReason.UNPAIRED);
@@ -96,7 +96,7 @@ export class AccessController implements AccessControllerRow {
     if (log) {
       await UnlockAttemptRepo.createUnlockAttemptLog(equipment.id, equipment.name, user.id, user.ritUsername, result.hasAccess, result.reason);
       await AuditLogRepo.createAuditLog(
-        `{user} ${result.hasAccess ? "activated" : "failed to activate"} {equipment}${result.hasAccess ? "" : `with reason ${result.reason}`}`,
+        `{user} ${result.hasAccess ? "activated" : "failed to activate"} {equipment} ${result.hasAccess ? "" : `with reason ${result.reason}`}`,
         "auth",
         await equipment.getMakerspaceID(),
         { id: user.id, label: `${user.firstName} ${user.lastName}` },

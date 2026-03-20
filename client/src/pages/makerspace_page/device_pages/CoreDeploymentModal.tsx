@@ -136,7 +136,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
             color="primary"
             onClick={() => handleSendCoreAction(CoreActions.SEAL)}
           >
-            SEAL
+            SEAL Deployment
           </Button>
         </Stack>
       </Stack>
