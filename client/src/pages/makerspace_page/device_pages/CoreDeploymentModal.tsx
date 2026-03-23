@@ -55,7 +55,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
   }
 
   return (
-    <PrettyModal open={props.open} onClose={props.onClose} width={"800px"}>
+    <PrettyModal open={props.open} onClose={props.onClose} width={"1000px"}>
       <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
         <Typography variant="h5">{props.core.device.name}</Typography>
         <IconButton onClick={props.onClose}>
@@ -63,7 +63,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
         </IconButton>
       </Stack>
       <Typography variant="subtitle1">SN: {props.core.device.SN}</Typography>
-      <Stack direction={"row"} width={"100%"}>
+      <Stack direction={"row"} width={"100%"} spacing={4}>
         {/* Config & Flags */}
         <Stack width={"33%"} spacing={4}>
           <Stack spacing={1}>
