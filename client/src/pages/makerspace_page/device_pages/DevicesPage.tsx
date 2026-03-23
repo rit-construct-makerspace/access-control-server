@@ -9,14 +9,15 @@ import { CoreCard } from "./CoreCard";
 export default function DevicesPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
-  const makerspaceWithDevicesResult = useQuery(GET_MAKERSPACE_WITH_DEVICES, { variables: { id: makerspaceID } });
+  // Refresh this every 20 seconds
+  const makerspaceWithDevicesResult = useQuery(GET_MAKERSPACE_WITH_DEVICES, { variables: { id: makerspaceID }, pollInterval: 20000 });
 
   const genericDevices: Device[] = makerspaceWithDevicesResult.data?.makerspaceByID.genericDevices ?? [];
   const cores: Core[] = makerspaceWithDevicesResult.data?.makerspaceByID.cores ?? [];
   const dispensers: Dispenser[] = makerspaceWithDevicesResult.data?.makerspaceByID.dispensers ?? [];
 
   return (
-    <Stack>
+    <Stack padding={"10px"}>
       <title>{`${makerspaceWithDevicesResult.data?.makerspaceByID.name ? `${makerspaceWithDevicesResult.data.makerspaceByID.name}'s` : "Loading"} Devices`}</title>
       <Typography variant="h4">{`${makerspaceWithDevicesResult.data?.makerspaceByID.name ? `${makerspaceWithDevicesResult.data.makerspaceByID.name}'s` : "Loading"} Devices`}</Typography>
       <Typography variant="h5">Cores</Typography>

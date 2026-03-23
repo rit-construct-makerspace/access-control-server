@@ -15,7 +15,8 @@ export const DeviceTypeDefs = gql`
 
   enum CoreInputMode {
     INSERT
-    TEMP
+    TEMP_PRESENT
+    TEMP_REMOVE
     TOGGLE
   }
 
@@ -25,6 +26,11 @@ export const DeviceTypeDefs = gql`
     ALWAYS_ON
     LOCKED_OUT
     FAULT
+  }
+
+  type CoreFlags {
+    lockWhenIdle: Boolean
+    restartWhenIdle: Boolean
   }
 
   type Core {
@@ -40,6 +46,7 @@ export const DeviceTypeDefs = gql`
     welcomeSpace: Makerspace
     activeUser: User
     state: AccessControllerState!
+    flags: CoreFlags!
   }
 
   enum DispenserError {
@@ -60,6 +67,7 @@ export const DeviceTypeDefs = gql`
     channelID: Int!
     state: AccessControllerState!
     device: Device!
+    core: Core!
   }
 
   enum CoreStateInput {
@@ -68,8 +76,27 @@ export const DeviceTypeDefs = gql`
     LOCKED_OUT
   }
 
+  enum CoreAction {
+    RESTART
+    IDENTIFY
+    SEAL
+  }
+
+  extend type Query {
+    getAccessControllerByID(accessControllerID: Int!): AccessController
+  }
+
+  input CoreFlagInput {
+    lockWhenIdle: Boolean!
+    restartWhenIdle: Boolean!
+  }
+
   extend type Mutation {
     setCoreState(deviceID: Int!, targetState: CoreStateInput): Boolean
+    pairGenericDevice(SN: String!, makerspaceID: Int!): String!
     pairCore(SN: String!, makerspaceID: Int!): String!
+    pairDispenser(SN: String!, makerspaceID: Int!): String!
+    sendCoreAction(deviceID: Int!, action: CoreAction!): Boolean
+    sendCoreFlags(deviceID: Int!, flags: CoreFlagInput!): Boolean
   }
 `;

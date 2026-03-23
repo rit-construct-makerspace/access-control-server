@@ -24,39 +24,40 @@ enum WSAPIError {
 export default class WSACSController {
   private static corePool: Map<number, ConnectionData> = new Map();
 
-  private static handleWsClose(event: ws.CloseEvent, deviceID: number) {
-    const connData = this.corePool.get(deviceID);
+  private static async handleWsClose(event: ws.CloseEvent, deviceID: number) {
+    const connData = WSACSController.corePool.get(deviceID);
     try {
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-close", event: event });
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-close", event: event });
       if (connData) {
-        this.corePool.delete(deviceID);
+        WSACSController.corePool.delete(deviceID);
       }
     } catch (e: any) {
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-close-error", error: e });
-      console.error(`WSACS: Close Exception: ${e}`)
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-close-error", error: e });
+      console.error(`WSACS: Device ${deviceID} Close Exception: ${e}`)
     }
   }
 
-  private static handleWsError(event: ws.ErrorEvent, deviceID: number) {
-    const connData = this.corePool.get(deviceID);
+  private static async handleWsError(event: ws.ErrorEvent, deviceID: number) {
+    const connData = WSACSController.corePool.get(deviceID);
     try {
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-error", event: event });
-      console.error(`WSACS: websocket error: ${event.error} - ${event.type}: ${event.message}`);
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-error", event: event });
+      console.error(`WSACS: Device ${deviceID} websocket error: ${event.error} - ${event.type}: ${event.message}`);
     } catch (e) {
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-handle-error-error", error: e, event: event });
-      console.error(`WSACS: Error Handle Exception: ${e}`);
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-handle-error-error", error: e, event: event });
+      console.error(`WSACS: Device ${deviceID} Error Handle Exception: ${e}`);
     }
   }
 
   private static async handleWsMessage(event: ws.MessageEvent, deviceID: number) {
-    try {
-      if (event.type !== "text") {
-        const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
-        WSACSController.sendCoreResponse(response, deviceID);
-        await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-nontext-message", event: event });
-        return;
-      }
 
+    if (event.data === undefined || event.data === null || event.data === "null") {
+      const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
+      WSACSController.sendCoreResponse(response, deviceID);
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-empty-message", event: event });
+      return;
+    }
+
+    try {
       const request = parseRequest(event.data);
       if (request.authTo !== undefined) {
         WSACSController.sendCoreResponse(await handleCoreAuthToRequest(request, deviceID), deviceID);
@@ -64,22 +65,22 @@ export default class WSACSController {
         WSACSController.sendCoreResponse(await handleCoreInfoRequest(request, deviceID), deviceID);
       } else if (request.message !== undefined) {
         // A message request does not require a response from the server
-        handleCoreMessageRequest(request, deviceID);
+        await handleCoreMessageRequest(request, deviceID);
       } else if (request.status !== undefined) {
         // A status request does not require a response from the server
-        handleCoreStatusRequest(request, deviceID);
+        await handleCoreStatusRequest(request, deviceID);
       } else {
-        DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-message-unknown-type", event: event });
+        await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.HIGH, { type: "ws-message-unknown-type", event: event });
         const response: WSACSServerPrompted = { error: WSACSServerError.BAD_REQUEST };
         WSACSController.sendCoreResponse(response, deviceID);
         return;
       }
 
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", event: event });
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", event: event });
 
     } catch (e) {
-      console.error(`WSACS: Message Exception: ${e}`)
-      DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message-error", error: e, event: event });
+      console.error(`WSACS: Device ${deviceID} Message Exception: ${e}`)
+      await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message-error", error: e, event: event });
       const response: WSACSServerPrompted = { error: WSACSServerError.SERVER_ERROR };
       WSACSController.sendCoreResponse(response, deviceID);
     }
@@ -93,32 +94,34 @@ export default class WSACSController {
       DeviceLogRepo.createDeviceLog(undefined, DeviceLogSeverity.MEDIUM, { type: "ws-unknown-device-connect", request: req });
       return;
     }
-    const connData = this.corePool.get(deviceID);
+
+    const connData = WSACSController.corePool.get(deviceID);
+
     if (connData !== undefined) {
       connData.ws.close(WSAPIError.Protocol, "Core is attempting to reconnect");
       DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-reconnect" });
-      this.corePool.delete(deviceID);
+      WSACSController.corePool.delete(deviceID);
     }
 
-    this.corePool.set(deviceID, {
+    WSACSController.corePool.set(deviceID, {
       ws: ws,
       deviceID: deviceID
     });
 
-    ws.onclose = (event) => this.handleWsClose(event, deviceID);
-    ws.onerror = (event) => this.handleWsError(event, deviceID);
-    ws.onmessage = (event) => this.handleWsMessage(event, deviceID);
+    ws.onclose = (event) => WSACSController.handleWsClose(event, deviceID);
+    ws.onerror = (event) => WSACSController.handleWsError(event, deviceID);
+    ws.onmessage = (event) => WSACSController.handleWsMessage(event, deviceID);
   }
 
   static sendCoreRequest(payload: WSACSServerUnprompted, deviceID: number): boolean {
-    const connection = this.corePool.get(deviceID);
+    const connection = WSACSController.corePool.get(deviceID);
     if (connection === undefined) { return false; }
     connection.ws.send(JSON.stringify(payload));
     return true;
   }
 
   static sendCoreResponse(payload: WSACSServerPrompted, deviceID: number): boolean {
-    const connection = this.corePool.get(deviceID);
+    const connection = WSACSController.corePool.get(deviceID);
     if (connection === undefined) { return false; }
     connection.ws.send(JSON.stringify(payload));
     return true;
@@ -141,27 +144,34 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
 
   const core = await CoreRepo.getCoreByDeviceID(deviceID);
   if (core === undefined) {
-    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-auth-core-not-found", request: request });
+    await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "ws-auth-core-not-found", request: request });
     response.error = WSACSServerError.DEVICE_NOT_FOUND;
     return response;
   }
 
+  const controllers = await core.getAccessControllers();
+
   const user = await UserRepo.getUserByCardTagID(request.authTo.cardTagID);
   if (user === undefined) {
     const device = await DeviceRepo.getDeviceByID(deviceID);
-    AuditLogRepo.createAuditLog(
+    await AuditLogRepo.createAuditLog(
       `Unknown cardTag {conceal} failed to activate device {device}`,
       "auth",
       device?.makerspaceID,
       { id: 0, label: request.authTo.cardTagID },
       { id: deviceID, label: device?.name ?? "UNKNOWN DEVICE" }
     );
-    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-auth-user-not-found", request: request });
-    response.error = WSACSServerError.USER_NOT_FOUND;
+    await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-auth-user-not-found", request: request });
+
+    response.authTo.channels = controllers.map((controller) => ({
+      id: controller.channelID,
+      state: request.authTo?.state ?? AccessControllerState.FAULT,
+      approved: false,
+      reason: AccessAttemptReason.UNKNOWN_USER
+    }))
+
     return response;
   }
-
-  const controllers = await core.getAccessControllers();
 
   if (request.authTo.state === AccessControllerState.UNLOCKED) {
 
@@ -199,7 +209,7 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
       const accessAttempt = await controllers[i].canUnlock(user.id, true);
       response.authTo.channels.push({
         id: controllers[i].channelID,
-        state: accessAttempt.hasAccess ? AccessControllerState.UNLOCKED : controllers[i].state,
+        state: AccessControllerState.UNLOCKED,
         approved: accessAttempt.hasAccess,
         reason: accessAttempt.reason
       });
@@ -217,7 +227,7 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
       const controlAttempt = await controllers[i].canControl(user.id);
       response.authTo.channels.push({
         id: controllers[i].channelID,
-        state: controlAttempt.canControl ? request.authTo.state : controllers[i].state,
+        state: request.authTo.state,
         approved: controlAttempt.canControl,
         reason: controlAttempt.reason
       });
@@ -279,14 +289,15 @@ async function handleCoreMessageRequest(request: WSACSCoreUnprompted, deviceID: 
   }
 
   if (!request.message.auditLog) {
-    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", message: request.message.content });
+    await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", message: request.message.content });
     return;
   }
+
   if (typeof request.message.content !== "object") { // The message is an auditlog, should be an object
     return;
   }
 
-  await AuditLogRepo.createUnassocaitedAuditLog(request.message.content.message, request.message.content.category, ...request.message.content.entities);
+  await AuditLogRepo.createUnassocaitedAuditLog(request.message.content.message, request.message.content.category);
   return;
 }
 
@@ -297,17 +308,17 @@ async function handleCoreStatusRequest(request: WSACSCoreUnprompted, deviceID: n
   }
 
   if (request.status.regular !== undefined) {
-    await core.statusUpdate(request.status.currentCardTag === "" ? undefined : request.status.currentCardTag);
+    await core.statusUpdate(request.status.currentCardTag);
     for (let i = 0; i < request.status.regular.currentStates.length; i++) {
-      core.updateControllerState(request.status.regular.currentStates[i].channelID, request.status.regular.currentStates[i].state);
+      await core.updateControllerState(request.status.regular.currentStates[i].channelID, request.status.regular.currentStates[i].state);
     }
   } else if (request.status.stateChange !== undefined) {
-    await core.statusUpdate(request.status.currentCardTag === "" ? undefined : request.status.currentCardTag);
+    await core.statusUpdate(request.status.currentCardTag);
     for (let i = 0; i < request.status.stateChange.channels.length; i++) {
-      core.updateControllerState(request.status.stateChange.channels[i].channelID, request.status.stateChange.channels[i].toState);
+      await core.updateControllerState(request.status.stateChange.channels[i].channelID, request.status.stateChange.channels[i].toState);
     }
     // TODO: Log state change in state change table
-    DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "state-change", request: request })
+    await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "state-change", request: request })
   }
 
   if (request.status.config !== undefined) {
