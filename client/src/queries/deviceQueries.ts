@@ -51,6 +51,15 @@ export interface Core {
   flags: CoreFlags;
 }
 
+export interface AccessController {
+  id: number;
+  channelID: number;
+  deviceID: number;
+  state: AccessControllerState;
+  device: Device;
+  core: Core;
+}
+
 enum DispenserError {
   CARD_STUCK = "CARD_STUCK",
   OUT_OF_CARDS = "OUT_OF_CARDS"
@@ -114,6 +123,14 @@ export const GET_ACCESS_CONTROLLER_BY_ID = gql`
       device {
         id
         name
+      }
+      core {
+        deviceID
+        activeUser {
+          id
+          firstName
+          lastName
+        }
       }
     }
   }

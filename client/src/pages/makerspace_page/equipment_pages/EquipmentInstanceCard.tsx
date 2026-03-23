@@ -22,7 +22,7 @@ import PendingIcon from '@mui/icons-material/Pending';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
 import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
 import { useIsMobile } from "../../../common/IsMobileProvider";
-import { SET_CORE_STATE } from "../../../queries/deviceQueries";
+import { AccessController, AccessControllerState, GET_ACCESS_CONTROLLER_BY_ID, SET_CORE_STATE } from "../../../queries/deviceQueries";
 
 interface EquipmentInstanceCardProps {
   instance: EquipmentInstance;
@@ -30,9 +30,6 @@ interface EquipmentInstanceCardProps {
 
 export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps) {
   const isMobile = useIsMobile();
-
-  const unpairedReaderResult = useQuery(GET_UNPAIRED_READERS)
-  const unpairedReaders: Reader[] | null = unpairedReaderResult?.data?.unpairedReaders;
 
   const [deleteInstance] = useMutation(DELETE_EQUIPMENT_INSTANCE, {
     refetchQueries: ["EquipmentInstances", "GetUnpairedReaders"]
@@ -48,13 +45,12 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   const [allowEdit, setAllowEdit] = useState(false);
   const [name, setName] = useState<string>(props.instance.name);
   const [status, setStatus] = useState<InstanceStatus>(props.instance.status);
-  const [reader, setReader] = useState<{ id: number, name: string } | null>(props.instance.reader);
 
-  const currentReaderResult = useQuery(GET_READER_BY_ID, {
-    pollInterval: 2000,
-    variables: { id: props.instance.reader?.id },
+  const currentAccessControllerResult = useQuery(GET_ACCESS_CONTROLLER_BY_ID, {
+    pollInterval: 15000,
+    variables: { accessControllerID: props.instance.accessController?.id }
   });
-  const currentReader: Reader | undefined = currentReaderResult.data?.reader;
+  const currentAccessController: AccessController | undefined = currentAccessControllerResult.data?.getAccessControllerByID;
 
 
   const [sendCommandedState] = useMutation(SET_CORE_STATE);
@@ -63,36 +59,35 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   function generateDropdownOptions(): { id: number | undefined, name: string }[] {
     const options: { id: number | undefined, name: string }[] = [];
 
-    if (props.instance.reader) {
-      options.push({ name: props.instance.reader.name + " (Active)", id: props.instance.reader.id });
-      options.push({ name: "Unpair From " + props.instance.reader.name, id: undefined });
-    }
+    // if (props.instance.reader) {
+    //   options.push({ name: props.instance.reader.name + " (Active)", id: props.instance.reader.id });
+    //   options.push({ name: "Unpair From " + props.instance.reader.name, id: undefined });
+    // }
 
-    if (unpairedReaders) {
-      const asOptions = unpairedReaders.map((reader: Reader) => ({ id: reader.id, name: reader.name }));
-      options.push(...asOptions);
-    }
+    // if (unpairedReaders) {
+    //   const asOptions = unpairedReaders.map((reader: Reader) => ({ id: reader.id, name: reader.name }));
+    //   options.push(...asOptions);
+    // }
 
     return options;
   }
 
   async function handleSave() {
     setAllowEdit(false);
-    updateInstance({ variables: { id: props.instance.id, name: name, status: status, readerID: reader?.id ?? null } })
+    updateInstance({ variables: { id: props.instance.id, name: name, status: status } })
   }
 
   async function handleCancel() {
     setAllowEdit(false);
     setName(props.instance.name);
     setStatus(props.instance.status);
-    setReader(props.instance.reader);
   }
 
   function handleStateChange(e: any) {
     setCommandedState(e.target.value);
   }
   function setStateClicked(_e: any) {
-    if (reader != null) {
+    if (currentAccessController != null) {
       sendCommandedState({ variables: { deviceID: props.instance.accessController.device?.id, targetState: commandedState } });
     }
   }
@@ -103,11 +98,11 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   }
 
   function activeUserDisplay() {
-    if (!currentReader) {
+    if (!currentAccessController) {
       return "No User";
     }
-    if (!currentReader.user) {
-      if (currentReader.state === "AlwaysOn" || currentReader.state === "Unlocked") {
+    if (!currentAccessController.core?.activeUser) {
+      if (currentAccessController.state === AccessControllerState.ALWAYS_ON || AccessControllerState.UNLOCKED) {
         return "Unlocked with no user";
       } else {
         return "No User";
@@ -115,7 +110,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
     }
     return <Stack direction={"row"}>
       User:&nbsp;
-      <AuditLogEntity entityCode={`user:${currentReader.user.id}:${currentReader.user.firstName} ${currentReader.user.lastName}`} />
+      <AuditLogEntity entityCode={`user:${currentAccessController.core?.activeUser.id}:${currentAccessController.core?.activeUser?.firstName} ${currentAccessController.core?.activeUser?.lastName}`} />
     </Stack>
   }
 
@@ -143,7 +138,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
         <Stack alignContent={"center"} alignItems={"center"}>
           {activeUserDisplay()}
         </Stack>
-        {
+        {/* {
           allowEdit
             ? <Autocomplete
               renderInput={
@@ -161,15 +156,14 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
                 <span>Paired with: <AuditLogEntity entityCode={`access_device:${reader.id}:${reader.name}`} /></span>
                 : <Alert severity="warning" variant="filled">No Reader Paired</Alert>}
             </Typography>
-        }
+        } */}
         <Stack direction="row" justifyContent="space-between" alignItems={"center"} spacing={1}>
-          <Select disabled={allowEdit || reader == null} size="small" defaultValue={currentReader?.state ?? "Idle"} value={commandedState} onChange={handleStateChange} fullWidth>
-            <MenuItem value="IDLE">Idle</MenuItem>
-            <MenuItem value="LOCKED_OUT">Lockout</MenuItem>
-            <MenuItem value="ALWAYS_ON">Always On</MenuItem>
-            <MenuItem value="RESTART">Restart</MenuItem>
+          <Select disabled={allowEdit || currentAccessController === undefined} size="small" defaultValue={currentAccessController?.state ?? AccessControllerState.IDLE} value={commandedState} onChange={handleStateChange} fullWidth>
+            <MenuItem value={AccessControllerState.IDLE}>Idle</MenuItem>
+            <MenuItem value={AccessControllerState.LOCKED_OUT}>Locked Out</MenuItem>
+            <MenuItem value={AccessControllerState.ALWAYS_ON}>Always On</MenuItem>
           </Select>
-          <IconButton disabled={allowEdit || reader == null} onClick={setStateClicked} color="secondary">
+          <IconButton disabled={allowEdit || currentAccessController === undefined} onClick={setStateClicked} color="secondary">
             <SendIcon />
           </IconButton>
         </Stack>
