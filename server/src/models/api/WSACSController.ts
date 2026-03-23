@@ -292,11 +292,12 @@ async function handleCoreMessageRequest(request: WSACSCoreUnprompted, deviceID: 
     await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.LOW, { type: "ws-message", message: request.message.content });
     return;
   }
+
   if (typeof request.message.content !== "object") { // The message is an auditlog, should be an object
     return;
   }
 
-  await AuditLogRepo.createUnassocaitedAuditLog(request.message.content.message, request.message.content.category, ...request.message.content.entities);
+  await AuditLogRepo.createUnassocaitedAuditLog(request.message.content.message, request.message.content.category);
   return;
 }
 
