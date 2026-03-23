@@ -102,7 +102,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
       return "No User";
     }
     if (!currentAccessController.core?.activeUser) {
-      if (currentAccessController.state === AccessControllerState.ALWAYS_ON || AccessControllerState.UNLOCKED) {
+      if (currentAccessController.state === AccessControllerState.ALWAYS_ON || currentAccessController.state === AccessControllerState.UNLOCKED) {
         return "Unlocked with no user";
       } else {
         return "No User";
