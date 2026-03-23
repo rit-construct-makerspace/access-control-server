@@ -67,6 +67,7 @@ export const DeviceTypeDefs = gql`
     channelID: Int!
     state: AccessControllerState!
     device: Device!
+    core: Core!
   }
 
   enum CoreStateInput {
@@ -79,6 +80,10 @@ export const DeviceTypeDefs = gql`
     RESTART
     IDENTIFY
     SEAL
+  }
+
+  extend type Query {
+    getAccessControllerByID(accessControllerID: Int!): AccessController
   }
 
   input CoreFlagInput {

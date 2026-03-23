@@ -75,6 +75,26 @@ const DeviceResolver = {
       { isStaff }: ApolloContext
     ) => isStaff(async (_user) => (
       await DeviceRepo.getDeviceByID(parent.deviceID)
+    )),
+
+    core: async (
+      parent: AccessControllerRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => (
+      await CoreRepo.getCoreByDeviceID(parent.deviceID)
+    ))
+  },
+
+  Query: {
+    getAccessControllerByID: async (
+      _parent: any,
+      args: {
+        accessControllerID: number
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => (
+      await ACRepo.getAccessControllerByID(args.accessControllerID)
     ))
   },
 

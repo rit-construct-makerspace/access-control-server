@@ -104,3 +104,17 @@ export const SEND_CORE_FLAGS = gql`
     sendCoreFlags(deviceID: $deviceID, flags: $flags)
   }
 `;
+
+export const GET_ACCESS_CONTROLLER_BY_ID = gql`
+  query GetAccessControllerByID($accessControllerID: Int!) {
+    getAccessControllerByID(accessControllerID: $accessControllerID) {
+      id
+      channelID
+      state
+      device {
+        id
+        name
+      }
+    }
+  }
+`;
