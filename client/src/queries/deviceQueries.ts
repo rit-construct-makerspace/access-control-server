@@ -15,9 +15,10 @@ export interface Device {
   makerspaceID: number;
 }
 
-enum CoreInputMode {
+export enum CoreInputMode {
   INSERT = "INSERT",
-  TEMP = "TEMP",
+  TEMP_PRESENT = "TEMP_PRESENT",
+  TEMP_REMOVE = "TEMP_REMOVE",
   TOGGLE = "TOGGLE"
 }
 
@@ -27,6 +28,11 @@ export enum AccessControllerState {
   ALWAYS_ON = "ALWAYS_ON",
   LOCKED_OUT = "LOCKED_OUT",
   FAULT = "FAULT"
+}
+
+export interface CoreFlags {
+  lockWhenIdle?: boolean;
+  restartWhenIdle?: boolean;
 }
 
 export interface Core {
@@ -42,6 +48,16 @@ export interface Core {
   welcomeSpace: FullMakerspace | undefined;
   activeUser: CurrentUser | undefined;
   state: AccessControllerState;
+  flags: CoreFlags;
+}
+
+export interface AccessController {
+  id: number;
+  channelID: number;
+  deviceID: number;
+  state: AccessControllerState;
+  device: Device;
+  core: Core;
 }
 
 enum DispenserError {
@@ -56,6 +72,12 @@ export interface Dispenser {
   device: Device;
 }
 
+export enum CoreActions {
+  RESTART = "RESTART",
+  SEAL = "SEAL",
+  IDENTIFY = "IDENTIFY"
+}
+
 export const SET_CORE_STATE = gql`
   mutation SetCoreState($deviceID: Int!, $targetState: CoreStateInput) {
     setCoreState(deviceID: $deviceID, targetState: $targetState)
@@ -65,5 +87,51 @@ export const SET_CORE_STATE = gql`
 export const PAIR_CORE = gql`
   mutation PairCore($SN: String!, $makerspaceID: Int!) {
     pairCore(SN: $SN, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const PAIR_GENERIC_DEVICE = gql`
+  mutation PairGenericDevice($SN: String!, $makerspaceID: Int!) {
+    pairGenericDevice(SN: $SN, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const PAIR_DISPENSER = gql`
+  mutation PairDispenser($SN: String!, $makerspaceID: Int!) {
+    pairDispenser(SN: $SN, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const SEND_CORE_ACTION = gql`
+  mutation SendCoreAction($deviceID: Int!, $action: CoreAction!) {
+    sendCoreAction(deviceID: $deviceID, action: $action)
+  }
+`;
+
+export const SEND_CORE_FLAGS = gql`
+  mutation SendCoreFlags($deviceID: Int!, $flags: CoreFlagInput!) {
+    sendCoreFlags(deviceID: $deviceID, flags: $flags)
+  }
+`;
+
+export const GET_ACCESS_CONTROLLER_BY_ID = gql`
+  query GetAccessControllerByID($accessControllerID: Int!) {
+    getAccessControllerByID(accessControllerID: $accessControllerID) {
+      id
+      channelID
+      state
+      device {
+        id
+        name
+      }
+      core {
+        deviceID
+        activeUser {
+          id
+          firstName
+          lastName
+        }
+      }
+    }
   }
 `;

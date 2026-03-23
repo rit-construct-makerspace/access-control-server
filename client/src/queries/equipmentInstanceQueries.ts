@@ -28,6 +28,7 @@ export interface EquipmentInstance {
     state: AccessControllerState;
     device: {
       name: string
+      id: number
     } | undefined
   }
 }
@@ -51,6 +52,7 @@ export const GET_EQUIPMENT_INSTANCES = gql`
         channelID
         state
         device {
+          id
           name
         }
       }

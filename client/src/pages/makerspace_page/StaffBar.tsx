@@ -11,7 +11,7 @@ import ScannerIcon from '@mui/icons-material/Scanner';
 import SchoolIcon from "@mui/icons-material/School";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import HandymanIcon from '@mui/icons-material/Handyman';
-import UsbIcon from '@mui/icons-material/Usb';
+import RouterIcon from '@mui/icons-material/Router';
 import { ButtonBase, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
@@ -140,7 +140,7 @@ export default function StaffBar() {
             ? <NavLink
               primary={"Devices"}
               to={`/makerspace/${makerspaceID}/devices`}
-              icon={<UsbIcon />}
+              icon={<RouterIcon />}
             />
             : null
         }
