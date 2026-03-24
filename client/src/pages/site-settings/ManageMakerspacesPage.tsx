@@ -25,6 +25,7 @@ export default function ManageMakerspacesAdminPage() {
 
   return (
     <Stack spacing={3} padding={"20px"}>
+      <title>Manage Makerspaces</title>
       <Stack direction={"row"} spacing={2}>
         <Typography variant="h4">Makerspaces</Typography>
         <Button color="success" variant="contained" onClick={() => setCreateMakerspaceModal(true)} startIcon={<AddIcon />}>
