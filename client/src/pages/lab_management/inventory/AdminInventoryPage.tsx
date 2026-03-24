@@ -6,7 +6,6 @@ import { useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
 import MaterialModal from "./MaterialModal";
 import { GET_INVENTORY_TAGS } from "../../../queries/inventoryQueries";
-import AdminPage from "../../AdminPage";
 import Ledger from "./Ledger";
 import InventoryTagsModal from "./InventoryTagsModal";
 import { GET_MAKERSPACES_WITH_ITEMS, MakerspaceWithItems } from "../../../queries/makerspaceQueries";
@@ -41,7 +40,7 @@ export default function AdminInventoryPage() {
 
   return (
     <RequestWrapper loading={makerspacesWithItemsResult.loading} error={makerspacesWithItemsResult.error}>
-      <AdminPage>
+      <Stack width={"auto"}>
         <title>Inventory | Make @ RIT</title>
         <StaffBar />
         <Box margin="25px">
@@ -94,7 +93,7 @@ export default function AdminInventoryPage() {
 
           <InventoryTagsModal tagModalOpen={tagsModalOpen} setTagModalOpen={setTagsModalOpen} />
         </Box>
-      </AdminPage>
+      </Stack>
     </RequestWrapper>
   );
 }
