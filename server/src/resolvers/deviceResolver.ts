@@ -6,6 +6,7 @@ import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepos
 import * as UserRepo from "../repositories/Users/UserRepository.js";
 import * as CoreRepo from "../repositories/Devices/CoreRepository.js";
 import * as DispenserRepo from "../repositories/Devices/DispenserRepository.js";
+import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js";
 import { CoreActions, CoreFlags, WSACSServerUnprompted } from "../models/api/WSACSFormats.js";
 import { EntityNotFound } from "../EntityNotFound.js";
 import WSACSController from "../models/api/WSACSController.js";
@@ -99,6 +100,7 @@ const DeviceResolver = {
   },
 
   Mutation: {
+    // This should not be used, setting state should be done on the access controller level
     setCoreState: async (
       _parent: any,
       args: {
@@ -109,6 +111,12 @@ const DeviceResolver = {
     ) => isStaff(async (user) => {
       const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
       if (core === undefined) { return false; }
+      await AuditLogRepo.createUnassocaitedAuditLog(
+        `{user} commanded {device} to ${args.targetState}`,
+        "admin",
+        { id: user.id, label: `${user.firstName} ${user.lastName}` },
+        { id: args.deviceID, label: core.name }
+      );
       return await core.setState(user, args.targetState);
     }),
 
