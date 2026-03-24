@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManagerFor } from "../../../common/PrivilegeUtils";
-import { useQuery } from "@apollo/client";
-import { GET_ORG_BY_ID } from "../../../queries/organizationQueries";
 
 interface AuditLogEntityProps {
   entityCode: string;
@@ -32,6 +30,8 @@ function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
       return `/makerspace/${id}`;
     case "organization":
       return `/makerspace/${makerspaceID}/organizations?q=${id}`;
+    case "device":
+      return `/makerspace/${makerspaceID}/devices?id=${id}`
     default:
       return `/makerspace/${makerspaceID}/history`;
   }
@@ -46,7 +46,7 @@ export default function AuditLogEntity({ entityCode }: AuditLogEntityProps) {
 
   const [entityType, id, label] = entityCode.split(":");
 
-  let url = getEntityUrl(entityType, id, makerspaceID ?? "0" );
+  let url = getEntityUrl(entityType, id, makerspaceID ?? "0");
 
   // If this would link to the readers page, but the current user is not a manager,
   // fall back to the makerspace history instead of exposing a non-accessible link.
