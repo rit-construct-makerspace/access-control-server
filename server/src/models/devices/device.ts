@@ -1,5 +1,6 @@
 import { createCipheriv, scryptSync } from "crypto";
 import { DeviceRow } from "../../db/tables.js";
+import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 
 export class Device implements DeviceRow {
   id: number;
@@ -45,5 +46,9 @@ export class Device implements DeviceRow {
     cipher.end();
 
     return encrypted;
+  }
+
+  async updateFirmwareVersion(version: string) {
+    await DeviceRepo.updateDeviceFirmware(this.id, version);
   }
 }
