@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, CardMedia, Link, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Button, Card, CardContent, CardMedia, IconButton, Link, Stack, Typography, useTheme } from "@mui/material";
 import Equipment from "../types/Equipment";
 import { useCurrentUser } from "./CurrentUserProvider";
 import { moduleStatusMapper, TrainingModule } from "./TrainingModuleUtils";
@@ -60,12 +60,12 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
           <Stack direction="row" height={props.isMobile ? undefined : "200px"}>
             {props.isMobile ? null :
               <Stack alignItems="center">
-                <Box width="150px" height="200px">
+                <Box width="200px" height="200px">
                   <CardMedia
                     component="img"
                     image={makeCDNLink(props.equipment.imageUrl, "user-uploads/")}
                     alt={`Picture of ${props.equipment.name}`}
-                    sx={{ width: "150px", height: "200px", backgroundColor: "lightgray" }}
+                    sx={{ width: "200px", height: "200px", backgroundColor: "lightgray" }}
                   />
                 </Box>
               </Stack>
@@ -77,15 +77,16 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                 <Typography variant="h6">{props.equipment.archived ? `${props.equipment.name} (Hidden)` : props.equipment.name}</Typography>
                 {
                   isPriviledged
-                    ? <Button
+                    ? <IconButton
                       onClick={() => { navigate(`/makerspace/${makerspaceID}/equipment/${props.equipment.id}`) }}
-                      aria-label="edit button"
-                      sx={{ width: "40px", height: "40px" }}
-                      variant="contained"
                       color="primary"
+                      sx={{
+                        width: "40px",
+                        height: "40px"
+                      }}
                     >
                       <ConstructionIcon />
-                    </Button>
+                    </IconButton>
                     : null
                 }
               </Stack>
