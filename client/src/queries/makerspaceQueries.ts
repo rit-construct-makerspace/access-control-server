@@ -216,6 +216,8 @@ export const GET_MAKERSPACE_BY_ID = gql`
           schedulable
           notes
           archived
+          subName
+          signOffUrl
         }
         trainingModules {
           id

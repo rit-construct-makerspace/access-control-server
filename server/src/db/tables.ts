@@ -62,6 +62,10 @@ export interface EquipmentRow {
   requiresInPerson: boolean;
   /** Whether or not a piece of equipment can be reserved */
   schedulable: boolean;
+  /** The URL to send people to when they click on the sign-off card */
+  signOffUrl: string;
+  /** The subname that appears under the main name */
+  subName: string;
 }
 
 /**

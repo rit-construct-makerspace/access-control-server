@@ -64,6 +64,8 @@ export const GET_EQUIPMENT_BY_ID = gql`
       requiresTrainerApproval
       requiresInPerson
       schedulable
+      subName
+      signOffUrl
     }
   }
 `;
@@ -188,6 +190,8 @@ export const UPDATE_EQUIPMENT = gql`
     $requiresTrainerApproval: Boolean
     $requiresInPerson: Boolean
     $schedulable: Boolean
+    $subName: String!
+    $signOffUrl: String!
   ) {
     updateEquipment(
       id: $id
@@ -201,8 +205,10 @@ export const UPDATE_EQUIPMENT = gql`
         byReservationOnly: $byReservationOnly,
         needsWelcome: $needsWelcome,
         requiresTrainerApproval: $requiresTrainerApproval,
-        requiresInPerson: $requiresInPerson
-        schedulable: $schedulable
+        requiresInPerson: $requiresInPerson,
+        schedulable: $schedulable,
+        subName: $subName,
+        signOffUrl: $signOffUrl
       }
     ) {
       id

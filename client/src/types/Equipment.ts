@@ -13,6 +13,8 @@ export default interface Equipment {
   readerID?: number;
   notes: string;
   archived: boolean;
+  subName: string;
+  signOffUrl: string;
 }
 
 export interface EquipmentWithRoom {
