@@ -45,6 +45,11 @@ export class Core extends Device implements CoreRow {
     return new Core(coreRow, deviceRow);
   }
 
+  /**
+   * Sends a message to the core to command its state
+   * @param executingUser The user setting the state of the core
+   * @param targetState The state the core is being set to
+   */
   async setState(executingUser: CurrentUser, targetState: AccessControllerState) {
     try {
       await ShlugControl.sendState(executingUser, this.deviceID, targetState)
