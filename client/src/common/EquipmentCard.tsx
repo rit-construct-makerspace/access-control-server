@@ -45,8 +45,6 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
    */
   const hasNotTakenModule = moduleStatuses.some((ms: { status: string }) => ms.status === "Not taken");
 
-  const [trainingModal, setTrainingModal] = useState(false);
-
   return (
     <Card
       sx={{
