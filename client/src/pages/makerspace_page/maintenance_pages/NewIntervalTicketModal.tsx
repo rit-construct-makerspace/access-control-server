@@ -8,7 +8,6 @@ import { useMemo, useState } from "react";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
 import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_INTERVAL_MAINTENANCE_TICKET, MaintenanceTicketSeverity } from "../../../queries/maintenanceTicketQueries";
-import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { toast } from "react-toastify";
 import FileUploadButton from "../../../common/FileUploadButton";
 import styled from "styled-components";
@@ -26,8 +25,6 @@ interface NewTicketModalProps {
 }
 
 export default function NewIntervalTicketModal(props: NewTicketModalProps) {
-  const user = useCurrentUser();
-
   const [equipment, setEquipment] = useState<Equipment>();
   const [instance, setInstance] = useState<EquipmentInstance>();
   const [description, setDescription] = useState("");
