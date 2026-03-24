@@ -9,7 +9,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteMakerspaceModal from "./DeleteMakerspaceModal";
 import CreateMakerspaceModal from "./CreateMakerspaceModal";
 
-export default function ManageMakerspacesPage() {
+export default function ManageMakerspacesAdminPage() {
   const navigate = useNavigate();
 
   const getMakerspacesResult = useQuery(GET_MAKERSPACES);
@@ -24,7 +24,7 @@ export default function ManageMakerspacesPage() {
   }
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={3} padding={"20px"}>
       <Stack direction={"row"} spacing={2}>
         <Typography variant="h4">Makerspaces</Typography>
         <Button color="success" variant="contained" onClick={() => setCreateMakerspaceModal(true)} startIcon={<AddIcon />}>
