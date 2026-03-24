@@ -76,7 +76,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
               <Stack direction="row" justifyContent="space-between" pl={"10px"}>
                 <Stack>
                   <Typography variant="h6">{props.equipment.archived ? `${props.equipment.name} (Hidden)` : props.equipment.name}</Typography>
-                  <Typography variant="subtitle1" fontStyle={"italic"}>{props.equipment.subName}</Typography>
+                  <Typography variant="subtitle1" fontStyle={"italic"} fontWeight={"regular"}>{props.equipment.subName}</Typography>
                 </Stack>
                 {
                   isPriviledged
