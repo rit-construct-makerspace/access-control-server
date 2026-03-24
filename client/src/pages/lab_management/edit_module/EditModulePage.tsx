@@ -40,7 +40,6 @@ export default function EditModulePage({
   moduleInitialValue,
   deleteModule,
   updateModule,
-  updateLoading,
 }: EditModulePageProps) {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const currentUser = useCurrentUser();
