@@ -52,6 +52,7 @@ import NewDevicePage from "./pages/makerspace_page/device_pages/NewDevicePage";
 import AdminBar from "./pages/site-settings/AdminBar";
 import ManageMakerspacesAdminPage from "./pages/site-settings/ManageMakerspacesPage";
 import LinkManagementAdminPage from "./pages/site-settings/LinkManagementAdminPage";
+import AdminHistoryPage from "./pages/site-settings/AdminHistoryPage";
 
 function AppRoot() {
   return (
@@ -226,6 +227,7 @@ export const appRouter = createBrowserRouter(
                       { path: "/admin/inventory", element: <AdminInventoryPage /> },
                       { path: "/admin/makerspaces", element: <ManageMakerspacesAdminPage /> },
                       { path: "/admin/links", element: <LinkManagementAdminPage /> },
+                      { path: "/admin/history", element: <AdminHistoryPage /> },
                     ]
                   }],
                 },
