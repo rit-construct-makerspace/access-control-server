@@ -1,4 +1,4 @@
-import { Alert, Autocomplete, Button, Card, IconButton, MenuItem, Select, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { Alert, Autocomplete, Button, Card, IconButton, Link, MenuItem, Select, Stack, TextField, Tooltip, Typography } from "@mui/material";
 import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES, InstanceStatus, UPDATE_INSTANCE } from "../../../queries/equipmentInstanceQueries";
 import ActionButton from "../../../common/ActionButton";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
@@ -23,6 +23,7 @@ import WifiOffIcon from '@mui/icons-material/WifiOff';
 import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { AccessController, AccessControllerState, GET_ACCESS_CONTROLLER_BY_ID, SET_CORE_STATE } from "../../../queries/deviceQueries";
+import { useNavigate } from "react-router-dom";
 
 interface EquipmentInstanceCardProps {
   instance: EquipmentInstance;
@@ -30,6 +31,7 @@ interface EquipmentInstanceCardProps {
 
 export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps) {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   const [deleteInstance] = useMutation(DELETE_EQUIPMENT_INSTANCE, {
     refetchQueries: ["EquipmentInstances", "GetUnpairedReaders"]
@@ -136,6 +138,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
           }
         </Stack>
         <Stack alignContent={"center"} alignItems={"center"}>
+          <Link href={`/app/makerspace/${currentAccessController?.device.makerspaceID}/devices`}>{`${currentAccessController?.device.name}:${currentAccessController?.channelID}`}</Link>
           {activeUserDisplay()}
         </Stack>
         {/* {
