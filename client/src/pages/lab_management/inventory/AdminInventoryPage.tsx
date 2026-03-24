@@ -42,7 +42,6 @@ export default function AdminInventoryPage() {
     <RequestWrapper loading={makerspacesWithItemsResult.loading} error={makerspacesWithItemsResult.error}>
       <Stack width={"auto"}>
         <title>Inventory | Make @ RIT</title>
-        <StaffBar />
         <Box margin="25px">
           <Stack direction="row" justifyContent="space-between" alignItems="baseline">
             <Typography variant="h4">Inventory</Typography>
