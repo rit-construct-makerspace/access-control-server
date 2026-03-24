@@ -191,8 +191,6 @@ export const appRouter = createBrowserRouter(
                             { path: "/makerspace/:makerspaceID/maintenance", element: <MaintenancePage /> },
                             { path: "/makerspace/:makerspaceID/reservations", element: <ManageReservationsPage /> },
 
-                            { path: "/makerspace/:makerspaceID/devices", element: <DevicesPage /> },
-
                             /* Routes for manager + higher */
                             {
                               element: <ManagerRoute />,
@@ -201,6 +199,7 @@ export const appRouter = createBrowserRouter(
                                 { path: "/makerspace/:makerspaceID/edit/room/:roomID", element: <ManageRoomPage /> },
                                 { path: "/makerspace/:makerspaceID/currency", element: <CurrencyPage /> },
 
+                                { path: "/makerspace/:makerspaceID/devices", element: <DevicesPage /> },
                                 { path: "/makerspace/:makerspaceID/devices/new", element: <NewDevicePage /> },
                               ],
                             },
