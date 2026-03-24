@@ -123,6 +123,7 @@ export const GET_ACCESS_CONTROLLER_BY_ID = gql`
       device {
         id
         name
+        makerspaceID
       }
       core {
         deviceID

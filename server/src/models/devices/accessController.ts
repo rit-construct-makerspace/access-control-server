@@ -141,4 +141,30 @@ export class AccessController implements AccessControllerRow {
   async getDevice(): Promise<Device | undefined> {
     return await DeviceRepo.getDeviceByID(this.deviceID);
   }
+
+  async endSession(cardTag: string): Promise<void> {
+    const rawUser = await UserRepo.getUserByCardTagID(cardTag);
+    if (rawUser === undefined) {
+      return;
+    }
+
+    const instance = await EquipmentInstanceRepo.getInstanceByAccessControllerID(this.id);
+    if (instance === undefined) {
+      return;
+    }
+
+    const rawEquipment = await EquipmentRepo.getEquipmentOrUndefinedByID(instance.equipmentID);
+    if (rawEquipment === undefined) {
+      return;
+    }
+    const equipment = new Equipment(rawEquipment);
+
+    await AuditLogRepo.createAuditLog(
+      "{user} deactivated {equipment}",
+      "auth",
+      await equipment.getMakerspaceID(),
+      { id: rawUser.id, label: `${rawUser.firstName} ${rawUser.lastName}` },
+      { id: equipment.id, label: `${equipment.name} - ${instance.name}` }
+    )
+  }
 }

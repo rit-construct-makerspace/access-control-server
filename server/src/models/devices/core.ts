@@ -128,5 +128,9 @@ export class Core extends Device implements CoreRow {
     if (config.flags !== undefined) {
       await CoreRepo.setCoreFlags(this.deviceID, config.flags);
     }
+
+    if (config.firmware !== undefined) {
+      await this.updateFirmwareVersion(config.firmware);
+    }
   }
 }
