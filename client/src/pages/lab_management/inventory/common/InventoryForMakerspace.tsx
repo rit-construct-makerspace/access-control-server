@@ -1,7 +1,6 @@
 import { IconButton } from "@mui/material";
 import { Box } from "@mui/system";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useState, useEffect } from "react";
 import { isManager } from "../../../../common/PrivilegeUtils";
 import { StaffOnlyToggle } from "./StaffOnlyToggle";
 import { StorefrontVisibleToggle } from "./StorefrontVisibleToggle";
@@ -10,7 +9,6 @@ import { MakerspaceWithItems } from "../../../../queries/makerspaceQueries";
 import InventoryItem, { InventoryTag } from "../../../../types/InventoryItem";
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
-import PageSectionHeader from "../../../../common/PageSectionHeader";
 
 function sortItemsByName(items: InventoryItem[]): InventoryItem[] {
   return [...items].sort((a, b) => (a.name > b.name ? 1 : -1)) ?? [];
