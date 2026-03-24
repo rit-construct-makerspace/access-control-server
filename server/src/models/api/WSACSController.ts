@@ -297,7 +297,13 @@ async function handleCoreMessageRequest(request: WSACSCoreUnprompted, deviceID: 
     return;
   }
 
-  await AuditLogRepo.createUnassocaitedAuditLog(request.message.content.message, request.message.content.category);
+  const core = await CoreRepo.getCoreByDeviceID(deviceID);
+
+  await AuditLogRepo.createUnassocaitedAuditLog(
+    `Message from {device}: ${request.message.content.message}`,
+    request.message.content.category,
+    { id: deviceID, label: core?.name ?? "UNKOWN DEVICE" }
+  );
   return;
 }
 
