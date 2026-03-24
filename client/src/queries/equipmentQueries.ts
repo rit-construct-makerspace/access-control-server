@@ -64,6 +64,8 @@ export const GET_EQUIPMENT_BY_ID = gql`
       requiresTrainerApproval
       requiresInPerson
       schedulable
+      subName
+      signOffUrl
     }
   }
 `;

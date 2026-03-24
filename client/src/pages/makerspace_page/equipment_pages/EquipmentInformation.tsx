@@ -103,6 +103,8 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         requiresTrainerApproval: requiresTrainer,
         requiresInPerson: requiresInPerson,
         schedulable: schedulable,
+        subName: subName,
+        signOffUrl: signOffUrl
       },
     });
 
