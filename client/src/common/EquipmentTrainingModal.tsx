@@ -174,7 +174,14 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
                           ) : (
                             <CloseIcon color="error" />
                           )}
-                          <Typography variant="body2">Staff Sign-Off</Typography>
+                          <Stack direction={"column"} width={"100%"}>
+                            <Typography variant="body2">Staff Sign-Off</Typography>
+                            {
+                              !user.accessChecks.some((check) => Number(check.equipmentID) === props.equipmentTrainings.id && check.approved)
+                                ? <Typography variant="body2">Complete all other requirments before attempting sign-off!</Typography>
+                                : null
+                            }
+                          </Stack>
                         </Stack>
                         : null
                     }
