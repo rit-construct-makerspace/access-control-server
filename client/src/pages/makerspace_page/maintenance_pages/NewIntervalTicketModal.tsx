@@ -7,13 +7,12 @@ import { FullMakerspace } from "../../../queries/makerspaceQueries";
 import { useMemo, useState } from "react";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
 import { useMutation, useQuery } from "@apollo/client";
-import { CREATE_INTERVAL_MAINTENANCE_TICKET, CREATE_MAINTENANCE_TICKET, MaintenanceTicketSeverity } from "../../../queries/maintenanceTicketQueries";
+import { CREATE_INTERVAL_MAINTENANCE_TICKET, MaintenanceTicketSeverity } from "../../../queries/maintenanceTicketQueries";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { toast } from "react-toastify";
 import FileUploadButton from "../../../common/FileUploadButton";
 import styled from "styled-components";
 import { makeCDNLink } from "../../../common/ImageFinder";
-import { format, parse } from "date-fns";
 import { DatePicker } from "@mui/x-date-pickers";
 
 const StyledImg = styled.img`
@@ -193,7 +192,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
               required
               slotProps={{
                 htmlInput: {
-                  pattern: "\d+"
+                  pattern: "\\d+"
                 }
               }}
               sx={{
