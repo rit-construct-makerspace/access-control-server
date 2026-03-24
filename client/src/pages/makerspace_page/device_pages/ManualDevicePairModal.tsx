@@ -62,7 +62,7 @@ export default function ManualDevicePairModal(props: ManualDevicePairModalProps)
       default:
         return undefined;
     }
-  }, [pairGenericResult.data, pairCoreResult.data, pairDispenserResult.data])
+  }, [pairGenericResult.data, pairCoreResult.data, pairDispenserResult.data, device])
 
   return (
     <PrettyModal open={props.open} onClose={handleClose} width={"800px"}>
