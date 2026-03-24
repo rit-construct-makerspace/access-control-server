@@ -138,7 +138,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
           }
         </Stack>
         <Stack alignContent={"center"} alignItems={"center"}>
-          <Link href={`/app/makerspace/${currentAccessController?.device.makerspaceID}/devices`}>{`${currentAccessController?.device.name}:${currentAccessController?.channelID}`}</Link>
+          <Link href={`/app/makerspace/${currentAccessController?.device.makerspaceID}/devices?q=${currentAccessController?.device.name}`}>{`${currentAccessController?.device.name}:${currentAccessController?.channelID}`}</Link>
           {activeUserDisplay()}
         </Stack>
         {/* {
