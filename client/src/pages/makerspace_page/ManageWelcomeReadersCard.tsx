@@ -34,7 +34,7 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
     }
 
     function generateDropdownOptions(): { id: number | undefined, name: string }[] {
-        let options: { id: number | undefined, name: string }[] = [];
+        const options: { id: number | undefined, name: string }[] = [];
 
         if (unpairedReaders) {
             const asOptions = unpairedReaders.map((reader: Reader) => ({ id: reader.id, name: reader.name }));
