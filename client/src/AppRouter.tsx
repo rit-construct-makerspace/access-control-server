@@ -51,6 +51,7 @@ import InventoryPage from "./pages/makerspace_page/inventory_pages/InventoryPage
 import QuickEditInventoryPage from "./pages/makerspace_page/inventory_pages/QuickEditInventoryPage";
 import DevicesPage from "./pages/makerspace_page/device_pages/DevicesPage";
 import NewDevicePage from "./pages/makerspace_page/device_pages/NewDevicePage";
+import AdminBar from "./pages/site-settings/AdminBar";
 
 function AppRoot() {
   return (
@@ -214,16 +215,19 @@ export const appRouter = createBrowserRouter(
                 /* Routes for admins */
                 {
                   element: <AdminRoute />,
-                  children: [
-                    { path: "/admin/announcements", element: <AnnouncementsPage /> },
-                    { path: "/admin/announcements/:id", element: <EditAnnouncement /> },
-                    { path: "/admin/announcements/new", element: <NewAnnouncementPage /> },
+                  children: [{
+                    path: "/admin",
+                    element: <AdminBar />,
+                    children: [
+                      { path: "/admin/announcements", element: <AnnouncementsPage /> },
+                      { path: "/admin/announcements/:id", element: <EditAnnouncement /> },
+                      { path: "/admin/announcements/new", element: <NewAnnouncementPage /> },
 
-                    { path: "/admin/inventory", element: <AdminInventoryPage /> },
+                      { path: "/admin/inventory", element: <AdminInventoryPage /> },
 
-                    { path: "/admin/newreader", element: <NewReaderPage /> },
-                    { path: "/admin/settings", element: <SiteSettingsPage /> },
-                  ],
+                      { path: "/admin/settings", element: <SiteSettingsPage /> },
+                    ]
+                  }],
                 },
 
                 { path: "/maker/training", element: <TrainingPage /> },
