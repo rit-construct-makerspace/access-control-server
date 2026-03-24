@@ -20,13 +20,9 @@ import QRCodeModal from "./QRCodeModal";
 export default function SiteSettingsPage() {
   const navigate = useNavigate();
 
-  const getMakerspacesResult = useQuery(GET_MAKERSPACES);
+
 
   const getCustomUrlsResult = useQuery(GET_ALL_CUSTOM_URLS);
-
-  const [createMakerspaceModal, setCreateMakerspaceModal] = useState(false);
-  const [deleteMakerspaceModal, setDeleteMakerspaceModal] = useState(false);
-  const [deletionTarget, setDeletionTarget] = useState({ id: 0, name: "THE JIM SHED: HOME OF THE MAKER MINDSET" });
 
   const [createCustomUrlModal, setCreateCustomUrlModal] = useState(false);
   const [deleteCustomUrlModal, setDeleteCustomUrlModal] = useState(false);
@@ -36,11 +32,6 @@ export default function SiteSettingsPage() {
 
   const [qrTarget, setQrTarget] = useState("");
   const [qrModal, setQrModal] = useState(false);
-
-  function handleArchive(id: number, name: string) {
-    setDeletionTarget({ id: id, name: name });
-    setDeleteMakerspaceModal(true);
-  }
 
   function handleDelete(id: number, shortUrl: string) {
     setDeleteUrl({ id: id, shortUrl: shortUrl });
@@ -67,43 +58,7 @@ export default function SiteSettingsPage() {
       <Typography variant="h3">Site Settings</Typography>
       <title>Site Settings | Make @ RIT</title>
       <Stack spacing={3}>
-        <Stack direction={"row"} spacing={2}>
-          <Typography variant="h4">Makerspaces</Typography>
-          <Button color="success" variant="contained" onClick={() => setCreateMakerspaceModal(true)} startIcon={<AddIcon />}>
-            Create Makerspace
-          </Button>
-        </Stack>
-        <RequestWrapper2 result={getMakerspacesResult} render={(data) => {
 
-          return (
-            <Grid container spacing={3}>
-              {
-                data.makerspaces.map((space: { id: number, name: string }) => (
-                  <Grid>
-                    <Card variant="outlined">
-                      <Stack width={"300px"} padding={"10px"} spacing={1}>
-                        <Typography variant="subtitle1">{space.name}</Typography>
-                        <Stack direction={"row"} justifyContent={"space-between"}>
-                          <Button
-                            color="error"
-                            variant="contained"
-                            startIcon={<DeleteIcon />}
-                            onClick={() => handleArchive(space.id, space.name)}
-                          >
-                            Delete
-                          </Button>
-                          <Button color="secondary" variant="outlined" onClick={() => navigate(`/makerspace/${space.id}/edit`)}>
-                            Manage
-                          </Button>
-                        </Stack>
-                      </Stack>
-                    </Card>
-                  </Grid>
-                ))
-              }
-            </Grid>
-          );
-        }} />
         <Stack direction={"column"} spacing={1}>
           <Stack direction={"row"} spacing={2}>
             <Typography variant="h4">Custom Links</Typography>
@@ -155,8 +110,7 @@ export default function SiteSettingsPage() {
 
           );
         }} />
-        <DeleteMakerspaceModal open={deleteMakerspaceModal} onClose={() => setDeleteMakerspaceModal(false)} id={deletionTarget.id} name={deletionTarget.name} />
-        <CreateMakerspaceModal open={createMakerspaceModal} onClose={() => setCreateMakerspaceModal(false)} />
+
         <DeleteCustomUrlModal open={deleteCustomUrlModal} onClose={() => setDeleteCustomUrlModal(false)} id={deleteUrl.id} shortUrl={deleteUrl.shortUrl} />
         <CreateCustomUrlModal open={createCustomUrlModal} onClose={() => setCreateCustomUrlModal(false)} />
         <UpdateCustomUrlModal open={updateCustomUrlModal} onClose={() => setUpdateCustomUrlModal(false)} id={updateUrl.id} shortUrl={updateUrl.shortUrl} longUrl={updateUrl.longUrl} />

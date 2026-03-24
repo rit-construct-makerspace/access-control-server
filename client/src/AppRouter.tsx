@@ -52,6 +52,7 @@ import QuickEditInventoryPage from "./pages/makerspace_page/inventory_pages/Quic
 import DevicesPage from "./pages/makerspace_page/device_pages/DevicesPage";
 import NewDevicePage from "./pages/makerspace_page/device_pages/NewDevicePage";
 import AdminBar from "./pages/site-settings/AdminBar";
+import ManageMakerspacesPage from "./pages/site-settings/ManageMakerspacesPage";
 
 function AppRoot() {
   return (
@@ -224,6 +225,7 @@ export const appRouter = createBrowserRouter(
                       { path: "/admin/announcements/new", element: <NewAnnouncementPage /> },
 
                       { path: "/admin/inventory", element: <AdminInventoryPage /> },
+                      { path: "/admin/makerspaces", element: <ManageMakerspacesPage /> },
 
                       { path: "/admin/settings", element: <SiteSettingsPage /> },
                     ]
