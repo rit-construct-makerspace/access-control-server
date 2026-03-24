@@ -344,7 +344,9 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               notes: notes,
               archived: props.equipment.archived,
               requiresInPerson: requiresInPerson,
-              schedulable: schedulable
+              schedulable: schedulable,
+              signOffUrl: signOffUrl,
+              subName: subName
             }}
             isMobile={isMobile}
             staffMode={false}
