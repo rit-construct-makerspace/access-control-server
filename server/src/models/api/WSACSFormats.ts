@@ -48,6 +48,7 @@ export interface CoreConfig {
   inputMode?: CoreInputMode;
   deployment?: ACSDeployment;
   flags?: CoreFlags;
+  firmware?: string;
 }
 
 export interface WSACSCoreUnprompted {
