@@ -25,8 +25,6 @@ import AdminInventoryPage from "./pages/lab_management/inventory/AdminInventoryP
 import AnnouncementsPage from "./pages/lab_management/announcements/AnnouncementsPage";
 import EditAnnouncement from "./pages/lab_management/announcements/EditAnnouncement";
 import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnouncementPage";
-import NewReaderPage from "./pages/newreaderpage/NewReaderPage";
-import SiteSettingsPage from "./pages/site-settings/SiteSettingsPage";
 import StaffBar from "./pages/makerspace_page/StaffBar";
 import UsersPage from "./pages/lab_management/users/UsersPage";
 import UserPage from "./pages/lab_management/users/UserPage";
@@ -53,6 +51,7 @@ import DevicesPage from "./pages/makerspace_page/device_pages/DevicesPage";
 import NewDevicePage from "./pages/makerspace_page/device_pages/NewDevicePage";
 import AdminBar from "./pages/site-settings/AdminBar";
 import ManageMakerspacesAdminPage from "./pages/site-settings/ManageMakerspacesPage";
+import LinkManagementAdminPage from "./pages/site-settings/LinkManagementAdminPage";
 
 function AppRoot() {
   return (
@@ -226,8 +225,7 @@ export const appRouter = createBrowserRouter(
 
                       { path: "/admin/inventory", element: <AdminInventoryPage /> },
                       { path: "/admin/makerspaces", element: <ManageMakerspacesAdminPage /> },
-
-                      { path: "/admin/settings", element: <SiteSettingsPage /> },
+                      { path: "/admin/links", element: <LinkManagementAdminPage /> },
                     ]
                   }],
                 },
