@@ -24,6 +24,7 @@ export interface Filters {
 
 /**
  * Create an AuditLog and append it to the table
+ * @deprecated createAuditLog should be used to associate with a makerspace
  * @param message String verb description of the Log entry (i.e. reserved, deleted)
  * @param entities items involved in log {id, label}
  */
