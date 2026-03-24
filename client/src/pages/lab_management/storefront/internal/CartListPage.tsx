@@ -1,6 +1,5 @@
 import { Box, Button } from "@mui/material";
 import PageSectionHeader from "../../../../common/PageSectionHeader";
-import AdminPage from "../../../AdminPage";
 import { Stack } from "@mui/system";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import AuditLogEntity from "../../audit_logs/AuditLogEntity";
@@ -86,7 +85,7 @@ export function CartListPage() {
   ];
 
   return (
-    <AdminPage>
+    <Stack width={"auto"}>
       <title>Carts | Make @ RIT</title>
       <Box m={"20px"}>
         <PageSectionHeader>Active Carts</PageSectionHeader>
@@ -118,7 +117,7 @@ export function CartListPage() {
             label="Search User"
             value={userSearch}
             onChange={(e) => setUserSearch(e.target.value)}
-            onSubmit={() => setUrlParam("a", userSearch) }
+            onSubmit={() => setUrlParam("a", userSearch)}
             size="small"
           />
         </Stack>
@@ -131,6 +130,6 @@ export function CartListPage() {
           />
         </Box>
       </Box>
-    </AdminPage>
+    </Stack>
   );
 }

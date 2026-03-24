@@ -93,13 +93,13 @@ export default function TopNav() {
       icon={<ArticleIcon />}
       newTab={true}
     />,
-//Commented out 2-24-26 until we can get the storefront payments working -@jim
-//    <NavLink
-//      to="/storefront"
-//      primary="Storefront"
-//      icon={<StorefrontIcon />}
-//      newTab={false}
-//    />
+    //Commented out 2-24-26 until we can get the storefront payments working -@jim
+    //    <NavLink
+    //      to="/storefront"
+    //      primary="Storefront"
+    //      icon={<StorefrontIcon />}
+    //      newTab={false}
+    //    />
   ];
 
   const userProfileButton = currentUser.visitor
@@ -147,10 +147,10 @@ export default function TopNav() {
       </MenuItem>
       {
         currentUser.admin &&
-        <MenuItem onClick={() => { navigate("/admin/settings"); handleUserMenuClose(); setMobileDrawer(false); }}>
+        <MenuItem onClick={() => { navigate("/admin/makerspaces"); handleUserMenuClose(); setMobileDrawer(false); }}>
           <Stack direction={"row"} spacing={2} alignItems="center" width={"100%"}>
             <TuneIcon />
-            <Typography variant="body1">Site Settings</Typography>
+            <Typography variant="body1">Manage Site</Typography>
           </Stack>
         </MenuItem>
       }
