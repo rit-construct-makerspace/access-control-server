@@ -297,7 +297,13 @@ async function handleCoreMessageRequest(request: WSACSCoreUnprompted, deviceID: 
     return;
   }
 
-  await AuditLogRepo.createUnassocaitedAuditLog(request.message.content.message, request.message.content.category);
+  const core = await CoreRepo.getCoreByDeviceID(deviceID);
+
+  await AuditLogRepo.createUnassocaitedAuditLog(
+    `Message from {device}: ${request.message.content.message}`,
+    request.message.content.category,
+    { id: deviceID, label: core?.name ?? "UNKOWN DEVICE" }
+  );
   return;
 }
 
@@ -307,14 +313,20 @@ async function handleCoreStatusRequest(request: WSACSCoreUnprompted, deviceID: n
     return;
   }
 
+  const controllers = await core.getAccessControllers();
+
   if (request.status.regular !== undefined) {
     await core.statusUpdate(request.status.currentCardTag);
     for (let i = 0; i < request.status.regular.currentStates.length; i++) {
       await core.updateControllerState(request.status.regular.currentStates[i].channelID, request.status.regular.currentStates[i].state);
     }
   } else if (request.status.stateChange !== undefined) {
+    const oldCardTag = core.currentCardTag;
     await core.statusUpdate(request.status.currentCardTag);
     for (let i = 0; i < request.status.stateChange.channels.length; i++) {
+      if (request.status.stateChange.channels[i].fromState === AccessControllerState.UNLOCKED) {
+        await controllers[i].endSession(oldCardTag ?? "");
+      }
       await core.updateControllerState(request.status.stateChange.channels[i].channelID, request.status.stateChange.channels[i].toState);
     }
     // TODO: Log state change in state change table
