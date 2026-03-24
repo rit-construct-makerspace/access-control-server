@@ -1,5 +1,5 @@
 import PrettyModal from "./PrettyModal";
-import { Button, Divider, IconButton, LinearProgress, Stack, Typography } from "@mui/material";
+import { Button, CardActionArea, Divider, IconButton, LinearProgress, Link, Stack, Typography } from "@mui/material";
 import { ModuleStatus, moduleStatusMapper, TrainingModule } from "./TrainingModuleUtils";
 import { useCurrentUser } from "./CurrentUserProvider";
 import CloseIcon from "@mui/icons-material/Close";
@@ -12,6 +12,7 @@ import CircularProgressWithContent from "./CircularProgressWithContent";
 import CheckIcon from '@mui/icons-material/Check';
 import { useIsMobile } from "./IsMobileProvider";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 interface EquipmentTrainingModalProps {
   makerspaceTrainings: {
@@ -30,13 +31,14 @@ interface EquipmentTrainingModalProps {
     trainingModules: TrainingModule[];
   };
   requiresInPerson: boolean;
+  signOffUrl: string;
   preview?: boolean;
 }
 
 export default function EquipmentTrainingModal(props: EquipmentTrainingModalProps) {
   const user = useCurrentUser();
   const isMobile = useIsMobile();
-  console.log("isMobile: " + isMobile);
+  const navigate = useNavigate();
 
   if (props.equipmentTrainings.trainingModules.length === 0 && !props.requiresInPerson) {
     return;
@@ -166,23 +168,32 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
                     }
                     {
                       props.requiresInPerson
-                        ? <Stack direction={"row"} spacing={1} alignItems="center" padding="7px">
-                          {user.visitor ? (
-                            <RadioButtonUncheckedIcon color="secondary" />
-                          ) : hasApprovedAccessCheck ? (
-                            <CheckIcon color="success" />
-                          ) : (
-                            <CloseIcon color="error" />
-                          )}
-                          <Stack direction={"column"} width={"100%"}>
-                            <Typography variant="body2">Staff Sign-Off</Typography>
-                            {
-                              !user.accessChecks.some((check) => Number(check.equipmentID) === props.equipmentTrainings.id && check.approved)
-                                ? <Typography variant="body2">Complete all other requirments before attempting sign-off!</Typography>
-                                : null
-                            }
+                        ? <CardActionArea
+                          onClick={props.signOffUrl ? () => window.open(props.signOffUrl, "_blank noopener noreferrer") : undefined}
+                          disableRipple={props.signOffUrl === ""}
+                        >
+                          <Stack direction={"row"} spacing={1} alignItems="center" padding="7px">
+                            {user.visitor ? (
+                              <RadioButtonUncheckedIcon color="secondary" />
+                            ) : hasApprovedAccessCheck ? (
+                              <CheckIcon color="success" />
+                            ) : (
+                              <CloseIcon color="error" />
+                            )}
+                            <Stack direction={"column"} width={"100%"}>
+                              {
+                                props.signOffUrl !== ""
+                                  ? <Link variant="body2">Staff Sign-Off</Link>
+                                  : <Typography variant="body2">Staff Sign-Off</Typography>
+                              }
+                              {
+                                !user.accessChecks.some((check) => Number(check.equipmentID) === props.equipmentTrainings.id && check.approved)
+                                  ? <Typography variant="body2">Complete all other requirments before attempting sign-off!</Typography>
+                                  : null
+                              }
+                            </Stack>
                           </Stack>
-                        </Stack>
+                        </CardActionArea>
                         : null
                     }
                   </Stack>

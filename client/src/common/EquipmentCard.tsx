@@ -109,6 +109,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                       trainingModules: props.equipment.trainingModules,
                     }}
                     requiresInPerson={props.equipment.requiresInPerson}
+                    signOffUrl={props.equipment.signOffUrl}
                     preview={props.preview}
                   />
                 </Stack>
