@@ -36,3 +36,8 @@ export async function updateAccessControllerStateByDeviceAndChannelID(deviceID: 
 export async function updateAccessControllerDurationByDeviceAndChannelID(deviceID: number, channelID: number, tempDuration: number): Promise<void> {
   await knex("AccessControllers").update({ tempDuration: tempDuration }).where({ deviceID: deviceID, channelID: channelID });
 }
+
+export async function getUnpairedAccessControllers(): Promise<AccessController[]> {
+  const result = await knex("AccessControllers").whereNotExists(knex("EquipmentInstances").where("EquipmentInstances.controllerID", "=", knex.ref("AccessControllers.id"))).select("*");
+  return result.map((raw) => new AccessController(raw));
+}

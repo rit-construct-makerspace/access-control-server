@@ -96,7 +96,15 @@ const DeviceResolver = {
       { isStaff }: ApolloContext
     ) => isStaff(async (_user) => (
       await ACRepo.getAccessControllerByID(args.accessControllerID)
-    ))
+    )),
+
+    getUnpairedAccessControllers: async (
+      _parent: any,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => (
+      await ACRepo.getUnpairedAccessControllers()
+    )),
   },
 
   Mutation: {
