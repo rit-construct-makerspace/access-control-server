@@ -1,4 +1,4 @@
-import { Button, Card, IconButton, Link, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, Card, IconButton, Link, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES, InstanceStatus, UPDATE_INSTANCE } from "../../../queries/equipmentInstanceQueries";
 import ActionButton from "../../../common/ActionButton";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
@@ -68,6 +68,18 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
     await deleteInstance({ variables: { id: props.instance.id } });
   }
 
+  function controllerPairingField() {
+
+    return <Autocomplete
+      renderInput={(params) => <TextField
+        {...params}
+        label={"Controller Pairing"}
+      />}
+      fullWidth
+      options={[]}
+    />;
+  }
+
   function activeUserDisplay() {
     if (!currentAccessController) {
       return "No User";
@@ -106,8 +118,12 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
               </>
           }
         </Stack>
-        <Stack alignContent={"center"} alignItems={"center"}>
-          <Link href={`/app/makerspace/${currentAccessController?.device.makerspaceID}/devices?q=${currentAccessController?.device.name}`}>{`${currentAccessController?.device.name}:${currentAccessController?.channelID}`}</Link>
+        <Stack alignItems={"center"} spacing={2}>
+          {
+            !allowEdit
+              ? <Link href={`/app/makerspace/${currentAccessController?.device.makerspaceID}/devices?q=${currentAccessController?.device.name}`}>{`${currentAccessController?.device.name}:${currentAccessController?.channelID}`}</Link>
+              : controllerPairingField()
+          }
           {activeUserDisplay()}
         </Stack>
         <Stack direction="row" justifyContent="space-between" alignItems={"center"} spacing={1}>
