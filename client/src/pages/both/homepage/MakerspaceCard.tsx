@@ -1,5 +1,4 @@
 import { Button, Card, CardActionArea, CardContent, CardMedia, Stack, Typography } from "@mui/material";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MakerspaceHours from "../../../types/MakerspaceHours";

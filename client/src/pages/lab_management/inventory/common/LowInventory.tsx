@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { GET_INVENTORY_ITEMS } from "../../../../queries/inventoryQueries";
 import { Box } from "@mui/system";
 import PageSectionHeader from "../../../../common/PageSectionHeader";
@@ -28,7 +27,7 @@ export default function LowInventory(props: LowInventoryProps) {
 			headerName: "Makerspace",
 			minWidth: 200,
 			flex: 1,
-			valueGetter: (value, row) => row.makerspace.name,
+			valueGetter: (_value, row) => row.makerspace.name,
 		},
 		{
 			field: "name",

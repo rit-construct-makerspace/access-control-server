@@ -6,7 +6,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useNavigate, useParams } from "react-router-dom";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import ThemedMarkdown from "./ThemedMarkdown";
-import { memo, useState } from "react";
+import { memo } from "react";
 import { makeCDNLink } from "./ImageFinder.js";
 import EquipmentTrainingModal from "./EquipmentTrainingModal";
 
@@ -44,8 +44,6 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
    * @return {boolean} True if a module has not been taken; False if all modules have been taken.
    */
   const hasNotTakenModule = moduleStatuses.some((ms: { status: string }) => ms.status === "Not taken");
-
-  const [trainingModal, setTrainingModal] = useState(false);
 
   return (
     <Card

@@ -1,4 +1,4 @@
-import { Button, Card, CardActions, CardContent, Stack, Typography, useTheme } from "@mui/material";
+import { Button, Card, CardActions, CardContent, Typography, useTheme } from "@mui/material";
 import { Announcement } from "../../../queries/announcementsQueries";
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import { useIsMobile } from "../../../common/IsMobileProvider";

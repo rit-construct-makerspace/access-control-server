@@ -1,16 +1,14 @@
-import { Autocomplete, AutocompleteRenderInputParams, Button, IconButton, InputAdornment, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, IconButton, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import CloseIcon from '@mui/icons-material/Close';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import Equipment from "../../../types/Equipment";
 import { FullMakerspace } from "../../../queries/makerspaceQueries";
-import { useEffect, useMemo, useState } from "react";
-import RequestWrapper2 from "../../../common/RequestWrapper2";
+import { useMemo, useState } from "react";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
 import { useMutation, useQuery } from "@apollo/client";
 import { CREATE_MAINTENANCE_TICKET, MaintenanceTicketSeverity } from "../../../queries/maintenanceTicketQueries";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { justifyContent } from "@mui/system";
 import { toast } from "react-toastify";
 import FileUploadButton from "../../../common/FileUploadButton";
 import styled from "styled-components";
@@ -36,10 +34,6 @@ export default function NewTicketModal(props: NewTicketModalProps) {
   const [severity, setSeverity] = useState<MaintenanceTicketSeverity>();
   const [imageUrl, setImageUrl] = useState<string>();
 
-  if (!(props.equipment || props.makerspace) || (props.equipment && props.makerspace)) {
-    return;
-  }
-
   const equipmentInstancesResult = useQuery(GET_EQUIPMENT_INSTANCES, { variables: { equipmentID: equipment?.id ?? -1 } });
   const [createTicket] = useMutation(CREATE_MAINTENANCE_TICKET, { refetchQueries: ["PaginatedMaintenanceTickets", "MaintenanceTickets"] });
 
@@ -53,6 +47,10 @@ export default function NewTicketModal(props: NewTicketModalProps) {
       return instance;
     }
   }, [instances, instance]);
+
+  if (!(props.equipment || props.makerspace) || (props.equipment && props.makerspace)) {
+    return;
+  }
 
 
   const makerspace_equipments_2 = props.makerspace?.rooms.map((room) => (room.equipment))

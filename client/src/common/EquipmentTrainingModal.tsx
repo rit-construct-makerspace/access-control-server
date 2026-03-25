@@ -12,7 +12,6 @@ import CircularProgressWithContent from "./CircularProgressWithContent";
 import CheckIcon from '@mui/icons-material/Check';
 import { useIsMobile } from "./IsMobileProvider";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 
 interface EquipmentTrainingModalProps {
   makerspaceTrainings: {
@@ -38,11 +37,6 @@ interface EquipmentTrainingModalProps {
 export default function EquipmentTrainingModal(props: EquipmentTrainingModalProps) {
   const user = useCurrentUser();
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
-
-  if (props.equipmentTrainings.trainingModules.length === 0 && !props.requiresInPerson) {
-    return;
-  }
 
   const hasApprovedAccessCheck: boolean = user.accessChecks.some((ac) => Number(ac.equipmentID) === Number(props.equipmentTrainings.id) && ac.approved)
 
@@ -64,6 +58,10 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
   const percentComplete: number = Math.round(totalReqsComplete / totalRequirements * 100);
 
   const [open, setOpen] = useState(false);
+
+  if (props.equipmentTrainings.trainingModules.length === 0 && !props.requiresInPerson) {
+    return;
+  }
 
   return (
     <Stack width={"100%"} height={"100%"} justifyContent={"center"} alignItems={"center"}>

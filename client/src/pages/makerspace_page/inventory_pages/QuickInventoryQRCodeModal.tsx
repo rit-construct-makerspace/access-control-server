@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Paper, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
@@ -58,7 +58,7 @@ export default function QuickInventoryQRCodeModal(props: QuickInventoryQRCodeMod
       // Set canvas dimensions to match SVG
       canvas.width = img.width;
       canvas.height = img.height;
-      if (ctx === null) { return };
+      if (ctx === null) { return; }
       ctx.drawImage(img, 0, 0);
 
       // Copy to clipboard as a PNG
@@ -107,7 +107,7 @@ export default function QuickInventoryQRCodeModal(props: QuickInventoryQRCodeMod
           options={mode === "item" ? items : tags}
           disabled={mode === undefined || mode === null}
           onChange={(_e, newValue) => setTarget(newValue ?? undefined)}
-          // @ts-expect-error
+          // @ts-expect-error If it doesn't exist on one, then the other must exist
           getOptionLabel={(option) => option.label ?? option.name}
           fullWidth
         />
