@@ -37,7 +37,12 @@ export async function updateAccessControllerDurationByDeviceAndChannelID(deviceI
   await knex("AccessControllers").update({ tempDuration: tempDuration }).where({ deviceID: deviceID, channelID: channelID });
 }
 
-export async function getUnpairedAccessControllers(): Promise<AccessController[]> {
-  const result = await knex("AccessControllers").whereNotExists(knex("EquipmentInstances").where("EquipmentInstances.controllerID", "=", knex.ref("AccessControllers.id"))).select("*");
+export async function getUnpairedAccessControllers(makerspaceID: number): Promise<AccessController[]> {
+  const result = await knex("AccessControllers").select("*").join("Devices", "AccessControllers.deviceID", "Devices.id")
+    // Not assigned to an instance
+    .whereNotExists(knex("EquipmentInstances").where("EquipmentInstances.controllerID", "=", knex.ref("AccessControllers.id")))
+    // Filter to devices in the target makerspace
+    .andWhere("Devices.makerspaceID", "=", makerspaceID);
+
   return result.map((raw) => new AccessController(raw));
 }

@@ -100,10 +100,12 @@ const DeviceResolver = {
 
     getUnpairedAccessControllers: async (
       _parent: any,
-      _args: any,
+      args: {
+        makerspaceID: number
+      },
       { isStaff }: ApolloContext
     ) => isStaff(async (_user) => (
-      await ACRepo.getUnpairedAccessControllers()
+      await ACRepo.getUnpairedAccessControllers(args.makerspaceID)
     )),
   },
 
