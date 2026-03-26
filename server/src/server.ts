@@ -35,6 +35,10 @@ import { InventoryItemRow } from "./db/tables.js";
 import * as API from "./api/api.js";
 import { getDeviceBySN } from "./repositories/Devices/DeviceRepository.js";
 import { authenticateDevice } from "./api/devices/deviceApi.js";
+import { WebSocketServer } from "ws";
+import { createServer } from "http";
+import { Aedes } from 'aedes'
+import { createWebSocketStream } from "ws";
 
 const require = createRequire(import.meta.url);
 
@@ -63,6 +67,7 @@ async function startServer() {
   var wsserver = expressWs(exp);
   var app = wsserver.app;
 
+  const httpServer = createServer(app);
 
   //Configure CORS
   app.use(cors(CORS_CONFIG));
@@ -564,12 +569,41 @@ async function startServer() {
 
   console.log(process.env.ID_FORMAT);
 
+
+  // AEDES MQTT broker initialization
+  const aedes = await Aedes.createBroker();
+
+  const mqttWSS = new WebSocketServer({
+    server: httpServer,
+    path: "/mqtt"
+  });
+
+  mqttWSS.on("connection", (websocket, req) => {
+    const stream = createWebSocketStream(websocket);
+    aedes.handle(stream, req);
+  })
+
+  aedes.on('client', (client) => {
+    console.log(`[MQTT] Client Connected: ${client ? client.id : 'unknown'}`);
+  });
+
+  aedes.on("connectionError", (client, error) => {
+    console.log(`[MQTT] Connection Error from ${client ? client.id : 'unknown'}: ${error}`)
+  })
+
+  aedes.on('publish', (packet, client) => {
+    // Ignore internal Aedes $SYS messages to keep the console clean
+    if (client && !packet.topic.startsWith('$SYS')) {
+      console.log(`[MQTT] Message from ${client.id} on topic '${packet.topic}': ${packet.payload.toString()}`);
+    }
+  });
+
   const pingResponse = await pingAtrium();
   if (typeof pingResponse !== 'boolean' || pingResponse == false) {
     console.error("Unable to contact atrium api. Currency functionality may be limited", pingResponse);
   }
 
-  app.listen({ port: PORT }, () => {
+  httpServer.listen({ port: PORT }, () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     )
