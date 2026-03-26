@@ -70,3 +70,81 @@ export enum CoreInfoOptions {
 export interface CoreInfoRequest {
   fields: CoreInfoOptions[];
 }
+
+/**
+ * Shape of what the server will send to the core in response to
+ * an authTo request
+ */
+export interface ServerAuthToResponse {
+  channels: {
+    channelID: number;
+    state: AccessControllerState;
+    approved: boolean;
+    reason: string;
+  }[];
+  cardTagID: string;
+}
+
+export enum CoreFiles {
+  CERT = "CERT",
+  OFFLINE_LIST = "OFFLINE_LIST",
+  OTA = "OTA"
+}
+
+/**
+ * Shape of what the server sends to the core when the server
+ * wants the core to update its configuration
+ */
+export interface ServerConfigUpdateRequest {
+  inputMode?: CoreInputMode;
+  channels?: {
+    id: number;
+    tempDuration?: number;
+    getFiles?: CoreFiles[];
+  }[];
+}
+
+export enum CoreActions {
+  RESTART = "RESTART",
+  SEAL = "SEAL",
+  IDENTIFY = "IDENTIFY"
+}
+
+/**
+ * Shape of what the server sends to the core when the server
+ * wants to command the core to take some action
+ */
+export interface ServerCommand {
+  toState?: {
+    id: number,
+    state: AccessControllerState
+  }[];
+  action?: CoreActions;
+  identifyChannel?: number;
+  flags?: CoreFlags;
+}
+
+export enum CoreRole {
+  WELCOME = "WELCOME",
+  EQUIPMENT = "EQUIPMENT"
+}
+
+/**
+ * Shape of what the server sends the core in response to
+ * an info request
+ */
+export interface ServerInfoResponse {
+  time?: number;
+  state?: {
+    id: number;
+    state: AccessControllerState
+  }[];
+  hmi?: {
+    role: CoreRole;
+    makerspace: string;
+    channels: {
+      channelID: number;
+      pairedEntity: string;
+    }[];
+  }
+}
