@@ -37,8 +37,9 @@ import { getDeviceBySN } from "./repositories/Devices/DeviceRepository.js";
 import { authenticateDevice } from "./api/devices/deviceApi.js";
 import { createWebSocketStream, WebSocketServer } from "ws";
 import { createServer } from "http";
-import { Aedes } from 'aedes';
+import { Aedes, AuthenticateError } from 'aedes';
 import mqtt from "mqtt";
+import * as DeviceRepo from "./repositories/Devices/DeviceRepository.js";
 
 const require = createRequire(import.meta.url);
 
@@ -578,10 +579,31 @@ async function startServer() {
     path: "/mqtt"
   });
 
+  aedes.authenticate = async function (_client, SN, password, done) {
+    const snString = SN ? SN.toString() : '';
+    const pwString = password ? password.toString() : '';
+
+    const device = await DeviceRepo.getDeviceBySN(snString);
+    if (device === undefined) {
+      // Return code 4: Bad Username or Password
+      const authError: AuthenticateError = Object.assign(new Error("Auth Failed"), { returnCode: 4 });
+      done(authError, false);
+    } else {
+      const key = await device.generateKey();
+      if (key === pwString) {
+        done(null, true);
+      } else {
+        // Return code 4: Bad Username or Password
+        const authError: AuthenticateError = Object.assign(new Error("Auth Failed"), { returnCode: 4 });
+        done(authError, false);
+      }
+    }
+  }
+
   mqttWSS.on("connection", (websocket, req) => {
     const stream = createWebSocketStream(websocket);
     aedes.handle(stream, req);
-  })
+  });
 
   // MQTT.js MQTT CLIENT
   const client = mqtt.connect("ws://localhost:3000/mqtt");
