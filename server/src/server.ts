@@ -35,10 +35,10 @@ import { InventoryItemRow } from "./db/tables.js";
 import * as API from "./api/api.js";
 import { getDeviceBySN } from "./repositories/Devices/DeviceRepository.js";
 import { authenticateDevice } from "./api/devices/deviceApi.js";
-import { WebSocketServer } from "ws";
+import { createWebSocketStream, WebSocketServer } from "ws";
 import { createServer } from "http";
-import { Aedes } from 'aedes'
-import { createWebSocketStream } from "ws";
+import { Aedes } from 'aedes';
+import mqtt from "mqtt";
 
 const require = createRequire(import.meta.url);
 
@@ -583,20 +583,25 @@ async function startServer() {
     aedes.handle(stream, req);
   })
 
-  aedes.on('client', (client) => {
-    console.log(`[MQTT] Client Connected: ${client ? client.id : 'unknown'}`);
+  // MQTT.js MQTT CLIENT
+  const client = mqtt.connect("ws://localhost:3000/mqtt");
+
+  client.on("connect", (_packet) => {
+    client.subscribe("makerspace/+/device/+/status", (err) => {
+      if (err) {
+        console.log(`[MQTT CLIENT] Error Subscribing: ${err}`)
+      }
+    });
   });
 
-  aedes.on("connectionError", (client, error) => {
-    console.log(`[MQTT] Connection Error from ${client ? client.id : 'unknown'}: ${error}`)
+
+
+  client.on("message", (topic, payload, packet) => {
+    console.log(
+      `[MQTT CLIENT] Received Message in: ${topic}
+      Message: ${payload}`
+    )
   })
-
-  aedes.on('publish', (packet, client) => {
-    // Ignore internal Aedes $SYS messages to keep the console clean
-    if (client && !packet.topic.startsWith('$SYS')) {
-      console.log(`[MQTT] Message from ${client.id} on topic '${packet.topic}': ${packet.payload.toString()}`);
-    }
-  });
 
   const pingResponse = await pingAtrium();
   if (typeof pingResponse !== 'boolean' || pingResponse == false) {
