@@ -10,13 +10,18 @@ import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
-import { AccessController, AccessControllerState, GET_ACCESS_CONTROLLER_BY_ID, SET_CORE_STATE } from "../../../queries/deviceQueries";
+import { AccessController, AccessControllerState, GET_ACCESS_CONTROLLER_BY_ID, GET_UNPAIRED_ACCESS_CONTROLLERS, SET_CORE_STATE } from "../../../queries/deviceQueries";
+import { useParams } from "react-router-dom";
 
 interface EquipmentInstanceCardProps {
   instance: EquipmentInstance;
 }
 
 export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps) {
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
+
+  const getUnpairedConrollersResult = useQuery(GET_UNPAIRED_ACCESS_CONTROLLERS, { variables: { makerspaceID: Number(makerspaceID) } });
+
   const [deleteInstance] = useMutation(DELETE_EQUIPMENT_INSTANCE, {
     refetchQueries: ["EquipmentInstances", "GetUnpairedReaders"]
   });
@@ -37,6 +42,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
     variables: { accessControllerID: props.instance.accessController?.id }
   });
   const currentAccessController: AccessController | undefined = currentAccessControllerResult.data?.getAccessControllerByID;
+  const upairedAccessControllers: AccessController[] | [] = getUnpairedConrollersResult.data?.getUnpairedAccessControllers ?? [];
 
 
   const [sendCommandedState] = useMutation(SET_CORE_STATE);
@@ -76,7 +82,9 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
         label={"Controller Pairing"}
       />}
       fullWidth
-      options={[]}
+      options={upairedAccessControllers}
+      getOptionLabel={(controller) => `${controller.device.name}:${controller.channelID}`}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
     />;
   }
 

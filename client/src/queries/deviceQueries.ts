@@ -136,3 +136,16 @@ export const GET_ACCESS_CONTROLLER_BY_ID = gql`
     }
   }
 `;
+
+export const GET_UNPAIRED_ACCESS_CONTROLLERS = gql`
+  query GetUnpairedAccessControllers($makerspaceID: Int!) {
+    getUnpairedAccessControllers(makerspaceID: $makerspaceID) {
+      id
+      channelID
+      device {
+        id
+        name
+      }
+    }
+  }
+`;
