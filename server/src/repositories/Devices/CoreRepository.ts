@@ -29,6 +29,9 @@ export async function getMakerspaceCores(makerspaceID: number): Promise<Core[]> 
   return await Promise.all(rawCores.map(async (raw) => (await Core.buid(raw))));
 }
 
+/**
+ * @deprecated The concept of a core having a state is outdated, state should be gotten and evaluated on a per-controller basis
+ */
 export async function getCoreState(deviceID: number): Promise<AccessControllerState> {
   const stateRankings = [AccessControllerState.IDLE, AccessControllerState.LOCKED_OUT, AccessControllerState.UNLOCKED, AccessControllerState.ALWAYS_ON, AccessControllerState.FAULT];
 

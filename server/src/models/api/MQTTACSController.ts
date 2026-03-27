@@ -1,4 +1,6 @@
 import mqtt from "mqtt";
+import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
+import { CoreStatusReport } from "./ACSFormats.js";
 
 
 export default class MQTTACSController {
@@ -13,7 +15,6 @@ export default class MQTTACSController {
 
     MQTTACSController.client.on("connect", (_packet) => {
       MQTTACSController.client.subscribe("makerspace/+/device/+/status", { qos: 2 });
-      MQTTACSController.client.subscribe("makerspace/+/device/+/cardTag", { qos: 2 });
       MQTTACSController.client.subscribe("makerspace/+/device/+/stateChange", { qos: 2 });
       MQTTACSController.client.subscribe("makerspace/+/device/+/log", { qos: 2 });
       MQTTACSController.client.subscribe("makerspace/+/device/+/authTo/request", { qos: 2 });
@@ -33,8 +34,6 @@ export default class MQTTACSController {
     switch (topicArray[4]) {
       case "status":
         return MQTTACSController.statusHandler(topic, payload, packet);
-      case "cardTag":
-        return MQTTACSController.cardTagHandler(topic, payload, packet);
       case "stateChange":
         return MQTTACSController.stateChangeHandler(topic, payload, packet);
       case "log":
@@ -48,12 +47,18 @@ export default class MQTTACSController {
     }
   }
 
-  private static statusHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+  private static async statusHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+    const topicArray = topic.split("/");
+    const deviceID = Number(topicArray[3]);
 
-  }
+    const core = await CoreRepo.getCoreByDeviceID(deviceID);
+    if (core === undefined) { return; }
 
-  private static cardTagHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+    const statusReport: CoreStatusReport = JSON.parse(payload.toString());
 
+    await core.statusUpdate(statusReport.currentCardTag);
+
+    statusReport.channels.forEach(async (channel) => await core.updateControllerState(channel.channelID, channel.state));
   }
 
   private static stateChangeHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
