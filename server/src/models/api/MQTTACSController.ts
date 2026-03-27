@@ -1,11 +1,9 @@
 import mqtt from "mqtt";
-import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
-import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js"
 import { CoreAuthToRequest, CoreConfigReport, CoreInfoRequest, CoreLogRequest, CoreStateChangeReport, CoreStatusReport, ServerAuthToResponse, ServerCommand, ServerConfigUpdateRequest, ServerInfoResponse } from "./ACSFormats.js";
-import { AccessControllerState } from "../../db/tables.js";
 import { ACSOrchestrator } from "./ACSOrchestrator.js";
 import { ACSController } from "./ACSController.js";
 import { Core } from "../devices/core.js";
+import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 
 
 export default class MQTTACSController extends ACSController {
@@ -55,8 +53,6 @@ export default class MQTTACSController extends ACSController {
   private static messageDirecter(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
 
-    console.log(`[MQTTACSContoller] Received message in ${topic}:\n${payload}`)
-
     if (topicArray.length < 5) { return; }
     switch (topicArray[4]) {
       case "status":
@@ -76,68 +72,80 @@ export default class MQTTACSController extends ACSController {
 
   private static async statusHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
-    const deviceID = Number(topicArray[3]);
-    MQTTACSController.registerDevice(deviceID);
+    const SN = topicArray[3];
+    const device = await DeviceRepo.getDeviceBySN(SN);
+    if (device == undefined) { return; }
+    MQTTACSController.registerDevice(device.id);
 
     const statusReport: CoreStatusReport = JSON.parse(payload.toString());
     // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreStatusReport(deviceID, statusReport);
+    ACSOrchestrator.handleCoreStatusReport(device.id, statusReport);
   }
 
   private static async stateChangeHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
-    const deviceID = Number(topicArray[3]);
-    MQTTACSController.registerDevice(deviceID);
+    const SN = topicArray[3];
+    const device = await DeviceRepo.getDeviceBySN(SN);
+    if (device == undefined) { return; }
+    MQTTACSController.registerDevice(device.id);
 
     const stateChangeReport: CoreStateChangeReport = JSON.parse(payload.toString());
     // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreStateChangeReport(deviceID, stateChangeReport);
+    ACSOrchestrator.handleCoreStateChangeReport(device.id, stateChangeReport);
   }
 
   private static async logHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
-    const deviceID = Number(topicArray[3]);
-    MQTTACSController.registerDevice(deviceID);
+    const SN = topicArray[3];
+    const device = await DeviceRepo.getDeviceBySN(SN);
+    if (device == undefined) { return; }
+    MQTTACSController.registerDevice(device.id);
 
     const logRequest: CoreLogRequest = JSON.parse(payload.toString());
     // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreLogRequest(deviceID, logRequest);
+    ACSOrchestrator.handleCoreLogRequest(device.id, logRequest);
   }
 
   private static async authToRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
-    const deviceID = Number(topicArray[3]);
-    MQTTACSController.registerDevice(deviceID);
+    const SN = topicArray[3];
+    const device = await DeviceRepo.getDeviceBySN(SN);
+    if (device == undefined) { return; }
+    MQTTACSController.registerDevice(device.id);
 
     const authToRequest: CoreAuthToRequest = JSON.parse(payload.toString());
     // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreAuthToRequest(deviceID, authToRequest);
+    ACSOrchestrator.handleCoreAuthToRequest(device.id, authToRequest);
   }
 
   private static async configReportHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
-    const deviceID = Number(topicArray[3]);
-    MQTTACSController.registerDevice(deviceID);
+    const SN = topicArray[3];
+    const device = await DeviceRepo.getDeviceBySN(SN);
+    if (device == undefined) { return; }
+    MQTTACSController.registerDevice(device.id);
 
     const configReport: CoreConfigReport = JSON.parse(payload.toString());
     // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreConfigReport(deviceID, configReport);
+    ACSOrchestrator.handleCoreConfigReport(device.id, configReport);
   }
 
   private static async infoRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
-    const deviceID = Number(topicArray[3]);
-    MQTTACSController.registerDevice(deviceID);
+    const SN = topicArray[3];
+    const device = await DeviceRepo.getDeviceBySN(SN);
+    if (device == undefined) { return; }
+    MQTTACSController.registerDevice(device.id);
 
     const infoRequest: CoreInfoRequest = JSON.parse(payload.toString());
     // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreInfoRequest(deviceID, infoRequest);
+    ACSOrchestrator.handleCoreInfoRequest(device.id, infoRequest);
   }
 
   sendCoreAuthToResponse(core: Core, response: ServerAuthToResponse): boolean {
