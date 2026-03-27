@@ -1,5 +1,5 @@
 import { ACSController } from "./ACSController.js";
-import { CoreAuthToRequest, CoreConfigReport, CoreInfoOptions, CoreInfoRequest, CoreLogRequest, CoreStateChangeReport, CoreStatusReport, ServerInfoResponse } from "./ACSFormats.js";
+import { CoreAuthToRequest, CoreConfigReport, CoreInfoOptions, CoreInfoRequest, CoreLogRequest, CoreStateChangeReport, CoreStatusReport, ServerCommand, ServerInfoResponse } from "./ACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
 import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
@@ -89,5 +89,12 @@ export class ACSOrchestrator {
     }
 
     ACSOrchestrator.getDeviceController(core.deviceID)?.sendCoreInfoResponse(core, response);
+  }
+
+  public static async handleSendCoreCommand(deviceID: number, command: ServerCommand) {
+    const core = await CoreRepo.getCoreByDeviceID(deviceID);
+    if (core === undefined) { return; }
+
+    ACSOrchestrator.getDeviceController(deviceID)?.sendCoreCommand(core, command);
   }
 }
