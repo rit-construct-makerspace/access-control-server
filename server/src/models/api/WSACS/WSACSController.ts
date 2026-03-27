@@ -1,13 +1,13 @@
 import * as ws from "ws";
 import { Request } from "express";
 import { CoreInfoRequests, WSACSCoreUnprompted, WSACSServerError, WSACSServerUnprompted, WSACSServerPrompted } from "./WSACSFormats.js";
-import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
-import * as UserRepo from "../../repositories/Users/UserRepository.js";
-import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
-import { AccessControllerState, DeviceLogSeverity } from "../../db/tables.js";
-import { AccessAttemptReason } from "../devices/accessController.js";
-import * as DeviceLogRepo from "../../repositories/Logs/DeviceLogsRepository.js";
-import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
+import * as CoreRepo from "../../../repositories/Devices/CoreRepository.js";
+import * as UserRepo from "../../../repositories/Users/UserRepository.js";
+import * as AuditLogRepo from "../../../repositories/AuditLogs/AuditLogRepository.js";
+import { AccessControllerState, DeviceLogSeverity } from "../../../db/tables.js";
+import { AccessAttemptReason } from "../../devices/accessController.js";
+import * as DeviceLogRepo from "../../../repositories/Logs/DeviceLogsRepository.js";
+import * as DeviceRepo from "../../../repositories/Devices/DeviceRepository.js";
 
 type ConnectionData = {
   ws: ws.WebSocket;

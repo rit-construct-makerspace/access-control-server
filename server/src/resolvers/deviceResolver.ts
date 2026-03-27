@@ -7,9 +7,9 @@ import * as UserRepo from "../repositories/Users/UserRepository.js";
 import * as CoreRepo from "../repositories/Devices/CoreRepository.js";
 import * as DispenserRepo from "../repositories/Devices/DispenserRepository.js";
 import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js";
-import { CoreActions, CoreFlags, WSACSServerUnprompted } from "../models/api/WSACSFormats.js";
+import { CoreActions, CoreFlags, WSACSServerUnprompted } from "../models/api/WSACS/WSACSFormats.js";
 import { EntityNotFound } from "../EntityNotFound.js";
-import WSACSController from "../models/api/WSACSController.js";
+import WSACSController from "../models/api/WSACS/WSACSController.js";
 
 const DeviceResolver = {
   Core: {

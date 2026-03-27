@@ -4,10 +4,10 @@ import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import * as ShlugControl from "../../wsapi.js"
 import { CurrentUser } from "../../context.js";
-import WSACSController from "../api/WSACSController.js";
+import WSACSController from "../api/WSACS/WSACSController.js";
 import { AccessController } from "./accessController.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
-import { CoreConfig, CoreFlags, WSACSServerUnprompted } from "../api/WSACSFormats.js";
+import { CoreConfig, CoreFlags, WSACSServerUnprompted } from "../api/WSACS/WSACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
 import { ACSDeployment } from "../ACS/deployment.js";

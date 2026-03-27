@@ -4,7 +4,7 @@ import { AccessControllerState, CoreInputMode, CoreRow } from "../../db/tables.j
 import { Core } from "../../models/devices/core.js";
 import * as ACRepo from "./AccessControllerRepository.js";
 import * as DeviceRepo from "./DeviceRepository.js";
-import { CoreFlags } from "../../models/api/WSACSFormats.js";
+import { CoreFlags } from "../../models/api/WSACS/WSACSFormats.js";
 import { ACSDeployment } from "../../models/ACS/deployment.js";
 
 export async function getCoreByDeviceID(deviceID: number): Promise<Core | undefined> {
