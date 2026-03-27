@@ -4,7 +4,9 @@ import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
 import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as DeviceLogRepo from "../../repositories/Logs/DeviceLogsRepository.js";
+import * as UserRepo from "../../repositories/Users/UserRepository.js";
 import { AccessControllerState, DeviceLogSeverity } from "../../db/tables.js";
+import { AccessAttemptReason } from "../devices/accessController.js";
 
 export class ACSOrchestrator {
   private static coreControllers: Map<number, ACSController> = new Map();
@@ -67,9 +69,38 @@ export class ACSOrchestrator {
 
   public static async handleCoreAuthToRequest(deviceID: number, authToRequest: CoreAuthToRequest) {
     const core = await CoreRepo.getCoreByDeviceID(deviceID);
-    if (core === undefined) { return; }
+    const user = await UserRepo.getUserByCardTagID(authToRequest.cardTagID);
 
+    if (core === undefined || user === undefined) {
+      AuditLogRepo.createAuditLog(
+        `{user} failed to activate {device}`,
+        "auth",
+        core?.makerspaceID,
+        { id: user?.id ?? -1, label: user ? `${user.firstName} ${user.lastName}` : "Unknown User" },
+        { id: deviceID, label: core ? core.name : "unkown device" }
+      );
 
+      if (core !== undefined) {
+        const controllers = await core.getAccessControllers();
+        ACSOrchestrator.getDeviceController(deviceID)?.sendCoreAuthToResponse(core, {
+          channels: controllers.map((controller) => ({
+            channelID: controller.channelID,
+            state: authToRequest.state,
+            approved: false,
+            reason: AccessAttemptReason.UNKNOWN_USER
+          })),
+          cardTagID: authToRequest.cardTagID
+        })
+      }
+      return;
+    }
+
+    const attemptResult = await core.authTo(user.id, authToRequest.state, true);
+
+    ACSOrchestrator.getDeviceController(deviceID)?.sendCoreAuthToResponse(core, {
+      channels: attemptResult,
+      cardTagID: authToRequest.cardTagID
+    })
   }
 
   public static async handleCoreConfigReport(deviceID: number, configReport: CoreConfigReport) {
