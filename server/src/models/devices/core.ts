@@ -138,4 +138,32 @@ export class Core extends Device implements CoreRow {
       await this.updateFirmwareVersion(config.firmware);
     }
   }
+
+  async authTo(userID: number, toState: AccessControllerState, log?: boolean): Promise<{
+    channelID: number;
+    state: AccessControllerState;
+    approved: boolean;
+    reason: string;
+  }[]> {
+    const result: {
+      channelID: number;
+      state: AccessControllerState;
+      approved: boolean;
+      reason: string;
+    }[] = [];
+
+    const controllers = await this.getAccessControllers();
+
+    controllers.forEach(async (controller) => {
+      if (toState === AccessControllerState.UNLOCKED) {
+        const attempt = await controller.canUnlock(userID, log);
+        result.push({ channelID: controller.channelID, state: toState, approved: attempt.hasAccess, reason: attempt.reason });
+      } else {
+        const attempt = await controller.canControl(userID);
+        result.push({ channelID: controller.channelID, state: toState, approved: attempt.canControl, reason: attempt.reason });
+      }
+    })
+
+    return result;
+  }
 }
