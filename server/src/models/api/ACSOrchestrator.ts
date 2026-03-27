@@ -1,5 +1,5 @@
 import { ACSController } from "./ACSController.js";
-import { CoreAuthToRequest, CoreConfigReport, CoreInfoRequest, CoreLogRequest, CoreStateChangeReport, CoreStatusReport } from "./ACSFormats.js";
+import { CoreAuthToRequest, CoreConfigReport, CoreInfoOptions, CoreInfoRequest, CoreLogRequest, CoreStateChangeReport, CoreStatusReport, ServerInfoResponse } from "./ACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
 import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
@@ -66,6 +66,9 @@ export class ACSOrchestrator {
   }
 
   public static async handleCoreAuthToRequest(deviceID: number, authToRequest: CoreAuthToRequest) {
+    const core = await CoreRepo.getCoreByDeviceID(deviceID);
+    if (core === undefined) { return; }
+
 
   }
 
@@ -74,6 +77,17 @@ export class ACSOrchestrator {
   }
 
   public static async handleCoreInfoRequest(deviceID: number, infoRequest: CoreInfoRequest) {
+    const core = await CoreRepo.getCoreByDeviceID(deviceID);
+    if (core === undefined) { return; }
 
+    const response: ServerInfoResponse = {
+      time: infoRequest.fields.includes(CoreInfoOptions.TIME)
+        ? (new Date).getTime() : undefined,
+      state: infoRequest.fields.includes(CoreInfoOptions.STATE)
+        ? (await core.getAccessControllers()).map((controller) => ({ id: controller.channelID, state: controller.state })) : undefined,
+      hmi: undefined
+    }
+
+    ACSOrchestrator.getDeviceController(core.deviceID)?.sendCoreInfoResponse(core, response);
   }
 }
