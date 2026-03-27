@@ -12,6 +12,11 @@ export async function getAccessControllersByDeviceID(deviceID: number): Promise<
   return coolRows;
 }
 
+export async function getAccessControllersByDeviceAndChannelID(deviceID: number, channelID: number): Promise<AccessController | undefined> {
+  const rawRow = await knex("AccessControllers").where({ deviceID: deviceID, channelID: channelID }).first();
+  return rawRow ? new AccessController(rawRow) : undefined;
+}
+
 export async function updateAccessController(newRow: AccessControllerRow): Promise<AccessController | undefined> {
   const rawResult = await knex("AccessControllers").where("id", newRow.id).update(newRow).returning("*");
   if (rawResult.length < 1) {

@@ -1,6 +1,8 @@
 import mqtt from "mqtt";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
-import { CoreStatusReport } from "./ACSFormats.js";
+import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js"
+import { CoreStateChangeReport, CoreStatusReport } from "./ACSFormats.js";
+import { AccessControllerState } from "../../db/tables.js";
 
 
 export default class MQTTACSController {
@@ -55,29 +57,48 @@ export default class MQTTACSController {
     if (core === undefined) { return; }
 
     const statusReport: CoreStatusReport = JSON.parse(payload.toString());
-
     await core.statusUpdate(statusReport.currentCardTag);
 
     statusReport.channels.forEach(async (channel) => await core.updateControllerState(channel.channelID, channel.state));
   }
 
-  private static stateChangeHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+  private static async stateChangeHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+    const topicArray = topic.split("/");
+    const deviceID = Number(topicArray[3]);
+
+    const core = await CoreRepo.getCoreByDeviceID(deviceID);
+    if (core === undefined) { return; }
+
+    const stateChangeReport: CoreStateChangeReport = JSON.parse(payload.toString());
+
+    const oldCardTag = core.currentCardTag;
+
+    await core.statusUpdate(stateChangeReport.currentCardTag);
+
+    stateChangeReport.channels.forEach(async (channel) => {
+      if (channel.fromState === AccessControllerState.UNLOCKED) {
+        // Leaving UNLOCKED, register an end of session message
+        (await ACRepo.getAccessControllersByDeviceAndChannelID(deviceID, channel.channelID))?.endSession(oldCardTag ?? "");
+      } else if (channel.toState === AccessControllerState.UNLOCKED) {
+        // TODO: Register start of session
+      }
+      await core.updateControllerState(channel.channelID, channel.toState);
+    })
+  }
+
+  private static async logHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
 
   }
 
-  private static logHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+  private static async authToRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
 
   }
 
-  private static authToRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+  private static async configReportHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
 
   }
 
-  private static configReportHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
-
-  }
-
-  private static infoRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+  private static async infoRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
 
   }
 }
