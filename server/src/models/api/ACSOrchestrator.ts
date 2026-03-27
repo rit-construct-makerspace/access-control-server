@@ -8,7 +8,7 @@ export class ACSOrchestrator {
     ACSOrchestrator.coreControllers.set(deviceID, controller);
   }
 
-  public getCoreController(deviceID: number): ACSController | undefined {
+  public getDeviceController(deviceID: number): ACSController | undefined {
     return ACSOrchestrator.coreControllers.get(deviceID);
   }
 
