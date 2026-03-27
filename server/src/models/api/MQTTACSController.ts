@@ -17,7 +17,10 @@ export default class MQTTACSController extends ACSController {
       return false;
     }
 
-    MQTTACSController.client = mqtt.connect("ws://localhost:3000/mqtt");
+    MQTTACSController.client = mqtt.connect("ws://localhost:3000/mqtt", {
+      username: "SERVER",
+      password: process.env.SERVER_MQTT_PASSWORD
+    });
 
     MQTTACSController.client.on("connect", (_packet) => {
       MQTTACSController.client.subscribe("makerspace/+/device/+/status", { qos: 2 });
@@ -28,7 +31,13 @@ export default class MQTTACSController extends ACSController {
       MQTTACSController.client.subscribe("makerspace/+/device/+/info/request", { qos: 2 });
     });
 
-    MQTTACSController.client.on("message", MQTTACSController.messageDirecter)
+    MQTTACSController.client.on("error", (error) => console.log(`[MQTTACSController] Error: ${error}`))
+
+    MQTTACSController.client.on("disconnect", (packet) => {
+      console.log(`[MQTTACSController] Disconnected: ${packet}`)
+    })
+
+    MQTTACSController.client.on("message", MQTTACSController.messageDirecter);
 
     return true;
   }
@@ -45,6 +54,8 @@ export default class MQTTACSController extends ACSController {
 
   private static messageDirecter(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
+
+    console.log(`[MQTTACSContoller] Received message in ${topic}:\n${payload}`)
 
     if (topicArray.length < 5) { return; }
     switch (topicArray[4]) {

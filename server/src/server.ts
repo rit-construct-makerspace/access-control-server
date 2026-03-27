@@ -40,6 +40,7 @@ import { createServer } from "http";
 import { Aedes, AuthenticateError } from 'aedes';
 import mqtt from "mqtt";
 import * as DeviceRepo from "./repositories/Devices/DeviceRepository.js";
+import MQTTACSController from "./models/api/MQTTACSController.js";
 
 const require = createRequire(import.meta.url);
 
@@ -583,6 +584,16 @@ async function startServer() {
     const snString = SN ? SN.toString() : '';
     const pwString = password ? password.toString() : '';
 
+    if (snString === "SERVER") {
+      if (pwString === process.env.SERVER_MQTT_PASSWORD && process.env.SERVER_MQTT_PASSWORD !== undefined) {
+        done(null, true);
+      } else {
+        const authError: AuthenticateError = Object.assign(new Error("Auth Failed"), { returnCode: 4 });
+        done(authError, false);
+      }
+      return;
+    }
+
     const device = await DeviceRepo.getDeviceBySN(snString);
     if (device === undefined) {
       // Return code 4: Bad Username or Password
@@ -606,24 +617,7 @@ async function startServer() {
   });
 
   // MQTT.js MQTT CLIENT
-  const client = mqtt.connect("ws://localhost:3000/mqtt");
-
-  client.on("connect", (_packet) => {
-    client.subscribe("makerspace/+/device/+/status", (err) => {
-      if (err) {
-        console.log(`[MQTT CLIENT] Error Subscribing: ${err}`)
-      }
-    });
-  });
-
-
-
-  client.on("message", (topic, payload, packet) => {
-    console.log(
-      `[MQTT CLIENT] Received Message in: ${topic}
-      Message: ${payload}`
-    )
-  })
+  const result = MQTTACSController.initialize();
 
   const pingResponse = await pingAtrium();
   if (typeof pingResponse !== 'boolean' || pingResponse == false) {
