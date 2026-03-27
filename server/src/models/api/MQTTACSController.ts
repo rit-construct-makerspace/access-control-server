@@ -1,12 +1,16 @@
 import mqtt from "mqtt";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js"
-import { CoreStateChangeReport, CoreStatusReport } from "./ACSFormats.js";
+import { CoreAuthToRequest, CoreConfigReport, CoreInfoRequest, CoreLogRequest, CoreStateChangeReport, CoreStatusReport, ServerAuthToResponse, ServerCommand, ServerConfigUpdateRequest, ServerInfoResponse } from "./ACSFormats.js";
 import { AccessControllerState } from "../../db/tables.js";
+import { ACSOrchestrator } from "./ACSOrchestrator.js";
+import { ACSController } from "./ACSController.js";
+import { Core } from "../devices/core.js";
 
 
-export default class MQTTACSController {
+export default class MQTTACSController extends ACSController {
   private static client: mqtt.MqttClient;
+  private static self: MQTTACSController = new MQTTACSController();
 
   public static initialize(): boolean {
     if (MQTTACSController.client !== undefined) {
@@ -27,6 +31,16 @@ export default class MQTTACSController {
     MQTTACSController.client.on("message", MQTTACSController.messageDirecter)
 
     return true;
+  }
+
+  public getName(): string {
+    return "MQTTACSController"
+  }
+
+  private static registerDevice(deviceID: number) {
+    if (ACSOrchestrator.getDeviceController(deviceID)?.getName() !== MQTTACSController.self.getName()) {
+      ACSOrchestrator.registerDevice(deviceID, MQTTACSController.self);
+    }
   }
 
   private static messageDirecter(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
@@ -52,53 +66,102 @@ export default class MQTTACSController {
   private static async statusHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
     const deviceID = Number(topicArray[3]);
-
-    const core = await CoreRepo.getCoreByDeviceID(deviceID);
-    if (core === undefined) { return; }
+    MQTTACSController.registerDevice(deviceID);
 
     const statusReport: CoreStatusReport = JSON.parse(payload.toString());
-    await core.statusUpdate(statusReport.currentCardTag);
+    // TODO: INPUT VALIDATION
 
-    statusReport.channels.forEach(async (channel) => await core.updateControllerState(channel.channelID, channel.state));
+    ACSOrchestrator.handleCoreStatusReport(deviceID, statusReport);
   }
 
   private static async stateChangeHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
     const deviceID = Number(topicArray[3]);
-
-    const core = await CoreRepo.getCoreByDeviceID(deviceID);
-    if (core === undefined) { return; }
+    MQTTACSController.registerDevice(deviceID);
 
     const stateChangeReport: CoreStateChangeReport = JSON.parse(payload.toString());
+    // TODO: INPUT VALIDATION
 
-    const oldCardTag = core.currentCardTag;
-
-    await core.statusUpdate(stateChangeReport.currentCardTag);
-
-    stateChangeReport.channels.forEach(async (channel) => {
-      if (channel.fromState === AccessControllerState.UNLOCKED) {
-        // Leaving UNLOCKED, register an end of session message
-        (await ACRepo.getAccessControllersByDeviceAndChannelID(deviceID, channel.channelID))?.endSession(oldCardTag ?? "");
-      } else if (channel.toState === AccessControllerState.UNLOCKED) {
-        // TODO: Register start of session
-      }
-      await core.updateControllerState(channel.channelID, channel.toState);
-    })
+    ACSOrchestrator.handleCoreStateChangeReport(deviceID, stateChangeReport);
   }
 
   private static async logHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+    const topicArray = topic.split("/");
+    const deviceID = Number(topicArray[3]);
+    MQTTACSController.registerDevice(deviceID);
 
+    const logRequest: CoreLogRequest = JSON.parse(payload.toString());
+    // TODO: INPUT VALIDATION
+
+    ACSOrchestrator.handleCoreLogRequest(deviceID, logRequest);
   }
 
   private static async authToRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+    const topicArray = topic.split("/");
+    const deviceID = Number(topicArray[3]);
+    MQTTACSController.registerDevice(deviceID);
 
+    const authToRequest: CoreAuthToRequest = JSON.parse(payload.toString());
+    // TODO: INPUT VALIDATION
+
+    ACSOrchestrator.handleCoreAuthToRequest(deviceID, authToRequest);
   }
 
   private static async configReportHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+    const topicArray = topic.split("/");
+    const deviceID = Number(topicArray[3]);
+    MQTTACSController.registerDevice(deviceID);
 
+    const configReport: CoreConfigReport = JSON.parse(payload.toString());
+    // TODO: INPUT VALIDATION
+
+    ACSOrchestrator.handleCoreConfigReport(deviceID, configReport);
   }
 
   private static async infoRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+    const topicArray = topic.split("/");
+    const deviceID = Number(topicArray[3]);
+    MQTTACSController.registerDevice(deviceID);
 
+    const infoRequest: CoreInfoRequest = JSON.parse(payload.toString());
+    // TODO: INPUT VALIDATION
+
+    ACSOrchestrator.handleCoreInfoRequest(deviceID, infoRequest);
+  }
+
+  sendCoreAuthToResponse(core: Core, response: ServerAuthToResponse): boolean {
+    try {
+      MQTTACSController.client.publish(`makerspace/${core.makerspaceID}/device/${core.SN}/authTo/response`, JSON.stringify(response), { qos: 2 });
+    } catch (_e) {
+      return false;
+    }
+    return true;
+  }
+
+  sendCoreConfigUpdate(core: Core, update: ServerConfigUpdateRequest): boolean {
+    try {
+      MQTTACSController.client.publish(`makerspace/${core.makerspaceID}/device/${core.SN}/config/update`, JSON.stringify(update), { qos: 2 });
+    } catch (_e) {
+      return false;
+    }
+    return true;
+  }
+
+  sendCoreInfoResponse(core: Core, response: ServerInfoResponse): boolean {
+    try {
+      MQTTACSController.client.publish(`makerspace/${core.makerspaceID}/device/${core.SN}/info/response`, JSON.stringify(response), { qos: 2 });
+    } catch (_e) {
+      return false;
+    }
+    return true;
+  }
+
+  sendCoreCommand(core: Core, command: ServerCommand): boolean {
+    try {
+      MQTTACSController.client.publish(`makerspace/${core.makerspaceID}/device/${core.SN}/command`, JSON.stringify(command), { qos: 2 });
+    } catch (_e) {
+      return false;
+    }
+    return true;
   }
 }
