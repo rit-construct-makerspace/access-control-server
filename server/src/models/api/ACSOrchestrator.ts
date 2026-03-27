@@ -2,7 +2,9 @@ import { ACSController } from "./ACSController.js";
 import { CoreAuthToRequest, CoreConfigReport, CoreInfoRequest, CoreLogRequest, CoreStateChangeReport, CoreStatusReport } from "./ACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
-import { AccessControllerState } from "../../db/tables.js";
+import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
+import * as DeviceLogRepo from "../../repositories/Logs/DeviceLogsRepository.js";
+import { AccessControllerState, DeviceLogSeverity } from "../../db/tables.js";
 
 export class ACSOrchestrator {
   private static coreControllers: Map<number, ACSController> = new Map();
@@ -44,7 +46,23 @@ export class ACSOrchestrator {
   }
 
   public static async handleCoreLogRequest(deviceID: number, logRequest: CoreLogRequest) {
+    const core = await CoreRepo.getCoreByDeviceID(deviceID);
+    if (core === undefined) { return; }
 
+    if (logRequest.auditLog) {
+      AuditLogRepo.createAuditLog(
+        `Message from {device}: ${logRequest.message}`,
+        logRequest.category,
+        core.makerspaceID,
+        { id: core.deviceID, label: core.name }
+      )
+    } else {
+      DeviceLogRepo.createDeviceLog(
+        core.deviceID,
+        DeviceLogSeverity.LOW,
+        { type: "message", message: logRequest.message }
+      )
+    }
   }
 
   public static async handleCoreAuthToRequest(deviceID: number, authToRequest: CoreAuthToRequest) {
