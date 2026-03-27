@@ -154,7 +154,8 @@ export class Core extends Device implements CoreRow {
 
     const controllers = await this.getAccessControllers();
 
-    controllers.forEach(async (controller) => {
+    for (let i = 0; i < controllers.length; i++) {
+      let controller = controllers[i];
       if (toState === AccessControllerState.UNLOCKED) {
         const attempt = await controller.canUnlock(userID, log);
         result.push({ channelID: controller.channelID, state: toState, approved: attempt.hasAccess, reason: attempt.reason });
@@ -162,7 +163,7 @@ export class Core extends Device implements CoreRow {
         const attempt = await controller.canControl(userID);
         result.push({ channelID: controller.channelID, state: toState, approved: attempt.canControl, reason: attempt.reason });
       }
-    })
+    }
 
     return result;
   }
