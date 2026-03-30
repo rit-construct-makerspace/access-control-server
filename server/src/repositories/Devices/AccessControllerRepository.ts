@@ -35,7 +35,11 @@ export async function getAccessControllerByID(accessControllerID: number): Promi
 }
 
 export async function updateAccessControllerStateByDeviceAndChannelID(deviceID: number, channelID: number, newState: AccessControllerState): Promise<void> {
-  await knex("AccessControllers").update({ state: newState }).where({ deviceID: deviceID, channelID: channelID });
+  try {
+    await knex("AccessControllers").update({ state: newState }).where({ deviceID: deviceID, channelID: channelID });
+  } catch (e) {
+    console.log(`Update Controller state failed: ${e}`)
+  }
 }
 
 export async function updateAccessControllerDurationByDeviceAndChannelID(deviceID: number, channelID: number, tempDuration: number): Promise<void> {

@@ -67,6 +67,8 @@ export default class MQTTACSController extends ACSController {
         return MQTTACSController.configReportHandler(topic, payload, packet);
       case "info":
         return MQTTACSController.infoRequestHandler(topic, payload, packet);
+      default:
+        console.log("UNKOWN TOPIC: ", topicArray[4]);
     }
   }
 
@@ -93,7 +95,7 @@ export default class MQTTACSController extends ACSController {
     const stateChangeReport: CoreStateChangeReport = JSON.parse(payload.toString());
     // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreStateChangeReport(device.id, stateChangeReport);
+    await ACSOrchestrator.handleCoreStateChangeReport(device.id, stateChangeReport);
   }
 
   private static async logHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {

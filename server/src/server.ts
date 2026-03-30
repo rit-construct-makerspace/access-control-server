@@ -580,6 +580,8 @@ async function startServer() {
     path: "/mqtt"
   });
 
+  aedes.on("connectionError", (client, error) => console.log(`[MQTT SERVER] Client Connection Error: ${error}`))
+
   aedes.authenticate = async function (_client, SN, password, done) {
     const snString = SN ? SN.toString() : '';
     const pwString = password ? password.toString() : '';
@@ -601,7 +603,7 @@ async function startServer() {
       done(authError, false);
     } else {
       const key = await device.generateKey();
-      if (key === pwString) {
+      if (key === pwString || process.env.IS_DEV) {
         done(null, true);
       } else {
         // Return code 4: Bad Username or Password
