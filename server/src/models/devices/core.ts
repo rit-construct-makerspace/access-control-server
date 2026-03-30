@@ -11,6 +11,7 @@ import { CoreConfig, CoreFlags, WSACSServerUnprompted } from "../api/WSACS/WSACS
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
 import { ACSDeployment } from "../ACS/deployment.js";
+import { ACSOrchestrator } from "../api/ACSOrchestrator.js";
 
 export class Core extends Device implements CoreRow {
   deviceID: number;
@@ -65,7 +66,9 @@ export class Core extends Device implements CoreRow {
     };
 
     const success = WSACSController.sendCoreRequest(request, this.deviceID);
-
+    ACSOrchestrator.handleSendCoreCommand(this.deviceID, {
+      toState: controllers.map((controller) => ({ id: controller.channelID, state: targetState }))
+    })
     return true;
   }
 
