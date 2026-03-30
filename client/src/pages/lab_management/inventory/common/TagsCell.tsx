@@ -1,4 +1,4 @@
-import { IconButton, Select, MenuItem, Chip, Autocomplete, TextField } from "@mui/material";
+import { IconButton, Select, MenuItem, Chip } from "@mui/material";
 import { Stack } from "@mui/system";
 import InventoryItem, { InventoryTag } from "../../../../types/InventoryItem";
 import InventoryTagChip from "../InventoryTagChip";

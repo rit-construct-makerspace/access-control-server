@@ -32,6 +32,8 @@ export interface Equipment {
   requiresTrainerApproval: boolean;
   requiresInPerson: boolean;
   schedulable: boolean;
+  signOffUrl: string;
+  subName: string;
   room: {
     id: number;
     name: string;

@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, CardMedia, Link, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Button, Card, CardContent, CardMedia, IconButton, Link, Stack, Typography, useTheme } from "@mui/material";
 import Equipment from "../types/Equipment";
 import { useCurrentUser } from "./CurrentUserProvider";
 import { moduleStatusMapper, TrainingModule } from "./TrainingModuleUtils";
@@ -6,7 +6,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { useNavigate, useParams } from "react-router-dom";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import ThemedMarkdown from "./ThemedMarkdown";
-import { memo, useState } from "react";
+import { memo } from "react";
 import { makeCDNLink } from "./ImageFinder.js";
 import EquipmentTrainingModal from "./EquipmentTrainingModal";
 
@@ -45,8 +45,6 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
    */
   const hasNotTakenModule = moduleStatuses.some((ms: { status: string }) => ms.status === "Not taken");
 
-  const [trainingModal, setTrainingModal] = useState(false);
-
   return (
     <Card
       sx={{
@@ -60,12 +58,12 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
           <Stack direction="row" height={props.isMobile ? undefined : "200px"}>
             {props.isMobile ? null :
               <Stack alignItems="center">
-                <Box width="150px" height="200px">
+                <Box width="200px" height="200px">
                   <CardMedia
                     component="img"
                     image={makeCDNLink(props.equipment.imageUrl, "user-uploads/")}
                     alt={`Picture of ${props.equipment.name}`}
-                    sx={{ width: "150px", height: "200px", backgroundColor: "lightgray" }}
+                    sx={{ width: "200px", height: "200px", backgroundColor: "lightgray" }}
                   />
                 </Box>
               </Stack>
@@ -74,18 +72,22 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
             <Stack height="100%" width={"100%"}>
               {/* Title & Edit button */}
               <Stack direction="row" justifyContent="space-between" pl={"10px"}>
-                <Typography variant="h6">{props.equipment.archived ? `${props.equipment.name} (Hidden)` : props.equipment.name}</Typography>
+                <Stack>
+                  <Typography variant="h6">{props.equipment.archived ? `${props.equipment.name} (Hidden)` : props.equipment.name}</Typography>
+                  <Typography variant="subtitle1" fontStyle={"italic"} fontWeight={"regular"}>{props.equipment.subName}</Typography>
+                </Stack>
                 {
                   isPriviledged
-                    ? <Button
+                    ? <IconButton
                       onClick={() => { navigate(`/makerspace/${makerspaceID}/equipment/${props.equipment.id}`) }}
-                      aria-label="edit button"
-                      sx={{ width: "40px", height: "40px" }}
-                      variant="contained"
                       color="primary"
+                      sx={{
+                        width: "40px",
+                        height: "40px"
+                      }}
                     >
                       <ConstructionIcon />
-                    </Button>
+                    </IconButton>
                     : null
                 }
               </Stack>
@@ -105,6 +107,7 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
                       trainingModules: props.equipment.trainingModules,
                     }}
                     requiresInPerson={props.equipment.requiresInPerson}
+                    signOffUrl={props.equipment.signOffUrl}
                     preview={props.preview}
                   />
                 </Stack>

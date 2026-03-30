@@ -25,8 +25,6 @@ import AdminInventoryPage from "./pages/lab_management/inventory/AdminInventoryP
 import AnnouncementsPage from "./pages/lab_management/announcements/AnnouncementsPage";
 import EditAnnouncement from "./pages/lab_management/announcements/EditAnnouncement";
 import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnouncementPage";
-import NewReaderPage from "./pages/newreaderpage/NewReaderPage";
-import SiteSettingsPage from "./pages/site-settings/SiteSettingsPage";
 import StaffBar from "./pages/makerspace_page/StaffBar";
 import UsersPage from "./pages/lab_management/users/UsersPage";
 import UserPage from "./pages/lab_management/users/UserPage";
@@ -51,6 +49,10 @@ import InventoryPage from "./pages/makerspace_page/inventory_pages/InventoryPage
 import QuickEditInventoryPage from "./pages/makerspace_page/inventory_pages/QuickEditInventoryPage";
 import DevicesPage from "./pages/makerspace_page/device_pages/DevicesPage";
 import NewDevicePage from "./pages/makerspace_page/device_pages/NewDevicePage";
+import AdminBar from "./pages/site-settings/AdminBar";
+import ManageMakerspacesAdminPage from "./pages/site-settings/ManageMakerspacesPage";
+import LinkManagementAdminPage from "./pages/site-settings/LinkManagementAdminPage";
+import AdminHistoryPage from "./pages/site-settings/AdminHistoryPage";
 
 function AppRoot() {
   return (
@@ -191,8 +193,6 @@ export const appRouter = createBrowserRouter(
                             { path: "/makerspace/:makerspaceID/maintenance", element: <MaintenancePage /> },
                             { path: "/makerspace/:makerspaceID/reservations", element: <ManageReservationsPage /> },
 
-                            { path: "/makerspace/:makerspaceID/devices", element: <DevicesPage /> },
-
                             /* Routes for manager + higher */
                             {
                               element: <ManagerRoute />,
@@ -201,6 +201,7 @@ export const appRouter = createBrowserRouter(
                                 { path: "/makerspace/:makerspaceID/edit/room/:roomID", element: <ManageRoomPage /> },
                                 { path: "/makerspace/:makerspaceID/currency", element: <CurrencyPage /> },
 
+                                { path: "/makerspace/:makerspaceID/devices", element: <DevicesPage /> },
                                 { path: "/makerspace/:makerspaceID/devices/new", element: <NewDevicePage /> },
                               ],
                             },
@@ -215,16 +216,20 @@ export const appRouter = createBrowserRouter(
                 /* Routes for admins */
                 {
                   element: <AdminRoute />,
-                  children: [
-                    { path: "/admin/announcements", element: <AnnouncementsPage /> },
-                    { path: "/admin/announcements/:id", element: <EditAnnouncement /> },
-                    { path: "/admin/announcements/new", element: <NewAnnouncementPage /> },
+                  children: [{
+                    path: "/admin",
+                    element: <AdminBar />,
+                    children: [
+                      { path: "/admin/announcements", element: <AnnouncementsPage /> },
+                      { path: "/admin/announcements/:id", element: <EditAnnouncement /> },
+                      { path: "/admin/announcements/new", element: <NewAnnouncementPage /> },
 
-                    { path: "/admin/inventory", element: <AdminInventoryPage /> },
-
-                    { path: "/admin/newreader", element: <NewReaderPage /> },
-                    { path: "/admin/settings", element: <SiteSettingsPage /> },
-                  ],
+                      { path: "/admin/inventory", element: <AdminInventoryPage /> },
+                      { path: "/admin/makerspaces", element: <ManageMakerspacesAdminPage /> },
+                      { path: "/admin/links", element: <LinkManagementAdminPage /> },
+                      { path: "/admin/history", element: <AdminHistoryPage /> },
+                    ]
+                  }],
                 },
 
                 { path: "/maker/training", element: <TrainingPage /> },

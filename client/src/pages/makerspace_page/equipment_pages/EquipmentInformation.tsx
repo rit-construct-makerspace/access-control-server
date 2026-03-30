@@ -82,6 +82,9 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [schedulable, setSchedulable] = useState(props.equipment.schedulable);
   const [room, setRoom] = useState(props.equipment.room);
   const [moduleIDs, setModuleIds] = useState(props.equipment.trainingModules.map((mod) => mod.id));
+  const [signOffUrl, setSignOffUrl] = useState(props.equipment.signOffUrl);
+  const [subName, setSubName] = useState(props.equipment.subName);
+
   const [unsaved, setUnsaved] = useState(false);
   const [blockerDialogOpen, setBlockerDialogOpen] = useState(false);
 
@@ -100,6 +103,8 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         requiresTrainerApproval: requiresTrainer,
         requiresInPerson: requiresInPerson,
         schedulable: schedulable,
+        subName: subName,
+        signOffUrl: signOffUrl
       },
     });
 
@@ -221,6 +226,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         </Stack>
 
         <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <TextField label="Sub-Name" value={subName} onChange={(e) => setSubName(e.target.value)} />
         <TextField label="SOP URL" value={sopUrl} onChange={(e) => setSopUrl(e.target.value)} />
         <RequestWrapper2
           result={getRoomsResult}
@@ -254,11 +260,10 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
           value={[
             byReservation ? "byReservation" : null,
             needsWelcome ? "needsWelcome" : null,
-            requiresTrainer ? "requiresTrainer" : null,
-            requiresInPerson ? "requiresInPerson" : null,
-            schedulable ? "schedulable" : null
+            requiresInPerson ? "requiresInPerson" : null
           ]}
           sx={{ alignSelf: "center" }}
+          fullWidth
         >
           <ToggleButton value={"byReservation"} onClick={() => setByReservation(!byReservation)}>
             Reservation Only
@@ -266,16 +271,52 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
           <ToggleButton value={"needsWelcome"} onClick={() => setNeedsWelcome(!needsWelcome)}>
             Needs Welcome
           </ToggleButton>
-          <ToggleButton value={"requiresTrainer"} onClick={() => setRequiresTrainer(!requiresTrainer)}>
-            Requires Trainer Approval
-          </ToggleButton>
           <ToggleButton value={"requiresInPerson"} onClick={() => setRequiresInPerson(!requiresInPerson)}>
             Requires Sign-Off
           </ToggleButton>
-          <ToggleButton value={"schedulable"} onClick={() => setSchedulable(!schedulable)}>
-            Schedulable
-          </ToggleButton>
         </ToggleButtonGroup>
+        {/* Reservation Settings */}
+        {
+          byReservation
+            ? <Stack spacing={1}>
+              <Typography>Reservation Settings</Typography>
+              <ToggleButton
+                value="schedulable"
+                selected={schedulable}
+                onClick={() => setSchedulable(!schedulable)}
+                color="primary"
+                sx={{
+                  width: "120px"
+                }}
+              >
+                Schedulable
+              </ToggleButton>
+            </Stack>
+            : null
+        }
+
+        {/* Sign-Off Settings */}
+        {
+          requiresInPerson
+            ? <Stack spacing={1}>
+              <Typography variant="subtitle1">Sign-Off Settings</Typography>
+              <ToggleButton
+                value={"requiresTrainer"}
+                selected={requiresTrainer}
+                onClick={() => setRequiresTrainer(!requiresTrainer)}
+                color="primary"
+                sx={{
+                  width: "250px"
+                }}
+              >
+                Requires Trainer To Approve
+              </ToggleButton>
+              <TextField label="Sign-Off URL" value={signOffUrl} onChange={(e) => setSignOffUrl(e.target.value)} />
+            </Stack>
+            : null
+        }
+
+
         <EquipmentTrainings
           equipmentID={props.equipment.id}
           equipmentModules={props.equipment.trainingModules}
@@ -305,7 +346,9 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               notes: notes,
               archived: props.equipment.archived,
               requiresInPerson: requiresInPerson,
-              schedulable: schedulable
+              schedulable: schedulable,
+              signOffUrl: signOffUrl,
+              subName: subName
             }}
             isMobile={isMobile}
             staffMode={false}

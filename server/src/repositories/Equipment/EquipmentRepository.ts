@@ -277,7 +277,9 @@ export async function updateEquipment(
     needsWelcome: equipment.needsWelcome ?? true,
     requiresTrainerApproval: equipment.requiresTrainerApproval,
     requiresInPerson: equipment.requiresInPerson,
-    schedulable: equipment.schedulable
+    schedulable: equipment.schedulable,
+    subName: equipment.subName,
+    signOffUrl: equipment.signOffUrl
   });
 
   await updateModules(id, equipment.moduleIDs);

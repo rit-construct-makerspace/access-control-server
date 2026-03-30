@@ -1,38 +1,22 @@
-import { Alert, Autocomplete, Button, Card, IconButton, Link, MenuItem, Select, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { Button, Card, IconButton, Link, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES, InstanceStatus, UPDATE_INSTANCE } from "../../../queries/equipmentInstanceQueries";
 import ActionButton from "../../../common/ActionButton";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-
 import { useMutation, useQuery } from "@apollo/client";
-import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
-import { GET_READER_BY_ID, GET_UNPAIRED_READERS, Reader, SET_READER_STATE } from "../../../queries/readersQueries";
-import { useEffect, useState } from "react";
-
+import { GET_UNPAIRED_READERS } from "../../../queries/readersQueries";
+import { useState } from "react";
 import BlockIcon from '@mui/icons-material/Block';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
-import LockIcon from '@mui/icons-material/Lock';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
-import HourglassFullIcon from '@mui/icons-material/HourglassFull';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import ReportProblemIcon from '@mui/icons-material/ReportProblemSharp';
-import StarsIcon from '@mui/icons-material/Stars';
-import PendingIcon from '@mui/icons-material/Pending';
-import WifiOffIcon from '@mui/icons-material/WifiOff';
 import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
-import { useIsMobile } from "../../../common/IsMobileProvider";
 import { AccessController, AccessControllerState, GET_ACCESS_CONTROLLER_BY_ID, SET_CORE_STATE } from "../../../queries/deviceQueries";
-import { useNavigate } from "react-router-dom";
 
 interface EquipmentInstanceCardProps {
   instance: EquipmentInstance;
 }
 
 export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps) {
-  const isMobile = useIsMobile();
-  const navigate = useNavigate();
-
   const [deleteInstance] = useMutation(DELETE_EQUIPMENT_INSTANCE, {
     refetchQueries: ["EquipmentInstances", "GetUnpairedReaders"]
   });
@@ -58,21 +42,6 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   const [sendCommandedState] = useMutation(SET_CORE_STATE);
   const [commandedState, setCommandedState] = useState<string>("IDLE");
 
-  function generateDropdownOptions(): { id: number | undefined, name: string }[] {
-    const options: { id: number | undefined, name: string }[] = [];
-
-    // if (props.instance.reader) {
-    //   options.push({ name: props.instance.reader.name + " (Active)", id: props.instance.reader.id });
-    //   options.push({ name: "Unpair From " + props.instance.reader.name, id: undefined });
-    // }
-
-    // if (unpairedReaders) {
-    //   const asOptions = unpairedReaders.map((reader: Reader) => ({ id: reader.id, name: reader.name }));
-    //   options.push(...asOptions);
-    // }
-
-    return options;
-  }
 
   async function handleSave() {
     setAllowEdit(false);
@@ -141,25 +110,6 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
           <Link href={`/app/makerspace/${currentAccessController?.device.makerspaceID}/devices?q=${currentAccessController?.device.name}`}>{`${currentAccessController?.device.name}:${currentAccessController?.channelID}`}</Link>
           {activeUserDisplay()}
         </Stack>
-        {/* {
-          allowEdit
-            ? <Autocomplete
-              renderInput={
-                (params: any) => <TextField {...params} label="Slug" />
-              }
-              getOptionLabel={(option) => option.name}
-              size="small"
-              options={generateDropdownOptions()}
-              onChange={(_, value) => setReader(value.id != null ? { id: value.id, name: value.name } : null)}
-              disableClearable
-              defaultValue={reader ?? { id: undefined, name: "No Reader" }}
-            />
-            : <Typography variant="body1" align="center">{
-              reader ?
-                <span>Paired with: <AuditLogEntity entityCode={`access_device:${reader.id}:${reader.name}`} /></span>
-                : <Alert severity="warning" variant="filled">No Reader Paired</Alert>}
-            </Typography>
-        } */}
         <Stack direction="row" justifyContent="space-between" alignItems={"center"} spacing={1}>
           <Select disabled={allowEdit || currentAccessController === undefined} size="small" defaultValue={currentAccessController?.state ?? AccessControllerState.IDLE} value={commandedState} onChange={handleStateChange} fullWidth>
             <MenuItem value={AccessControllerState.IDLE}>Idle</MenuItem>

@@ -39,8 +39,6 @@ export default function MakerspacePage() {
     const queryString = searchParams.get("a") ?? "";
 
     setEquipmentSearch(queryString)
-
-    getMakerspace
   }, [location.search]);
 
   return (

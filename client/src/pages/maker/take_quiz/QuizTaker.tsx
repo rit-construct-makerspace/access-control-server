@@ -102,7 +102,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
     setQuizProgressed(true);
   };
 
-  const checkAllAnswered = (element: any, index: number) => (element.optionIDs.length != answerSheetReq[index].reqCount);
+  const _checkAllAnswered = (element: any, index: number) => (element.optionIDs.length != answerSheetReq[index].reqCount);
 
   const trainingSubmissionAnimation = () => {
     toast.success("Training Module Submitted", {

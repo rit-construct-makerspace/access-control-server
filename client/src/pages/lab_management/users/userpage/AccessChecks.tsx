@@ -1,12 +1,10 @@
-import { Alert, Button, Chip, MenuItem, Select, Stack, Typography } from "@mui/material"
+import { Alert, Stack, Typography } from "@mui/material"
 import ActionButton from "../../../../common/ActionButton"
 import { isManager, isStaffFor, isTrainerFor } from "../../../../common/PrivilegeUtils"
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { AccessCheckExtraInfo, GET_USER } from "../../../../queries/userQueries";
 import { useState } from "react";
-import RequestWrapper from "../../../../common/RequestWrapper";
-import { GET_ALL_EQUIPMENTS } from "../../../../queries/equipmentQueries";
 import AccessCheckCard from "../AccessCheckCard";
 import CreateAccessCheckModal from "./CreateAccessCheckModal";
 
@@ -23,10 +21,7 @@ interface AccessCheckProps {
 export default function AccessChecks(props: AccessCheckProps) {
   const currentUser = useCurrentUser();
 
-  const [openCreateCheckDialouge, setOpenCreateCheckDialouge] = useState<boolean>();  
-  const [newCheckEquipmentID, setNewCheckEquipmentID] = useState<string>();
   const [createAccessCheckModal, setCreateAccessCheckModal] = useState(false);
-  
 
   const [refreshCheck, refreshCheckResult] = useMutation(REFRESH_CHECKS, { variables: { userID: props.user.id }, refetchQueries: [{ query: GET_USER, variables: { id: props.user.id } }] });
 
@@ -46,7 +41,7 @@ export default function AccessChecks(props: AccessCheckProps) {
 
       <Stack direction={"row"} spacing={1}>
         <ActionButton iconSize={5} color="info" appearance={"small"} variant="outlined" handleClick={async () => { refreshCheck() }} loading={refreshCheckResult.loading} buttonText="Refresh Checks" tooltipText="Purge all unapproved checks and repopulate based on currently passed modules." />
-        {isManager(currentUser) && <ActionButton iconSize={5} color="primary" appearance={"small"} variant="outlined" handleClick={async () => { setCreateAccessCheckModal(true)}} loading={false} buttonText="Create Check" />}
+        {isManager(currentUser) && <ActionButton iconSize={5} color="primary" appearance={"small"} variant="outlined" handleClick={async () => { setCreateAccessCheckModal(true) }} loading={false} buttonText="Create Check" />}
       </Stack>
 
       <Stack spacing={1} mt={2}>
@@ -59,7 +54,7 @@ export default function AccessChecks(props: AccessCheckProps) {
         <Alert severity="info">No Access Checks Available</Alert>
       )}
 
-        <CreateAccessCheckModal open={createAccessCheckModal} onClose={() => setCreateAccessCheckModal(false)} user={props.user} />
+      <CreateAccessCheckModal open={createAccessCheckModal} onClose={() => setCreateAccessCheckModal(false)} user={props.user} />
     </Stack>
   )
 }

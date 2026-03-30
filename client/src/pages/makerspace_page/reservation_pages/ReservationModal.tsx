@@ -25,10 +25,6 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 export default function ReservationModal(props: ReservationModalProps) {
   const user = useCurrentUser();
 
-  if (props.reservation === undefined) {
-    return;
-  }
-
   const [setReservationApproval] = useMutation(SET_RESERVATION_APPROVAL, { refetchQueries: ["Reservations"] });
   const [deleteReservation] = useMutation(DELETE_RESERVATION, { refetchQueries: ["Reservations"] });
 
@@ -69,6 +65,10 @@ export default function ReservationModal(props: ReservationModalProps) {
 
     toast.success("Deleted Reservation")
     props.onClose();
+  }
+
+  if (props.reservation === undefined) {
+    return;
   }
 
   return (

@@ -1,5 +1,5 @@
 import PrettyModal from "./PrettyModal";
-import { Button, Divider, IconButton, LinearProgress, Stack, Typography } from "@mui/material";
+import { Button, CardActionArea, Divider, IconButton, LinearProgress, Link, Stack, Typography } from "@mui/material";
 import { ModuleStatus, moduleStatusMapper, TrainingModule } from "./TrainingModuleUtils";
 import { useCurrentUser } from "./CurrentUserProvider";
 import CloseIcon from "@mui/icons-material/Close";
@@ -30,17 +30,13 @@ interface EquipmentTrainingModalProps {
     trainingModules: TrainingModule[];
   };
   requiresInPerson: boolean;
+  signOffUrl: string;
   preview?: boolean;
 }
 
 export default function EquipmentTrainingModal(props: EquipmentTrainingModalProps) {
   const user = useCurrentUser();
   const isMobile = useIsMobile();
-  console.log("isMobile: " + isMobile);
-
-  if (props.equipmentTrainings.trainingModules.length === 0 && !props.requiresInPerson) {
-    return;
-  }
 
   const hasApprovedAccessCheck: boolean = user.accessChecks.some((ac) => Number(ac.equipmentID) === Number(props.equipmentTrainings.id) && ac.approved)
 
@@ -62,6 +58,10 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
   const percentComplete: number = Math.round(totalReqsComplete / totalRequirements * 100);
 
   const [open, setOpen] = useState(false);
+
+  if (props.equipmentTrainings.trainingModules.length === 0 && !props.requiresInPerson) {
+    return;
+  }
 
   return (
     <Stack width={"100%"} height={"100%"} justifyContent={"center"} alignItems={"center"}>
@@ -166,16 +166,32 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
                     }
                     {
                       props.requiresInPerson
-                        ? <Stack direction={"row"} spacing={1} alignItems="center" padding="7px">
-                          {user.visitor ? (
-                            <RadioButtonUncheckedIcon color="secondary" />
-                          ) : hasApprovedAccessCheck ? (
-                            <CheckIcon color="success" />
-                          ) : (
-                            <CloseIcon color="error" />
-                          )}
-                          <Typography variant="body2">Staff Sign-Off</Typography>
-                        </Stack>
+                        ? <CardActionArea
+                          onClick={props.signOffUrl ? () => window.open(props.signOffUrl, "_blank noopener noreferrer") : undefined}
+                          disableRipple={props.signOffUrl === ""}
+                        >
+                          <Stack direction={"row"} spacing={1} alignItems="center" padding="7px">
+                            {user.visitor ? (
+                              <RadioButtonUncheckedIcon color="secondary" />
+                            ) : hasApprovedAccessCheck ? (
+                              <CheckIcon color="success" />
+                            ) : (
+                              <CloseIcon color="error" />
+                            )}
+                            <Stack direction={"column"} width={"100%"}>
+                              {
+                                props.signOffUrl !== ""
+                                  ? <Link variant="body2">Staff Sign-Off</Link>
+                                  : <Typography variant="body2">Staff Sign-Off</Typography>
+                              }
+                              {
+                                !user.accessChecks.some((check) => Number(check.equipmentID) === props.equipmentTrainings.id && check.approved)
+                                  ? <Typography variant="body2">Complete all other requirments before attempting sign-off!</Typography>
+                                  : null
+                              }
+                            </Stack>
+                          </Stack>
+                        </CardActionArea>
                         : null
                     }
                   </Stack>

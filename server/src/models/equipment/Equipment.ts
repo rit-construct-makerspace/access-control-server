@@ -18,6 +18,8 @@ export class Equipment implements EquipmentRow {
   requiresTrainerApproval: boolean;
   requiresInPerson: boolean;
   schedulable: boolean;
+  signOffUrl: string;
+  subName: string;
 
   constructor(row: EquipmentRow) {
     this.id = row.id;
@@ -34,6 +36,8 @@ export class Equipment implements EquipmentRow {
     this.requiresTrainerApproval = row.requiresTrainerApproval;
     this.requiresInPerson = row.requiresInPerson;
     this.schedulable = row.schedulable;
+    this.signOffUrl = row.signOffUrl;
+    this.subName = row.subName;
   }
 
   async hasAccess(user: User): Promise<{ hasAccess: boolean, reason: AccessAttemptReason }> {

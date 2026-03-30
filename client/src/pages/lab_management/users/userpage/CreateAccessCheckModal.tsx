@@ -1,6 +1,5 @@
-import { Autocomplete, Button, Chip, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../../common/PrettyModal";
-import RequestWrapper from "../../../../common/RequestWrapper";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { GET_ALL_EQUIPMENTS } from "../../../../queries/equipmentQueries";
 import { useState } from "react";
@@ -44,21 +43,21 @@ export default function CreateAccessCheckModal(props: CreateAccessCheckModalProp
         <Typography variant="h5">Create Access Check</Typography>
         <Stack direction={"row"}>
           <RequestWrapper2 result={getEquipment} render={(data) => {
-            const equipments : any[] = [];
-            data?.allEquipment.forEach((equipment:Equipment) => {
-              equipments.push({label:equipment.name, item:equipment, id:equipment.id})
+            const equipments: any[] = [];
+            data?.allEquipment.forEach((equipment: Equipment) => {
+              equipments.push({ label: equipment.name, item: equipment, id: equipment.id })
             });
             const sortedEquipment = equipments.sort((a, b) => (a.label.toLowerCase().localeCompare(b.label.toLowerCase())));
 
             return (
-              <Autocomplete 
-                options={sortedEquipment} 
+              <Autocomplete
+                options={sortedEquipment}
                 sx={{ width: "100%" }}
-                onChange={(e, v, r) => setNewCheckEquipmentID(v.id)}  
-                renderInput={(params) => <TextField {...params} label="Search Item" onFocus={event => {event.target.select()}}/>}
+                onChange={(_e, v, _r) => setNewCheckEquipmentID(v.id)}
+                renderInput={(params) => <TextField {...params} label="Search Item" onFocus={event => { event.target.select() }} />}
               />
             )
-          }}> 
+          }}>
           </RequestWrapper2>
         </Stack>
         <Stack direction={"row"} justifyContent={"space-between"}>

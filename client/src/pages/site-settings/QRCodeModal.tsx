@@ -27,7 +27,7 @@ export default function QRCodeModal(props: {
       // Set canvas dimensions to match SVG
       canvas.width = img.width;
       canvas.height = img.height;
-      if (ctx === null) { return };
+      if (ctx === null) { return; }
       ctx.drawImage(img, 0, 0);
 
       // Copy to clipboard as a PNG
