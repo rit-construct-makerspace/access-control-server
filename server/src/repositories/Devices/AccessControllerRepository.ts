@@ -12,6 +12,11 @@ export async function getAccessControllersByDeviceID(deviceID: number): Promise<
   return coolRows;
 }
 
+export async function getAccessControllersByDeviceAndChannelID(deviceID: number, channelID: number): Promise<AccessController | undefined> {
+  const rawRow = await knex("AccessControllers").where({ deviceID: deviceID, channelID: channelID }).first();
+  return rawRow ? new AccessController(rawRow) : undefined;
+}
+
 export async function updateAccessController(newRow: AccessControllerRow): Promise<AccessController | undefined> {
   const rawResult = await knex("AccessControllers").where("id", newRow.id).update(newRow).returning("*");
   if (rawResult.length < 1) {
@@ -30,7 +35,11 @@ export async function getAccessControllerByID(accessControllerID: number): Promi
 }
 
 export async function updateAccessControllerStateByDeviceAndChannelID(deviceID: number, channelID: number, newState: AccessControllerState): Promise<void> {
-  await knex("AccessControllers").update({ state: newState }).where({ deviceID: deviceID, channelID: channelID });
+  try {
+    await knex("AccessControllers").update({ state: newState }).where({ deviceID: deviceID, channelID: channelID });
+  } catch (e) {
+    console.log(`Update Controller state failed: ${e}`)
+  }
 }
 
 export async function updateAccessControllerDurationByDeviceAndChannelID(deviceID: number, channelID: number, tempDuration: number): Promise<void> {

@@ -7,9 +7,10 @@ import * as UserRepo from "../repositories/Users/UserRepository.js";
 import * as CoreRepo from "../repositories/Devices/CoreRepository.js";
 import * as DispenserRepo from "../repositories/Devices/DispenserRepository.js";
 import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js";
-import { CoreActions, CoreFlags, WSACSServerUnprompted } from "../models/api/WSACSFormats.js";
+import { CoreActions, CoreFlags, WSACSServerUnprompted } from "../models/api/WSACS/WSACSFormats.js";
 import { EntityNotFound } from "../EntityNotFound.js";
-import WSACSController from "../models/api/WSACSController.js";
+import WSACSController from "../models/api/WSACS/WSACSController.js";
+import { ACSOrchestrator } from "../models/api/ACSOrchestrator.js";
 
 const DeviceResolver = {
   Core: {
@@ -175,6 +176,9 @@ const DeviceResolver = {
             action: args.action
           }
         };
+        ACSOrchestrator.handleSendCoreCommand(args.deviceID, {
+          action: args.action
+        });
         return WSACSController.sendCoreRequest(command, args.deviceID);
       })
     },
@@ -198,6 +202,10 @@ const DeviceResolver = {
             flags: args.flags
           }
         };
+
+        ACSOrchestrator.handleSendCoreCommand(args.deviceID, {
+          flags: args.flags
+        })
         return WSACSController.sendCoreRequest(command, args.deviceID);
       })
     },

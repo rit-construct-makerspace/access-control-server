@@ -4,13 +4,14 @@ import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import * as ShlugControl from "../../wsapi.js"
 import { CurrentUser } from "../../context.js";
-import WSACSController from "../api/WSACSController.js";
+import WSACSController from "../api/WSACS/WSACSController.js";
 import { AccessController } from "./accessController.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
-import { CoreConfig, CoreFlags, WSACSServerUnprompted } from "../api/WSACSFormats.js";
+import { CoreConfig, CoreFlags, WSACSServerUnprompted } from "../api/WSACS/WSACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
 import { ACSDeployment } from "../ACS/deployment.js";
+import { ACSOrchestrator } from "../api/ACSOrchestrator.js";
 
 export class Core extends Device implements CoreRow {
   deviceID: number;
@@ -65,7 +66,9 @@ export class Core extends Device implements CoreRow {
     };
 
     const success = WSACSController.sendCoreRequest(request, this.deviceID);
-
+    ACSOrchestrator.handleSendCoreCommand(this.deviceID, {
+      toState: controllers.map((controller) => ({ id: controller.channelID, state: targetState }))
+    })
     return true;
   }
 
@@ -118,7 +121,7 @@ export class Core extends Device implements CoreRow {
 
     if (config.channels !== undefined) {
       for (let i = 0; i < config.channels.length; i++) {
-        await ACRepo.updateAccessControllerDurationByDeviceAndChannelID(this.deviceID, config.channels[i].id, config.channels[i].tempDuration);
+        await ACRepo.updateAccessControllerDurationByDeviceAndChannelID(this.deviceID, config.channels[i].channelID, config.channels[i].tempDuration);
       }
     }
 
@@ -137,5 +140,34 @@ export class Core extends Device implements CoreRow {
     if (config.firmware !== undefined) {
       await this.updateFirmwareVersion(config.firmware);
     }
+  }
+
+  async authTo(userID: number, toState: AccessControllerState, log?: boolean): Promise<{
+    channelID: number;
+    state: AccessControllerState;
+    approved: boolean;
+    reason: string;
+  }[]> {
+    const result: {
+      channelID: number;
+      state: AccessControllerState;
+      approved: boolean;
+      reason: string;
+    }[] = [];
+
+    const controllers = await this.getAccessControllers();
+
+    for (let i = 0; i < controllers.length; i++) {
+      let controller = controllers[i];
+      if (toState === AccessControllerState.UNLOCKED) {
+        const attempt = await controller.canUnlock(userID, log);
+        result.push({ channelID: controller.channelID, state: toState, approved: attempt.hasAccess, reason: attempt.reason });
+      } else {
+        const attempt = await controller.canControl(userID);
+        result.push({ channelID: controller.channelID, state: toState, approved: attempt.canControl, reason: attempt.reason });
+      }
+    }
+
+    return result;
   }
 }

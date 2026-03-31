@@ -1,6 +1,6 @@
-import { AccessControllerState, CoreInputMode } from "../../db/tables.js";
-import { AuditLog } from "../logs/AuditLogs.js";
-import { ACSDeployment } from "../ACS/deployment.js";
+import { AccessControllerState, CoreInputMode } from "../../../db/tables.js";
+import { AuditLog } from "../../logs/AuditLogs.js";
+import { ACSDeployment } from "../../ACS/deployment.js";
 
 /**
  * TIME: Current time
@@ -42,7 +42,7 @@ export interface CoreFlags {
 
 export interface CoreConfig {
   channels?: {
-    id: number;
+    channelID: number;
     tempDuration: number;
   }[];
   inputMode?: CoreInputMode;
