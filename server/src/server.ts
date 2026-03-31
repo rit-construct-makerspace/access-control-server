@@ -620,6 +620,7 @@ async function startServer() {
 
   // MQTT.js MQTT CLIENT
   const result = MQTTACSController.initialize();
+  console.log(`${result ? "Successfully initialized" : "Failed to initialize"} local MQTT client`);
 
   const pingResponse = await pingAtrium();
   if (typeof pingResponse !== 'boolean' || pingResponse == false) {

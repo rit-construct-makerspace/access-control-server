@@ -15,7 +15,12 @@ export default class MQTTACSController extends ACSController {
       return false;
     }
 
-    MQTTACSController.client = mqtt.connect("ws://localhost:3000/mqtt", {
+    const address = process.env.SERVER_MQTT_ADDRESS;
+    if (address === undefined) {
+      return false;
+    }
+
+    MQTTACSController.client = mqtt.connect(address, {
       username: "SERVER",
       password: process.env.SERVER_MQTT_PASSWORD
     });
