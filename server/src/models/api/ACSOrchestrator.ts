@@ -46,7 +46,8 @@ export class ACSOrchestrator {
           // Leaving UNLOCKED, register an end of session message
           (await ACRepo.getAccessControllersByDeviceAndChannelID(deviceID, channel.channelID))?.endSession(oldCardTag ?? "");
         } else if (channel.toState === AccessControllerState.UNLOCKED) {
-          // TODO: Register start of session
+          // Going to UNLOCKED, register start of session message
+          (await ACRepo.getAccessControllersByDeviceAndChannelID(deviceID, channel.channelID))?.startSession(stateChangeReport.currentCardTag)
         }
         await core.updateControllerState(channel.channelID, channel.toState);
       }
