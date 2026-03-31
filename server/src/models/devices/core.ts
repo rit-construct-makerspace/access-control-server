@@ -121,7 +121,7 @@ export class Core extends Device implements CoreRow {
 
     if (config.channels !== undefined) {
       for (let i = 0; i < config.channels.length; i++) {
-        await ACRepo.updateAccessControllerDurationByDeviceAndChannelID(this.deviceID, config.channels[i].id, config.channels[i].tempDuration);
+        await ACRepo.updateAccessControllerDurationByDeviceAndChannelID(this.deviceID, config.channels[i].channelID, config.channels[i].tempDuration);
       }
     }
 

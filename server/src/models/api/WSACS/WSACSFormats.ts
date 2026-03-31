@@ -42,7 +42,7 @@ export interface CoreFlags {
 
 export interface CoreConfig {
   channels?: {
-    id: number;
+    channelID: number;
     tempDuration: number;
   }[];
   inputMode?: CoreInputMode;

@@ -141,7 +141,9 @@ export class ACSOrchestrator {
 
   public static async handleCoreConfigReport(deviceID: number, configReport: CoreConfigReport) {
     try {
-
+      const core = await CoreRepo.getCoreByDeviceID(deviceID);
+      if (core === undefined) { return; }
+      await core.updateConfiguration(configReport)
     } catch (e) {
       await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "core-config-report-error", error: e });
     }
