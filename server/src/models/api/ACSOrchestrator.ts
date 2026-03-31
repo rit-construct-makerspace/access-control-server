@@ -42,6 +42,10 @@ export class ACSOrchestrator {
 
       for (let i = 0; i < stateChangeReport.channels.length; i++) {
         const channel = stateChangeReport.channels[i];
+
+        // TODO: put this in an AccessController.reportStateChange function, such that if we detect a state change in a regular status update,
+        // we can still trigger the proper effects
+
         if (channel.fromState === AccessControllerState.UNLOCKED) {
           // Leaving UNLOCKED, register an end of session message
           (await ACRepo.getAccessControllersByDeviceAndChannelID(deviceID, channel.channelID))?.endSession(oldCardTag ?? "");
