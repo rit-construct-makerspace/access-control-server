@@ -190,11 +190,11 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
                 startIcon={<UnarchiveIcon />}
                 onClick={() => publishEquipment()}
               >
-                Publish
+                Unhide
               </Button>
             ) : (
               <Button color="error" variant="contained" startIcon={<ArchiveIcon />} onClick={() => archiveEquipment()}>
-                Archive
+                Hide
               </Button>
             )}
             <Button variant="contained" startIcon={<SaveIcon />} onClick={handleEquipmentUpdate}>
