@@ -95,13 +95,15 @@ export class AccessController implements AccessControllerRow {
     const result = await equipment.hasAccess(user);
     if (log) {
       await UnlockAttemptRepo.createUnlockAttemptLog(equipment.id, equipment.name, user.id, user.ritUsername, result.hasAccess, result.reason);
-      await AuditLogRepo.createAuditLog(
-        `{user} ${result.hasAccess ? "activated" : "failed to activate"} {equipment} ${result.hasAccess ? "" : `with reason ${result.reason}`}`,
-        "auth",
-        await equipment.getMakerspaceID(),
-        { id: user.id, label: `${user.firstName} ${user.lastName}` },
-        { id: equipment.id, label: `${equipment.name} - ${instance.name}` }
-      );
+      if (!result.hasAccess) {
+        await AuditLogRepo.createAuditLog(
+          `{user} failed to activate {equipment} with reason ${result.reason}`,
+          "auth",
+          await equipment.getMakerspaceID(),
+          { id: user.id, label: `${user.firstName} ${user.lastName}` },
+          { id: equipment.id, label: `${equipment.name} - ${instance.name}` }
+        );
+      }
     }
     return result;
   }
