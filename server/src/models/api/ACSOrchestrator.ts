@@ -25,7 +25,11 @@ export class ACSOrchestrator {
       if (core === undefined) { return; }
 
       await core.statusUpdate(statusReport.currentCardTag);
-      statusReport.channels.forEach(async (channel) => await core.updateControllerState(channel.channelID, channel.state));
+
+      for (let i = 0; i < statusReport.channels.length; i++) {
+        await core.updateControllerState(statusReport.channels[i].channelID, statusReport.channels[i].state);
+      }
+
     } catch (e) {
       await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "core-status-error", error: e });
     }
