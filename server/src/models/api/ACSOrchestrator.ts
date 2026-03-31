@@ -71,14 +71,14 @@ export class ACSOrchestrator {
       if (core === undefined) { return; }
 
       if (logRequest.auditLog) {
-        AuditLogRepo.createAuditLog(
+        await AuditLogRepo.createAuditLog(
           `Message from {device}: ${logRequest.message}`,
           logRequest.category,
           core.makerspaceID,
           { id: core.deviceID, label: core.name }
         )
       } else {
-        DeviceLogRepo.createDeviceLog(
+        await DeviceLogRepo.createDeviceLog(
           core.deviceID,
           DeviceLogSeverity.LOW,
           { type: "message", message: logRequest.message }
