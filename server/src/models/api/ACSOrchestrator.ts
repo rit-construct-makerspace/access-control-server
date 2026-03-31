@@ -95,7 +95,7 @@ export class ACSOrchestrator {
       const user = await UserRepo.getUserByCardTagID(authToRequest.cardTagID);
 
       if (core === undefined || user === undefined) {
-        AuditLogRepo.createAuditLog(
+        await AuditLogRepo.createAuditLog(
           `{user} failed to activate {device}`,
           "auth",
           core?.makerspaceID,
