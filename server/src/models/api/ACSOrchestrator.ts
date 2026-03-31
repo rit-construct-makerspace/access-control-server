@@ -40,7 +40,8 @@ export class ACSOrchestrator {
 
       await core.statusUpdate(stateChangeReport.currentCardTag);
 
-      stateChangeReport.channels.forEach(async (channel) => {
+      for (let i = 0; i < stateChangeReport.channels.length; i++) {
+        const channel = stateChangeReport.channels[i];
         if (channel.fromState === AccessControllerState.UNLOCKED) {
           // Leaving UNLOCKED, register an end of session message
           (await ACRepo.getAccessControllersByDeviceAndChannelID(deviceID, channel.channelID))?.endSession(oldCardTag ?? "");
@@ -48,7 +49,8 @@ export class ACSOrchestrator {
           // TODO: Register start of session
         }
         await core.updateControllerState(channel.channelID, channel.toState);
-      })
+      }
+
     } catch (e) {
       await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "core-state-change-report-error", error: e });
     }

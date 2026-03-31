@@ -603,7 +603,7 @@ async function startServer() {
       done(authError, false);
     } else {
       const key = await device.generateKey();
-      if (key === pwString || process.env.IS_DEV) {
+      if (key === pwString) {
         done(null, true);
       } else {
         // Return code 4: Bad Username or Password
