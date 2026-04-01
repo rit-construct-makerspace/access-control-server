@@ -148,3 +148,7 @@ export interface ServerInfoResponse {
     }[];
   }
 }
+
+export interface WelcomeRequest {
+  cardTagID: string;
+}

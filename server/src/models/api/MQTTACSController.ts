@@ -1,5 +1,5 @@
 import mqtt from "mqtt";
-import { CoreAuthToRequest, CoreConfigReport, CoreInfoRequest, CoreLogRequest, CoreStateChangeReport, CoreStatusReport, ServerAuthToResponse, ServerCommand, ServerConfigUpdateRequest, ServerInfoResponse } from "./ACSFormats.js";
+import { CoreAuthToRequest, CoreConfigReport, CoreInfoRequest, CoreLogRequest, CoreStateChangeReport, CoreStatusReport, ServerAuthToResponse, ServerCommand, ServerConfigUpdateRequest, ServerInfoResponse, WelcomeRequest } from "./ACSFormats.js";
 import { ACSOrchestrator } from "./ACSOrchestrator.js";
 import { ACSController } from "./ACSController.js";
 import { Core } from "../devices/core.js";
@@ -72,8 +72,11 @@ export default class MQTTACSController extends ACSController {
         return MQTTACSController.configReportHandler(topic, payload, packet);
       case "info":
         return MQTTACSController.infoRequestHandler(topic, payload, packet);
+      case "welcome":
+        return MQTTACSController.welcomeRequestHandler(topic, payload, packet);
       default:
         console.log("UNKOWN TOPIC: ", topicArray[4]);
+        return;
     }
   }
 
@@ -153,6 +156,15 @@ export default class MQTTACSController extends ACSController {
     // TODO: INPUT VALIDATION
 
     ACSOrchestrator.handleCoreInfoRequest(device.id, infoRequest);
+  }
+
+  private static async welcomeRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
+    const topicArray = topic.split("/");
+    const makerspaceID = Number(topicArray[1]);
+
+    const welcomeRequest: WelcomeRequest = JSON.parse(payload.toString());
+
+    ACSOrchestrator.handleWelcomeRequest(makerspaceID, welcomeRequest.cardTagID);
   }
 
   sendCoreAuthToResponse(core: Core, response: ServerAuthToResponse): boolean {

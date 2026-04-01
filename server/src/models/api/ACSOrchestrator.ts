@@ -5,8 +5,10 @@ import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.j
 import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
 import * as DeviceLogRepo from "../../repositories/Logs/DeviceLogsRepository.js";
 import * as UserRepo from "../../repositories/Users/UserRepository.js";
+import * as MakerspaceRepo from "../../repositories/Makerspaces/MakerspaceRespository.js";
 import { AccessControllerState, DeviceLogSeverity } from "../../db/tables.js";
 import { AccessAttemptReason } from "../devices/accessController.js";
+import { Makerspace } from "../makerspaces/makerspace.js";
 
 export class ACSOrchestrator {
   private static coreControllers: Map<number, ACSController> = new Map();
@@ -186,5 +188,17 @@ export class ACSOrchestrator {
     } catch (e) {
       await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "send-core-command-error", error: e });
     }
+  }
+
+  public static async handleWelcomeRequest(makerspaceID: number, cardTagID: string) {
+    const rawSpace = await MakerspaceRepo.getMakerspaceByID(makerspaceID);
+    if (rawSpace === undefined) { return; }
+
+    const user = await UserRepo.getUserByCardTagID(cardTagID);
+    if (user === undefined) { return; }
+
+    const welcomeSpace = new Makerspace(rawSpace);
+
+    await welcomeSpace.welcome(user.id);
   }
 }
