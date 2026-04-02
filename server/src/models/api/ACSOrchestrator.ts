@@ -6,6 +6,7 @@ import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.j
 import * as DeviceLogRepo from "../../repositories/Logs/DeviceLogsRepository.js";
 import * as UserRepo from "../../repositories/Users/UserRepository.js";
 import * as MakerspaceRepo from "../../repositories/Makerspaces/MakerspaceRespository.js";
+import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 import { AccessControllerState, DeviceLogSeverity } from "../../db/tables.js";
 import { AccessAttemptReason } from "../devices/accessController.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
@@ -190,15 +191,43 @@ export class ACSOrchestrator {
     }
   }
 
-  public static async handleWelcomeRequest(makerspaceID: number, cardTagID: string) {
-    const rawSpace = await MakerspaceRepo.getMakerspaceByID(makerspaceID);
-    if (rawSpace === undefined) { return; }
+  public static async handleWelcomeRequest(makerspaceID: number, deviceID: number, cardTagID: string) {
+    try {
+      const device = await DeviceRepo.getDeviceByID(deviceID);
+      if (device === undefined) { return; }
 
-    const user = await UserRepo.getUserByCardTagID(cardTagID);
-    if (user === undefined) { return; }
+      const rawSpace = await MakerspaceRepo.getMakerspaceByID(makerspaceID);
+      if (rawSpace === undefined) { return; }
 
-    const welcomeSpace = new Makerspace(rawSpace);
+      const user = await UserRepo.getUserByCardTagID(cardTagID);
+      if (user === undefined) {
+        ACSOrchestrator.getDeviceController(deviceID)?.sendWelcomeResponse(device, { welcomed: false, cardTagID: cardTagID });
+        await AuditLogRepo.createAuditLog(
+          `Unkown card {conceal} failed to sign in to {makerspace}`,
+          "welcome",
+          rawSpace.id,
+          { id: 0, label: cardTagID },
+          { id: rawSpace.id, label: rawSpace.name }
+        );
+        return;
+      }
 
-    await welcomeSpace.welcome(user.id);
+      const welcomeSpace = new Makerspace(rawSpace);
+
+      await welcomeSpace.welcome(user.id);
+
+      ACSOrchestrator.getDeviceController(deviceID)?.sendWelcomeResponse(device, { welcomed: true, cardTagID: cardTagID });
+
+      await AuditLogRepo.createAuditLog(
+        `{user} signed in to {makerspace}`,
+        "welcome",
+        rawSpace.id,
+        { id: user.id, label: `${user.firstName} ${user.lastName}` },
+        { id: rawSpace.id, label: rawSpace.name }
+      );
+
+    } catch (_e) {
+
+    }
   }
 }

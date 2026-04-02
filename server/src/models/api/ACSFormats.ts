@@ -152,3 +152,8 @@ export interface ServerInfoResponse {
 export interface WelcomeRequest {
   cardTagID: string;
 }
+
+export interface WelcomeResponse {
+  welcomed: boolean;
+  cardTagID: string;
+}
