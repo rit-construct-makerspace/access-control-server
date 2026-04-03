@@ -7,7 +7,7 @@ import { Alert, Autocomplete, Button, Card, CardContent, IconButton, TextField, 
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import AddLinkIcon from '@mui/icons-material/AddLink';
 import AuditLogEntity from "../lab_management/audit_logs/AuditLogEntity";
-import { Core, GET_PAIRED_WELCOME_CORES, GET_UNPAIRED_CORES } from "../../queries/deviceQueries";
+import { Core, GET_PAIRED_WELCOME_CORES, GET_UNPAIRED_CORES, PAIR_WELCOME_DEVICE, UNPAIR_WELCOME_DEVICE } from "../../queries/deviceQueries";
 
 
 export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId: number }) {
@@ -20,17 +20,17 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
   const unpairedCores: Core[] | null = unpairedCoreResult.data?.getUnpairedCores;
   const pairedCores: Core[] | null = pairedWelcomeCoreResult.data?.getPairedWelcomeCores;
 
-  const [unpairWelcomeReader] = useMutation(UNPAIR_AS_WELCOME_READER, { refetchQueries: [{ query: GET_UNPAIRED_READERS, }, { query: GET_WELCOME_READERS_FOR_MAKERSPACE, variables: { makerspaceId: makerspaceId } }] });
-  function unpairReader(id: number) {
-    unpairWelcomeReader({ variables: { readerId: id, makerspaceId: makerspaceId } });
+  const [unpairWelcomeDevice] = useMutation(UNPAIR_WELCOME_DEVICE, { refetchQueries: ["GetUnpairedCores", "GetPairedWelcomeCores"] });
+  function unpairDevice(id: number) {
+    unpairWelcomeDevice({ variables: { deviceID: id, makerspaceID: makerspaceId } });
   }
 
-  const [pairWelcomeReader] = useMutation(PAIR_AS_WELCOME_READER, { refetchQueries: [{ query: GET_UNPAIRED_READERS }, { query: GET_WELCOME_READERS_FOR_MAKERSPACE, variables: { makerspaceId: makerspaceId } }] });
-  function pairReader() {
+  const [pairWelcomeDevice] = useMutation(PAIR_WELCOME_DEVICE, { refetchQueries: ["GetUnpairedCores", "GetPairedWelcomeCores"] });
+  function pairDevice() {
     if (device == null) {
       return;
     }
-    pairWelcomeReader({ variables: { readerId: device?.id, makerspaceId: makerspaceId } });
+    pairWelcomeDevice({ variables: { deviceID: device.id, makerspaceID: makerspaceId } });
     setDevice(null);
   }
 
@@ -71,7 +71,7 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
                         {"ID " + core.device.id}
                       </Typography>
                       <Tooltip title="Unpair as Welcome Reader">
-                        <IconButton onClick={() => { unpairReader(core.device.id) }} color={"error"}><LinkOffIcon /></IconButton>
+                        <IconButton onClick={() => { unpairDevice(core.device.id) }} color={"error"}><LinkOffIcon /></IconButton>
                       </Tooltip>
                     </Stack>
                   </Stack>
@@ -83,6 +83,7 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
         </Stack>
         <Stack direction={"row"} width={"100%"} justifyContent={"space-between"} spacing={2}>
           <Autocomplete
+            key={device?.id ?? -1}
             renderInput={
               (params: any) => <TextField {...params} label="Device" />
             }
@@ -93,7 +94,7 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
             defaultValue={device ?? { id: undefined, name: "No Device" }}
             fullWidth
           />
-          <Button startIcon={<AddLinkIcon />} onClick={pairReader} disabled={device == null} variant="contained">Pair</Button>
+          <Button startIcon={<AddLinkIcon />} onClick={pairDevice} disabled={device == null} variant="contained">Pair</Button>
         </Stack>
       </Stack>
 

@@ -173,3 +173,15 @@ export const GET_PAIRED_WELCOME_CORES = gql`
     }
   }
 `;
+
+export const PAIR_WELCOME_DEVICE = gql`
+  mutation PairWelcomeDevice($deviceID: Int!, $makerspaceID: Int!) {
+    pairWelcomeDevice(deviceID: $deviceID, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const UNPAIR_WELCOME_DEVICE = gql`
+  mutation UnpairWelcomeDevice($deviceID: Int!, $makerspaceID: Int!) {
+    unpairWelcomeDevice(deviceID: $deviceID, makerspaceID: $makerspaceID)
+  }
+`;
