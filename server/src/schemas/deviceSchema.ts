@@ -84,6 +84,9 @@ export const DeviceTypeDefs = gql`
 
   extend type Query {
     getAccessControllerByID(accessControllerID: Int!): AccessController
+    getUnpairedAccessControllers(makerspaceID: Int!): [AccessController]
+    getUnpairedCores(makerspaceID: Int!): [Core]
+    getPairedWelcomeCores(makerspaceID: Int!): [Core]
   }
 
   input CoreFlagInput {
@@ -98,5 +101,7 @@ export const DeviceTypeDefs = gql`
     pairDispenser(SN: String!, makerspaceID: Int!): String!
     sendCoreAction(deviceID: Int!, action: CoreAction!): Boolean
     sendCoreFlags(deviceID: Int!, flags: CoreFlagInput!): Boolean
+    pairWelcomeDevice(deviceID: Int!, makerspaceID: Int!): Boolean
+    unpairWelcomeDevice(deviceID: Int!, makerspaceID: Int!): Boolean
   }
 `;

@@ -43,6 +43,7 @@ export interface CoreAuthToRequest {
 export interface CoreFlags {
   lockWhenIdle: boolean;
   restartWhenIdle: boolean;
+  welcoming: boolean;
 }
 
 export interface CoreConfigReport {
@@ -64,7 +65,8 @@ export interface CoreConfigReport {
 export enum CoreInfoOptions {
   TIME = "TIME",
   STATE = "STATE",
-  HMI = "HMI"
+  HMI = "HMI",
+  FLAGS = "FLAGS"
 }
 
 export interface CoreInfoRequest {
@@ -146,7 +148,8 @@ export interface ServerInfoResponse {
       channelID: number;
       pairedEntity: string;
     }[];
-  }
+  };
+  flags?: CoreFlags
 }
 
 export interface WelcomeRequest {

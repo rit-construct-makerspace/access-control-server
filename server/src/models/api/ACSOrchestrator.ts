@@ -121,25 +121,6 @@ export class ACSOrchestrator {
         return;
       }
 
-      const welcomeSpace = await core.getWelcomeMakerspace();
-      if (welcomeSpace !== undefined) {
-        // This is a welcome reader, welcome and return approved rather than chcking access
-        await welcomeSpace.welcome(user.id);
-
-        const controllers = await core.getAccessControllers();
-
-        ACSOrchestrator.getDeviceController(deviceID)?.sendCoreAuthToResponse(core, {
-          channels: controllers.map((controller) => ({
-            channelID: controller.channelID,
-            state: AccessControllerState.UNLOCKED,
-            approved: true,
-            reason: AccessAttemptReason.WELCOME
-          })),
-          cardTagID: authToRequest.cardTagID
-        })
-        return;
-      }
-
       const attemptResult = await core.authTo(user.id, authToRequest.state, true);
 
       ACSOrchestrator.getDeviceController(deviceID)?.sendCoreAuthToResponse(core, {
@@ -171,7 +152,13 @@ export class ACSOrchestrator {
           ? (new Date).getTime() : undefined,
         state: infoRequest.fields.includes(CoreInfoOptions.STATE)
           ? (await core.getAccessControllers()).map((controller) => ({ id: controller.channelID, state: controller.state })) : undefined,
-        hmi: undefined
+        hmi: undefined,
+        flags: infoRequest.fields.includes(CoreInfoOptions.FLAGS)
+          ? {
+            lockWhenIdle: core.flags?.lockWhenIdle ?? false,
+            restartWhenIdle: core.flags?.restartWhenIdle ?? false,
+            welcoming: (await core.getWelcomeMakerspace()) !== undefined
+          } : undefined
       }
 
       ACSOrchestrator.getDeviceController(core.deviceID)?.sendCoreInfoResponse(core, response);
@@ -194,10 +181,10 @@ export class ACSOrchestrator {
   public static async handleWelcomeRequest(makerspaceID: number, deviceID: number, cardTagID: string) {
     try {
       const device = await DeviceRepo.getDeviceByID(deviceID);
-      if (device === undefined) { return; }
+      if (device === undefined) { console.log("can't find device"); return; }
 
       const rawSpace = await MakerspaceRepo.getMakerspaceByID(makerspaceID);
-      if (rawSpace === undefined) { return; }
+      if (rawSpace === undefined) { console.log("can't find makerspace"); return; }
 
       const user = await UserRepo.getUserByCardTagID(cardTagID);
       if (user === undefined) {

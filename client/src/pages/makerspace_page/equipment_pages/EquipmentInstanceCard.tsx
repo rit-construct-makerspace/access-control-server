@@ -1,4 +1,4 @@
-import { Button, Card, IconButton, Link, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, Card, IconButton, Link, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES, InstanceStatus, UPDATE_INSTANCE } from "../../../queries/equipmentInstanceQueries";
 import ActionButton from "../../../common/ActionButton";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
@@ -10,13 +10,18 @@ import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
-import { AccessController, AccessControllerState, GET_ACCESS_CONTROLLER_BY_ID, SET_CORE_STATE } from "../../../queries/deviceQueries";
+import { AccessController, AccessControllerState, GET_ACCESS_CONTROLLER_BY_ID, GET_UNPAIRED_ACCESS_CONTROLLERS, SET_CORE_STATE } from "../../../queries/deviceQueries";
+import { useParams } from "react-router-dom";
 
 interface EquipmentInstanceCardProps {
   instance: EquipmentInstance;
 }
 
 export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps) {
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
+
+  const getUnpairedConrollersResult = useQuery(GET_UNPAIRED_ACCESS_CONTROLLERS, { variables: { makerspaceID: Number(makerspaceID) } });
+
   const [deleteInstance] = useMutation(DELETE_EQUIPMENT_INSTANCE, {
     refetchQueries: ["EquipmentInstances", "GetUnpairedReaders"]
   });
@@ -37,6 +42,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
     variables: { accessControllerID: props.instance.accessController?.id }
   });
   const currentAccessController: AccessController | undefined = currentAccessControllerResult.data?.getAccessControllerByID;
+  const upairedAccessControllers: AccessController[] | [] = getUnpairedConrollersResult.data?.getUnpairedAccessControllers ?? [];
 
 
   const [sendCommandedState] = useMutation(SET_CORE_STATE);
@@ -66,6 +72,20 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
 
   async function handleDeleteInstance() {
     await deleteInstance({ variables: { id: props.instance.id } });
+  }
+
+  function controllerPairingField() {
+
+    return <Autocomplete
+      renderInput={(params) => <TextField
+        {...params}
+        label={"Controller Pairing"}
+      />}
+      fullWidth
+      options={upairedAccessControllers}
+      getOptionLabel={(controller) => `${controller.device.name}:${controller.channelID}`}
+      isOptionEqualToValue={(option, value) => option.id === value.id}
+    />;
   }
 
   function activeUserDisplay() {
@@ -106,8 +126,12 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
               </>
           }
         </Stack>
-        <Stack alignContent={"center"} alignItems={"center"}>
-          <Link href={`/app/makerspace/${currentAccessController?.device.makerspaceID}/devices?q=${currentAccessController?.device.name}`}>{`${currentAccessController?.device.name}:${currentAccessController?.channelID}`}</Link>
+        <Stack alignItems={"center"} spacing={2}>
+          {
+            !allowEdit
+              ? <Link href={`/app/makerspace/${currentAccessController?.device.makerspaceID}/devices?q=${currentAccessController?.device.name}`}>{`${currentAccessController?.device.name}:${currentAccessController?.channelID}`}</Link>
+              : controllerPairingField()
+          }
           {activeUserDisplay()}
         </Stack>
         <Stack direction="row" justifyContent="space-between" alignItems={"center"} spacing={1}>
