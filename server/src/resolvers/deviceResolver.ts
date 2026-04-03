@@ -7,10 +7,11 @@ import * as UserRepo from "../repositories/Users/UserRepository.js";
 import * as CoreRepo from "../repositories/Devices/CoreRepository.js";
 import * as DispenserRepo from "../repositories/Devices/DispenserRepository.js";
 import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js";
-import { CoreActions, CoreFlags, WSACSServerUnprompted } from "../models/api/WSACS/WSACSFormats.js";
+import { WSACSServerUnprompted } from "../models/api/WSACS/WSACSFormats.js";
 import { EntityNotFound } from "../EntityNotFound.js";
 import WSACSController from "../models/api/WSACS/WSACSController.js";
 import { ACSOrchestrator } from "../models/api/ACSOrchestrator.js";
+import { CoreActions, CoreFlags } from "../models/api/ACSFormats.js";
 
 const DeviceResolver = {
   Core: {
@@ -252,7 +253,11 @@ const DeviceResolver = {
 
       const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
       if (core !== undefined) {
-        core.setState(user, AccessControllerState.WELCOMING);
+        core.setFlags({
+          lockWhenIdle: core.flags.lockWhenIdle,
+          restartWhenIdle: core.flags.restartWhenIdle,
+          welcoming: true
+        });
       }
 
       return result;
@@ -265,9 +270,18 @@ const DeviceResolver = {
         makerspaceID: number
       },
       { isManagerFor }: ApolloContext
-    ) => isManagerFor(args.makerspaceID, async (_user) => (
+    ) => isManagerFor(args.makerspaceID, async (user) => {
       await DeviceRepo.unpairWelcomeDevice(args.deviceID, args.makerspaceID)
-    ))
+
+      const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
+      if (core !== undefined) {
+        core.setFlags({
+          lockWhenIdle: core.flags.lockWhenIdle,
+          restartWhenIdle: core.flags.restartWhenIdle,
+          welcoming: false
+        });
+      }
+    })
   }
 };
 

@@ -171,7 +171,13 @@ export class ACSOrchestrator {
           ? (new Date).getTime() : undefined,
         state: infoRequest.fields.includes(CoreInfoOptions.STATE)
           ? (await core.getAccessControllers()).map((controller) => ({ id: controller.channelID, state: controller.state })) : undefined,
-        hmi: undefined
+        hmi: undefined,
+        flags: infoRequest.fields.includes(CoreInfoOptions.FLAGS)
+          ? {
+            lockWhenIdle: core.flags?.lockWhenIdle ?? false,
+            restartWhenIdle: core.flags?.restartWhenIdle ?? false,
+            welcoming: core.flags?.welcoming ?? false
+          } : undefined
       }
 
       ACSOrchestrator.getDeviceController(core.deviceID)?.sendCoreInfoResponse(core, response);

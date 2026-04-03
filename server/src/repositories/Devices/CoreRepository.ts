@@ -4,8 +4,8 @@ import { AccessControllerState, CoreInputMode, CoreRow } from "../../db/tables.j
 import { Core } from "../../models/devices/core.js";
 import * as ACRepo from "./AccessControllerRepository.js";
 import * as DeviceRepo from "./DeviceRepository.js";
-import { CoreFlags } from "../../models/api/WSACS/WSACSFormats.js";
 import { ACSDeployment } from "../../models/ACS/deployment.js";
+import { CoreFlags } from "../../models/api/ACSFormats.js";
 
 export async function getCoreByDeviceID(deviceID: number): Promise<Core | undefined> {
   const rawRow = await knex("Cores").where("deviceID", deviceID).first();
