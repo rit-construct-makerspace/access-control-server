@@ -101,5 +101,7 @@ export const DeviceTypeDefs = gql`
     pairDispenser(SN: String!, makerspaceID: Int!): String!
     sendCoreAction(deviceID: Int!, action: CoreAction!): Boolean
     sendCoreFlags(deviceID: Int!, flags: CoreFlagInput!): Boolean
+    pairWelcomeDevice(deviceID: Int!, makerspaceID: Int!): Boolean
+    unpairWelcomeDevice(deviceID: Int!, makerspaceID: Int!): Boolean
   }
 `;

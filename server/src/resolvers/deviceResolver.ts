@@ -239,6 +239,28 @@ const DeviceResolver = {
         return WSACSController.sendCoreRequest(command, args.deviceID);
       })
     },
+
+    pairWelcomeDevice: async (
+      _parent: any,
+      args: {
+        deviceID: number,
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (_user) => (
+      await DeviceRepo.pairWelcomeDevice(args.deviceID, args.makerspaceID)
+    )),
+
+    unpairWelcomeDevice: async (
+      _parent: any,
+      args: {
+        deviceID: number,
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (_user) => (
+      await DeviceRepo.unpairWelcomeDevice(args.deviceID, args.makerspaceID)
+    ))
   }
 };
 
