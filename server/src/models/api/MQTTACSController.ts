@@ -83,94 +83,122 @@ export default class MQTTACSController extends ACSController {
   }
 
   private static async statusHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
-    const topicArray = topic.split("/");
-    const SN = topicArray[3];
-    const device = await DeviceRepo.getDeviceBySN(SN);
-    if (device == undefined) { return; }
-    MQTTACSController.registerDevice(device.id);
+    try {
+      const topicArray = topic.split("/");
+      const SN = topicArray[3];
+      const device = await DeviceRepo.getDeviceBySN(SN);
+      if (device == undefined) { return; }
+      MQTTACSController.registerDevice(device.id);
 
-    const statusReport: CoreStatusReport = JSON.parse(payload.toString());
-    // TODO: INPUT VALIDATION
+      const statusReport: CoreStatusReport = JSON.parse(payload.toString());
+      // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreStatusReport(device.id, statusReport);
+      ACSOrchestrator.handleCoreStatusReport(device.id, statusReport);
+    } catch (e) {
+      console.error(`[MQTTACSController] statusHandler error: ${e}`);
+    }
   }
 
   private static async stateChangeHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
-    const topicArray = topic.split("/");
-    const SN = topicArray[3];
-    const device = await DeviceRepo.getDeviceBySN(SN);
-    if (device == undefined) { return; }
-    MQTTACSController.registerDevice(device.id);
+    try {
+      const topicArray = topic.split("/");
+      const SN = topicArray[3];
+      const device = await DeviceRepo.getDeviceBySN(SN);
+      if (device == undefined) { return; }
+      MQTTACSController.registerDevice(device.id);
 
-    const stateChangeReport: CoreStateChangeReport = JSON.parse(payload.toString());
-    // TODO: INPUT VALIDATION
+      const stateChangeReport: CoreStateChangeReport = JSON.parse(payload.toString());
+      // TODO: INPUT VALIDATION
 
-    await ACSOrchestrator.handleCoreStateChangeReport(device.id, stateChangeReport);
+      await ACSOrchestrator.handleCoreStateChangeReport(device.id, stateChangeReport);
+    } catch (e) {
+      console.error(`[MQTTACSController] stateChangeHandler error: ${e}`);
+    }
   }
 
   private static async logHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
-    const topicArray = topic.split("/");
-    const SN = topicArray[3];
-    const device = await DeviceRepo.getDeviceBySN(SN);
-    if (device == undefined) { return; }
-    MQTTACSController.registerDevice(device.id);
+    try {
+      const topicArray = topic.split("/");
+      const SN = topicArray[3];
+      const device = await DeviceRepo.getDeviceBySN(SN);
+      if (device == undefined) { return; }
+      MQTTACSController.registerDevice(device.id);
 
-    const logRequest: CoreLogRequest = JSON.parse(payload.toString());
-    // TODO: INPUT VALIDATION
+      const logRequest: CoreLogRequest = JSON.parse(payload.toString());
+      // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreLogRequest(device.id, logRequest);
+      ACSOrchestrator.handleCoreLogRequest(device.id, logRequest);
+    } catch (e) {
+      console.error(`[MQTTACSController] logHandlerError: ${e}`);
+    }
   }
 
   private static async authToRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
-    const topicArray = topic.split("/");
-    const SN = topicArray[3];
-    const device = await DeviceRepo.getDeviceBySN(SN);
-    if (device == undefined) { return; }
-    MQTTACSController.registerDevice(device.id);
+    try {
+      const topicArray = topic.split("/");
+      const SN = topicArray[3];
+      const device = await DeviceRepo.getDeviceBySN(SN);
+      if (device == undefined) { return; }
+      MQTTACSController.registerDevice(device.id);
 
-    const authToRequest: CoreAuthToRequest = JSON.parse(payload.toString());
-    // TODO: INPUT VALIDATION
+      const authToRequest: CoreAuthToRequest = JSON.parse(payload.toString());
+      // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreAuthToRequest(device.id, authToRequest);
+      ACSOrchestrator.handleCoreAuthToRequest(device.id, authToRequest);
+    } catch (e) {
+      console.error(`[MQTTACSController] authToRequest error: ${e}`);
+    }
   }
 
   private static async configReportHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
-    const topicArray = topic.split("/");
-    const SN = topicArray[3];
-    const device = await DeviceRepo.getDeviceBySN(SN);
-    if (device == undefined) { return; }
-    MQTTACSController.registerDevice(device.id);
+    try {
+      const topicArray = topic.split("/");
+      const SN = topicArray[3];
+      const device = await DeviceRepo.getDeviceBySN(SN);
+      if (device == undefined) { return; }
+      MQTTACSController.registerDevice(device.id);
 
-    const configReport: CoreConfigReport = JSON.parse(payload.toString());
-    // TODO: INPUT VALIDATION
+      const configReport: CoreConfigReport = JSON.parse(payload.toString());
+      // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreConfigReport(device.id, configReport);
+      ACSOrchestrator.handleCoreConfigReport(device.id, configReport);
+    } catch (e) {
+      console.error(`[MQTTACSController] handleCoreConfigReport error: ${e}`);
+    }
   }
 
   private static async infoRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
-    const topicArray = topic.split("/");
-    const SN = topicArray[3];
-    const device = await DeviceRepo.getDeviceBySN(SN);
-    if (device == undefined) { return; }
-    MQTTACSController.registerDevice(device.id);
+    try {
+      const topicArray = topic.split("/");
+      const SN = topicArray[3];
+      const device = await DeviceRepo.getDeviceBySN(SN);
+      if (device == undefined) { return; }
+      MQTTACSController.registerDevice(device.id);
 
-    const infoRequest: CoreInfoRequest = JSON.parse(payload.toString());
-    // TODO: INPUT VALIDATION
+      const infoRequest: CoreInfoRequest = JSON.parse(payload.toString());
+      // TODO: INPUT VALIDATION
 
-    ACSOrchestrator.handleCoreInfoRequest(device.id, infoRequest);
+      ACSOrchestrator.handleCoreInfoRequest(device.id, infoRequest);
+    } catch (e) {
+      console.error(`[MQTTACSController] handleCoreInfoRequest error: ${e}`);
+    }
   }
 
   private static async welcomeRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
-    const topicArray = topic.split("/");
-    const makerspaceID = Number(topicArray[1]);
-    const SN = topicArray[3];
-    const device = await DeviceRepo.getDeviceBySN(SN);
-    if (device == undefined) { return; }
-    MQTTACSController.registerDevice(device.id);
+    try {
+      const topicArray = topic.split("/");
+      const makerspaceID = Number(topicArray[1]);
+      const SN = topicArray[3];
+      const device = await DeviceRepo.getDeviceBySN(SN);
+      if (device == undefined) { return; }
+      MQTTACSController.registerDevice(device.id);
 
-    const welcomeRequest: WelcomeRequest = JSON.parse(payload.toString());
+      const welcomeRequest: WelcomeRequest = JSON.parse(payload.toString());
 
-    ACSOrchestrator.handleWelcomeRequest(makerspaceID, device.id, welcomeRequest.cardTagID);
+      ACSOrchestrator.handleWelcomeRequest(makerspaceID, device.id, welcomeRequest.cardTagID);
+    } catch (e) {
+      console.error(`[MQTTACSController] welcomeRequestHandler error: ${e}`);
+    }
   }
 
   sendCoreAuthToResponse(core: Core, response: ServerAuthToResponse): boolean {

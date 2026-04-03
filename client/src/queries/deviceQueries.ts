@@ -136,3 +136,52 @@ export const GET_ACCESS_CONTROLLER_BY_ID = gql`
     }
   }
 `;
+
+export const GET_UNPAIRED_ACCESS_CONTROLLERS = gql`
+  query GetUnpairedAccessControllers($makerspaceID: Int!) {
+    getUnpairedAccessControllers(makerspaceID: $makerspaceID) {
+      id
+      channelID
+      device {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const GET_UNPAIRED_CORES = gql`
+  query GetUnpairedCores($makerspaceID: Int!) {
+    getUnpairedCores(makerspaceID: $makerspaceID) {
+      deviceID
+      device {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const GET_PAIRED_WELCOME_CORES = gql`
+  query GetPairedWelcomeCores($makerspaceID: Int!) {
+    getPairedWelcomeCores(makerspaceID: $makerspaceID) {
+      deviceID
+      device {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const PAIR_WELCOME_DEVICE = gql`
+  mutation PairWelcomeDevice($deviceID: Int!, $makerspaceID: Int!) {
+    pairWelcomeDevice(deviceID: $deviceID, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const UNPAIR_WELCOME_DEVICE = gql`
+  mutation UnpairWelcomeDevice($deviceID: Int!, $makerspaceID: Int!) {
+    unpairWelcomeDevice(deviceID: $deviceID, makerspaceID: $makerspaceID)
+  }
+`;

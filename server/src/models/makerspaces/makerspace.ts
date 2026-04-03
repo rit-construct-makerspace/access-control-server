@@ -31,15 +31,6 @@ export class Makerspace implements MakerspaceRow {
   }
 
   async welcome(userID: number) {
-    const user = await UserRepo.getUserByID(userID);
-    AuditLogRepo.createAuditLog(
-      `{user} signed into {makerspace}`,
-      "welcome",
-      this.id,
-      { id: user.id, label: `${user.firstName, user.lastName}` },
-      { id: this.id, label: this.name }
-    );
-
     const rooms = await this.getRooms();
     rooms.forEach((room) => room.welcome(userID));
   }
