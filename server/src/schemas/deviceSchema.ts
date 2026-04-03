@@ -86,6 +86,7 @@ export const DeviceTypeDefs = gql`
     getAccessControllerByID(accessControllerID: Int!): AccessController
     getUnpairedAccessControllers(makerspaceID: Int!): [AccessController]
     getUnpairedCores(makerspaceID: Int!): [Core]
+    getPairedWelcomeCores(makerspaceID: Int!): [Core]
   }
 
   input CoreFlagInput {

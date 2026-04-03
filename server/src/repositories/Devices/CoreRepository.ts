@@ -64,9 +64,18 @@ export async function getUnpairedCores(makerspaceID: number): Promise<Core[]> {
     // None of its controllers are paired with an equipment instance
     .whereNotExists(knex("AccessControllers").join("EquipmentInstances", "AccessControllers.id", "EquipmentInstances.controllerID").where("AccessControllers.deviceID", "=", knex.ref("Cores.deviceID")))
     // its not paired as a welcome reader already
-    .whereNotExists(knex("MakerspaceWelcomeReaders").where("deviceID", "=", knex.ref("Cores.deviceID")));
+    .whereNotExists(knex("MakerspaceWelcomeReaders").where("deviceID", "=", knex.ref("Cores.deviceID")))
+    // in this specific makerspace
+    .andWhere("Devices.makerspaceID", "=", makerspaceID);
 
   return await Promise.all(rawCores.map(async (rawRow) => await Core.buid(rawRow)));
+}
+
+export async function getMakerspaceWelcomeCores(makerspaceID: number): Promise<Core[]> {
+  const rawCores = await knex("MakerspaceWelcomeReaders").join("Cores", "MakerspaceWelcomeReaders.deviceID", "Cores.deviceID").select("Cores.*")
+    .where("makerspaceID", "=", makerspaceID);
+
+  return await Promise.all(rawCores.map(async (raw) => await Core.buid(raw)));
 }
 
 export async function coreStatusUpdate(deviceID: number, cardTagID: string | undefined) {

@@ -117,6 +117,16 @@ const DeviceResolver = {
       { isManagerFor }: ApolloContext
     ) => isManagerFor(args.makerspaceID, async (_user) => (
       await CoreRepo.getUnpairedCores(args.makerspaceID)
+    )),
+
+    getPairedWelcomeCores: async (
+      _parent: any,
+      args: {
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (_user) => (
+      await CoreRepo.getMakerspaceWelcomeCores(args.makerspaceID)
     ))
   },
 
