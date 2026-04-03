@@ -85,6 +85,7 @@ export const DeviceTypeDefs = gql`
   extend type Query {
     getAccessControllerByID(accessControllerID: Int!): AccessController
     getUnpairedAccessControllers(makerspaceID: Int!): [AccessController]
+    getUnpairedCores(makerspaceID: Int!): [Core]
   }
 
   input CoreFlagInput {
