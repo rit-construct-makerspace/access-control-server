@@ -7,17 +7,18 @@ import { Alert, Autocomplete, Button, Card, CardContent, IconButton, TextField, 
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import AddLinkIcon from '@mui/icons-material/AddLink';
 import AuditLogEntity from "../lab_management/audit_logs/AuditLogEntity";
+import { Core, GET_PAIRED_WELCOME_CORES, GET_UNPAIRED_CORES } from "../../queries/deviceQueries";
 
 
 export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId: number }) {
-    const unpairedReaderResult = useQuery(GET_UNPAIRED_READERS)
-    const [reader, setReader] = useState<{ id: number, name: string } | null>(null);
+    const [device, setDevice] = useState<{ id: number, name: string } | null>(null);
 
-    const pairedWelcomeReaderResult = useQuery(GET_WELCOME_READERS_FOR_MAKERSPACE, { variables: { makerspaceId: makerspaceId } });
+    const unpairedCoreResult = useQuery(GET_UNPAIRED_CORES, { variables: { makerspaceID: makerspaceId } });
+    const pairedWelcomeCoreResult = useQuery(GET_PAIRED_WELCOME_CORES, { variables: { makerspaceID: makerspaceId } });
 
 
-    const unpairedReaders: Reader[] | null = unpairedReaderResult?.data?.unpairedReaders;
-    const pairedReaders: Reader[] | null = pairedWelcomeReaderResult?.data?.welcomeReadersForMakerspace;
+    const unpairedCores: Core[] | null = unpairedCoreResult.data?.getUnpairedCores;
+    const pairedCores: Core[] | null = pairedWelcomeCoreResult.data?.getPairedWelcomeCores;
 
     const [unpairWelcomeReader] = useMutation(UNPAIR_AS_WELCOME_READER, { refetchQueries: [{ query: GET_UNPAIRED_READERS, }, { query: GET_WELCOME_READERS_FOR_MAKERSPACE, variables: { makerspaceId: makerspaceId } }] });
     function unpairReader(id: number) {
@@ -26,43 +27,43 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
 
     const [pairWelcomeReader] = useMutation(PAIR_AS_WELCOME_READER, { refetchQueries: [{ query: GET_UNPAIRED_READERS }, { query: GET_WELCOME_READERS_FOR_MAKERSPACE, variables: { makerspaceId: makerspaceId } }] });
     function pairReader() {
-        if (reader == null) {
+        if (device == null) {
             return;
         }
-        pairWelcomeReader({ variables: { readerId: reader?.id, makerspaceId: makerspaceId } });
-        setReader(null);
+        pairWelcomeReader({ variables: { readerId: device?.id, makerspaceId: makerspaceId } });
+        setDevice(null);
     }
 
     function generateDropdownOptions(): { id: number | undefined, name: string }[] {
         const options: { id: number | undefined, name: string }[] = [];
 
-        if (unpairedReaders) {
-            const asOptions = unpairedReaders.map((reader: Reader) => ({ id: reader.id, name: reader.name }));
+        if (unpairedCores) {
+            const asOptions = unpairedCores.map((core: Core) => ({ id: core.device.id, name: core.device.name }));
             options.push(...asOptions);
         }
         return options;
     }
 
     return <Box>
-        <RequestWrapper loading={unpairedReaderResult.loading || pairedWelcomeReaderResult.loading} error={unpairedReaderResult.error || pairedWelcomeReaderResult.error}>
+        <RequestWrapper loading={unpairedCoreResult.loading || pairedWelcomeCoreResult.loading} error={unpairedCoreResult.error || pairedWelcomeCoreResult.error}>
             <Stack spacing={2}>
                 <Typography variant="h5" fontWeight={"bold"}>Welcome Readers</Typography>
                 <Stack direction={"column"} spacing={2}>
                     {
-                        (pairedReaders && pairedReaders.length > 0) ?
-                            (pairedReaders.map((reader: Reader) => {
+                        (pairedCores && pairedCores.length > 0) ?
+                            (pairedCores.map((core: Core) => {
                                 return <Card>
                                     <CardContent>
                                         <Stack direction={"row"} spacing={1} sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                                             <Typography variant="h6" component="div">
-                                                <AuditLogEntity entityCode={`access_device:${reader.id}:${reader.name}`} />
+                                                <AuditLogEntity entityCode={`device:${core.device.id}:${core.device.name}`} />
                                             </Typography>
                                             <Stack direction={"row"} alignItems={"center"}>
                                                 <Typography variant="body2">
-                                                    {"ID " + reader.id}
+                                                    {"ID " + core.device.id}
                                                 </Typography>
                                                 <Tooltip title="Unpair as Welcome Reader">
-                                                    <IconButton onClick={() => { unpairReader(reader.id) }} color={"error"}><LinkOffIcon /></IconButton>
+                                                    <IconButton onClick={() => { unpairReader(core.device.id) }} color={"error"}><LinkOffIcon /></IconButton>
                                                 </Tooltip>
                                             </Stack>
                                         </Stack>
@@ -81,12 +82,12 @@ export default function ManageWelcomReadersCard({ makerspaceId }: { makerspaceId
                         getOptionLabel={(option) => option.name}
                         size="small"
                         options={generateDropdownOptions()}
-                        onChange={(_, value) => setReader(value.id != null ? { id: value.id, name: value.name } : null)}
+                        onChange={(_, value) => setDevice(value.id != null ? { id: value.id, name: value.name } : null)}
                         disableClearable
-                        defaultValue={reader ?? { id: undefined, name: "No Reader" }}
+                        defaultValue={device ?? { id: undefined, name: "No Reader" }}
                         fullWidth
                     />
-                    <Button startIcon={<AddLinkIcon />} onClick={pairReader} disabled={reader == null} variant="contained">Pair</Button>
+                    <Button startIcon={<AddLinkIcon />} onClick={pairReader} disabled={device == null} variant="contained">Pair</Button>
                 </Stack>
             </Stack>
 

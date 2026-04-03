@@ -149,3 +149,27 @@ export const GET_UNPAIRED_ACCESS_CONTROLLERS = gql`
     }
   }
 `;
+
+export const GET_UNPAIRED_CORES = gql`
+  query GetUnpairedCores($makerspaceID: Int!) {
+    getUnpairedCores(makerspaceID: $makerspaceID) {
+      deviceID
+      device {
+        id
+        name
+      }
+    }
+  }
+`
+
+export const GET_PAIRED_WELCOME_CORES = gql`
+  query GetPairedWelcomeCores($makerspaceID: Int!) {
+    getPairedWelcomeCores(makerspaceID: $makerspaceID) {
+      deviceID
+      device {
+        id
+        name
+      }
+    }
+  }
+`;
