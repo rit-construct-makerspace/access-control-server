@@ -64,13 +64,11 @@ export async function getMakerspaceGenericDevices(makerspaceID: number): Promise
 
 export async function pairWelcomeDevice(deviceID: number, makerspaceID: number): Promise<boolean> {
   await knex("MakerspaceWelcomeReaders").insert({ deviceID: deviceID, makerspaceID: makerspaceID });
-
   return true;
 }
 
 export async function unpairWelcomeDevice(deviceID: number, makerspaceID: number): Promise<boolean> {
   await knex("MakerspaceWelcomeReaders").where({ makerspaceID: makerspaceID, deviceID: deviceID }).delete();
-
   return true;
 }
 

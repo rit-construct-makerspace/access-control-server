@@ -52,20 +52,7 @@ export class Core extends Device implements CoreRow {
    * @param targetState The state the core is being set to
    */
   async setState(executingUser: CurrentUser, targetState: AccessControllerState) {
-    try {
-      await ShlugControl.sendState(executingUser, this.deviceID, targetState)
-    } catch (e) {
-      console.log(`failed to parse id for old wsacs: ${e}`);
-    }
-
     const controllers = await this.getAccessControllers();
-    const request: WSACSServerUnprompted = {
-      command: {
-        toState: controllers.map((controller) => ({ id: controller.channelID, state: targetState }))
-      }
-    };
-
-    const success = WSACSController.sendCoreRequest(request, this.deviceID);
     ACSOrchestrator.handleSendCoreCommand(this.deviceID, {
       toState: controllers.map((controller) => ({ id: controller.channelID, state: targetState }))
     })
