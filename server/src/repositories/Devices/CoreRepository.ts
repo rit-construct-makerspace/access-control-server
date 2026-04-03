@@ -4,7 +4,7 @@ import { AccessControllerState, CoreInputMode, CoreRow } from "../../db/tables.j
 import { Core } from "../../models/devices/core.js";
 import * as ACRepo from "./AccessControllerRepository.js";
 import * as DeviceRepo from "./DeviceRepository.js";
-import { CoreFlags } from "../../models/api/WSACSFormats.js";
+import { CoreFlags } from "../../models/api/WSACS/WSACSFormats.js";
 import { ACSDeployment } from "../../models/ACS/deployment.js";
 
 export async function getCoreByDeviceID(deviceID: number): Promise<Core | undefined> {
@@ -29,6 +29,9 @@ export async function getMakerspaceCores(makerspaceID: number): Promise<Core[]> 
   return await Promise.all(rawCores.map(async (raw) => (await Core.buid(raw))));
 }
 
+/**
+ * @deprecated The concept of a core having a state is outdated, state should be gotten and evaluated on a per-controller basis
+ */
 export async function getCoreState(deviceID: number): Promise<AccessControllerState> {
   const stateRankings = [AccessControllerState.IDLE, AccessControllerState.LOCKED_OUT, AccessControllerState.UNLOCKED, AccessControllerState.ALWAYS_ON, AccessControllerState.FAULT];
 

@@ -35,6 +35,12 @@ import { InventoryItemRow } from "./db/tables.js";
 import * as API from "./api/api.js";
 import { getDeviceBySN } from "./repositories/Devices/DeviceRepository.js";
 import { authenticateDevice } from "./api/devices/deviceApi.js";
+import { createWebSocketStream, WebSocketServer } from "ws";
+import { createServer } from "http";
+import { Aedes, AuthenticateError } from 'aedes';
+import mqtt from "mqtt";
+import * as DeviceRepo from "./repositories/Devices/DeviceRepository.js";
+import MQTTACSController from "./models/api/MQTTACSController.js";
 
 const require = createRequire(import.meta.url);
 
@@ -63,6 +69,7 @@ async function startServer() {
   var wsserver = expressWs(exp);
   var app = wsserver.app;
 
+  const httpServer = createServer(app);
 
   //Configure CORS
   app.use(cors(CORS_CONFIG));
@@ -564,12 +571,63 @@ async function startServer() {
 
   console.log(process.env.ID_FORMAT);
 
+
+  // AEDES MQTT broker initialization
+  const aedes = await Aedes.createBroker();
+
+  const mqttWSS = new WebSocketServer({
+    server: httpServer,
+    path: "/mqtt"
+  });
+
+  aedes.on("connectionError", (client, error) => console.log(`[MQTT SERVER] Client Connection Error: ${error}`))
+
+  aedes.authenticate = async function (_client, SN, password, done) {
+    const snString = SN ? SN.toString() : '';
+    const pwString = password ? password.toString() : '';
+
+    if (snString === "SERVER") {
+      if (pwString === process.env.SERVER_MQTT_PASSWORD && process.env.SERVER_MQTT_PASSWORD !== undefined) {
+        done(null, true);
+      } else {
+        const authError: AuthenticateError = Object.assign(new Error("Auth Failed"), { returnCode: 4 });
+        done(authError, false);
+      }
+      return;
+    }
+
+    const device = await DeviceRepo.getDeviceBySN(snString);
+    if (device === undefined) {
+      // Return code 4: Bad Username or Password
+      const authError: AuthenticateError = Object.assign(new Error("Auth Failed"), { returnCode: 4 });
+      done(authError, false);
+    } else {
+      const key = await device.generateKey();
+      if (key === pwString) {
+        done(null, true);
+      } else {
+        // Return code 4: Bad Username or Password
+        const authError: AuthenticateError = Object.assign(new Error("Auth Failed"), { returnCode: 4 });
+        done(authError, false);
+      }
+    }
+  }
+
+  mqttWSS.on("connection", (websocket, req) => {
+    const stream = createWebSocketStream(websocket);
+    aedes.handle(stream, req);
+  });
+
+  // MQTT.js MQTT CLIENT
+  const result = MQTTACSController.initialize();
+  console.log(`${result ? "Successfully initialized" : "Failed to initialize"} local MQTT client`);
+
   const pingResponse = await pingAtrium();
   if (typeof pingResponse !== 'boolean' || pingResponse == false) {
     console.error("Unable to contact atrium api. Currency functionality may be limited", pingResponse);
   }
 
-  app.listen({ port: PORT }, () => {
+  httpServer.listen({ port: PORT }, () => {
     console.log(
       `🚀 GraphQL-Server is running on https://localhost:${PORT}/graphql`
     )
