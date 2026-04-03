@@ -108,6 +108,16 @@ const DeviceResolver = {
     ) => isStaff(async (_user) => (
       await ACRepo.getUnpairedAccessControllers(args.makerspaceID)
     )),
+
+    getUnpairedCores: async (
+      _parent: any,
+      args: {
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (_user) => (
+      await CoreRepo.getUnpairedCores(args.makerspaceID)
+    ))
   },
 
   Mutation: {
