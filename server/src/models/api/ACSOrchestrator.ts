@@ -157,7 +157,7 @@ export class ACSOrchestrator {
           ? {
             lockWhenIdle: core.flags?.lockWhenIdle ?? false,
             restartWhenIdle: core.flags?.restartWhenIdle ?? false,
-            welcoming: core.flags?.welcoming ?? false
+            welcoming: (await core.getWelcomeMakerspace()) !== undefined
           } : undefined
       }
 
