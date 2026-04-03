@@ -62,7 +62,7 @@ export async function pairNewCore(SN: string, makerspaceID: number): Promise<Cor
 export async function getUnpairedCores(makerspaceID: number): Promise<Core[]> {
   const rawCores = await knex("Cores").select("*").join("Devices", "Cores.deviceID", "Devices.id")
     // None of its controllers are paired with an equipment instance
-    .whereNotExists(knex("AccessControllers").join("EquipmentInstances", "AccessControllers.id", "EquipmentInstances.controllerID").where("AccessControllers.deviceID", "=", knex.ref("Cores.deviceID")))
+    .whereNotExists(knex("AccessControllers").join("EquipmentInstances", "AccessControllers.id", "EquipmentInstances.accessControllerID").where("AccessControllers.deviceID", "=", knex.ref("Cores.deviceID")))
     // its not paired as a welcome reader already
     .whereNotExists(knex("MakerspaceWelcomeReaders").where("deviceID", "=", knex.ref("Cores.deviceID")))
     // in this specific makerspace
