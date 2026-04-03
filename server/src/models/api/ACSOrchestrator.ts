@@ -121,25 +121,6 @@ export class ACSOrchestrator {
         return;
       }
 
-      const welcomeSpace = await core.getWelcomeMakerspace();
-      if (welcomeSpace !== undefined) {
-        // This is a welcome reader, welcome and return approved rather than chcking access
-        await welcomeSpace.welcome(user.id);
-
-        const controllers = await core.getAccessControllers();
-
-        ACSOrchestrator.getDeviceController(deviceID)?.sendCoreAuthToResponse(core, {
-          channels: controllers.map((controller) => ({
-            channelID: controller.channelID,
-            state: AccessControllerState.UNLOCKED,
-            approved: true,
-            reason: AccessAttemptReason.WELCOME
-          })),
-          cardTagID: authToRequest.cardTagID
-        })
-        return;
-      }
-
       const attemptResult = await core.authTo(user.id, authToRequest.state, true);
 
       ACSOrchestrator.getDeviceController(deviceID)?.sendCoreAuthToResponse(core, {
