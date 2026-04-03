@@ -33,7 +33,7 @@ export default class MQTTACSController extends ACSController {
       MQTTACSController.client.subscribe("makerspace/+/device/+/authTo/request", { qos: 2 });
       MQTTACSController.client.subscribe("makerspace/+/device/+/config/report", { qos: 2 });
       MQTTACSController.client.subscribe("makerspace/+/device/+/info/request", { qos: 2 });
-      MQTTACSController.client.subscribe("makersapce/+/device/+/welcome/request");
+      MQTTACSController.client.subscribe("makerspace/+/device/+/welcome/request", { qos: 2 });
     });
 
     MQTTACSController.client.on("error", (error) => console.log(`[MQTTACSController] Error: ${error}`))

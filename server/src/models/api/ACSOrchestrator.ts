@@ -194,10 +194,10 @@ export class ACSOrchestrator {
   public static async handleWelcomeRequest(makerspaceID: number, deviceID: number, cardTagID: string) {
     try {
       const device = await DeviceRepo.getDeviceByID(deviceID);
-      if (device === undefined) { return; }
+      if (device === undefined) { console.log("can't find device"); return; }
 
       const rawSpace = await MakerspaceRepo.getMakerspaceByID(makerspaceID);
-      if (rawSpace === undefined) { return; }
+      if (rawSpace === undefined) { console.log("can't find makerspace"); return; }
 
       const user = await UserRepo.getUserByCardTagID(cardTagID);
       if (user === undefined) {
