@@ -109,7 +109,8 @@ export interface ServerConfigUpdateRequest {
 export enum CoreActions {
   RESTART = "RESTART",
   SEAL = "SEAL",
-  IDENTIFY = "IDENTIFY"
+  IDENTIFY = "IDENTIFY",
+  SCHEDULED_RESTART = "SCHEDULED_RESTART"
 }
 
 /**

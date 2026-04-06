@@ -245,4 +245,12 @@ export default class MQTTACSController extends ACSController {
     }
     return true;
   }
+
+  sendAllCommand(command: ServerCommand) {
+    MQTTACSController.client.publish(`makerspace/+/device/+/command`, JSON.stringify(command), { qos: 2 });
+  }
+
+  sendMakerspaceCommand(makerspaceID: number, command: ServerCommand) {
+    MQTTACSController.client.publish(`makerspace/${makerspaceID}/device/+/command`, JSON.stringify(command), { qos: 2 });
+  }
 }
