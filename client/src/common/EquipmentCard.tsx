@@ -49,8 +49,9 @@ const EquipmentCard = memo(function EquipmentCard(props: EquipmentCardProps) {
     <Card
       sx={{
         width: props.isMobile ? "350px" : "600px",
-        backgroundColor: props.equipment.archived ? theme.palette.error.light : undefined,
         height: "100%",
+        boxSizing: "border-box",
+        border: props.equipment.archived ? `5px solid ${theme.palette.error.main}` : undefined
       }}
     >
       <CardContent sx={{ width: "100%", height: "100%" }}>

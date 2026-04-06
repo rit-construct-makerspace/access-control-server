@@ -1,6 +1,7 @@
-import { AccessControllerState, CoreInputMode } from "../../db/tables.js";
-import { AuditLog } from "../logs/AuditLogs.js";
-import { ACSDeployment } from "../ACS/deployment.js";
+import { AccessControllerState, CoreInputMode } from "../../../db/tables.js";
+import { AuditLog } from "../../logs/AuditLogs.js";
+import { ACSDeployment } from "../../ACS/deployment.js";
+import { CoreFlags } from "../ACSFormats.js";
 
 /**
  * TIME: Current time
@@ -35,14 +36,9 @@ export enum CoreStateChangeReason {
   FAULT = "FAULT"
 }
 
-export interface CoreFlags {
-  lockWhenIdle: boolean;
-  restartWhenIdle: boolean;
-}
-
 export interface CoreConfig {
   channels?: {
-    id: number;
+    channelID: number;
     tempDuration: number;
   }[];
   inputMode?: CoreInputMode;

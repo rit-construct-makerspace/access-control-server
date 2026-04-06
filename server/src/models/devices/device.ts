@@ -30,7 +30,7 @@ export class Device implements DeviceRow {
     const serverKey = scryptSync(serverApiPass, 'makerspace-salt¯\_(ツ)_/¯', 24);
     const algorithm = 'aes-192-cbc';
 
-    const plainText = `device:${this.SN}:${this.keyCycle}`;
+    const plainText = `shlug:${this.SN}:${this.keyCycle}`;
     // generate iv from pairTime so when a key differs only by its keyCycle the front part of the hash doesnt look the same
     const iv: ArrayBuffer = (await crypto.subtle.digest('SHA-256', Buffer.from(this.pairTime.toISOString(), 'utf-8'))).slice(0, 16);
 

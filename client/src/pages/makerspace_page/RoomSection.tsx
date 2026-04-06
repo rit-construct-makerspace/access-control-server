@@ -22,7 +22,7 @@ export default function RoomSection(props: RoomSectionProps) {
   const isMobile = useIsMobile();
   const roomEquipment = props.room.equipment;
 
-  const filteredEquipment = roomEquipment.filter((equipment: Equipment) => equipment.name.toLowerCase().includes(props.equipmentSearch.toLowerCase()))
+  const filteredEquipment = roomEquipment.filter((equipment: Equipment) => equipment.name.toLowerCase().includes(props.equipmentSearch.toLowerCase()) || equipment.subName.toLowerCase().includes(props.equipmentSearch.toLowerCase()))
   const sortedEquipment = filteredEquipment.sort((a, b) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));
   const archivedEquipment = sortedEquipment.filter((equipment: Equipment) => equipment.archived);
   const liveEquipment = sortedEquipment.filter((equipment: Equipment) => !equipment.archived);

@@ -95,13 +95,15 @@ export class AccessController implements AccessControllerRow {
     const result = await equipment.hasAccess(user);
     if (log) {
       await UnlockAttemptRepo.createUnlockAttemptLog(equipment.id, equipment.name, user.id, user.ritUsername, result.hasAccess, result.reason);
-      await AuditLogRepo.createAuditLog(
-        `{user} ${result.hasAccess ? "activated" : "failed to activate"} {equipment} ${result.hasAccess ? "" : `with reason ${result.reason}`}`,
-        "auth",
-        await equipment.getMakerspaceID(),
-        { id: user.id, label: `${user.firstName} ${user.lastName}` },
-        { id: equipment.id, label: `${equipment.name} - ${instance.name}` }
-      );
+      if (!result.hasAccess) {
+        await AuditLogRepo.createAuditLog(
+          `{user} failed to activate {equipment} with reason ${result.reason}`,
+          "auth",
+          await equipment.getMakerspaceID(),
+          { id: user.id, label: `${user.firstName} ${user.lastName}` },
+          { id: equipment.id, label: `${equipment.name} - ${instance.name}` }
+        );
+      }
     }
     return result;
   }
@@ -140,6 +142,32 @@ export class AccessController implements AccessControllerRow {
 
   async getDevice(): Promise<Device | undefined> {
     return await DeviceRepo.getDeviceByID(this.deviceID);
+  }
+
+  async startSession(cardTag: string): Promise<void> {
+    const rawUser = await UserRepo.getUserByCardTagID(cardTag);
+    if (rawUser === undefined) {
+      return;
+    }
+
+    const instance = await EquipmentInstanceRepo.getInstanceByAccessControllerID(this.id);
+    if (instance === undefined) {
+      return;
+    }
+
+    const rawEquipment = await EquipmentRepo.getEquipmentOrUndefinedByID(instance.equipmentID);
+    if (rawEquipment === undefined) {
+      return;
+    }
+    const equipment = new Equipment(rawEquipment);
+
+    await AuditLogRepo.createAuditLog(
+      "{user} activated {equipment}",
+      "auth",
+      await equipment.getMakerspaceID(),
+      { id: rawUser.id, label: `${rawUser.firstName} ${rawUser.lastName}` },
+      { id: equipment.id, label: `${equipment.name} - ${instance.name}` }
+    )
   }
 
   async endSession(cardTag: string): Promise<void> {

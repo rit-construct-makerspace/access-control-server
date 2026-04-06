@@ -7,9 +7,11 @@ import * as UserRepo from "../repositories/Users/UserRepository.js";
 import * as CoreRepo from "../repositories/Devices/CoreRepository.js";
 import * as DispenserRepo from "../repositories/Devices/DispenserRepository.js";
 import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js";
-import { CoreActions, CoreFlags, WSACSServerUnprompted } from "../models/api/WSACSFormats.js";
+import { WSACSServerUnprompted } from "../models/api/WSACS/WSACSFormats.js";
 import { EntityNotFound } from "../EntityNotFound.js";
-import WSACSController from "../models/api/WSACSController.js";
+import WSACSController from "../models/api/WSACS/WSACSController.js";
+import { ACSOrchestrator } from "../models/api/ACSOrchestrator.js";
+import { CoreActions, CoreFlags } from "../models/api/ACSFormats.js";
 
 const DeviceResolver = {
   Core: {
@@ -96,6 +98,36 @@ const DeviceResolver = {
       { isStaff }: ApolloContext
     ) => isStaff(async (_user) => (
       await ACRepo.getAccessControllerByID(args.accessControllerID)
+    )),
+
+    getUnpairedAccessControllers: async (
+      _parent: any,
+      args: {
+        makerspaceID: number
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => (
+      await ACRepo.getUnpairedAccessControllers(args.makerspaceID)
+    )),
+
+    getUnpairedCores: async (
+      _parent: any,
+      args: {
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (_user) => (
+      await CoreRepo.getUnpairedCores(args.makerspaceID)
+    )),
+
+    getPairedWelcomeCores: async (
+      _parent: any,
+      args: {
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (_user) => (
+      await CoreRepo.getMakerspaceWelcomeCores(args.makerspaceID)
     ))
   },
 
@@ -175,6 +207,9 @@ const DeviceResolver = {
             action: args.action
           }
         };
+        ACSOrchestrator.handleSendCoreCommand(args.deviceID, {
+          action: args.action
+        });
         return WSACSController.sendCoreRequest(command, args.deviceID);
       })
     },
@@ -198,9 +233,55 @@ const DeviceResolver = {
             flags: args.flags
           }
         };
+
+        ACSOrchestrator.handleSendCoreCommand(args.deviceID, {
+          flags: args.flags
+        })
         return WSACSController.sendCoreRequest(command, args.deviceID);
       })
     },
+
+    pairWelcomeDevice: async (
+      _parent: any,
+      args: {
+        deviceID: number,
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (user) => {
+      const result = await DeviceRepo.pairWelcomeDevice(args.deviceID, args.makerspaceID);
+
+      const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
+      if (core !== undefined) {
+        core.setFlags({
+          lockWhenIdle: core.flags.lockWhenIdle,
+          restartWhenIdle: core.flags.restartWhenIdle,
+          welcoming: true
+        });
+      }
+
+      return result;
+    }),
+
+    unpairWelcomeDevice: async (
+      _parent: any,
+      args: {
+        deviceID: number,
+        makerspaceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async (user) => {
+      await DeviceRepo.unpairWelcomeDevice(args.deviceID, args.makerspaceID)
+
+      const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
+      if (core !== undefined) {
+        core.setFlags({
+          lockWhenIdle: core.flags.lockWhenIdle,
+          restartWhenIdle: core.flags.restartWhenIdle,
+          welcoming: false
+        });
+      }
+    })
   }
 };
 

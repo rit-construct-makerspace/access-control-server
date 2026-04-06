@@ -4,8 +4,8 @@ import { AccessControllerState, CoreInputMode, CoreRow } from "../../db/tables.j
 import { Core } from "../../models/devices/core.js";
 import * as ACRepo from "./AccessControllerRepository.js";
 import * as DeviceRepo from "./DeviceRepository.js";
-import { CoreFlags } from "../../models/api/WSACSFormats.js";
 import { ACSDeployment } from "../../models/ACS/deployment.js";
+import { CoreFlags } from "../../models/api/ACSFormats.js";
 
 export async function getCoreByDeviceID(deviceID: number): Promise<Core | undefined> {
   const rawRow = await knex("Cores").where("deviceID", deviceID).first();
@@ -29,6 +29,9 @@ export async function getMakerspaceCores(makerspaceID: number): Promise<Core[]> 
   return await Promise.all(rawCores.map(async (raw) => (await Core.buid(raw))));
 }
 
+/**
+ * @deprecated The concept of a core having a state is outdated, state should be gotten and evaluated on a per-controller basis
+ */
 export async function getCoreState(deviceID: number): Promise<AccessControllerState> {
   const stateRankings = [AccessControllerState.IDLE, AccessControllerState.LOCKED_OUT, AccessControllerState.UNLOCKED, AccessControllerState.ALWAYS_ON, AccessControllerState.FAULT];
 
@@ -54,6 +57,25 @@ export async function pairNewCore(SN: string, makerspaceID: number): Promise<Cor
   }).returning("*");
 
   return await Core.buid(newCore[0]);
+}
+
+export async function getUnpairedCores(makerspaceID: number): Promise<Core[]> {
+  const rawCores = await knex("Cores").select("*").join("Devices", "Cores.deviceID", "Devices.id")
+    // None of its controllers are paired with an equipment instance
+    .whereNotExists(knex("AccessControllers").join("EquipmentInstances", "AccessControllers.id", "EquipmentInstances.accessControllerID").where("AccessControllers.deviceID", "=", knex.ref("Cores.deviceID")))
+    // its not paired as a welcome reader already
+    .whereNotExists(knex("MakerspaceWelcomeReaders").where("deviceID", "=", knex.ref("Cores.deviceID")))
+    // in this specific makerspace
+    .andWhere("Devices.makerspaceID", "=", makerspaceID);
+
+  return await Promise.all(rawCores.map(async (rawRow) => await Core.buid(rawRow)));
+}
+
+export async function getMakerspaceWelcomeCores(makerspaceID: number): Promise<Core[]> {
+  const rawCores = await knex("MakerspaceWelcomeReaders").join("Cores", "MakerspaceWelcomeReaders.deviceID", "Cores.deviceID").select("Cores.*")
+    .where("makerspaceID", "=", makerspaceID);
+
+  return await Promise.all(rawCores.map(async (raw) => await Core.buid(raw)));
 }
 
 export async function coreStatusUpdate(deviceID: number, cardTagID: string | undefined) {
