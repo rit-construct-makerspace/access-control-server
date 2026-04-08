@@ -156,7 +156,7 @@ export class ACSOrchestrator {
         flags: infoRequest.fields.includes(CoreInfoOptions.FLAGS)
           ? {
             lockWhenIdle: core.flags?.lockWhenIdle ?? false,
-            restartWhenIdle: core.flags?.restartWhenIdle ?? false,
+            restartWhenUnused: core.flags?.restartWhenUnused ?? false,
             welcoming: (await core.getWelcomeMakerspace()) !== undefined
           } : undefined
       }

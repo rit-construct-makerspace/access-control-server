@@ -42,7 +42,7 @@ export interface CoreAuthToRequest {
 
 export interface CoreFlags {
   lockWhenIdle: boolean;
-  restartWhenIdle: boolean;
+  restartWhenUnused: boolean;
   welcoming: boolean;
 }
 
