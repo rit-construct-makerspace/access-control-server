@@ -26,17 +26,11 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   });
 
   const [updateInstance] = useMutation(UPDATE_INSTANCE, {
-    refetchQueries: [
-      { query: GET_EQUIPMENT_INSTANCES, variables: { equipmentID: props.instance.equipment.id } },
-      "GetUnpairedAccessControllers"
-    ]
+    refetchQueries: ["EquipmentInstances", "GetUnpairedAccessControllers"]
   });
 
   const [updatePairing] = useMutation(UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT, {
-    refetchQueries: [
-      "EquipmentInstances",
-      "GetUnpairedAccessControllers"
-    ]
+    refetchQueries: ["EquipmentInstances", "GetUnpairedAccessControllers"]
   })
 
 
