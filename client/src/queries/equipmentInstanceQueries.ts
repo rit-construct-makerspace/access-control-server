@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { AccessControllerState } from "./deviceQueries";
+import { AccessController, AccessControllerState } from "./deviceQueries";
 
 export enum InstanceStatus {
   UNDEPLOYED = "UNDEPLOYED",
@@ -18,19 +18,7 @@ export interface EquipmentInstance {
   }
   name: string;
   status: InstanceStatus;
-  reader: {
-    id: number;
-    name: string;
-  } | null;
-  accessController: {
-    id: number;
-    channelID: number;
-    state: AccessControllerState;
-    device: {
-      name: string
-      id: number
-    } | undefined
-  }
+  accessController: AccessController
 }
 
 export const GET_EQUIPMENT_INSTANCES = gql`

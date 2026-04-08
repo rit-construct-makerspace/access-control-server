@@ -44,11 +44,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   const [name, setName] = useState<string>(props.instance.name);
   const [status, setStatus] = useState<InstanceStatus>(props.instance.status);
 
-  const currentAccessControllerResult = useQuery(GET_ACCESS_CONTROLLER_BY_ID, {
-    pollInterval: 15000,
-    variables: { accessControllerID: props.instance.accessController?.id }
-  });
-  const currentAccessController: AccessController | undefined = currentAccessControllerResult.data?.getAccessControllerByID;
+  const currentAccessController: AccessController | undefined = props.instance.accessController;
   const upairedAccessControllers: AccessController[] | [] = getUnpairedConrollersResult.data?.getUnpairedAccessControllers ?? [];
 
 
@@ -136,10 +132,12 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
         <Stack alignItems={"center"} spacing={2}>
           {
             !allowEdit
-              ? <Link href={`/app/makerspace/${currentAccessController?.device.makerspaceID}/devices?q=${currentAccessController?.device.name}`}>{`${currentAccessController?.device.name}:${currentAccessController?.channelID}`}</Link>
+              ? currentAccessController
+                ? <Link href={`/app/makerspace/${currentAccessController?.device.makerspaceID}/devices?q=${currentAccessController?.device.name}`}>{`${currentAccessController?.device.name}:${currentAccessController?.channelID}`}</Link>
+                : <Typography>Unpaired</Typography>
               : controllerPairingField()
           }
-          {activeUserDisplay()}
+          <Typography>{activeUserDisplay()}</Typography>
         </Stack>
         <Stack direction="row" justifyContent="space-between" alignItems={"center"} spacing={1}>
           <Select disabled={allowEdit || currentAccessController === undefined} size="small" defaultValue={currentAccessController?.state ?? AccessControllerState.IDLE} value={commandedState} onChange={handleStateChange} fullWidth>
