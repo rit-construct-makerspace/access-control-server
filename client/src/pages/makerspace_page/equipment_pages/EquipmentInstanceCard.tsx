@@ -9,7 +9,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
-import { AccessController, AccessControllerState, GET_ACCESS_CONTROLLER_BY_ID, GET_UNPAIRED_ACCESS_CONTROLLERS, SET_CORE_STATE } from "../../../queries/deviceQueries";
+import { AccessController, AccessControllerState, GET_UNPAIRED_ACCESS_CONTROLLERS, SET_CORE_STATE } from "../../../queries/deviceQueries";
 import { useParams } from "react-router-dom";
 
 interface EquipmentInstanceCardProps {
@@ -28,14 +28,14 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   const [updateInstance] = useMutation(UPDATE_INSTANCE, {
     refetchQueries: [
       { query: GET_EQUIPMENT_INSTANCES, variables: { equipmentID: props.instance.equipment.id } },
-      { query: GET_UNPAIRED_ACCESS_CONTROLLERS }
+      "GetUnpairedAccessControllers"
     ]
   });
 
   const [updatePairing] = useMutation(UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT, {
     refetchQueries: [
-      { query: GET_EQUIPMENT_INSTANCES, variables: { equipmentID: props.instance.equipment.id } },
-      { query: GET_UNPAIRED_ACCESS_CONTROLLERS }
+      "EquipmentInstances",
+      "GetUnpairedAccessControllers"
     ]
   })
 
@@ -43,6 +43,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   const [allowEdit, setAllowEdit] = useState(false);
   const [name, setName] = useState<string>(props.instance.name);
   const [status, setStatus] = useState<InstanceStatus>(props.instance.status);
+  const [pairedController, setPairedController] = useState<AccessController | undefined>(props.instance.accessController);
 
   const currentAccessController: AccessController | undefined = props.instance.accessController;
   const upairedAccessControllers: AccessController[] | [] = getUnpairedConrollersResult.data?.getUnpairedAccessControllers ?? [];
@@ -54,14 +55,15 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
 
   async function handleSave() {
     setAllowEdit(false);
-    updateInstance({ variables: { id: props.instance.id, name: name, status: status } })
-    updatePairing({ variables: { id: props.instance.id } })
+    await updateInstance({ variables: { id: props.instance.id, name: name, status: status } })
+    await updatePairing({ variables: { id: Number(props.instance.id), accessControllerID: pairedController?.id } })
   }
 
   async function handleCancel() {
     setAllowEdit(false);
     setName(props.instance.name);
     setStatus(props.instance.status);
+    setPairedController(props.instance.accessController);
   }
 
   function handleStateChange(e: any) {
@@ -80,26 +82,29 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   function controllerPairingField() {
 
     return <Autocomplete
+      key={props.instance.id}
       renderInput={(params) => <TextField
         {...params}
         label={"Controller Pairing"}
       />}
       fullWidth
-      options={upairedAccessControllers}
+      options={props.instance.accessController ? [props.instance.accessController, ...upairedAccessControllers] : upairedAccessControllers}
       getOptionLabel={(controller) => `${controller.device.name}:${controller.channelID}`}
       isOptionEqualToValue={(option, value) => option.id === value.id}
+      onChange={(_e, newValue) => setPairedController(newValue ?? undefined)}
+      value={pairedController}
     />;
   }
 
   function activeUserDisplay() {
     if (!currentAccessController) {
-      return "No User";
+      return <Typography>No User</Typography>;
     }
     if (!currentAccessController.core?.activeUser) {
       if (currentAccessController.state === AccessControllerState.ALWAYS_ON || currentAccessController.state === AccessControllerState.UNLOCKED) {
-        return "Unlocked with no user";
+        return <Typography>Unlocked with no user</Typography>;
       } else {
-        return "No User";
+        return <Typography>No User</Typography>;
       }
     }
     return <Stack direction={"row"}>
@@ -137,7 +142,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
                 : <Typography>Unpaired</Typography>
               : controllerPairingField()
           }
-          <Typography>{activeUserDisplay()}</Typography>
+          {activeUserDisplay()}
         </Stack>
         <Stack direction="row" justifyContent="space-between" alignItems={"center"} spacing={1}>
           <Select disabled={allowEdit || currentAccessController === undefined} size="small" defaultValue={currentAccessController?.state ?? AccessControllerState.IDLE} value={commandedState} onChange={handleStateChange} fullWidth>

@@ -89,6 +89,6 @@ export async function deleteInstance(id: number): Promise<boolean> {
 }
 
 export async function updateInstanceControllerAssignment(id: number, accessControllerID?: number): Promise<boolean> {
-    await knex("EquipmentInstances").update({ accessControllerID: accessControllerID }).where({ id: id });
+    await knex("EquipmentInstances").update({ accessControllerID: accessControllerID ?? null }).where({ id: id });
     return true;
 }

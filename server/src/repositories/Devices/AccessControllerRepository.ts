@@ -63,6 +63,6 @@ export async function deleteAllCoreChannels(deviceID: number): Promise<number> {
 
 export async function createAccessControllers(deviceID: number, count: number): Promise<void> {
   for (let i = 0; i < count; i++) {
-    await knex("AccessControllers").insert({ deviceID: deviceID, channelID: i })
+    await knex("AccessControllers").insert({ deviceID: deviceID, channelID: i, state: AccessControllerState.IDLE })
   }
 }
