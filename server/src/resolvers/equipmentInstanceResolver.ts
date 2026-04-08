@@ -19,13 +19,6 @@ const EquipmentInstanceResolver = {
       _context: ApolloContext) => {
       return EquipmentRepo.getEquipmentByID(Number(parent.equipmentID));
     },
-    //Fetch full data for equipment field
-    reader: async (
-      parent: EquipmentInstancesRow,
-      _args: any,
-      _context: ApolloContext) => {
-      return getReaderByID(Number(parent.readerID));
-    },
 
     accessController: async (
       parent: EquipmentInstancesRow,
@@ -80,7 +73,9 @@ const EquipmentInstanceResolver = {
      */
     createEquipmentinstance: async (
       _parent: any,
-      args: { equipmentID: number, name: string },
+      args: {
+        equipmentID: number, name: string
+      },
       { isManager }: ApolloContext) =>
       isManager(async (user) => {
         const equipment = await EquipmentRepo.getEquipmentByID(args.equipmentID);
@@ -98,7 +93,11 @@ const EquipmentInstanceResolver = {
      */
     updateInstance: async (
       _parent: any,
-      args: { id: number, name: string, status: string, readerID: number | null },
+      args: {
+        id: number,
+        name: string,
+        status: string,
+      },
       { isStaff }: ApolloContext) =>
       isStaff(async (user) => {
 
@@ -109,7 +108,7 @@ const EquipmentInstanceResolver = {
         const equipment = await EquipmentRepo.getEquipmentByID(instance.equipmentID);
         if (!equipment) throw new GraphQLError("Instance does not have associate Machine");
 
-        const newInstance = await InstanceRepo.updateInstance(args.id, args.name, args.status, args.readerID);
+        const newInstance = await InstanceRepo.updateInstance(args.id, args.name, args.status);
 
         if (instance?.name != newInstance?.name) {
           await createUnassocaitedAuditLog(`{user} renamed instance '${instance?.name}' of equipment {equipment} to '${newInstance?.name}'`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
@@ -117,27 +116,6 @@ const EquipmentInstanceResolver = {
 
         if (instance?.status != newInstance?.status) {
           await createUnassocaitedAuditLog(`{user} changed status of '${newInstance?.name}' of equipment {equipment} to '${newInstance?.status}'`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
-        }
-
-        var oldReader = null;
-        if (instance?.readerID) {
-          oldReader = await getReaderByID(instance.readerID);
-        }
-
-        var newReader = null;
-        if (args.readerID == oldReader?.id) {
-          newReader = oldReader;
-        } if (args.readerID && args.readerID != args.id) {
-          newReader = await getReaderByID(args.readerID);
-        }
-        if (newReader == null && oldReader != null) {
-          await createUnassocaitedAuditLog(`{user} unpaired {access_device} from instance {equipment}: ${newInstance?.name}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: oldReader.id, label: oldReader?.name ?? "unknown reader" }, { id: equipment.id, label: equipment.name });
-        } else if (newReader != null && oldReader?.id != newReader?.id) {
-          await createUnassocaitedAuditLog(`{user} paired {access_device} to {equipment}: ${newInstance?.name}`, 'admin', { id: user.id, label: getUsersFullName(user) }, { id: newReader?.id, label: newReader?.name ?? "unknown reader" }, { id: equipment.id, label: equipment.name });
-        }
-
-        if (newInstance?.readerID) {
-          newInstance.readerID = Number(newInstance.readerID)
         }
 
         return newInstance;
@@ -200,27 +178,30 @@ const EquipmentInstanceResolver = {
     deleteInstance: async (
       _parent: any,
       args: { id: number },
-      { isManager }: ApolloContext) =>
-      isManager(async (user) => {
-        const orig = await getInstanceByID(args.id);
-        if (!orig) throw new GraphQLError("Instance does not exist");
-        const equipment = await EquipmentRepo.getEquipmentByID(orig.equipmentID);
-        if (!equipment) throw new GraphQLError("Equipment does not exist");
-        const room = await RoomRepo.getRoomByID(equipment.roomID);
-        if (!user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
-          throw new GraphQLError(`Not Privileged for Makerspace ${room?.makerspaceID}`);
-        }
-        await createUnassocaitedAuditLog(`{user} deleted instance "${orig.name}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
-        return await deleteInstance(args.id)
-      }),
-    assignReaderToEquipmentInstance: async (
-      _parent: any,
-      args: { instanceId: number, readerId: number | undefined },
-      { isStaff }: ApolloContext) =>
-      isStaff(async (user) => {
+      { isManager }: ApolloContext
+    ) => isManager(async (user) => {
+      const orig = await getInstanceByID(args.id);
+      if (!orig) throw new GraphQLError("Instance does not exist");
+      const equipment = await EquipmentRepo.getEquipmentByID(orig.equipmentID);
+      if (!equipment) throw new GraphQLError("Equipment does not exist");
+      const room = await RoomRepo.getRoomByID(equipment.roomID);
+      if (!user.manager.includes(room?.makerspaceID ?? -1) && !user.admin) {
+        throw new GraphQLError(`Not Privileged for Makerspace ${room?.makerspaceID}`);
+      }
+      await createUnassocaitedAuditLog(`{user} deleted instance "${orig.name}" on {equipment}`, "admin", { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
+      return await deleteInstance(args.id)
+    }),
 
-        return InstanceRepo.assignReaderToEquipmentInstance(args.instanceId, args.readerId);
-      }),
+    updateInstanceControllerAssignment: async (
+      _parent: any,
+      args: {
+        id: number,
+        accessControllerID?: number
+      },
+      { isManager }: ApolloContext
+    ) => isManager(async (_user) => (
+      InstanceRepo.updateInstanceControllerAssignment(args.id, args.accessControllerID)
+    ))
   }
 
 };

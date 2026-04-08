@@ -11,7 +11,6 @@ export const EquipmentInstanceTypeDefs = gql`
         equipment: Equipment!
         name: String!
         status: String
-        reader: Reader
         accessController: AccessController
     }
     type Reader {
@@ -35,7 +34,7 @@ export const EquipmentInstanceTypeDefs = gql`
         setInstanceStatus(id: ID!, status: String!): EquipmentInstance
         setInstanceName(id: ID!, name: String!): EquipmentInstance
         deleteInstance(id: ID!): Boolean
-        assignReaderToEquipmentInstance(instanceId: ID!, readerId: ID): EquipmentInstance
-        updateInstance(id: ID!, name: String!, status: String!, readerID: ID): EquipmentInstance
+        updateInstance(id: ID!, name: String!, status: String!): EquipmentInstance
+        updateInstanceControllerAssignment(id: Int!, accessControllerID: Int): Boolean
     }
 `

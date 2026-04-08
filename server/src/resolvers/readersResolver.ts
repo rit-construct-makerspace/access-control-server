@@ -9,13 +9,12 @@ import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRe
 import { getUserByCardTagID, getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
 import { AccessControllerState, ReaderLogRow, ReaderRow } from "../db/tables.js";
-import * as ShlugControl from "../wsapi.js"
 import * as EquipmentInstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 
 import { createCipheriv, randomInt, scryptSync } from "crypto";
 import { generateRandomHumanName } from "../data/humanReadableNames.js";
-import { getInstanceByID, getInstanceByReaderID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
+import { getInstanceByID } from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import { getEquipmentByID } from "../repositories/Equipment/EquipmentRepository.js";
 import { oldStateToStateEnum } from "../db/migrations/20260209155821_devices-overhaul.js";
 const serverApiPass = process.env.SERVER_API_PASSWORD ?? 'unsecure_server_password';

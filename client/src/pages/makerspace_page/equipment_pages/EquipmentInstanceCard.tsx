@@ -1,9 +1,8 @@
 import { Autocomplete, Button, Card, IconButton, Link, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
-import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES, InstanceStatus, UPDATE_INSTANCE } from "../../../queries/equipmentInstanceQueries";
+import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES, InstanceStatus, UPDATE_INSTANCE, UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT } from "../../../queries/equipmentInstanceQueries";
 import ActionButton from "../../../common/ActionButton";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import { useMutation, useQuery } from "@apollo/client";
-import { GET_UNPAIRED_READERS } from "../../../queries/readersQueries";
 import { useState } from "react";
 import BlockIcon from '@mui/icons-material/Block';
 import SaveIcon from '@mui/icons-material/Save';
@@ -29,8 +28,16 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   const [updateInstance] = useMutation(UPDATE_INSTANCE, {
     refetchQueries: [
       { query: GET_EQUIPMENT_INSTANCES, variables: { equipmentID: props.instance.equipment.id } },
-      { query: GET_UNPAIRED_READERS }]
+      { query: GET_UNPAIRED_ACCESS_CONTROLLERS }
+    ]
   });
+
+  const [updatePairing] = useMutation(UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT, {
+    refetchQueries: [
+      { query: GET_EQUIPMENT_INSTANCES, variables: { equipmentID: props.instance.equipment.id } },
+      { query: GET_UNPAIRED_ACCESS_CONTROLLERS }
+    ]
+  })
 
 
   const [allowEdit, setAllowEdit] = useState(false);
@@ -52,6 +59,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   async function handleSave() {
     setAllowEdit(false);
     updateInstance({ variables: { id: props.instance.id, name: name, status: status } })
+    updatePairing({ variables: { id: props.instance.id } })
   }
 
   async function handleCancel() {
@@ -68,7 +76,6 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
       sendCommandedState({ variables: { deviceID: props.instance.accessController.device?.id, targetState: commandedState } });
     }
   }
-
 
   async function handleDeleteInstance() {
     await deleteInstance({ variables: { id: props.instance.id } });

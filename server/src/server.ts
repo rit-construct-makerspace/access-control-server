@@ -20,7 +20,6 @@ import { getReaderBySN, getReaderCertCA } from "./repositories/Readers/ReaderRep
 import morgan from "morgan"; //Log provider
 import { createRequire } from "module";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
-import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getMakerspaceHoursNextWeek } from "./repositories/Makerspaces/MakerspaceHoursRepository.js";
@@ -190,15 +189,6 @@ async function startServer() {
   const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
   const API_DEBUG_LOGGING = process.env.API_DEBUG_LOGGING == "true";
 
-
-  /**
-   * Websocket
-   * Handler for upgrading api call to websocket connection
-   * Details of protocol are handled in wsapi.ts
-   */
-  // Websocket ACS Handler
-  app.ws("/api/ws", ws_acs_api);
-
   app.all("/api/files/*filename", async function (req, res, next) {
     const SNHeader = 'shlug-sn';
     const KeyHeader = 'shlug-key';
@@ -218,7 +208,6 @@ async function startServer() {
 
     const ok = await authenticateDevice(device, Key);
     if (!ok) {
-      wsApiLog("Declining API file to unauthed shlug with SN " + SN, "file");
       return res.status(403).send();
     }
     return next();
