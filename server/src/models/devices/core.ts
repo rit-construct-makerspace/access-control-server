@@ -14,6 +14,20 @@ import { ACSDeployment } from "../ACS/deployment.js";
 import { ACSOrchestrator } from "../api/ACSOrchestrator.js";
 import { CoreFlags } from "../api/ACSFormats.js";
 
+const DEFAULT_FLAGS: CoreFlags = {
+  lockWhenIdle: false,
+  restartWhenUnused: false,
+  welcoming: false
+}
+
+export function verifyCoreFlags(flags: any): CoreFlags {
+  return {
+    lockWhenIdle: flags?.lockWhenIdle ?? DEFAULT_FLAGS.lockWhenIdle,
+    restartWhenUnused: flags?.restartWhenUnused ?? flags.restartWhenIdle ?? DEFAULT_FLAGS.restartWhenUnused,
+    welcoming: flags?.welcoming ?? DEFAULT_FLAGS.welcoming
+  };
+}
+
 export class Core extends Device implements CoreRow {
   deviceID: number;
   channels: number;
@@ -35,7 +49,7 @@ export class Core extends Device implements CoreRow {
     this.currentCardTag = coreRow.currentCardTag;
     this.lastStatusTime = coreRow.lastStatusTime;
     this.sessionStartTime = coreRow.sessionStartTime;
-    this.flags = coreRow.flags;
+    this.flags = verifyCoreFlags(coreRow.flags);
     this.sealedDeployment = coreRow.sealedDeployment;
     this.reportedDeployment = coreRow.reportedDeployment;
   }

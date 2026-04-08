@@ -156,7 +156,7 @@ export class ACSOrchestrator {
         flags: infoRequest.fields.includes(CoreInfoOptions.FLAGS)
           ? {
             lockWhenIdle: core.flags?.lockWhenIdle ?? false,
-            restartWhenIdle: core.flags?.restartWhenIdle ?? false,
+            restartWhenUnused: core.flags?.restartWhenUnused ?? false,
             welcoming: (await core.getWelcomeMakerspace()) !== undefined
           } : undefined
       }
@@ -213,6 +213,36 @@ export class ACSOrchestrator {
         { id: rawSpace.id, label: rawSpace.name }
       );
 
+    } catch (_e) {
+
+    }
+  }
+
+  public static async commandAllCores(command: ServerCommand): Promise<void> {
+    try {
+      const cores = ACSOrchestrator.coreControllers.keys();
+
+      for (const coreID of cores) {
+        const core = await CoreRepo.getCoreByDeviceID(coreID);
+        if (core === undefined) { continue; }
+
+        ACSOrchestrator.coreControllers.get(coreID)?.sendCoreCommand(core, command);
+      }
+    } catch (_e) {
+
+    }
+  }
+
+  public static async commandMakerspaceCores(makerspaceID: number, command: ServerCommand): Promise<void> {
+    try {
+      const cores = ACSOrchestrator.coreControllers.keys();
+
+      for (const coreID of cores) {
+        const core = await CoreRepo.getCoreByDeviceID(coreID);
+        if (core === undefined || core.makerspaceID !== makerspaceID) { continue; }
+
+        ACSOrchestrator.coreControllers.get(coreID)?.sendCoreCommand(core, command);
+      }
     } catch (_e) {
 
     }

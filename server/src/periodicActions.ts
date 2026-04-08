@@ -2,6 +2,8 @@ import { knex } from "./db/index.js";
 import { listObjects } from "./integrations/aws/s3.js"
 import { send_generic_email } from "./integrations/email/email.js";
 import { notifyNewMaintenanceTicket } from "./integrations/slack/slack.js";
+import { CoreActions } from "./models/api/ACSFormats.js";
+import { ACSOrchestrator } from "./models/api/ACSOrchestrator.js";
 import { createUnassocaitedAuditLog } from "./repositories/AuditLogs/AuditLogRepository.js";
 import { advanceIntervalTickets } from "./repositories/Equipment/MaintenanceTicketRepository.js";
 
@@ -76,5 +78,13 @@ export async function advanceTimeTickets(): Promise<void> {
 
 	} catch (e) {
 		console.error("Could not advance time-based maintenance tickets: ", e);
+	}
+}
+
+export async function scheduledRestartAllCores(): Promise<void> {
+	try {
+		await ACSOrchestrator.commandAllCores({ action: CoreActions.SCHEDULED_RESTART });
+	} catch (e) {
+		console.error("Error while restarting all cores: ", e);
 	}
 }

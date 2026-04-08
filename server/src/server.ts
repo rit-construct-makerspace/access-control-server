@@ -29,7 +29,7 @@ import * as Emailer from "./integrations/email/email.js"
 import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
-import { advanceTimeTickets, deletePastSpecialHours, purge_images } from "./periodicActions.js";
+import { advanceTimeTickets, deletePastSpecialHours, purge_images, scheduledRestartAllCores } from "./periodicActions.js";
 import { getCustomUrl } from "./repositories/Links/customUrlRepository.js";
 import { InventoryItemRow } from "./db/tables.js";
 import * as API from "./api/api.js";
@@ -549,6 +549,9 @@ async function startServer() {
 
     // Advance any time-based maintennace tickets from UPCOMING -> TODO
     await advanceTimeTickets();
+
+    // Command all cores to restart for the periodic restart
+    await scheduledRestartAllCores();
   });
 
 
