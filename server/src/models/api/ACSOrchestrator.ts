@@ -219,24 +219,32 @@ export class ACSOrchestrator {
   }
 
   public static async commandAllCores(command: ServerCommand): Promise<void> {
-    const cores = ACSOrchestrator.coreControllers.keys();
+    try {
+      const cores = ACSOrchestrator.coreControllers.keys();
 
-    for (const coreID of cores) {
-      const core = await CoreRepo.getCoreByDeviceID(coreID);
-      if (core === undefined) { continue; }
+      for (const coreID of cores) {
+        const core = await CoreRepo.getCoreByDeviceID(coreID);
+        if (core === undefined) { continue; }
 
-      ACSOrchestrator.coreControllers.get(coreID)?.sendCoreCommand(core, command);
+        ACSOrchestrator.coreControllers.get(coreID)?.sendCoreCommand(core, command);
+      }
+    } catch (_e) {
+
     }
   }
 
   public static async commandMakerspaceCores(makerspaceID: number, command: ServerCommand): Promise<void> {
-    const cores = ACSOrchestrator.coreControllers.keys();
+    try {
+      const cores = ACSOrchestrator.coreControllers.keys();
 
-    for (const coreID of cores) {
-      const core = await CoreRepo.getCoreByDeviceID(coreID);
-      if (core === undefined || core.makerspaceID !== makerspaceID) { continue; }
+      for (const coreID of cores) {
+        const core = await CoreRepo.getCoreByDeviceID(coreID);
+        if (core === undefined || core.makerspaceID !== makerspaceID) { continue; }
 
-      ACSOrchestrator.coreControllers.get(coreID)?.sendCoreCommand(core, command);
+        ACSOrchestrator.coreControllers.get(coreID)?.sendCoreCommand(core, command);
+      }
+    } catch (_e) {
+
     }
   }
 }
