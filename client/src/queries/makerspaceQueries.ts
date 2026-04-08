@@ -319,6 +319,11 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
           firmwareVersion
           targetFirmware
         }
+        controllers {
+          id
+          channelID
+          state
+        }
         instance {
           id
           name

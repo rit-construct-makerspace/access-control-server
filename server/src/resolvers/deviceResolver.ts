@@ -52,12 +52,21 @@ const DeviceResolver = {
 
       return undefined;
     }),
+
     state: async (
       parent: CoreRow,
       _args: any,
       { isStaff }: ApolloContext
     ) => isStaff(async (_user) => (
       CoreRepo.getCoreState(parent.deviceID)
+    )),
+
+    controllers: async (
+      parent: CoreRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => (
+      ACRepo.getAccessControllersByDeviceID(parent.deviceID)
     ))
   },
 

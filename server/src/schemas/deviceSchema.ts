@@ -42,6 +42,7 @@ export const DeviceTypeDefs = gql`
     lastStatusTime: DateTime
     sessionStartTime: DateTime
     device: Device!
+    controllers: [AccessController]
     instance: EquipmentInstance
     welcomeSpace: Makerspace
     activeUser: User

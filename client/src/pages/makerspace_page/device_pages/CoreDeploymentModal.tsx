@@ -1,4 +1,4 @@
-import { Autocomplete, Button, Checkbox, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import { Core, CoreActions, CoreInputMode, SEND_CORE_ACTION, SEND_CORE_FLAGS } from "../../../queries/deviceQueries";
 import { useMutation } from "@apollo/client";
@@ -19,6 +19,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
 
   const [lockWhenIdle, setLockWhenIdle] = useState<boolean | undefined>(props.core.flags.lockWhenIdle);
   const [restartWhenIdle, setRestartWhenIdle] = useState<boolean | undefined>(props.core.flags.restartWhenIdle);
+  const [confirmSeal, setConfirmSeal] = useState(false);
 
   const [sendCoreAction] = useMutation(SEND_CORE_ACTION);
   const [sendCoreFlags] = useMutation(SEND_CORE_FLAGS);
@@ -134,12 +135,38 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => handleSendCoreAction(CoreActions.SEAL)}
+            onClick={() => props.core.channels !== props.core.controllers.length ? setConfirmSeal(true) : handleSendCoreAction(CoreActions.SEAL)}
           >
             SEAL Deployment
           </Button>
         </Stack>
       </Stack>
+      <Dialog open={confirmSeal}>
+        <DialogTitle>
+          Access Controllers will be Destroyed
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            The number of channels the Core is reporting is different than the number of Access Controllers created for this device.
+            For saftey, the existing Access Controllers will be destroyed and the correct number will be created.
+            Are you sure you want to proceed?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="error"
+            onClick={() => setConfirmSeal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            color="success"
+            onClick={() => { handleSendCoreAction(CoreActions.SEAL); setConfirmSeal(false) }}
+          >
+            Proceed
+          </Button>
+        </DialogActions>
+      </Dialog>
     </PrettyModal>
   );
 }

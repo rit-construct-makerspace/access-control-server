@@ -44,6 +44,7 @@ export interface Core {
   lastStatusTime: Date;
   sessionStartTime: Date;
   device: Device;
+  controllers: AccessController[];
   instance: EquipmentInstance | undefined;
   welcomeSpace: FullMakerspace | undefined;
   activeUser: CurrentUser | undefined;
