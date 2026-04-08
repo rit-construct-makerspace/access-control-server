@@ -47,7 +47,7 @@ export async function updateAccessControllerDurationByDeviceAndChannelID(deviceI
 }
 
 export async function getUnpairedAccessControllers(makerspaceID: number): Promise<AccessController[]> {
-  const result = await knex("AccessControllers").select("*").join("Devices", "AccessControllers.deviceID", "Devices.id")
+  const result = await knex("AccessControllers").select("AccessControllers.*").join("Devices", "AccessControllers.deviceID", "Devices.id")
     // Not assigned to an instance
     .whereNotExists(knex("EquipmentInstances").where("EquipmentInstances.accessControllerID", "=", knex.ref("AccessControllers.id")))
     // Filter to devices in the target makerspace
