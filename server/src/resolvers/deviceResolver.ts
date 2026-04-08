@@ -202,15 +202,9 @@ const DeviceResolver = {
       }
 
       return isManagerFor(core.makerspaceID, (_user) => {
-        const command: WSACSServerUnprompted = {
-          command: {
-            action: args.action
-          }
-        };
         ACSOrchestrator.handleSendCoreCommand(args.deviceID, {
           action: args.action
         });
-        return WSACSController.sendCoreRequest(command, args.deviceID);
       })
     },
 
@@ -255,7 +249,7 @@ const DeviceResolver = {
       if (core !== undefined) {
         core.setFlags({
           lockWhenIdle: core.flags.lockWhenIdle,
-          restartWhenIdle: core.flags.restartWhenIdle,
+          restartWhenUnused: core.flags.restartWhenUnused,
           welcoming: true
         });
       }
@@ -277,7 +271,7 @@ const DeviceResolver = {
       if (core !== undefined) {
         core.setFlags({
           lockWhenIdle: core.flags.lockWhenIdle,
-          restartWhenIdle: core.flags.restartWhenIdle,
+          restartWhenUnused: core.flags.restartWhenUnused,
           welcoming: false
         });
       }
