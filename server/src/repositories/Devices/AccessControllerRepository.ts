@@ -55,3 +55,14 @@ export async function getUnpairedAccessControllers(makerspaceID: number): Promis
 
   return result.map((raw) => new AccessController(raw));
 }
+
+export async function deleteAllCoreChannels(deviceID: number): Promise<number> {
+  const result = await knex("AccessControllers").where({ deviceID: deviceID }).delete();
+  return result;
+}
+
+export async function createAccessControllers(deviceID: number, count: number): Promise<void> {
+  for (let i = 0; i < count; i++) {
+    await knex("AccessControllers").insert({ deviceID: deviceID, channelID: i })
+  }
+}

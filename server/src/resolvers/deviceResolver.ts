@@ -201,8 +201,12 @@ const DeviceResolver = {
         throw new EntityNotFound(`Core with ID: ${args.deviceID} not found`);
       }
 
-      return isManagerFor(core.makerspaceID, (_user) => {
-        ACSOrchestrator.handleSendCoreCommand(args.deviceID, {
+      return isManagerFor(core.makerspaceID, async (_user) => {
+        if (args.action === CoreActions.SEAL) {
+          await core.sealDeployment();
+        }
+
+        await ACSOrchestrator.handleSendCoreCommand(args.deviceID, {
           action: args.action
         });
       })

@@ -166,4 +166,14 @@ export class Core extends Device implements CoreRow {
 
     return result;
   }
+
+  async sealDeployment() {
+    await CoreRepo.sealCoreDeployment(this.deviceID);
+    const controllers = await this.getAccessControllers();
+    if (this.channels !== controllers.length) {
+      // There was a change in the number of channels, drop the existing ones and make the correct number.
+      await ACRepo.deleteAllCoreChannels(this.deviceID);
+      await ACRepo.createAccessControllers(this.deviceID, this.channels);
+    }
+  }
 }
