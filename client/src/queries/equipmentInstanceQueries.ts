@@ -18,7 +18,7 @@ export interface EquipmentInstance {
   }
   name: string;
   status: InstanceStatus;
-  accessController: AccessController
+  accessController: AccessController | undefined;
 }
 
 export const GET_EQUIPMENT_INSTANCES = gql`

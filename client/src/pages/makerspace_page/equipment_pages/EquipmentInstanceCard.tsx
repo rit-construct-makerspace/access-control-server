@@ -3,7 +3,7 @@ import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES, 
 import ActionButton from "../../../common/ActionButton";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import { useMutation, useQuery } from "@apollo/client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import BlockIcon from '@mui/icons-material/Block';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
@@ -19,18 +19,20 @@ interface EquipmentInstanceCardProps {
 export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps) {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
-  const getUnpairedConrollersResult = useQuery(GET_UNPAIRED_ACCESS_CONTROLLERS, { variables: { makerspaceID: Number(makerspaceID) } });
+  const getUnpairedControllersResult = useQuery(GET_UNPAIRED_ACCESS_CONTROLLERS, { variables: { makerspaceID: Number(makerspaceID) } });
 
   const [deleteInstance] = useMutation(DELETE_EQUIPMENT_INSTANCE, {
     refetchQueries: ["EquipmentInstances", "GetUnpairedReaders"]
   });
 
   const [updateInstance] = useMutation(UPDATE_INSTANCE, {
-    refetchQueries: ["EquipmentInstances", "GetUnpairedAccessControllers"]
+    refetchQueries: ["EquipmentInstances", "GetUnpairedAccessControllers"],
+    awaitRefetchQueries: true
   });
 
   const [updatePairing] = useMutation(UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT, {
-    refetchQueries: ["EquipmentInstances", "GetUnpairedAccessControllers"]
+    refetchQueries: ["EquipmentInstances", "GetUnpairedAccessControllers"],
+    awaitRefetchQueries: true
   })
 
 
@@ -40,7 +42,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   const [pairedController, setPairedController] = useState<AccessController | undefined>(props.instance.accessController);
 
   const currentAccessController: AccessController | undefined = props.instance.accessController;
-  const upairedAccessControllers: AccessController[] | [] = getUnpairedConrollersResult.data?.getUnpairedAccessControllers ?? [];
+  const unpairedAccessControllers: AccessController[] | [] = getUnpairedControllersResult.data?.getUnpairedAccessControllers ?? [];
 
 
   const [sendCommandedState] = useMutation(SET_CORE_STATE);
@@ -64,7 +66,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
     setCommandedState(e.target.value);
   }
   function setStateClicked(_e: any) {
-    if (currentAccessController != null) {
+    if (props.instance.accessController != null) {
       sendCommandedState({ variables: { deviceID: props.instance.accessController.device?.id, targetState: commandedState } });
     }
   }
@@ -82,7 +84,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
         label={"Controller Pairing"}
       />}
       fullWidth
-      options={props.instance.accessController ? [props.instance.accessController, ...upairedAccessControllers] : upairedAccessControllers}
+      options={props.instance.accessController ? [props.instance.accessController, ...unpairedAccessControllers] : unpairedAccessControllers}
       getOptionLabel={(controller) => `${controller.device.name}:${controller.channelID}`}
       isOptionEqualToValue={(option, value) => option.id === value.id}
       onChange={(_e, newValue) => setPairedController(newValue ?? undefined)}
@@ -119,7 +121,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
           {
             !allowEdit
               ? <>
-                <ActionButton iconSize={20} color={"primary"} appearance={"icon-only"} tooltipText="Rename" handleClick={async () => setAllowEdit(true)}
+                <ActionButton iconSize={20} color={"primary"} appearance={"icon-only"} tooltipText="Edit" handleClick={async () => { setPairedController(props.instance.accessController); setAllowEdit(true); }}
                   loading={false}><DriveFileRenameOutlineIcon /></ActionButton>
               </>
               : <>
@@ -128,7 +130,7 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
               </>
           }
         </Stack>
-        <Stack alignItems={"center"} spacing={2}>
+        <Stack alignItems={"center"} spacing={allowEdit ? 1 : 2}>
           {
             !allowEdit
               ? currentAccessController

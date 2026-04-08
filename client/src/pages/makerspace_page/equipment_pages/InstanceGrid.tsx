@@ -13,18 +13,16 @@ export default function InstanceGrid(props: InstanceGridProps) {
   const instances: EquipmentInstance[] = equipmentInstancesResult.data?.equipmentInstances ?? [];
 
   return (
-    equipmentInstancesResult.loading
-      ? <LinearProgress color="primary" />
-      : instances.length === 0
-        ? <Alert severity="info" variant="filled" sx={{ width: "max-content" }}>No Instances!</Alert>
-        : <Grid container spacing={2}>
-          {
-            instances.map((instance: EquipmentInstance) => (
-              <Grid key={instance.id} width={props.isMobile ? "100%" : "280px"}>
-                <EquipmentInstanceCard instance={instance} />
-              </Grid>
-            ))
-          }
-        </Grid>
+    instances.length === 0
+      ? <Alert severity="info" variant="filled" sx={{ width: "max-content" }}>No Instances!</Alert>
+      : <Grid container spacing={2}>
+        {
+          instances.map((instance: EquipmentInstance) => (
+            <Grid key={instance.id} width={props.isMobile ? "100%" : "280px"}>
+              <EquipmentInstanceCard instance={instance} />
+            </Grid>
+          ))
+        }
+      </Grid>
   );
 }
