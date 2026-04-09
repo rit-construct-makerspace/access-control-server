@@ -51,7 +51,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
           deviceID: props.core.device.id,
           flags: {
             lockWhenIdle: lockWhenIdle ?? false,
-            restartWhenIdle: restartWhenIdle ?? false
+            restartWhenUnused: restartWhenIdle ?? false
           }
         }
       });
@@ -115,7 +115,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
                   color="primary"
                 />
               }
-              label="Restart When Idle"
+              label="Restart When Unused"
             />
             <Button
               variant="contained"
