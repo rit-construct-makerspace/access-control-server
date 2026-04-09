@@ -289,6 +289,26 @@ const DeviceResolver = {
         });
       }
     })
+  },
+
+  unpairCore: async (
+    _parent: any,
+    args: {
+      deviceID: number
+    },
+    { isManagerFor }: ApolloContext
+  ) => {
+    const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
+    if (core === undefined) { throw new EntityNotFound(`Core ${args.deviceID} does not exist`) }
+    return isManagerFor(core.makerspaceID, async (user) => {
+      await CoreRepo.unpairCore(args.deviceID);
+      AuditLogRepo.createAuditLog(
+        `{user} unpaired core ${args.deviceID}: ${core.name} from Make`,
+        "admin",
+        core.makerspaceID,
+        { id: user.id, label: `${user.firstName, user.lastName}` }
+      );
+    })
   }
 };
 

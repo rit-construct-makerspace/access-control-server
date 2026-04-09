@@ -59,6 +59,13 @@ export async function pairNewCore(SN: string, makerspaceID: number): Promise<Cor
   return await Core.buid(newCore[0]);
 }
 
+export async function unpairCore(deviceID: number) {
+  await ACRepo.deleteAllCoreChannels(deviceID);
+  // await knex("Cores").where({ deviceID: deviceID }).delete();
+  await DeviceRepo.unpairDevice(deviceID);
+  return true;
+}
+
 export async function getUnpairedCores(makerspaceID: number): Promise<Core[]> {
   const rawCores = await knex("Cores").select("*").join("Devices", "Cores.deviceID", "Devices.id")
     // None of its controllers are paired with an equipment instance

@@ -91,6 +91,11 @@ export async function pairNewDevice(SN: string, makerspaceID: number): Promise<D
   return new Device(newDevice[0]);
 }
 
+export async function unpairDevice(deviceID: number) {
+  await knex("Devices").where({ id: deviceID }).delete();
+  return true;
+}
+
 export async function updateDeviceFirmware(deviceID: number, version: string) {
   await knex("Devices").update({ firmwareVersion: version }).where({ id: deviceID });
 }
