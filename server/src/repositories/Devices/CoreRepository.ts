@@ -6,6 +6,7 @@ import * as ACRepo from "./AccessControllerRepository.js";
 import * as DeviceRepo from "./DeviceRepository.js";
 import { ACSDeployment } from "../../models/ACS/deployment.js";
 import { CoreFlags } from "../../models/api/ACSFormats.js";
+import { EntityNotFound } from "../../EntityNotFound.js";
 
 export async function getCoreByDeviceID(deviceID: number): Promise<Core | undefined> {
   const rawRow = await knex("Cores").where("deviceID", deviceID).first();
@@ -104,4 +105,16 @@ export async function updateCoreInputMode(deviceID: number, mode: CoreInputMode)
 
 export async function setCoreFlags(deviceID: number, flags: CoreFlags): Promise<void> {
   await knex("Cores").update({ flags: flags }).where({ deviceID: deviceID });
+}
+
+export async function cycleCoreKey(deviceID: number): Promise<Core> {
+  const core = await getCoreByDeviceID(deviceID);
+  if (core === undefined) {
+    throw new EntityNotFound(`No core with ID ${deviceID} exists, may be paired as another device type`);
+  }
+
+  await knex("Devices").update({ keyCycle: core.keyCycle + 1 }).where({ id: deviceID });
+  core.keyCycle = core.keyCycle + 1;
+
+  return core;
 }

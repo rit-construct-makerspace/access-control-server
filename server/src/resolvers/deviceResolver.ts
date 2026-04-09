@@ -12,6 +12,7 @@ import { EntityNotFound } from "../EntityNotFound.js";
 import WSACSController from "../models/api/WSACS/WSACSController.js";
 import { ACSOrchestrator } from "../models/api/ACSOrchestrator.js";
 import { CoreActions, CoreFlags } from "../models/api/ACSFormats.js";
+import { GraphQLError } from "graphql";
 
 const DeviceResolver = {
   Core: {
@@ -181,8 +182,17 @@ const DeviceResolver = {
       },
       { isManagerFor }: ApolloContext
     ) => isManagerFor(args.makerspaceID, async (_user) => {
-      const newCore = await CoreRepo.pairNewCore(args.SN, args.makerspaceID);
-      return await newCore.generateKey();
+      const device = await DeviceRepo.getDeviceBySN(args.SN);
+      if (device !== undefined) {
+        if (device.makerspaceID !== args.makerspaceID) {
+          throw new GraphQLError(`Insufficent priviledge! Tried to cycle key of device paired in another makerspace.`);
+        }
+        const core = await CoreRepo.cycleCoreKey(device.id);
+        return await core.generateKey();
+      } else {
+        const newCore = await CoreRepo.pairNewCore(args.SN, args.makerspaceID);
+        return await newCore.generateKey();
+      }
     }),
 
     pairDispenser: async (
