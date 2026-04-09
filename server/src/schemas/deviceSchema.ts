@@ -104,5 +104,6 @@ export const DeviceTypeDefs = gql`
     sendCoreFlags(deviceID: Int!, flags: CoreFlagInput!): Boolean
     pairWelcomeDevice(deviceID: Int!, makerspaceID: Int!): Boolean
     unpairWelcomeDevice(deviceID: Int!, makerspaceID: Int!): Boolean
+    unpairCore(deviceID: Int!): Boolean
   }
 `;
