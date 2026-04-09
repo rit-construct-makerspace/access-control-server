@@ -345,7 +345,7 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
         state
         flags {
           lockWhenIdle
-          restartWhenIdle
+          restartWhenUnused
         }
       }
       dispensers {

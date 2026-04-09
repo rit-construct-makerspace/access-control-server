@@ -32,7 +32,7 @@ export enum AccessControllerState {
 
 export interface CoreFlags {
   lockWhenIdle?: boolean;
-  restartWhenIdle?: boolean;
+  restartWhenUnused?: boolean;
 }
 
 export interface Core {

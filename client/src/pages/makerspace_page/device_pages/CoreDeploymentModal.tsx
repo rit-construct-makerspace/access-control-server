@@ -21,7 +21,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
   const [inputMode, setInputMode] = useState<CoreInputMode>(props.core.inputMode);
 
   const [lockWhenIdle, setLockWhenIdle] = useState<boolean | undefined>(props.core.flags.lockWhenIdle);
-  const [restartWhenIdle, setRestartWhenIdle] = useState<boolean | undefined>(props.core.flags.restartWhenIdle);
+  const [restartWhenIdle, setRestartWhenIdle] = useState<boolean | undefined>(props.core.flags.restartWhenUnused);
   const [confirmSeal, setConfirmSeal] = useState(false);
   const [confirmUnpair, setConfirmUnpair] = useState(false);
   const [tab, setTab] = useState<"controllers" | "deployment">("controllers");

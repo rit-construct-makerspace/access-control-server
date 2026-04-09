@@ -30,7 +30,7 @@ export const DeviceTypeDefs = gql`
 
   type CoreFlags {
     lockWhenIdle: Boolean
-    restartWhenIdle: Boolean
+    restartWhenUnused: Boolean
   }
 
   type Core {
@@ -94,7 +94,7 @@ export const DeviceTypeDefs = gql`
 
   input CoreFlagInput {
     lockWhenIdle: Boolean!
-    restartWhenIdle: Boolean!
+    restartWhenUnused: Boolean!
   }
 
   extend type Mutation {
