@@ -56,11 +56,20 @@ const EquipmentInstanceResolver = {
     getReaderPairedWithInstanceByInstanceId: async (
       _parent: any,
       args: { instanceID: number },
-      { isStaff }: ApolloContext) =>
-      isStaff(async () => {
-        return await InstanceRepo.getReaderByInstanceId(args.instanceID)
-      }),
+      { isStaff }: ApolloContext
+    ) => isStaff(async () => {
+      return await InstanceRepo.getReaderByInstanceId(args.instanceID)
+    }),
 
+    getInstanceByControllerID: async (
+      _parent: any,
+      args: {
+        controllerID: number
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => (
+      await InstanceRepo.getInstanceByAccessControllerID(args.controllerID)
+    ))
   },
 
   Mutation: {

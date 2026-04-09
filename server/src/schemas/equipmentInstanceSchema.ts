@@ -27,6 +27,7 @@ export const EquipmentInstanceTypeDefs = gql`
         equipmentInstances(equipmentID: ID!): [EquipmentInstance]
         getReaderPairedWithInstanceByInstanceId(instanceID: ID!): Reader
         getInstanceByID(id: ID!): EquipmentInstance
+        getInstanceByControllerID(controllerID: Int!): EquipmentInstance
     }
 
     extend type Mutation {
