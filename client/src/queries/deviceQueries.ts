@@ -186,3 +186,9 @@ export const UNPAIR_WELCOME_DEVICE = gql`
     unpairWelcomeDevice(deviceID: $deviceID, makerspaceID: $makerspaceID)
   }
 `;
+
+export const UNPAIR_CORE = gql`
+  mutation UnpairCore($deviceID: Int!) {
+    unpairCore(deviceID: $deviceID)
+  }
+`;
