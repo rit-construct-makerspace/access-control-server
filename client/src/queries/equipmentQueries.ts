@@ -282,4 +282,18 @@ export const GET_EQUIPMENT_TRAININGS_BY_ID = gql`
   }
 `;
 
+export const GET_INSTANCE_BY_CONTROLLER_ID = gql`
+  query GetInstanceByControllerID($controllerID: Int!) {
+    getInstanceByControllerID(controllerID: $controllerID) {
+      id
+      name
+      equipment {
+        id
+        name
+        subName
+      }
+    }
+  }
+`;
+
 export default GET_EQUIPMENTS;

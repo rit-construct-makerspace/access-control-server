@@ -15,6 +15,7 @@ export interface EquipmentInstance {
   equipment: {
     id: number;
     name: string;
+    subName: string;
   }
   name: string;
   status: InstanceStatus;
@@ -38,6 +39,7 @@ export const GET_EQUIPMENT_INSTANCES = gql`
         device {
           id
           name
+          makerspaceID
         }
       }
     }
