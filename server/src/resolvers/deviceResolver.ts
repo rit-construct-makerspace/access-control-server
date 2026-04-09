@@ -68,6 +68,22 @@ const DeviceResolver = {
       { isStaff }: ApolloContext
     ) => isStaff(async (_user) => (
       ACRepo.getAccessControllersByDeviceID(parent.deviceID)
+    )),
+
+    sealedDeployment: async (
+      parent: CoreRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff((_user) => (
+      JSON.stringify(parent.sealedDeployment, undefined, 1)
+    )),
+
+    reportedDeployment: async (
+      parent: CoreRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff((_user) => (
+      JSON.stringify(parent.reportedDeployment, undefined, 1)
     ))
   },
 

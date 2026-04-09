@@ -48,6 +48,8 @@ export const DeviceTypeDefs = gql`
     activeUser: User
     state: AccessControllerState!
     flags: CoreFlags!
+    sealedDeployment: String
+    reportedDeployment: String
   }
 
   enum DispenserError {

@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Alert, Autocomplete, Box, Button, Card, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, FormControlLabel, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import { Core, CoreActions, CoreInputMode, SEND_CORE_ACTION, SEND_CORE_FLAGS, UNPAIR_CORE } from "../../../queries/deviceQueries";
 import { useMutation } from "@apollo/client";
@@ -155,8 +155,15 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
           {
             tab === "deployment" &&
             <Stack height={"100%"} spacing={1}>
-              deployment
-              <Stack height={"100%"}>
+              <Stack height={"100%"} direction={"row"} justifyContent={"space-between"}>
+                <Stack width={"48%"}>
+                  <Typography variant="subtitle1">Sealed Deployment</Typography>
+                  <Typography sx={{ whiteSpace: "pre-wrap" }}>{props.core.sealedDeployment}</Typography>
+                </Stack>
+                <Stack width={"48%"}>
+                  <Typography variant="subtitle1">Reported Deployment</Typography>
+                  <Typography sx={{ whiteSpace: "pre-wrap" }}>{props.core.reportedDeployment}</Typography>
+                </Stack>
               </Stack>
               <Stack direction={"row"} justifyContent={"space-between"}>
                 <Button

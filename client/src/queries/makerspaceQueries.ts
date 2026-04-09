@@ -311,6 +311,8 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
       cores {
         channels
         lastStatusTime
+        sealedDeployment
+        reportedDeployment
         device {
           id
           name

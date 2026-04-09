@@ -50,6 +50,8 @@ export interface Core {
   activeUser: CurrentUser | undefined;
   state: AccessControllerState;
   flags: CoreFlags;
+  sealedDeployment: string;
+  reportedDeployment: string;
 }
 
 export interface AccessController {
