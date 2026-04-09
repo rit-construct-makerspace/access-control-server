@@ -1,4 +1,4 @@
-import { Autocomplete, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import { Core, CoreActions, CoreInputMode, SEND_CORE_ACTION, SEND_CORE_FLAGS } from "../../../queries/deviceQueries";
 import { useMutation } from "@apollo/client";
@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import SendIcon from '@mui/icons-material/Send';
+import AccessControllerRow from "./AccessControllerRow";
 
 interface CoreDeploymentModalProps {
   core: Core;
@@ -20,6 +21,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
   const [lockWhenIdle, setLockWhenIdle] = useState<boolean | undefined>(props.core.flags.lockWhenIdle);
   const [restartWhenIdle, setRestartWhenIdle] = useState<boolean | undefined>(props.core.flags.restartWhenIdle);
   const [confirmSeal, setConfirmSeal] = useState(false);
+  const [tab, setTab] = useState<"controllers" | "deployment">("controllers");
 
   const [sendCoreAction] = useMutation(SEND_CORE_ACTION);
   const [sendCoreFlags] = useMutation(SEND_CORE_FLAGS);
@@ -131,14 +133,34 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
           </Stack>
         </Stack>
         {/* Deployment */}
-        <Stack width={"66%"}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => props.core.channels !== props.core.controllers.length ? setConfirmSeal(true) : handleSendCoreAction(CoreActions.SEAL)}
-          >
-            SEAL Deployment
-          </Button>
+        <Stack width={"66%"} spacing={1}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs value={tab} onChange={(_e, newValue) => setTab(newValue)}>
+              <Tab label="Controllers" value={"controllers"} />
+              <Tab label="Deployment" value={"deployment"} />
+            </Tabs>
+          </Box>
+          {
+            tab === "controllers" &&
+            <Stack height={"100%"} spacing={1}>
+              {
+                props.core.controllers.map((controller) => <AccessControllerRow controller={controller} />)
+              }
+            </Stack>
+          }
+          {
+            tab === "deployment" &&
+            <Stack height={"100%"}>
+              deployment
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => props.core.channels !== props.core.controllers.length ? setConfirmSeal(true) : handleSendCoreAction(CoreActions.SEAL)}
+              >
+                SEAL Deployment
+              </Button>
+            </Stack>
+          }
         </Stack>
       </Stack>
       <Dialog open={confirmSeal}>
@@ -167,6 +189,6 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
           </Button>
         </DialogActions>
       </Dialog>
-    </PrettyModal>
+    </PrettyModal >
   );
 }
