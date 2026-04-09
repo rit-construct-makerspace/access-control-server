@@ -23,8 +23,6 @@ import usersResolver from "./resolvers/usersResolver.js";
 import auditLogsResolver from "./resolvers/auditLogsResolver.js";
 import holdsResolver from "./resolvers/holdsResolver.js";
 import AnnouncementsResolver from "./resolvers/announcementsResolver.js";
-import { ReaderTypeDefs } from "./schemas/readersSchema.js";
-import ReadersResolver from "./resolvers/readersResolver.js";
 import { AccessCheckTypeDefs } from "./schemas/accessChecksSchema.js";
 import AccessChecksResolver from "./resolvers/accessChecksResolver.js";
 import MakerspaceHoursResolver from "./resolvers/makerspaceHoursResolver.js";
@@ -88,7 +86,6 @@ export const schema = makeExecutableSchema({
     AuditLogsTypeDefs,
     CalendarEventsTypeDefs,
     AnnouncementsTypeDefs,
-    ReaderTypeDefs,
     AccessCheckTypeDefs,
     MakerspacesTypeDefs,
     MakerspaceHoursTypeDefs,
@@ -120,7 +117,6 @@ export const schema = makeExecutableSchema({
     holdsResolver,
     auditLogsResolver,
     AnnouncementsResolver,
-    ReadersResolver,
     AccessChecksResolver,
     MakerspacesResolver,
     MakerspaceHoursResolver,

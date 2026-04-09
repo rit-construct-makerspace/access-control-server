@@ -12,6 +12,7 @@ import { EntityNotFound } from "../EntityNotFound.js";
 import WSACSController from "../models/api/WSACS/WSACSController.js";
 import { ACSOrchestrator } from "../models/api/ACSOrchestrator.js";
 import { CoreActions, CoreFlags } from "../models/api/ACSFormats.js";
+import { GraphQLError } from "graphql";
 
 const DeviceResolver = {
   Core: {
@@ -52,12 +53,37 @@ const DeviceResolver = {
 
       return undefined;
     }),
+
     state: async (
       parent: CoreRow,
       _args: any,
       { isStaff }: ApolloContext
     ) => isStaff(async (_user) => (
       CoreRepo.getCoreState(parent.deviceID)
+    )),
+
+    controllers: async (
+      parent: CoreRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff(async (_user) => (
+      ACRepo.getAccessControllersByDeviceID(parent.deviceID)
+    )),
+
+    sealedDeployment: async (
+      parent: CoreRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff((_user) => (
+      JSON.stringify(parent.sealedDeployment, undefined, 1)
+    )),
+
+    reportedDeployment: async (
+      parent: CoreRow,
+      _args: any,
+      { isStaff }: ApolloContext
+    ) => isStaff((_user) => (
+      JSON.stringify(parent.reportedDeployment, undefined, 1)
     ))
   },
 
@@ -172,8 +198,17 @@ const DeviceResolver = {
       },
       { isManagerFor }: ApolloContext
     ) => isManagerFor(args.makerspaceID, async (_user) => {
-      const newCore = await CoreRepo.pairNewCore(args.SN, args.makerspaceID);
-      return await newCore.generateKey();
+      const device = await DeviceRepo.getDeviceBySN(args.SN);
+      if (device !== undefined) {
+        if (device.makerspaceID !== args.makerspaceID) {
+          throw new GraphQLError(`Insufficent priviledge! Tried to cycle key of device paired in another makerspace.`);
+        }
+        const core = await CoreRepo.cycleCoreKey(device.id);
+        return await core.generateKey();
+      } else {
+        const newCore = await CoreRepo.pairNewCore(args.SN, args.makerspaceID);
+        return await newCore.generateKey();
+      }
     }),
 
     pairDispenser: async (
@@ -201,16 +236,14 @@ const DeviceResolver = {
         throw new EntityNotFound(`Core with ID: ${args.deviceID} not found`);
       }
 
-      return isManagerFor(core.makerspaceID, (_user) => {
-        const command: WSACSServerUnprompted = {
-          command: {
-            action: args.action
-          }
-        };
-        ACSOrchestrator.handleSendCoreCommand(args.deviceID, {
+      return isManagerFor(core.makerspaceID, async (_user) => {
+        if (args.action === CoreActions.SEAL) {
+          await core.sealDeployment();
+        }
+
+        await ACSOrchestrator.handleSendCoreCommand(args.deviceID, {
           action: args.action
         });
-        return WSACSController.sendCoreRequest(command, args.deviceID);
       })
     },
 
@@ -255,7 +288,7 @@ const DeviceResolver = {
       if (core !== undefined) {
         core.setFlags({
           lockWhenIdle: core.flags.lockWhenIdle,
-          restartWhenIdle: core.flags.restartWhenIdle,
+          restartWhenUnused: core.flags.restartWhenUnused,
           welcoming: true
         });
       }
@@ -277,12 +310,32 @@ const DeviceResolver = {
       if (core !== undefined) {
         core.setFlags({
           lockWhenIdle: core.flags.lockWhenIdle,
-          restartWhenIdle: core.flags.restartWhenIdle,
+          restartWhenUnused: core.flags.restartWhenUnused,
           welcoming: false
         });
       }
-    })
-  }
+    }),
+
+    unpairCore: async (
+      _parent: any,
+      args: {
+        deviceID: number
+      },
+      { isManagerFor }: ApolloContext
+    ) => {
+      const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
+      if (core === undefined) { throw new EntityNotFound(`Core ${args.deviceID} does not exist`) }
+      return await isManagerFor(core.makerspaceID, async (user) => {
+        await CoreRepo.unpairCore(args.deviceID);
+        AuditLogRepo.createAuditLog(
+          `{user} unpaired core ${args.deviceID}: ${core.name} from Make`,
+          "admin",
+          core.makerspaceID,
+          { id: user.id, label: `${user.firstName, user.lastName}` }
+        );
+      })
+    }
+  },
 };
 
 export default DeviceResolver;

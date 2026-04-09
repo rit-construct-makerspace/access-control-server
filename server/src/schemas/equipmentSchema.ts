@@ -56,8 +56,8 @@ export const EquipmentTypeDefs = gql`
     requiresTrainerApproval: Boolean
     requiresInPerson: Boolean
     schedulable: Boolean
-    subName: String!
-    signOffUrl: String!
+    subName: String
+    signOffUrl: String
   }
 
   extend type Query {

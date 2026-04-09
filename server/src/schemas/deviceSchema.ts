@@ -30,7 +30,7 @@ export const DeviceTypeDefs = gql`
 
   type CoreFlags {
     lockWhenIdle: Boolean
-    restartWhenIdle: Boolean
+    restartWhenUnused: Boolean
   }
 
   type Core {
@@ -42,11 +42,14 @@ export const DeviceTypeDefs = gql`
     lastStatusTime: DateTime
     sessionStartTime: DateTime
     device: Device!
+    controllers: [AccessController]
     instance: EquipmentInstance
     welcomeSpace: Makerspace
     activeUser: User
     state: AccessControllerState!
     flags: CoreFlags!
+    sealedDeployment: String
+    reportedDeployment: String
   }
 
   enum DispenserError {
@@ -91,7 +94,7 @@ export const DeviceTypeDefs = gql`
 
   input CoreFlagInput {
     lockWhenIdle: Boolean!
-    restartWhenIdle: Boolean!
+    restartWhenUnused: Boolean!
   }
 
   extend type Mutation {
@@ -103,5 +106,6 @@ export const DeviceTypeDefs = gql`
     sendCoreFlags(deviceID: Int!, flags: CoreFlagInput!): Boolean
     pairWelcomeDevice(deviceID: Int!, makerspaceID: Int!): Boolean
     unpairWelcomeDevice(deviceID: Int!, makerspaceID: Int!): Boolean
+    unpairCore(deviceID: Int!): Boolean
   }
 `;

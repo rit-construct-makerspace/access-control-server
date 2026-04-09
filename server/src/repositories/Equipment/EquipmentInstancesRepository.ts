@@ -5,7 +5,6 @@
 
 import { knex } from "../../db/index.js";
 import { EquipmentInstancesRow, ReaderRow } from "../../db/tables.js";
-import { getReaderByID } from "../Readers/ReaderRepository.js";
 
 /**
  * Fetch all EquipmentInstances related to noted Equipment
@@ -30,18 +29,8 @@ export async function getInstanceByID(id: number): Promise<EquipmentInstancesRow
  * @param id unique id of EquipmentInstance
  * @returns EquipmentInstance or undefined if not exist
  */
-export async function updateInstance(id: number, name: string, status: string, readerID: number | null): Promise<EquipmentInstancesRow | undefined> {
-    return (await knex("EquipmentInstances").update({ name: name, status: status, readerID: readerID }).where({ id }).returning("*"))[0];
-}
-
-
-/**
- * Fetch an EquipmentInstance by its associate reader ID
- * @param id unique id of reader
- * @returns EquipmentInstance or undefined if not exist
- */
-export async function getInstanceByReaderID(readerID: number): Promise<EquipmentInstancesRow | undefined> {
-    return await knex("EquipmentInstances").select().where({ readerID }).first();
+export async function updateInstance(id: number, name: string, status: string): Promise<EquipmentInstancesRow | undefined> {
+    return (await knex("EquipmentInstances").update({ name: name, status: status }).where({ id }).returning("*"))[0];
 }
 
 /**
@@ -67,26 +56,6 @@ export async function getReaderByInstanceId(instanceID: number): Promise<ReaderR
  */
 export async function createInstance(equipmentID: number, name: string): Promise<EquipmentInstancesRow> {
     return await knex("EquipmentInstances").insert({ equipmentID, name });
-}
-
-/**
- * Assign a reader to a machine instance
- * @param instanceID the ID of the instance to pair to
- * @param readerId the ID of the reader to pair with
- * @return an updated instance or null if that instance couldnt be found to update
- */
-export async function assignReaderToEquipmentInstance(instanceID: number, readerID: number | undefined): Promise<EquipmentInstancesRow | undefined> {
-    if (readerID != null) {
-        // If trying to pair (rather than unpair) verify that pairing is valid
-        const reader = await getReaderByID(readerID);
-        if (reader == null) {
-            throw Error("Could not find reader to pair with");
-        }
-        if (reader.SN == null) {
-            throw Error("Can not pair with old-style reader. Enter values over serial instead");
-        }
-    }
-    return (await knex("EquipmentInstances").update({ readerID: readerID || null }).where({ id: instanceID }).returning("*"))[0];
 }
 
 /**
@@ -116,5 +85,10 @@ export async function setInstanceName(id: number, name: string): Promise<Equipme
  */
 export async function deleteInstance(id: number): Promise<boolean> {
     await knex("EquipmentInstances").delete().where({ id });
+    return true;
+}
+
+export async function updateInstanceControllerAssignment(id: number, accessControllerID?: number): Promise<boolean> {
+    await knex("EquipmentInstances").update({ accessControllerID: accessControllerID ?? null }).where({ id: id });
     return true;
 }

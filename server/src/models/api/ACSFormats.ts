@@ -42,7 +42,7 @@ export interface CoreAuthToRequest {
 
 export interface CoreFlags {
   lockWhenIdle: boolean;
-  restartWhenIdle: boolean;
+  restartWhenUnused: boolean;
   welcoming: boolean;
 }
 
@@ -109,7 +109,8 @@ export interface ServerConfigUpdateRequest {
 export enum CoreActions {
   RESTART = "RESTART",
   SEAL = "SEAL",
-  IDENTIFY = "IDENTIFY"
+  IDENTIFY = "IDENTIFY",
+  SCHEDULED_RESTART = "SCHEDULED_RESTART"
 }
 
 /**

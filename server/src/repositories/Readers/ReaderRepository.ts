@@ -5,7 +5,6 @@
 
 import { knex } from "../../db/index.js";
 import { ReaderLogRow, ReaderRow, TextFieldRow, MakerspaceRow } from "../../db/tables.js";
-import { getInstanceByReaderID } from "../Equipment/EquipmentInstancesRepository.js";
 import { getMakerspaceByID } from "../Makerspaces/MakerspaceRespository.js";
 
 /**
@@ -309,11 +308,7 @@ export async function setReaderName(
  * @returns the primary key in the database
  */
 export async function submitReaderLog(readerID: number | null, dateTime: Date, log: any): Promise<number> {
-    let instance = null;
-    if (readerID) {
-        instance = await getInstanceByReaderID(readerID);
-    }
-    return submitReaderLogWithInstance(readerID, instance?.id ?? null, dateTime, log);
+    return submitReaderLogWithInstance(readerID, null, dateTime, log);
 }
 export async function submitReaderLogWithInstance(readerID: number | null, currentInstanceID: number | null, dateTime: Date, log: any): Promise<number> {
     return await knex("ReaderLogs").insert({ readerID, currentInstanceID, dateTime, log }).returning("id");

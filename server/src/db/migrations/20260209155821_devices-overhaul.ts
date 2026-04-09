@@ -1,9 +1,6 @@
 import type { Knex } from "knex";
 import { AccessControllerState, CoreInputMode, ReaderRow } from "../tables.js";
 import * as ReaderRepo from "../../repositories/Readers/ReaderRepository.js"
-import * as EquipmentInstanceRepo from "../../repositories/Equipment/EquipmentInstancesRepository.js"
-import * as EquipmentRepo from "../../repositories/Equipment/EquipmentRepository.js";
-import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
 import { DispenserError } from "../../api/devices/cards/cardApi.js";
 
 export function oldStateToStateEnum(oldState: string) {
@@ -41,6 +38,7 @@ async function getMakerspaceOfReader(reader: ReaderRow, knex: Knex): Promise<num
   if (status === ReaderRepo.PairStatus.PairedAsWelcomer) {
     return (await knex("MakerspaceWelcomeReaders").first().where({ readerID: reader.id }).select("makerspaceID"))?.makerspaceID;
   } else if (status === ReaderRepo.PairStatus.PairedAsInstance) {
+    // @ts-ignore this field has been removed
     const instance = await knex("EquipmentInstances").select().where({ readerID: reader.id }).first();
     if (instance === undefined) { return undefined; }
     const equipment = await knex("Equipment").where({ id: instance.equipmentID }).first();

@@ -20,7 +20,6 @@ import { getReaderBySN, getReaderCertCA } from "./repositories/Readers/ReaderRep
 import morgan from "morgan"; //Log provider
 import { createRequire } from "module";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
-import { authenticateReader, ws_acs_api, wsApiLog } from "./wsapi.js"
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./repositories/Store/InventoryRepository.js";
 import { createLedger } from "./repositories/Store/InventoryLedgerRepository.js";
 import { getMakerspaceHoursNextWeek } from "./repositories/Makerspaces/MakerspaceHoursRepository.js";
@@ -29,7 +28,7 @@ import * as Emailer from "./integrations/email/email.js"
 import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
-import { advanceTimeTickets, deletePastSpecialHours, purge_images } from "./periodicActions.js";
+import { advanceTimeTickets, deletePastSpecialHours, purge_images, scheduledRestartAllCores } from "./periodicActions.js";
 import { getCustomUrl } from "./repositories/Links/customUrlRepository.js";
 import { InventoryItemRow } from "./db/tables.js";
 import * as API from "./api/api.js";
@@ -190,15 +189,6 @@ async function startServer() {
   const API_NORMAL_LOGGING = process.env.API_NORMAL_LOGGING == "true";
   const API_DEBUG_LOGGING = process.env.API_DEBUG_LOGGING == "true";
 
-
-  /**
-   * Websocket
-   * Handler for upgrading api call to websocket connection
-   * Details of protocol are handled in wsapi.ts
-   */
-  // Websocket ACS Handler
-  app.ws("/api/ws", ws_acs_api);
-
   app.all("/api/files/*filename", async function (req, res, next) {
     const SNHeader = 'shlug-sn';
     const KeyHeader = 'shlug-key';
@@ -218,7 +208,6 @@ async function startServer() {
 
     const ok = await authenticateDevice(device, Key);
     if (!ok) {
-      wsApiLog("Declining API file to unauthed shlug with SN " + SN, "file");
       return res.status(403).send();
     }
     return next();
@@ -549,6 +538,9 @@ async function startServer() {
 
     // Advance any time-based maintennace tickets from UPCOMING -> TODO
     await advanceTimeTickets();
+
+    // Command all cores to restart for the periodic restart
+    await scheduledRestartAllCores();
   });
 
 
