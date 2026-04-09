@@ -81,8 +81,6 @@ export interface EquipmentInstancesRow {
   /** The state of the equipment, ACTIVE,RETIRED,NEEDS_REPAIRED, etc. */
   status: string;
   /** Optional FK of the card reader associated with this instance */
-  readerID: number | null
-  /** Optional FK of the access controller associated with this instance */
   accessControllerID: number | null
 }
 

@@ -32,7 +32,7 @@ export enum AccessControllerState {
 
 export interface CoreFlags {
   lockWhenIdle?: boolean;
-  restartWhenIdle?: boolean;
+  restartWhenUnused?: boolean;
 }
 
 export interface Core {
@@ -44,11 +44,14 @@ export interface Core {
   lastStatusTime: Date;
   sessionStartTime: Date;
   device: Device;
+  controllers: AccessController[];
   instance: EquipmentInstance | undefined;
   welcomeSpace: FullMakerspace | undefined;
   activeUser: CurrentUser | undefined;
   state: AccessControllerState;
   flags: CoreFlags;
+  sealedDeployment: string;
+  reportedDeployment: string;
 }
 
 export interface AccessController {
@@ -183,5 +186,11 @@ export const PAIR_WELCOME_DEVICE = gql`
 export const UNPAIR_WELCOME_DEVICE = gql`
   mutation UnpairWelcomeDevice($deviceID: Int!, $makerspaceID: Int!) {
     unpairWelcomeDevice(deviceID: $deviceID, makerspaceID: $makerspaceID)
+  }
+`;
+
+export const UNPAIR_CORE = gql`
+  mutation UnpairCore($deviceID: Int!) {
+    unpairCore(deviceID: $deviceID)
   }
 `;

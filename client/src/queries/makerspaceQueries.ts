@@ -311,6 +311,8 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
       cores {
         channels
         lastStatusTime
+        sealedDeployment
+        reportedDeployment
         device {
           id
           name
@@ -318,6 +320,11 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
           hardwareVersion
           firmwareVersion
           targetFirmware
+        }
+        controllers {
+          id
+          channelID
+          state
         }
         instance {
           id
@@ -338,7 +345,7 @@ export const GET_MAKERSPACE_WITH_DEVICES = gql`
         state
         flags {
           lockWhenIdle
-          restartWhenIdle
+          restartWhenUnused
         }
       }
       dispensers {

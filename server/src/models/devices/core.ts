@@ -2,12 +2,10 @@ import { AccessControllerState, CoreInputMode, CoreRow, DeviceRow } from "../../
 import { Device } from "./device.js";
 import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
-import * as ShlugControl from "../../wsapi.js"
 import { CurrentUser } from "../../context.js";
-import WSACSController from "../api/WSACS/WSACSController.js";
 import { AccessController } from "./accessController.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
-import { CoreConfig, WSACSServerUnprompted } from "../api/WSACS/WSACSFormats.js";
+import { CoreConfig } from "../api/WSACS/WSACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
 import { ACSDeployment } from "../ACS/deployment.js";
@@ -165,5 +163,15 @@ export class Core extends Device implements CoreRow {
     }
 
     return result;
+  }
+
+  async sealDeployment() {
+    await CoreRepo.sealCoreDeployment(this.deviceID);
+    const controllers = await this.getAccessControllers();
+    if (this.channels !== controllers.length) {
+      // There was a change in the number of channels, drop the existing ones and make the correct number.
+      await ACRepo.deleteAllCoreChannels(this.deviceID);
+      await ACRepo.createAccessControllers(this.deviceID, this.channels);
+    }
   }
 }

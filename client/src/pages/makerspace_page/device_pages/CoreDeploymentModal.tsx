@@ -1,11 +1,14 @@
-import { Autocomplete, Button, Checkbox, FormControlLabel, IconButton, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Autocomplete, Box, Button, Card, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, FormControlLabel, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
-import { Core, CoreActions, CoreInputMode, SEND_CORE_ACTION, SEND_CORE_FLAGS } from "../../../queries/deviceQueries";
+import { Core, CoreActions, CoreInputMode, SEND_CORE_ACTION, SEND_CORE_FLAGS, UNPAIR_CORE } from "../../../queries/deviceQueries";
 import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import SendIcon from '@mui/icons-material/Send';
+import AccessControllerRow from "./AccessControllerRow";
+import PowerOffIcon from '@mui/icons-material/PowerOff';
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 
 interface CoreDeploymentModalProps {
   core: Core;
@@ -18,10 +21,14 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
   const [inputMode, setInputMode] = useState<CoreInputMode>(props.core.inputMode);
 
   const [lockWhenIdle, setLockWhenIdle] = useState<boolean | undefined>(props.core.flags.lockWhenIdle);
-  const [restartWhenIdle, setRestartWhenIdle] = useState<boolean | undefined>(props.core.flags.restartWhenIdle);
+  const [restartWhenIdle, setRestartWhenIdle] = useState<boolean | undefined>(props.core.flags.restartWhenUnused);
+  const [confirmSeal, setConfirmSeal] = useState(false);
+  const [confirmUnpair, setConfirmUnpair] = useState(false);
+  const [tab, setTab] = useState<"controllers" | "deployment">("controllers");
 
-  const [sendCoreAction] = useMutation(SEND_CORE_ACTION);
+  const [sendCoreAction] = useMutation(SEND_CORE_ACTION, { refetchQueries: ["GetMakerspaceWithDevices"], awaitRefetchQueries: true });
   const [sendCoreFlags] = useMutation(SEND_CORE_FLAGS);
+  const [unpairCore] = useMutation(UNPAIR_CORE, { refetchQueries: ["GetMakerspaceWithDevices"] })
 
   async function handleSendCoreAction(action: CoreActions) {
     try {
@@ -44,7 +51,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
           deviceID: props.core.device.id,
           flags: {
             lockWhenIdle: lockWhenIdle ?? false,
-            restartWhenIdle: restartWhenIdle ?? false
+            restartWhenUnused: restartWhenIdle ?? false
           }
         }
       });
@@ -108,7 +115,7 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
                   color="primary"
                 />
               }
-              label="Restart When Idle"
+              label="Restart When Unused"
             />
             <Button
               variant="contained"
@@ -129,17 +136,110 @@ export default function CoreDeploymentModal(props: CoreDeploymentModalProps) {
             </Button>
           </Stack>
         </Stack>
-        {/* Deployment */}
-        <Stack width={"66%"}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleSendCoreAction(CoreActions.SEAL)}
-          >
-            SEAL Deployment
-          </Button>
+        {/* Controllers & Deployment */}
+        <Stack width={"66%"} spacing={1}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs value={tab} onChange={(_e, newValue) => setTab(newValue)}>
+              <Tab label="Controllers" value={"controllers"} />
+              <Tab label="Deployment" value={"deployment"} />
+            </Tabs>
+          </Box>
+          {
+            tab === "controllers" &&
+            <Stack height={"100%"} spacing={1}>
+              {
+                props.core.controllers.map((controller) => <AccessControllerRow controller={controller} />)
+              }
+            </Stack>
+          }
+          {
+            tab === "deployment" &&
+            <Stack height={"100%"} spacing={1}>
+              <Stack height={"100%"} direction={"row"} justifyContent={"space-between"}>
+                <Stack width={"48%"}>
+                  <Typography variant="subtitle1">Sealed Deployment</Typography>
+                  <Typography sx={{ whiteSpace: "pre-wrap" }}>{props.core.sealedDeployment}</Typography>
+                </Stack>
+                <Stack width={"48%"}>
+                  <Typography variant="subtitle1">Reported Deployment</Typography>
+                  <Typography sx={{ whiteSpace: "pre-wrap" }}>{props.core.reportedDeployment}</Typography>
+                </Stack>
+              </Stack>
+              <Stack direction={"row"} justifyContent={"space-between"}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => props.core.channels !== props.core.controllers.length ? setConfirmSeal(true) : handleSendCoreAction(CoreActions.SEAL)}
+                  startIcon={<VerifiedUserIcon />}
+                >
+                  SEAL Deployment
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => setConfirmUnpair(true)}
+                  startIcon={<PowerOffIcon />}
+                >
+                  Unpair Core
+                </Button>
+              </Stack>
+            </Stack>
+          }
         </Stack>
       </Stack>
-    </PrettyModal>
+      {/* Confirm Seal Dialog */}
+      <Dialog open={confirmSeal}>
+        <DialogTitle>
+          Access Controllers will be Destroyed
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            The number of channels the Core is reporting is different than the number of Access Controllers created for this device.
+            For safety, the existing Access Controllers will be destroyed and the correct number will be created.
+            This will unpair any equipment currently paired with this deployment.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="error"
+            onClick={() => setConfirmSeal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            color="success"
+            onClick={() => { handleSendCoreAction(CoreActions.SEAL); setConfirmSeal(false) }}
+          >
+            Proceed
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Confirm Unpair Dialog */}
+      <Dialog open={confirmUnpair}>
+        <DialogTitle>
+          Core will be Unpaired from the Server
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            This core will no longer be able to connect to the server. Its access controllers will be deleted,
+            and it will be unpaired from all paired equipment and makerspaces.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="error"
+            onClick={() => setConfirmUnpair(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            color="success"
+            onClick={() => { unpairCore({ variables: { deviceID: props.core.device.id } }); setConfirmUnpair(false); props.onClose() }}
+          >
+            Proceed
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </PrettyModal >
   );
 }

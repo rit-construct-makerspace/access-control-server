@@ -12,7 +12,6 @@ import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRe
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { AccessControllerState, EquipmentRow } from "../db/tables.js";
 import { EquipmentInput } from "../schemas/equipmentSchema.js";
-import { getNumUnavailableReadersByEquipment, getNumIdleReadersByEquipment } from "../repositories/Readers/ReaderRepository.js";
 import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import { GraphQLError } from "graphql";
 
@@ -112,7 +111,7 @@ const EquipmentResolvers = {
      * @returns Equipment
      */
     correspondingEquipment: async (_parent: any, args: { readerid: number }, _context: any) => {
-      const inst = await EquipmentInstanceRepo.getInstanceByReaderID(args.readerid);
+      const inst = await EquipmentInstanceRepo.getInstanceByAccessControllerID(args.readerid);
       if (!inst) {
         return null;
       }

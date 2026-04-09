@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { AccessControllerState } from "./deviceQueries";
+import { AccessController, AccessControllerState } from "./deviceQueries";
 
 export enum InstanceStatus {
   UNDEPLOYED = "UNDEPLOYED",
@@ -15,22 +15,11 @@ export interface EquipmentInstance {
   equipment: {
     id: number;
     name: string;
+    subName: string;
   }
   name: string;
   status: InstanceStatus;
-  reader: {
-    id: number;
-    name: string;
-  } | null;
-  accessController: {
-    id: number;
-    channelID: number;
-    state: AccessControllerState;
-    device: {
-      name: string
-      id: number
-    } | undefined
-  }
+  accessController: AccessController | undefined;
 }
 
 export const GET_EQUIPMENT_INSTANCES = gql`
@@ -43,10 +32,6 @@ export const GET_EQUIPMENT_INSTANCES = gql`
       }
       name
       status
-      reader {
-        id
-        name
-      }
       accessController {
         id
         channelID
@@ -54,6 +39,7 @@ export const GET_EQUIPMENT_INSTANCES = gql`
         device {
           id
           name
+          makerspaceID
         }
       }
     }
@@ -104,8 +90,8 @@ export const SET_INSTANCE_NAME = gql`
 
 
 export const UPDATE_INSTANCE = gql`
-  mutation UpdateInstance($id: ID!, $name: String!, $status: String!, $readerID: ID) {
-      updateInstance(id: $id, name: $name, status: $status, readerID: $readerID) {
+  mutation UpdateInstance($id: ID!, $name: String!, $status: String!) {
+      updateInstance(id: $id, name: $name, status: $status) {
           id
           equipment {
             id
@@ -113,10 +99,6 @@ export const UPDATE_INSTANCE = gql`
           }
           name
           status
-          reader{
-            id
-            name
-          }
       }
   }
 `;
@@ -127,15 +109,6 @@ export const DELETE_EQUIPMENT_INSTANCE = gql`
         deleteInstance(id: $id)
     }
 `;
-
-
-export const ASSIGN_READER_TO_EQUIPMENT_INSTANCE = gql`
-  mutation AssignReaderToEquipmentInstance($instanceId: ID!, $readerId: ID) {
-    assignReaderToEquipmentInstance(instanceId: $instanceId, readerId: $readerId){
-        id
-    }
-  }
-`
 
 export const GET_READER_PAIRED_WITH_INSTANCE_BY_INSTANCE_ID = gql`
     query GetReaderPairedWithInstanceByInstanceId($instanceID: ID!){
@@ -160,3 +133,9 @@ export const GET_READER_PAIRED_WITH_INSTANCE_BY_INSTANCE_ID = gql`
       SN
       }
     }`
+
+export const UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT = gql`
+  mutation UpdateInstanceControllerAssignment($id: Int!, $accessControllerID: Int) {
+    updateInstanceControllerAssignment(id: $id, accessControllerID: $accessControllerID)
+  }
+`;
