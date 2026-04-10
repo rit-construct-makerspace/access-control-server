@@ -137,7 +137,7 @@ export class AccessController implements AccessControllerRow {
 
     const isStaff = await user.isStaffOf(rawRoom.makerspaceID);
     var hasAccess = true;
-    if (targetState === AccessControllerState.ALWAYS_ON) {
+    if ((targetState === AccessControllerState.ALWAYS_ON) && !(await user.isManagerOf(rawRoom.makerspaceID))) {
       const result = await this.canUnlock(user.id, false);
       hasAccess = result.hasAccess;
     }
