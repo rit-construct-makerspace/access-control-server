@@ -224,7 +224,7 @@ async function handleCoreAuthToRequest(request: WSACSCoreUnprompted, deviceID: n
   ) {
 
     for (let i = 0; i < controllers.length; i++) {
-      const controlAttempt = await controllers[i].canControl(user.id);
+      const controlAttempt = await controllers[i].canControl(user.id, request.authTo.state);
       response.authTo.channels.push({
         id: controllers[i].channelID,
         state: request.authTo.state,

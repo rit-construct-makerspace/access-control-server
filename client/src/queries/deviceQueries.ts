@@ -87,6 +87,12 @@ export const SET_CORE_STATE = gql`
   }
 `;
 
+export const COMMAND_CONTROLLER_STATE = gql`
+  mutation CommandControllerState($accessControllerID: Int!, $targetState: CoreStateInput!) {
+    commandAccessControllerState(accessControllerID: $accessControllerID, targetState: $targetState)
+  }
+`;
+
 export const PAIR_CORE = gql`
   mutation PairCore($SN: String!, $makerspaceID: Int!) {
     pairCore(SN: $SN, makerspaceID: $makerspaceID)
