@@ -6,6 +6,7 @@ import { isManagerFor } from "../../../common/PrivilegeUtils";
 
 interface AuditLogEntityProps {
   entityCode: string;
+  makerspaceID?: number;
 }
 
 function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
@@ -15,7 +16,7 @@ function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
     case "room":
       return `/makerspace/${makerspaceID}/edit/room/${id}`;
     case "equipment":
-      return "/equipment/" + id;
+      return `/makerspace/${makerspaceID}/equipment/${id}`;
     case "inventory":
       return "/admin/inventory";
     case "module":
@@ -37,21 +38,19 @@ function getEntityUrl(entityType: string, id: string, makerspaceID: string) {
   }
 }
 
-export default function AuditLogEntity({ entityCode }: AuditLogEntityProps) {
+export default function AuditLogEntity(props: AuditLogEntityProps) {
   const navigate = useNavigate();
-  // Dangerous!!! Might be undefined. A temporary fix until history/logs can be overhauled
-  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const user = useCurrentUser();
-  const manager = isManagerFor(user, Number(makerspaceID));
+  const manager = isManagerFor(user, Number(props.makerspaceID ?? 0));
 
-  const [entityType, id, label] = entityCode.split(":");
+  const [entityType, id, label] = props.entityCode.split(":");
 
-  let url = getEntityUrl(entityType, id, makerspaceID ?? "0");
+  let url = getEntityUrl(entityType, id, `${props.makerspaceID ?? "0"}`);
 
   // If this would link to the readers page, but the current user is not a manager,
   // fall back to the makerspace history instead of exposing a non-accessible link.
   if ((entityType === "access_device" || entityType === "machine") && !manager) {
-    url = `/makerspace/${makerspaceID}/history`;
+    url = `/makerspace/${props.makerspaceID}/history`;
   }
 
   const [reveal, setReveal] = useState(entityType !== "conceal");
