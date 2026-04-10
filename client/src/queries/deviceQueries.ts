@@ -88,7 +88,7 @@ export const SET_CORE_STATE = gql`
 `;
 
 export const COMMAND_CONTROLLER_STATE = gql`
-  mutation CommandControllerState($accessControllerID: Int!, $targetState: CoreStateInput) {
+  mutation CommandControllerState($accessControllerID: Int!, $targetState: CoreStateInput!) {
     commandAccessControllerState(accessControllerID: $accessControllerID, targetState: $targetState)
   }
 `;

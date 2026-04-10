@@ -9,7 +9,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
-import { AccessController, AccessControllerState, GET_UNPAIRED_ACCESS_CONTROLLERS, SET_CORE_STATE } from "../../../queries/deviceQueries";
+import { AccessController, AccessControllerState, COMMAND_CONTROLLER_STATE, GET_UNPAIRED_ACCESS_CONTROLLERS, SET_CORE_STATE } from "../../../queries/deviceQueries";
 import { useParams } from "react-router-dom";
 
 interface EquipmentInstanceRowProps {
@@ -45,7 +45,7 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
   const unpairedAccessControllers: AccessController[] | [] = getUnpairedControllersResult.data?.getUnpairedAccessControllers ?? [];
 
 
-  const [sendCommandedState] = useMutation(SET_CORE_STATE);
+  const [sendCommandedState] = useMutation(COMMAND_CONTROLLER_STATE);
   const [commandedState, setCommandedState] = useState<string>("IDLE");
 
 
@@ -67,7 +67,7 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
   }
   function setStateClicked(_e: any) {
     if (props.instance.accessController != null) {
-      sendCommandedState({ variables: { deviceID: props.instance.accessController.device?.id, targetState: commandedState } });
+      sendCommandedState({ variables: { accessControllerID: props.instance.accessController.id, targetState: commandedState } });
     }
   }
 

@@ -195,7 +195,7 @@ const DeviceResolver = {
       if (core === undefined) { throw new EntityNotFound(`Core for Acccess Controller ${args.accessControllerID} not found`); }
 
       const instance = await InstanceRepo.getInstanceByAccessControllerID(controller.id);
-      const equipment = await EquipmentRepo.getEquipmentByID(instance?.id ?? -1);
+      const equipment = await EquipmentRepo.getEquipmentByID(instance?.equipmentID ?? -1);
 
       return await isStaffFor(core.makerspaceID, async (user) => {
         const result = await controller.canControl(user.id, args.targetState);

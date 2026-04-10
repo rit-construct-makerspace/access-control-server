@@ -125,7 +125,7 @@ export class AccessController implements AccessControllerRow {
       return { canControl: false, reason: AccessAttemptReason.UNPAIRED };
     }
 
-    const rawEquipment = await EquipmentRepo.getEquipmentOrUndefinedByID(instance.id);
+    const rawEquipment = await EquipmentRepo.getEquipmentOrUndefinedByID(instance.equipmentID);
     if (rawEquipment === undefined) {
       return { canControl: false, reason: AccessAttemptReason.UNPAIRED };
     }
@@ -137,12 +137,14 @@ export class AccessController implements AccessControllerRow {
 
     const isStaff = await user.isStaffOf(rawRoom.makerspaceID);
     var hasAccess = true;
-    if ((targetState === AccessControllerState.ALWAYS_ON) && !(await user.isManagerOf(rawRoom.makerspaceID))) {
-      const result = await this.canUnlock(user.id, false);
-      hasAccess = result.hasAccess;
+    if (targetState === AccessControllerState.ALWAYS_ON) {
+      if (!(await user.isManagerOf(rawRoom.makerspaceID))) {
+        const result = await this.canUnlock(user.id, false);
+        hasAccess = result.hasAccess;
+      }
     }
 
-    return { canControl: isStaff, reason: isStaff && hasAccess ? AccessAttemptReason.APPROVED : AccessAttemptReason.INSUFFICENT_PRIVILEGE }
+    return { canControl: isStaff && hasAccess, reason: isStaff && hasAccess ? AccessAttemptReason.APPROVED : AccessAttemptReason.INSUFFICENT_PRIVILEGE }
   }
 
   async getDevice(): Promise<Device | undefined> {
