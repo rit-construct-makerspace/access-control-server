@@ -36,5 +36,13 @@ export const AuditLogsTypeDefs = gql`
       searchText: String
       filters: Filters
     ): [AuditLog]
+
+    makerspaceLogs(
+      startDate: DateTime
+      stopDate: DateTime
+      searchText: String
+      filters: Filters
+      makerspaceID: Int!
+    ): [AuditLog]
   }
 `;
