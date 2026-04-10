@@ -13,6 +13,7 @@ export const AuditLogsTypeDefs = gql`
     dateTime: DateTime!
     message: String
     category: String
+    makerspaceID: Int
   }
 
   input Filters {
