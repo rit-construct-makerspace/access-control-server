@@ -33,12 +33,14 @@ const GET_LOGS = gql`
     $stopDate: DateTime
     $searchText: String
     $filters: Filters
+    $makerspaceID: Int!
   ) {
-    auditLogs(
+    makerspaceLogs(
       startDate: $startDate
       stopDate: $stopDate
       searchText: $searchText
       filters: $filters
+      makerspaceID: $makerspaceID
     ) {
       id
       dateTime
@@ -129,7 +131,8 @@ export default function LogPage() {
         startDate: parseDateForQuery(startDate, startOfDay),
         stopDate: parseDateForQuery(stopDate, endOfDay),
         searchText: queryString,
-        filters: filters
+        filters: filters,
+        makerspaceID: Number(makerspaceID)
       },
     });
   }, [search, query, filters]);
@@ -273,7 +276,7 @@ export default function LogPage() {
       <RequestWrapper2
         result={queryResult}
         render={(data) => {
-          if (data.auditLogs.length === 0) {
+          if (data.makerspaceLogs.length === 0) {
             return (
               <Typography
                 variant="body1"
@@ -290,7 +293,7 @@ export default function LogPage() {
           }
           return (
             <Stack divider={<Divider flexItem />} mt={4} spacing={0.75}>
-              {data.auditLogs.map((log: any) => (
+              {data.makerspaceLogs.map((log: any) => (
                 <AuditLogRow
                   key={log.id}
                   dateTime={log.dateTime}
