@@ -14,7 +14,6 @@ import HelpPage from "./pages/maker/signup/HelpPage";
 import SignupPage from "./pages/maker/signup/SignupPage";
 import TrainingPage from "./pages/maker/training/TrainingPage";
 import MakerspacePage from "./pages/makerspace_page/MakerspacePage";
-import EquipmentRedirector from "./pages/makerspace_page/equipment_pages/EquipmentRedirector";
 import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
 import EventsDisplay from "./pages/signage/EventsDisplay";
 import HoursDisplay from "./pages/signage/HoursDisplay";
@@ -149,8 +148,6 @@ export const appRouter = createBrowserRouter(
               children: [
                 { path: "/user/trainings", element: <UserTraingingsPage /> },
                 { path: "/user/settings", element: <UserSettingsPage /> },
-
-                { path: "/equipment/:equipmentID", element: <EquipmentRedirector /> },
 
                 { path: "/makerspace/:makerspaceID/reserve/:equipmentID", element: <ReservationRequestPage /> },
 

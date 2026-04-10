@@ -4,7 +4,7 @@ import reactStringReplace from "react-string-replace";
 import AuditLogEntity from "./AuditLogEntity";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 
-const chipSx: SxProps = {p: "3px", width: "min-content", fontSize: "0.75em"}
+const chipSx: SxProps = { p: "3px", width: "min-content", fontSize: "0.75em" }
 
 const categoryChips = {
   welcome: <Chip label="Sign-In" variant="outlined" color="success" size="small" sx={chipSx} />,
@@ -24,16 +24,17 @@ interface AuditLogRowProps {
   dateTime: string;
   message: string;
   category: string;
+  makerspaceID?: number;
 }
 
 function formatDateTime(dateTime: string) {
   return format(parseISO(dateTime), "M/d/yy h:mmaaa").split(" ");
 }
 
-export default function AuditLogRow({ dateTime, message, category }: AuditLogRowProps) {
+export default function AuditLogRow(props: AuditLogRowProps) {
   const isMobile = useIsMobile();
 
-  const [date, time] = formatDateTime(dateTime);
+  const [date, time] = formatDateTime(props.dateTime);
 
   return (
     <Stack direction={isMobile ? "column" : "row"} alignItems={isMobile ? "flex-start" : "center"} px={2}>
@@ -47,12 +48,12 @@ export default function AuditLogRow({ dateTime, message, category }: AuditLogRow
           </Typography>
         </Stack>
         <Stack direction={"row"} width={"75%"} justifyContent={"center"}>
-          {categoryChips[category as keyof typeof categoryChips]}
+          {categoryChips[props.category as keyof typeof categoryChips]}
         </Stack>
       </Stack>
       <Typography>
-        {reactStringReplace(message, /<(\w+?:\d+?:.*?)>/g, (match, i) => (
-          <AuditLogEntity key={match + i} entityCode={match} />
+        {reactStringReplace(props.message, /<(\w+?:\d+?:.*?)>/g, (match, i) => (
+          <AuditLogEntity key={match + i} entityCode={match} makerspaceID={props.makerspaceID} />
         ))}
       </Typography>
     </Stack>

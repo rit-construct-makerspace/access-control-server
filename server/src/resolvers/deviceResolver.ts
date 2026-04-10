@@ -331,7 +331,7 @@ const DeviceResolver = {
           `{user} unpaired core ${args.deviceID}: ${core.name} from Make`,
           "admin",
           core.makerspaceID,
-          { id: user.id, label: `${user.firstName, user.lastName}` }
+          { id: user.id, label: `${user.firstName} ${user.lastName}` }
         );
       })
     }

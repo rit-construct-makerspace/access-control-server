@@ -17,17 +17,34 @@ const AuditLogResolvers = {
      * @returns matching Audit Logs
      */
     auditLogs: async (
-      parent: any,
+      _parent: any,
       args: { startDate: string; stopDate: string; searchText: string, filters?: AuditLogRepo.Filters },
-      { isStaff }: ApolloContext
-    ) =>
-      isStaff(async () => {
-        const startDate = args.startDate ?? "2020-01-01";
-        const stopDate = args.stopDate ?? "2200-01-01";
-        const searchText = args.searchText ?? "";
+      { isAdmin }: ApolloContext
+    ) => isAdmin(async () => {
+      const startDate = args.startDate ?? "2020-01-01";
+      const stopDate = args.stopDate ?? "2200-01-01";
+      const searchText = args.searchText ?? "";
 
-        return await AuditLogRepo.getLogs(startDate, stopDate, searchText, args.filters);
-      }),
+      return await AuditLogRepo.getLogs(startDate, stopDate, searchText, args.filters);
+    }),
+
+    makerspaceLogs: async (
+      _parent: any,
+      args: {
+        startDate: string;
+        stopDate: string;
+        searchText: string,
+        filters?: AuditLogRepo.Filters,
+        makerspaceID: number
+      },
+      { isStaff }: ApolloContext
+    ) => isStaff(async () => {
+      const startDate = args.startDate ?? "2020-01-01";
+      const stopDate = args.stopDate ?? "2200-01-01";
+      const searchText = args.searchText ?? "";
+
+      return await AuditLogRepo.getLogsByMakerspace(args.makerspaceID, startDate, stopDate, searchText, args.filters);
+    })
   },
 };
 
