@@ -41,6 +41,13 @@ export const GET_EQUIPMENT_INSTANCES = gql`
           name
           makerspaceID
         }
+        core {
+          activeUser {
+            id
+            firstName
+            lastName
+          }
+        }
       }
     }
   }
