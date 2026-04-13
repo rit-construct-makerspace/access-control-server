@@ -12,11 +12,11 @@ import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
 import { AccessController, AccessControllerState, COMMAND_CONTROLLER_STATE, GET_UNPAIRED_ACCESS_CONTROLLERS, SET_CORE_STATE } from "../../../queries/deviceQueries";
 import { useParams } from "react-router-dom";
 
-interface EquipmentInstanceCardProps {
+interface EquipmentInstanceRowProps {
   instance: EquipmentInstance;
 }
 
-export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps) {
+export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
   const getUnpairedControllersResult = useQuery(GET_UNPAIRED_ACCESS_CONTROLLERS, { variables: { makerspaceID: Number(makerspaceID) } });
@@ -65,7 +65,6 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
   function handleStateChange(e: any) {
     setCommandedState(e.target.value);
   }
-
   function setStateClicked(_e: any) {
     if (props.instance.accessController != null) {
       sendCommandedState({ variables: { accessControllerID: props.instance.accessController.id, targetState: commandedState } });
@@ -112,26 +111,15 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
 
   return (
     <Card sx={{ padding: "15px" }} >
-      <Stack spacing={2}>
-        <Stack direction="row" alignItems="center" justifyContent={"space-between"}>
+      <Stack spacing={1} direction={"row"} width={"100%"} height={"60px"} alignItems={"center"}>
+        <Stack direction="row" alignItems="center" width={"300px"}>
           {
             !allowEdit
               ? <Typography variant="h6" fontWeight={"bold"}>{props.instance.name}</Typography>
               : <TextField size="small" value={name} onChange={(e) => setName(e.target.value)}></TextField>
           }
-          {
-            !allowEdit
-              ? <>
-                <ActionButton iconSize={20} color={"primary"} appearance={"icon-only"} tooltipText="Edit" handleClick={async () => { setPairedController(props.instance.accessController); setAllowEdit(true); }}
-                  loading={false}><DriveFileRenameOutlineIcon /></ActionButton>
-              </>
-              : <>
-                <ActionButton iconSize={20} color={"error"} appearance={"icon-only"} tooltipText="Cancel" handleClick={handleCancel}
-                  loading={false}><BlockIcon /></ActionButton>
-              </>
-          }
         </Stack>
-        <Stack alignItems={"center"} spacing={1}>
+        <Stack alignItems={"center"} direction={"row"} width={"300px"}>
           {
             !allowEdit
               ? currentAccessController
@@ -139,39 +127,59 @@ export default function EquipmentInstanceCard(props: EquipmentInstanceCardProps)
                 : <Typography>Unpaired</Typography>
               : controllerPairingField()
           }
-          {activeUserDisplay()}
-          <Stack direction={"row"} spacing={2} alignItems={"center"}>
-            <Typography>Current State:</Typography>
-            <Chip
-              label={currentAccessController?.state ?? "NONE"}
-              color={currentAccessController?.state === undefined ? "info"
-                : currentAccessController.state === AccessControllerState.IDLE ? "warning"
-                  : currentAccessController.state === AccessControllerState.UNLOCKED ? "success"
-                    : currentAccessController.state === AccessControllerState.LOCKED_OUT || currentAccessController.state === AccessControllerState.FAULT ? "error"
-                      : currentAccessController.state === AccessControllerState.ALWAYS_ON ? "success"
-                        : "info"
-              }
-            />
-          </Stack>
         </Stack>
-        <Stack direction="row" justifyContent="space-between" alignItems={"center"} spacing={1}>
+        <Stack direction={"row"} alignItems={"center"} width={"300px"}>
+          {activeUserDisplay()}
+        </Stack>
+        <Stack direction={"row"} spacing={2} alignItems={"center"} width={"300px"}>
+          <Typography>Current State:</Typography>
+          <Chip
+            label={currentAccessController?.state ?? "NONE"}
+            color={currentAccessController?.state === undefined ? "info"
+              : currentAccessController.state === AccessControllerState.IDLE ? "warning"
+                : currentAccessController.state === AccessControllerState.UNLOCKED ? "success"
+                  : currentAccessController.state === AccessControllerState.LOCKED_OUT || currentAccessController.state === AccessControllerState.FAULT ? "error"
+                    : currentAccessController.state === AccessControllerState.ALWAYS_ON ? "success"
+                      : "info"
+            }
+          />
+        </Stack>
+        <Stack direction="row" alignItems={"center"} spacing={1} width={"200px"}>
           <Select disabled={allowEdit || currentAccessController === undefined} size="small" defaultValue={currentAccessController?.state ?? AccessControllerState.IDLE} value={commandedState} onChange={handleStateChange} fullWidth>
             <MenuItem value={AccessControllerState.IDLE}>Idle</MenuItem>
             <MenuItem value={AccessControllerState.LOCKED_OUT}>Locked Out</MenuItem>
             <MenuItem value={AccessControllerState.ALWAYS_ON}>Always On</MenuItem>
           </Select>
-          <IconButton disabled={allowEdit || currentAccessController === undefined} onClick={setStateClicked} color="secondary">
+          <IconButton disabled={allowEdit || currentAccessController === undefined} onClick={setStateClicked} color="primary">
             <SendIcon />
           </IconButton>
         </Stack>
-        {
-          allowEdit
-            ? <Stack direction="row" justifyContent="space-between">
-              <Button color="error" variant="contained" startIcon={<DeleteIcon />} onClick={handleDeleteInstance}>Delete</Button>
-              <Button color="success" variant="contained" startIcon={<SaveIcon />} onClick={handleSave}>Save</Button>
-            </Stack>
-            : undefined
-        }
+        <Stack flexGrow={1} direction={"row"} spacing={1} alignItems={"center"} justifyContent={"flex-end"}>
+          {
+            !allowEdit
+              ? <Button
+                startIcon={<DriveFileRenameOutlineIcon />}
+                color="info"
+                variant="contained"
+                onClick={() => { setPairedController(props.instance.accessController); setAllowEdit(true); }}
+              >
+                Edit
+              </Button>
+              : <Stack direction={"row"} spacing={1}>
+                <Button color="error" variant="contained" startIcon={<DeleteIcon />} onClick={handleDeleteInstance}>Delete</Button>
+                <Button color="success" variant="contained" startIcon={<SaveIcon />} onClick={handleSave}>Save</Button>
+                <Button
+                  color="warning"
+                  variant="contained"
+                  startIcon={<BlockIcon />}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+              </Stack>
+          }
+        </Stack>
+
       </Stack>
     </Card >
   );

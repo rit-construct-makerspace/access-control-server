@@ -6,6 +6,7 @@ import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepos
 import * as UserRepo from "../repositories/Users/UserRepository.js";
 import * as CoreRepo from "../repositories/Devices/CoreRepository.js";
 import * as DispenserRepo from "../repositories/Devices/DispenserRepository.js";
+import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js";
 import { WSACSServerUnprompted } from "../models/api/WSACS/WSACSFormats.js";
 import { EntityNotFound } from "../EntityNotFound.js";
@@ -169,14 +170,63 @@ const DeviceResolver = {
     ) => isStaff(async (user) => {
       const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
       if (core === undefined) { return false; }
-      await AuditLogRepo.createUnassocaitedAuditLog(
+      await AuditLogRepo.createAuditLog(
         `{user} commanded {device} to ${args.targetState}`,
         "admin",
+        core.makerspaceID,
         { id: user.id, label: `${user.firstName} ${user.lastName}` },
         { id: args.deviceID, label: core.name }
       );
       return await core.setState(user, args.targetState);
     }),
+
+    commandAccessControllerState: async (
+      _parent: any,
+      args: {
+        accessControllerID: number,
+        targetState: AccessControllerState
+      },
+      { isStaffFor }: ApolloContext
+    ) => {
+      const controller = await ACRepo.getAccessControllerByID(args.accessControllerID);
+      if (controller === undefined) { throw new EntityNotFound(`Access Controller ${args.accessControllerID} not found`); }
+
+      const core = await CoreRepo.getCoreByDeviceID(controller.deviceID);
+      if (core === undefined) { throw new EntityNotFound(`Core for Acccess Controller ${args.accessControllerID} not found`); }
+
+      const instance = await InstanceRepo.getInstanceByAccessControllerID(controller.id);
+      const equipment = await EquipmentRepo.getEquipmentByID(instance?.equipmentID ?? -1);
+
+      return await isStaffFor(core.makerspaceID, async (user) => {
+        const result = await controller.canControl(user.id, args.targetState);
+        if (result.canControl) {
+          ACSOrchestrator.handleSendCoreCommand(core.deviceID, {
+            toState: [{
+              id: controller.channelID,
+              state: args.targetState
+            }]
+          })
+          await AuditLogRepo.createAuditLog(
+            `{user} commanded {equipment} to ${args.targetState}`,
+            "admin",
+            core.makerspaceID,
+            { id: user.id, label: `${user.firstName} ${user.lastName}` },
+            { id: equipment?.id, label: `${equipment?.name} - ${instance?.name}` }
+          )
+        } else {
+          await AuditLogRepo.createAuditLog(
+            `{user} failed to command {equipment} to ${args.targetState} due to ${result.reason}`,
+            "admin",
+            core.makerspaceID,
+            { id: user.id, label: `${user.firstName} ${user.lastName}` },
+            { id: equipment?.id, label: `${equipment?.name} - ${instance?.name}` }
+          )
+        }
+
+        return result.canControl;
+
+      })
+    },
 
     pairGenericDevice: async (
       _parent: any,
@@ -331,7 +381,7 @@ const DeviceResolver = {
           `{user} unpaired core ${args.deviceID}: ${core.name} from Make`,
           "admin",
           core.makerspaceID,
-          { id: user.id, label: `${user.firstName, user.lastName}` }
+          { id: user.id, label: `${user.firstName} ${user.lastName}` }
         );
       })
     }

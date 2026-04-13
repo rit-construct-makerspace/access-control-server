@@ -29,6 +29,7 @@ const GET_LOGS = gql`
       dateTime
       message
       category
+      makerspaceID
     }
   }
 `;
@@ -280,6 +281,7 @@ export default function AdminHistoryPage() {
                   dateTime={log.dateTime}
                   message={log.message}
                   category={log.category}
+                  makerspaceID={log.makerspaceID}
                 />
               ))}
               <Typography variant="body2">This page is limitted to 100 logs. Consider narrowing your search criteria.</Typography>

@@ -118,3 +118,7 @@ export async function cycleCoreKey(deviceID: number): Promise<Core> {
 
   return core;
 }
+
+export async function updateCoreChannelCount(deviceID: number, channels: number): Promise<void> {
+  await knex("Cores").update({ channels: channels }).where({ deviceID: deviceID });
+}

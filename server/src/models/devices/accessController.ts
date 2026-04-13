@@ -113,7 +113,7 @@ export class AccessController implements AccessControllerRow {
    * @param userID the userID of the person who's permissions to check
    * @returns true if the given userID has permission, false otherwise
    */
-  async canControl(userID: number): Promise<{ canControl: boolean, reason: AccessAttemptReason }> {
+  async canControl(userID: number, targetState: AccessControllerState): Promise<{ canControl: boolean, reason: AccessAttemptReason }> {
     const rawUser = await UserRepo.getUserByIDOrUndefined(userID);
     if (rawUser === undefined) {
       return { canControl: false, reason: AccessAttemptReason.UNKNOWN_USER };
@@ -125,7 +125,7 @@ export class AccessController implements AccessControllerRow {
       return { canControl: false, reason: AccessAttemptReason.UNPAIRED };
     }
 
-    const rawEquipment = await EquipmentRepo.getEquipmentOrUndefinedByID(instance.id);
+    const rawEquipment = await EquipmentRepo.getEquipmentOrUndefinedByID(instance.equipmentID);
     if (rawEquipment === undefined) {
       return { canControl: false, reason: AccessAttemptReason.UNPAIRED };
     }
@@ -136,8 +136,15 @@ export class AccessController implements AccessControllerRow {
     }
 
     const isStaff = await user.isStaffOf(rawRoom.makerspaceID);
+    var hasAccess = true;
+    if (targetState === AccessControllerState.ALWAYS_ON) {
+      if (!(await user.isManagerOf(rawRoom.makerspaceID))) {
+        const result = await this.canUnlock(user.id, false);
+        hasAccess = result.hasAccess;
+      }
+    }
 
-    return { canControl: isStaff, reason: isStaff ? AccessAttemptReason.APPROVED : AccessAttemptReason.INSUFFICENT_PRIVILEGE }
+    return { canControl: isStaff && hasAccess, reason: isStaff && hasAccess ? AccessAttemptReason.APPROVED : AccessAttemptReason.INSUFFICENT_PRIVILEGE }
   }
 
   async getDevice(): Promise<Device | undefined> {

@@ -26,13 +26,13 @@ export function getUsersFullName(user: UserRow) {
  */
 export async function getUsers(searchText?: string): Promise<UserRow[]> {
   if (!searchText || searchText.trim().length === 0) {
-    return knex("Users").select().orderBy("activeHold", "DESC").orderBy("ritUsername", "ASC");
+    return knex("Users").select().orderBy("ritUsername", "ASC");
   }
   const expandedSearchText = `%${searchText}%`;
   return knex("Users").select()
     .whereRaw(`"firstName" || ' ' || "lastName" ilike ?`, expandedSearchText)
     .orWhereILike("ritUsername", expandedSearchText)
-    .orderBy("activeHold", "DESC").orderBy("ritUsername", "ASC");
+    .orderBy("ritUsername", "ASC");
 }
 
 /**
@@ -42,13 +42,13 @@ export async function getUsers(searchText?: string): Promise<UserRow[]> {
  */
 export async function getUsersLimit(searchText?: string): Promise<UserRow[]> {
   if (!searchText || searchText.trim().length === 0) {
-    return knex("Users").select().orderBy("activeHold", "DESC").orderBy("ritUsername", "ASC").limit(100);
+    return knex("Users").select().orderBy("ritUsername", "ASC").limit(100);
   }
   const expandedSearchText = `%${searchText}%`;
   return knex("Users").select()
     .whereRaw(`"firstName" || ' ' || "lastName" ilike ?`, expandedSearchText)
     .orWhereILike("ritUsername", expandedSearchText)
-    .orderBy("activeHold", "DESC").orderBy("ritUsername", "ASC").limit(100);
+    .orderBy("ritUsername", "ASC").limit(100);
 }
 
 /**

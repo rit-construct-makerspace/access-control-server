@@ -60,6 +60,7 @@ export class Core extends Device implements CoreRow {
   }
 
   /**
+   * @deprecated State should be controlled on the access controller level
    * Sends a message to the core to command its state
    * @param executingUser The user setting the state of the core
    * @param targetState The state the core is being set to
@@ -117,6 +118,7 @@ export class Core extends Device implements CoreRow {
       for (let i = 0; i < config.channels.length; i++) {
         await ACRepo.updateAccessControllerDurationByDeviceAndChannelID(this.deviceID, config.channels[i].channelID, config.channels[i].tempDuration);
       }
+      await CoreRepo.updateCoreChannelCount(this.deviceID, config.channels.length);
     }
 
     if (config.inputMode !== undefined) {
@@ -157,7 +159,7 @@ export class Core extends Device implements CoreRow {
         const attempt = await controller.canUnlock(userID, log);
         result.push({ channelID: controller.channelID, state: toState, approved: attempt.hasAccess, reason: attempt.reason });
       } else {
-        const attempt = await controller.canControl(userID);
+        const attempt = await controller.canControl(userID, toState);
         result.push({ channelID: controller.channelID, state: toState, approved: attempt.canControl, reason: attempt.reason });
       }
     }

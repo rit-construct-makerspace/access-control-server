@@ -136,3 +136,59 @@ export async function getLogs(
   //Map rows
   return knexResult;
 }
+
+/**
+ * Fetch logs by filtered criteria
+ * @param makerspaceID the id of the makerspace to get logs for
+ * @param startDate earliest date to filter by
+ * @param stopDate latest date to filter by
+ * @param searchText text to filter by
+ * @returns matching AuditLogs
+ */
+export async function getLogsByMakerspace(
+  makerspaceID: number,
+  startDate: string,
+  stopDate: string,
+  searchText: string,
+  filters?: Filters
+): Promise<AuditLogRow[]> {
+  //Add every active filter to SQL-valid array syntax
+  const filterString = ((filters?.welcome ? "'welcome', " : "")
+    + (filters?.auth ? "'auth', " : "")
+    + (filters?.help ? "'help', " : "")
+    + (filters?.state ? "'state', " : "")
+    + (filters?.status ? "'status', " : "")
+    + (filters?.help ? "'help', " : "")
+    + (filters?.message ? "'message', " : "")
+    + (filters?.training ? "'training', " : "")
+    + (filters?.admin ? "'admin', " : "")
+    + (filters?.server ? "'server', " : "")
+  );
+
+  //Create WHERE rule content to only grab entries matcching one of the applied filters
+  const filterSQL = `"category" = ANY (ARRAY[${filterString.substring(0, filterString.length - 2)}])` + (filters?.uncategorized ? ` OR "category" IS NULL` : "");
+
+  const knexResult = (filterString && filterString != "")
+    //If filters exist, use filterSQL
+    ? await knex("AuditLogs")
+      .select()
+      .where({ makerspaceID: makerspaceID })
+      .whereRaw(`("dateTime" at time zone 'UTC') BETWEEN TIMESTAMP '${new Date(startDate).toISOString().replace("T", " ").replace("Z", "")}' AND TIMESTAMP '${new Date(stopDate).toISOString().replace("T", " ").replace("Z", "")}'`)
+      .whereRaw(filterSQL)
+      .where("message", "ilike", `%${searchText}%`)
+      .whereRaw((filters?.errors != "both" ? `message ${filters?.errors == "no-errors" ? "NOT " : ""} ilike '%<error:%'` : "TRUE"))
+      .orderBy("dateTime", "DESC")
+      .limit(100)
+    //else, don't use filterSQL
+    : await knex("AuditLogs")
+      .select()
+      .where({ makerspaceID: makerspaceID })
+      .whereRaw(`("dateTime" at time zone 'UTC') BETWEEN TIMESTAMP '${new Date(startDate).toISOString().replace("T", " ").replace("Z", "")}' AND TIMESTAMP '${new Date(stopDate).toISOString().replace("T", " ").replace("Z", "")}'`)
+      .where("message", "ilike", `%${searchText}%`)
+      .whereRaw((filters?.errors != "both" ? `message ${filters?.errors == "no-errors" ? "NOT " : ""} ilike '%<error:%'` : "TRUE"))
+      .orderBy("dateTime", "DESC")
+      .limit(100)
+
+  //Map rows
+  return knexResult;
+}

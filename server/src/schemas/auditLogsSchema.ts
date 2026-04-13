@@ -13,6 +13,7 @@ export const AuditLogsTypeDefs = gql`
     dateTime: DateTime!
     message: String
     category: String
+    makerspaceID: Int
   }
 
   input Filters {
@@ -35,6 +36,14 @@ export const AuditLogsTypeDefs = gql`
       stopDate: DateTime
       searchText: String
       filters: Filters
+    ): [AuditLog]
+
+    makerspaceLogs(
+      startDate: DateTime
+      stopDate: DateTime
+      searchText: String
+      filters: Filters
+      makerspaceID: Int!
     ): [AuditLog]
   }
 `;
