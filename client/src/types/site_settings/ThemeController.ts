@@ -82,6 +82,9 @@ export class ThemeController {
   }
 
   private static evaluateThemeString(themeString: string): MakeTheme {
+    if (ThemeController.registeredThemes === undefined) {
+      ThemeController.registeredThemes = new Map();
+    }
     const result = ThemeController.registeredThemes.get(themeString);
 
     if (result === undefined) {

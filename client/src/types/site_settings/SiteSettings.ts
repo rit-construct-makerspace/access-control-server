@@ -1,5 +1,5 @@
 import { ServerThemeData } from "./MakeTheme";
 
-interface SiteSettings {
+export interface SiteSettings {
   themes: ServerThemeData[];
 }

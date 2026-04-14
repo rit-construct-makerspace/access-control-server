@@ -6,6 +6,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { ToastContainer, Slide } from "react-toastify";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV2';
 import { LocalizationProvider } from '@mui/x-date-pickers';
+import { SiteSettings } from "./types/site_settings/SiteSettings";
 
 const apolloClient = new ApolloClient({
   uri: import.meta.env.VITE_GRAPHQL_URL ?? "http://localhost:3000/graphql",
@@ -13,7 +14,7 @@ const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-export default function App(props: { siteSettings: any, children: ReactNode }) {
+export default function App(props: { siteSettings: SiteSettings, children: ReactNode }) {
   const [theme, setTheme] = useState(ThemeController.activeTheme.getTheme());
 
   ThemeController.addThemeWatcher(setTheme);

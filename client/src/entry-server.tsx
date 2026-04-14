@@ -3,6 +3,7 @@ import App from './App';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from "react-router-dom"
 import { routes } from './AppRouter';
 import express from "express";
+import { SiteSettings } from './types/site_settings/SiteSettings';
 
 function createFetchRequest(req: express.Request): Request {
   const origin = `${req.protocol}://${req.get("host")}`;
@@ -36,7 +37,7 @@ function createFetchRequest(req: express.Request): Request {
 }
 
 // The server calls this function to get the HTML string
-export async function render(req: express.Request, siteSettings: any) {
+export async function render(req: express.Request, siteSettings: SiteSettings) {
   const fetchRequest = createFetchRequest(req);
 
   const { query, dataRoutes } = createStaticHandler(routes, {
