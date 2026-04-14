@@ -19,21 +19,23 @@ export default function App(props: { siteSettings: any, children: ReactNode }) {
 
   ThemeController.addThemeWatcher(setTheme);
 
+  console.log(props.siteSettings)
+
   return (
-    <ClientOnly fallback="loading">
-      <ApolloProvider client={apolloClient}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
+    <ApolloProvider client={apolloClient}>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <ClientOnly fallback="isMobile requires window">
             <IsMobileProvider>
               <>
                 {props.children}
                 <ToastContainer position="bottom-left" transition={Slide} />
               </>
             </IsMobileProvider>
-          </ThemeProvider>
-        </LocalizationProvider>
-      </ApolloProvider>
-    </ClientOnly>
+          </ClientOnly>
+        </ThemeProvider>
+      </LocalizationProvider>
+    </ApolloProvider>
   );
 }

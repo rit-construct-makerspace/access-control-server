@@ -129,28 +129,6 @@ async function startServer() {
   papercut.registerEndpoints(app);
   API.registerEndpoints(app);
 
-  /**
-   * REGEX QUERY:
-   * matches to all urls EXCEPT:
-   *    /app/
-   *    /app/home
-   *    /app/makerspace/##
-   *    /app/display/...
-   *      (# is a number)
-   * This is so some parts of the website can be publicly accessible w/o logging in.
-   * // /\/app(?!\/makerspace\/\d+|\/home|\/display)\/.+/gm
-   */
-  app.all(/\/app(?!\/makerspace\/\d+|\/home|\/display)\/.+/gm, (req, res, next) => {
-    //process.env.USE_TEST_DEV_USER_DANGER=="TRUE" || 
-    if (process.env.USE_TEST_DEV_USER_DANGER == "TRUE" || req.user) {
-      return next();
-    }
-    console.log("LOGIN REDIRECT");
-    //Redirect to login path
-    //In staging/prod, /login will then redirect to the IdP
-    res.redirect("/login");
-  });
-
   app.get("/", function (req, res) {
     res.redirect(SECURE_ORIGIN + "/app/");
   });
@@ -203,7 +181,7 @@ async function startServer() {
 
       const settingsScript = `<script>window.__SITE_SETTINGS__ = ${JSON.stringify(siteSettings)}</script>`;
 
-      const finalHtml = template.replace('<!--SCRIPT_REPLACE-->', settingsScript).replace('<!--ROOT_REPLACE-->', appHtml);
+      const finalHtml = template.replace('<!--SCRIPT_REPLACE-->', settingsScript).replace('<!--ROOT_REPLACE-->', `<div id="root">${appHtml}</div>`);
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
     } catch (e) {
