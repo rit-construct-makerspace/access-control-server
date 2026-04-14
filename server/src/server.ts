@@ -157,11 +157,15 @@ async function startServer() {
 
 
   let vite: ViteDevServer;
+  const clientDir = path.resolve(__dirname, "../../client");
   if (process.env.NODE_ENV !== "production") {
     vite = await import("vite").then((m) =>
       m.createServer({
+        root: clientDir,
         server: { middlewareMode: true },
-        appType: "custom"
+        appType: "custom",
+        base: "/app/",
+        configFile: path.resolve(clientDir, "vite.config.ts")
       })
     )
 
@@ -171,10 +175,13 @@ async function startServer() {
     app.use("/app/", express.static(path.join(__dirname, '../../client/build'), { index: false }));
   }
 
-  app.use("*any", (req, res, next) => { console.log(`processed req on: ${req.originalUrl}`); next() })
+  app.use(async (req, res, next) => {
 
-  app.get("/app/", async (req, res) => {
-    console.log("Request to get an app page");
+    if (!req.originalUrl.match(/^\/app(\/|$)/)) {
+      return next();
+    }
+
+    console.log("Request to get an app page: ", req.originalUrl);
     try {
       const url = req.originalUrl
       let template, render;
@@ -192,11 +199,11 @@ async function startServer() {
 
       const siteSettings = "Hello World!";
 
-      const { html: appHtml } = render(url, siteSettings);
+      const { html: appHtml } = await render(req, siteSettings);
 
       const settingsScript = `<script>window.__SITE_SETTINGS__ = ${JSON.stringify(siteSettings)}</script>`;
 
-      const finalHtml = template.replace('', settingsScript).replace('', appHtml);
+      const finalHtml = template.replace('<!--SCRIPT_REPLACE-->', settingsScript).replace('<!--ROOT_REPLACE-->', appHtml);
 
       res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
     } catch (e) {

@@ -120,7 +120,7 @@ class ItalianRestaurant implements MakeTheme {
 }
 
 export class ThemeController {
-  static activeTheme: MakeTheme = this.evaluateThemeString(localStorage.getItem("themeMode") ?? "light");
+  static activeTheme: MakeTheme = this.evaluateThemeString("light");
   static themeWatchers: ((theme: Theme) => void)[] = [];
   static stringWatchers: ((theme: string) => void)[] = []
 
