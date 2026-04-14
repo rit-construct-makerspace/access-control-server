@@ -3,7 +3,7 @@ import { Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/materia
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
-import { ThemeController } from "../Theme";
+import { ThemeController } from "../types/site_settings/ThemeController";
 
 
 export default function ThemeToggle() {

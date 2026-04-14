@@ -6,7 +6,7 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { Autocomplete, Button, Card, Divider, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
 import { format, getDay, parse, startOfWeek } from "date-fns";
 import { enUS } from "date-fns/locale";
-import { LightTheme } from "../../../Theme";
+import { fallbackTheme } from "../../../types/site_settings/ThemeController";
 import ReservationModal from "./ReservationModal";
 import { Reservation, ReservationEvent } from "../../../types/Reservation";
 import { useState } from "react";
@@ -54,7 +54,7 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 
 export default function ManageReservationsPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
-  const lightTheme = (new LightTheme).getTheme();
+  const lightTheme = fallbackTheme.getTheme();
   const user = useCurrentUser();
 
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });

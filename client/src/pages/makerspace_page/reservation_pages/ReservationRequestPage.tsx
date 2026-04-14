@@ -9,7 +9,7 @@ import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { LightTheme } from "../../../Theme";
+import { fallbackTheme } from "../../../types/site_settings/ThemeController";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
@@ -62,7 +62,7 @@ export default function ReservationRequestPage() {
   const user = useCurrentUser();
   const navigate = useNavigate();
 
-  const lightTheme = (new LightTheme).getTheme();
+  const lightTheme = fallbackTheme.getTheme();
 
   const getReservationsResult = useQuery(GET_RESERVATIONS_FLEXIBLY, {
     variables: {

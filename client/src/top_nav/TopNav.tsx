@@ -18,7 +18,7 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import ArticleIcon from '@mui/icons-material/Article';
 import TuneIcon from '@mui/icons-material/Tune';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { ThemeController } from "../Theme";
+import { ThemeController } from "../types/site_settings/ThemeController";
 
 const StyledLogo = styled.img`
   padding: 12px;
