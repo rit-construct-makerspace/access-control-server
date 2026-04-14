@@ -1,5 +1,5 @@
 import { Calendar, dateFnsLocalizer, Event, SlotInfo, Views } from "react-big-calendar";
-import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import rawWithDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { useParams } from "react-router";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
@@ -21,6 +21,15 @@ import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import CloseIcon from '@mui/icons-material/Close';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import { isManager } from "../../../common/PrivilegeUtils";
+
+const withDragAndDrop = (() => {
+  let fn: any = rawWithDragAndDrop;
+  while (fn && typeof fn !== 'function') {
+    fn = fn.default;
+  }
+
+  return fn;
+})();
 
 const DnDCalendar = withDragAndDrop(Calendar);
 const locales = {
@@ -345,7 +354,6 @@ export default function ManageReservationsPage() {
                     width: "80%"
                   }}
                 >
-                  {/* @ts-expect-error */}
                   <DnDCalendar
                     date={targetDay}
                     onNavigate={onNavigate}

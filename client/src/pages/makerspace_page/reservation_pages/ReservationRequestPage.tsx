@@ -1,7 +1,7 @@
 import { Alert, AlertTitle, Button, Card, Link, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { Calendar, dateFnsLocalizer, SlotInfo, Event } from "react-big-calendar";
-import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import rawWithDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import format from 'date-fns/format'
 import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
@@ -26,6 +26,14 @@ import Equipment from "../../../types/Equipment";
 import NotFoundPage from "../../../pages/NotFoundPage";
 import { addDays, endOfDay, isAfter, startOfDay } from "date-fns";
 
+const withDragAndDrop = (() => {
+  let fn: any = rawWithDragAndDrop;
+  while (fn && typeof fn !== 'function') {
+    fn = fn.default;
+  }
+
+  return fn;
+})();
 const DnDCalendar = withDragAndDrop(Calendar);
 
 const locales = {
@@ -298,7 +306,6 @@ export default function ReservationRequestPage() {
                     width: "80%"
                   }}
                 >
-                  {/* @ts-expect-error */}
                   <DnDCalendar
                     localizer={localizer}
                     defaultView={"week"}
