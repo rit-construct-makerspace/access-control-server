@@ -26,14 +26,12 @@ export default function App(props: { siteSettings: any, children: ReactNode }) {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <ClientOnly fallback="isMobile requires window">
-            <IsMobileProvider>
-              <>
-                {props.children}
-                <ToastContainer position="bottom-left" transition={Slide} />
-              </>
-            </IsMobileProvider>
-          </ClientOnly>
+          <IsMobileProvider>
+            <>
+              {props.children}
+              <ToastContainer position="bottom-left" transition={Slide} />
+            </>
+          </IsMobileProvider>
         </ThemeProvider>
       </LocalizationProvider>
     </ApolloProvider>
