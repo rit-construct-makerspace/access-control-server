@@ -15,7 +15,7 @@ const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-export default function App() {
+export default function App(props: { siteSettings: any }) {
   const [theme, setTheme] = useState(ThemeController.activeTheme.getTheme());
 
   ThemeController.addThemeWatcher(setTheme);

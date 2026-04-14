@@ -4,10 +4,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "tsx server/dist/server.js",
+    "start": "tsx server/dist/entry-server.js",
     "start:client": "cd client/ && npm run start",
     "build": "npm run build:server && npm run build:client",
-    "build:server": "cd server/ && tsc  --build --clean && tsc -p .",
+    "build:server": "cd server/ && vite build --ssr ../client/src/entry-server.tsx",
     "build:client": "cd client/ && npm install --force && npm run build",
     "start:dev": "cross-env NODE_ENV=development npm run build:dev",
     "start:staging": "cross-env NODE_ENV=staging npm run build:dev",
@@ -65,6 +65,7 @@
     "tsx": "^4.16.5",
     "typescript": "^5",
     "uuid": "^8.3.2",
+    "vite": "^8.0.8",
     "ws": "^8.18.3",
     "xml2js": "^0.6.2"
   },

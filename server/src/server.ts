@@ -16,7 +16,7 @@ import path from "path";
 import * as schedule from "node-schedule";
 import { getUserByCardTagID, getUsersFullName } from "./repositories/Users/UserRepository.js";
 import { createUnassocaitedAuditLog } from "./repositories/AuditLogs/AuditLogRepository.js";
-import { getReaderBySN, getReaderCertCA } from "./repositories/Readers/ReaderRepository.js";
+import { getReaderCertCA } from "./repositories/Readers/ReaderRepository.js";
 import morgan from "morgan"; //Log provider
 import { createRequire } from "module";
 import { setDataPointValue } from "./repositories/DataPoints/DataPointsRepository.js";
@@ -37,9 +37,10 @@ import { authenticateDevice } from "./api/devices/deviceApi.js";
 import { createWebSocketStream, WebSocketServer } from "ws";
 import { createServer } from "http";
 import { Aedes, AuthenticateError } from 'aedes';
-import mqtt from "mqtt";
 import * as DeviceRepo from "./repositories/Devices/DeviceRepository.js";
 import MQTTACSController from "./models/api/MQTTACSController.js";
+import fs from "node:fs";
+import { ViteDevServer } from "vite";
 
 const require = createRequire(import.meta.url);
 
@@ -125,12 +126,6 @@ async function startServer() {
     process.exit(-1);
   }
 
-  app.use("/app", express.static(path.join(__dirname, "../../client/npx browserslist@latest --update-db\n")));
-
-  //serves built react app files under make.rit.edu/app
-  app.use("/app/", express.static(path.join(__dirname, '../../client/build')));
-
-
   papercut.registerEndpoints(app);
   API.registerEndpoints(app);
 
@@ -156,20 +151,62 @@ async function startServer() {
     res.redirect("/login");
   });
 
-  //redirects  make.rit.edu/app/home(may be in peoples browsers history from old redirect)
-  app.get("/app/home", function (req, res) {
-    res.redirect(SECURE_ORIGIN + "/app/");
-  });
   app.get("/", function (req, res) {
     res.redirect(SECURE_ORIGIN + "/app/");
   });
 
-  app.get("/app/*apppage", function (req, res) {
-    res.sendFile(path.join(__dirname, "../../client/build", "index.html"));
-  });
 
-  // app.get('*', (req, res) => {
-  //   res.redirect("/app");
+  let vite: ViteDevServer;
+  if (process.env.NODE_ENV !== "production") {
+    vite = await import("vite").then((m) =>
+      m.createServer({
+        server: { middlewareMode: true },
+        appType: "custom"
+      })
+    )
+
+    app.use(vite.middlewares);
+  } else {
+    // Production, serve built files
+    app.use("/app/", express.static(path.join(__dirname, '../../client/build'), { index: false }));
+  }
+
+  app.use("*any", (req, res, next) => { console.log(`processed req on: ${req.originalUrl}`); next() })
+
+  app.get("/app/", async (req, res) => {
+    console.log("Request to get an app page");
+    try {
+      const url = req.originalUrl
+      let template, render;
+
+      if (process.env.NODE_ENV !== "production") {
+        template = fs.readFileSync(path.resolve(__dirname, "../../client/index.html"), 'utf-8');
+        template = await vite.transformIndexHtml(url, template);
+        const entryServerPath = path.resolve(__dirname, "../../client/src/entry-server.tsx");
+        render = (await vite.ssrLoadModule(entryServerPath)).render
+      } else {
+        // production, serve built files
+        template = fs.readFileSync(path.resolve(__dirname, "../../client/build/index.html"), 'utf-8');
+        render = (await import("../../client/src/entry-server.js")).render;
+      }
+
+      const siteSettings = "Hello World!";
+
+      const { html: appHtml } = render(url, siteSettings);
+
+      const settingsScript = `<script>window.__SITE_SETTINGS__ = ${JSON.stringify(siteSettings)}</script>`;
+
+      const finalHtml = template.replace('', settingsScript).replace('', appHtml);
+
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+    } catch (e) {
+      console.error(e);
+      res.status(500).end(e instanceof Error ? e.message : String(e));
+    }
+  })
+
+  // app.get("/app/*apppage", function (req, res) {
+  //   res.sendFile(path.join(__dirname, "../../client/build", "index.html"));
   // });
 
   app.get("/link/:link", async function (req, res) {
