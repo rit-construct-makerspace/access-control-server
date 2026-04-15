@@ -136,7 +136,7 @@ async function startServer() {
 
   let vite: ViteDevServer;
   const clientDir = path.resolve(__dirname, "../../client");
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV === "development") {
     vite = await import("vite").then((m) =>
       m.createServer({
         root: clientDir,
@@ -164,7 +164,7 @@ async function startServer() {
       const url = req.originalUrl
       let template, render;
 
-      if (process.env.NODE_ENV !== "production") {
+      if (process.env.NODE_ENV === "development") {
         template = fs.readFileSync(path.resolve(__dirname, "../../client/index.html"), 'utf-8');
         template = await vite.transformIndexHtml(url, template);
         const entryServerPath = path.resolve(__dirname, "../../client/src/entry-server.tsx");
