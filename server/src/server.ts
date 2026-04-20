@@ -41,6 +41,8 @@ import * as DeviceRepo from "./repositories/Devices/DeviceRepository.js";
 import MQTTACSController from "./models/api/MQTTACSController.js";
 import fs from "node:fs";
 import { ViteDevServer } from "vite";
+import { SiteSettings } from "./models/site_settings/SiteSettings.js";
+import * as ThemeRepo from "./repositories/SiteSettings/ThemesRepository.js";
 
 const require = createRequire(import.meta.url);
 
@@ -175,7 +177,15 @@ async function startServer() {
         render = (await import("../../client/src/entry-server.js")).render;
       }
 
-      const siteSettings = "Hello World!";
+      const siteSettings: SiteSettings = {
+        themes: (await ThemeRepo.getThemes()).map((row) => ({
+          key: row.id.toString(),
+          themeName: row.themeName,
+          title: row.title,
+          muiThemeOptions: row.muiThemeOptions,
+          logo: row.logo
+        }))
+      };
 
       const { html: appHtml } = await render(req, siteSettings);
 
