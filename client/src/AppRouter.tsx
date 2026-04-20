@@ -1,4 +1,4 @@
-import { createBrowserRouter, Outlet, useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import { CurrentUserProvider, useCurrentUser } from "./common/CurrentUserProvider";
 import { isAdmin, isManagerFor, isOnlyTrainer, isStaffFor } from "./common/PrivilegeUtils";
 import NoPrivilegePage from "./pages/NoPrivilegePage";
@@ -53,6 +53,7 @@ import ManageMakerspacesAdminPage from "./pages/site-settings/ManageMakerspacesP
 import LinkManagementAdminPage from "./pages/site-settings/LinkManagementAdminPage";
 import AdminHistoryPage from "./pages/site-settings/AdminHistoryPage";
 import ThemeManagementPage from "./pages/site-settings/ThemeManagementPage";
+import NewThemePage from "./pages/site-settings/NewThemePage";
 
 function AppRoot() {
   return (
@@ -222,6 +223,7 @@ export const routes = [
                     { path: "/admin/announcements/new", element: <NewAnnouncementPage /> },
 
                     { path: "/admin/themes", element: <ThemeManagementPage /> },
+                    { path: "/admin/themes/new", element: <NewThemePage /> },
 
                     { path: "/admin/inventory", element: <AdminInventoryPage /> },
                     { path: "/admin/makerspaces", element: <ManageMakerspacesAdminPage /> },
