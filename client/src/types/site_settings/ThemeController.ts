@@ -77,6 +77,10 @@ export class ThemeController {
     this.notifyStringWatchers();
   }
 
+  static getActiveTheme() {
+    return ThemeController.activeTheme;
+  }
+
   static registerTheme(key: string, theme: MakeTheme) {
     ThemeController.registeredThemes.set(key, theme);
   }

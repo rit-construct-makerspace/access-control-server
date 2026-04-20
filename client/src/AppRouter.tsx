@@ -52,6 +52,7 @@ import AdminBar from "./pages/site-settings/AdminBar";
 import ManageMakerspacesAdminPage from "./pages/site-settings/ManageMakerspacesPage";
 import LinkManagementAdminPage from "./pages/site-settings/LinkManagementAdminPage";
 import AdminHistoryPage from "./pages/site-settings/AdminHistoryPage";
+import ThemeManagementPage from "./pages/site-settings/ThemeManagementPage";
 
 function AppRoot() {
   return (
@@ -219,6 +220,8 @@ export const routes = [
                     { path: "/admin/announcements", element: <AnnouncementsPage /> },
                     { path: "/admin/announcements/:id", element: <EditAnnouncement /> },
                     { path: "/admin/announcements/new", element: <NewAnnouncementPage /> },
+
+                    { path: "/admin/themes", element: <ThemeManagementPage /> },
 
                     { path: "/admin/inventory", element: <AdminInventoryPage /> },
                     { path: "/admin/makerspaces", element: <ManageMakerspacesAdminPage /> },
