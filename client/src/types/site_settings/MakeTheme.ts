@@ -6,6 +6,7 @@ export interface ServerThemeData {
   themeName: string; // Name to display where this theme appears to the user
   title: string; // Site title under this theme, for RIT: "Make @ RIT"
   muiThemeOptions: ThemeOptions;
+  logo: string;
 }
 
 export class MakeTheme implements RegisteredTheme, ServerThemeData {
@@ -13,16 +14,29 @@ export class MakeTheme implements RegisteredTheme, ServerThemeData {
   themeName: string;
   title: string;
   muiThemeOptions: ThemeOptions;
+  logo: string;
 
   constructor(serverData: ServerThemeData) {
     this.key = serverData.key;
     this.themeName = serverData.themeName;
     this.title = serverData.title;
     this.muiThemeOptions = serverData.muiThemeOptions;
+    this.logo = serverData.logo;
   }
 
   getTheme(): Theme {
-    return createTheme(this.muiThemeOptions);
+    return createTheme({
+      ...this.muiThemeOptions,
+      typography: {
+        fontFamily: 'Roboto',
+        subtitle1: {
+          fontWeight: "bold",
+        },
+        body1: {
+          fontWeight: undefined,
+        },
+      },
+    });
   }
   getThemeName(): string {
     return this.key;

@@ -54,6 +54,7 @@ import LinkManagementAdminPage from "./pages/site-settings/LinkManagementAdminPa
 import AdminHistoryPage from "./pages/site-settings/AdminHistoryPage";
 import ThemeManagementPage from "./pages/site-settings/ThemeManagementPage";
 import NewThemePage from "./pages/site-settings/NewThemePage";
+import ManageThemePage from "./pages/site-settings/ManageThemePage";
 
 function AppRoot() {
   return (
@@ -224,6 +225,7 @@ export const routes = [
 
                     { path: "/admin/themes", element: <ThemeManagementPage /> },
                     { path: "/admin/themes/new", element: <NewThemePage /> },
+                    { path: "/admin/themes/:themeKey", element: <ManageThemePage /> },
 
                     { path: "/admin/inventory", element: <AdminInventoryPage /> },
                     { path: "/admin/makerspaces", element: <ManageMakerspacesAdminPage /> },
