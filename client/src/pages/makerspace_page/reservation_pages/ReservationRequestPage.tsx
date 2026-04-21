@@ -25,6 +25,7 @@ import { isStaff, isStaffOrSelf } from "../../../common/PrivilegeUtils";
 import Equipment from "../../../types/Equipment";
 import NotFoundPage from "../../../pages/NotFoundPage";
 import { addDays, endOfDay, isAfter, startOfDay } from "date-fns";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 const withDragAndDrop = (() => {
   let fn: any = rawWithDragAndDrop;
@@ -60,7 +61,7 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 export default function ReservationRequestPage() {
   const { makerspaceID, equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
   const user = useCurrentUser();
-  const navigate = useNavigate();
+  const makeTheme = useMakeTheme();
 
   const lightTheme = fallbackTheme.getTheme();
 
@@ -213,7 +214,7 @@ export default function ReservationRequestPage() {
 
           return (
             <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
-              <title>{`Reserve ${equipment.name} | Make @ RIT`}</title>
+              <title>{`Reserve ${equipment.name} | ${makeTheme.title}`}</title>
               <Stack width={"20%"} spacing={2}>
                 <Typography variant="h5" textAlign={"center"}>
                   {equipment.schedulable ? "Requesting a reservation for:" : "Reservations for:"}

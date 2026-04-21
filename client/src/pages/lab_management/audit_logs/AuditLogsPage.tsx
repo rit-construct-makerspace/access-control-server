@@ -26,6 +26,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { ManualRoomSignInModal } from "./ManualRoomSignInModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 const GET_LOGS = gql`
   query GetLogs(
@@ -76,6 +77,7 @@ function parseDateForQuery(
 export default function LogPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const isMobile = useIsMobile();
+  const makeTheme = useMakeTheme();
 
   const { search } = useLocation();
   const navigate = useNavigate();
@@ -161,7 +163,7 @@ export default function LogPage() {
 
   return (
     <Box margin="25px">
-      <title>History | Make @ RIT</title>
+      <title>{`History | ${makeTheme.title}`}</title>
       <Stack direction="row" justifyContent="space-between" alignItems="baseline">
         <Typography variant="h4">History</Typography>
         <Button startIcon={<PersonAddIcon />} color="secondary" onClick={() => setManualSignInModal(true)}>Manual Room Sign-in</Button>

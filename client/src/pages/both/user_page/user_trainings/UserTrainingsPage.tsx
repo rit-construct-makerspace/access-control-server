@@ -1,4 +1,4 @@
-import { Divider, Grid, Stack, Typography } from "@mui/material";
+import { Divider, Stack, Typography } from "@mui/material";
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
 import { useQuery } from "@apollo/client";
 import {
@@ -7,15 +7,15 @@ import {
 } from "../../../../common/TrainingModuleUtils";
 import RequestWrapper2 from "../../../../common/RequestWrapper2";
 import { GET_ACCESS_CHECKS_BY_USERID } from "../../../../queries/accessChecksQueries";
-import AccessCheck from "../../../../types/AccessCheck";
-import EquipmentCard from "../../../../common/EquipmentCard";
 import ModuleStatusRow from "../../../../common/ModuleStatusRow";
 import { useIsMobile } from "../../../../common/IsMobileProvider";
 import { GET_ALL_TRAINING_MODULES } from "../../../../queries/trainingQueries";
+import { useMakeTheme } from "../../../../common/MakeThemeProvider";
 
 export default function UserTraingingsPage() {
   const user = useCurrentUser();
   const isMobile = useIsMobile();
+  const makeTheme = useMakeTheme();
 
   const getAllModules = useQuery(GET_ALL_TRAINING_MODULES);
   const getAccessChecks = useQuery(GET_ACCESS_CHECKS_BY_USERID, {
@@ -82,7 +82,7 @@ export default function UserTraingingsPage() {
           );
         }}
       />
-      <title>{`${user.firstName}'s Trainings | Make @ RIT`}</title>
+      <title>{`${user.firstName}'s Trainings | ${makeTheme.title}`}</title>
     </Stack>
   );
 }

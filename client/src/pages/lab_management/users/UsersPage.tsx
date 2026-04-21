@@ -6,11 +6,14 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import { GET_NUM_USERS, GET_USERS_LIMIT, PartialUser } from "../../../queries/userQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 export default function UsersPage() {
-  const { makerspaceID} = useParams<{ makerspaceID: string}>();
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const { search } = useLocation();
   const navigate = useNavigate();
+  const makeTheme = useMakeTheme();
+
   const [query, queryResult] = useLazyQuery(GET_USERS_LIMIT);
   const numUsersResult = useQuery(GET_NUM_USERS);
 
@@ -53,7 +56,7 @@ export default function UsersPage() {
 
   return (
     <Box margin="10px 25px">
-      <title>People | Make @ RIT</title>
+      <title>{`People | ${makeTheme.title}`}</title>
       <Typography variant="h4" sx={{ mb: 2 }}>People</Typography>
       <Stack direction={"row"} spacing={1} sx={{ mb: 2 }}>
         <SearchBar

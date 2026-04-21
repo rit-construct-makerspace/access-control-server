@@ -10,6 +10,7 @@ import { RefundModal } from "./RefundModal";
 import { ConfirmPickupModal } from "./ConfirmPickupModal";
 import { CancelCartModal } from "./CancelCartModal";
 import { useNavigate, useParams } from "react-router-dom";
+import { useMakeTheme } from "../../../../common/MakeThemeProvider";
 
 export interface CartItemCountState extends CartItem {
   newCartcount: number;
@@ -19,6 +20,7 @@ export function CartPage() {
   const navigate = useNavigate();
   const { makerspaceID, cartID } = useParams<{ makerspaceID: string, cartID: string }>();
   if (!makerspaceID || !cartID) throw new Error("Makerspace ID and Cart ID are required");
+  const makeTheme = useMakeTheme();
 
   const cartResult = useQuery(GET_CART, { variables: { id: cartID } });
 
@@ -48,7 +50,7 @@ export function CartPage() {
   const columns: GridColDef<(typeof rows)[number]>[] = [
     {
       field: "image", headerName: "Image", width: 160,
-      renderCell: (params) => (<img src={(params.row.image && params.row.image != "") ? params.row.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")} alt="Product" style={{width: "100%"}} />),
+      renderCell: (params) => (<img src={(params.row.image && params.row.image != "") ? params.row.image : (import.meta.env.BASE_URL + "/shed_acronym_vert.jpg")} alt="Product" style={{ width: "100%" }} />),
     },
     { field: "name", headerName: "Name", width: 300 },
     {
@@ -89,7 +91,7 @@ export function CartPage() {
           </Button>
         </Stack>
       }>
-        <title>Carts | Make @ RIT</title>
+        <title>{`Carts | ${makeTheme.title}`}</title>
         <DataGrid
           rows={rows}
           columns={columns}
