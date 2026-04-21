@@ -3,8 +3,6 @@ import { Alert, Button, CardActionArea, Divider, Stack, Typography } from "@mui/
 import { GET_THEMES } from "../../queries/themeQueries";
 import { ServerThemeData } from "../../types/site_settings/MakeTheme";
 import { useNavigate } from "react-router-dom";
-import { ThemeController } from "../../types/site_settings/ThemeController";
-import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useMakeTheme } from "../../common/MakeThemeProvider";
@@ -16,8 +14,6 @@ export default function ThemeManagementPage() {
   const getThemesResult = useQuery(GET_THEMES);
 
   const themes: ServerThemeData[] = getThemesResult.data?.getThemes ?? [];
-
-  console.log(themes)
 
   return (
     <Stack padding={"10px 15px"} spacing={2}>

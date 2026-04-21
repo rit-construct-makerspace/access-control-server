@@ -19,6 +19,8 @@ import ArticleIcon from '@mui/icons-material/Article';
 import TuneIcon from '@mui/icons-material/Tune';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { ThemeController } from "../types/site_settings/ThemeController";
+import { useMakeTheme } from "../common/MakeThemeProvider";
+import { makeCDNLink } from "../common/ImageFinder";
 
 const StyledLogo = styled.img`
   padding: 12px;
@@ -30,6 +32,7 @@ const StyledLogo = styled.img`
 export default function TopNav() {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const makeTheme = useMakeTheme();
 
   const currentUser = useCurrentUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -86,12 +89,14 @@ export default function TopNav() {
       primary="3D Printing"
       icon={<LayersIcon />}
       newTab={true}
+      key={0}
     />,
     <NavLink
       to={"https://docs.make.rit.edu"}
       primary={"Knowledge Base"}
       icon={<ArticleIcon />}
       newTab={true}
+      key={1}
     />,
     //Commented out 2-24-26 until we can get the storefront payments working -@jim
     //    <NavLink
@@ -167,7 +172,7 @@ export default function TopNav() {
       {isMobile
         ? <AppBar position="static">
           <Stack direction="row" justifyContent="space-between">
-            <StyledLogo width="65%" src={(themeString === "dark") ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" onClick={() => { navigate(`/`); }} />
+            <StyledLogo width="65%" src={makeTheme.logo !== "" ? makeCDNLink(makeTheme.logo, "user-uploads/") : LogoSvgWhite} onClick={() => { navigate(`/`); }} />
             <IconButton onClick={() => setMobileDrawer(true)}>
               <MenuIcon />
             </IconButton>
@@ -184,7 +189,7 @@ export default function TopNav() {
           <AppBar position="static">
             <Stack component="nav" direction="row" justifyContent="space-between" alignItems="center">
               <ButtonBase onClick={() => { navigate(`/`); }} sx={{ width: "15%" }} focusRipple>
-                <StyledLogo width="100%" src={localStorage.getItem("themeMode") === "dark" ? LogoSvgOrange : LogoSvgWhite} alt="SHED logo" />
+                <StyledLogo width="100%" src={makeTheme.logo !== "" ? makeCDNLink(makeTheme.logo, "user-uploads/") : LogoSvgWhite} />
               </ButtonBase>
               {navlinks}
               {userProfileButton}
