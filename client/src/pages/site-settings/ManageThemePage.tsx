@@ -10,6 +10,7 @@ import styled from "styled-components";
 import SaveIcon from '@mui/icons-material/Save';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import { toast } from "react-toastify";
+import { useMakeTheme } from "../../common/MakeThemeProvider";
 
 const StyledImg = styled.img`
   padding: 12px;
@@ -21,6 +22,7 @@ const StyledImg = styled.img`
 export default function ManageThemePage() {
   const { themeKey } = useParams<{ themeKey: string }>();
   const navigate = useNavigate();
+  const makeTheme = useMakeTheme();
 
   const [updaeTheme] = useMutation(UPDATE_THEME, { refetchQueries: ["GetThemes"], awaitRefetchQueries: true })
 
@@ -126,6 +128,7 @@ export default function ManageThemePage() {
     <ThemeProvider theme={activeTheme}>
       <Paper elevation={0} sx={{ padding: "20px 0px 100px 0px" }}>
         <Stack alignItems={"center"} spacing={3}>
+          <title>{`Edit Theme | ${makeTheme.title}`}</title>
           <Stack direction="row" width={"80%"} justifyContent={"space-between"}>
             <Typography variant="h4">{currentTheme ? `Edit ${currentTheme.themeName} Theme` : "Loading..."}</Typography>
             <Stack direction={"row"} spacing={2}>

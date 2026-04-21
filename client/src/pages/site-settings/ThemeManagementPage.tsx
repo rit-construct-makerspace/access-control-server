@@ -7,12 +7,11 @@ import { ThemeController } from "../../types/site_settings/ThemeController";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { useMakeTheme } from "../../common/MakeThemeProvider";
 
 export default function ThemeManagementPage() {
   const navigate = useNavigate();
-  const [activeTheme, setActiveTheme] = useState(ThemeController.getActiveTheme());
-
-  ThemeController.addThemeWatcher((theme) => setActiveTheme(ThemeController.getActiveTheme()))
+  const makeTheme = useMakeTheme();
 
   const getThemesResult = useQuery(GET_THEMES);
 
@@ -22,7 +21,7 @@ export default function ThemeManagementPage() {
 
   return (
     <Stack padding={"10px 15px"} spacing={2}>
-      <title>{`Themes | ${activeTheme.title}`}</title>
+      <title>{`Themes | ${makeTheme.title}`}</title>
       <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} alignSelf={"center"} width={"60%"}>
         <Typography variant="h4">Theme Management</Typography>
         <Button

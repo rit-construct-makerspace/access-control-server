@@ -2,7 +2,6 @@ import { Alert, AppBar, Box, Button, Card, createTheme, Paper, Stack, TextField,
 import { useNavigate } from "react-router-dom";
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import { useState } from "react";
-import { ThemeController } from "../../types/site_settings/ThemeController";
 import FileUploadButton from "../../common/FileUploadButton";
 import styled from "styled-components";
 import { makeCDNLink } from "../../common/ImageFinder";
@@ -10,6 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useMutation } from "@apollo/client";
 import { CREATE_THEME } from "../../queries/themeQueries";
 import { toast } from "react-toastify";
+import { useMakeTheme } from "../../common/MakeThemeProvider";
 
 const StyledImg = styled.img`
   padding: 12px;
@@ -23,8 +23,7 @@ export default function NewThemePage() {
 
   const [createMakeTheme] = useMutation(CREATE_THEME, { refetchQueries: ["GetThemes"], awaitRefetchQueries: true });
 
-  const [activeTheme, setActiveTheme] = useState(ThemeController.getActiveTheme());
-  ThemeController.addThemeWatcher((_theme) => setActiveTheme(ThemeController.getActiveTheme()));
+  const makeTheme = useMakeTheme();
 
   const [themeName, setThemeName] = useState("");
   const [siteTitle, setSiteTitle] = useState("Make");
@@ -96,7 +95,7 @@ export default function NewThemePage() {
     <ThemeProvider theme={newTheme}>
       <Paper elevation={0}>
         <Stack spacing={3} padding={"10px 15px"} alignItems={"center"}>
-          <title>{`New Theme | ${activeTheme.title}`}</title>
+          <title>{`New Theme | ${makeTheme.title}`}</title>
           <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
             <Typography variant="h4">Create New Theme</Typography>
             <Stack

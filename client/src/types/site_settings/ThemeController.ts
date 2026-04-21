@@ -35,7 +35,8 @@ export const fallbackTheme = new MakeTheme({
         fontWeight: undefined,
       },
     },
-  }
+  },
+  logo: ""
 })
 
 export class ThemeController {
@@ -43,6 +44,7 @@ export class ThemeController {
 
   static themeWatchers: ((theme: Theme) => void)[] = [];
   static stringWatchers: ((theme: string) => void)[] = [];
+  static makeThemeWatchers: ((theme: MakeTheme) => void)[] = [];
 
   static registeredThemes: Map<string, MakeTheme>;
 
@@ -70,11 +72,24 @@ export class ThemeController {
     })
   }
 
+  static addMakeThemeWatcher(watcher: (theme: MakeTheme) => void) {
+    if (!this.makeThemeWatchers.includes(watcher)) {
+      this.makeThemeWatchers.push(watcher);
+    }
+  }
+
+  private static notifyMakeThemeWatchers() {
+    this.makeThemeWatchers.forEach((watcher) => {
+      watcher(this.activeTheme);
+    })
+  }
+
   static setActiveTheme(theme: string) {
     this.activeTheme = this.evaluateThemeString(theme);
     localStorage.setItem("themeMode", this.activeTheme.getThemeName());
     this.notifyThemeWatchers();
     this.notifyStringWatchers();
+    this.notifyMakeThemeWatchers();
   }
 
   static getActiveTheme() {

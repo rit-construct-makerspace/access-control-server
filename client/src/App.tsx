@@ -8,6 +8,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV2';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { SiteSettings } from "./types/site_settings/SiteSettings";
 import { MakeTheme } from "./types/site_settings/MakeTheme";
+import { MakeThemeProvider } from "./common/MakeThemeProvider";
 
 const apolloClient = new ApolloClient({
   uri: import.meta.env.VITE_GRAPHQL_URL ?? "http://localhost:3000/graphql",
@@ -29,15 +30,17 @@ export default function App(props: { siteSettings: SiteSettings, children: React
   return (
     <ApolloProvider client={apolloClient}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <IsMobileProvider>
-            <>
-              {props.children}
-              <ToastContainer position="bottom-left" transition={Slide} />
-            </>
-          </IsMobileProvider>
-        </ThemeProvider>
+        <MakeThemeProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <IsMobileProvider>
+              <>
+                {props.children}
+                <ToastContainer position="bottom-left" transition={Slide} />
+              </>
+            </IsMobileProvider>
+          </ThemeProvider>
+        </MakeThemeProvider>
       </LocalizationProvider>
     </ApolloProvider>
   );
