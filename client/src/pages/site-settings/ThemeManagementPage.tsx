@@ -21,9 +21,9 @@ export default function ThemeManagementPage() {
   console.log(themes)
 
   return (
-    <Stack padding={"10px 15px"} spacing={3}>
+    <Stack padding={"10px 15px"} spacing={2}>
       <title>{`Themes | ${activeTheme.title}`}</title>
-      <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
+      <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"} alignSelf={"center"} width={"60%"}>
         <Typography variant="h4">Theme Management</Typography>
         <Button
           variant="contained"
@@ -36,7 +36,7 @@ export default function ThemeManagementPage() {
       </Stack>
       {
         themes.length > 0
-          ? <Stack width={"50%"} alignSelf={"center"} divider={<Divider orientation="horizontal" flexItem />}>
+          ? <Stack width={"60%"} alignSelf={"center"} divider={<Divider orientation="horizontal" flexItem />}>
             {
               themes.map((serverTheme) => (
                 <CardActionArea onClick={() => navigate(`/admin/themes/${serverTheme.key}`)} sx={{ padding: "15px 10px" }}>

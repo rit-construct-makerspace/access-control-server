@@ -1,4 +1,4 @@
-import { ButtonBase, Stack, Typography } from "@mui/material";
+import { ButtonBase, Divider, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { useIsMobile } from "../../common/IsMobileProvider";
 import { Outlet } from "react-router-dom";
@@ -68,6 +68,7 @@ export default function AdminBar() {
             </ButtonBase>
           : adminNavigation
       }
+      <Divider orientation={"horizontal"} flexItem />
       <Outlet />
     </Stack>
   );
