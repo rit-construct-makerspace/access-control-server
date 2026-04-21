@@ -12,6 +12,7 @@ export async function up(knex: Knex): Promise<void> {
     t.string("title").notNullable().defaultTo("Make");
     t.jsonb("muiThemeOptions").defaultTo({});
     t.string("logo").notNullable().defaultTo("");
+    t.boolean("default").notNullable().defaultTo(false);
   })
 }
 
