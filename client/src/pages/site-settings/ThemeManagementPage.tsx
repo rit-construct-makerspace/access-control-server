@@ -1,11 +1,12 @@
 import { useQuery } from "@apollo/client";
-import { Alert, Button, CardActionArea, Stack, Typography } from "@mui/material";
+import { Alert, Button, CardActionArea, Divider, Stack, Typography } from "@mui/material";
 import { GET_THEMES } from "../../queries/themeQueries";
 import { ServerThemeData } from "../../types/site_settings/MakeTheme";
 import { useNavigate } from "react-router-dom";
 import { ThemeController } from "../../types/site_settings/ThemeController";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 export default function ThemeManagementPage() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function ThemeManagementPage() {
 
   const themes: ServerThemeData[] = getThemesResult.data?.getThemes ?? [];
 
+  console.log(themes)
 
   return (
     <Stack padding={"10px 15px"} spacing={3}>
@@ -34,13 +36,20 @@ export default function ThemeManagementPage() {
       </Stack>
       {
         themes.length > 0
-          ? themes.map((serverTheme) => (
-            <CardActionArea onClick={() => navigate(`/admin/themes/${serverTheme.key}`)}>
-              <Stack direction={"row"}>
-                <Typography variant="subtitle1">{serverTheme.themeName}</Typography>
-              </Stack>
-            </CardActionArea>
-          ))
+          ? <Stack width={"50%"} alignSelf={"center"} divider={<Divider orientation="horizontal" flexItem />}>
+            {
+              themes.map((serverTheme) => (
+                <CardActionArea onClick={() => navigate(`/admin/themes/${serverTheme.key}`)} sx={{ padding: "15px 10px" }}>
+                  <Stack direction={"row"} justifyContent={"space-between"}>
+                    <Typography variant="subtitle1">{serverTheme.themeName}</Typography>
+                    <ArrowForwardIosIcon
+                      color="primary"
+                    />
+                  </Stack>
+                </CardActionArea>
+              ))
+            }
+          </Stack>
           : <Alert
             severity="info"
           >

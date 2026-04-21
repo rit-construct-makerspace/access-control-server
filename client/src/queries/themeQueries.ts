@@ -7,7 +7,15 @@ export const GET_THEMES = gql`
       themeName
       title
       muiThemeOptions
-      icon
+      logo
+    }
+  }
+`;
+
+export const CREATE_THEME = gql`
+  mutation CreateTheme($themeName: String!, $title: String!, $muiThemeOptions: String!, $logo: String!) {
+    createTheme(themeName: $themeName, title: $title, muiThemeOptions: $muiThemeOptions, logo: $logo) {
+      key
     }
   }
 `;

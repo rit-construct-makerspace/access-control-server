@@ -1,13 +1,13 @@
 import { gql } from "graphql-tag";
 
-export const TermsTypeDefs = gql`
+export const ThemeTypeDefs = gql`
 
   type Theme {
     key: String!
     themeName: String!
     title: String!
     muiThemeOptions: String!
-    icon: String!
+    logo: String!
   }
 
   extend type Query {
@@ -15,6 +15,6 @@ export const TermsTypeDefs = gql`
   }
 
   extend type Mutation {
-    createTheme(themeName: String!, title: String!, muiThemeOptions: String!, icon: String!): Theme
+    createTheme(themeName: String!, title: String!, muiThemeOptions: String!, logo: String!): Theme
   }
 `;

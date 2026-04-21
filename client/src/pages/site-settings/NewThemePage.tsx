@@ -1,21 +1,30 @@
-import { Alert, Button, Card, createTheme, Paper, Stack, TextField, ThemeOptions, ThemeProvider, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Alert, AppBar, Box, Button, Card, createTheme, Paper, Stack, TextField, ThemeOptions, ThemeProvider, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import { useState } from "react";
 import { ThemeController } from "../../types/site_settings/ThemeController";
 import FileUploadButton from "../../common/FileUploadButton";
 import styled from "styled-components";
+import { makeCDNLink } from "../../common/ImageFinder";
+import AddIcon from '@mui/icons-material/Add';
+import { useMutation } from "@apollo/client";
+import { CREATE_THEME } from "../../queries/themeQueries";
+import { toast } from "react-toastify";
 
 const StyledImg = styled.img`
-  padding: 5px
-  maxHeight: 200px
+  padding: 12px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 export default function NewThemePage() {
   const navigate = useNavigate();
 
+  const [createMakeTheme] = useMutation(CREATE_THEME, { refetchQueries: ["GetThemes"], awaitRefetchQueries: true });
+
   const [activeTheme, setActiveTheme] = useState(ThemeController.getActiveTheme());
-  ThemeController.addThemeWatcher((_theme) => setActiveTheme(ThemeController.getActiveTheme()))
+  ThemeController.addThemeWatcher((_theme) => setActiveTheme(ThemeController.getActiveTheme()));
 
   const [themeName, setThemeName] = useState("");
   const [siteTitle, setSiteTitle] = useState("Make");
@@ -67,6 +76,22 @@ export default function NewThemePage() {
     },
   });
 
+  async function handleCreateTheme() {
+    try {
+      await createMakeTheme({
+        variables: {
+          themeName: themeName,
+          title: siteTitle,
+          muiThemeOptions: JSON.stringify(muiThemeOptions),
+          logo: logo
+        }
+      })
+      navigate(`/admin/themes`);
+    } catch (e) {
+      toast.error(`Failed to create theme: ${e}`);
+    }
+  }
+
   return (
     <ThemeProvider theme={newTheme}>
       <Paper elevation={0}>
@@ -74,14 +99,27 @@ export default function NewThemePage() {
           <title>{`New Theme | ${activeTheme.title}`}</title>
           <Stack direction={"row"} justifyContent={"space-between"} width={"100%"}>
             <Typography variant="h4">Create New Theme</Typography>
-            <Button
-              variant="contained"
-              color="error"
-              startIcon={<NotInterestedIcon />}
-              onClick={() => navigate("/admin/themes")}
+            <Stack
+              direction={"row"}
+              spacing={1}
             >
-              Cancel
-            </Button>
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<NotInterestedIcon />}
+                onClick={() => navigate("/admin/themes")}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="success"
+                startIcon={<AddIcon />}
+                onClick={handleCreateTheme}
+              >
+                Create
+              </Button>
+            </Stack>
           </Stack>
           <Stack spacing={2} width={"80%"}>
             <Stack direction={"row"} spacing={2}>
@@ -105,6 +143,7 @@ export default function NewThemePage() {
                 </Typography>
                 <ToggleButtonGroup
                   value={themeMode}
+                  color="primary"
                   exclusive
                   onChange={(_e, newMode) => newMode ? setThemeMode(newMode) : null}
                 >
@@ -142,7 +181,11 @@ export default function NewThemePage() {
                         No Logo Uploaded
                       </Stack>
                     </Card>
-                    : <StyledImg src={logo} />
+                    : <Box height={"72px"} width={"288px"}>
+                      <AppBar sx={{ position: "relative" }}>
+                        <StyledImg width={"100%"} src={makeCDNLink(logo, "user-uploads/")} />
+                      </AppBar>
+                    </Box>
                 }
               </Stack>
             </Stack>
@@ -281,7 +324,7 @@ export default function NewThemePage() {
                   variant="filled"
                   severity="info"
                 >
-                  Warning!
+                  Info!
                 </Alert>
               </Stack>
               <Stack spacing={1} width={"100%"}>
@@ -302,7 +345,7 @@ export default function NewThemePage() {
                   variant="filled"
                   severity="success"
                 >
-                  Warning!
+                  Success!
                 </Alert>
               </Stack>
             </Stack>

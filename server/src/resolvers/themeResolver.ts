@@ -1,7 +1,26 @@
 import { ApolloContext } from "../context.js";
+import { ThemeRow } from "../db/tables.js";
 import * as ThemeRepo from "../repositories/SiteSettings/ThemesRepository.js";
 
 const ThemeResolver = {
+  Theme: {
+    key: (
+      parent: ThemeRow,
+      _args: any,
+      { isAdmin }: ApolloContext
+    ) => isAdmin((_user) => (
+      `${parent.id}`
+    )),
+
+    muiThemeOptions: (
+      parent: ThemeRow,
+      _args: any,
+      { isAdmin }: ApolloContext
+    ) => isAdmin((_user) => (
+      JSON.stringify(parent.muiThemeOptions)
+    ))
+  },
+
   Query: {
     getThemes: async (
       _parent: any,
