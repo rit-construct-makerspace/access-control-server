@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
-import { Alert, AppBar, Box, Button, Card, createTheme, Paper, Stack, TextField, ThemeOptions, ThemeProvider, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Alert, AppBar, Box, Button, Card, createTheme, Paper, Stack, TextField, ThemeOptions, ThemeProvider, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@mui/material";
 import { GET_THEME, UPDATE_THEME } from "../../queries/themeQueries";
 import { useNavigate, useParams } from "react-router-dom";
 import { ServerThemeData } from "../../types/site_settings/MakeTheme";
@@ -11,6 +11,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import { toast } from "react-toastify";
 import { useMakeTheme } from "../../common/MakeThemeProvider";
+import AnnouncementIcon from '@mui/icons-material/Announcement';
 
 const StyledImg = styled.img`
   padding: 12px;
@@ -198,6 +199,9 @@ export default function ManageThemePage() {
                     height: "min-content"
                   }}
                 />
+                <Tooltip title="Logo should be around 300x75">
+                  <AnnouncementIcon color="secondary" />
+                </Tooltip>
                 {
                   logo === ""
                     ? <Card
