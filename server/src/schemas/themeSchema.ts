@@ -8,6 +8,7 @@ export const ThemeTypeDefs = gql`
     title: String!
     muiThemeOptions: String!
     logo: String!
+    default: Boolean!
   }
 
   extend type Query {
@@ -18,5 +19,6 @@ export const ThemeTypeDefs = gql`
   extend type Mutation {
     createTheme(themeName: String!, title: String!, muiThemeOptions: String!, logo: String!): Theme
     updateTheme(key: String!, themeName: String!, title: String!, muiThemeOptions: String!, logo: String!): Theme
+    markDefaultTheme(key: String!): Boolean!
   }
 `;

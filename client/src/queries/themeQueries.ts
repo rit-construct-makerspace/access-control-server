@@ -8,6 +8,7 @@ export const GET_THEMES = gql`
       title
       muiThemeOptions
       logo
+      default
     }
   }
 `;
@@ -20,6 +21,7 @@ export const GET_THEME = gql`
       title
       muiThemeOptions
       logo
+      default
     }
   }
 `;
@@ -37,5 +39,11 @@ export const UPDATE_THEME = gql`
     updateTheme(key: $key, themeName: $themeName, title: $title, muiThemeOptions: $muiThemeOptions, logo: $logo) {
       key
     }
+  }
+`;
+
+export const MARK_DEFAULT_THEME = gql`
+  mutation MarkDefaultTheme($key: String!) {
+    markDefaultTheme(key: $key)
   }
 `;

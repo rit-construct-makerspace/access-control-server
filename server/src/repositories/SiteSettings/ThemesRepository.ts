@@ -25,3 +25,9 @@ export async function updateTheme(id: number, themeName: string, title: string, 
 
   return result[0];
 }
+
+export async function markDefaultTheme(id: number): Promise<boolean> {
+  await knex("Themes").update({ default: false });
+  await knex("Themes").where({ id: id }).update({ default: true });
+  return true;
+}

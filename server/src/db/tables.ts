@@ -761,6 +761,7 @@ export interface ThemeRow {
   title: string;
   muiThemeOptions: object;
   logo: string;
+  default: boolean;
 }
 
 declare module "knex/types/tables.js" {

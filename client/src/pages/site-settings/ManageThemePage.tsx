@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { Alert, AppBar, Box, Button, Card, createTheme, Paper, Stack, TextField, ThemeOptions, ThemeProvider, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@mui/material";
-import { GET_THEME, UPDATE_THEME } from "../../queries/themeQueries";
+import { GET_THEME, MARK_DEFAULT_THEME, UPDATE_THEME } from "../../queries/themeQueries";
 import { useNavigate, useParams } from "react-router-dom";
 import { ServerThemeData } from "../../types/site_settings/MakeTheme";
 import { useEffect, useState } from "react";
@@ -12,6 +12,7 @@ import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import { toast } from "react-toastify";
 import { useMakeTheme } from "../../common/MakeThemeProvider";
 import AnnouncementIcon from '@mui/icons-material/Announcement';
+import StarIcon from '@mui/icons-material/Star';
 
 const StyledImg = styled.img`
   padding: 12px;
@@ -25,7 +26,8 @@ export default function ManageThemePage() {
   const navigate = useNavigate();
   const makeTheme = useMakeTheme();
 
-  const [updaeTheme] = useMutation(UPDATE_THEME, { refetchQueries: ["GetThemes"], awaitRefetchQueries: true })
+  const [updateTheme] = useMutation(UPDATE_THEME, { refetchQueries: ["GetThemes"], awaitRefetchQueries: true });
+  const [markDefaultTheme] = useMutation(MARK_DEFAULT_THEME, { refetchQueries: ["GetThemes"], awaitRefetchQueries: true });
 
   const [themeName, setThemeName] = useState("");
   const [siteTitle, setSiteTitle] = useState("Make");
@@ -110,7 +112,7 @@ export default function ManageThemePage() {
 
   async function handleUpdateTheme() {
     try {
-      await updaeTheme({
+      await updateTheme({
         variables: {
           key: themeKey,
           themeName: themeName,
@@ -120,6 +122,19 @@ export default function ManageThemePage() {
         }
       })
       toast.success(`Updated Theme!`)
+    } catch (e) {
+      toast.error(`Failed to update theme: ${e}`)
+    }
+  }
+
+  async function handleMarkDefaultTheme() {
+    try {
+      await markDefaultTheme({
+        variables: {
+          key: themeKey
+        }
+      })
+      toast.success(`Marked this as the default theme`)
     } catch (e) {
       toast.error(`Failed to update theme: ${e}`)
     }
@@ -140,6 +155,16 @@ export default function ManageThemePage() {
                 onClick={() => navigate(`/admin/themes`)}
               >
                 Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<StarIcon />}
+                onClick={handleMarkDefaultTheme}
+                disabled={currentTheme?.default ?? true}
+                loading={themeResult.loading}
+              >
+                Mark as Default Theme
               </Button>
               <Button
                 variant="contained"

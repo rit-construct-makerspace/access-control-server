@@ -7,6 +7,7 @@ export interface ServerThemeData {
   title: string; // Site title under this theme, for RIT: "Make @ RIT"
   muiThemeOptions: ThemeOptions;
   logo: string;
+  default: boolean;
 }
 
 export class MakeTheme implements RegisteredTheme, ServerThemeData {
@@ -15,6 +16,7 @@ export class MakeTheme implements RegisteredTheme, ServerThemeData {
   title: string;
   muiThemeOptions: ThemeOptions;
   logo: string;
+  default: boolean;
 
   constructor(serverData: ServerThemeData) {
     this.key = serverData.key;
@@ -22,6 +24,7 @@ export class MakeTheme implements RegisteredTheme, ServerThemeData {
     this.title = serverData.title;
     this.muiThemeOptions = serverData.muiThemeOptions;
     this.logo = serverData.logo;
+    this.default = serverData.default;
   }
 
   getTheme(): Theme {

@@ -1,11 +1,12 @@
 import { useQuery } from "@apollo/client";
-import { Alert, Button, CardActionArea, Divider, Stack, Typography } from "@mui/material";
+import { Alert, Button, CardActionArea, Divider, Stack, Tooltip, Typography } from "@mui/material";
 import { GET_THEMES } from "../../queries/themeQueries";
 import { ServerThemeData } from "../../types/site_settings/MakeTheme";
 import { useNavigate } from "react-router-dom";
 import AddIcon from '@mui/icons-material/Add';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useMakeTheme } from "../../common/MakeThemeProvider";
+import StarIcon from '@mui/icons-material/Star';
 
 export default function ThemeManagementPage() {
   const navigate = useNavigate();
@@ -36,7 +37,14 @@ export default function ThemeManagementPage() {
               themes.map((serverTheme) => (
                 <CardActionArea onClick={() => navigate(`/admin/themes/${serverTheme.key}`)} sx={{ padding: "15px 10px" }}>
                   <Stack direction={"row"} justifyContent={"space-between"}>
-                    <Typography variant="subtitle1">{serverTheme.themeName}</Typography>
+                    <Stack direction={"row"} spacing={2}>
+                      <Typography variant="subtitle1">{serverTheme.themeName}</Typography>
+                      {
+                        serverTheme.default
+                          ? <Tooltip title="Default Theme"><StarIcon color="info" /></Tooltip>
+                          : null
+                      }
+                    </Stack>
                     <ArrowForwardIosIcon
                       color="primary"
                     />
