@@ -183,7 +183,8 @@ async function startServer() {
           themeName: row.themeName,
           title: row.title,
           muiThemeOptions: row.muiThemeOptions,
-          logo: row.logo
+          logo: row.logo,
+          default: row.default
         }))
       };
 

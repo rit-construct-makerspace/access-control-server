@@ -24,7 +24,7 @@ export default function App(props: { siteSettings: SiteSettings, children: React
 
   useEffect(() => {
     // Executes once when client is loaded
-    ThemeController.setActiveTheme(localStorage.getItem("themeMode") ?? "fallback")
+    ThemeController.setActiveTheme(localStorage.getItem("themeMode") ?? "")
   }, [])
 
   return (

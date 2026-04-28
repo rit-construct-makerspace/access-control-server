@@ -11,21 +11,6 @@ export const fallbackTheme = new MakeTheme({
   themeName: "Fallback",
   title: "Make",
   muiThemeOptions: {
-    palette: {
-      primary: {
-        main: "#F76902",
-        dark: "#F76902",
-        contrastText: "#FFFFFF",
-      },
-      secondary: {
-        main: "#7D55C7",
-        contrastText: "#FFFFFF",
-      },
-      warning: {
-        main: '#FFAB00',
-      },
-      mode: "light"
-    },
     typography: {
       fontFamily: 'Roboto',
       subtitle1: {
@@ -36,7 +21,8 @@ export const fallbackTheme = new MakeTheme({
       },
     },
   },
-  logo: ""
+  logo: "",
+  default: false
 })
 
 export class ThemeController {
@@ -107,6 +93,12 @@ export class ThemeController {
     const result = ThemeController.registeredThemes.get(themeString);
 
     if (result === undefined) {
+      const defaultThemes = ThemeController.registeredThemes.entries().filter((entry) => entry[1].default).toArray();
+
+      if (defaultThemes.length > 0) {
+        return defaultThemes[0][1];
+      }
+
       return fallbackTheme;
     } else {
       return result;
