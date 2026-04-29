@@ -4,10 +4,12 @@ import { useMutation, useQuery } from "@apollo/client";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_ANNOUNCEMENTS, GET_ANNOUNCEMENT, UPDATE_ANNOUNCEMENT, DELETE_ANNOUNCEMENT, Announcement } from "../../../queries/announcementsQueries";
 import { useParams } from "react-router-dom";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 
 export default function EditAnnouncement() {
   const { id } = useParams<{ id: string }>();
+  const makeTheme = useMakeTheme();
 
   const [announcementDraft, setAnnouncementDraft] = useState<Partial<Announcement>>({});
 
@@ -43,7 +45,7 @@ export default function EditAnnouncement() {
   return (
     <RequestWrapper loading={query.loading || del.loading} error={query.error || del.error} minHeight={322}>
       <>
-        <title>{`Edit ${announcementDraft.title ?? "Announcement"} | Make @ RIT`}</title>
+        <title>{`Edit ${announcementDraft.title ?? "Announcement"} | ${makeTheme.title}`}</title>
         <AnnouncementModalContents
           isNewAnnouncement={false}
           announcementDraft={announcementDraft}

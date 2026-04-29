@@ -15,6 +15,7 @@ import styled from "styled-components";
 import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { GET_CURRENT_USER, UPDATE_STUDENT_PROFILE } from "../../../queries/userQueries";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 const StyledFakeTextField = styled.div`
   border-radius: 4px;
@@ -55,6 +56,8 @@ function generateGradDates() {
 export default function SignupPage() {
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
+  const makeTheme = useMakeTheme();
+
   const [updateStudentProfile, result] = useMutation(UPDATE_STUDENT_PROFILE);
 
   const [pronouns, setPronouns] = useState("");
@@ -103,7 +106,7 @@ export default function SignupPage() {
 
   return (
     <Stack spacing={3} sx={{ maxWidth: 715, mx: "auto", mt: 8 }}>
-      <title>Signup | Make @ RIT</title>
+      <title>{`Signup | ${makeTheme.title}`}</title>
       <Typography variant="h3">Welcome to <Typography variant="h3" display={"inline"} color="primary" fontWeight={"bold"}>Make @ RIT!</Typography></Typography>
       <Typography variant="body1">
         Make is the gateway to accessing trainings and equipment at the <b>SHED</b>, RIT's largest makerspace.

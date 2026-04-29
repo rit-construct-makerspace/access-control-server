@@ -8,11 +8,13 @@ import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_ANNOUNCEMENTS } from "../../../queries/announcementsQueries";
 import AnnouncementModule from "./AnnouncementModule";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 
 export default function AnnouncementsPage() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const makeTheme = useMakeTheme();
 
   const getAnnouncementsResults = useQuery(GET_ANNOUNCEMENTS);
 
@@ -28,7 +30,7 @@ export default function AnnouncementsPage() {
       error={getAnnouncementsResults.error}
     >
       <Stack padding="25px" spacing={2}>
-        <title>Manage Announcements | Make @ RIT</title>
+        <title>{`Manage Announcements | ${makeTheme.title}`}</title>
         <Typography variant="h4">Edit Announcements</Typography>
         <Stack direction={isMobile ? "column" : "row"} alignItems="center" spacing={1}>
           <SearchBar
@@ -49,7 +51,7 @@ export default function AnnouncementsPage() {
 
         <Stack
           alignItems="stretch"
-          sx={{ width: "100%"}}
+          sx={{ width: "100%" }}
           divider={<Divider flexItem />}
         >
           {getAnnouncementsResults.data?.getAllAnnouncements

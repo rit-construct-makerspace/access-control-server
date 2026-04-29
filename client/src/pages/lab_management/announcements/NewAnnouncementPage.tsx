@@ -6,6 +6,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import { useNavigate } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
 import AnnouncementCard from "../../both/homepage/AnnouncementCard.js";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 interface InputErrors {
   title?: boolean;
@@ -16,6 +17,7 @@ interface InputErrors {
 
 export default function NewAnnouncementPage() {
   const navigate = useNavigate();
+  const makeTheme = useMakeTheme();
 
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
@@ -85,7 +87,7 @@ export default function NewAnnouncementPage() {
 
   return (
     <Stack padding={"25px"} spacing={2}>
-      <title>New Announcment | Make @ RIT</title>
+      <title>{`New Announcment | ${makeTheme.title}`}</title>
       <Typography variant="h5">New Announcement</Typography>
       <Stack direction="row" spacing={2}>
         <Stack spacing={2} flexGrow={1}>

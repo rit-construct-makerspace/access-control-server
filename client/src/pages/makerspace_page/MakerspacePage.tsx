@@ -14,6 +14,7 @@ import { useIsMobile } from "../../common/IsMobileProvider";
 import { isManagerFor, isStaffFor } from "../../common/PrivilegeUtils";
 import { moduleStatusMapper } from "../../common/TrainingModuleUtils";
 import ExpandableHeader from "./ExpandableHeader";
+import { useMakeTheme } from "../../common/MakeThemeProvider";
 
 export default function MakerspacePage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
@@ -21,6 +22,7 @@ export default function MakerspacePage() {
   const user = useCurrentUser();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const makeTheme = useMakeTheme();
 
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
@@ -51,7 +53,7 @@ export default function MakerspacePage() {
 
       return (
         <Stack spacing={"2"} padding={isMobile ? "0 10px 10px" : "0 20px 20px"} divider={<Divider orientation="horizontal" flexItem />}>
-          <title>{`${fullSpace.name} | Make @ RIT`}</title>
+          <title>{`${fullSpace.name} | ${makeTheme.title}`}</title>
           <StaffBar />
           {ExpandableHeader({ makerspace: fullSpace, makerspaceTrainings })}
           <Stack

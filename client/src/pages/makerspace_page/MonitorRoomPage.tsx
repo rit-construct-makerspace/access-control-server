@@ -16,6 +16,7 @@ import { TrainingModule } from "../../common/TrainingModuleUtils";
 import ManageRoomTrainings from "./ManageRoomTrainings";
 import { toast } from "react-toastify";
 import EquipmentBlockDialog from "./EquipmentBlockDialog";
+import { useMakeTheme } from "../../common/MakeThemeProvider";
 
 export interface Swipe {
   id: string;
@@ -33,6 +34,7 @@ export default function ManageRoomPage() {
   const user = useCurrentUser();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const makeTheme = useMakeTheme();
 
   const queryResult = useQuery(GET_ROOM, { variables: { id: roomID } });
   const [updateRoomName] = useMutation(UPDATE_ROOM_NAME);
@@ -116,7 +118,7 @@ export default function ManageRoomPage() {
 
         return (
           <Box margin={"20px"}>
-            <title>{`Manage ${room.name} | Make @ RIT`}</title>
+            <title>{`Manage ${room.name} | ${makeTheme.title}`}</title>
             <Stack direction="column" spacing={2}>
               <Stack
                 direction={isMobile ? "column" : "row"}
@@ -142,9 +144,9 @@ export default function ManageRoomPage() {
                       Archive Room
                     </Button>
                   )}
-                    <Button color="error" variant="contained" startIcon={<DeleteIcon />} onClick={handleDeleteRoom} disabled={isManagerFor(user, Number(roomID)) ? false : true}>
-                      Delete Room
-                    </Button>
+                  <Button color="error" variant="contained" startIcon={<DeleteIcon />} onClick={handleDeleteRoom} disabled={isManagerFor(user, Number(roomID)) ? false : true}>
+                    Delete Room
+                  </Button>
                 </Stack>
               </Stack>
               <Stack direction={isMobile ? "column" : "row"} width="auto" spacing={2}>

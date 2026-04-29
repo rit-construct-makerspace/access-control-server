@@ -1,4 +1,4 @@
-import { ButtonBase, Stack, Typography } from "@mui/material";
+import { ButtonBase, Divider, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import { useIsMobile } from "../../common/IsMobileProvider";
 import { Outlet } from "react-router-dom";
@@ -9,6 +9,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import HistoryIcon from '@mui/icons-material/History';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
+import PaletteIcon from '@mui/icons-material/Palette';
 
 export default function AdminBar() {
   const isMobile = useIsMobile();
@@ -46,6 +47,11 @@ export default function AdminBar() {
       to={"/admin/announcements"}
       icon={<AnnouncementIcon />}
     />
+    <NavLink
+      primary="Themes"
+      to={"/admin/themes"}
+      icon={<PaletteIcon />}
+    />
   </Stack>
 
   return (
@@ -62,6 +68,7 @@ export default function AdminBar() {
             </ButtonBase>
           : adminNavigation
       }
+      <Divider orientation={"horizontal"} flexItem />
       <Outlet />
     </Stack>
   );

@@ -13,6 +13,7 @@ import { InventoryForMakerspace } from "./common/InventoryForMakerspace";
 import { useNavigate } from "react-router-dom";
 import LowInventory from "./common/LowInventory";
 import StaffBar from "../../makerspace_page/StaffBar";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 
 export default function AdminInventoryPage() {
@@ -21,6 +22,7 @@ export default function AdminInventoryPage() {
   const [tagsModalOpen, setTagsModalOpen] = useState<boolean>(false);
 
   const navigate = useNavigate();
+  const makeTheme = useMakeTheme();
 
   const inventoryTagsResult = useQuery(GET_INVENTORY_TAGS);
 
@@ -41,7 +43,7 @@ export default function AdminInventoryPage() {
   return (
     <RequestWrapper loading={makerspacesWithItemsResult.loading} error={makerspacesWithItemsResult.error}>
       <Stack width={"auto"}>
-        <title>Inventory | Make @ RIT</title>
+        <title>{`Inventory | ${makeTheme.title}`}</title>
         <Box margin="25px">
           <Stack direction="row" justifyContent="space-between" alignItems="baseline">
             <Typography variant="h4">Inventory</Typography>

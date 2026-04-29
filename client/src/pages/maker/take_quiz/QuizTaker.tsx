@@ -11,6 +11,7 @@ import Markdown from "react-markdown";
 import GET_TRAINING_MODULES from "../../../queries/trainingQueries";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { GET_CURRENT_USER } from "../../../queries/userQueries";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 const StyledDiv = styled.div`
   border-radius: 4px;
@@ -65,6 +66,7 @@ interface QuizTakerProps {
 export default function QuizTaker({ module }: QuizTakerProps) {
   const [quizProgressed, setQuizProgressed] = useState<boolean>(false);
   const isMobile = useIsMobile();
+  const makeTheme = useMakeTheme();
 
   const initialAnswerSheet = module.quiz
     .filter((item) => item.type === QuizItemType.MultipleChoice || item.type === QuizItemType.Checkboxes)
@@ -159,7 +161,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
 
   return (
     <Stack spacing={4} sx={styles.strongerBolds}>
-      <title>{`${module.name} | Make @ RIT`}</title>
+      <title>{`${module.name} | ${makeTheme.title}`}</title>
       {module.isLocked && (
         <Card>
           <CardContent>

@@ -11,12 +11,14 @@ import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { isStaffFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 export default function TrainingModulesPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const currentUser = useCurrentUser();
+  const makeTheme = useMakeTheme();
 
   const getModuleResults = useQuery(GET_TRAINING_MODULES);
 
@@ -25,7 +27,7 @@ export default function TrainingModulesPage() {
   const handleNewModuleClicked = async () => {
     // Redirect to the module editor after creation
     navigate(`/makerspace/${makerspaceID}/training/new`);
-  };  
+  };
 
   const setUrlParam = (paramName: string, paramValue: string) => {
     const params = new URLSearchParams(location.search);
@@ -41,14 +43,14 @@ export default function TrainingModulesPage() {
 
   return (
     <Stack margin="0 20px" spacing={2}>
-      <title>Manage Trainings | Make @ RIT</title>
+      <title>{`Manage Trainings | ${makeTheme.title}`}</title>
       <Typography variant="h3">Manage Trainings</Typography>
       <Stack direction="row" alignItems="center" spacing={1}>
         <SearchBar
           placeholder="Search training modules"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          onSubmit={() => setUrlParam("a", searchText) }
+          onSubmit={() => setUrlParam("a", searchText)}
           onClear={() => setSearchText("")}
         />
         <Button

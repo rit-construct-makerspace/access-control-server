@@ -13,12 +13,14 @@ import EventCard from "./EventCard";
 import EditIcon from "@mui/icons-material/Edit";
 import { isAdmin } from "../../../common/PrivilegeUtils";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 export function Dashboard() {
   const currentUser = useCurrentUser();
   const adminMode = isAdmin(currentUser);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const makeTheme = useMakeTheme();
 
   const getMakerspacesResult = useQuery(GET_MAKERSPACES_WITH_HOURS);
   const getAnnouncementsResult = useQuery(GET_ANNOUNCEMENTS);
@@ -26,7 +28,7 @@ export function Dashboard() {
 
   return (
     <Box>
-      <title>Make @ RIT</title>
+      <title>{makeTheme.title}</title>
       {/* Makerspaces */}
       <RequestWrapper2
         result={getMakerspacesResult}

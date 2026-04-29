@@ -1,4 +1,4 @@
-import { Button, ButtonOwnProps, styled } from "@mui/material";
+import { Button, ButtonOwnProps, styled, SxProps } from "@mui/material";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { toast } from "react-toastify";
 
@@ -20,6 +20,7 @@ interface FileUploadProps {
   text?: string;
   onUpload: (name: string) => void;
   width?: string;
+  sx?: SxProps;
 }
 
 export default function FileUploadButton(props: FileUploadProps) {
@@ -59,6 +60,7 @@ export default function FileUploadButton(props: FileUploadProps) {
       startIcon={<CloudUploadIcon />}
       sx={{
         width: props.width,
+        ...props.sx
       }}
     >
       {props.text ?? "Upload files"}

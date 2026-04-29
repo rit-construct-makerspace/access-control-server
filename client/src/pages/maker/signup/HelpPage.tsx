@@ -6,13 +6,16 @@ import { useQuery } from "@apollo/client";
 import MakerspaceCard from "../../both/homepage/MakerspaceCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 export default function HelpPage() {
     const isMobile = useIsMobile();
+    const makeTheme = useMakeTheme();
+
     const getMakerspacesResult = useQuery(GET_MAKERSPACES_WITH_HOURS);
 
     return <Stack direction={"column"} alignItems={"center"} padding={"10px"} textAlign={"center"}>
-        <title>Help | Make @ RIT</title>
+        <title>{`Help | ${makeTheme.title}`}</title>
         <Typography variant="h3">Welcome to Make @ RIT!</Typography>
         <Typography variant="h5">Some info before you begin,</Typography>
         <br />
