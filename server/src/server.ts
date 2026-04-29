@@ -174,7 +174,7 @@ async function startServer() {
       } else {
         // production, serve built files
         template = fs.readFileSync(path.resolve(__dirname, "../../client/build/index.html"), 'utf-8');
-        render = (await import("../../client/src/entry-server.js")).render;
+        render = (await import("../dist/entry-server.js")).render;
       }
 
       const siteSettings: SiteSettings = {
