@@ -61,6 +61,7 @@
     "pg": "^8.7.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
+    "react-router-dom": "^7.14.2",
     "side-channel-list": "^1.0.0",
     "side-channel-map": "^1.0.1",
     "side-channel-weakmap": "^1.0.2",
