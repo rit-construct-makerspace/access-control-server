@@ -174,6 +174,7 @@ async function startServer() {
       } else {
         // production, serve built files
         template = fs.readFileSync(path.resolve(__dirname, "../../client/build/index.html"), 'utf-8');
+        // @ts-ignore module not found for some reason
         render = (await import("../dist/entry-server.js")).render;
       }
 
