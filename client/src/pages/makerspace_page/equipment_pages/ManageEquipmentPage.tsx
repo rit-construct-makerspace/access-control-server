@@ -17,6 +17,7 @@ import HandymanIcon from '@mui/icons-material/Handyman';
 import MaintenanceTicketGrid from "../maintenance_pages/MaintenanceTicketGrid";
 import WarningIcon from '@mui/icons-material/Warning';
 import NewTicketModal from "../maintenance_pages/NewTicketModal";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 export interface Equipment {
   id: number;
@@ -55,6 +56,7 @@ export default function ManageEquipmentPage() {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const user = useCurrentUser();
+  const makeTheme = useMakeTheme();
 
   const getEquipmentByIDResult = useQuery(GET_EQUIPMENT_BY_ID, {
     variables: {
@@ -91,7 +93,7 @@ export default function ManageEquipmentPage() {
       return (
 
         <Stack padding={"0 20px 15px"}>
-          <title>{`Manage ${equipment.name} | Make @ RIT`}</title>
+          <title>{`Manage ${equipment.name} | ${makeTheme.title}`}</title>
           <Stack spacing={2}>
             <Stack
               direction={isMobile ? "column" : "row"}

@@ -28,6 +28,7 @@ import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { useCallback } from "react";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import GET_TRAINING_MODULES, { ARCHIVE_MODULE, GET_ARCHIVED_TRAINING_MODULES, GET_MODULE, PUBLISH_MODULE } from "../../../queries/trainingQueries";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 interface EditModulePageProps {
   moduleInitialValue: Module;
@@ -46,6 +47,7 @@ export default function EditModulePage({
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useIsMobile();
+  const makeTheme = useMakeTheme();
 
   const [module, setModule] = useImmer<Module>(moduleInitialValue);
   const queryResult = useQuery(GET_MODULE, { variables: { id: module.id } });
@@ -174,7 +176,7 @@ export default function EditModulePage({
 
   return (
     <Stack margin="0 20px 20px" spacing={2}>
-      <title>Edit Training | Make @ RIT</title>
+      <title>{`Edit Training | ${makeTheme.title}`}</title>
       <Typography variant="h4" textAlign="center">Edit {module.name}</Typography>
       <Stack
         direction={isMobile ? "column" : "row"}

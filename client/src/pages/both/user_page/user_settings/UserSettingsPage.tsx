@@ -9,11 +9,13 @@ import { stringAvatar } from "../../../../common/avatarGenerator";
 import ThemeToggle from "../../../../common/ThemeToggle";
 import { GET_USER, UPDATE_STUDENT_PROFILE } from "../../../../queries/userQueries";
 import { useIsMobile } from "../../../../common/IsMobileProvider";
+import { useMakeTheme } from "../../../../common/MakeThemeProvider";
 
 export default function UserSettingsPage() {
     const currentUser = useCurrentUser();
+    const makeTheme = useMakeTheme();
 
-    const userResult = useQuery(GET_USER, {variables: {id: currentUser.id}});
+    const userResult = useQuery(GET_USER, { variables: { id: currentUser.id } });
     const [updateStudentProfile] = useMutation(UPDATE_STUDENT_PROFILE);
 
     const [editInfo, setEditInfo] = useState(false);
@@ -28,18 +30,18 @@ export default function UserSettingsPage() {
                 college: userResult.data?.user.college,
                 expectedGraduation: userResult.data?.user.expectedGraduation
             },
-            refetchQueries: [{ query: GET_USER, variables: {id: currentUser.id} }],
+            refetchQueries: [{ query: GET_USER, variables: { id: currentUser.id } }],
         });
     }
 
     const isMobile = useIsMobile();
 
     return (
-        <Stack margin={isMobile ? "10px" : "30px"} width={isMobile ? "fit-content" : "auto"} spacing={2} divider={<Divider orientation="horizontal" flexItem/>}>
-            <title>User Settings | Make @ RIT</title>
+        <Stack margin={isMobile ? "10px" : "30px"} width={isMobile ? "fit-content" : "auto"} spacing={2} divider={<Divider orientation="horizontal" flexItem />}>
+            <title>{`User Settings | ${makeTheme.title}`}</title>
             {/* Personal info */}
-            <RequestWrapper2 result={userResult} render={({user}) => {
-                
+            <RequestWrapper2 result={userResult} render={({ user }) => {
+
                 if (pronouns === "") {
                     setPronouns(user.pronouns)
                 }
@@ -60,17 +62,17 @@ export default function UserSettingsPage() {
                                 <Avatar
                                     alt={`Profile Picture for ${user.firstName} ${user.lastName}`}
                                     {
-                                        ...stringAvatar(
-                                            user.firstName,
-                                            user.lastName,
-                                            {width: "60px", height: "60px", fontSize: 28}
-                                        )
+                                    ...stringAvatar(
+                                        user.firstName,
+                                        user.lastName,
+                                        { width: "60px", height: "60px", fontSize: 28 }
+                                    )
                                     }
                                 />
                                 <Typography variant={isMobile ? "h5" : "h3"}>{user.firstName} {user.lastName} ({user.ritUsername})</Typography>
                             </Stack>
                             <IconButton aria-label="edit information" onClick={handleOpen}>
-                                <EditIcon sx={{width: "30px", height: "30px", color: "gray"}}/>
+                                <EditIcon sx={{ width: "30px", height: "30px", color: "gray" }} />
                             </IconButton>
                             <Dialog open={editInfo} onClose={handleClose}>
                                 <DialogTitle>Edit Personal Information</DialogTitle>
@@ -96,24 +98,24 @@ export default function UserSettingsPage() {
                         </Stack>
                         <Grid container justifyContent="space-around" maxWidth={isMobile ? undefined : "750px"}>
                             <Grid minWidth="155px">
-                                <InfoBlob label="Pronous" value={pronouns}/>
+                                <InfoBlob label="Pronous" value={pronouns} />
                             </Grid>
                             <Grid minWidth="155px">
-                                <InfoBlob label="College" value={user.college}/>
+                                <InfoBlob label="College" value={user.college} />
                             </Grid>
                             <Grid minWidth="155px">
-                                <InfoBlob label="Expected Graduation" value={user.expectedGraduation}/>
+                                <InfoBlob label="Expected Graduation" value={user.expectedGraduation} />
                             </Grid>
                         </Grid>
-                        <InfoBlob label="Member Since" value={user.registrationDate.slice(0, 10)}/>
+                        <InfoBlob label="Member Since" value={user.registrationDate.slice(0, 10)} />
                     </Stack>
                 );
-            }}/>
-                
+            }} />
+
             {/* Appearence (Dark Mode toggle) */}
             <Stack spacing={1}>
                 <Typography variant="h3">Appearance</Typography>
-                <ThemeToggle/>
+                <ThemeToggle />
             </Stack>
         </Stack>
     );

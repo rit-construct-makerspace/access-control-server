@@ -755,6 +755,15 @@ export interface FirmwareLocationRow {
   firmwareURL: string;
 }
 
+export interface ThemeRow {
+  id: number;
+  themeName: string;
+  title: string;
+  muiThemeOptions: object;
+  logo: string;
+  default: boolean;
+}
+
 declare module "knex/types/tables.js" {
   interface Tables {
     AuditLogs: AuditLogRow;
@@ -809,5 +818,6 @@ declare module "knex/types/tables.js" {
     DeviceLogs: DeviceLogRow;
     UnlockAttemptLogs: UnlockAttemptLogRow;
     FirmwareLocations: FirmwareLocationRow;
+    Themes: ThemeRow;
   }
 }

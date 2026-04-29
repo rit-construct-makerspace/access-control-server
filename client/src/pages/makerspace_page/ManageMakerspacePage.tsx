@@ -14,12 +14,14 @@ import ManageWelcomReadersCard from "./ManageWelcomeReadersCard";
 import ManageMakerspaceTrainings from "./ManageMakerspaceTrainings";
 import ManageMakerspaceHours from "./ManageMakerspaceHours";
 import ManageMakerspaceInformation from "./ManageMakerspaceInformation";
+import { useMakeTheme } from "../../common/MakeThemeProvider";
 
 
 export default function ManageMakerspacePage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
 
   const isMobile = useIsMobile();
+  const makeTheme = useMakeTheme();
 
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
@@ -43,7 +45,7 @@ export default function ManageMakerspacePage() {
 
         return (
           <Stack spacing={3} padding="0 20px 10px">
-            <title>{`Manage ${space.name} | Make @ RIT`}</title>
+            <title>{`Manage ${space.name} | ${makeTheme.title}`}</title>
             <Stack
               direction={isMobile ? "column" : "row"}
               justifyContent={isMobile ? undefined : "space-between"}

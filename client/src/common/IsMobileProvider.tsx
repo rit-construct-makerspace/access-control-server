@@ -4,15 +4,17 @@ interface IsMobileProviderProps {
     children: ReactElement;
 }
 
-const isMobileContext = createContext<boolean | undefined>(undefined); 
+const isMobileContext = createContext<boolean | undefined>(undefined);
 
 export function IsMobileProvider(props: IsMobileProviderProps) {
-    const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
-    
+    // init to 1200 because window not defined when using SSR
+    const [windowWidth, setWindowWidth] = useState<number>(1200);
+
     function handleWindowSizeChange() {
         setWindowWidth(window.innerWidth);
     }
     useEffect(() => {
+        setWindowWidth(window.innerWidth)
         window.addEventListener('resize', handleWindowSizeChange);
         return () => {
             window.removeEventListener('resize', handleWindowSizeChange);

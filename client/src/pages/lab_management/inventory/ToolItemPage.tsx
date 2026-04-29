@@ -15,6 +15,7 @@ import { CreateToolItemInstanceModal, EditToolItemInstanceModal } from "./EditCr
 import { GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
 import Room from "../../../types/Room";
 import { isManager } from "../../../common/PrivilegeUtils";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 
 export function ToolItemPage() {
@@ -24,9 +25,10 @@ export function ToolItemPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const currentUser = useCurrentUser();
+  const makeTheme = useMakeTheme();
 
   const getToolItemTypes = useQuery(GET_TOOL_ITEM_TYPES_WITH_INSTANCES);
-  const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, {variables: {id: makerspaceID}});
+  const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
   const [currentType, setCurrentType] = useState<ToolItemType>();
 
@@ -41,11 +43,11 @@ export function ToolItemPage() {
     setReturnItem(item);
     setCurrentType(type);
   }
-  
+
   return (
     <Box padding="25px">
       {/* <ToolItemsByUser handleReturnItemClick={handleReturnInstanceClick} /> */}
-      <title>Tools | Make @ RIT</title>
+      <title>{`Tools | ${makeTheme.title}`}</title>
       <Stack direction="row" justifyContent="space-between" alignItems="baseline" paddingBottom="10px">
         <Typography variant="h4">Tools</Typography>
         {isManager(currentUser) && <Button startIcon={<AddIcon />} variant="outlined" color="primary" onClick={() => navigate(`/makerspace/${makerspaceID}/tools/type`)}>Create Type</Button>}
@@ -58,7 +60,7 @@ export function ToolItemPage() {
           ))}
 
           {location.pathname.includes("type") && !getToolItemTypes.loading && <ToolItemTypeModal type={!typeid ? undefined : getToolItemTypes.data?.toolItemTypes.find((type: ToolItemType) => Number(type.id) === Number(typeid))} />}
-          {location.pathname.includes("instance") && searchParams.get("type") && !getToolItemTypes.loading && (instanceid 
+          {location.pathname.includes("instance") && searchParams.get("type") && !getToolItemTypes.loading && (instanceid
             ? <EditToolItemInstanceModal itemID={Number(instanceid)} type={getToolItemTypes.data?.toolItemTypes.find((type: ToolItemType) => Number(type.id) === Number(searchParams.get("type")))} />
             : <CreateToolItemInstanceModal type={getToolItemTypes.data?.toolItemTypes.find((type: ToolItemType) => Number(type.id) === Number(searchParams.get("type")))} />)}
         </Stack>

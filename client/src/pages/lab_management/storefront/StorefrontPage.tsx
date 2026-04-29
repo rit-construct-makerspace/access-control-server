@@ -19,6 +19,7 @@ import { GET_MAKERSPACES_WITH_ITEMS, MakerspaceWithItems } from "../../../querie
 import CheckoutSuccessModal from "./CheckoutSuccessModal";
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { useNavigate } from "react-router-dom";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 
 const CHECKOUT_ITEMS = gql`
@@ -42,6 +43,7 @@ export default function StorefrontPage() {
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const makeTheme = useMakeTheme();
 
   const { loading, error, data } = useQuery(GET_MAKERSPACES_WITH_ITEMS, { variables: { storefrontVisible: isStaff(currentUser) ? null : true } });
 
@@ -82,7 +84,7 @@ export default function StorefrontPage() {
     const queryString = searchParams.get("a") ?? "";
 
     setSearchText(queryString)
-  }, [location.search]);  
+  }, [location.search]);
 
   const getCartFromStorage = useCallback(() => {
     const storedCart = localStorage.getItem("cart");
@@ -155,9 +157,9 @@ export default function StorefrontPage() {
   return (
     <RequestWrapper loading={loading} error={error}>
       <Page title={"Store"} noPadding={isMobile}>
-        <title>Storefront | Make @ RIT</title>
+        <title>{`Storefront | ${makeTheme.title}`}</title>
 
-        {(currentUser.visitor==false && import.meta.env.VITE_DISABLE_STOREFRONT_CART === "false") && <ShoppingCart
+        {(currentUser.visitor == false && import.meta.env.VITE_DISABLE_STOREFRONT_CART === "false") && <ShoppingCart
           entries={shoppingCart}
           removeEntry={removeFromShoppingCart}
           setEntryCount={setEntryCount}
@@ -184,7 +186,7 @@ export default function StorefrontPage() {
           sx={{ mb: 2, alignSelf: "flex-start" }}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          onSubmit={() => setUrlParam("a", searchText) }
+          onSubmit={() => setUrlParam("a", searchText)}
           onClear={() => setSearchText("")}
         />
 

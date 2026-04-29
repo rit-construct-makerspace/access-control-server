@@ -8,6 +8,7 @@ import { CREATE_EQUIPMENT } from "../../../queries/equipmentQueries";
 import GET_ROOMS from "../../../queries/roomQueries";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 
 export default function NewEquipmentPage() {
@@ -15,6 +16,7 @@ export default function NewEquipmentPage() {
 
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+  const makeTheme = useMakeTheme();
 
   const getRoomsResult = useQuery(GET_ROOMS);
 
@@ -59,7 +61,7 @@ export default function NewEquipmentPage() {
 
   return (
     <Stack width={"100%"} justifyContent={"center"} padding={"0 20px 15px"} alignItems={"center"}>
-      <title>New Equipment | Make @ RIT</title>
+      <title>{`New Equipment | ${makeTheme.title}`}</title>
       <Stack width={isMobile ? "100%" : "50%"} spacing={2}>
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
           <Typography variant="h5" fontWeight={"bold"}>Machine Information</Typography>

@@ -7,19 +7,21 @@ export default defineConfig({
     react(),
     eslint({
       dev: true,
-      
+
       build: true, // lint on build
       cache: true, // cache lints
       emitWarning: true,
       emitError: true,
       // Don't fail build on errors (bc the entire build would fail rn)
       // if its 2026 and this is still here you should feel bad
-      emitErrorAsWarning: true, 
-      
+      emitErrorAsWarning: true,
+
     }),
   ],
+  ssr: {
+    noExternal: true
+  },
   base: "/app/",
-  
   build: {
     outDir: 'build',
   },

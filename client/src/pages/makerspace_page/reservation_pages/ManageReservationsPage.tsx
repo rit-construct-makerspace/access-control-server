@@ -1,12 +1,12 @@
 import { Calendar, dateFnsLocalizer, Event, SlotInfo, Views } from "react-big-calendar";
-import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import rawWithDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import { useParams } from "react-router";
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { Autocomplete, Button, Card, Divider, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
 import { format, getDay, parse, startOfWeek } from "date-fns";
 import { enUS } from "date-fns/locale";
-import { LightTheme } from "../../../Theme";
+import { fallbackTheme } from "../../../types/site_settings/ThemeController";
 import ReservationModal from "./ReservationModal";
 import { Reservation, ReservationEvent } from "../../../types/Reservation";
 import { useState } from "react";
@@ -21,6 +21,15 @@ import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import CloseIcon from '@mui/icons-material/Close';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import { isManager } from "../../../common/PrivilegeUtils";
+
+const withDragAndDrop = (() => {
+  let fn: any = rawWithDragAndDrop;
+  while (fn && typeof fn !== 'function') {
+    fn = fn.default;
+  }
+
+  return fn;
+})();
 
 const DnDCalendar = withDragAndDrop(Calendar);
 const locales = {
@@ -45,7 +54,7 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 
 export default function ManageReservationsPage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
-  const lightTheme = (new LightTheme).getTheme();
+  const lightTheme = fallbackTheme.getTheme();
   const user = useCurrentUser();
 
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
@@ -345,7 +354,6 @@ export default function ManageReservationsPage() {
                     width: "80%"
                   }}
                 >
-                  {/* @ts-expect-error */}
                   <DnDCalendar
                     date={targetDay}
                     onNavigate={onNavigate}

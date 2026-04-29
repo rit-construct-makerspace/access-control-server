@@ -57,6 +57,8 @@ jobs:
 
       - name: Install Node modules
         run: npm ci
+      - name: Install Client Node Modules
+        run: cd client && npm ci
       - name: Lint Server
         run: npm run lint
         # Don't fail build on errors (bc the entire build would fail rn)

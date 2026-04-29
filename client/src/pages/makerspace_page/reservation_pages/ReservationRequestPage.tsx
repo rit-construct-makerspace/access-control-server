@@ -1,7 +1,7 @@
 import { Alert, AlertTitle, Button, Card, Link, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
 import { Calendar, dateFnsLocalizer, SlotInfo, Event } from "react-big-calendar";
-import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import rawWithDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import format from 'date-fns/format'
 import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
@@ -9,7 +9,7 @@ import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import { LightTheme } from "../../../Theme";
+import { fallbackTheme } from "../../../types/site_settings/ThemeController";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
@@ -25,7 +25,16 @@ import { isStaff, isStaffOrSelf } from "../../../common/PrivilegeUtils";
 import Equipment from "../../../types/Equipment";
 import NotFoundPage from "../../../pages/NotFoundPage";
 import { addDays, endOfDay, isAfter, startOfDay } from "date-fns";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
+const withDragAndDrop = (() => {
+  let fn: any = rawWithDragAndDrop;
+  while (fn && typeof fn !== 'function') {
+    fn = fn.default;
+  }
+
+  return fn;
+})();
 const DnDCalendar = withDragAndDrop(Calendar);
 
 const locales = {
@@ -52,9 +61,9 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 export default function ReservationRequestPage() {
   const { makerspaceID, equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
   const user = useCurrentUser();
-  const navigate = useNavigate();
+  const makeTheme = useMakeTheme();
 
-  const lightTheme = (new LightTheme).getTheme();
+  const lightTheme = fallbackTheme.getTheme();
 
   const getReservationsResult = useQuery(GET_RESERVATIONS_FLEXIBLY, {
     variables: {
@@ -205,7 +214,7 @@ export default function ReservationRequestPage() {
 
           return (
             <Stack direction={"row"} padding={"20px"} spacing={4} width={"100%"}>
-              <title>{`Reserve ${equipment.name} | Make @ RIT`}</title>
+              <title>{`Reserve ${equipment.name} | ${makeTheme.title}`}</title>
               <Stack width={"20%"} spacing={2}>
                 <Typography variant="h5" textAlign={"center"}>
                   {equipment.schedulable ? "Requesting a reservation for:" : "Reservations for:"}
@@ -298,7 +307,6 @@ export default function ReservationRequestPage() {
                     width: "80%"
                   }}
                 >
-                  {/* @ts-expect-error */}
                   <DnDCalendar
                     localizer={localizer}
                     defaultView={"week"}

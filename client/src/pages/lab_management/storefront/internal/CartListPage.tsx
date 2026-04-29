@@ -10,10 +10,12 @@ import { useEffect, useState } from "react";
 import { GET_MAKERSPACES } from "../../../../queries/makerspaceQueries";
 import { Checkbox, FormControlLabel, FormGroup, TextField, CircularProgress } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import { useMakeTheme } from "../../../../common/MakeThemeProvider";
 
 export function CartListPage() {
   const navigate = useNavigate();
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
+  const makeTheme = useMakeTheme();
 
   const getCartsResult = useQuery(GET_CARTS, { pollInterval: 10000 });
   const getMakerspacesResult = useQuery(GET_MAKERSPACES);
@@ -86,7 +88,7 @@ export function CartListPage() {
 
   return (
     <Stack width={"auto"}>
-      <title>Carts | Make @ RIT</title>
+      <title>{`Carts | ${makeTheme.title}`}</title>
       <Box m={"20px"}>
         <PageSectionHeader>Active Carts</PageSectionHeader>
 

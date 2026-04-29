@@ -11,6 +11,7 @@ import SearchBar from "../../common/SearchBar";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import AuditLogRow from "../lab_management/audit_logs/AuditLogRow";
 import { ManualRoomSignInModal } from "../lab_management/audit_logs/ManualRoomSignInModal";
+import { useMakeTheme } from "../../common/MakeThemeProvider";
 
 const GET_LOGS = gql`
   query GetLogs(
@@ -61,6 +62,8 @@ export default function AdminHistoryPage() {
 
   const { search } = useLocation();
   const navigate = useNavigate();
+  const makeTheme = useMakeTheme();
+
   const [query, queryResult] = useLazyQuery(GET_LOGS, { pollInterval: 2000 });
   const [searchText, setSearchText] = useState("");
   const [expanded, setExpanded] = useState(false);
@@ -142,7 +145,7 @@ export default function AdminHistoryPage() {
 
   return (
     <Box margin="25px">
-      <title>History | Make @ RIT</title>
+      <title>{`History | ${makeTheme.title}`}</title>
       <Stack direction="row" justifyContent="space-between" alignItems="baseline">
         <Typography variant="h4">History</Typography>
         <Button startIcon={<PersonAddIcon />} color="secondary" onClick={() => setManualSignInModal(true)}>Manual Room Sign-in</Button>
