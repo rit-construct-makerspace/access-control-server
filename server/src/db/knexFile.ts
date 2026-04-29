@@ -84,7 +84,7 @@ const config: any = { //remove ': any' if using --esm
     },
     migrations: {
       tableName: "knex_migrations",
-      directory: "dist/db/migrations",
+      directory: "migrations",
     },
     seeds: {
       directory: "seeds",
