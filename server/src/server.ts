@@ -161,7 +161,6 @@ async function startServer() {
       return next();
     }
 
-    console.log("Request to get an app page: ", req.originalUrl);
     try {
       const url = req.originalUrl
       let template, render;
