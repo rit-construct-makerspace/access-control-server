@@ -19,7 +19,7 @@ export default defineConfig({
     }),
   ],
   ssr: {
-    noExternal: ['@mui/x-data-grid']
+    noExternal: true
   },
   base: "/app/",
   build: {
