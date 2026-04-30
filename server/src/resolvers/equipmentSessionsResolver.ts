@@ -56,9 +56,9 @@ const EquipmentSessionsResolver = {
      */
     equipmentSessions: async (
       _parent: any,
-      args: {startDate: string, stopDate: string},
+      args: { startDate: string, stopDate: string },
       { isStaff }: ApolloContext) =>
-      isStaff(async (user: CurrentUser) => {
+      isStaff(async (_user: CurrentUser) => {
         return await getEquipmentSessions();
       }),
   },
