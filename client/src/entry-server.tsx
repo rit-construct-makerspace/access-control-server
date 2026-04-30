@@ -1,9 +1,10 @@
-import { renderToString } from 'react-dom/server';
+import { renderToPipeableStream, renderToString } from 'react-dom/server';
 import App from './App';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from "react-router-dom"
 import { routes } from './AppRouter';
 import express from "express";
 import { SiteSettings } from './types/site_settings/SiteSettings';
+import { Transform } from 'node:stream';
 
 function createFetchRequest(req: express.Request): Request {
   const origin = `${req.protocol}://${req.get("host")}`;
@@ -37,7 +38,7 @@ function createFetchRequest(req: express.Request): Request {
 }
 
 // The server calls this function to get the HTML string
-export async function render(req: express.Request, siteSettings: SiteSettings) {
+export async function render(req: express.Request, res: express.Response, siteSettings: SiteSettings, head: string, tail: string) {
   const fetchRequest = createFetchRequest(req);
 
   const { query, dataRoutes } = createStaticHandler(routes, {
@@ -47,16 +48,53 @@ export async function render(req: express.Request, siteSettings: SiteSettings) {
   const context = await query(fetchRequest);
 
   if (context instanceof Response) {
-    throw context;
+    return res.redirect(context.status, context.headers.get("Location") || "/app");
   }
 
   const router = createStaticRouter(dataRoutes, context);
 
+  let didError = false;
 
-  const html = renderToString(
+  const { pipe } = renderToPipeableStream(
     <App siteSettings={siteSettings}>
       <StaticRouterProvider router={router} context={context} />
-    </App>
+    </App>,
+    {
+      onShellReady() {
+        // The shell is ready to be sent to the browser
+        res.status(didError ? 500 : 200).set({ 'Content-Type': 'text/html' });
+
+        // 1. Write the top half of the Vite HTML template
+        res.write(head);
+
+        // 2. Create a transform stream to pipe React chunks to the Express response
+        const transformStream = new Transform({
+          transform(chunk, encoding, callback) {
+            res.write(chunk, encoding);
+            callback();
+          }
+        });
+
+        // 3. When React finishes streaming, append the bottom half of the template and close
+        transformStream.on('finish', () => {
+          res.end(tail);
+        });
+
+        // 4. Start the pipe
+        pipe(transformStream);
+      },
+
+      onShellError(error) {
+        // Something went wrong rendering the initial shell
+        console.error("Shell error:", error);
+        res.status(500).set({ 'Content-Type': 'text/html' }).end("<h1>Internal Server Error</h1>");
+      },
+
+      onError(error) {
+        // Catch errors that happen inside Suspense boundaries while streaming
+        didError = true;
+        console.error("Streaming error:", error);
+      }
+    }
   );
-  return { html };
 }

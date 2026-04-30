@@ -19,7 +19,8 @@ export default defineConfig({
     }),
   ],
   ssr: {
-    noExternal: true
+    noExternal: true,
+    external: ["react", "react-dom", "react-dom/server"],
   },
   base: "/app/",
   build: {
