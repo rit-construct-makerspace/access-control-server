@@ -19,8 +19,8 @@ export default defineConfig({
     }),
   ],
   ssr: {
-    external: ["react", "react-dom", "react-dom/server", "rehackt"],
-    noExternal: ["@mui/x-data-grid"]
+    noExternal: true,
+    external: ["react", "react-dom", "react-dom/server"],
   },
   base: "/app/",
   build: {
