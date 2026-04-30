@@ -10,7 +10,7 @@ export const RestrictionResolver = {
             parent: RestrictionRow,
             _args: any,
             { isStaff }: ApolloContext
-        ) => isStaff(async (user: CurrentUser) => {
+        ) => isStaff(async (_user: CurrentUser) => {
             return parent.creatorID ? UsersRepo.getUserByID(parent.creatorID) : null
         }),
 
@@ -18,7 +18,7 @@ export const RestrictionResolver = {
             parent: RestrictionRow,
             _args: any,
             { isStaff }: ApolloContext
-        ) => isStaff (async (user: CurrentUser) => {
+        ) => isStaff(async (_user: CurrentUser) => {
             return parent.makerspaceID ? MakerspaceRepo.getMakerspaceByID(parent.makerspaceID) : null
         }),
     },
@@ -26,7 +26,7 @@ export const RestrictionResolver = {
     Mutation: {
         createRestriction: async (
             _parent: any,
-            args: { targetID: number, makerspaceID: number, reason: string},
+            args: { targetID: number, makerspaceID: number, reason: string },
             { isStaffFor }: ApolloContext
         ) => isStaffFor(args.makerspaceID, async (user: CurrentUser) => {
             return await RestrictionRepository.createRestriction(user.id, args.targetID, args.makerspaceID, args.reason);
@@ -34,11 +34,11 @@ export const RestrictionResolver = {
 
         deleteRestriction: async (
             _parent: any,
-            args: {id: number},
+            args: { id: number },
             { isStaffFor }: ApolloContext
         ) => {
             const restriction = await RestrictionRepository.getRestriction(args.id);
-            return isStaffFor(restriction.makerspaceID, async (user: CurrentUser) => {
+            return isStaffFor(restriction.makerspaceID, async (_user: CurrentUser) => {
                 return await RestrictionRepository.deleteRestriction(args.id);
             })
         }
