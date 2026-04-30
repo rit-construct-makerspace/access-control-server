@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { AccessController, AccessControllerState } from "./deviceQueries";
+import { AccessController } from "./deviceQueries";
 
 export enum InstanceStatus {
   UNDEPLOYED = "UNDEPLOYED",
