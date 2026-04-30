@@ -5,6 +5,7 @@ import { routes } from './AppRouter';
 import express from "express";
 import { SiteSettings } from './types/site_settings/SiteSettings';
 import { Transform } from 'node:stream';
+import { ApolloClient, InMemoryCache } from '@apollo/client';
 
 function createFetchRequest(req: express.Request): Request {
   const origin = `${req.protocol}://${req.get("host")}`;
@@ -51,12 +52,18 @@ export async function render(req: express.Request, res: express.Response, siteSe
     return res.redirect(context.status, context.headers.get("Location") || "/app");
   }
 
+  const apolloClient = new ApolloClient({
+    uri: import.meta.env.VITE_GRAPHQL_URL ?? "http://localhost:3000/graphql",
+    credentials: "include",
+    cache: new InMemoryCache(),
+  });
+
   const router = createStaticRouter(dataRoutes, context);
 
   let didError = false;
 
   const { pipe } = renderToPipeableStream(
-    <App siteSettings={siteSettings}>
+    <App siteSettings={siteSettings} apolloClient={apolloClient}>
       <StaticRouterProvider router={router} context={context} />
     </App>,
     {
