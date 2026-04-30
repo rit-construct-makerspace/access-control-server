@@ -1,7 +1,6 @@
 import { Alert, AppBar, Avatar, Box, Button, ButtonBase, Drawer, IconButton, Menu, MenuItem, Stack, Typography } from "@mui/material";
 import styled from "styled-components";
 import LogoSvgWhite from "../assets/shed logo white.png";
-import LogoSvgOrange from "../assets/shed logo orange white.png";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import LayersIcon from '@mui/icons-material/Layers';
@@ -14,11 +13,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Footer from "./Footer";
 import PersonIcon from '@mui/icons-material/Person';
 import { useIsMobile } from "../common/IsMobileProvider";
-import StorefrontIcon from '@mui/icons-material/Storefront';
 import ArticleIcon from '@mui/icons-material/Article';
 import TuneIcon from '@mui/icons-material/Tune';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { ThemeController } from "../types/site_settings/ThemeController";
 import { useMakeTheme } from "../common/MakeThemeProvider";
 import { makeCDNLink } from "../common/ImageFinder";
 
@@ -37,9 +34,6 @@ export default function TopNav() {
   const currentUser = useCurrentUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(anchorEl);
-
-  const [themeString, setThemeString] = useState(ThemeController.activeTheme.getThemeName());
-  ThemeController.addStringWatcher(setThemeString);
 
   const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
