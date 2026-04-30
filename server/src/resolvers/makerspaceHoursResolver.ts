@@ -10,7 +10,7 @@ const MakerspaceHoursResolver = {
       args: {
         makerspaceID: number
       },
-      { }: ApolloContext
+      _context: any
     ) => {
       return await HoursRepo.getMakerspaceHoursNextWeek(args.makerspaceID);
     },
@@ -21,7 +21,7 @@ const MakerspaceHoursResolver = {
         day: Date,
         makerspaceID: number
       },
-      { }: ApolloContext
+      _context: any
     ) => {
       return await HoursRepo.getMakerspaceHoursOnDay(args.day, args.makerspaceID);
     },
@@ -31,7 +31,7 @@ const MakerspaceHoursResolver = {
       args: {
         makerspaceID: number
       },
-      { }: ApolloContext
+      _context: any
     ) => {
       return await HoursRepo.getMakerspaceDefaultHours(args.makerspaceID);
     },
@@ -41,7 +41,7 @@ const MakerspaceHoursResolver = {
       args: {
         makerspaceID: number
       },
-      { }: ApolloContext
+      _context: any
     ) => {
       return await HoursRepo.getMakerspaceSpecialHours(args.makerspaceID);
     }
