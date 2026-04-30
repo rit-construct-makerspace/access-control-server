@@ -3,12 +3,11 @@ import { useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
 import { useQuery } from "@apollo/client/react";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import { DataGrid, GridRowsProp, GridColDef, GridPaginationModel, GridSortModel, getGridStringOperators, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridRowsProp, GridColDef, GridPaginationModel, GridSortModel, GridRenderCellParams } from "@mui/x-data-grid";
 import { useState } from "react";
 import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, PAGINATED_MAINTENANCE_TICKETS } from "../../../queries/maintenanceTicketQueries";
 import NewTicketModal from "./NewTicketModal";
 import WarningIcon from '@mui/icons-material/Warning';
-import MaintenanceTicketModal from "./MaintenanceTicketModal";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import NewIntervalTicketModal from "./NewIntervalTicketModal";
 import { isManager } from "../../../common/PrivilegeUtils";
@@ -58,7 +57,7 @@ export default function MaintenancePage() {
     }
   });
 
-  const containsOperator = getGridStringOperators().filter((operator) => operator.value === "contains");
+  // const containsOperator = getGridStringOperators().filter((operator) => operator.value === "contains");
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 10, filterable: false, resizable: false, hideable: false },
