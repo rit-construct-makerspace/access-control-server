@@ -15,7 +15,7 @@ import DeleteMaterialButton from "./DeleteMaterialButton";
 import HelpTooltip from "../../../common/HelpTooltip";
 import SaveIcon from "@mui/icons-material/Save";
 import InventoryItem from "../../../types/InventoryItem";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { GET_MAKERSPACES } from "../../../queries/makerspaceQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { useIsMobile } from "../../../common/IsMobileProvider";

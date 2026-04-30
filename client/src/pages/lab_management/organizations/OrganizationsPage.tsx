@@ -2,7 +2,7 @@ import { Button, Card, Grid, IconButton, Stack, TextField, Typography } from "@m
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import SearchBar from "../../../common/SearchBar";
 import gql from "graphql-tag";
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client/react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import RequestWrapper2 from "../../../common/RequestWrapper2";

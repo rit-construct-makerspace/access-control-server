@@ -6,7 +6,7 @@ import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import LockClockIcon from "@mui/icons-material/LockClock";
 import CloseIcon from "@mui/icons-material/Close";
 import { format } from "date-fns";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { GET_PASSED_SUBMISSION } from "../queries/getSubmissions";
 import { useCurrentUser } from "./CurrentUserProvider.js";
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';

@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Alert, Button, CardActionArea, Divider, Stack, Tooltip, Typography } from "@mui/material";
 import { GET_THEMES } from "../../queries/themeQueries";
 import { ServerThemeData } from "../../types/site_settings/MakeTheme";

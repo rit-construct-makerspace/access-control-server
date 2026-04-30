@@ -8,7 +8,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import GET_USERS, { GET_USER } from "../../../queries/userQueries";
 import { toast } from "react-toastify";
 import { isStaff } from "../../../common/PrivilegeUtils";

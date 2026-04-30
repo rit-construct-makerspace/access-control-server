@@ -1,7 +1,7 @@
 import { Alert, Button, Card, Checkbox, FormControl, FormControlLabel, FormGroup, IconButton, InputLabel, MenuItem, Select, Stack, Typography } from "@mui/material";
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
 import { ChangeEvent, useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { MAKE_USER_MANAGER, MAKE_USER_STAFF, MAKE_USER_TRAINER, REVOKE_USER_MANAGER, REVOKE_USER_STAFF, REVOKE_USER_TRAINER, SET_USER_ADMIN } from "../../../../queries/permissionQueries";
 import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../../../common/RequestWrapper2";

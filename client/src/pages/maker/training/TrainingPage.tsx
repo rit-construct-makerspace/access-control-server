@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Page from "../../Page";
 import Explainer from "./Explainer";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import {

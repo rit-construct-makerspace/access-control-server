@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Button, Checkbox, Stack, TextField } from "@mui/material";
 import { PAIR_READER } from "../../queries/readersQueries";
 import { useState } from "react";

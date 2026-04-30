@@ -1,22 +1,17 @@
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ThemeController } from "./types/site_settings/ThemeController";
 import { IsMobileProvider } from "./common/IsMobileProvider";
 import { ReactNode, useEffect, useState } from "react";
 import { ToastContainer, Slide } from "react-toastify";
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV2';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { SiteSettings } from "./types/site_settings/SiteSettings";
 import { MakeTheme } from "./types/site_settings/MakeTheme";
 import { MakeThemeProvider } from "./common/MakeThemeProvider";
 
-const apolloClient = new ApolloClient({
-  uri: import.meta.env.VITE_GRAPHQL_URL ?? "http://localhost:3000/graphql",
-  credentials: "include",
-  cache: new InMemoryCache(),
-});
-
-export default function App(props: { siteSettings: SiteSettings, children: ReactNode }) {
+export default function App(props: { siteSettings: SiteSettings, children: ReactNode, apolloClient: ApolloClient }) {
   const [theme, setTheme] = useState(ThemeController.activeTheme.getTheme());
 
   ThemeController.addThemeWatcher(setTheme);
@@ -28,7 +23,7 @@ export default function App(props: { siteSettings: SiteSettings, children: React
   }, [])
 
   return (
-    <ApolloProvider client={apolloClient}>
+    <ApolloProvider client={props.apolloClient}>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <MakeThemeProvider>
           <ThemeProvider theme={theme}>

@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { Box, Stack, styled, Table, TableCell, TableHead, TableRow, TextField } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import PageSectionHeader from "../../../common/PageSectionHeader";
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client/react";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_LEDGERS } from "../../../queries/inventoryQueries";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";

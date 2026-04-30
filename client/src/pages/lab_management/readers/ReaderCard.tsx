@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useMutation, QueryResult } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import TimeAgo from 'react-timeago'
 import { DELETE_READER, GET_READERS, GET_READERS_WITH_PAIRINGS, IDENTIFY_READER, Reader, REQUEST_OTA_UPDATE, SET_READER_STATE } from "../../../queries/readersQueries";
 import LanIcon from '@mui/icons-material/Lan';
@@ -41,7 +41,7 @@ interface ReaderWithPairing extends Reader {
 
 interface ReaderCardProps {
   reader: ReaderWithPairing
-  firmwareVersions: QueryResult<any>
+  firmwareVersions: useQuery.Result<any>
   makerspaceID: string,
   searchQuery: string,
 }

@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { UPDATE_TOOL_ITEM_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES, GET_TOOL_ITEM_TYPES, CREATE_TOOL_ITEM_TYPE } from "../../../queries/toolItemQueries";
 import { ToolItemType, ToolItemTypeInput } from "../../../types/ToolItem";
 import { useEffect, useState } from "react";

@@ -1,4 +1,4 @@
-import { useLazyQuery, useMutation } from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client/react";
 import { ToolItemInstance, ToolItemType } from "../../../types/ToolItem";
 import { BORROW_INSTANCE, GET_TOOL_ITEM_INSTANCES_BY_BORROWER, GET_TOOL_ITEM_INSTANCES_BY_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES } from "../../../queries/toolItemQueries";
 import PrettyModal from "../../../common/PrettyModal";

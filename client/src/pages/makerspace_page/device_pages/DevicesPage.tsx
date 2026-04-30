@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { GET_MAKERSPACE_WITH_DEVICES } from "../../../queries/makerspaceQueries";
 import { Core, Device, Dispenser } from "../../../queries/deviceQueries";

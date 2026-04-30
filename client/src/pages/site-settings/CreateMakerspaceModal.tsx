@@ -1,7 +1,7 @@
 import { Button, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../common/PrettyModal";
 import AddIcon from '@mui/icons-material/Add';
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import gql from "graphql-tag";
 import { useState } from "react";
 

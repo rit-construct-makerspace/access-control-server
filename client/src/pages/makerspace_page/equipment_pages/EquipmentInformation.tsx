@@ -20,7 +20,7 @@ import {
   PUBLISH_EQUIPMENT,
   UPDATE_EQUIPMENT,
 } from "../../../queries/equipmentQueries";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import EquipmentCard from "../../../common/EquipmentCard";

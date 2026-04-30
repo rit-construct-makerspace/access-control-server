@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { Button, Stack, TextField, Typography } from "@mui/material";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
 import { useNavigate, useParams } from "react-router-dom";

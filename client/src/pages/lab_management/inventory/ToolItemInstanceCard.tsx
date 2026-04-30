@@ -4,11 +4,10 @@ import { useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { DELETE_INSTANCE, GET_TOOL_ITEM_INSTANCES_BY_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES } from "../../../queries/toolItemQueries";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
 import TimeAgo from 'react-timeago'
-import {makeIntlFormatter} from 'react-timeago/defaultFormatter';
 import { useNavigate, useParams } from "react-router-dom";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { isManager } from "../../../common/PrivilegeUtils";
@@ -17,7 +16,7 @@ import { isManager } from "../../../common/PrivilegeUtils";
 
 
 export function ToolItemInstanceCard({ item, handleLoanClick, handleReturnClick }: { item: ToolItemInstance, handleLoanClick: (item: ToolItemInstance) => void, handleReturnClick: (item: ToolItemInstance) => void }) {
-  const {makerspaceID} = useParams<{makerspaceID: string}>();
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const navigate = useNavigate();
 
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -87,15 +86,11 @@ export function ToolItemInstanceCard({ item, handleLoanClick, handleReturnClick 
 
   const lastTimeDifference = item.borrowedAt ? (new Date().getTime() - new Date(item.borrowedAt).getTime()) : null;
 
-  const intlFormatter = makeIntlFormatter({
-    locale: "en-US",
-  });
-
   return (
     <Card sx={{ backgroundColor: CARD_COLOR, maxWidth: 380 }}>
-      <CardHeader title={item.uniqueIdentifier} subheader={<Stack direction={"row"} justifyContent={"space-between"} alignItems={"flex-start"}><span>ID {item.id}</span><Chip label={item.status} color={STATUS_COLOR} variant="filled" size="small" /></Stack>} action={isManager(currentUser) && CONTROL_MENU} sx={{pb: 0}} />
-      <CardContent sx={{minHeight: 250, pb: 0}}>
-        <Box mb={2} height={"2em"} sx={{overflowY: "scroll"}}>
+      <CardHeader title={item.uniqueIdentifier} subheader={<Stack direction={"row"} justifyContent={"space-between"} alignItems={"flex-start"}><span>ID {item.id}</span><Chip label={item.status} color={STATUS_COLOR} variant="filled" size="small" /></Stack>} action={isManager(currentUser) && CONTROL_MENU} sx={{ pb: 0 }} />
+      <CardContent sx={{ minHeight: 250, pb: 0 }}>
+        <Box mb={2} height={"2em"} sx={{ overflowY: "scroll" }}>
           <Typography variant="body2">{item.notes}</Typography>
         </Box>
         <Table size="small">
@@ -104,18 +99,18 @@ export function ToolItemInstanceCard({ item, handleLoanClick, handleReturnClick 
             <TableCell align="right" sx={{ color: CONDITION_COLOR }}>{item.condition}</TableCell>
           </TableRow>
           {item.borrower?.id && [
-          <TableRow>
-            <TableCell align="left" sx={{ fontWeight: "bold", maxWidth: 140, minHeight: 60 }}>Borrower</TableCell>
-            <TableCell align="right"><AuditLogEntity entityCode={`user:${item.borrower.id}:${item.borrower.firstName} ${item.borrower.lastName}`} /></TableCell>
-          </TableRow>,
-          <TableRow>
-            <TableCell align="left" sx={{ fontWeight: "bold", maxWidth: 140, minHeight: 60 }}>Borrowed</TableCell>
-            <TableCell align="right">
-              <span style={{ fontWeight: lastTimeDifference ?? 0 > 86400000 ? 'bold' : 'regular', color: lastTimeDifference ?? 0 > 86400000 ? 'red' : 'inherit' }}>
-                <TimeAgo date={new Date(Number(item.borrowedAt))} formatter={intlFormatter} />
-              </span>
-            </TableCell>
-          </TableRow>
+            <TableRow>
+              <TableCell align="left" sx={{ fontWeight: "bold", maxWidth: 140, minHeight: 60 }}>Borrower</TableCell>
+              <TableCell align="right"><AuditLogEntity entityCode={`user:${item.borrower.id}:${item.borrower.firstName} ${item.borrower.lastName}`} /></TableCell>
+            </TableRow>,
+            <TableRow>
+              <TableCell align="left" sx={{ fontWeight: "bold", maxWidth: 140, minHeight: 60 }}>Borrowed</TableCell>
+              <TableCell align="right">
+                <span style={{ fontWeight: lastTimeDifference ?? 0 > 86400000 ? 'bold' : 'regular', color: lastTimeDifference ?? 0 > 86400000 ? 'red' : 'inherit' }}>
+                  <TimeAgo date={new Date(Number(item.borrowedAt))} />
+                </span>
+              </TableCell>
+            </TableRow>
           ]}
           <TableRow>
             <TableCell align="left" sx={{ fontWeight: "bold", maxWidth: 140, minHeight: 60 }}>Location</TableCell>
@@ -130,7 +125,7 @@ export function ToolItemInstanceCard({ item, handleLoanClick, handleReturnClick 
       <CardActions>
         {item.status === ToolItemStatus.OUT && <Button variant="text" color="error" fullWidth onClick={() => handleReturnClick(item)}>Return</Button>}
         {item.status === ToolItemStatus.AVAILABLE && <Button variant="text" color="secondary" fullWidth onClick={() => handleLoanClick(item)}>Loan</Button>}
-        {(item.status === ToolItemStatus.DO_NOT_USE || item.status === ToolItemStatus.MISSING || item.status === ToolItemStatus.INTERNAL_USE) && 
+        {(item.status === ToolItemStatus.DO_NOT_USE || item.status === ToolItemStatus.MISSING || item.status === ToolItemStatus.INTERNAL_USE) &&
           <Button variant="text" color="error" fullWidth disabled>Cannot Loan</Button>}
       </CardActions>
     </Card>

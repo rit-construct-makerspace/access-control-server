@@ -2,7 +2,7 @@ import { Box, Button, Checkbox, FormControlLabel, Typography } from "@mui/materi
 import PrettyModal from "../../../../common/PrettyModal";
 import { CartItemCountState } from "./CartPage";
 import { useState } from "react";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { GET_CART, SUBTRACT_ITEM_FROM_CART } from "../../../../queries/cartQueries";
 
 interface PrettyModalProps {

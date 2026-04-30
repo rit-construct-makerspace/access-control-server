@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { Alert, AppBar, Box, Button, Card, createTheme, Paper, Stack, TextField, ThemeOptions, ThemeProvider, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@mui/material";
 import { GET_THEME, MARK_DEFAULT_THEME, UPDATE_THEME } from "../../queries/themeQueries";
 import { useNavigate, useParams } from "react-router-dom";

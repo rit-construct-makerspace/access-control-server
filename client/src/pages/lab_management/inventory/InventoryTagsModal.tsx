@@ -1,5 +1,5 @@
 import PrettyModal from "../../../common/PrettyModal";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { Button, Chip, InputLabel, MenuItem, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import RequestWrapper from "../../../common/RequestWrapper";

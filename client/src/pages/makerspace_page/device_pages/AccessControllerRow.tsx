@@ -1,7 +1,7 @@
 import { Button, Card, CardActionArea, Skeleton, Stack, Typography } from "@mui/material";
 import { AccessController } from "../../../queries/deviceQueries";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { GET_INSTANCE_BY_CONTROLLER_ID } from "../../../queries/equipmentQueries";
 import { EquipmentInstance } from "../../../queries/equipmentInstanceQueries";
 import { useNavigate, useParams } from "react-router-dom";

@@ -5,7 +5,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { useState } from "react";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { DELETE_TYPE, GET_TOOL_ITEM_TYPES } from "../../../queries/toolItemQueries";

@@ -14,7 +14,7 @@ import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { CREATE_RESERVATION, GET_RESERVATIONS_FLEXIBLY } from "../../../queries/reservationQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { toast } from "react-toastify";

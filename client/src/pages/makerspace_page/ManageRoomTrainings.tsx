@@ -2,7 +2,8 @@ import { Button, Card, FormControl, IconButton, InputLabel, MenuItem, Select, St
 import { TrainingModule } from "../../common/TrainingModuleUtils";
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import GET_TRAINING_MODULES from "../../queries/trainingQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { useState } from "react";
@@ -75,8 +76,8 @@ export default function ManageRoomTrainings(props: ManageRoomTrainingsProps) {
                 const rawModules: [TrainingModule] = data.modules;
                 const possibleModuels = rawModules.filter((possible) =>
                 (
-                    (possible.makerspaceID == null || Number(possible.makerspaceID) === Number(makerspaceID)) && // Has permission to use this training
-                    !props.trainings.some((existing) => existing.id === possible.id) // This training is not already assigned to the makerspace
+                    (// Has permission to use this training
+                    (possible.makerspaceID == null || Number(possible.makerspaceID) === Number(makerspaceID)) && !props.trainings.some((existing) => existing.id === possible.id)) // This training is not already assigned to the makerspace
                 ))
 
                 const sortedModules = possibleModuels.sort((a, b) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));

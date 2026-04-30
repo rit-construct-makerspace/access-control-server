@@ -1,7 +1,7 @@
 import { Box, Stack } from "@mui/system";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import GET_EVENTS, { MakeEvent } from "../../queries/eventQueries";
 import { Fade, LinearProgress, Typography } from "@mui/material";
 import { format } from "date-fns";

@@ -2,7 +2,7 @@ import { Button, Stack, Typography } from "@mui/material";
 import PrettyModal from "../../common/PrettyModal";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { useIsMobile } from "../../common/IsMobileProvider";
 import { DELETE_CUSTOM_URL } from "../../queries/customUrlQueries.js";
 

@@ -2,7 +2,7 @@ import { GET_INVENTORY_ITEMS } from "../../../../queries/inventoryQueries";
 import { Box } from "@mui/system";
 import PageSectionHeader from "../../../../common/PageSectionHeader";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { TagsCell } from "./TagsCell";
 import { InventoryTag } from "../../../../types/InventoryItem";
 
