@@ -1,4 +1,4 @@
-import { createTheme, Theme } from "@mui/material";
+import { Theme } from "@mui/material";
 import { MakeTheme } from "./MakeTheme";
 
 export abstract class RegisteredTheme {
