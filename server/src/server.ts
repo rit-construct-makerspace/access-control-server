@@ -188,13 +188,15 @@ async function startServer() {
         }))
       };
 
-      const { html: appHtml } = await render(req, siteSettings);
-
       const settingsScript = `<script>window.__SITE_SETTINGS__ = ${JSON.stringify(siteSettings)}</script>`;
+      const processedTemplate = template.replace('<!--SCRIPT_REPLACE-->', settingsScript);
 
-      const finalHtml = template.replace('<!--SCRIPT_REPLACE-->', settingsScript).replace('<!--ROOT_REPLACE-->', `<div id="root">${appHtml}</div>`);
+      const [htmlStart, htmlEnd] = processedTemplate.split('<!--ROOT_REPLACE-->');
+      const head = htmlStart + '<div id="root">';
+      const tail = '</div>' + htmlEnd;
 
-      res.status(200).set({ 'Content-Type': 'text/html' }).end(finalHtml);
+      await render(req, res, siteSettings, head, tail);
+
     } catch (e) {
       console.error(e);
       res.status(500).end(e instanceof Error ? e.message : String(e));
