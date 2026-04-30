@@ -3,7 +3,7 @@ import PrettyModal from "../../../common/PrettyModal";
 import { Reservation } from "../../../types/Reservation";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManager, isManagerOrSelf, isStaffOrSelf } from "../../../common/PrivilegeUtils";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { DELETE_RESERVATION, SET_RESERVATION_APPROVAL } from "../../../queries/reservationQueries";
 import { toast } from "react-toastify";
 

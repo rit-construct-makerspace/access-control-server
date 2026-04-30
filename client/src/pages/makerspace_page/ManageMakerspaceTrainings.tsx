@@ -2,7 +2,7 @@ import { Button, Card, FormControl, IconButton, InputLabel, MenuItem, Select, St
 import { TrainingModule } from "../../common/TrainingModuleUtils";
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import GET_TRAINING_MODULES from "../../queries/trainingQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { ADD_TRAINING_TO_MAKERSPACE, GET_MAKERSPACE_BY_ID, REMOVE_TRAINING_FROM_MAKERSPACE } from "../../queries/makerspaceQueries";
@@ -50,8 +50,8 @@ export default function ManageMakerspaceTrainings(props: ManageMakerspaceTrainin
         const rawModules: [TrainingModule] = data.modules;
         const possibleModuels = rawModules.filter((possible) =>
         (
-          (possible.makerspaceID == null || Number(possible.makerspaceID) === Number(props.makerspaceID)) && // This makerspace may use this training
-          !props.trainings.some((existing) => Number(existing.id) === Number(possible.id)) // This training is not already assigned to this makerspace
+          (// This makerspace may use this training
+          (possible.makerspaceID == null || Number(possible.makerspaceID) === Number(props.makerspaceID)) && !props.trainings.some((existing) => Number(existing.id) === Number(possible.id))) // This training is not already assigned to this makerspace
         ))
 
         const sortedModules = possibleModuels.sort((a, b) => (a.name.toLowerCase().localeCompare(b.name.toLowerCase())));

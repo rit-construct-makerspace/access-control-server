@@ -1,5 +1,5 @@
 import { IconButton } from "@mui/material";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { DELETE_INVENTORY_LEDGER, GET_LEDGERS } from "../../../queries/inventoryQueries";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCurrentUser } from "../../../common/CurrentUserProvider";

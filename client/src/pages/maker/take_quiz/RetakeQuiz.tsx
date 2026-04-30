@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Card, CardContent, CardHeader, Link, Typography } from "@mui/material";
 import { GET_PASSED_SUBMISSION, GET_REMAINING_SUBMISSIONS } from "../../../queries/getSubmissions";
 import { useIsMobile } from "../../../common/IsMobileProvider";

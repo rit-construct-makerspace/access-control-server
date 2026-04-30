@@ -4,7 +4,7 @@ import {
   Typography,
   Stack,
   CardHeader} from "@mui/material";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { GET_ACCESS_PROGRESSES } from "../../../queries/trainingQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { AccessProgress } from "../../../types/TrainingModule";

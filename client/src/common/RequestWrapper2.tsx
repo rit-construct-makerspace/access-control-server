@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { QueryResult } from "@apollo/client";
+import type { useQuery } from "@apollo/client/react";
 import { Alert, CircularProgress, Stack } from "@mui/material";
 
 /**
@@ -11,7 +11,7 @@ import { Alert, CircularProgress, Stack } from "@mui/material";
  */
 
 interface RequestWrapper2Props {
-  result: QueryResult;
+  result: useQuery.Result;
   render: (data: any) => ReactElement;
   minHeight?: number;
 }

@@ -3,7 +3,7 @@ import SearchBar from "../../../common/SearchBar";
 import { Button, Divider, Stack, Typography } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_ANNOUNCEMENTS } from "../../../queries/announcementsQueries";
 import AnnouncementModule from "./AnnouncementModule";

@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { Button, Card, CardActions, CardContent, CardHeader, Stack, Typography, useTheme } from "@mui/material";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { format, parseISO } from "date-fns";
 import { isStaffFor } from "../../../common/PrivilegeUtils";
 import { GET_USER, Restriction } from "../../../queries/userQueries";
@@ -15,7 +15,7 @@ const DELETE_RESTRICTION = gql`
     mutation DeleteRestriction($id: ID!) {
         deleteRestriction(id: $id)
     } 
-`; 
+`;
 
 export default function RestrictionCard(props: RestrictionCardProps) {
     const currentUser = useCurrentUser();

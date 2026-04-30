@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { useCurrentUser } from "../../../common/CurrentUserProvider"
 import { GET_EQUIPMENTS } from "../../../queries/equipmentQueries";
 import { MenuItem, Select } from "@mui/material";

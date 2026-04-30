@@ -7,7 +7,8 @@ import {
   Select,
 } from "@mui/material";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { InputLabel } from "@mui/material";
 import SaveIcon from '@mui/icons-material/Save';
 

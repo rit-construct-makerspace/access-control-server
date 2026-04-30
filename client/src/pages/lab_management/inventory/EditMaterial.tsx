@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import MaterialModalContents, {
   InventoryItemInput,
 } from "./MaterialModalContents";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_INVENTORY_ITEMS, GET_INVENTORY_ITEM, UPDATE_INVENTORY_ITEM, DELETE_INVENTORY_ITEM } from "../../../queries/inventoryQueries";
 import { GET_MAKERSPACES_WITH_ITEMS } from "../../../queries/makerspaceQueries";

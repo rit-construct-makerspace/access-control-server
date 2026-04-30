@@ -5,7 +5,7 @@ import DeleteCustomUrlModal from "./DeleteCustomUrlModal";
 import QRCodeModal from "./QRCodeModal";
 import UpdateCustomUrlModal from "./UpdateCustomUrlModal";
 import { useState } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { GET_ALL_CUSTOM_URLS } from "../../queries/customUrlQueries";
 import { toast } from "react-toastify";
 import QrCodeIcon from '@mui/icons-material/QrCode';

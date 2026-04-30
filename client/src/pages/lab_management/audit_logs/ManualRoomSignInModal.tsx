@@ -1,4 +1,5 @@
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client/react";
 import PrettyModal from "../../../common/PrettyModal";
 import { Box, Button, CircularProgress, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";

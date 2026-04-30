@@ -1,7 +1,7 @@
 import { Checkbox, FormControlLabel, IconButton, InputAdornment, Stack, TextField, Typography } from "@mui/material";
 import MakerspaceHours from "../../types/MakerspaceHours";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DELETE_SPECIAL_HOURS } from "../../queries/makerspaceQueries";
 import { useIsMobile } from "../../common/IsMobileProvider";

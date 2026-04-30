@@ -2,7 +2,7 @@ import { Autocomplete, Button, FormControlLabel, Stack, Switch, TextField, Typog
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import AddIcon from '@mui/icons-material/Add';
 import { useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { CREATE_EQUIPMENT } from "../../../queries/equipmentQueries";
 import GET_ROOMS from "../../../queries/roomQueries";

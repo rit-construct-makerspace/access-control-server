@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { GET_AVAILABLE_FIRMWARE_VERSIONS, GET_READERS_WITH_PAIRINGS, Reader, RESTART_ALL_READERS } from "../../../queries/readersQueries";
 import { Box, Button, Checkbox, FormControlLabel, Grid, Link, Stack } from "@mui/material";

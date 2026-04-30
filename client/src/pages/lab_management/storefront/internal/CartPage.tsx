@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { CANCEL_CART, COMPLETE_CART, GET_CART } from "../../../../queries/cartQueries";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Button, Snackbar, Stack, TextField, Typography } from "@mui/material";

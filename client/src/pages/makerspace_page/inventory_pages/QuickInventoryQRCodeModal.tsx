@@ -1,7 +1,7 @@
 import { Autocomplete, Box, Button, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { GET_MAKERSPACE_WITH_ITEMS } from "../../../queries/makerspaceQueries";
 import { GET_INVENTORY_TAGS } from "../../../queries/inventoryQueries";
 import { useEffect, useMemo, useRef, useState } from "react";

@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { ToolItemInstance, ToolItemType } from "../../../types/ToolItem";
 import { GET_TOOL_ITEM_INSTANCES_BY_BORROWER, GET_TOOL_ITEM_INSTANCES_BY_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES, RETURN_INSTANCE } from "../../../queries/toolItemQueries";
 import PrettyModal from "../../../common/PrettyModal";

@@ -1,7 +1,7 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import AddIcon from '@mui/icons-material/Add';
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { GET_TOOL_ITEM_TYPES_WITH_INSTANCES } from "../../../queries/toolItemQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { ToolItemInstance, ToolItemType } from "../../../types/ToolItem";

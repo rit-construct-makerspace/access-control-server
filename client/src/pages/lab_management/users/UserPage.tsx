@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Box, Stack } from "@mui/material";
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client/react";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import PrivilegeControl from "./userpage/PrivilegeControl";
 import { useParams } from "react-router-dom";

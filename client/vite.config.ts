@@ -10,7 +10,6 @@ export default defineConfig(({ command }) => {
       react(),
       eslint({
         dev: true,
-
         build: true, // lint on build
         cache: true, // cache lints
         emitWarning: true,
@@ -22,7 +21,7 @@ export default defineConfig(({ command }) => {
       }),
     ],
     ssr: {
-      noExternal: isDev ? ["@mui/x-data-grid"] : true,
+      noExternal: ["@mui/x-data-grid", "@mui/icons-material", "@apollo/client", "react-timeago/defaultFormatter", "styled-components", "@emotion/stylis"],
       external: ["react", "react-dom", "react-dom/server"],
     },
     base: "/app/",

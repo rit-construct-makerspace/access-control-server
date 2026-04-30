@@ -1,16 +1,17 @@
-import { ApolloClient, ApolloProvider, NormalizedCacheObject } from "@apollo/client";
+import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ThemeController } from "./types/site_settings/ThemeController";
 import { IsMobileProvider } from "./common/IsMobileProvider";
 import { ReactNode, useEffect, useState } from "react";
 import { ToastContainer, Slide } from "react-toastify";
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV2';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { SiteSettings } from "./types/site_settings/SiteSettings";
 import { MakeTheme } from "./types/site_settings/MakeTheme";
 import { MakeThemeProvider } from "./common/MakeThemeProvider";
 
-export default function App(props: { siteSettings: SiteSettings, children: ReactNode, apolloClient: ApolloClient<NormalizedCacheObject> }) {
+export default function App(props: { siteSettings: SiteSettings, children: ReactNode, apolloClient: ApolloClient }) {
   const [theme, setTheme] = useState(ThemeController.activeTheme.getTheme());
 
   ThemeController.addThemeWatcher(setTheme);

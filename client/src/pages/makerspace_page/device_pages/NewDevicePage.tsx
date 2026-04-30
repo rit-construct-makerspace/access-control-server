@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ManualDevicePairModal from "./ManualDevicePairModal";
 import { GET_SMALL_MAKERSPACE } from "../../../queries/makerspaceQueries";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 
 export default function NewDevicePage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();

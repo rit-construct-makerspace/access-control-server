@@ -6,7 +6,7 @@ import Equipment from "../../../types/Equipment";
 import { FullMakerspace } from "../../../queries/makerspaceQueries";
 import { useMemo, useState } from "react";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { CREATE_MAINTENANCE_TICKET, MaintenanceTicketSeverity } from "../../../queries/maintenanceTicketQueries";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { toast } from "react-toastify";

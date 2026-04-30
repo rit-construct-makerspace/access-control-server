@@ -1,6 +1,6 @@
 import { Divider, Stack, Typography } from "@mui/material";
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import {
   ModuleStatus,
   moduleStatusMapper,

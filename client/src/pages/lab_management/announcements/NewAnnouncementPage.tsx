@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { GET_ANNOUNCEMENTS, CREATE_ANNOUNCEMENT } from "../../../queries/announcementsQueries";
 import { Button, FormControlLabel, Grid, Stack, Switch, TextField, Typography } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";

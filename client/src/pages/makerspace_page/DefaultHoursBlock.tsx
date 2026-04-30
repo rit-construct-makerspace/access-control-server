@@ -3,7 +3,7 @@ import { Button, Checkbox, FormControlLabel, InputAdornment, Stack, TextField, T
 import { MakerspaceDefaultHours } from "../../types/MakerspaceHours";
 import { useState } from "react";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { toast } from "react-toastify";
 import { UPDATE_DEFAULT_HOURS } from "../../queries/makerspaceQueries";
 import { useIsMobile } from "../../common/IsMobileProvider";

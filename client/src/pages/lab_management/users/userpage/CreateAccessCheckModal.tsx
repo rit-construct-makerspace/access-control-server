@@ -1,6 +1,7 @@
 import { Autocomplete, Button, Stack, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../../common/PrettyModal";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { GET_ALL_EQUIPMENTS } from "../../../../queries/equipmentQueries";
 import { useState } from "react";
 import { GET_USER } from "../../../../queries/userQueries";

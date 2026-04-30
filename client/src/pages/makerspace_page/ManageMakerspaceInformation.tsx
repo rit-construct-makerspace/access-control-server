@@ -5,7 +5,7 @@ import { useIsMobile } from "../../common/IsMobileProvider";
 import MakerspaceHours from "../../types/MakerspaceHours";
 import SaveIcon from '@mui/icons-material/Save';
 import { useCallback, useEffect, useState } from "react";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { UPDATE_MAKERSPACE } from "../../queries/makerspaceQueries";
 import { toast } from "react-toastify";
 

@@ -1,4 +1,5 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { Stack, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { isManager } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
