@@ -35,7 +35,7 @@ const EquipmentResolvers = {
       let avail = 0;
       for (let i = 0; i < instances.length; i++) {
         if (instances[i].accessControllerID === null || instances[i].accessControllerID === undefined) { continue; }
-        let controller = await ACRepo.getAccessControllerByID(instances[i].accessControllerID ?? -1)
+        const controller = await ACRepo.getAccessControllerByID(instances[i].accessControllerID ?? -1)
         if (controller === undefined) { continue; }
         if (controller.state === AccessControllerState.IDLE) { avail++; }
       }
@@ -48,7 +48,7 @@ const EquipmentResolvers = {
       let inUse = 0;
       for (let i = 0; i < instances.length; i++) {
         if (instances[i].accessControllerID === null || instances[i].accessControllerID === undefined) { continue; }
-        let controller = await ACRepo.getAccessControllerByID(instances[i].accessControllerID ?? -1)
+        const controller = await ACRepo.getAccessControllerByID(instances[i].accessControllerID ?? -1)
         if (controller === undefined) { continue; }
         if (controller.state !== AccessControllerState.IDLE) { inUse++; }
       }
@@ -200,7 +200,7 @@ const EquipmentResolvers = {
      */
     archiveEquipment: async (_: any, args: { id: number },
       { isManager }: ApolloContext) =>
-      isManager(async (user: CurrentUser) => {
+      isManager(async (_user: CurrentUser) => {
         return await EquipmentRepo.setEquipmentArchived(args.id, true);
       }),
 
@@ -212,7 +212,7 @@ const EquipmentResolvers = {
      */
     publishEquipment: async (_: any, args: { id: number },
       { isManager }: ApolloContext) =>
-      isManager(async (user: CurrentUser) => {
+      isManager(async (_user: CurrentUser) => {
         return await EquipmentRepo.setEquipmentArchived(args.id, false);
       }),
   },
