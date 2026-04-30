@@ -16,7 +16,7 @@ const PermissionResolver = {
       _parent: any,
       _args: any,
       { isStaff }: ApolloContext) =>
-      isStaff(async (user: CurrentUser) => {
+      isStaff(async (_user: CurrentUser) => {
         return true;
       }),
   },
