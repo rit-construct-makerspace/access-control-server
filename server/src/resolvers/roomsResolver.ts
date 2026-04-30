@@ -8,7 +8,6 @@ import { Room } from "../models/rooms/room.js";
 import { ApolloContext, CurrentUser } from "../context.js";
 import * as MakerspaceRepo from "../repositories/Makerspaces/MakerspaceRespository.js";
 import { GraphQLError } from "graphql";
-import { isManager } from "../privilege.js";
 
 const RoomResolvers = {
   Room: {
@@ -45,8 +44,8 @@ const RoomResolvers = {
      * @throws GraphQLError if not MENTOR or STAFF or is on hold
      * @todo Probably rstrict this ot admin only, but ensure it is not used anywhere first
      */
-    rooms: async (_: any, args: { null: any }, { isStaff }: ApolloContext) =>
-      isStaff(async (user: CurrentUser) => {
+    rooms: async (_: any, _args: any, { isStaff }: ApolloContext) =>
+      isStaff(async (_user: CurrentUser) => {
         return await RoomRepo.getRooms();
       }),
 
