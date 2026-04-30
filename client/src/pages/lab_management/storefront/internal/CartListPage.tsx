@@ -3,7 +3,7 @@ import PageSectionHeader from "../../../../common/PageSectionHeader";
 import { Stack } from "@mui/system";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import AuditLogEntity from "../../audit_logs/AuditLogEntity";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { GET_CARTS } from "../../../../queries/cartQueries";
 import { InventoryCart } from "../../../../types/InventoryCart";
 import { useEffect, useState } from "react";

@@ -1,6 +1,7 @@
 import { Button, Card, CardActions, Stack, Typography } from "@mui/material";
 import { format, parseISO } from "date-fns";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManager, isStaff } from "../../../common/PrivilegeUtils";
 import { GET_USER, Hold } from "../../../queries/userQueries";

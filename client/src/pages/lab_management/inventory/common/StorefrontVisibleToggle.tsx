@@ -1,6 +1,6 @@
 import { Switch } from "@mui/material";
 import InventoryItem from "../../../../types/InventoryItem";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { isManager } from "../../../../common/PrivilegeUtils";
 import { GET_INVENTORY_ITEMS, SET_STOREFRONT_VISIBLE } from "../../../../queries/inventoryQueries";
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";

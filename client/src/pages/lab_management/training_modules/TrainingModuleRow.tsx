@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { TrainingModule } from "../../../common/TrainingModuleUtils";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ARCHIVE_MODULE, DELETE_MODULE, PUBLISH_MODULE } from "../../../queries/trainingQueries";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { toast } from "react-toastify";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManagerFor } from "../../../common/PrivilegeUtils";

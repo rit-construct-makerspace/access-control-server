@@ -2,7 +2,8 @@ import { Alert, Stack, Typography } from "@mui/material"
 import ActionButton from "../../../../common/ActionButton"
 import { isManager, isStaffFor, isTrainerFor } from "../../../../common/PrivilegeUtils"
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { AccessCheckExtraInfo, GET_USER } from "../../../../queries/userQueries";
 import { useState } from "react";
 import AccessCheckCard from "../AccessCheckCard";

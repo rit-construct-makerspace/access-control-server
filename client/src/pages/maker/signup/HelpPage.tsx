@@ -2,7 +2,7 @@ import { Link, Typography } from "@mui/material";
 import { Grid, Stack } from "@mui/system";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { GET_MAKERSPACES_WITH_HOURS, MakerspaceWithHours } from "../../../queries/makerspaceQueries";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import MakerspaceCard from "../../both/homepage/MakerspaceCard";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';

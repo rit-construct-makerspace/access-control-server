@@ -3,7 +3,7 @@ import SearchBar from "../../../common/SearchBar";
 import { Button, Divider, Stack, Typography } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
 import { useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@apollo/client"
+import { useQuery } from "@apollo/client/react";
 import TrainingModuleRow from "./TrainingModuleRow";
 import { GET_TRAINING_MODULES } from "../../../queries/trainingQueries";
 import { TrainingModule } from "../../../common/TrainingModuleUtils";

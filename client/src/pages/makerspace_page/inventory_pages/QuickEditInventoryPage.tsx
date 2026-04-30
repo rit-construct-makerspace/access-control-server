@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { useParams } from "react-router-dom";
 import { GET_INVENTORY_ITEM, GET_INVENTORY_ITEMS_BY_TAG, SET_ITEM_AMOUNT } from "../../../queries/inventoryQueries";
 import { Autocomplete, Button, Stack, TextField, Typography } from "@mui/material";

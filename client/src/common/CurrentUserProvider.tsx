@@ -1,5 +1,5 @@
 import { createContext, ReactElement, useContext } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import RequestWrapper2 from "./RequestWrapper2";
 import { Navigate, useLocation } from "react-router-dom";
 import { AccessCheck, GET_CURRENT_USER } from "../queries/userQueries";

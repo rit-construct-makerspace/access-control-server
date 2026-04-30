@@ -2,7 +2,8 @@ import { Alert, Box, Button, Card, IconButton, Stack, Typography } from "@mui/ma
 import { format } from "date-fns";
 import { isStaffFor } from "../../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { GET_USER } from "../../../../queries/userQueries";
 import DeleteIcon from '@mui/icons-material/Delete';
 

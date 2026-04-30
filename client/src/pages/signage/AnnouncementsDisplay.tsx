@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Box, Divider, LinearProgress, Slide, Typography } from "@mui/material";
 import { Announcement, GET_ANNOUNCEMENTS } from "../../queries/announcementsQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";

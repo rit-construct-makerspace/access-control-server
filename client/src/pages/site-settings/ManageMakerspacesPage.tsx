@@ -1,7 +1,7 @@
 import { Button, Card, Grid, Stack, Typography } from "@mui/material";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { GET_MAKERSPACES } from "../../queries/makerspaceQueries";
 import { useState } from "react";
 import AddIcon from '@mui/icons-material/Add';

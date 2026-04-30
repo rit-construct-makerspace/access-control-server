@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Box, Button, Card, Checkbox, Collapse, Divider, FormControlLabel, FormGroup, IconButton, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import { gql, useLazyQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client/react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { endOfDay, parse, startOfDay } from "date-fns";
 import CloseIcon from "@mui/icons-material/Close";

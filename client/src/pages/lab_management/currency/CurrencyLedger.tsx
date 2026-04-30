@@ -1,4 +1,4 @@
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client/react";
 import { Button, Stack } from "@mui/material";
 import gql from "graphql-tag";
 import { useEffect, useState } from "react";

@@ -2,7 +2,7 @@ import { Button, Checkbox, FormControlLabel, InputAdornment, Stack, TextField } 
 import { useState } from "react";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import gql from "graphql-tag";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { useParams } from "react-router-dom";
 import { useIsMobile } from "../../common/IsMobileProvider";
 

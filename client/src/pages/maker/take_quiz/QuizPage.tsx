@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { useParams } from "react-router-dom";
 import { GET_MODULE_ANSWER_COUNT } from "../../../queries/trainingQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";

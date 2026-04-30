@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
 import { Alert, Grid, Stack } from "@mui/material";
 import EquipmentInstanceRow from "./EquipmentInstanceRow";

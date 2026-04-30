@@ -6,7 +6,7 @@ import FileUploadButton from "../../common/FileUploadButton";
 import styled from "styled-components";
 import { makeCDNLink } from "../../common/ImageFinder";
 import AddIcon from '@mui/icons-material/Add';
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { CREATE_THEME } from "../../queries/themeQueries";
 import { toast } from "react-toastify";
 import { useMakeTheme } from "../../common/MakeThemeProvider";

@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { Stack } from "@mui/material";
 import { useParams } from "react-router-dom";
 import RequestWrapper from "../../../common/RequestWrapper";

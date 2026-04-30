@@ -1,7 +1,7 @@
 import { Autocomplete, Button, Stack, TextField, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { DataGrid, GridRowsProp, GridColDef, GridFilterModel, GridPaginationModel, GridSortModel, getGridStringOperators, GridRenderCellParams } from "@mui/x-data-grid";
 import { useState } from "react";

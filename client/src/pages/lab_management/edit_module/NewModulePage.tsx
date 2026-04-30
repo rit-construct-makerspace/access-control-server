@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { GET_TRAINING_MODULES, GET_ARCHIVED_TRAINING_MODULES, CREATE_TRAINING_MODULE, GET_MODULE } from "../../../queries/trainingQueries";
 import 'react-toastify/dist/ReactToastify.css';

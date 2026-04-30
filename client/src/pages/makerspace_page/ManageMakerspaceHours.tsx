@@ -1,6 +1,6 @@
 import { Divider, Stack, Typography } from "@mui/material";
 import gql from "graphql-tag";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import MakerspaceHours, { MakerspaceDefaultHours } from "../../types/MakerspaceHours";
 import DefaultHoursBlock from "./DefaultHoursBlock";

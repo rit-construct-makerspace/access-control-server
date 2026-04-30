@@ -1,6 +1,6 @@
 import { useCurrentUser } from "../../../../common/CurrentUserProvider";
 import { Avatar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Grid, IconButton, Stack, TextField, Typography } from "@mui/material";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import InfoBlob from "../../../lab_management/users/InfoBlob";
 import EditIcon from '@mui/icons-material/Edit';
 import { useState } from "react";

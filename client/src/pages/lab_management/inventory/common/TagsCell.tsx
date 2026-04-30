@@ -2,7 +2,7 @@ import { IconButton, Select, MenuItem, Chip } from "@mui/material";
 import { Stack } from "@mui/system";
 import InventoryItem, { InventoryTag } from "../../../../types/InventoryItem";
 import InventoryTagChip from "../InventoryTagChip";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { useState } from "react";
 import { ADD_TAG_TO_ITEM, GET_INVENTORY_ITEMS, REMOVE_TAG_FROM_ITEM } from "../../../../queries/inventoryQueries";
 import AddCircleIcon from '@mui/icons-material/AddCircle';

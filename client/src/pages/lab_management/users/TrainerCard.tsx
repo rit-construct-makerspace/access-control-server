@@ -3,7 +3,7 @@ import { useIsMobile } from "../../../common/IsMobileProvider";
 import { isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { EquipmentWithRoom } from "../../../types/Equipment";

@@ -10,7 +10,7 @@ import { fallbackTheme } from "../../../types/site_settings/ThemeController";
 import ReservationModal from "./ReservationModal";
 import { Reservation, ReservationEvent } from "../../../types/Reservation";
 import { useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { CREATE_RESERVATION, GET_RESERVATIONS_FLEXIBLY } from "../../../queries/reservationQueries";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../../common/RequestWrapper2";

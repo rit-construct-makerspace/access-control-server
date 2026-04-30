@@ -8,7 +8,7 @@ import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import ThemedMarkdown from "../../../common/ThemedMarkdown";
 import DeleteIcon from '@mui/icons-material/Delete';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { toast } from "react-toastify";
 import TaskIcon from '@mui/icons-material/Task';
 import styled from "styled-components";

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import CreateIcon from "@mui/icons-material/Create";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client/react";
 import RequestWrapper from "../../../common/RequestWrapper";
 import MaterialModal from "./MaterialModal";
 import { GET_INVENTORY_TAGS } from "../../../queries/inventoryQueries";

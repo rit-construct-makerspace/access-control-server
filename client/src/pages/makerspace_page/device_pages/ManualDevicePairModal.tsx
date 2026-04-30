@@ -2,7 +2,7 @@ import { Button, Checkbox, Divider, FormControlLabel, LinearProgress, Stack, Tex
 import PrettyModal from "../../../common/PrettyModal";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import { PAIR_CORE, PAIR_DISPENSER, PAIR_GENERIC_DEVICE } from "../../../queries/deviceQueries";
 
 interface ManualDevicePairModalProps {

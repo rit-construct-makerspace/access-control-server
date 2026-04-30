@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import SearchBar from "../../../common/SearchBar";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import UserCard from "./UserCard";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client/react";
 import { GET_NUM_USERS, GET_USERS_LIMIT, PartialUser } from "../../../queries/userQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { useLocation, useNavigate, useParams } from "react-router-dom";

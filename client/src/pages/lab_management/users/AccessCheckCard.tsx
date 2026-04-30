@@ -1,5 +1,6 @@
 import { Button, Card, CardActions  } from "@mui/material";
-import { gql, useMutation } from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client/react";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
 import { GET_USER } from "../../../queries/userQueries";
 import { useIsMobile } from "../../../common/IsMobileProvider";
