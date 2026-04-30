@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import { ApolloContext } from "../context.js";
 import { InventoryCartsRow } from "../db/tables.js";
 import { clearItemsFromCart, deleteInventoryCart, getInventoryCartByID, getInventoryCarts, getInventoryCartsByMakerspace, getItemsInCart, subtractItemFromCart } from "../repositories/Store/InventoryCartsRepository.js";
-import { addItemAmount, addItemsAmounts, getItemById } from "../repositories/Store/InventoryRepository.js";
+import { addItemsAmounts, getItemById } from "../repositories/Store/InventoryRepository.js";
 import { getUserByID } from "../repositories/Users/UserRepository.js";
 import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
 
@@ -51,7 +51,7 @@ export const CartResolver = {
       _parent: any,
       args: { cartID: number; itemID: number; quantity: number, restock?: boolean },
       context: ApolloContext
-    ) => context.isTrainer(async (user) => {
+    ) => context.isTrainer(async (_user) => {
       if (args.quantity <= 0) {
         throw new Error("Quantity must be greater than zero");
       }
@@ -67,9 +67,9 @@ export const CartResolver = {
       if (!item) {
         throw new Error("Item not found");
       }
-      const totalCost = args.quantity * (item?.pricePerUnit || 0);
+      // const totalCost = args.quantity * (item?.pricePerUnit || 0);
 
-      const transDescription = `Refund for ${args.quantity} of ${item?.name}`;
+      // const transDescription = `Refund for ${args.quantity} of ${item?.name}`;
       throw new GraphQLError("Store charging not implemented yet");
       /*
       const transaction = new Transaction(
@@ -96,7 +96,7 @@ export const CartResolver = {
       _parent: any,
       args: { cartID: number },
       context: ApolloContext
-    ) => context.isTrainer(async (user) => {
+    ) => context.isTrainer(async (_user) => {
       //Restock items
       const cart = await getInventoryCartByID(args.cartID);
       const cartUser = cart ? await getUserByID(cart.userID) : null;
@@ -108,15 +108,15 @@ export const CartResolver = {
       }
 
       //Refund items
-      var totalRefund = 0;
-      var ledgerItems: { name: string, quantity: number, pricePerUnit: number }[] = [];
+      // let totalRefund = 0;
+      const ledgerItems: { name: string, quantity: number, pricePerUnit: number }[] = [];
 
-      for (var i = 0; i < fullItems.length; i++) {
+      for (let i = 0; i < fullItems.length; i++) {
         ledgerItems.push({ name: fullItems[i].name, quantity: fullItems[i].count, pricePerUnit: fullItems[i].pricePerUnit });
-        totalRefund += fullItems[i].count * fullItems[i].pricePerUnit;
+        // totalRefund += fullItems[i].count * fullItems[i].pricePerUnit;
       }
 
-      const transDescription = `Refund of items: ${ledgerItems.map(item => `${item.name} x${item.quantity}`).join(", ")}`;
+      // const transDescription = `Refund of items: ${ledgerItems.map(item => `${item.name} x${item.quantity}`).join(", ")}`;
       throw new GraphQLError("Storefront charging not implemented yet");
       /*
       const transaction = new Transaction(
@@ -142,18 +142,18 @@ export const CartResolver = {
         });
       }
       */
-     return false;
+      return false;
     }),
     completeCart: async (
       _parent: any,
       args: { cartID: number },
       context: ApolloContext
-    ) => context.isTrainer(async (user) => {
+    ) => context.isTrainer(async (_user) => {
       return await clearItemsFromCart(args.cartID).then(async () => {
         await deleteInventoryCart(args.cartID);
         return true;
       });
-      
+
     })
   }
 }
