@@ -142,10 +142,7 @@ export default function AdminHistoryPage() {
 
   const showClearButton = startDateString || stopDateString || search.includes("q=");
 
-  const logs = useMemo(() => {
-    return queryResult.data ? queryResult.data.auditLogs : undefined;
-  }, [queryResult.data, queryResult.data?.auditLogs])
-
+  const logs = queryResult.data ? queryResult.data.auditLogs : undefined;
   return (
     <Box margin="25px">
       <title>{`History | ${makeTheme.title}`}</title>

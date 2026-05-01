@@ -47,7 +47,6 @@ export default function QuickEditInventoryPage(props: QuickEditInventoryPageProp
   useEffect(() => setQuantity(evaluatedItem?.count ?? -1), [evaluatedItem])
 
   const debouncedQuantity = useDebounce(quantity, 250);
-  useEffect(() => console.log(debouncedQuantity), [debouncedQuantity])
   useEffect(() => {
     if (evaluatedItem !== undefined && debouncedQuantity !== -1 && debouncedQuantity !== evaluatedItem.count) {
       setItemAmount({ variables: { itemID: Number(evaluatedItem.id), count: debouncedQuantity } });
