@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Box, Button, Divider, Snackbar, Stack, Switch, Typography } from "@mui/material";
+import { Box, Divider, Snackbar, Stack, Switch, Typography } from "@mui/material";
 import SearchBar from "../../../common/SearchBar";
 import InventoryItem from "../../../types/InventoryItem";
 import AddToCartModal from "./AddToCartModal";
@@ -11,14 +11,13 @@ import { useMutation, useQuery } from "@apollo/client/react";
 import RequestWrapper from "../../../common/RequestWrapper";
 import { GET_INVENTORY_ITEMS } from "../../../queries/inventoryQueries";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { isAdmin, isManager, isOnlyTrainer, isStaff } from "../../../common/PrivilegeUtils";
+import { isAdmin, isManager, isStaff } from "../../../common/PrivilegeUtils";
 import Page from "../../Page";
 import { ListingCard } from "./ListingCard";
 import { ListingModal } from "./ListingModal";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { GET_MAKERSPACES_WITH_ITEMS, MakerspaceWithItems } from "../../../queries/makerspaceQueries";
 import CheckoutSuccessModal from "./CheckoutSuccessModal";
-import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { useNavigate } from "react-router-dom";
 import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
