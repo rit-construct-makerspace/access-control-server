@@ -42,7 +42,10 @@ export default function ManageThemePage() {
 
   const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
 
-  const themeResult = useQuery(GET_THEME, { variables: { key: themeKey } });
+  const themeResult = useQuery(GET_THEME, {
+    variables: { key: themeKey },
+
+  });
 
   const currentTheme: ServerThemeData = themeResult.data ? {
     ...themeResult.data?.getTheme,
@@ -71,7 +74,7 @@ export default function ManageThemePage() {
       setThemeMode(currentTheme.muiThemeOptions.palette?.mode)
       // I hope anyway
     }
-  }, [themeResult.data]);
+  }, [currentTheme]);
 
   const muiThemeOptions: ThemeOptions = {
     palette: {
