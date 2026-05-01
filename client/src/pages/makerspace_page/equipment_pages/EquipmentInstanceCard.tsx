@@ -1,15 +1,15 @@
 import { Autocomplete, Button, Card, Chip, IconButton, Link, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
-import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, GET_EQUIPMENT_INSTANCES, InstanceStatus, UPDATE_INSTANCE, UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT } from "../../../queries/equipmentInstanceQueries";
+import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, InstanceStatus, UPDATE_INSTANCE, UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT } from "../../../queries/equipmentInstanceQueries";
 import ActionButton from "../../../common/ActionButton";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import { useMutation, useQuery } from "@apollo/client/react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import BlockIcon from '@mui/icons-material/Block';
 import SaveIcon from '@mui/icons-material/Save';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AuditLogEntity from "../../lab_management/audit_logs/AuditLogEntity";
-import { AccessController, AccessControllerState, COMMAND_CONTROLLER_STATE, GET_UNPAIRED_ACCESS_CONTROLLERS, SET_CORE_STATE } from "../../../queries/deviceQueries";
+import { AccessController, AccessControllerState, COMMAND_CONTROLLER_STATE, GET_UNPAIRED_ACCESS_CONTROLLERS } from "../../../queries/deviceQueries";
 import { useParams } from "react-router-dom";
 
 interface EquipmentInstanceCardProps {
