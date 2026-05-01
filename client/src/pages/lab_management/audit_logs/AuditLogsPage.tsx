@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
 import {
   Box,
   Button,
@@ -9,6 +9,7 @@ import {
   FormControlLabel,
   FormGroup,
   IconButton,
+  LinearProgress,
   Stack,
   TextField,
   ToggleButton,
@@ -162,6 +163,10 @@ export default function LogPage() {
   const showClearButton =
     startDateString || stopDateString || search.includes("q=");
 
+  const logs = useMemo(() => {
+    return queryResult.data ? queryResult.data.makerspaceLogs : undefined;
+  }, [queryResult.data, queryResult.data?.makerspaceLogs])
+
   return (
     <Box margin="25px">
       <title>{`History | ${makeTheme.title}`}</title>
@@ -277,27 +282,23 @@ export default function LogPage() {
           </Stack>
         </Collapse>
       </Card>
-      <RequestWrapper2
-        result={queryResult}
-        render={(data) => {
-          if (data.makerspaceLogs.length === 0) {
-            return (
-              <Typography
-                variant="body1"
-                sx={{
-                  fontStyle: "italic",
-                  color: "grey.700",
-                  mx: "auto",
-                  my: 8,
-                }}
-              >
-                No results.
-              </Typography>
-            );
-          }
-          return (
-            <Stack divider={<Divider flexItem />} mt={4} spacing={0.75}>
-              {data.makerspaceLogs.map((log: any) => (
+      {
+        logs === undefined
+          ? <LinearProgress />
+          : (logs.length === 0)
+            ? <Typography
+              variant="body1"
+              sx={{
+                fontStyle: "italic",
+                color: "grey.700",
+                mx: "auto",
+                my: 8,
+              }}
+            >
+              No results.
+            </Typography>
+            : <Stack divider={<Divider flexItem />} mt={4} spacing={0.75}>
+              {logs.map((log: any) => (
                 <AuditLogRow
                   key={log.id}
                   dateTime={log.dateTime}
@@ -308,9 +309,7 @@ export default function LogPage() {
               ))}
               <Typography variant="body2">This page is limitted to 100 logs. Consider narrowing your search criteria.</Typography>
             </Stack>
-          );
-        }}
-      />
+      }
 
       <ManualRoomSignInModal modalOpen={manualSignInModal} setModalOpen={setManualSignInModal} />
     </Box>
