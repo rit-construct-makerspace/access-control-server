@@ -9,7 +9,6 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useIsMobile } from "../../common/IsMobileProvider";
 import SearchBar from "../../common/SearchBar";
-import RequestWrapper2 from "../../common/RequestWrapper2";
 import AuditLogRow from "../lab_management/audit_logs/AuditLogRow";
 import { ManualRoomSignInModal } from "../lab_management/audit_logs/ManualRoomSignInModal";
 import { useMakeTheme } from "../../common/MakeThemeProvider";
