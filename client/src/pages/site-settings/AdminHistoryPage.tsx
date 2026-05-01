@@ -1,5 +1,5 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { Box, Button, Card, Checkbox, Collapse, Divider, FormControlLabel, FormGroup, IconButton, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { Box, Button, Card, Checkbox, Collapse, Divider, FormControlLabel, FormGroup, IconButton, LinearProgress, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -141,8 +141,11 @@ export default function AdminHistoryPage() {
     navigate(`/admin/history`, { replace: true });
   };
 
-  const showClearButton =
-    startDateString || stopDateString || search.includes("q=");
+  const showClearButton = startDateString || stopDateString || search.includes("q=");
+
+  const logs = useMemo(() => {
+    return queryResult.data ? queryResult.data.auditLogs : undefined;
+  }, [queryResult.data, queryResult.data?.auditLogs])
 
   return (
     <Box margin="25px">
@@ -259,27 +262,23 @@ export default function AdminHistoryPage() {
           </Stack>
         </Collapse>
       </Card>
-      <RequestWrapper2
-        result={queryResult}
-        render={(data) => {
-          if (data.auditLogs.length === 0) {
-            return (
-              <Typography
-                variant="body1"
-                sx={{
-                  fontStyle: "italic",
-                  color: "grey.700",
-                  mx: "auto",
-                  my: 8,
-                }}
-              >
-                No results.
-              </Typography>
-            );
-          }
-          return (
-            <Stack divider={<Divider flexItem />} mt={4} spacing={0.75}>
-              {data.auditLogs.map((log: any) => (
+      {
+        logs === undefined
+          ? <LinearProgress />
+          : (logs.length === 0)
+            ? <Typography
+              variant="body1"
+              sx={{
+                fontStyle: "italic",
+                color: "grey.700",
+                mx: "auto",
+                my: 8,
+              }}
+            >
+              No results.
+            </Typography>
+            : <Stack divider={<Divider flexItem />} mt={4} spacing={0.75}>
+              {logs.map((log: any) => (
                 <AuditLogRow
                   key={log.id}
                   dateTime={log.dateTime}
@@ -290,9 +289,7 @@ export default function AdminHistoryPage() {
               ))}
               <Typography variant="body2">This page is limitted to 100 logs. Consider narrowing your search criteria.</Typography>
             </Stack>
-          );
-        }}
-      />
+      }
 
       <ManualRoomSignInModal modalOpen={manualSignInModal} setModalOpen={setManualSignInModal} />
     </Box>
