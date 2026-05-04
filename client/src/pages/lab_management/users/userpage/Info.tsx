@@ -37,14 +37,17 @@ export default function Info(props: InfoProps) {
             <Typography>{props.user.pronouns}</Typography>
           </Stack>
         </Stack>
-        <IconButton onClick={() => navigate(`/makerspace/${makerspaceID}/people`)} sx={{ width: "51px", height: "51px", p: 0, fontSize: 14 }} >
-          <ArrowBackIcon sx={{ fontSize: 18 }} /> Back
-        </IconButton>
-        {/* <NavLink
-                  primary={"All People"}
-                  to={`/makerspace/${makerspaceID}/people`}
-                  icon={<ArrowBackIcon />}
-                /> */}
+        <Button
+          startIcon={<HistoryIcon />}
+          variant="contained"
+          color="secondary"
+          onClick={() => navigate(`/makerspace/${makerspaceID}/history?q=<user:${props.user.id}:`)}
+          sx={{
+            height: "max-content"
+          }}
+        >
+          View logs
+        </Button>
       </Stack>
       <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? undefined : "space-between"} mt={4}>
         <Stack direction={isMobile ? "column" : "row"} spacing={isMobile ? 2 : 6}>
@@ -61,14 +64,6 @@ export default function Info(props: InfoProps) {
             value={props.user.expectedGraduation}
           />
         </Stack>
-        <Button
-          startIcon={<HistoryIcon />}
-          variant="contained"
-          color="secondary"
-          onClick={() => navigate(`/makerspace/${makerspaceID}/history?q=<user:${props.user.id}:`)}
-        >
-          View logs
-        </Button>
       </Stack>
       {
         props.user.archived && <Alert severity="warning" variant="filled">This user is archived!</Alert>

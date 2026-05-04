@@ -32,10 +32,10 @@ export default function UserPage() {
         result={getUserResult}
         render={({ user }) => {
           return (
-            <Stack>
+            <Stack spacing={4}>
               <title>{`${user.firstName} ${user.lastName} | ${makeTheme.title}`}</title>
               <Info user={user} />
-              <Stack direction={isMobile ? "column" : "row"} width="100%" mt={4} spacing={4} justifyContent="center">
+              <Stack direction={isMobile ? "column" : "row"} width="100%" spacing={4} justifyContent="center">
                 <Stack width="50%">
                   <AccessChecks user={user} />
                   <Trainings user={user} />

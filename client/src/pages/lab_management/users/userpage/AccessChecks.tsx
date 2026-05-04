@@ -35,17 +35,19 @@ export default function AccessChecks(props: AccessCheckProps) {
   );
 
   return (
-    <Stack >
-      <Typography variant="h6" component="div" mb={1}>
-        Access Checks
-      </Typography>
+    <Stack spacing={1}>
+      <Stack direction={"row"} justifyContent={"space-between"}>
+        <Typography variant="h6" component="div">
+          Access Checks
+        </Typography>
 
-      <Stack direction={"row"} spacing={1}>
-        <ActionButton iconSize={5} color="info" appearance={"small"} variant="outlined" handleClick={async () => { refreshCheck() }} loading={refreshCheckResult.loading} buttonText="Refresh Checks" tooltipText="Purge all unapproved checks and repopulate based on currently passed modules." />
-        {isManager(currentUser) && <ActionButton iconSize={5} color="primary" appearance={"small"} variant="outlined" handleClick={async () => { setCreateAccessCheckModal(true) }} loading={false} buttonText="Create Check" />}
+        <Stack direction={"row"} spacing={1}>
+          {isManager(currentUser) && <ActionButton iconSize={5} color="primary" appearance={"small"} variant="outlined" handleClick={async () => { setCreateAccessCheckModal(true) }} loading={false} buttonText="Create Check" />}
+          <ActionButton iconSize={5} color="info" appearance={"small"} variant="outlined" handleClick={async () => { refreshCheck() }} loading={refreshCheckResult.loading} buttonText="Refresh Checks" tooltipText="Purge all unapproved checks and repopulate based on currently passed modules." />
+        </Stack>
       </Stack>
 
-      <Stack spacing={1} mt={2}>
+      <Stack spacing={1}>
         {filteredACs != null && filteredACs.map((accessCheck: AccessCheckExtraInfo) => (
           <AccessCheckCard key={accessCheck.id} accessCheck={accessCheck} userID={props.user.id} />
         ))}

@@ -226,10 +226,7 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                 }
               </Stack>
               <Stack direction="row" spacing={1}>
-                <FormControl fullWidth>
-                  <InputLabel id="add-trainer-permissions"></InputLabel>
-                  <TrainerEquipmentSelect user={props.user} setAddTrainerPerms={setAddTrainerPerms} />
-                </FormControl>
+                <TrainerEquipmentSelect user={props.user} setAddTrainerPerms={setAddTrainerPerms} />
                 <Button
                   variant="contained"
                   color="success"
