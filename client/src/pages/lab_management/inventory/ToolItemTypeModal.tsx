@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client/react";
 import { UPDATE_TOOL_ITEM_TYPE, GET_TOOL_ITEM_TYPES_WITH_INSTANCES, GET_TOOL_ITEM_TYPES, CREATE_TOOL_ITEM_TYPE } from "../../../queries/toolItemQueries";
 import { ToolItemType, ToolItemTypeInput } from "../../../types/ToolItem";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PrettyModal from "../../../common/PrettyModal";
 import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button, Divider, InputLabel, FormControl, MenuItem, Select, Stack, Switch, TextField, Tooltip, Typography, FormControlLabel } from "@mui/material";
@@ -43,11 +43,11 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
 
   const [newType, setNewType] = useState<ToolItemTypeInput>((type ? currType : blankType));
 
-  function close() {
+  const close = useCallback(() => {
     navigate(`/makerspace/${makerspaceID}/tools`)
-  }
+  }, [navigate, makerspaceID]);
 
-  function handleEditSubmit() {
+  const handleEditSubmit = useCallback(() => {
     if (!newType.name || newType.name === "") {
       setNameAlert(true);
       return;
@@ -70,7 +70,7 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
     else createType({ variables: { toolItemType: newType } })
 
     close();
-  }
+  }, [newType, close, createType, editType, type]);
 
   useEffect(() => {
     if (newType.imageUrl !== type?.imageUrl && newType !== blankType.imageUrl) {
