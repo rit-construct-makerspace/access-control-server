@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManagerFor } from "../../../common/PrivilegeUtils";
 
