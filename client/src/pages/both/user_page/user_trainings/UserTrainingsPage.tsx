@@ -18,7 +18,7 @@ export default function UserTraingingsPage() {
   const makeTheme = useMakeTheme();
 
   const getAllModules = useQuery(GET_ALL_TRAINING_MODULES);
-  const getAccessChecks = useQuery(GET_ACCESS_CHECKS_BY_USERID, {
+  const _getAccessChecks = useQuery(GET_ACCESS_CHECKS_BY_USERID, {
     variables: { userID: user.id },
   });
 
