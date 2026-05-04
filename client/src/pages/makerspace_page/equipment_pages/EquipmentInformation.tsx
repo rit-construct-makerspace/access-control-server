@@ -85,7 +85,6 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [signOffUrl, setSignOffUrl] = useState(props.equipment.signOffUrl);
   const [subName, setSubName] = useState(props.equipment.subName);
 
-  const [unsaved, setUnsaved] = useState(false);
   const [blockerDialogOpen, setBlockerDialogOpen] = useState(false);
 
   function handleEquipmentUpdate() {
@@ -107,8 +106,6 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         signOffUrl: signOffUrl
       },
     });
-
-    setUnsaved(false);
   }
 
   useEffect(() => {
@@ -123,33 +120,17 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
     }
   }, [moduleIDs]);
 
-  useEffect(() => {
-    setUnsaved(
-      name !== props.equipment.name ||
-      imageUrl !== props.equipment.imageUrl ||
-      sopUrl !== props.equipment.sopUrl ||
-      notes !== props.equipment.notes ||
-      byReservation !== props.equipment.byReservationOnly ||
-      needsWelcome !== props.equipment.needsWelcome ||
-      requiresTrainer !== props.equipment.requiresTrainerApproval ||
-      requiresInPerson !== props.equipment.requiresInPerson ||
-      room.id !== props.equipment.room.id ||
-      moduleIDs.length !== props.equipment.trainingModules.length ||
-      schedulable !== props.equipment.schedulable
-    );
-  }, [
-    name,
-    imageUrl,
-    sopUrl,
-    notes,
-    byReservation,
-    needsWelcome,
-    requiresTrainer,
-    requiresInPerson,
-    room.id,
-    moduleIDs.length,
-    schedulable,
-  ]);
+  const unsaved = name !== props.equipment.name ||
+    imageUrl !== props.equipment.imageUrl ||
+    sopUrl !== props.equipment.sopUrl ||
+    notes !== props.equipment.notes ||
+    byReservation !== props.equipment.byReservationOnly ||
+    needsWelcome !== props.equipment.needsWelcome ||
+    requiresTrainer !== props.equipment.requiresTrainerApproval ||
+    requiresInPerson !== props.equipment.requiresInPerson ||
+    room.id !== props.equipment.room.id ||
+    moduleIDs.length !== props.equipment.trainingModules.length ||
+    schedulable !== props.equipment.schedulable
 
   useEffect(() => {
     if (blocker.state === "blocked") {
