@@ -31,7 +31,7 @@ export default function QuickEditInventoryPage(props: QuickEditInventoryPageProp
     } else {
       return [invItemsResult.data.InventoryItem]
     }
-  }, [invItemsResult.data])
+  }, [invItemsResult.data, props.fromTag])
 
   const [selectedItem, setSelectedItem] = useState<InventoryItem>();
 
@@ -41,7 +41,7 @@ export default function QuickEditInventoryPage(props: QuickEditInventoryPageProp
     } else {
       return invItems.length > 0 ? invItems[0] : undefined;
     }
-  }, [invItems, selectedItem])
+  }, [invItems, selectedItem, props.fromTag])
 
   const [quantity, setQuantity] = useState(evaluatedItem?.count ?? -1);
   useEffect(() => setQuantity(evaluatedItem?.count ?? -1), [evaluatedItem])
