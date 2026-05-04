@@ -161,7 +161,7 @@ export default function QuizTaker({ module }: QuizTakerProps) {
 
 
   return (
-    <Stack spacing={4} sx={styles.strongerBolds}>
+    <Stack spacing={4} sx={styles.strongerBolds} width={"80%"}>
       <title>{`${module.name} | ${makeTheme.title}`}</title>
       {module.isLocked && (
         <Card>
