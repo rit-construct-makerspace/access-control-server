@@ -1,9 +1,8 @@
 import { useMutation, useQuery } from "@apollo/client/react";
-import { Button, createTheme, LinearProgress, Paper, Stack, ThemeOptions, ThemeProvider, Typography } from "@mui/material";
+import { Button, LinearProgress, Stack, Typography } from "@mui/material";
 import { GET_THEME, MARK_DEFAULT_THEME, UPDATE_THEME } from "../../queries/themeQueries";
 import { useNavigate, useParams } from "react-router-dom";
 import { ServerThemeData } from "../../types/site_settings/MakeTheme";
-import { useEffect, useState } from "react";
 import SaveIcon from '@mui/icons-material/Save';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import { toast } from "react-toastify";
@@ -20,11 +19,8 @@ export default function ManageThemePage() {
   const [updateTheme] = useMutation(UPDATE_THEME, { refetchQueries: ["GetThemes"], awaitRefetchQueries: true });
   const [markDefaultTheme] = useMutation(MARK_DEFAULT_THEME, { refetchQueries: ["GetThemes"], awaitRefetchQueries: true });
 
-  const [themeMode, setThemeMode] = useState<"light" | "dark">("light");
-
   const themeResult = useQuery(GET_THEME, {
     variables: { key: themeKey },
-
   });
 
   const currentTheme: ServerThemeData = themeResult.data ? {
