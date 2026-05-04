@@ -12,7 +12,6 @@ import StorefrontPage from "./pages/lab_management/storefront/StorefrontPage";
 import StorefrontPreviewPage from "./pages/lab_management/storefront_preview/StorefrontPreviewPage";
 import HelpPage from "./pages/maker/signup/HelpPage";
 import SignupPage from "./pages/maker/signup/SignupPage";
-import TrainingPage from "./pages/maker/training/TrainingPage";
 import MakerspacePage from "./pages/makerspace_page/MakerspacePage";
 import AnnouncementsDisplay from "./pages/signage/AnnouncementsDisplay";
 import EventsDisplay from "./pages/signage/EventsDisplay";
