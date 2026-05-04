@@ -4,7 +4,7 @@ import { GET_INVENTORY_ITEM, GET_INVENTORY_ITEMS_BY_TAG, SET_ITEM_AMOUNT } from 
 import { Autocomplete, Button, Stack, TextField, Typography } from "@mui/material";
 import InventoryItem from "../../../types/InventoryItem";
 import { useIsMobile } from "../../../common/IsMobileProvider";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useEffectEvent } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useDebounce } from "../../../common/useDebounce";
@@ -18,9 +18,10 @@ export default function QuickEditInventoryPage(props: QuickEditInventoryPageProp
 
   const isMobile = useIsMobile();
 
-  const invItemsResult = props.fromTag
-    ? useQuery(GET_INVENTORY_ITEMS_BY_TAG, { variables: { tagID: Number(invID) } })
-    : useQuery(GET_INVENTORY_ITEM, { variables: { id: invID } })
+  const tagResult = useQuery(GET_INVENTORY_ITEMS_BY_TAG, { variables: { tagID: Number(invID) }, skip: !props.fromTag });
+  const itemResult = useQuery(GET_INVENTORY_ITEM, { variables: { id: invID }, skip: props.fromTag });
+
+  const invItemsResult = props.fromTag ? tagResult : itemResult;
 
   const [setItemAmount] = useMutation(SET_ITEM_AMOUNT, { refetchQueries: ["GetInventoryItem", "InventoryItemsByTag"] });
 
@@ -47,11 +48,14 @@ export default function QuickEditInventoryPage(props: QuickEditInventoryPageProp
   useEffect(() => setQuantity(evaluatedItem?.count ?? -1), [evaluatedItem])
 
   const debouncedQuantity = useDebounce(quantity, 250);
-  useEffect(() => {
+  const handleDebounceChange = useEffectEvent(() => {
     if (evaluatedItem !== undefined && debouncedQuantity !== -1 && debouncedQuantity !== evaluatedItem.count) {
       setItemAmount({ variables: { itemID: Number(evaluatedItem.id), count: debouncedQuantity } });
     }
-  }, [debouncedQuantity])
+  })
+  useEffect(() => {
+    handleDebounceChange();
+  }, [debouncedQuantity, handleDebounceChange])
 
   return (
     <Stack spacing={4} justifyContent={"center"}>
