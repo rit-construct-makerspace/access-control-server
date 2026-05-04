@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from "@apollo/client/react";
 import { CANCEL_CART, COMPLETE_CART, GET_CART } from "../../../../queries/cartQueries";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Button, Snackbar, Stack, TextField, Typography } from "@mui/material";
+import { Button, Snackbar, Stack, Typography } from "@mui/material";
 import { CartItem } from "../../../../types/InventoryCart";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Page from "../../../Page";
 import RequestWrapper from "../../../../common/RequestWrapper";
 import { RefundModal } from "./RefundModal";
