@@ -13,10 +13,12 @@ import AccessChecks from "./userpage/AccessChecks";
 import Trainings from "./userpage/Trainings";
 import Info from "./userpage/Info";
 import Notes from "./userpage/Notes";
+import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 export default function UserPage() {
-  const { userID} = useParams<{ userID: string }>();
+  const { userID } = useParams<{ userID: string }>();
   const isMobile = useIsMobile();
+  const makeTheme = useMakeTheme();
 
   const [getUser, getUserResult] = useLazyQuery(GET_USER);
 
@@ -31,6 +33,7 @@ export default function UserPage() {
         render={({ user }) => {
           return (
             <Stack>
+              <title>{`${user.firstName} ${user.lastName} | ${makeTheme.title}`}</title>
               <Info user={user} />
               <Stack direction={isMobile ? "column" : "row"} width="100%" mt={4} spacing={4} justifyContent="center">
                 <Stack width="50%">

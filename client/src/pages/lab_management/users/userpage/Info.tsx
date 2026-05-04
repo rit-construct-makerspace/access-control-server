@@ -15,8 +15,8 @@ interface InfoProps {
 export default function Info(props: InfoProps) {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const { makerspaceID} = useParams<{ makerspaceID: string }>();
-  
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
+
 
   return (
     <Stack>
@@ -63,7 +63,7 @@ export default function Info(props: InfoProps) {
         </Stack>
         <Button
           startIcon={<HistoryIcon />}
-          variant="outlined"
+          variant="contained"
           color="secondary"
           onClick={() => navigate(`/makerspace/${makerspaceID}/history?q=<user:${props.user.id}:`)}
         >
