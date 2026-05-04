@@ -76,7 +76,7 @@ export function ToolItemTypeModal({ type }: { type?: ToolItemType }) {
     if (newType.imageUrl !== type?.imageUrl && newType !== blankType.imageUrl) {
       handleEditSubmit();
     }
-  }, [newType, blankType.imageUrl, type?.imageUrl]);
+  }, [newType, blankType.imageUrl, type?.imageUrl, handleEditSubmit]);
 
   const isMobile = useIsMobile()
 
