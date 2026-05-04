@@ -9,13 +9,14 @@ import { InventoryCart } from "../../../../types/InventoryCart";
 import { useEffect, useState } from "react";
 import { GET_MAKERSPACES } from "../../../../queries/makerspaceQueries";
 import { Checkbox, FormControlLabel, FormGroup, TextField, CircularProgress } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useMakeTheme } from "../../../../common/MakeThemeProvider";
 
 export function CartListPage() {
   const navigate = useNavigate();
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const makeTheme = useMakeTheme();
+  const { search } = useLocation();
 
   const getCartsResult = useQuery(GET_CARTS, { pollInterval: 10000 });
   const getMakerspacesResult = useQuery(GET_MAKERSPACES);
@@ -37,16 +38,16 @@ export function CartListPage() {
   });
 
   const setUrlParam = (paramName: string, paramValue: string) => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(search);
     params.set(paramName, paramValue);
     navigate(`/makerspace/${makerspaceID}/storefront/carts?` + params, { replace: true });
   };
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
+    const searchParams = new URLSearchParams(search);
     const queryString = searchParams.get("a") ?? "";
 
     setUserSearch(queryString)
-  }, [location.search]);
+  }, [search]);
 
   const columns: GridColDef<(typeof rows)[number]>[] = [
     {
