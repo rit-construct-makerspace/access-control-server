@@ -2,7 +2,6 @@ import { useQuery } from "@apollo/client/react";
 import { useParams } from "react-router-dom";
 import { Button, Stack, Typography } from "@mui/material";
 import { GET_MAKERSPACE_WITH_ITEMS } from "../../../queries/makerspaceQueries";
-import InventoryItem from "../../../types/InventoryItem";
 import { InventoryForMakerspace } from "../../lab_management/inventory/common/InventoryForMakerspace";
 import { GET_INVENTORY_TAGS } from "../../../queries/inventoryQueries";
 import { useState } from "react";
@@ -21,7 +20,6 @@ export default function InventoryPage() {
   const inventoryTagsResult = useQuery(GET_INVENTORY_TAGS);
 
   const name: string = makerspaceInventoryResult.data?.makerspaceByID.name ?? "Loading";
-  const items: InventoryItem[] = makerspaceInventoryResult.data?.makerspaceByID.items ?? [];
 
   const [modalItemID, setModalItemID] = useState("");
   const [tagsModalOpen, setTagsModalOpen] = useState(false);

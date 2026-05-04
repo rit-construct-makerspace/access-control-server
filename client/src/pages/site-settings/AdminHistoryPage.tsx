@@ -1,15 +1,14 @@
-import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Box, Button, Card, Checkbox, Collapse, Divider, FormControlLabel, FormGroup, IconButton, LinearProgress, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { endOfDay, parse, startOfDay } from "date-fns";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useIsMobile } from "../../common/IsMobileProvider";
 import SearchBar from "../../common/SearchBar";
-import RequestWrapper2 from "../../common/RequestWrapper2";
 import AuditLogRow from "../lab_management/audit_logs/AuditLogRow";
 import { ManualRoomSignInModal } from "../lab_management/audit_logs/ManualRoomSignInModal";
 import { useMakeTheme } from "../../common/MakeThemeProvider";
@@ -143,10 +142,7 @@ export default function AdminHistoryPage() {
 
   const showClearButton = startDateString || stopDateString || search.includes("q=");
 
-  const logs = useMemo(() => {
-    return queryResult.data ? queryResult.data.auditLogs : undefined;
-  }, [queryResult.data, queryResult.data?.auditLogs])
-
+  const logs = queryResult.data ? queryResult.data.auditLogs : undefined;
   return (
     <Box margin="25px">
       <title>{`History | ${makeTheme.title}`}</title>

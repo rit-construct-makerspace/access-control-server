@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client/react";
 import { Button, Divider, FormControlLabel, Stack, Switch } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../queries/makerspaceQueries";
 import RequestWrapper2 from "../../common/RequestWrapper2";
 import { useEffect, useState } from "react";
@@ -18,11 +18,11 @@ import { useMakeTheme } from "../../common/MakeThemeProvider";
 
 export default function MakerspacePage() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
-
   const user = useCurrentUser();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const makeTheme = useMakeTheme();
+  const { search } = useLocation();
 
   const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
 
@@ -32,16 +32,16 @@ export default function MakerspacePage() {
   const [showHidden, setShowHidden] = useState(false);
 
   const setUrlParam = (paramName: string, paramValue: string) => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(search);
     params.set(paramName, paramValue);
     navigate(`/makerspace/${makerspaceID}?` + params, { replace: true });
   };
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
+    const searchParams = new URLSearchParams(search);
     const queryString = searchParams.get("a") ?? "";
 
     setEquipmentSearch(queryString)
-  }, [location.search]);
+  }, [search]);
 
   return (
     <RequestWrapper2 result={getMakerspace} render={(data) => {

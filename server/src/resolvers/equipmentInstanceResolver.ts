@@ -7,7 +7,6 @@ import { EquipmentInstancesRow } from "../db/tables.js";
 import { createInstance, deleteInstance, getInstanceByID, getInstancesByEquipment, setInstanceName, setInstanceStatus } from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { GraphQLError } from "graphql";
-import { getReaderByID } from "../repositories/Readers/ReaderRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 
 const EquipmentInstanceResolver = {

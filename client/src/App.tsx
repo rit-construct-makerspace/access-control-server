@@ -1,4 +1,4 @@
-import { ApolloClient, NormalizedCacheObject } from "@apollo/client";
+import { ApolloClient } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ThemeController } from "./types/site_settings/ThemeController";

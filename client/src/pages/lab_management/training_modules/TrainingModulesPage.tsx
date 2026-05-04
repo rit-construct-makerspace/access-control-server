@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import SearchBar from "../../../common/SearchBar";
 import { Button, Divider, Stack, Typography } from "@mui/material";
 import CreateIcon from "@mui/icons-material/Create";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client/react";
 import TrainingModuleRow from "./TrainingModuleRow";
 import { GET_TRAINING_MODULES } from "../../../queries/trainingQueries";
@@ -19,6 +19,7 @@ export default function TrainingModulesPage() {
   const isMobile = useIsMobile();
   const currentUser = useCurrentUser();
   const makeTheme = useMakeTheme();
+  const { search } = useLocation();
 
   const getModuleResults = useQuery(GET_TRAINING_MODULES);
 
@@ -30,16 +31,16 @@ export default function TrainingModulesPage() {
   };
 
   const setUrlParam = (paramName: string, paramValue: string) => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(search);
     params.set(paramName, paramValue);
     navigate(`/makerspace/${makerspaceID}/trainings?` + params, { replace: true });
   };
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
+    const searchParams = new URLSearchParams(search);
     const queryString = searchParams.get("a") ?? "";
 
     setSearchText(queryString)
-  }, [location.search]);
+  }, [search]);
 
   return (
     <Stack margin="0 20px" spacing={2}>

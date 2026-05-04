@@ -113,7 +113,7 @@ export default function ManageReservationsPage() {
     setReservationModal(true);
   }
 
-  function eventPropGetter(event: ReservationEvent, start: Date, end: Date, isSelected: boolean) {
+  function eventPropGetter(event: ReservationEvent, _start: Date, _end: Date, _isSelected: boolean) {
     if (event.title?.toString().includes("Draft")) {
       return {
         style: {

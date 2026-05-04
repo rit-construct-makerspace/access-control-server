@@ -7,7 +7,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuIcon from '@mui/icons-material/Menu';
 import PaidIcon from '@mui/icons-material/Paid';
 import PeopleIcon from "@mui/icons-material/People";
-import ScannerIcon from '@mui/icons-material/Scanner';
 import SchoolIcon from "@mui/icons-material/School";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import HandymanIcon from '@mui/icons-material/Handyman';

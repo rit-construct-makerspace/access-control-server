@@ -108,7 +108,7 @@ const removeAnswersFromQuiz = (quiz: TrainingModuleItem[]) => {
 function countQuizCorrectOptions(quiz: TrainingModuleItem[]) {
   for (const item of quiz) {
     if (item.options) {
-      var count = 0;
+      let count = 0;
       for (const option of item.options) {
         if (option.correct == true) {
           count++;

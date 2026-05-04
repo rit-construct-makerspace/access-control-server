@@ -1,7 +1,6 @@
 import { Button, Card, Grid, IconButton, Stack, TextField, Typography } from "@mui/material";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import SearchBar from "../../../common/SearchBar";
-import gql from "graphql-tag";
 import { useLazyQuery, useMutation } from "@apollo/client/react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";

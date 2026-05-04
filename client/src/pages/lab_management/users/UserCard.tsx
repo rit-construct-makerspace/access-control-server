@@ -1,5 +1,4 @@
-import React from "react";
-import { Avatar, Card, CardActionArea, Stack, Typography, useTheme } from "@mui/material";
+import { Avatar, Card, CardActionArea, Stack, Typography } from "@mui/material";
 import { PartialUser } from "../../../queries/userQueries";
 import PrivilegeChip from "./PrivilegeChip";
 import { stringAvatar } from "../../../common/avatarGenerator";
@@ -10,8 +9,6 @@ interface UserCardProps {
 }
 
 export default function UserCard({ user, onClick }: UserCardProps) {
-  const theme = useTheme();
-
   return (
     <Card elevation={2} sx={{
       mr: 2, mb: 2

@@ -11,7 +11,6 @@ import EquipmentProgressCard from "./EquipmentProgessCard";
 import RetakeQuiz from "./RetakeQuiz";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { useEffect } from "react";
 import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 export default function QuizResults() {
@@ -58,7 +57,7 @@ export default function QuizResults() {
           {submissionID && passedSubmissionResult?.data?.submission.makerID === currentUser.id ?
             <Stack direction={"row"} alignItems={"flex-start"} width={"100%"} >
               <Stack direction="column" width={isMobile ? "100%" : "50%"} spacing={2}>
-                <SubmissionCard module={moduleResult.data?.module!} submission={passedSubmissionResult.data?.submission} />
+                <SubmissionCard module={moduleResult.data?.module} submission={passedSubmissionResult.data?.submission} />
                 {isMobile && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
                 {isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
                 <ResultsCard summary={passedSubmissionResult.data?.submission.summary}></ResultsCard>
@@ -71,7 +70,7 @@ export default function QuizResults() {
             :
             <Stack direction={"row"} alignItems={"flex-start"} width={"100%"} >
               <Stack direction="column" width={isMobile ? "100%" : "50%"} spacing={2}>
-                <SubmissionCard module={moduleResult.data?.module!} submission={currentSubmissionResult.data?.latestSubmission} />
+                <SubmissionCard module={moduleResult.data?.module} submission={currentSubmissionResult.data?.latestSubmission} />
                 {isMobile && moduleResult.data ? <RetakeQuiz moduleID={moduleResult.data?.module.id} ></RetakeQuiz> : <></>}
                 {isMobile && moduleResult.data && <EquipmentProgressCard moduleID={moduleResult.data?.module.id} />}
                 <ResultsCard summary={currentSubmissionResult.data?.latestSubmission.summary}></ResultsCard>

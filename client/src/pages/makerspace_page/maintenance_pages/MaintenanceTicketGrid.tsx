@@ -1,4 +1,4 @@
-import { Alert, Grid, Stack, Typography } from "@mui/material";
+import { Alert, Grid } from "@mui/material";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { GET_MAINTENANCE_TICKETS, MaintenanceTicket, MaintenanceTicketStatus } from "../../../queries/maintenanceTicketQueries";
 import { useQuery } from "@apollo/client/react";

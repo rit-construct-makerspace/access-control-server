@@ -1,4 +1,4 @@
-import { Alert, Autocomplete, Box, Button, Card, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, FormControlLabel, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, IconButton, Stack, Tab, Tabs, TextField, Typography } from "@mui/material";
 import PrettyModal from "../../../common/PrettyModal";
 import { Core, CoreActions, CoreInputMode, SEND_CORE_ACTION, SEND_CORE_FLAGS, UNPAIR_CORE } from "../../../queries/deviceQueries";
 import { useMutation } from "@apollo/client/react";

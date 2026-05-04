@@ -93,7 +93,7 @@ const DeviceResolver = {
       parent: DispenserRow,
       _args: any,
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
+    ) => isStaff(async (_user) => (
       await DeviceRepo.getDeviceByID(parent.deviceID)
     )),
   },
@@ -331,7 +331,7 @@ const DeviceResolver = {
         makerspaceID: number
       },
       { isManagerFor }: ApolloContext
-    ) => isManagerFor(args.makerspaceID, async (user) => {
+    ) => isManagerFor(args.makerspaceID, async (_user) => {
       const result = await DeviceRepo.pairWelcomeDevice(args.deviceID, args.makerspaceID);
 
       const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
@@ -353,7 +353,7 @@ const DeviceResolver = {
         makerspaceID: number
       },
       { isManagerFor }: ApolloContext
-    ) => isManagerFor(args.makerspaceID, async (user) => {
+    ) => isManagerFor(args.makerspaceID, async (_user) => {
       await DeviceRepo.unpairWelcomeDevice(args.deviceID, args.makerspaceID)
 
       const core = await CoreRepo.getCoreByDeviceID(args.deviceID);

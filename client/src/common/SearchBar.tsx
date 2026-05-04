@@ -2,16 +2,6 @@ import { IconButton, InputAdornment, StandardTextFieldProps, TextField } from "@
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 
-export function searchFilter<T>(
-  searchText: string,
-  collection: T[],
-  getter: (x: T) => string
-): T[] {
-  return collection.filter((x: any) =>
-    getter(x).toLocaleLowerCase().includes(searchText.toLocaleLowerCase())
-  );
-}
-
 interface SearchBarProps extends StandardTextFieldProps {
   onSubmit?: () => void;
   onClear?: () => void;

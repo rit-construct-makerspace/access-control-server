@@ -48,7 +48,7 @@ const MakerspacesResolver = {
       parent: MakerspaceRow,
       _args: any,
       { isStaffFor }: ApolloContext
-    ) => isStaffFor(parent.id, async (user) => (
+    ) => isStaffFor(parent.id, async (_user) => (
       await DeviceRepo.getMakerspaceDevices(parent.id)
     )),
 
@@ -56,7 +56,7 @@ const MakerspacesResolver = {
       parent: MakerspaceRow,
       _args: any,
       { isStaffFor }: ApolloContext
-    ) => isStaffFor(parent.id, async (user) => (
+    ) => isStaffFor(parent.id, async (_user) => (
       await DeviceRepo.getMakerspaceGenericDevices(parent.id)
     )),
 
@@ -64,7 +64,7 @@ const MakerspacesResolver = {
       parent: MakerspaceRow,
       _args: any,
       { isStaffFor }: ApolloContext
-    ) => isStaffFor(parent.id, async (user) => (
+    ) => isStaffFor(parent.id, async (_user) => (
       await CoreRepo.getMakerspaceCores(parent.id)
     )),
 
@@ -72,7 +72,7 @@ const MakerspacesResolver = {
       parent: MakerspaceRow,
       _args: any,
       { isStaffFor }: ApolloContext
-    ) => isStaffFor(parent.id, async (user) => (
+    ) => isStaffFor(parent.id, async (_user) => (
       await DispenserRepo.getMakerspaceDispensers(parent.id)
     ))
   },
@@ -108,7 +108,7 @@ const MakerspacesResolver = {
         id: number
       },
       { isStaffFor }: ApolloContext
-    ) => isStaffFor(args.id, async (user) => (
+    ) => isStaffFor(args.id, async (_user) => (
       await getValidStaff(args.id)
     ))
   },

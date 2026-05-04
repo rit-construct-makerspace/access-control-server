@@ -45,7 +45,7 @@
     "start": "vite",
     "build": "vite build",
     "lint:fix": "eslint -c eslint.config.js --fix src/**/*.{ts,tsx}",
-    "lint": "eslint -c eslint.config.js --fix src/**/*.{ts,tsx}"
+    "lint": "eslint -c eslint.config.js src/**/*.{ts,tsx}"
   },
   "husky": {
     "hooks": {
