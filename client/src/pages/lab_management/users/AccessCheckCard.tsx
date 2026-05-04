@@ -1,9 +1,11 @@
-import { Button, Card, CardActions  } from "@mui/material";
+import { Button, Card, CardActions, Stack } from "@mui/material";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
-import { GET_USER } from "../../../queries/userQueries";
+import { AccessCheckExtraInfo, GET_USER } from "../../../queries/userQueries";
 import { useIsMobile } from "../../../common/IsMobileProvider";
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 
 const APPROVE_CHECK = gql`
   mutation ApproveAccessCheck($id: ID!) {
@@ -43,18 +45,25 @@ export default function AccessCheckCard({ accessCheck, userID }: AccessCheckCard
   return (
     <Card
       sx={{
-        backgroundColor: !approved ? (localStorage.getItem("themeMode") === "dark" ? "grey.900" : "grey.100") : (localStorage.getItem("themeMode") === "dark" ? "lightGreen.800" : "lightGreen.100"),
-        border: `2px solid ${!approved ? "lightgrey" : "palegreen"}`,
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
         flexWrap: isMobile ? 'wrap' : 'nowrap',
         alignItems: 'center',
+        padding: "5px"
       }}
+      variant={approved ? undefined : "outlined"}
     >
-      <div style={{ width: isMobile ? "100%" : "40%", marginLeft: "10px" }}>
-        <AuditLogEntity entityCode={"equipment:" + accessCheck.equipment.id + ":" + ((accessCheck.equipment !== undefined) ? accessCheck.equipment.name : "Loading...")}></AuditLogEntity>
-      </div>
+      <Stack sx={{ paddingLeft: "10px" }} direction={"row"} spacing={1} alignItems={"center"}>
+        {
+          approved
+            ? <CheckIcon color="success" />
+            : <CloseIcon color="error" />
+        }
+        <AuditLogEntity
+          entityCode={"equipment:" + accessCheck.equipment.id + ":" + ((accessCheck.equipment !== undefined) ? accessCheck.equipment.name : "Loading...")}
+        />
+      </Stack>
       <CardActions>
         {!approved && (
           <Button

@@ -15,8 +15,8 @@ interface InfoProps {
 export default function Info(props: InfoProps) {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const { makerspaceID} = useParams<{ makerspaceID: string }>();
-  
+  const { makerspaceID } = useParams<{ makerspaceID: string }>();
+
 
   return (
     <Stack>
@@ -37,39 +37,36 @@ export default function Info(props: InfoProps) {
             <Typography>{props.user.pronouns}</Typography>
           </Stack>
         </Stack>
-        <IconButton onClick={() => navigate(`/makerspace/${makerspaceID}/people`)} sx={{ width: "51px", height: "51px", p: 0, fontSize: 14 }} >
-          <ArrowBackIcon sx={{ fontSize: 18 }} /> Back
-        </IconButton>
-        {/* <NavLink
-                  primary={"All People"}
-                  to={`/makerspace/${makerspaceID}/people`}
-                  icon={<ArrowBackIcon />}
-                /> */}
-      </Stack>
-      <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? undefined : "space-between"} mt={4}>
-        <Stack direction={isMobile ? "column" : "row"} spacing={isMobile ? 2 : 6}>
-          <InfoBlob
-            label="Member Since"
-            value={format(parseISO(props.user.registrationDate), "MM/dd/yyyy")}
-          />
-          <InfoBlob
-            label="College"
-            value={props.user.college}
-          />
-          <InfoBlob
-            label="Expected Graduation"
-            value={props.user.expectedGraduation}
-          />
-        </Stack>
         <Button
           startIcon={<HistoryIcon />}
-          variant="outlined"
+          variant="contained"
           color="secondary"
           onClick={() => navigate(`/makerspace/${makerspaceID}/history?q=<user:${props.user.id}:`)}
+          size={isMobile ? "small" : undefined}
+          sx={{
+            height: "max-content"
+          }}
         >
           View logs
         </Button>
       </Stack>
+      {
+        isMobile ? null
+          : <Stack direction={isMobile ? "row" : "row"} spacing={isMobile ? undefined : 6} justifyContent={isMobile ? "space-between" : undefined}>
+            <InfoBlob
+              label="Member Since"
+              value={format(parseISO(props.user.registrationDate), "MM/dd/yyyy")}
+            />
+            <InfoBlob
+              label="College"
+              value={props.user.college}
+            />
+            <InfoBlob
+              label="Expected Graduation"
+              value={props.user.expectedGraduation}
+            />
+          </Stack>
+      }
       {
         props.user.archived && <Alert severity="warning" variant="filled">This user is archived!</Alert>
       }

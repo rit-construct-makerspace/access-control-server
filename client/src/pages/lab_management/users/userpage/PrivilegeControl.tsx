@@ -117,7 +117,7 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
               <Stack direction="row" spacing={1}>
                 {
                   managerSpaces.length === 0
-                    ? <Alert severity="info">Not a Manager!</Alert>
+                    ? <Alert severity="info" variant="filled">Not a Manager!</Alert>
                     : managerSpaces.map((space: FullMakerspace) => {
                       return (
                         <Card sx={{ maxWidth: "200px", padding: "10px" }}>
@@ -152,13 +152,13 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                     }
                   </Select>
                 </FormControl>
-									<Button
-										variant="contained"
-										color="success"
-										onClick={handleAddManagerPerms}
-										startIcon={<PersonAddIcon />}
-										disabled={!isStaff(currentUser)}
-									>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleAddManagerPerms}
+                  startIcon={<PersonAddIcon />}
+                  disabled={!isStaff(currentUser)}
+                >
                   Add
                 </Button>
               </Stack>
@@ -168,7 +168,7 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
               <Stack direction="row" spacing={1}>
                 {
                   staffSpaces.length === 0
-                    ? <Alert severity="info">Not Staff!</Alert>
+                    ? <Alert severity="info" variant="filled">Not Staff!</Alert>
                     : staffSpaces.map((space: FullMakerspace) => {
                       return (
                         <Card sx={{ maxWidth: "200px", padding: "10px" }}>
@@ -203,13 +203,13 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
                     }
                   </Select>
                 </FormControl>
-									<Button
-										variant="contained"
-										color="success"
-										onClick={handleAddStaffPerms}
-										startIcon={<PersonAddIcon />}
-                    disabled={!isStaff(currentUser)}
-									>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleAddStaffPerms}
+                  startIcon={<PersonAddIcon />}
+                  disabled={!isStaff(currentUser)}
+                >
                   Add
                 </Button>
               </Stack>
@@ -219,24 +219,21 @@ export default function PrivilegeControl(props: PrivilegeControlProps) {
               <Stack direction="row" spacing={1}>
                 {
                   props.user.trainer.length === 0
-                    ? <Alert severity="info">Not a Trainer!</Alert>
+                    ? <Alert severity="info" variant="filled">Not a Trainer!</Alert>
                     : props.user.trainer.map((equipmentID: number) => (
                       <TrainerCard equipmentID={equipmentID} removeTrainerPerms={removeTrainerPerms} />
                     ))
                 }
               </Stack>
               <Stack direction="row" spacing={1}>
-                <FormControl fullWidth>
-                  <InputLabel id="add-trainer-permissions"></InputLabel>
-                  <TrainerEquipmentSelect user={props.user} setAddTrainerPerms={setAddTrainerPerms} />
-                </FormControl>
-									<Button
-										variant="contained"
-										color="success"
-										onClick={handleAddTrainerPerms}
-										startIcon={<PersonAddIcon />}
-                    disabled={!isStaff(currentUser)}
-									>
+                <TrainerEquipmentSelect user={props.user} setAddTrainerPerms={setAddTrainerPerms} />
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleAddTrainerPerms}
+                  startIcon={<PersonAddIcon />}
+                  disabled={!isStaff(currentUser)}
+                >
                   Add
                 </Button>
               </Stack>

@@ -32,7 +32,6 @@ export default function HoldCard({ hold, userID }: HoldCardProps) {
 	return (
 		<Card
 			sx={{
-        backgroundColor: removed ? (localStorage.getItem("themeMode") === "dark" ? "grey.900" : "grey.100") : (localStorage.getItem("themeMode") === "dark" ? "#150000" : "#fff8f8"),
 				border: `1px solid ${removed ? "grey" : "red"}`,
 			}}
 		>
@@ -42,7 +41,7 @@ export default function HoldCard({ hold, userID }: HoldCardProps) {
 				</Typography>
 			)}
 			<CardActions sx={{ px: 2 }}>
-				<Stack sx={{ flex: 1, color: "#595959" }}>
+				<Stack sx={{ flex: 1 }}>
 					<Typography variant="body2">
 						Placed by {`${hold.creator.firstName} ${hold.creator.lastName}`} on{" "}
 						{format(parseISO(hold.createDate), "M/d/yy h:mmaaa")}

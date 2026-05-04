@@ -78,86 +78,87 @@ export default function HoldsRestrictions(props: HoldsRestrictionsProps) {
 
 
   return (
-    <Stack>
-      <Stack direction="row" justifyContent={"space-between"} mb={1}>
-        <Typography variant="h6">
-          Account Holds
+    <Stack spacing={3}>
+      <Stack spacing={1}>
+        <Stack direction="row" justifyContent={"space-between"}>
+          <Typography variant="h6">
+            Account Holds
+          </Typography>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={handlePlaceHoldClicked}
+            startIcon={<BlockIcon />}
+            disabled={!isStaff(currentUser)}
+          >
+            Place hold
+          </Button>
+        </Stack>
+
+        {props.user.holds.length === 0 && (
+          <Alert severity="success">No Holds!</Alert>
+        )}
+
+        <Stack spacing={2}>
+          {props.user.holds.map((hold: Hold) => (
+            <HoldCard key={hold.id} hold={hold} userID={props.user.id} />
+          ))}
+        </Stack>
+      </Stack>
+      <Stack spacing={1}>
+        <Typography variant="h6" component="div" mt={2} mb={1}>
+          Account Restrictions
         </Typography>
-        <Button
-          color="error"
-          variant="contained"
-          onClick={handlePlaceHoldClicked}
-          startIcon={<BlockIcon />}
-          disabled={!isStaff(currentUser)}
-        >
-          Place hold
-        </Button>
-      </Stack>
+        {
+          isStaff(currentUser)
+            ? < RequestWrapper2 result={getMakerspacesResult} render={(data) => {
 
-      {props.user.holds.length === 0 && (
-        <Alert severity="success">No Holds!</Alert>
-      )}
+              const fullSpaces: FullMakerspace[] = data.makerspaces;
+              // I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript 
+              const potentialRestrictions = fullSpaces.filter((space: FullMakerspace) => isStaffFor(currentUser, Number(space.id)))
 
-      <Stack spacing={2}>
-        {props.user.holds.map((hold: Hold) => (
-          <HoldCard key={hold.id} hold={hold} userID={props.user.id} />
-        ))}
-      </Stack>
-
-
-      <Typography variant="h6" component="div" mt={2} mb={1}>
-        Account Restrictions
-      </Typography>
-
-      {props.user.restrictions.length === 0 && (
-        <Alert severity="success">No Restrictions!</Alert>
-      )}
-
-      <Stack spacing={2}>
-        {props.user.restrictions.map((restriction: Restriction) => (
-          <RestrictionCard key={restriction.id} restriction={restriction} userID={props.user.id} />
-        ))}
-      </Stack>
-
-      {
-        isStaff(currentUser)
-          ? < RequestWrapper2 result={getMakerspacesResult} render={(data) => {
-
-            const fullSpaces: FullMakerspace[] = data.makerspaces;
-            // I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript I hate typescript 
-            const potentialRestrictions = fullSpaces.filter((space: FullMakerspace) => isStaffFor(currentUser, Number(space.id)))
-
-            return (
-              <Stack direction="row" spacing={1} mt={2} alignItems={"center"}>
-                <FormControl fullWidth>
-                  <InputLabel id="restriction-makerspace">Makerspace</InputLabel>
-                  <Select id="restriction-makerspace"
-                    label="Makerspace"
-                    onChange={(e) => setRestrictionMakerspace(Number(e.target.value))}
-                    fullWidth
+              return (
+                <Stack direction="row" spacing={1} mt={2} alignItems={"center"}>
+                  <FormControl fullWidth>
+                    <InputLabel id="restriction-makerspace">Makerspace</InputLabel>
+                    <Select id="restriction-makerspace"
+                      label="Makerspace"
+                      onChange={(e) => setRestrictionMakerspace(Number(e.target.value))}
+                      fullWidth
+                    >
+                      {
+                        potentialRestrictions.map((space: FullMakerspace) => (
+                          <MenuItem value={space.id}>{space.name} ID: {space.id}</MenuItem>
+                        ))
+                      }
+                    </Select>
+                  </FormControl>
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    onClick={handleCreateRestriction}
+                    startIcon={<LockIcon />}
+                    sx={{ whiteSpace: "nowrap", minWidth: "unset", height: "100%" }}
                   >
-                    {
-                      potentialRestrictions.map((space: FullMakerspace) => (
-                        <MenuItem value={space.id}>{space.name} ID: {space.id}</MenuItem>
-                      ))
-                    }
-                  </Select>
-                </FormControl>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={handleCreateRestriction}
-                  startIcon={<LockIcon />}
-                  sx={{ whiteSpace: "nowrap", minWidth: "unset" }}
-                >
-                  Place Restriction
-                </Button>
-              </Stack>
-            );
-          }
-          } />
-          : null
-      }
+                    Place Restriction
+                  </Button>
+                </Stack>
+              );
+            }
+            } />
+            : null
+        }
+
+        {props.user.restrictions.length === 0 && (
+          <Alert severity="success" variant="filled">No Restrictions!</Alert>
+        )}
+
+        <Stack spacing={2}>
+          {props.user.restrictions.map((restriction: Restriction) => (
+            <RestrictionCard key={restriction.id} restriction={restriction} userID={props.user.id} />
+          ))}
+        </Stack>
+      </Stack>
     </Stack>
   )
 }
