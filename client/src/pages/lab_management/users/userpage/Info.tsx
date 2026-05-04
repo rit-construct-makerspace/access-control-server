@@ -42,6 +42,7 @@ export default function Info(props: InfoProps) {
           variant="contained"
           color="secondary"
           onClick={() => navigate(`/makerspace/${makerspaceID}/history?q=<user:${props.user.id}:`)}
+          size={isMobile ? "small" : undefined}
           sx={{
             height: "max-content"
           }}
@@ -49,22 +50,23 @@ export default function Info(props: InfoProps) {
           View logs
         </Button>
       </Stack>
-      <Stack direction={isMobile ? "column" : "row"} justifyContent={isMobile ? undefined : "space-between"} mt={4}>
-        <Stack direction={isMobile ? "column" : "row"} spacing={isMobile ? 2 : 6}>
-          <InfoBlob
-            label="Member Since"
-            value={format(parseISO(props.user.registrationDate), "MM/dd/yyyy")}
-          />
-          <InfoBlob
-            label="College"
-            value={props.user.college}
-          />
-          <InfoBlob
-            label="Expected Graduation"
-            value={props.user.expectedGraduation}
-          />
-        </Stack>
-      </Stack>
+      {
+        isMobile ? null
+          : <Stack direction={isMobile ? "row" : "row"} spacing={isMobile ? undefined : 6} justifyContent={isMobile ? "space-between" : undefined}>
+            <InfoBlob
+              label="Member Since"
+              value={format(parseISO(props.user.registrationDate), "MM/dd/yyyy")}
+            />
+            <InfoBlob
+              label="College"
+              value={props.user.college}
+            />
+            <InfoBlob
+              label="Expected Graduation"
+              value={props.user.expectedGraduation}
+            />
+          </Stack>
+      }
       {
         props.user.archived && <Alert severity="warning" variant="filled">This user is archived!</Alert>
       }

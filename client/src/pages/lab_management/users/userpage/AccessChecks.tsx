@@ -9,6 +9,7 @@ import { useState } from "react";
 import AccessCheckCard from "../AccessCheckCard";
 import CreateAccessCheckModal from "./CreateAccessCheckModal";
 import SearchBar from "../../../../common/SearchBar";
+import { useIsMobile } from "../../../../common/IsMobileProvider";
 
 const REFRESH_CHECKS = gql`
   mutation RefreshAccessChecks($userID: ID!) {
@@ -22,6 +23,7 @@ interface AccessCheckProps {
 
 export default function AccessChecks(props: AccessCheckProps) {
   const currentUser = useCurrentUser();
+  const isMobile = useIsMobile();
 
   const [createAccessCheckModal, setCreateAccessCheckModal] = useState(false);
   const [searchText, setSearchtext] = useState("");
@@ -44,7 +46,7 @@ export default function AccessChecks(props: AccessCheckProps) {
 
   return (
     <Stack spacing={1}>
-      <Stack direction={"row"} justifyContent={"space-between"}>
+      <Stack direction={isMobile ? "column" : "row"} justifyContent={"space-between"}>
         <Typography variant="h6" component="div">
           Access Checks
         </Typography>

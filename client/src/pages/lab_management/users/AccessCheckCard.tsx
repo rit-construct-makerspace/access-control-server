@@ -2,7 +2,7 @@ import { Button, Card, CardActions, Stack } from "@mui/material";
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
 import AuditLogEntity from "../audit_logs/AuditLogEntity";
-import { GET_USER } from "../../../queries/userQueries";
+import { AccessCheckExtraInfo, GET_USER } from "../../../queries/userQueries";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';

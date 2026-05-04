@@ -36,12 +36,12 @@ export default function UserPage() {
               <title>{`${user.firstName} ${user.lastName} | ${makeTheme.title}`}</title>
               <Info user={user} />
               <Stack direction={isMobile ? "column" : "row"} width="100%" spacing={4} justifyContent="center">
-                <Stack width="50%">
+                <Stack width={isMobile ? "100%" : "50%"}>
                   <AccessChecks user={user} />
                   <Trainings user={user} />
                 </Stack>
 
-                <Stack width="50%">
+                <Stack width={"100%"}>
                   <HoldsRestrictions user={user} />
                   <PrivilegeControl user={user} isMobile={isMobile} />
                   <CardTagSettings userID={user.id} hasCardTag={(user.cardTagID != null && user.cardTagID !== "")} />
