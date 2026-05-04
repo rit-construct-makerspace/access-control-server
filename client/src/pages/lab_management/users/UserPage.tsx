@@ -41,7 +41,7 @@ export default function UserPage() {
                   <Trainings user={user} />
                 </Stack>
 
-                <Stack width={"100%"}>
+                <Stack width={isMobile ? "100%" : "50%"}>
                   <HoldsRestrictions user={user} />
                   <PrivilegeControl user={user} isMobile={isMobile} />
                   <CardTagSettings userID={user.id} hasCardTag={(user.cardTagID != null && user.cardTagID !== "")} />
