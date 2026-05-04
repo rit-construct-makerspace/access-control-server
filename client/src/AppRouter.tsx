@@ -235,7 +235,6 @@ export const routes = [
                 }],
               },
 
-              { path: "/maker/training", element: <TrainingPage /> },
               { path: "/maker/training/:id", element: <QuizPage /> },
               { path: "/maker/training/:id/results/", element: <QuizResults /> },
               { path: "/maker/training/:id/results/:submissionID", element: <QuizResults /> },
