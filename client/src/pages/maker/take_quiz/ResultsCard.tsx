@@ -46,47 +46,51 @@ export default function SubmissionCard({ summary }: ResultsCardProps) {
 
   return (
     <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>
-      <CardHeader title="Summary & Feedback"/>
+      <CardHeader title="Summary & Feedback" />
       <CardContent>
         <Stack direction={"column"} spacing={2}>
-        {summaryObj.map((choiceSummary: ChoiceSummary) => (
-          <Card elevation={2} sx={{ p: 2 }}>
-            <Stack direction={"row"} spacing={2} alignItems="center" >
-              {choiceSummary.correct 
-              ? <CheckCircleIcon color="success" />
-              : <CloseIcon color="error" />}
-              <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><ThemedMarkdown>{choiceSummary.questionText}</ThemedMarkdown></Typography>
-            </Stack>
-            <Stack direction={"row"} spacing={2} alignItems="center">
-              {choiceSummary.correct 
-              ? <>
-                  <ThumbUpAltOutlinedIcon color="info" />
-                  <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}>
-                    <ThemedMarkdown>{choiceSummary.comment}</ThemedMarkdown>
-                  </Typography>
-                </>
-              : <Alert
-                  icon={<LightbulbOutlinedIcon fontSize="inherit" />}
-                  severity="warning"
-                  sx={{ margin: 0 }}
-                >
-                  <AlertTitle>Hint</AlertTitle>
-                  <Typography sx={{ fontWeight: 500, ...styles.strongerBolds }}>
-                    <ThemedMarkdown
-                      components={{
-                        p({ children }) {
-                          return <p style={{ margin: 0 }}>{children}</p>;
-                        },
-                      }}
-                    >
-                      {choiceSummary.comment}
-                    </ThemedMarkdown>
-                  </Typography>
-                </Alert>
+          {summaryObj.map((choiceSummary: ChoiceSummary) => (
+            <Card elevation={2} sx={{ p: 2 }}>
+              <Stack direction={"row"} spacing={2} alignItems="center" >
+                {choiceSummary.correct
+                  ? <CheckCircleIcon color="success" />
+                  : <CloseIcon color="error" />}
+                <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}><ThemedMarkdown>{choiceSummary.questionText}</ThemedMarkdown></Typography>
+              </Stack>
+              {
+                choiceSummary.comment
+                  ? <Stack direction={"row"} spacing={2} alignItems="center">
+                    {choiceSummary.correct
+                      ? <>
+                        <ThumbUpAltOutlinedIcon color="info" />
+                        <Typography sx={{ fontWeight: 500, mb: 1, ...styles.strongerBolds }}>
+                          <ThemedMarkdown>{choiceSummary.comment}</ThemedMarkdown>
+                        </Typography>
+                      </>
+                      : <Alert
+                        icon={<LightbulbOutlinedIcon fontSize="inherit" />}
+                        severity="warning"
+                        sx={{ margin: 0 }}
+                      >
+                        <AlertTitle>Hint</AlertTitle>
+                        <Typography sx={{ fontWeight: 500, ...styles.strongerBolds }}>
+                          <ThemedMarkdown
+                            components={{
+                              p({ children }) {
+                                return <p style={{ margin: 0 }}>{children}</p>;
+                              },
+                            }}
+                          >
+                            {choiceSummary.comment}
+                          </ThemedMarkdown>
+                        </Typography>
+                      </Alert>
+                    }
+                  </Stack>
+                  : null
               }
-            </Stack>
-          </Card>
-        ))}
+            </Card>
+          ))}
         </Stack>
       </CardContent>
     </Card>
