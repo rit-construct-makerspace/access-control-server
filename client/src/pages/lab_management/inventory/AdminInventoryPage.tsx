@@ -10,9 +10,8 @@ import Ledger from "./Ledger";
 import InventoryTagsModal from "./InventoryTagsModal";
 import { GET_MAKERSPACES_WITH_ITEMS, MakerspaceWithItems } from "../../../queries/makerspaceQueries";
 import { InventoryForMakerspace } from "./common/InventoryForMakerspace";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import LowInventory from "./common/LowInventory";
-import StaffBar from "../../makerspace_page/StaffBar";
 import { useMakeTheme } from "../../../common/MakeThemeProvider";
 
 
@@ -23,22 +22,23 @@ export default function AdminInventoryPage() {
 
   const navigate = useNavigate();
   const makeTheme = useMakeTheme();
+  const { search } = useLocation();
 
   const inventoryTagsResult = useQuery(GET_INVENTORY_TAGS);
 
   const makerspacesWithItemsResult = useQuery(GET_MAKERSPACES_WITH_ITEMS);
 
   const setUrlParam = (paramName: string, paramValue: string) => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(search);
     params.set(paramName, paramValue);
     navigate(`/admin/inventory?` + params, { replace: true });
   };
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
+    const searchParams = new URLSearchParams(search);
     const queryString = searchParams.get("a") ?? "";
 
     setSearchText(queryString)
-  }, [location.search]);
+  }, [search]);
 
   return (
     <RequestWrapper loading={makerspacesWithItemsResult.loading} error={makerspacesWithItemsResult.error}>

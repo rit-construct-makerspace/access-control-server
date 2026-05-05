@@ -36,7 +36,7 @@ export default function QuizPage() {
     <RequestWrapper2
       result={result}
       render={(data) => (
-        <Stack spacing={2} margin={"15px 30px"}>
+        <Stack spacing={2} margin={"15px 30px"} alignItems={"center"}>
           <Typography variant={isMobile ? "h5" : "h3"}>{data.moduleWithAnswerCount?.name}</Typography>
           <QuizTaker module={data?.moduleWithAnswerCount} />
         </Stack>

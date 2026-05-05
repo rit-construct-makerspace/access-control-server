@@ -34,9 +34,9 @@ export default function DevicesPage() {
   // Refresh this every 20 seconds
   const makerspaceWithDevicesResult = useQuery(GET_MAKERSPACE_WITH_DEVICES, { variables: { id: makerspaceID }, pollInterval: 20000 });
 
-  const genericDevices: Device[] = makerspaceWithDevicesResult.data?.makerspaceByID.genericDevices ?? [];
+  const _genericDevices: Device[] = makerspaceWithDevicesResult.data?.makerspaceByID.genericDevices ?? [];
   const cores: Core[] = makerspaceWithDevicesResult.data?.makerspaceByID.cores ?? [];
-  const dispensers: Dispenser[] = makerspaceWithDevicesResult.data?.makerspaceByID.dispensers ?? [];
+  const _dispensers: Dispenser[] = makerspaceWithDevicesResult.data?.makerspaceByID.dispensers ?? [];
 
   const filteredCores: Core[] = cores.filter((core) => core.device.name.includes(searchText))
 

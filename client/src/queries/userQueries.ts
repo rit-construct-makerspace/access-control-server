@@ -22,6 +22,7 @@ export interface AccessCheckExtraInfo {
   equipment: {
     id: number;
     name: string;
+    subName: string;
     requiresTrainerApproval: boolean;
     room: {
       makerspace: {
@@ -156,6 +157,7 @@ export const GET_USER = gql`
         equipment {
           id
           name
+          subName
           requiresTrainerApproval
           room {
             makerspace {

@@ -14,7 +14,7 @@ const MaintenanceTicketResolver = {
       parent: MaintenanceTicketRow,
       _args: any,
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
+    ) => isStaff(async (_user) => (
       InstanceRepo.getInstanceByID(parent.instanceID)
     )),
 
@@ -22,7 +22,7 @@ const MaintenanceTicketResolver = {
       parent: MaintenanceTicketRow,
       _args: any,
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
+    ) => isStaff(async (_user) => (
       parent.userID
         ? UserRepo.getUserByID(parent.userID)
         : undefined
@@ -32,7 +32,7 @@ const MaintenanceTicketResolver = {
       parent: MaintenanceTicketRow,
       _args: any,
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
+    ) => isStaff(async (_user) => (
       parent.assignedID
         ? UserRepo.getUserByID(parent.assignedID)
         : undefined
@@ -46,7 +46,7 @@ const MaintenanceTicketResolver = {
         id: number
       },
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
+    ) => isStaff(async (_user) => (
       await MaintenanceTicketRepo.getMaintenanceTicket(args.id)
     )),
 
@@ -59,7 +59,7 @@ const MaintenanceTicketResolver = {
         status?: MaintenanceTicketStatus[]
       },
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
+    ) => isStaff(async (_user) => (
       await MaintenanceTicketRepo.getMaintenanceTicketsFlexibly(args.makerspaceIDs, args.equipmentIDs, args.instanceIDs, args.status)
     )),
 
@@ -82,7 +82,7 @@ const MaintenanceTicketResolver = {
         makerspaceID?: number
       },
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
+    ) => isStaff(async (_user) => (
       await MaintenanceTicketRepo.paginatedMaintenanceTickets(args.pagination, args.sort, args.filter, args.makerspaceID)
     ))
   },
@@ -98,7 +98,7 @@ const MaintenanceTicketResolver = {
         imageUrl?: string
       },
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => {
+    ) => isStaff(async (_user) => {
       const result = await MaintenanceTicketRepo.createMaintenanceTicket(MaintenanceTicketType.REPORTED, args.severity, args.instanceID, args.description, args.userID, args.imageUrl)
       notifyNewMaintenanceTicket(result);
       return result;
@@ -115,7 +115,7 @@ const MaintenanceTicketResolver = {
         imageUrl?: string
       },
       { isManager }: ApolloContext // should perhaps be ifManagerFor
-    ) => isManager(async (user) => (
+    ) => isManager(async (_user) => (
       await MaintenanceTicketRepo.createIntervalMaintenanceTicket(
         args.severity,
         args.instanceID,
@@ -133,7 +133,7 @@ const MaintenanceTicketResolver = {
         status: MaintenanceTicketStatus
       },
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
+    ) => isStaff(async (_user) => (
       await MaintenanceTicketRepo.modifyMaintenanceTicketStatus(args.id, args.status)
     )),
 
@@ -146,7 +146,7 @@ const MaintenanceTicketResolver = {
         description: string
       },
       { isStaff }: ApolloContext
-    ) => isStaff(async (user) => (
+    ) => isStaff(async (_user) => (
       await MaintenanceTicketRepo.updateMaintenanceTicket(args.id, args.severity, args.status, args.description)
     )),
 
@@ -187,7 +187,7 @@ const MaintenanceTicketResolver = {
         id: number
       },
       { isManager }: ApolloContext
-    ) => isManager(async (user) => (
+    ) => isManager(async (_user) => (
       await MaintenanceTicketRepo.deleteMaintenanceTicket(args.id)
     ))
   }

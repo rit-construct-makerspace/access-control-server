@@ -85,16 +85,15 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
   const [signOffUrl, setSignOffUrl] = useState(props.equipment.signOffUrl);
   const [subName, setSubName] = useState(props.equipment.subName);
 
-  const [unsaved, setUnsaved] = useState(false);
   const [blockerDialogOpen, setBlockerDialogOpen] = useState(false);
 
-  function handleEquipmentUpdate() {
+  function handleEquipmentUpdate(newModules?: number[]) {
     updateEquipment({
       variables: {
         id: props.equipment.id,
         name: name,
         roomID: room.id,
-        moduleIDs: moduleIDs,
+        moduleIDs: newModules ?? moduleIDs,
         imageUrl: imageUrl,
         sopUrl: sopUrl,
         notes: notes,
@@ -107,49 +106,19 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
         signOffUrl: signOffUrl
       },
     });
-
-    setUnsaved(false);
   }
 
-  useEffect(() => {
-    if (imageUrl !== props.equipment.imageUrl) {
-      handleEquipmentUpdate();
-    }
-  }, [imageUrl]);
-
-  useEffect(() => {
-    if (moduleIDs.length !== props.equipment.trainingModules.length) {
-      handleEquipmentUpdate();
-    }
-  }, [moduleIDs]);
-
-  useEffect(() => {
-    setUnsaved(
-      name !== props.equipment.name ||
-      imageUrl !== props.equipment.imageUrl ||
-      sopUrl !== props.equipment.sopUrl ||
-      notes !== props.equipment.notes ||
-      byReservation !== props.equipment.byReservationOnly ||
-      needsWelcome !== props.equipment.needsWelcome ||
-      requiresTrainer !== props.equipment.requiresTrainerApproval ||
-      requiresInPerson !== props.equipment.requiresInPerson ||
-      room.id !== props.equipment.room.id ||
-      moduleIDs.length !== props.equipment.trainingModules.length ||
-      schedulable !== props.equipment.schedulable
-    );
-  }, [
-    name,
-    imageUrl,
-    sopUrl,
-    notes,
-    byReservation,
-    needsWelcome,
-    requiresTrainer,
-    requiresInPerson,
-    room.id,
-    moduleIDs.length,
-    schedulable,
-  ]);
+  const unsaved = name !== props.equipment.name ||
+    imageUrl !== props.equipment.imageUrl ||
+    sopUrl !== props.equipment.sopUrl ||
+    notes !== props.equipment.notes ||
+    byReservation !== props.equipment.byReservationOnly ||
+    needsWelcome !== props.equipment.needsWelcome ||
+    requiresTrainer !== props.equipment.requiresTrainerApproval ||
+    requiresInPerson !== props.equipment.requiresInPerson ||
+    room.id !== props.equipment.room.id ||
+    moduleIDs.length !== props.equipment.trainingModules.length ||
+    schedulable !== props.equipment.schedulable
 
   useEffect(() => {
     if (blocker.state === "blocked") {
@@ -181,7 +150,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
               color="info"
               variant="contained"
               text="Upload Image"
-              onUpload={(name: string) => setImageUrl(name)}
+              onUpload={(name: string) => { setImageUrl(_old => name); handleEquipmentUpdate(); }}
             />
             {props.equipment.archived ? (
               <Button
@@ -197,7 +166,7 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
                 Hide
               </Button>
             )}
-            <Button variant="contained" startIcon={<SaveIcon />} onClick={handleEquipmentUpdate}>
+            <Button variant="contained" startIcon={<SaveIcon />} onClick={() => handleEquipmentUpdate()}>
               Save
             </Button>
 
@@ -315,18 +284,17 @@ export default function EquipmentInformation(props: EquipmentInformationProps) {
             </Stack>
             : null
         }
-
-
         <EquipmentTrainings
           equipmentID={props.equipment.id}
           equipmentModules={props.equipment.trainingModules}
           addModule={(mID) => {
-            setModuleIds([...moduleIDs, mID]);
+            const newIDs = [...moduleIDs, mID]
+            setModuleIds(newIDs);
+            handleEquipmentUpdate(newIDs);
           }}
           removeModule={(mID) => {
-            const temp = [...moduleIDs];
-            temp.splice(temp.indexOf(mID), 1);
-            setModuleIds(temp);
+            setModuleIds((prev) => { prev.splice(prev.indexOf(mID), 1); return prev; });
+            handleEquipmentUpdate();
           }}
         />
       </Stack>

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -19,7 +19,6 @@ import {
 import SearchBar from "../../../common/SearchBar";
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client/react";
-import RequestWrapper2 from "../../../common/RequestWrapper2";
 import AuditLogRow from "./AuditLogRow";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { endOfDay, parse, startOfDay } from "date-fns";
@@ -85,7 +84,7 @@ export default function LogPage() {
   const navigate = useNavigate();
   const [query, queryResult] = useLazyQuery(GET_LOGS, { pollInterval: 2000 });
   const [searchText, setSearchText] = useState("");
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [manualSignInModal, setManualSignInModal] = useState(false);
 
   const handleExpandClick = () => {
@@ -140,7 +139,7 @@ export default function LogPage() {
         makerspaceID: Number(makerspaceID)
       },
     });
-  }, [search, query, filters]);
+  }, [search, query, filters, makerspaceID]);
 
   const setUrlParam = (paramName: string, paramValue: string) => {
     const params = new URLSearchParams(search);
@@ -163,9 +162,7 @@ export default function LogPage() {
   const showClearButton =
     startDateString || stopDateString || search.includes("q=");
 
-  const logs = useMemo(() => {
-    return queryResult.data ? queryResult.data.makerspaceLogs : undefined;
-  }, [queryResult.data, queryResult.data?.makerspaceLogs])
+  const logs = queryResult.data ? queryResult.data.makerspaceLogs : undefined;
 
   return (
     <Box margin="25px">

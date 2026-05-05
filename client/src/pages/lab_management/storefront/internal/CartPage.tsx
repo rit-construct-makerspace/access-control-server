@@ -1,9 +1,9 @@
 import { useMutation, useQuery } from "@apollo/client/react";
 import { CANCEL_CART, COMPLETE_CART, GET_CART } from "../../../../queries/cartQueries";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Button, Snackbar, Stack, TextField, Typography } from "@mui/material";
+import { Button, Snackbar, Stack, Typography } from "@mui/material";
 import { CartItem } from "../../../../types/InventoryCart";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Page from "../../../Page";
 import RequestWrapper from "../../../../common/RequestWrapper";
 import { RefundModal } from "./RefundModal";
@@ -28,12 +28,7 @@ export function CartPage() {
   const [cancelCartMutation] = useMutation(CANCEL_CART);
 
   const staticRows: CartItem[] = cartResult.data?.cart?.items || [];
-
-  const [rows, setRows] = useState<CartItemCountState[]>(staticRows.map(item => ({ ...item, newCartcount: item.cartcount })));
-
-  useEffect(() => {
-    setRows(staticRows.map(item => ({ ...item, newCartcount: item.cartcount })));
-  }, [staticRows]);
+  const rows = staticRows.map(item => ({ ...item, newCartcount: item.cartcount }));
 
   const [refundModalItem, setRefundModalItem] = useState<CartItemCountState | null>(null);
   const [refundSuccessSnackbarOpen, setRefundSuccessSnackbarOpen] = useState(false);
@@ -57,19 +52,6 @@ export function CartPage() {
       field: "quantity", headerName: "Quantity", width: 600,
       renderCell: (params) =>
         <Stack direction={"row"} alignItems={"center"} sx={{ textDecoration: params.row.cartcount > 0 ? "none" : "line-through" }}>
-          <TextField
-            value={params.row.newCartcount}
-            onChange={(e) => {
-              const newCount = parseInt(e.target.value);
-              setRows((prevRows) =>
-                prevRows.map((row) =>
-                  row.id === params.row.id ? { ...row, newCartcount: newCount } : row
-                )
-              );
-            }}
-            type="number"
-            slotProps={{ htmlInput: { min: 0, max: params.row.cartcount } }}
-          />
           <Typography>{params.row.newCartcount == 1 ? params.row.unit : params.row.pluralUnit}</Typography>
           <Button variant="outlined" color="primary" size="small" disabled={params.row.cartcount - params.row.newCartcount <= 0} sx={{ ml: 4 }} onClick={() => {
             setRefundModalItem(params.row);

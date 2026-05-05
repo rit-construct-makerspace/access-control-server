@@ -4,7 +4,6 @@
  */
 
 import { gql } from "graphql-tag";
-import { EquipmentRow, TrainingModuleRow } from "../db/tables.js";
 
 export const TrainingHoldsTypeDefs = gql`
   type TrainingHold {

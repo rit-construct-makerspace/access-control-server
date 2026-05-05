@@ -18,10 +18,10 @@ const TrainingSubmissionResolvers = {
       parent: any,
       args: { submissionID: string },
       { ifAuthenticated }: ApolloContext
-    ) => 
-      ifAuthenticated (async (user: any) => {
+    ) =>
+      ifAuthenticated(async (_user: any) => {
         return SubmissionRepo.getSubmission(Number(args.submissionID));
-    }),
+      }),
 
     /**
      * Fetch all ModuleSubmissions
@@ -34,10 +34,10 @@ const TrainingSubmissionResolvers = {
       { ifAuthenticated }: ApolloContext
     ) =>
       ifAuthenticated(async (user: any) => {
-        return args.moduleID ? 
+        return args.moduleID ?
           await SubmissionRepo.getSubmissionsByModule(user.id, Number(args.moduleID)) :
           await SubmissionRepo.getSubmissionsByUser(user.id)
-    }),
+      }),
 
     /**
      * Fetch the last submitted ModuleSubmission for the specified module
@@ -51,10 +51,10 @@ const TrainingSubmissionResolvers = {
       { ifAuthenticated }: ApolloContext
     ) =>
       ifAuthenticated(async (user: any) => {
-        return args.moduleID ? 
+        return args.moduleID ?
           await SubmissionRepo.getLatestSubmissionByModule(user.id, Number(args.moduleID)) :
           await SubmissionRepo.getLatestSubmission(user.id)
-    }),
+      }),
 
     /**
      * Fetch failed submissions made by a user for a module
@@ -66,26 +66,26 @@ const TrainingSubmissionResolvers = {
       _parent: any,
       args: { moduleID: string },
       { ifAuthenticated }: ApolloContext
-    ) => 
-      ifAuthenticated (async (user: any) => {
-        var failedSubmissions = (await SubmissionRepo.getFailedSubmissionsTodayByModuleAndUser(Number(args.moduleID), user.id)).length
-        return {"failedSubmissions" : failedSubmissions, "submissionLimit" : Number(process.env.TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK)};
-    }),
+    ) =>
+      ifAuthenticated(async (user: any) => {
+        const failedSubmissions = (await SubmissionRepo.getFailedSubmissionsTodayByModuleAndUser(Number(args.moduleID), user.id)).length
+        return { "failedSubmissions": failedSubmissions, "submissionLimit": Number(process.env.TRAINING_MAX_ATTEMPTS_PER_DAY_BEFORE_LOCK) };
+      }),
 
-        /**
-     * Fetch most recent passing submissions within a year made by a user for a module
-     * @argument moduleId ID of the TrainingModule 
-     * @returns ModuleSubmission
-     * @throws GraphQLError if not authenticated or is on hold
-     */
+    /**
+ * Fetch most recent passing submissions within a year made by a user for a module
+ * @argument moduleId ID of the TrainingModule 
+ * @returns ModuleSubmission
+ * @throws GraphQLError if not authenticated or is on hold
+ */
     passingSubmission: async (
       _parent: any,
       args: { moduleID: string },
       { ifAuthenticated }: ApolloContext
-    ) => 
-      ifAuthenticated (async (user: any) => {
+    ) =>
+      ifAuthenticated(async (user: any) => {
         return await SubmissionRepo.getPassingSubmission(Number(args.moduleID), user.id)
-    }),
+      }),
 
   }
 };

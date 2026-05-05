@@ -1,5 +1,5 @@
 import { Alert, AlertTitle, Button, Card, Link, Paper, Stack, TextField, ThemeProvider, Typography } from "@mui/material";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { Calendar, dateFnsLocalizer, SlotInfo, Event } from "react-big-calendar";
 import rawWithDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import format from 'date-fns/format'
@@ -59,7 +59,7 @@ const formatter = new Intl.DateTimeFormat("en-US", {
 });
 
 export default function ReservationRequestPage() {
-  const { makerspaceID, equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
+  const { equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
   const user = useCurrentUser();
   const makeTheme = useMakeTheme();
 
@@ -136,7 +136,7 @@ export default function ReservationRequestPage() {
     setDescription("");
   }
 
-  function eventPropGetter(event: ReservationEvent, start: Date, end: Date, isSelected: boolean) {
+  function eventPropGetter(event: ReservationEvent, _start: Date, _end: Date, _isSelected: boolean) {
     if (event.title?.toString().includes("Draft")) {
       return {
         style: {
@@ -323,7 +323,6 @@ export default function ReservationRequestPage() {
                     events={[...liveReservationEvents, { ...draftReservation, isDraggable: true }]}
                     onSelectEvent={handleEventSelect}
                     onRangeChange={handleRangeChange}
-                    // @ts-ignore
                     onEventDrop={handleEventDrop}
                     onEventResize={handleEventResize}
                     draggableAccessor={"isDraggable"}

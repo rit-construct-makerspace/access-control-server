@@ -168,7 +168,7 @@ const AccessChecksResolver = {
       args: { userID: number, equipmentID: number },
       { isManager }: ApolloContext) =>
       isManager(async () => {
-        const result = await createAccessCheck(args.userID, args.equipmentID, true);
+        const _result = await createAccessCheck(args.userID, args.equipmentID, true);
         return true;
       }
       ),
@@ -183,7 +183,7 @@ const AccessChecksResolver = {
       _parent: any,
       args: { userID: number },
       { isTrainer }: ApolloContext) =>
-      isTrainer(async (user) => {
+      isTrainer(async (_user) => {
         const equipmentToCheck = await EquipmentRepo.getEquipment();
         await purgeUnapprovedAccessChecks(args.userID);
         for (const equipment of equipmentToCheck) {

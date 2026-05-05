@@ -1,4 +1,4 @@
-import { Button, Card, CardActionArea, Skeleton, Stack, Typography } from "@mui/material";
+import { Card, CardActionArea, Skeleton, Stack, Typography } from "@mui/material";
 import { AccessController } from "../../../queries/deviceQueries";
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useQuery } from "@apollo/client/react";

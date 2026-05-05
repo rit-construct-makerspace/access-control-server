@@ -22,10 +22,10 @@ const ReservationResolver = {
       { ifStaffOrSelf }: ApolloContext
     ) => {
       try {
-        return ifStaffOrSelf(parent.userID, async (user) => (
+        return ifStaffOrSelf(parent.userID, async (_user) => (
           await UserRepo.getUserByID(parent.userID)
         ))
-      } catch (e) {
+      } catch (_e) {
         return undefined
       }
     },
@@ -36,7 +36,7 @@ const ReservationResolver = {
       { ifStaffOrSelf }: ApolloContext
     ) => {
       try {
-        return ifStaffOrSelf(parent.userID, async (user) => (
+        return ifStaffOrSelf(parent.userID, async (_user) => (
           parent.description
         ))
       } catch {
@@ -51,7 +51,7 @@ const ReservationResolver = {
       args: {
         id: number
       },
-      { }: ApolloContext
+      _context: any
     ) => {
       return await ReservationRepo.getReservationById(args.id);
     },
@@ -65,7 +65,7 @@ const ReservationResolver = {
         },
         equipmentIDs?: number[]
       },
-      { }: ApolloContext
+      _context: any
     ) => {
       return await ReservationRepo.getReservationsFlexibly(args.range, args.equipmentIDs);
     }
@@ -124,7 +124,7 @@ const ReservationResolver = {
         approve: boolean
       },
       { isManager }: ApolloContext // Should really be isManagerFor
-    ) => isManager(async (user) => {
+    ) => isManager(async (_user) => {
       return await ReservationRepo.setReservationApproval(args.id, args.approve);
     }),
 
@@ -139,7 +139,7 @@ const ReservationResolver = {
       if (!target) {
         throw new GraphQLError(`Reservation ${args.id} does not exist`);
       }
-      return ifManagerOrSelf(target.userID, async (user) => {
+      return ifManagerOrSelf(target.userID, async (_user) => {
         return await ReservationRepo.deleteReservation(args.id);
       })
     }

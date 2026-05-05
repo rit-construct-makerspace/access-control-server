@@ -1,9 +1,8 @@
 import { useMutation, useQuery } from "@apollo/client/react";
-import { GET_UNPAIRED_READERS, GET_WELCOME_READERS_FOR_MAKERSPACE, PAIR_AS_WELCOME_READER, Reader, UNPAIR_AS_WELCOME_READER } from "../../queries/readersQueries";
 import { useState } from "react";
 import RequestWrapper from "../../common/RequestWrapper";
 import { Box, Stack } from "@mui/system";
-import { Alert, Autocomplete, Button, Card, CardContent, IconButton, TextField, Tooltip, Typography } from "@mui/material";
+import { Alert, Autocomplete, Button, Card, IconButton, TextField, Tooltip, Typography } from "@mui/material";
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import AddLinkIcon from '@mui/icons-material/AddLink';
 import AuditLogEntity from "../lab_management/audit_logs/AuditLogEntity";

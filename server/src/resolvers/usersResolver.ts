@@ -256,8 +256,9 @@ const UsersResolvers = {
       args: { userID: string, notes: string },
       { isStaff }: ApolloContext
     ) =>
-      isStaff(async (executingUser: any) => {
+      isStaff(async (_executingUser: any) => {
         const userSubject = await UserRepo.setNotes(Number(args.userID), args.notes);
+        return userSubject;
       }),
 
     /**

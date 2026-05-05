@@ -1,6 +1,6 @@
 import { ApolloContext } from "../context.js";
 import * as InventoryRepo from "../repositories/Store/InventoryRepository.js";
-import { InventoryItem, InventoryItemInput } from "../schemas/storeFrontSchema.js";
+import { InventoryItemInput } from "../schemas/storeFrontSchema.js";
 import { deleteInventoryItem } from "../repositories/Store/InventoryRepository.js";
 import { createLedger, deleteLedger, getLedgers } from "../repositories/Store/InventoryLedgerRepository.js";
 import { GraphQLError } from "graphql";
@@ -8,7 +8,6 @@ import { getUserByID, getUserByIDOrUndefined } from "../repositories/Users/UserR
 import { notifyInventoryItemBelowThreshold } from "../integrations/slack/slack.js";
 import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
 import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
-import { addItemsToCart, addOrUpdateItemsInCart, createInventoryCart, getInventoryCartsByUser } from "../repositories/Store/InventoryCartsRepository.js";
 
 const StorefrontResolvers = {
   InventoryItem: {
@@ -121,7 +120,7 @@ const StorefrontResolvers = {
         tagID: number
       },
       { isStaff }: ApolloContext
-    ) => isStaff((user) => (
+    ) => isStaff((_user) => (
       InventoryRepo.getItemsByTagID(args.tagID)
     )),
   },
@@ -332,7 +331,7 @@ const StorefrontResolvers = {
         }
 
         const allItems = await InventoryRepo.getItemsByID(args.items.map(item => item.id));
-        for (var i = 0; i < args.items.length; i++) {
+        for (let i = 0; i < args.items.length; i++) {
           const item = allItems.find((item) => item.id == args.items[i].id);
           if (!item) {
             throw new GraphQLError("Item with ID " + args.items[i].id + " does not exist");
@@ -346,10 +345,10 @@ const StorefrontResolvers = {
           }
         }
 
-        var totalCost = 0;
-        var ledgerItems: { name: string, quantity: number, pricePerUnit: number }[] = []
+        let totalCost = 0;
+        const ledgerItems: { name: string, quantity: number, pricePerUnit: number }[] = []
 
-        for (var i = 0; i < args.items.length; i++) {
+        for (let i = 0; i < args.items.length; i++) {
           //Deduct count from each respective item. Fail if item does not exist
           const item = await InventoryRepo.addItemAmount(args.items[i].id, args.items[i].count * -1)
           if (!item) {

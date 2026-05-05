@@ -1,6 +1,7 @@
-import { gql } from "@apollo/client";
+import { gql, TypedDocumentNode } from "@apollo/client";
+import AccessCheck from "../types/AccessCheck";
 
-export const GET_ACCESS_CHECKS_BY_USERID = gql`
+export const GET_ACCESS_CHECKS_BY_USERID: TypedDocumentNode<AccessCheck, { userID: string }> = gql`
   query getAccessChecksByUserID($userID: ID!) {
     accessChecksByUserID(userID: $userID) {
       id

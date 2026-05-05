@@ -49,7 +49,7 @@ export default function Trainings(props: TrainingProps) {
       <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
         <Stack spacing={0.5}>
           {props.user.passedModules != null && props.user.passedModules.map((module: { moduleID: number, moduleName: string, passedDate: string, makerspaceID: string }) => (
-            <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") === "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
+            <Card sx={{ p: "0.25em", border: `1px solid grey` }}>
               <Stack direction={"row"} sx={{ justifyContent: "space-between" }} alignItems={"center"}>
                 <Typography>{module.moduleName}</Typography>
                 <Stack direction={"row"} spacing={1} alignItems={"center"}>
@@ -75,14 +75,14 @@ export default function Trainings(props: TrainingProps) {
 
       {
         (props.user.trainingHolds == null || (props.user.trainingHolds.length === 0)) && (
-          <Alert severity="success">No Locked Trainings</Alert>
+          <Alert severity="success" variant="filled">No Locked Trainings</Alert>
         )
       }
 
       <Box sx={{ maxHeight: "300px", overflowY: "scroll" }}>
         <Stack spacing={0.5}>
           {props.user.trainingHolds != null && props.user.trainingHolds.map((hold: { id: number; expires: Date; module: { id: number; name: string } }) => (
-            <Card sx={{ p: "0.25em", backgroundColor: (localStorage.getItem("themeMode") === "dark" ? "grey.900" : "grey.100"), border: `1px solid grey` }}>
+            <Card sx={{ p: "0.25em", border: `1px solid grey` }}>
               <Stack direction={"row"} alignItems={"center"} sx={{ justifyContent: "space-between" }}>
                 <Stack direction={"row"} alignItems={"center"} spacing={2}>
                   <Typography color={"secondary"}><b>Exp: </b>{format(new Date(hold.expires), "M/d/yy h:mmaaa")}</Typography>

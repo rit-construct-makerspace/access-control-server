@@ -3,18 +3,17 @@ import { useParams } from "react-router-dom";
 import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../../queries/makerspaceQueries";
 import { useQuery } from "@apollo/client/react";
 import RequestWrapper2 from "../../../common/RequestWrapper2";
-import { DataGrid, GridRowsProp, GridColDef, GridFilterModel, GridPaginationModel, GridSortModel, getGridStringOperators, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridRowsProp, GridColDef, GridPaginationModel, GridSortModel, GridRenderCellParams } from "@mui/x-data-grid";
 import { useState } from "react";
 import { MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, PAGINATED_MAINTENANCE_TICKETS } from "../../../queries/maintenanceTicketQueries";
 import NewTicketModal from "./NewTicketModal";
 import WarningIcon from '@mui/icons-material/Warning';
-import MaintenanceTicketModal from "./MaintenanceTicketModal";
-import { useDebounce } from "../../../common/useDebounce";
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import NewIntervalTicketModal from "./NewIntervalTicketModal";
 import { isManager } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import Equipment from "../../../types/Equipment";
+import MaintenanceTicketButtonCell from "./MaintenanceTicketButtonCell";
 
 const formatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/New_York",
@@ -58,7 +57,7 @@ export default function MaintenancePage() {
     }
   });
 
-  const containsOperator = getGridStringOperators().filter((operator) => operator.value === "contains");
+  // const containsOperator = getGridStringOperators().filter((operator) => operator.value === "contains");
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID", width: 10, filterable: false, resizable: false, hideable: false },
@@ -71,26 +70,9 @@ export default function MaintenancePage() {
     { field: "assigned", headerName: "Assigned", width: 140, sortable: false, filterable: false, resizable: false },
     { field: "dateCreated", headerName: "Created", width: 180, filterable: false, resizable: false },
     {
-      field: "manage", headerName: "Manage", width: 140, filterable: false, sortable: false, renderCell: (params: GridRenderCellParams<any, MaintenanceTicket>) => {
-        const [open, setOpen] = useState(false);
-
-        if (!params.value) {
-          return;
-        }
-
-        return (
-          <Stack height={"100%"} justifyContent={"center"}>
-            <Button
-              color="info"
-              variant="contained"
-              onClick={() => setOpen(true)}
-            >
-              View Ticket
-            </Button>
-            <MaintenanceTicketModal ticket={params.value} open={open} onClose={() => setOpen(false)} />
-          </Stack>
-        );
-      }
+      field: "manage", headerName: "Manage", width: 140, filterable: false, sortable: false, renderCell: (params: GridRenderCellParams<any, MaintenanceTicket>) => (
+        <MaintenanceTicketButtonCell ticket={params.value} />
+      )
     }
   ];
 

@@ -71,7 +71,7 @@ export const OrganizationResolver = {
       },
       { isManager }: ApolloContext
     ) => {
-      return isManager(async (user) => {
+      return isManager(async (_user) => {
         const result = await OrgRepo.editOrganizationNotes(args.orgID, args.notes);
 
         return result;
