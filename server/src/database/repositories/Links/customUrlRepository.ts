@@ -1,6 +1,6 @@
 import { knex } from "../../knex/index.js";
 import { CustomUrlRow } from "../../knex/tables.js";
-import { CustomUrlInput } from "../../schemas/customUrlSchema.js";
+import { CustomUrlInput } from "../../../graphql/schemas/customUrlSchema.js";
 
 export async function getCustomUrl(shortUrl: string): Promise<CustomUrlRow> {
   return await knex('CustomUrls').select('*').where({ shortUrl }).first();

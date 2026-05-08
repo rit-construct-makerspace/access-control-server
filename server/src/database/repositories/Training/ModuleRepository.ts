@@ -50,7 +50,7 @@ export async function getModuleByID(id: number): Promise<TrainingModuleRow> {
 export async function getModuleIDsByEquipmentID(equipmentID: number): Promise<Pick<ModulesForEquipmentRow, "moduleID">[]> {
   const moduleIDs = await knex("ModulesForEquipment")
     .select("moduleID")
-    .where(equipmentID);
+    .where({ equipmentID: equipmentID });
 
   return moduleIDs;
 }

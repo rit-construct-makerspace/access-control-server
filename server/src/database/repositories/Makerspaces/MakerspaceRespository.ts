@@ -5,7 +5,7 @@
 
 import { knex } from '../../knex/index.js';
 import { TrainingModuleRow, MakerspaceRow, UserRow } from '../../knex/tables.js';
-import { MakerspaceInput } from '../../schemas/makerspacesSchema.js';
+import { MakerspaceInput } from '../../../graphql/schemas/makerspacesSchema.js';
 import * as ModuleRepo from '../Training/ModuleRepository.js';
 
 

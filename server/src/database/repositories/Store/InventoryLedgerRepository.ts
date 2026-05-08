@@ -5,7 +5,6 @@
 
 import { knex } from "../../knex/index.js";
 import { InventoryLedgerRow } from "../../knex/tables.js";
-import { InventoryItem } from "../../schemas/storeFrontSchema.js";
 
 /**
  * Get the first 100 Inventory Ledgers by search params

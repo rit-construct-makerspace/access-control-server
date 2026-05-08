@@ -3,7 +3,7 @@ import { knex } from "../../knex/index.js";
 import { CurrencyLedgerRow } from "../../knex/tables.js";
 import * as OrgRepo from "../Users/OrganizationRepository.js";
 import * as UserRepo from "../Users/UserRepository.js";
-import { CurrencyType } from "../../integrations/currency/types.js";
+import { CurrencyType } from "../../../integrations/currency/types.js";
 
 export async function createCurrencyLedgerEntry(
     accountID: number,

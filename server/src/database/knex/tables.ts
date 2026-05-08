@@ -4,8 +4,8 @@
  * This contains the definitions for the objects every knex select operation will map to.
  */
 
-import { DispenserError } from "../api/devices/cards/cardApi.js";
-import { CurrencySource, CurrencyType } from "../integrations/currency/types.js";
+import { DispenserError } from "../../api/devices/cards/cardApi.js";
+import { CurrencySource, CurrencyType } from "../../integrations/currency/types.js";
 import { ACSDeployment } from "../models/ACS/deployment.js";
 import { CoreFlags } from "../models/api/ACSFormats.js";
 

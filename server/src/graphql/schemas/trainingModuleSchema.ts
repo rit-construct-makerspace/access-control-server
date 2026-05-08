@@ -4,7 +4,7 @@
  */
 
 import { gql } from "graphql-tag";
-import { EquipmentRow, TrainingModuleRow } from "../knex/tables.js";
+import { EquipmentRow, TrainingModuleRow } from "../../database/knex/tables.js";
 
 export interface TrainingModule { //dead
   id: number;
