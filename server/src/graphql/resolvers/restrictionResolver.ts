@@ -1,8 +1,8 @@
-import { ApolloContext, CurrentUser } from "../context.js";
-import { RestrictionRow } from "../database/knex/tables.js";
-import * as UsersRepo from "../database/repositories/Users/UserRepository.js";
-import * as RestrictionRepository from "../database/repositories/Restrictions/RestrictionsRepository.js";
-import * as MakerspaceRepo from "../database/repositories/Makerspaces/MakerspaceRespository.js";
+import { ApolloContext, CurrentUser } from "../../context.js";
+import { RestrictionRow } from "../../database/knex/tables.js";
+import * as UsersRepo from "../../database/repositories/Users/UserRepository.js";
+import * as RestrictionRepository from "../../database/repositories/Restrictions/RestrictionsRepository.js";
+import * as MakerspaceRepo from "../../database/repositories/Makerspaces/MakerspaceRespository.js";
 
 export const RestrictionResolver = {
     Restriction: {

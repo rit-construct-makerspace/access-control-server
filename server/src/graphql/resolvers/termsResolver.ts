@@ -3,8 +3,8 @@
  * GraphQL Endpoint Implementations for the Terms value of the TextFields table
  */
 
-import { ApolloContext } from "../context.js";
-import { getTerms, setTerms } from "../database/repositories/TextItems/TermsRepository.js";
+import { ApolloContext } from "../../context.js";
+import { getTerms, setTerms } from "../../database/repositories/TextItems/TermsRepository.js";
 
 const TermsResolver = {
   Query: {

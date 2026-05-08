@@ -5,7 +5,7 @@
 import { knex } from "../../knex/index.js";
 import { EntityNotFound } from "../../../EntityNotFound.js";
 import { EquipmentRow, TrainingModuleRow, UserRow } from "../../knex/tables.js";
-import { EquipmentInput } from "../../../schemas/equipmentSchema.js";
+import { EquipmentInput } from "../../../graphql/schemas/equipmentSchema.js";
 import * as ModuleRepo from "../Training/ModuleRepository.js";
 import * as HoldsRepo from "../Holds/HoldsRepository.js";
 import * as UserRepo from "../Users/UserRepository.js";

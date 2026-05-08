@@ -9,7 +9,7 @@ import { EntityNotFound } from "../../../EntityNotFound.js";
 import {
   InventoryItem,
   InventoryItemInput,
-} from "../../../schemas/storeFrontSchema.js";
+} from "../../../graphql/schemas/storeFrontSchema.js";
 
 /**
  * Fetch all Inventory Items

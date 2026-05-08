@@ -1,12 +1,12 @@
-import { ApolloContext } from "../context.js"
-import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../database/knex/tables.js"
-import * as MaintenanceTicketRepo from "../database/repositories/Equipment/MaintenanceTicketRepository.js"
-import * as InstanceRepo from "../database/repositories/Equipment/EquipmentInstancesRepository.js"
-import * as UserRepo from "../database/repositories/Users/UserRepository.js"
-import * as AuditLogRepo from "../database/repositories/AuditLogs/AuditLogRepository.js"
-import * as EquipmentRepo from "../database/repositories/Equipment/EquipmentRepository.js";
-import { notifyNewMaintenanceTicket } from "../integrations/slack/slack.js"
-import { Equipment } from "../database/models/equipment/Equipment.js"
+import { ApolloContext } from "../../context.js"
+import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../database/knex/tables.js"
+import * as MaintenanceTicketRepo from "../../database/repositories/Equipment/MaintenanceTicketRepository.js"
+import * as InstanceRepo from "../../database/repositories/Equipment/EquipmentInstancesRepository.js"
+import * as UserRepo from "../../database/repositories/Users/UserRepository.js"
+import * as AuditLogRepo from "../../database/repositories/AuditLogs/AuditLogRepository.js"
+import * as EquipmentRepo from "../../database/repositories/Equipment/EquipmentRepository.js";
+import { notifyNewMaintenanceTicket } from "../../integrations/slack/slack.js"
+import { Equipment } from "../../database/models/equipment/Equipment.js"
 
 const MaintenanceTicketResolver = {
   MaintenanceTicket: {

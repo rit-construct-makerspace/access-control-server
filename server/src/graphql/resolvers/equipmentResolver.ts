@@ -3,16 +3,16 @@
  * GraphQL Endpoint Implementations for Equipment
  */
 
-import * as EquipmentRepo from "../database/repositories/Equipment/EquipmentRepository.js";
-import * as EquipmentInstanceRepo from "../database/repositories/Equipment/EquipmentInstancesRepository.js";
-import * as RoomRepo from "../database/repositories/Rooms/RoomRepository.js";
-import * as ModuleRepo from "../database/repositories/Training/ModuleRepository.js"
-import { ApolloContext, CurrentUser } from "../context.js";
-import { createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
-import { getUsersFullName } from "../database/repositories/Users/UserRepository.js";
-import { AccessControllerState, EquipmentRow } from "../database/knex/tables.js";
+import * as EquipmentRepo from "../../database/repositories/Equipment/EquipmentRepository.js";
+import * as EquipmentInstanceRepo from "../../database/repositories/Equipment/EquipmentInstancesRepository.js";
+import * as RoomRepo from "../../database/repositories/Rooms/RoomRepository.js";
+import * as ModuleRepo from "../../database/repositories/Training/ModuleRepository.js"
+import { ApolloContext, CurrentUser } from "../../context.js";
+import { createUnassocaitedAuditLog } from "../../database/repositories/AuditLogs/AuditLogRepository.js";
+import { getUsersFullName } from "../../database/repositories/Users/UserRepository.js";
+import { AccessControllerState, EquipmentRow } from "../../database/knex/tables.js";
 import { EquipmentInput } from "../schemas/equipmentSchema.js";
-import * as ACRepo from "../database/repositories/Devices/AccessControllerRepository.js";
+import * as ACRepo from "../../database/repositories/Devices/AccessControllerRepository.js";
 import { GraphQLError } from "graphql";
 
 

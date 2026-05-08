@@ -1,13 +1,13 @@
-import * as EquipmentRepo from "../database/repositories/Equipment/EquipmentRepository.js";
-import * as InstanceRepo from "../database/repositories/Equipment/EquipmentInstancesRepository.js";
-import * as RoomRepo from "../database/repositories/Rooms/RoomRepository.js";
-import * as ACRepo from "../database/repositories/Devices/AccessControllerRepository.js";
-import { ApolloContext } from "../context.js";
-import { EquipmentInstancesRow } from "../database/knex/tables.js";
-import { createInstance, deleteInstance, getInstanceByID, getInstancesByEquipment, setInstanceName, setInstanceStatus } from "../database/repositories/Equipment/EquipmentInstancesRepository.js";
-import { createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
+import * as EquipmentRepo from "../../database/repositories/Equipment/EquipmentRepository.js";
+import * as InstanceRepo from "../../database/repositories/Equipment/EquipmentInstancesRepository.js";
+import * as RoomRepo from "../../database/repositories/Rooms/RoomRepository.js";
+import * as ACRepo from "../../database/repositories/Devices/AccessControllerRepository.js";
+import { ApolloContext } from "../../context.js";
+import { EquipmentInstancesRow } from "../../database/knex/tables.js";
+import { createInstance, deleteInstance, getInstanceByID, getInstancesByEquipment, setInstanceName, setInstanceStatus } from "../../database/repositories/Equipment/EquipmentInstancesRepository.js";
+import { createUnassocaitedAuditLog } from "../../database/repositories/AuditLogs/AuditLogRepository.js";
 import { GraphQLError } from "graphql";
-import { getUsersFullName } from "../database/repositories/Users/UserRepository.js";
+import { getUsersFullName } from "../../database/repositories/Users/UserRepository.js";
 
 const EquipmentInstanceResolver = {
   EquipmentInstance: {

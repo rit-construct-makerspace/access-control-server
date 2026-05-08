@@ -1,15 +1,15 @@
-import { ApolloContext } from "../context.js";
-import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getMakerspaceByID, getMakerspaces, getTrainingsByMakerspace, getValidStaff, removeTrainingFromMakerspace, updateMakerspace } from "../database/repositories/Makerspaces/MakerspaceRespository.js";
-import { MakerspaceRow } from "../database/knex/tables.js";
-import { getRoomsByMakerspace } from "../database/repositories/Rooms/RoomRepository.js";
+import { ApolloContext } from "../../context.js";
+import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getMakerspaceByID, getMakerspaces, getTrainingsByMakerspace, getValidStaff, removeTrainingFromMakerspace, updateMakerspace } from "../../database/repositories/Makerspaces/MakerspaceRespository.js";
+import { MakerspaceRow } from "../../database/knex/tables.js";
+import { getRoomsByMakerspace } from "../../database/repositories/Rooms/RoomRepository.js";
 import { MakerspaceInput } from "../schemas/makerspacesSchema.js";
-import * as HoursRepo from "../database/repositories/Makerspaces/MakerspaceHoursRepository.js";
-import { createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
-import { getUsersFullName } from "../database/repositories/Users/UserRepository.js";
-import { getItems, getItemsWhereStorefront } from "../database/repositories/Store/InventoryRepository.js";
-import * as DeviceRepo from "../database/repositories/Devices/DeviceRepository.js";
-import * as CoreRepo from "../database/repositories/Devices/CoreRepository.js";
-import * as DispenserRepo from "../database/repositories/Devices/DispenserRepository.js";
+import * as HoursRepo from "../../database/repositories/Makerspaces/MakerspaceHoursRepository.js";
+import { createUnassocaitedAuditLog } from "../../database/repositories/AuditLogs/AuditLogRepository.js";
+import { getUsersFullName } from "../../database/repositories/Users/UserRepository.js";
+import { getItems, getItemsWhereStorefront } from "../../database/repositories/Store/InventoryRepository.js";
+import * as DeviceRepo from "../../database/repositories/Devices/DeviceRepository.js";
+import * as CoreRepo from "../../database/repositories/Devices/CoreRepository.js";
+import * as DispenserRepo from "../../database/repositories/Devices/DispenserRepository.js";
 
 const MakerspacesResolver = {
   Makerspace: {

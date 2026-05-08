@@ -3,15 +3,15 @@
  * GraphQL Endpoint Implementations for Access Checks
  */
 
-import * as EquipmentRepo from "../database/repositories/Equipment/EquipmentRepository.js";
-import * as RoomRepo from "../database/repositories/Rooms/RoomRepository.js";
-import { ApolloContext } from "../context.js";
-import { accessCheckExists, createAccessCheck, getAccessCheckByID, getAccessChecks, getAccessChecksByApproved, getAccessChecksByUserID, purgeUnapprovedAccessChecks, setAccessCheckApproval } from "../database/repositories/Equipment/AccessChecksRepository.js";
-import { createAuditLog, createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
-import { getUserByID, getUsersFullName } from "../database/repositories/Users/UserRepository.js";
+import * as EquipmentRepo from "../../database/repositories/Equipment/EquipmentRepository.js";
+import * as RoomRepo from "../../database/repositories/Rooms/RoomRepository.js";
+import { ApolloContext } from "../../context.js";
+import { accessCheckExists, createAccessCheck, getAccessCheckByID, getAccessChecks, getAccessChecksByApproved, getAccessChecksByUserID, purgeUnapprovedAccessChecks, setAccessCheckApproval } from "../../database/repositories/Equipment/AccessChecksRepository.js";
+import { createAuditLog, createUnassocaitedAuditLog } from "../../database/repositories/AuditLogs/AuditLogRepository.js";
+import { getUserByID, getUsersFullName } from "../../database/repositories/Users/UserRepository.js";
 import { GraphQLError } from "graphql";
-import { AccessCheckRow } from "../database/knex/tables.js";
-import { Equipment } from "../database/models/equipment/Equipment.js";
+import { AccessCheckRow } from "../../database/knex/tables.js";
+import { Equipment } from "../../database/models/equipment/Equipment.js";
 
 const AccessChecksResolver = {
   AccessCheck: {

@@ -3,12 +3,12 @@
  * GraphQL endpoint implementations for EquipmentSessions
  */
 
-import * as EquipmentRepo from "../database/repositories/Equipment/EquipmentRepository.js";
-import { ApolloContext, CurrentUser } from "../context.js";
-import { getUserByID } from "../database/repositories/Users/UserRepository.js";
-import { getEquipmentSessions } from "../database/repositories/Equipment/EquipmentSessionsRepository.js";
-import { getRoomByID } from "../database/repositories/Rooms/RoomRepository.js";
-import { getMakerspaceByID } from "../database/repositories/Makerspaces/MakerspaceRespository.js";
+import * as EquipmentRepo from "../../database/repositories/Equipment/EquipmentRepository.js";
+import { ApolloContext, CurrentUser } from "../../context.js";
+import { getUserByID } from "../../database/repositories/Users/UserRepository.js";
+import { getEquipmentSessions } from "../../database/repositories/Equipment/EquipmentSessionsRepository.js";
+import { getRoomByID } from "../../database/repositories/Rooms/RoomRepository.js";
+import { getMakerspaceByID } from "../../database/repositories/Makerspaces/MakerspaceRespository.js";
 
 const EquipmentSessionsResolver = {
   EquipmentSession: {

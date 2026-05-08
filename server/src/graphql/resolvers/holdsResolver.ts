@@ -1,10 +1,10 @@
-import { ApolloContext, CurrentUser } from "../context.js";
-import * as HoldsRepo from "../database/repositories/Holds/HoldsRepository.js";
-import * as UsersRepo from "../database/repositories/Users/UserRepository.js";
-import { createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
-import { getUsersFullName } from "../database/repositories/Users/UserRepository.js";
-import { HoldRow } from "../database/knex/tables.js";
-import { send_hold_placed_email } from "../integrations/email/email.js";
+import { ApolloContext, CurrentUser } from "../../context.js";
+import * as HoldsRepo from "../../database/repositories/Holds/HoldsRepository.js";
+import * as UsersRepo from "../../database/repositories/Users/UserRepository.js";
+import { createUnassocaitedAuditLog } from "../../database/repositories/AuditLogs/AuditLogRepository.js";
+import { getUsersFullName } from "../../database/repositories/Users/UserRepository.js";
+import { HoldRow } from "../../database/knex/tables.js";
+import { send_hold_placed_email } from "../../integrations/email/email.js";
 
 const HoldsResolvers = {
   Hold: {

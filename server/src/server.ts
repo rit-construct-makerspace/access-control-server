@@ -9,7 +9,7 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express5";
 import compression from "compression";
 import cors from "cors";
-import { schema } from "./schema.js";
+import { schema } from "./graphql/schema.js";
 import { setupSessions, setupDevAuth, setupSamlAuth, setupAuth } from "./auth.js";
 import context, { determineUser } from "./context.js";
 import path from "path";

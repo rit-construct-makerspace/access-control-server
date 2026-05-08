@@ -1,5 +1,5 @@
-import { ApolloContext } from "../context.js";
-import { createCustomUrl, deleteCustomUrl, getCustomUrl, getCustomUrlById, getCustomUrls, updateCustomUrl } from "../database/repositories/Links/customUrlRepository.js";
+import { ApolloContext } from "../../context.js";
+import { createCustomUrl, deleteCustomUrl, getCustomUrl, getCustomUrlById, getCustomUrls, updateCustomUrl } from "../../database/repositories/Links/customUrlRepository.js";
 import { CustomUrlInput } from "../schemas/customUrlSchema.js";
 
 const CustomUrlResolver = {

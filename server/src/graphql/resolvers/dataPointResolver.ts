@@ -3,8 +3,8 @@
  * GraphQL Endpoint Implementations for Data Points (misc integer data)
  */
 
-import { ApolloContext } from "../context.js";
-import { getDataPointByID, incrementDataPointValue, setDataPointValue } from "../database/repositories/DataPoints/DataPointsRepository.js";
+import { ApolloContext } from "../../context.js";
+import { getDataPointByID, incrementDataPointValue, setDataPointValue } from "../../database/repositories/DataPoints/DataPointsRepository.js";
 
 const DataPointsResolver = {
   Query: {

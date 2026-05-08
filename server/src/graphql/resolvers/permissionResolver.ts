@@ -3,7 +3,7 @@
  * GraphQL endpoint implmenentations for Permissions
  */
 
-import { ApolloContext, CurrentUser } from "../context.js";
+import { ApolloContext, CurrentUser } from "../../context.js";
 
 const PermissionResolver = {
   Query: {

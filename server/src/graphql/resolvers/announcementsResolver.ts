@@ -3,8 +3,8 @@
  * GraphQL Endpoint Implementations for Announcements
  */
 
-import { ApolloContext } from "../context.js";
-import { getAnnouncements, getAnnouncementByID, createAnnouncement, updateAnnouncement, deleteAnnouncement } from "../database/repositories/Announcements/AnnouncementsRepository.js";
+import { ApolloContext } from "../../context.js";
+import { getAnnouncements, getAnnouncementByID, createAnnouncement, updateAnnouncement, deleteAnnouncement } from "../../database/repositories/Announcements/AnnouncementsRepository.js";
 
 const AnnouncementsResolver = {
 

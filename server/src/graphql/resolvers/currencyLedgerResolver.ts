@@ -1,5 +1,5 @@
-import { ApolloContext } from "../context.js"
-import * as CurrencyLedgerRepo from "../database/repositories/Currency/CurrencyLedgerRepository.js"
+import { ApolloContext } from "../../context.js"
+import * as CurrencyLedgerRepo from "../../database/repositories/Currency/CurrencyLedgerRepository.js"
 
 
 export const CurrencyLedgerResolvers = {
