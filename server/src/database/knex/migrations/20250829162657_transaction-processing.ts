@@ -1,5 +1,5 @@
 import type { Knex } from "knex";
-import { CurrencySource, CurrencyType } from "../../integrations/currency/types.js";
+import { CurrencySource, CurrencyType } from "../../../integrations/currency/types.js";
 
 
 export async function up(knex: Knex): Promise<void> {
