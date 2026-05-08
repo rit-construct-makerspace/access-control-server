@@ -1,5 +1,5 @@
 import { ChatPostMessageArguments, WebClient } from "@slack/web-api";
-import { EquipmentRow, MaintenanceTicketRow, MakerspaceRow, ReservationRow, UserRow } from "../../db/tables.js";
+import { EquipmentRow, MaintenanceTicketRow, MakerspaceRow, ReservationRow, UserRow } from "../../knex/tables.js";
 import * as EquipmentInstanceRepo from "../../repositories/Equipment/EquipmentInstancesRepository.js";
 import * as EquipmentRepo from "../../repositories/Equipment/EquipmentRepository.js";
 import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";

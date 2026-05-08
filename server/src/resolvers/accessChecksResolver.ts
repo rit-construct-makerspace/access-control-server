@@ -10,7 +10,7 @@ import { accessCheckExists, createAccessCheck, getAccessCheckByID, getAccessChec
 import { createAuditLog, createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUserByID, getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { GraphQLError } from "graphql";
-import { AccessCheckRow } from "../db/tables.js";
+import { AccessCheckRow } from "../knex/tables.js";
 import { Equipment } from "../models/equipment/Equipment.js";
 
 const AccessChecksResolver = {

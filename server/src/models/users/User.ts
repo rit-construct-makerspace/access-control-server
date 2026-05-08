@@ -1,4 +1,4 @@
-import { RestrictionRow, UserRow } from "../../db/tables.js";
+import { RestrictionRow, UserRow } from "../../knex/tables.js";
 import * as HoldsRepo from "../../repositories/Holds/HoldsRepository.js";
 import * as RestrctionRepo from "../../repositories/Restrictions/RestrictionsRepository.js";
 import * as UserRepo from "../../repositories/Users/UserRepository.js";

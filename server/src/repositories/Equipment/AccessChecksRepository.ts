@@ -2,8 +2,8 @@
  * DB operations endpoint for AccessChecks table
  */
 
-import { knex } from "../../db/index.js";
-import { AccessCheckRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { AccessCheckRow } from "../../knex/tables.js";
 
 
 /**

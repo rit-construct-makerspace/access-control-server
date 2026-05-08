@@ -1,4 +1,4 @@
-import { AccessControllerState, CoreInputMode } from "../../db/tables.js"
+import { AccessControllerState, CoreInputMode } from "../../knex/tables.js"
 import { ACSDeployment } from "../ACS/deployment.js";
 
 export interface CoreStatusReport {

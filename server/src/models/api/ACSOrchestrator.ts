@@ -7,7 +7,7 @@ import * as DeviceLogRepo from "../../repositories/Logs/DeviceLogsRepository.js"
 import * as UserRepo from "../../repositories/Users/UserRepository.js";
 import * as MakerspaceRepo from "../../repositories/Makerspaces/MakerspaceRespository.js";
 import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
-import { AccessControllerState, DeviceLogSeverity } from "../../db/tables.js";
+import { AccessControllerState, DeviceLogSeverity } from "../../knex/tables.js";
 import { AccessAttemptReason } from "../devices/accessController.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
 

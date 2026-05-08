@@ -3,8 +3,8 @@
  * DB Operations for Tool Item Types
  */
 
-import { knex } from "../../db/index.js";
-import { ToolItemTypesRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { ToolItemTypesRow } from "../../knex/tables.js";
 
 /**
  * Fetch all Tool Item Types

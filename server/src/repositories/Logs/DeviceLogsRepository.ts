@@ -1,5 +1,5 @@
-import { DeviceLogRow, DeviceLogSeverity } from "../../db/tables.js";
-import { knex } from "../../db/index.js";
+import { DeviceLogRow, DeviceLogSeverity } from "../../knex/tables.js";
+import { knex } from "../../knex/index.js";
 
 export async function createDeviceLog(deviceID: number | undefined, severity: DeviceLogSeverity, log: object): Promise<DeviceLogRow> {
   if (severity === DeviceLogSeverity.HIGH) {

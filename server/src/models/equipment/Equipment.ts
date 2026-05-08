@@ -1,4 +1,4 @@
-import { EquipmentRow } from "../../db/tables.js";
+import { EquipmentRow } from "../../knex/tables.js";
 import { AccessAttemptReason } from "../devices/accessController.js";
 import { User } from "../users/User.js";
 import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";

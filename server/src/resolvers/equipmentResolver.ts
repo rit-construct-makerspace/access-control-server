@@ -10,7 +10,7 @@ import * as ModuleRepo from "../repositories/Training/ModuleRepository.js"
 import { ApolloContext, CurrentUser } from "../context.js";
 import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
-import { AccessControllerState, EquipmentRow } from "../db/tables.js";
+import { AccessControllerState, EquipmentRow } from "../knex/tables.js";
 import { EquipmentInput } from "../schemas/equipmentSchema.js";
 import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import { GraphQLError } from "graphql";

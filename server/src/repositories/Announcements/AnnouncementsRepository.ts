@@ -3,8 +3,8 @@
  */
 
 import { EntityNotFound } from "../../EntityNotFound.js";
-import { knex } from "../../db/index.js";
-import { AnnouncementRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { AnnouncementRow } from "../../knex/tables.js";
 
 /**
  * fetch every Announcement

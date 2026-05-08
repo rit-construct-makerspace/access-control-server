@@ -3,8 +3,8 @@
  * DB Operations for Equipment Instances
  */
 
-import { knex } from "../../db/index.js";
-import { EquipmentInstancesRow, ReaderRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { EquipmentInstancesRow, ReaderRow } from "../../knex/tables.js";
 
 /**
  * Fetch all EquipmentInstances related to noted Equipment

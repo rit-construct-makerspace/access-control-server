@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
-import { knex } from "../../db/index.js";
-import { AccessControllerRow, AccessControllerState } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { AccessControllerRow, AccessControllerState } from "../../knex/tables.js";
 import { AccessController } from "../../models/devices/accessController.js";
 
 export async function getAccessControllersByDeviceID(deviceID: number): Promise<AccessController[]> {

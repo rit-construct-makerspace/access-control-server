@@ -1,4 +1,4 @@
-import { RoomRow } from "../../db/tables.js";
+import { RoomRow } from "../../knex/tables.js";
 import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
 
 export class Room implements RoomRow {

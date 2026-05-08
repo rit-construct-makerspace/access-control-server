@@ -1,6 +1,6 @@
 import { ApolloContext } from "../context.js";
 import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getMakerspaceByID, getMakerspaces, getTrainingsByMakerspace, getValidStaff, removeTrainingFromMakerspace, updateMakerspace } from "../repositories/Makerspaces/MakerspaceRespository.js";
-import { MakerspaceRow } from "../db/tables.js";
+import { MakerspaceRow } from "../knex/tables.js";
 import { getRoomsByMakerspace } from "../repositories/Rooms/RoomRepository.js";
 import { MakerspaceInput } from "../schemas/makerspacesSchema.js";
 import * as HoursRepo from "../repositories/Makerspaces/MakerspaceHoursRepository.js";

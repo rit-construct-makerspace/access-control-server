@@ -2,8 +2,8 @@
  * DB operations endpoint for TrainingModule table
  */
 
-import { knex } from "../../db/index.js";
-import { TrainingModuleRow, TrainingModuleItem, ModulesForEquipmentRow, EquipmentRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { TrainingModuleRow, TrainingModuleItem, ModulesForEquipmentRow, EquipmentRow } from "../../knex/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import { PassedModule } from "../../schemas/usersSchema.js";
 

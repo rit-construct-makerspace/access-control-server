@@ -4,8 +4,8 @@
  */
 
 import { GraphQLError } from "graphql";
-import { knex } from "../../db/index.js";
-import { DefaultHoursRow, SpecialHoursRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { DefaultHoursRow, SpecialHoursRow } from "../../knex/tables.js";
 
 const full_formatter = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/New_York",

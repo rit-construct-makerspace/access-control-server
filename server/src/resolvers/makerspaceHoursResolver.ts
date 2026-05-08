@@ -1,6 +1,6 @@
 import { ApolloContext } from "../context.js";
 import * as HoursRepo from "../repositories/Makerspaces/MakerspaceHoursRepository.js";
-import { DefaultHoursRow, SpecialHoursRow } from "../db/tables.js";
+import { DefaultHoursRow, SpecialHoursRow } from "../knex/tables.js";
 
 const MakerspaceHoursResolver = {
 

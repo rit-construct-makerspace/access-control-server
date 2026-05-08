@@ -1,12 +1,12 @@
-import { knex } from "../../db/index.js";
-import { RestrictionRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { RestrictionRow } from "../../knex/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 
 /**
  * Function to get restriction by ID
  */
 export async function getRestriction(id: number): Promise<RestrictionRow> {
-    const restriciton = await knex("Restrictions").first().where({id: id});
+    const restriciton = await knex("Restrictions").first().where({ id: id });
 
     if (!restriciton) throw new EntityNotFound(`Restriction #${id} Not Found`);
 
@@ -43,7 +43,7 @@ export async function createRestriction(
  * @param id id of the restriciton to delete
  */
 export async function deleteRestriction(id: number): Promise<boolean> {
-    await knex("Restrictions").delete().where({id: id});
+    await knex("Restrictions").delete().where({ id: id });
     return true;
 }
 
@@ -53,7 +53,7 @@ export async function deleteRestriction(id: number): Promise<boolean> {
  * @returns An array of @type {RestrictionRow}
  */
 export async function getRestrictionsByUserID(userID: number): Promise<RestrictionRow[]> {
-    return await knex("Restrictions").select().where({userID: userID}).orderBy("createDate", "desc");
+    return await knex("Restrictions").select().where({ userID: userID }).orderBy("createDate", "desc");
 }
 
 /**

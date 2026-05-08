@@ -3,8 +3,8 @@
  * DB Operations for Equipment Sessions
  */
 
-import { knex } from "../../db/index.js";
-import { EquipmentSessionRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { EquipmentSessionRow } from "../../knex/tables.js";
 
 /**
  * Insert a new Equipment Session into table

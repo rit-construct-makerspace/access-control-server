@@ -1,5 +1,5 @@
 import { ApolloContext } from "../context.js";
-import { AccessControllerRow, AccessControllerState, CoreRow, DispenserRow } from "../db/tables.js";
+import { AccessControllerRow, AccessControllerState, CoreRow, DispenserRow } from "../knex/tables.js";
 import * as DeviceRepo from "../repositories/Devices/DeviceRepository.js";
 import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js";

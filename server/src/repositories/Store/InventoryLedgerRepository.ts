@@ -3,8 +3,8 @@
  * DB Operations for Inventory Ledgers
  */
 
-import { knex } from "../../db/index.js";
-import { InventoryLedgerRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { InventoryLedgerRow } from "../../knex/tables.js";
 import { InventoryItem } from "../../schemas/storeFrontSchema.js";
 
 /**

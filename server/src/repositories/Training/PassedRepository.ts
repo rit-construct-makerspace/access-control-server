@@ -1,4 +1,4 @@
-import { knex } from "../../db/index.js";
+import { knex } from "../../knex/index.js";
 
 
 export async function addPassedModule(userID: number, moduleID: number, passedDate: Date) {
@@ -18,7 +18,7 @@ export async function purgeExpiredPassedModules(): Promise<number> {
   return result.rows.length;
 }
 
-export async function getPassedTrainingsDaysAgo(days: number): Promise<{email: string, moduleIds: number[], moduleNames: string[]}[]> {
+export async function getPassedTrainingsDaysAgo(days: number): Promise<{ email: string, moduleIds: number[], moduleNames: string[] }[]> {
   const result = await knex.raw(`
 select
 	CONCAT(u."ritUsername", '@rit.edu') as email,

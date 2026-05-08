@@ -1,4 +1,4 @@
-import { AccessControllerRow, AccessControllerState } from "../../db/tables.js";
+import { AccessControllerRow, AccessControllerState } from "../../knex/tables.js";
 import * as EquipmentInstanceRepo from "../../repositories/Equipment/EquipmentInstancesRepository.js";
 import * as EquipmentRepo from "../../repositories/Equipment/EquipmentRepository.js";
 import * as UserRepo from "../../repositories/Users/UserRepository.js";

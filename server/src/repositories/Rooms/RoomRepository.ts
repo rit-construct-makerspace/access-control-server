@@ -3,9 +3,9 @@
  */
 
 import { Room } from "../../models/rooms/room.js";
-import { knex } from "../../db/index.js";
+import { knex } from "../../knex/index.js";
 import assert from "assert";
-import { RoomSwipeRow, TrainingModuleRow } from "../../db/tables.js";
+import { RoomSwipeRow, TrainingModuleRow } from "../../knex/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import * as ModuleRepo from "../Training/ModuleRepository.js";
 

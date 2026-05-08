@@ -1,6 +1,6 @@
 import ejs from "ejs"
 import { centsToDollarString } from "../currency/currency.js"
-import { TransactionEntryRow, TransactionRow } from "../../db/tables.js"
+import { TransactionEntryRow, TransactionRow } from "../../knex/tables.js"
 import { getCurrencyLedgerEntriesForTransactionEntryByEntryId, getTransactionById, getTransactionEntriesByTransactionId } from "../../repositories/Currency/TransactionRepository.js"
 import { CurrencyType } from "../currency/types.js"
 import { getAccountBalanceCents, getAccountOwner } from "../../repositories/Currency/CurrencyAccountsRepository.js"

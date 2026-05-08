@@ -2,9 +2,9 @@
  * DB operations endpoint for Holds table
  */
 
-import { knex } from "../../db/index.js";
+import { knex } from "../../knex/index.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
-import { HoldRow } from "../../db/tables.js";
+import { HoldRow } from "../../knex/tables.js";
 
 /**
  * Fetcha  hold by it's unique ID

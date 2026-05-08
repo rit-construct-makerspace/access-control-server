@@ -1,4 +1,4 @@
-import { knex } from "../../db/index.js";
+import { knex } from "../../knex/index.js";
 import { Dispenser } from "../../models/devices/Dispenser.js";
 import * as DeviceRepo from "./DeviceRepository.js";
 

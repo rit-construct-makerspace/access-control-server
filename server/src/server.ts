@@ -30,7 +30,7 @@ import * as S3 from "./integrations/aws/s3.js"
 import { isStaff } from "./privilege.js";
 import { advanceTimeTickets, deletePastSpecialHours, purge_images, scheduledRestartAllCores } from "./periodicActions.js";
 import { getCustomUrl } from "./repositories/Links/customUrlRepository.js";
-import { InventoryItemRow } from "./db/tables.js";
+import { InventoryItemRow } from "./knex/tables.js";
 import * as API from "./api/api.js";
 import { getDeviceBySN } from "./repositories/Devices/DeviceRepository.js";
 import { authenticateDevice } from "./api/devices/deviceApi.js";

@@ -1,14 +1,14 @@
 import * as CurrencyAccountRepo from "../Currency/CurrencyAccountsRepository.js"
-import { knex } from "../../db/index.js";
+import { knex } from "../../knex/index.js";
 import { GraphQLError } from "graphql";
-import { OrganizationsRow } from "../../db/tables.js";
+import { OrganizationsRow } from "../../knex/tables.js";
 
 export async function createOrganization(username: string, notes: string, displayname?: string): Promise<OrganizationsRow> {
   // Create the account for the organization
   const accountID = await CurrencyAccountRepo.createAccount();
 
   const data = displayname ? { username: username, displayname: displayname, notes: notes } : { username: username, notes: notes };
-  
+
 
   try {
     var orgID = await knex("Organizations").insert({ ...data, accountID: accountID }).returning("*");

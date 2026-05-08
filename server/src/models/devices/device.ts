@@ -1,5 +1,5 @@
 import { createCipheriv, scryptSync } from "crypto";
-import { DeviceRow } from "../../db/tables.js";
+import { DeviceRow } from "../../knex/tables.js";
 import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 
 export class Device implements DeviceRow {

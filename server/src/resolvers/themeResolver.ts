@@ -1,5 +1,5 @@
 import { ApolloContext } from "../context.js";
-import { ThemeRow } from "../db/tables.js";
+import { ThemeRow } from "../knex/tables.js";
 import * as ThemeRepo from "../repositories/SiteSettings/ThemesRepository.js";
 
 const ThemeResolver = {

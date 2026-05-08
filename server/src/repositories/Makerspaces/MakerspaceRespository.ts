@@ -3,8 +3,8 @@
  * DB Operations for Makerspaces
  */
 
-import { knex } from '../../db/index.js';
-import { TrainingModuleRow, MakerspaceRow, UserRow } from '../../db/tables.js';
+import { knex } from '../../knex/index.js';
+import { TrainingModuleRow, MakerspaceRow, UserRow } from '../../knex/tables.js';
 import { MakerspaceInput } from '../../schemas/makerspacesSchema.js';
 import * as ModuleRepo from '../Training/ModuleRepository.js';
 

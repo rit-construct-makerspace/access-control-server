@@ -10,7 +10,7 @@ import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRe
 import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import * as SubmissionRepo from "../repositories/Training/SubmissionRepository.js";
 import { MODULE_PASSING_THRESHOLD } from "../constants.js";
-import { TrainingModuleItem, TrainingModuleRow } from "../db/tables.js";
+import { TrainingModuleItem, TrainingModuleRow } from "../knex/tables.js";
 import { accessCheckExists, createAccessCheck, hasApprovedAccessCheck } from "../repositories/Equipment/AccessChecksRepository.js";
 import { createTrainingHold, getTrainingHoldByUserForModule } from "../repositories/Training/TrainingHoldsRespository.js";
 import * as PassedModuleRepo from "../repositories/Training/PassedRepository.js";

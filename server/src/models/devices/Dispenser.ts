@@ -1,4 +1,4 @@
-import { DeviceRow, DispenserRow } from "../../db/tables.js";
+import { DeviceRow, DispenserRow } from "../../knex/tables.js";
 import { Device } from "./device.js";
 import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";

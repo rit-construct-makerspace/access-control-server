@@ -1,5 +1,5 @@
-import { knex } from "../../db/index.js";
-import { ThemeRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { ThemeRow } from "../../knex/tables.js";
 
 export async function getThemes(): Promise<ThemeRow[]> {
   return await knex("Themes").select("*").orderBy("id", "asc");

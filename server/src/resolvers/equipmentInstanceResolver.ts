@@ -3,7 +3,7 @@ import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepos
 import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
 import * as ACRepo from "../repositories/Devices/AccessControllerRepository.js";
 import { ApolloContext } from "../context.js";
-import { EquipmentInstancesRow } from "../db/tables.js";
+import { EquipmentInstancesRow } from "../knex/tables.js";
 import { createInstance, deleteInstance, getInstanceByID, getInstancesByEquipment, setInstanceName, setInstanceStatus } from "../repositories/Equipment/EquipmentInstancesRepository.js";
 import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { GraphQLError } from "graphql";

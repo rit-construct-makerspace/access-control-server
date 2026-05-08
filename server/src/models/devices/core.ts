@@ -1,4 +1,4 @@
-import { AccessControllerState, CoreInputMode, CoreRow, DeviceRow } from "../../db/tables.js";
+import { AccessControllerState, CoreInputMode, CoreRow, DeviceRow } from "../../knex/tables.js";
 import { Device } from "./device.js";
 import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";

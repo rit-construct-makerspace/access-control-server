@@ -3,8 +3,8 @@
  * DB Operations for Tool Item Instances
  */
 
-import { knex } from "../../db/index.js";
-import { ToolItemInstancesRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { ToolItemInstancesRow } from "../../knex/tables.js";
 
 /**
  * Fetch all Tool Item Instances
@@ -20,7 +20,7 @@ export async function getToolItemInstances(): Promise<ToolItemInstancesRow[]> {
  * @returns all matching Tool Item Instances
  */
 export async function getToolItemInstancesByType(typeID: number): Promise<ToolItemInstancesRow[]> {
-    return await knex("ToolItemInstances").select().where({typeID}).orderBy("id");
+    return await knex("ToolItemInstances").select().where({ typeID }).orderBy("id");
 }
 
 /**
@@ -29,7 +29,7 @@ export async function getToolItemInstancesByType(typeID: number): Promise<ToolIt
  * @returns Tool Item Instance
  */
 export async function getToolItemInstanceByID(id: number): Promise<ToolItemInstancesRow | undefined> {
-    return await knex("ToolItemInstances").select().where({id}).first();
+    return await knex("ToolItemInstances").select().where({ id }).first();
 }
 
 /**
@@ -38,7 +38,7 @@ export async function getToolItemInstanceByID(id: number): Promise<ToolItemInsta
  * @returns all matching Tool Item Instances
  */
 export async function getToolItemInstancesByBorrower(borrowerUserID: number): Promise<ToolItemInstancesRow[]> {
-    return await knex("ToolItemInstances").select().where({borrowerUserID});
+    return await knex("ToolItemInstances").select().where({ borrowerUserID });
 }
 
 /**
@@ -53,7 +53,7 @@ export async function getToolItemInstancesByBorrower(borrowerUserID: number): Pr
  * @returns new ToolItemInstance
  */
 export async function createToolItemInstance(typeID: number, uniqueIdentifier: string, locationRoomID: number | undefined, locationDescription: string | undefined, condition: string, status: string, notes: string | undefined): Promise<ToolItemInstancesRow> {
-    return await knex("ToolItemInstances").insert({typeID, uniqueIdentifier, locationRoomID, locationDescription, condition, status, notes});
+    return await knex("ToolItemInstances").insert({ typeID, uniqueIdentifier, locationRoomID, locationDescription, condition, status, notes });
 }
 
 /**
@@ -69,7 +69,7 @@ export async function createToolItemInstance(typeID: number, uniqueIdentifier: s
  * @returns updated Tool Item Instance
  */
 export async function updateToolItemInstance(id: number, typeID: number, uniqueIdentifier: string, locationRoomID: number | undefined, locationDescription: string | undefined, condition: string, status: string, notes: string | undefined): Promise<ToolItemInstancesRow | undefined> {
-    return (await knex("ToolItemInstances").update({typeID, uniqueIdentifier, locationRoomID, locationDescription, condition, status, notes}).where({id}).returning("*"))[0];
+    return (await knex("ToolItemInstances").update({ typeID, uniqueIdentifier, locationRoomID, locationDescription, condition, status, notes }).where({ id }).returning("*"))[0];
 }
 
 /**
@@ -78,7 +78,7 @@ export async function updateToolItemInstance(id: number, typeID: number, uniqueI
  * @returns true
  */
 export async function deleteToolItemInstance(id: number): Promise<boolean> {
-    await knex("ToolItemInstances").delete().where({id});
+    await knex("ToolItemInstances").delete().where({ id });
     return true;
 }
 
@@ -89,7 +89,7 @@ export async function deleteToolItemInstance(id: number): Promise<boolean> {
  * @returns true
  */
 export async function borrowItem(borrowerUserID: number, id: number): Promise<boolean> {
-    await knex("ToolItemInstances").update({borrowerUserID, borrowedAt: knex.fn.now(), status: "OUT"}).where({id});
+    await knex("ToolItemInstances").update({ borrowerUserID, borrowedAt: knex.fn.now(), status: "OUT" }).where({ id });
     return true;
 }
 
@@ -99,6 +99,6 @@ export async function borrowItem(borrowerUserID: number, id: number): Promise<bo
  * @returns true
  */
 export async function returnItem(id: number): Promise<boolean> {
-    await knex("ToolItemInstances").update({borrowerUserID: null, borrowedAt: null, status: "AVAILABLE"}).where({id});
+    await knex("ToolItemInstances").update({ borrowerUserID: null, borrowedAt: null, status: "AVAILABLE" }).where({ id });
     return true;
 }

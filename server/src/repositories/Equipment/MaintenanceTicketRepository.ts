@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
-import { knex } from "../../db/index.js";
-import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../knex/tables.js";
 import { addHours, endOfDay } from "date-fns"
 
 export async function createMaintenanceTicket(

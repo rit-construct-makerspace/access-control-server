@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
-import { knex } from "../../db/index.js";
-import { TempCardRow, UserRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { TempCardRow, UserRow } from "../../knex/tables.js";
 
 export async function IssueCard(userID: number, cardTagID: string): Promise<TempCardRow> {
   return await knex("TemporaryCards").insert({ userID: userID, cardTagID: cardTagID });

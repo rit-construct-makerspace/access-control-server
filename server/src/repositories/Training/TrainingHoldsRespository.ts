@@ -3,8 +3,8 @@
  * DB Operations for Training Holds
  */
 
-import { knex } from "../../db/index.js";
-import { TrainingHoldsRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { TrainingHoldsRow } from "../../knex/tables.js";
 
 /**
  * Fetch Training Holds
@@ -20,7 +20,7 @@ export async function getTrainingHolds(): Promise<TrainingHoldsRow[]> {
  * @returns all matching Training Holds
  */
 export async function getTrainingHoldsByUser(userID: number): Promise<TrainingHoldsRow[]> {
-    return await knex("TrainingHolds").select().where({userID}).andWhere("expires", ">=", knex.fn.now());
+    return await knex("TrainingHolds").select().where({ userID }).andWhere("expires", ">=", knex.fn.now());
 }
 
 /**
@@ -30,7 +30,7 @@ export async function getTrainingHoldsByUser(userID: number): Promise<TrainingHo
  * @returns Training Hold or undefined if not found
  */
 export async function getTrainingHoldByUserForModule(userID: number, moduleID: number): Promise<TrainingHoldsRow | undefined> {
-    return await knex("TrainingHolds").select().where({userID, moduleID}).andWhere("expires", ">=", knex.fn.now()).first();
+    return await knex("TrainingHolds").select().where({ userID, moduleID }).andWhere("expires", ">=", knex.fn.now()).first();
 }
 
 /**
@@ -39,7 +39,7 @@ export async function getTrainingHoldByUserForModule(userID: number, moduleID: n
  * @returns Training Hold or undefined if ID not exist
  */
 export async function getTrainingHoldByID(id: number): Promise<TrainingHoldsRow | undefined> {
-    return await knex("TrainingHolds").select().where({id}).first();
+    return await knex("TrainingHolds").select().where({ id }).first();
 }
 
 /**
@@ -52,12 +52,12 @@ export async function getTrainingHoldByID(id: number): Promise<TrainingHoldsRow 
 export async function createTrainingHold(userID: number, moduleID: number, expires?: Date): Promise<boolean> {
     if (!expires) {
         expires = new Date();
-        expires.setDate(expires.getDate()+1);
+        expires.setDate(expires.getDate() + 1);
         expires.setHours(0);
         expires.setMinutes(0);
         expires.setSeconds(0);
     }
-    await knex("TrainingHolds").insert({userID, moduleID, expires});
+    await knex("TrainingHolds").insert({ userID, moduleID, expires });
     return true;
 }
 
@@ -76,7 +76,7 @@ export async function deleteExpiredTrainingHolds(): Promise<boolean> {
  * @returns true
  */
 export async function deleteTrainingHold(id: number): Promise<boolean> {
-    await knex("TrainingHolds").delete().where({id});
+    await knex("TrainingHolds").delete().where({ id });
     return true;
 }
 

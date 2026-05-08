@@ -1,4 +1,4 @@
-import { knex } from "../db/index.js";
+import { knex } from "../knex/index.js";
 
 
 

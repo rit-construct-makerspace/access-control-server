@@ -1,5 +1,5 @@
 import { ApolloContext } from "../context.js";
-import { CurrencyAccountsRow } from "../db/tables.js";
+import { CurrencyAccountsRow } from "../knex/tables.js";
 import { send_cc_balance_change_email } from "../integrations/email/email.js";
 import * as CurrencyAccountRepo from "../repositories/Currency/CurrencyAccountsRepository.js"
 

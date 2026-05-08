@@ -1,5 +1,5 @@
 import { ApolloContext } from "../context.js"
-import { ReservationRow } from "../db/tables.js";
+import { ReservationRow } from "../knex/tables.js";
 import * as ReservationRepo from "../repositories/Equipment/ReservationRepository.js"
 import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
 import * as UserRepo from "../repositories/Users/UserRepository.js";

@@ -1,5 +1,5 @@
-import { knex } from "../../db/index.js";
-import { ExpressSessionRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { ExpressSessionRow } from "../../knex/tables.js";
 
 
 export async function getSession(sid: string): Promise<ExpressSessionRow | undefined> {

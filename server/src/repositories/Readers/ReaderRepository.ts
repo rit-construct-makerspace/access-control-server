@@ -3,8 +3,8 @@
  * DB Operations for Readers (ACS Devices)
  */
 
-import { knex } from "../../db/index.js";
-import { ReaderLogRow, ReaderRow, TextFieldRow, MakerspaceRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { ReaderLogRow, ReaderRow, TextFieldRow, MakerspaceRow } from "../../knex/tables.js";
 import { getMakerspaceByID } from "../Makerspaces/MakerspaceRespository.js";
 
 /**

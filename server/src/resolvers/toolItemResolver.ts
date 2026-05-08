@@ -4,7 +4,7 @@
  */
 
 import { ApolloContext } from "../context.js";
-import { ToolItemInstancesRow, ToolItemTypesRow } from "../db/tables.js";
+import { ToolItemInstancesRow, ToolItemTypesRow } from "../knex/tables.js";
 import { borrowItem, createToolItemInstance, deleteToolItemInstance, getToolItemInstanceByID, getToolItemInstances, getToolItemInstancesByBorrower, getToolItemInstancesByType, returnItem, updateToolItemInstance } from "../repositories/Store/ToolItemInstancesRepository.js";
 import { createToolItemType, deleteToolItemType, getToolItemTypeByID, getToolItemTypes, getToolItemTypesWhereAllowCheckout, updateToolItemType } from "../repositories/Store/ToolItemTypesRepository.js";
 import { getUserByID, getUsersFullName } from "../repositories/Users/UserRepository.js";

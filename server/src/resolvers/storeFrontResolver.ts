@@ -6,7 +6,7 @@ import { createLedger, deleteLedger, getLedgers } from "../repositories/Store/In
 import { GraphQLError } from "graphql";
 import { getUserByID, getUserByIDOrUndefined } from "../repositories/Users/UserRepository.js";
 import { notifyInventoryItemBelowThreshold } from "../integrations/slack/slack.js";
-import { InventoryItemRow, InventoryLedgerRow } from "../db/tables.js";
+import { InventoryItemRow, InventoryLedgerRow } from "../knex/tables.js";
 import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
 
 const StorefrontResolvers = {

@@ -1,4 +1,4 @@
-import { MakerspaceRow } from "../../db/tables.js";
+import { MakerspaceRow } from "../../knex/tables.js";
 import { Room } from "../rooms/room.js";
 import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
 import * as UserRepo from "../../repositories/Users/UserRepository.js";

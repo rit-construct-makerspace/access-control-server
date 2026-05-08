@@ -1,5 +1,5 @@
 import { ApolloContext } from "../context.js";
-import { OrganizationsRow } from "../db/tables.js";
+import { OrganizationsRow } from "../knex/tables.js";
 import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import * as OrgRepo from "../repositories/Users/OrganizationRepository.js";
 import * as CurrencyAccountRepo from "../repositories/Currency/CurrencyAccountsRepository.js"

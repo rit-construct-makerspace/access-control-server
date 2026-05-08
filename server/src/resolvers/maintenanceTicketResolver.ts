@@ -1,5 +1,5 @@
 import { ApolloContext } from "../context.js"
-import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../db/tables.js"
+import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../knex/tables.js"
 import * as MaintenanceTicketRepo from "../repositories/Equipment/MaintenanceTicketRepository.js"
 import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js"
 import * as UserRepo from "../repositories/Users/UserRepository.js"

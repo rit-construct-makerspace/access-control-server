@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
-import { knex } from "../../db/index.js";
-import { DeviceRow, MakerspaceRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { DeviceRow, MakerspaceRow } from "../../knex/tables.js";
 import { Device } from "../../models/devices/device.js";
 import { generateRandomHumanName } from "../../data/humanReadableNames.js";
 import { randomInt } from "crypto";

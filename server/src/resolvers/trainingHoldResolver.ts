@@ -4,7 +4,7 @@
  */
 
 import { ApolloContext } from "../context.js";
-import { TrainingHoldsRow } from "../db/tables.js";
+import { TrainingHoldsRow } from "../knex/tables.js";
 import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
 import { getModuleByID } from "../repositories/Training/ModuleRepository.js";
 import { deleteTrainingHold, getTrainingHoldByID } from "../repositories/Training/TrainingHoldsRespository.js";

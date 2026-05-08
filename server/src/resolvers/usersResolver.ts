@@ -12,7 +12,7 @@ import { getUsersFullName } from "../repositories/Users/UserRepository.js";
 import { getActiveTrainingHoldsByUser } from "../repositories/Training/TrainingHoldsRespository.js";
 import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
-import { UserRow } from "../db/tables.js";
+import { UserRow } from "../knex/tables.js";
 
 const UsersResolvers = {
   User: {

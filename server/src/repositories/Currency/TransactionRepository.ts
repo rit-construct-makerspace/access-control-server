@@ -1,5 +1,5 @@
-import { knex } from "../../db/index.js";
-import { CurrencyLedgerRow, TransactionEntryRow, TransactionRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { CurrencyLedgerRow, TransactionEntryRow, TransactionRow } from "../../knex/tables.js";
 import { CurrencySource, CurrencyType } from "../../integrations/currency/types.js";
 import { createUnassocaitedAuditLog } from "../AuditLogs/AuditLogRepository.js";
 

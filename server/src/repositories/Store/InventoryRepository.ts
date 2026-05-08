@@ -2,8 +2,8 @@
  * DB operations endpoint for Holds table
  */
 
-import { knex } from "../../db/index.js";
-import { InventoryItemRow, InventoryTagRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { InventoryItemRow, InventoryTagRow } from "../../knex/tables.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 
 import {

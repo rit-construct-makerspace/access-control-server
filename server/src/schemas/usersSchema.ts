@@ -4,7 +4,7 @@
  */
 
 import { gql } from "graphql-tag";
-import { UserRow } from "../db/tables.js";
+import { UserRow } from "../knex/tables.js";
 
 
 export interface PassedModule {

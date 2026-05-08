@@ -3,8 +3,8 @@
  * DB Operations for Inventory Carts
  */
 
-import { knex } from "../../db/index.js";
-import { InventoryCartsRow, InventoryItemRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { InventoryCartsRow, InventoryItemRow } from "../../knex/tables.js";
 
 export async function getInventoryCarts(): Promise<InventoryCartsRow[]> {
   return await knex("InventoryCarts").select();

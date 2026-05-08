@@ -1,4 +1,4 @@
-import { AccessControllerState, CoreInputMode } from "../../../db/tables.js";
+import { AccessControllerState, CoreInputMode } from "../../../knex/tables.js";
 import { AuditLog } from "../../logs/AuditLogs.js";
 import { ACSDeployment } from "../../ACS/deployment.js";
 import { CoreFlags } from "../ACSFormats.js";

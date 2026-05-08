@@ -1,6 +1,6 @@
 import { GraphQLError } from "graphql";
-import { knex } from "../../db/index.js";
-import { AccessControllerState, CoreInputMode, CoreRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { AccessControllerState, CoreInputMode, CoreRow } from "../../knex/tables.js";
 import { Core } from "../../models/devices/core.js";
 import * as ACRepo from "./AccessControllerRepository.js";
 import * as DeviceRepo from "./DeviceRepository.js";

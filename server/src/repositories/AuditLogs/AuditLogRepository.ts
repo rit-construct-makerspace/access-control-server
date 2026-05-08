@@ -2,8 +2,8 @@
  * DB operations endpoint for AuditLog table
  */
 
-import { knex } from "../../db/index.js";
-import { AuditLogRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { AuditLogRow } from "../../knex/tables.js";
 import { AuditLogEntity } from "../../models/logs/AuditLogs.js";
 
 

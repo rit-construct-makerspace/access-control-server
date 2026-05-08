@@ -1,4 +1,4 @@
-import { knex } from "./db/index.js";
+import { knex } from "./knex/index.js";
 import { listObjects } from "./integrations/aws/s3.js"
 import { send_generic_email } from "./integrations/email/email.js";
 import { notifyNewMaintenanceTicket } from "./integrations/slack/slack.js";

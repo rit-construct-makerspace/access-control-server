@@ -1,5 +1,5 @@
-import { knex } from "../../db/index.js";
-import { UnlockAttemptLogRow } from "../../db/tables.js";
+import { knex } from "../../knex/index.js";
+import { UnlockAttemptLogRow } from "../../knex/tables.js";
 
 export async function createUnlockAttemptLog(
   equipmentID: number | undefined,

@@ -1,7 +1,7 @@
 import * as Atrium from "../atrium-integration/atrium.js"
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js"
 import { CurrencySource, MakeMoneyError } from "./types.js";
-import { TransactionRow } from "../../db/tables.js";
+import { TransactionRow } from "../../knex/tables.js";
 import { getCurrencyLedgerEntry } from "../../repositories/Currency/CurrencyLedgerRepository.js";
 
 const USE_ATRIUM_FOR_CURRENCY = process.env.ATRIUM_ENABLED == "true";
