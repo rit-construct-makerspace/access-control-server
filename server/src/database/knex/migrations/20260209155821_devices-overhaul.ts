@@ -1,7 +1,7 @@
 import type { Knex } from "knex";
 import { AccessControllerState, CoreInputMode, ReaderRow } from "../tables.js";
 import * as ReaderRepo from "../../repositories/Readers/ReaderRepository.js"
-import { DispenserError } from "../../api/devices/cards/cardApi.js";
+import { DispenserError } from "../../../api/devices/cards/cardApi.js";
 
 export function oldStateToStateEnum(oldState: string) {
   switch (oldState) {
