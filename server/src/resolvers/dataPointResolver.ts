@@ -4,7 +4,7 @@
  */
 
 import { ApolloContext } from "../context.js";
-import { getDataPointByID, incrementDataPointValue, setDataPointValue } from "../repositories/DataPoints/DataPointsRepository.js";
+import { getDataPointByID, incrementDataPointValue, setDataPointValue } from "../database/repositories/DataPoints/DataPointsRepository.js";
 
 const DataPointsResolver = {
   Query: {

@@ -1,11 +1,11 @@
-import { knex } from "./knex/index.js";
+import { knex } from "./database/knex/index.js";
 import { listObjects } from "./integrations/aws/s3.js"
 import { send_generic_email } from "./integrations/email/email.js";
 import { notifyNewMaintenanceTicket } from "./integrations/slack/slack.js";
-import { CoreActions } from "./models/api/ACSFormats.js";
-import { ACSOrchestrator } from "./models/api/ACSOrchestrator.js";
-import { createUnassocaitedAuditLog } from "./repositories/AuditLogs/AuditLogRepository.js";
-import { advanceIntervalTickets } from "./repositories/Equipment/MaintenanceTicketRepository.js";
+import { CoreActions } from "./database/models/api/ACSFormats.js";
+import { ACSOrchestrator } from "./database/models/api/ACSOrchestrator.js";
+import { createUnassocaitedAuditLog } from "./database/repositories/AuditLogs/AuditLogRepository.js";
+import { advanceIntervalTickets } from "./database/repositories/Equipment/MaintenanceTicketRepository.js";
 
 /**
  * If you use the CDN to store user-uploads, make sure you update this query so it knows that those images are in use

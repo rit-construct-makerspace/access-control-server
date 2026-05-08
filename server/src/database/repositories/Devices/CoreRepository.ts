@@ -6,7 +6,7 @@ import * as ACRepo from "./AccessControllerRepository.js";
 import * as DeviceRepo from "./DeviceRepository.js";
 import { ACSDeployment } from "../../models/ACS/deployment.js";
 import { CoreFlags } from "../../models/api/ACSFormats.js";
-import { EntityNotFound } from "../../EntityNotFound.js";
+import { EntityNotFound } from "../../../EntityNotFound.js";
 
 export async function getCoreByDeviceID(deviceID: number): Promise<Core | undefined> {
   const rawRow = await knex("Cores").where("deviceID", deviceID).first();

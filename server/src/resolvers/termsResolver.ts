@@ -4,14 +4,14 @@
  */
 
 import { ApolloContext } from "../context.js";
-import { getTerms, setTerms } from "../repositories/TextItems/TermsRepository.js";
+import { getTerms, setTerms } from "../database/repositories/TextItems/TermsRepository.js";
 
 const TermsResolver = {
   Query: {
     getTerms: async (
       _parent: any,
       _args: any) =>
-        (await getTerms())?.value
+      (await getTerms())?.value
   },
 
   Mutation: {

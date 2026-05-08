@@ -3,18 +3,18 @@
  * GraphQL Endpoint Implementations for TrainingModules, and executions for submitting to modules
  */
 
-import * as ModuleRepo from "../repositories/Training/ModuleRepository.js";
+import * as ModuleRepo from "../database/repositories/Training/ModuleRepository.js";
 import { AccessProgress, AnswerInput } from "../schemas/trainingModuleSchema.js";
 import { ApolloContext } from "../context.js";
-import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
-import { getUsersFullName } from "../repositories/Users/UserRepository.js";
-import * as SubmissionRepo from "../repositories/Training/SubmissionRepository.js";
+import { createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
+import { getUsersFullName } from "../database/repositories/Users/UserRepository.js";
+import * as SubmissionRepo from "../database/repositories/Training/SubmissionRepository.js";
 import { MODULE_PASSING_THRESHOLD } from "../constants.js";
-import { TrainingModuleItem, TrainingModuleRow } from "../knex/tables.js";
-import { accessCheckExists, createAccessCheck, hasApprovedAccessCheck } from "../repositories/Equipment/AccessChecksRepository.js";
-import { createTrainingHold, getTrainingHoldByUserForModule } from "../repositories/Training/TrainingHoldsRespository.js";
-import * as PassedModuleRepo from "../repositories/Training/PassedRepository.js";
-import * as TrainingModuleReo from "../repositories/Training/ModuleRepository.js";
+import { TrainingModuleItem, TrainingModuleRow } from "../database/knex/tables.js";
+import { accessCheckExists, createAccessCheck, hasApprovedAccessCheck } from "../database/repositories/Equipment/AccessChecksRepository.js";
+import { createTrainingHold, getTrainingHoldByUserForModule } from "../database/repositories/Training/TrainingHoldsRespository.js";
+import * as PassedModuleRepo from "../database/repositories/Training/PassedRepository.js";
+import * as TrainingModuleReo from "../database/repositories/Training/ModuleRepository.js";
 import { GraphQLError } from "graphql";
 
 /**

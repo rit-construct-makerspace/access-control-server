@@ -1,9 +1,9 @@
 import { ApolloContext } from "../context.js";
-import { OrganizationsRow } from "../knex/tables.js";
-import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
-import * as OrgRepo from "../repositories/Users/OrganizationRepository.js";
-import * as CurrencyAccountRepo from "../repositories/Currency/CurrencyAccountsRepository.js"
-import { getUsersFullName } from "../repositories/Users/UserRepository.js";
+import { OrganizationsRow } from "../database/knex/tables.js";
+import { createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
+import * as OrgRepo from "../database/repositories/Users/OrganizationRepository.js";
+import * as CurrencyAccountRepo from "../database/repositories/Currency/CurrencyAccountsRepository.js"
+import { getUsersFullName } from "../database/repositories/Users/UserRepository.js";
 
 export const OrganizationResolver = {
 

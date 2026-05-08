@@ -4,7 +4,7 @@
 
 import { knex } from "../../knex/index.js";
 import { ModuleSubmissionRow } from "../../knex/tables.js";
-import { EntityNotFound } from "../../EntityNotFound.js";
+import { EntityNotFound } from "../../../EntityNotFound.js";
 import * as PassedRepo from "./PassedRepository.js";
 
 /**

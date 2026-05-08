@@ -1,8 +1,8 @@
 import { ChatPostMessageArguments, WebClient } from "@slack/web-api";
-import { EquipmentRow, MaintenanceTicketRow, MakerspaceRow, ReservationRow, UserRow } from "../../knex/tables.js";
-import * as EquipmentInstanceRepo from "../../repositories/Equipment/EquipmentInstancesRepository.js";
-import * as EquipmentRepo from "../../repositories/Equipment/EquipmentRepository.js";
-import * as RoomRepo from "../../repositories/Rooms/RoomRepository.js";
+import { EquipmentRow, MaintenanceTicketRow, MakerspaceRow, ReservationRow, UserRow } from "../../database/knex/tables.js";
+import * as EquipmentInstanceRepo from "../../database/repositories/Equipment/EquipmentInstancesRepository.js";
+import * as EquipmentRepo from "../../database/repositories/Equipment/EquipmentRepository.js";
+import * as RoomRepo from "../../database/repositories/Rooms/RoomRepository.js";
 import { format } from "date-fns";
 
 // Read a token from the environment variables

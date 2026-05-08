@@ -1,6 +1,6 @@
 import { knex } from "../../knex/index.js";
 import { RestrictionRow } from "../../knex/tables.js";
-import { EntityNotFound } from "../../EntityNotFound.js";
+import { EntityNotFound } from "../../../EntityNotFound.js";
 
 /**
  * Function to get restriction by ID

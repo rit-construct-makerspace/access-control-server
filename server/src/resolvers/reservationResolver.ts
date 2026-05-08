@@ -1,10 +1,10 @@
 import { ApolloContext } from "../context.js"
-import { ReservationRow } from "../knex/tables.js";
-import * as ReservationRepo from "../repositories/Equipment/ReservationRepository.js"
-import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
-import * as UserRepo from "../repositories/Users/UserRepository.js";
-import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
-import * as AccessCheckRepo from "../repositories/Equipment/AccessChecksRepository.js"
+import { ReservationRow } from "../database/knex/tables.js";
+import * as ReservationRepo from "../database/repositories/Equipment/ReservationRepository.js"
+import * as EquipmentRepo from "../database/repositories/Equipment/EquipmentRepository.js";
+import * as UserRepo from "../database/repositories/Users/UserRepository.js";
+import * as RoomRepo from "../database/repositories/Rooms/RoomRepository.js";
+import * as AccessCheckRepo from "../database/repositories/Equipment/AccessChecksRepository.js"
 import { GraphQLError } from "graphql";
 import { notifyReservationRequest } from "../integrations/slack/slack.js";
 

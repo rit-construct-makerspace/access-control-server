@@ -4,13 +4,13 @@
  */
 
 import { ApolloContext } from "../context.js";
-import { ToolItemInstancesRow, ToolItemTypesRow } from "../knex/tables.js";
-import { borrowItem, createToolItemInstance, deleteToolItemInstance, getToolItemInstanceByID, getToolItemInstances, getToolItemInstancesByBorrower, getToolItemInstancesByType, returnItem, updateToolItemInstance } from "../repositories/Store/ToolItemInstancesRepository.js";
-import { createToolItemType, deleteToolItemType, getToolItemTypeByID, getToolItemTypes, getToolItemTypesWhereAllowCheckout, updateToolItemType } from "../repositories/Store/ToolItemTypesRepository.js";
-import { getUserByID, getUsersFullName } from "../repositories/Users/UserRepository.js";
+import { ToolItemInstancesRow, ToolItemTypesRow } from "../database/knex/tables.js";
+import { borrowItem, createToolItemInstance, deleteToolItemInstance, getToolItemInstanceByID, getToolItemInstances, getToolItemInstancesByBorrower, getToolItemInstancesByType, returnItem, updateToolItemInstance } from "../database/repositories/Store/ToolItemInstancesRepository.js";
+import { createToolItemType, deleteToolItemType, getToolItemTypeByID, getToolItemTypes, getToolItemTypesWhereAllowCheckout, updateToolItemType } from "../database/repositories/Store/ToolItemTypesRepository.js";
+import { getUserByID, getUsersFullName } from "../database/repositories/Users/UserRepository.js";
 import { ToolItemInstanceInput, ToolItemTypeInput } from "../schemas/toolItemsSchema.js";
-import { getRoomByID } from "../repositories/Rooms/RoomRepository.js";
-import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import { getRoomByID } from "../database/repositories/Rooms/RoomRepository.js";
+import { createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
 import { GraphQLError } from "graphql";
 import { notifyToolItemMarked } from "../integrations/slack/slack.js";
 

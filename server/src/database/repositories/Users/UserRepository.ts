@@ -4,7 +4,7 @@
 
 import { knex } from "../../knex/index.js";
 import { createUnassocaitedAuditLog } from "../AuditLogs/AuditLogRepository.js";
-import { EntityNotFound } from "../../EntityNotFound.js";
+import { EntityNotFound } from "../../../EntityNotFound.js";
 import { UserRow } from "../../knex/tables.js";
 import * as CurrencyAccountRepo from "../../repositories/Currency/CurrencyAccountsRepository.js";
 import * as TempCardRepo from "./TempCardRepository.js";

@@ -4,7 +4,7 @@ import { CurrencyAccountsRow } from "../../knex/tables.js";
 import * as OrgRepo from "../Users/OrganizationRepository.js";
 import * as UserRepo from "../Users/UserRepository.js";
 import * as CurrencyLedgerRepo from "./CurrencyLedgerRepository.js";
-import { CurrencyType } from "../../integrations/currency/types.js";
+import { CurrencyType } from "../../../integrations/currency/types.js";
 
 type AccountOwner = {
   displayName: string;

@@ -4,12 +4,12 @@
 
 import { knex } from "../../knex/index.js";
 import { InventoryItemRow, InventoryTagRow } from "../../knex/tables.js";
-import { EntityNotFound } from "../../EntityNotFound.js";
+import { EntityNotFound } from "../../../EntityNotFound.js";
 
 import {
   InventoryItem,
   InventoryItemInput,
-} from "../../schemas/storeFrontSchema.js";
+} from "../../../schemas/storeFrontSchema.js";
 
 /**
  * Fetch all Inventory Items

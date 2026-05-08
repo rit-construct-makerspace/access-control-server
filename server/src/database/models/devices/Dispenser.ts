@@ -1,8 +1,8 @@
 import { DeviceRow, DispenserRow } from "../../knex/tables.js";
 import { Device } from "./device.js";
 import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
-import { EntityNotFound } from "../../EntityNotFound.js";
-import { DispenserError } from "../../api/devices/cards/cardApi.js";
+import { EntityNotFound } from "../../../EntityNotFound.js";
+import { DispenserError } from "../../../api/devices/cards/cardApi.js";
 
 export class Dispenser extends Device implements DispenserRow {
   deviceID: number;

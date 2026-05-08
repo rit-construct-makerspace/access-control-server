@@ -3,7 +3,7 @@
  * GraphQL Endpoint Implementations for ModuleSubmissions
  */
 
-import * as SubmissionRepo from "../repositories/Training/SubmissionRepository.js";
+import * as SubmissionRepo from "../database/repositories/Training/SubmissionRepository.js";
 import { ApolloContext } from "../context.js";
 
 const TrainingSubmissionResolvers = {

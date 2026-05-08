@@ -1,9 +1,9 @@
 import expressWs from 'express-ws';
 import * as Atrium from "../../../integrations/atrium-integration/atrium.js";
 import { CurrencySource } from "../../../integrations/currency/types.js";
-import * as UserRepo from "../../../repositories/Users/UserRepository.js";
-import * as TempCardRepo from "../../../repositories/Users/TempCardRepository.js";
-import { ReaderRow } from "../../../knex/tables.js";
+import * as UserRepo from "../../../database/repositories/Users/UserRepository.js";
+import * as TempCardRepo from "../../../database/repositories/Users/TempCardRepository.js";
+import { ReaderRow } from "../../../database/knex/tables.js";
 
 enum DispenserStatus {
   CARD_CHANGE = "CARD_CHANGE",

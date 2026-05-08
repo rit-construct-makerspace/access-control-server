@@ -1,7 +1,7 @@
 import { ApolloContext } from "../context.js";
-import { CurrencyAccountsRow } from "../knex/tables.js";
+import { CurrencyAccountsRow } from "../database/knex/tables.js";
 import { send_cc_balance_change_email } from "../integrations/email/email.js";
-import * as CurrencyAccountRepo from "../repositories/Currency/CurrencyAccountsRepository.js"
+import * as CurrencyAccountRepo from "../database/repositories/Currency/CurrencyAccountsRepository.js"
 
 export const CurrencyAccountResolvers = {
   CurrencyAccount: {

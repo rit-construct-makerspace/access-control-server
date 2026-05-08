@@ -4,11 +4,11 @@
  */
 
 import { ApolloContext } from "../context.js";
-import { TrainingHoldsRow } from "../knex/tables.js";
-import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
-import { getModuleByID } from "../repositories/Training/ModuleRepository.js";
-import { deleteTrainingHold, getTrainingHoldByID } from "../repositories/Training/TrainingHoldsRespository.js";
-import { getUserByID, getUsersFullName } from "../repositories/Users/UserRepository.js";
+import { TrainingHoldsRow } from "../database/knex/tables.js";
+import { createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
+import { getModuleByID } from "../database/repositories/Training/ModuleRepository.js";
+import { deleteTrainingHold, getTrainingHoldByID } from "../database/repositories/Training/TrainingHoldsRespository.js";
+import { getUserByID, getUsersFullName } from "../database/repositories/Users/UserRepository.js";
 
 export const TrainingHoldResolver = {
   TrainingHold: {

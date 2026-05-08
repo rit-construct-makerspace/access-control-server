@@ -4,8 +4,8 @@
 
 import { knex } from "../../knex/index.js";
 import { TrainingModuleRow, TrainingModuleItem, ModulesForEquipmentRow, EquipmentRow } from "../../knex/tables.js";
-import { EntityNotFound } from "../../EntityNotFound.js";
-import { PassedModule } from "../../schemas/usersSchema.js";
+import { EntityNotFound } from "../../../EntityNotFound.js";
+import { PassedModule } from "../../../schemas/usersSchema.js";
 
 /**
  * Fetch all Training Modules in the table

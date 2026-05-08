@@ -1,13 +1,13 @@
 import { ApolloContext } from "../context.js";
-import * as InventoryRepo from "../repositories/Store/InventoryRepository.js";
+import * as InventoryRepo from "../database/repositories/Store/InventoryRepository.js";
 import { InventoryItemInput } from "../schemas/storeFrontSchema.js";
-import { deleteInventoryItem } from "../repositories/Store/InventoryRepository.js";
-import { createLedger, deleteLedger, getLedgers } from "../repositories/Store/InventoryLedgerRepository.js";
+import { deleteInventoryItem } from "../database/repositories/Store/InventoryRepository.js";
+import { createLedger, deleteLedger, getLedgers } from "../database/repositories/Store/InventoryLedgerRepository.js";
 import { GraphQLError } from "graphql";
-import { getUserByID, getUserByIDOrUndefined } from "../repositories/Users/UserRepository.js";
+import { getUserByID, getUserByIDOrUndefined } from "../database/repositories/Users/UserRepository.js";
 import { notifyInventoryItemBelowThreshold } from "../integrations/slack/slack.js";
-import { InventoryItemRow, InventoryLedgerRow } from "../knex/tables.js";
-import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
+import { InventoryItemRow, InventoryLedgerRow } from "../database/knex/tables.js";
+import { getMakerspaceByID } from "../database/repositories/Makerspaces/MakerspaceRespository.js";
 
 const StorefrontResolvers = {
   InventoryItem: {

@@ -1,9 +1,9 @@
 import ejs from "ejs"
 import { centsToDollarString } from "../currency/currency.js"
-import { TransactionEntryRow, TransactionRow } from "../../knex/tables.js"
-import { getCurrencyLedgerEntriesForTransactionEntryByEntryId, getTransactionById, getTransactionEntriesByTransactionId } from "../../repositories/Currency/TransactionRepository.js"
+import { TransactionEntryRow, TransactionRow } from "../../database/knex/tables.js"
+import { getCurrencyLedgerEntriesForTransactionEntryByEntryId, getTransactionById, getTransactionEntriesByTransactionId } from "../../database/repositories/Currency/TransactionRepository.js"
 import { CurrencyType } from "../currency/types.js"
-import { getAccountBalanceCents, getAccountOwner } from "../../repositories/Currency/CurrencyAccountsRepository.js"
+import { getAccountBalanceCents, getAccountOwner } from "../../database/repositories/Currency/CurrencyAccountsRepository.js"
 
 const templateSource: string = `
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />

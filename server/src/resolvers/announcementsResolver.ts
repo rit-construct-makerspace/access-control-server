@@ -4,7 +4,7 @@
  */
 
 import { ApolloContext } from "../context.js";
-import { getAnnouncements, getAnnouncementByID, createAnnouncement, updateAnnouncement, deleteAnnouncement } from "../repositories/Announcements/AnnouncementsRepository.js";
+import { getAnnouncements, getAnnouncementByID, createAnnouncement, updateAnnouncement, deleteAnnouncement } from "../database/repositories/Announcements/AnnouncementsRepository.js";
 
 const AnnouncementsResolver = {
 
@@ -17,9 +17,9 @@ const AnnouncementsResolver = {
     getAllAnnouncements: async (
       _parent: any,
       _args: any,
-      ) => {
-        return await getAnnouncements();
-      },
+    ) => {
+      return await getAnnouncements();
+    },
 
     /**
      * Fetch Announcement by ID
@@ -47,7 +47,7 @@ const AnnouncementsResolver = {
      */
     createAnnouncement: async (
       _parent: any,
-      args: {title: string, description: string, linkText: string, linkUrl: string},
+      args: { title: string, description: string, linkText: string, linkUrl: string },
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
         return await createAnnouncement(args);
@@ -65,7 +65,7 @@ const AnnouncementsResolver = {
      */
     updateAnnouncement: async (
       _parent: any,
-      args: {id: number, title: string, description: string, linkText: string, linkUrl: string},
+      args: { id: number, title: string, description: string, linkText: string, linkUrl: string },
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
         return await updateAnnouncement(args);
@@ -79,7 +79,7 @@ const AnnouncementsResolver = {
      */
     deleteAnnouncement: async (
       _parent: any,
-      args: {id: number},
+      args: { id: number },
       { isAdmin }: ApolloContext) =>
       isAdmin(async () => {
         return await deleteAnnouncement(args.id);

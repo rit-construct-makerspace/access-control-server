@@ -1,12 +1,12 @@
-import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
-import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
-import * as UserRepo from "../repositories/Users/UserRepository.js";
-import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
-import { getUsersFullName } from "../repositories/Users/UserRepository.js";
+import * as RoomRepo from "../database/repositories/Rooms/RoomRepository.js";
+import * as EquipmentRepo from "../database/repositories/Equipment/EquipmentRepository.js";
+import * as UserRepo from "../database/repositories/Users/UserRepository.js";
+import { createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
+import { getUsersFullName } from "../database/repositories/Users/UserRepository.js";
 import assert from "assert";
-import { Room } from "../models/rooms/room.js";
+import { Room } from "../database/models/rooms/room.js";
 import { ApolloContext, CurrentUser } from "../context.js";
-import * as MakerspaceRepo from "../repositories/Makerspaces/MakerspaceRespository.js";
+import * as MakerspaceRepo from "../database/repositories/Makerspaces/MakerspaceRespository.js";
 import { GraphQLError } from "graphql";
 
 const RoomResolvers = {

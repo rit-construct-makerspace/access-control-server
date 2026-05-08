@@ -4,7 +4,7 @@
  */
 
 import { CurrencySource, MakeMoneyError } from "./types.js"
-import * as TransactionRepo from "../../repositories/Currency/TransactionRepository.js"
+import * as TransactionRepo from "../../database/repositories/Currency/TransactionRepository.js"
 import * as Currency from "./currency.js"
 import { send_transaction_email } from "../email/email.js";
 
@@ -82,7 +82,7 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
         // If we have charged the user money last time, this will be negative
         // If it is positive, we have somehow paid them
         const deltaForThisTransaction = (lastCharges.atrium?.amount ?? 0) + (lastCharges.credit?.amount ?? 0)
-        if (centsToCharge + deltaForThisTransaction > 0){
+        if (centsToCharge + deltaForThisTransaction > 0) {
             // recharge would give the user money (something fishy)
             console.error(`Currency: Caught fraudulent refund before refund. Not gonna refund it. Probably needs manual rectification. tid: ${transactionID} asking for ${centsToCharge}, only ever spent ${-deltaForThisTransaction}`)
             return false;
@@ -95,7 +95,7 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
         // update amount to charge based on how much was already refunded/spent
         centsToCharge = deltaForThisTransaction + centsToCharge;
     }
-    if (centsToCharge > 0){
+    if (centsToCharge > 0) {
         console.error(`Currency: Illegal attempt to refund more than spent: tid:${transactionID}, tried to adjust ${centsToCharge} with reason ${reason}`)
         return false;
     }
@@ -106,7 +106,7 @@ export async function UpdateTransaction(transactionID: number, deltaCents: numbe
         console.error(`Currency: Could not charge account tid: ${parent.id}, teid: ${entryId}, err: ${chargeResult} `);
         return chargeResult;
     }
-    if (!chargeResult){
+    if (!chargeResult) {
         return false;
     }
 

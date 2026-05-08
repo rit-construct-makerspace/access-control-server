@@ -1,18 +1,18 @@
-import * as UserRepo from "../repositories/Users/UserRepository.js";
-import * as ModuleRepo from "../repositories/Training/ModuleRepository.js";
-import * as HoldsRepo from "../repositories/Holds/HoldsRepository.js";
-import * as AccessCheckRepo from "../repositories/Equipment/AccessChecksRepository.js";
-import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
-import * as RoomRepo from "../repositories/Rooms/RoomRepository.js";
-import * as RestrictionRepo from "../repositories/Restrictions/RestrictionsRepository.js";
-import * as CurrencyAccountRepo from "../repositories/Currency/CurrencyAccountsRepository.js";
-import { createUnassocaitedAuditLog } from "../repositories/AuditLogs/AuditLogRepository.js";
+import * as UserRepo from "../database/repositories/Users/UserRepository.js";
+import * as ModuleRepo from "../database/repositories/Training/ModuleRepository.js";
+import * as HoldsRepo from "../database/repositories/Holds/HoldsRepository.js";
+import * as AccessCheckRepo from "../database/repositories/Equipment/AccessChecksRepository.js";
+import * as EquipmentRepo from "../database/repositories/Equipment/EquipmentRepository.js";
+import * as RoomRepo from "../database/repositories/Rooms/RoomRepository.js";
+import * as RestrictionRepo from "../database/repositories/Restrictions/RestrictionsRepository.js";
+import * as CurrencyAccountRepo from "../database/repositories/Currency/CurrencyAccountsRepository.js";
+import { createUnassocaitedAuditLog } from "../database/repositories/AuditLogs/AuditLogRepository.js";
 import { ApolloContext, CurrentUser } from "../context.js";
-import { getUsersFullName } from "../repositories/Users/UserRepository.js";
-import { getActiveTrainingHoldsByUser } from "../repositories/Training/TrainingHoldsRespository.js";
-import { getMakerspaceByID } from "../repositories/Makerspaces/MakerspaceRespository.js";
+import { getUsersFullName } from "../database/repositories/Users/UserRepository.js";
+import { getActiveTrainingHoldsByUser } from "../database/repositories/Training/TrainingHoldsRespository.js";
+import { getMakerspaceByID } from "../database/repositories/Makerspaces/MakerspaceRespository.js";
 import { EntityNotFound } from "../EntityNotFound.js";
-import { UserRow } from "../knex/tables.js";
+import { UserRow } from "../database/knex/tables.js";
 
 const UsersResolvers = {
   User: {

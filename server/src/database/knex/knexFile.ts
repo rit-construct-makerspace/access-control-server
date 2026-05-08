@@ -11,7 +11,7 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url); //Remove this line if running using --esm
 const __dirname = import.meta.dirname;
 
-require("dotenv").config({ path: __dirname + "/./../../.env" });
+require("dotenv").config({ path: __dirname + "/./../../../.env" });
 
 // Update with your config settings.
 const config: any = { //remove ': any' if using --esm

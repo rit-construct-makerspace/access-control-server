@@ -1,12 +1,12 @@
 import { ApolloContext } from "../context.js"
-import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../knex/tables.js"
-import * as MaintenanceTicketRepo from "../repositories/Equipment/MaintenanceTicketRepository.js"
-import * as InstanceRepo from "../repositories/Equipment/EquipmentInstancesRepository.js"
-import * as UserRepo from "../repositories/Users/UserRepository.js"
-import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js"
-import * as EquipmentRepo from "../repositories/Equipment/EquipmentRepository.js";
+import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../database/knex/tables.js"
+import * as MaintenanceTicketRepo from "../database/repositories/Equipment/MaintenanceTicketRepository.js"
+import * as InstanceRepo from "../database/repositories/Equipment/EquipmentInstancesRepository.js"
+import * as UserRepo from "../database/repositories/Users/UserRepository.js"
+import * as AuditLogRepo from "../database/repositories/AuditLogs/AuditLogRepository.js"
+import * as EquipmentRepo from "../database/repositories/Equipment/EquipmentRepository.js";
 import { notifyNewMaintenanceTicket } from "../integrations/slack/slack.js"
-import { Equipment } from "../models/equipment/Equipment.js"
+import { Equipment } from "../database/models/equipment/Equipment.js"
 
 const MaintenanceTicketResolver = {
   MaintenanceTicket: {

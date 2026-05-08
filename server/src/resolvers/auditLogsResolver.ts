@@ -3,7 +3,7 @@
  * GraphQL Endpoint Implementations for Audit Logs
  */
 
-import * as AuditLogRepo from "../repositories/AuditLogs/AuditLogRepository.js";
+import * as AuditLogRepo from "../database/repositories/AuditLogs/AuditLogRepository.js";
 import { ApolloContext } from "../context.js";
 
 const AuditLogResolvers = {

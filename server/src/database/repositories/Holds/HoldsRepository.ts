@@ -3,7 +3,7 @@
  */
 
 import { knex } from "../../knex/index.js";
-import { EntityNotFound } from "../../EntityNotFound.js";
+import { EntityNotFound } from "../../../EntityNotFound.js";
 import { HoldRow } from "../../knex/tables.js";
 
 /**
