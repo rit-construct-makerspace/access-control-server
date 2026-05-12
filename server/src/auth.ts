@@ -19,6 +19,7 @@ import {
   createUser,
   getUserByRitUsername,
   getUserManagerPerms,
+  getUsersFullName,
   getUserStaffPerms,
   getUserTrainerPerms,
   updateAtriumToken,
@@ -411,16 +412,15 @@ export function setupSamlAuth(app: express.Application) {
       }
 
       try {
-        if (existingUser.atriumToken == null) {
           // generate atrium token for user
           const uid = ritUser["urn:oid:1.3.6.1.4.1.4447.1.20"];
-          const res = await generateAtriumToken(uid);
+          console.log("Generating atrium token for ", getUsersFullName(existingUser));
+          const res = await generateAtriumToken(uid); 
           if (typeof res == "string") {
             existingUser = await updateAtriumToken(existingUser.id, res);
           } else {
             console.error("Failed to generate atrium token for user", res, ritUser);
           }
-        }
       } catch (e) {
         console.error(`Failed to generate Atrium token for user '${existingUser.ritUsername}': ${e}`)
       }
