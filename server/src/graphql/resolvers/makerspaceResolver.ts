@@ -1,0 +1,194 @@
+import { ApolloContext } from "../../context.js";
+import { addTrainingToMakerspace, archiveMakerspace, createMakerspace, deleteMakerspace, getMakerspaceByID, getMakerspaces, getTrainingsByMakerspace, getValidStaff, removeTrainingFromMakerspace, updateMakerspace } from "../../database/repositories/Makerspaces/MakerspaceRespository.js";
+import { MakerspaceRow } from "../../database/knex/tables.js";
+import { getRoomsByMakerspace } from "../../database/repositories/Rooms/RoomRepository.js";
+import { MakerspaceInput } from "../schemas/makerspacesSchema.js";
+import * as HoursRepo from "../../database/repositories/Makerspaces/MakerspaceHoursRepository.js";
+import { createUnassocaitedAuditLog } from "../../database/repositories/AuditLogs/AuditLogRepository.js";
+import { getUsersFullName } from "../../database/repositories/Users/UserRepository.js";
+import { getItems, getItemsWhereStorefront } from "../../database/repositories/Store/InventoryRepository.js";
+import * as DeviceRepo from "../../database/repositories/Devices/DeviceRepository.js";
+import * as CoreRepo from "../../database/repositories/Devices/CoreRepository.js";
+import * as DispenserRepo from "../../database/repositories/Devices/DispenserRepository.js";
+
+const MakerspacesResolver = {
+  Makerspace: {
+    //Map rooms field to array of Rooms
+    rooms: async (
+      parent: MakerspaceRow,
+      _args: any,
+    ) => {
+      return getRoomsByMakerspace(parent.id);
+    },
+
+    //Map hours field to array of MakerspaceHours
+    hours: async (
+      parent: MakerspaceRow,
+      _args: any,
+    ) => {
+      return HoursRepo.getMakerspaceHoursNextWeek(parent.id);
+    },
+
+    trainingModules: async (
+      parent: MakerspaceRow,
+      _args: any,
+    ) => {
+      return getTrainingsByMakerspace(parent.id);
+    },
+    items: async (
+      parent: MakerspaceRow,
+      args: { storefrontVisible?: boolean },
+    ) => {
+      return args.storefrontVisible == undefined
+        ? getItems(parent.id)
+        : getItemsWhereStorefront(args.storefrontVisible, parent.id);
+    },
+
+    devices: async (
+      parent: MakerspaceRow,
+      _args: any,
+      { isStaffFor }: ApolloContext
+    ) => isStaffFor(parent.id, async (_user) => (
+      await DeviceRepo.getMakerspaceDevices(parent.id)
+    )),
+
+    genericDevices: async (
+      parent: MakerspaceRow,
+      _args: any,
+      { isStaffFor }: ApolloContext
+    ) => isStaffFor(parent.id, async (_user) => (
+      await DeviceRepo.getMakerspaceGenericDevices(parent.id)
+    )),
+
+    cores: async (
+      parent: MakerspaceRow,
+      _args: any,
+      { isStaffFor }: ApolloContext
+    ) => isStaffFor(parent.id, async (_user) => (
+      await CoreRepo.getMakerspaceCores(parent.id)
+    )),
+
+    dispensers: async (
+      parent: MakerspaceRow,
+      _args: any,
+      { isStaffFor }: ApolloContext
+    ) => isStaffFor(parent.id, async (_user) => (
+      await DispenserRepo.getMakerspaceDispensers(parent.id)
+    ))
+  },
+
+  Query: {
+    /**
+     * Fetch all Makerspaces
+     * @returns array of Makerspaces
+     * @throws GraphQLError if not MAKER, MENTOR, or STAFF or is on hold
+     */
+    makerspaces: async (
+      _parent: any,
+      _args: any,
+    ) => {
+      return await getMakerspaces();
+    },
+
+    /**
+     * Fetch a single Makerspace by ID
+     * @param id the id of the Makerspace to get
+     * @returns a single Makerspace
+     */
+    makerspaceByID: async (
+      _parent: any,
+      args: { id: number },
+    ) => {
+      return await getMakerspaceByID(args.id);
+    },
+
+    getValidStaff: async (
+      _parent: any,
+      args: {
+        id: number
+      },
+      { isStaffFor }: ApolloContext
+    ) => isStaffFor(args.id, async (_user) => (
+      await getValidStaff(args.id)
+    ))
+  },
+
+  Mutation: {
+    /**
+     * Create a Makerspace
+     * @argument name Name of the new Makerspace
+     * @returns new Makerspace
+     * @throws GraphQLError if not STAFF or is on hold
+     */
+    addMakerspace: async (
+      _parent: any,
+      args: { name: string },
+      { isAdmin }: ApolloContext) =>
+      isAdmin(async () => {
+        const res = await createMakerspace(args.name);
+        return res
+      }),
+
+    updateMakerspace: async (
+      _parent: any,
+      args: { id: number, newMakerspace: MakerspaceInput },
+      { isManagerFor }: ApolloContext) =>
+      isManagerFor(args.id, async () => {
+        const res = await updateMakerspace(args.id, args.newMakerspace);
+        return res
+      }),
+
+    /**
+     * Delete a Makerspace
+     * @argument id ID of the Makerspace to delete
+     * @returns true
+     * @throws GraphQLError if not STAFF or is on hold
+     */
+    deleteMakerspace: async (
+      _parent: any,
+      args: { id: number },
+      { isAdmin }: ApolloContext) =>
+      isAdmin(async () => {
+        await deleteMakerspace(args.id);
+        return (await getMakerspaces())[0];
+      }),
+
+    addTrainingToMakerspace: async (
+      _parent: any,
+      args: {
+        makerspaceID: number,
+        moduleID: number,
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async () => {
+      return await addTrainingToMakerspace(args.makerspaceID, args.moduleID);
+    }),
+
+    removeTrainingFromMakerspace: async (
+      _parent: any,
+      args: {
+        makerspaceID: number,
+        moduleID: number,
+      },
+      { isManagerFor }: ApolloContext
+    ) => isManagerFor(args.makerspaceID, async () => {
+      return await removeTrainingFromMakerspace(args.makerspaceID, args.moduleID);
+    }),
+
+    archiveMakerspace: async (
+      _parent: any,
+      args: {
+        id: number
+      },
+      { isAdmin }: ApolloContext
+    ) => isAdmin(async (user) => {
+      createUnassocaitedAuditLog(`{user} archived makerspace ${args.id}`, "admin",
+        { id: user.id, label: getUsersFullName(user) }
+      )
+      return await archiveMakerspace(args.id);
+    })
+
+  }
+};
+
+export default MakerspacesResolver;

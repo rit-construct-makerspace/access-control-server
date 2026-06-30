@@ -1,6 +1,6 @@
-import { UserRow } from "./db/tables.js";
+import { UserRow } from "./database/knex/tables.js";
 import { GraphQLError } from "graphql/error/GraphQLError.js";
-import { knex } from "./db/index.js";
+import { knex } from "./database/knex/index.js";
 
 // console.log("Migrating");
 // const ret = await knex.migrate.latest()

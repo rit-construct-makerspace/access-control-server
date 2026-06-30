@@ -1,12 +1,12 @@
 import express from "express";
 import xmlparser from "express-xml-bodyparser";
 import * as xml2js from "xml2js"
-import { createUnassocaitedAuditLog } from "../../repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "../../database/repositories/AuditLogs/AuditLogRepository.js";
 import * as Currency from "../currency/currency.js"
 import { NewTransaction, UpdateTransaction } from "../currency/transactions.js";
-import { getAccountIDByUsername } from "../../repositories/Currency/CurrencyAccountsRepository.js";
+import { getAccountIDByUsername } from "../../database/repositories/Currency/CurrencyAccountsRepository.js";
 import { CurrencySource, MakeMoneyError } from "../currency/types.js";
-import { getTransactionByPrinterJobId } from "../../repositories/Currency/TransactionRepository.js";
+import { getTransactionByPrinterJobId } from "../../database/repositories/Currency/TransactionRepository.js";
 
 const PAPERCUT_SECURITY_SECRET = process.env.PAPERCUT_SECURITY_SECRET;
 const FREE_3D_PRINTS = process.env.FREE_3D_PRINTS === "true";

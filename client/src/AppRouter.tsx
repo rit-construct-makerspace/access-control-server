@@ -8,8 +8,6 @@ import LogoutPromptPage from "./pages/both/logout/LogoutPromptPage";
 import TermsPage from "./pages/both/policy/TermsPage";
 import UserSettingsPage from "./pages/both/user_page/user_settings/UserSettingsPage";
 import UserTraingingsPage from "./pages/both/user_page/user_trainings/UserTrainingsPage";
-import StorefrontPage from "./pages/lab_management/storefront/StorefrontPage";
-import StorefrontPreviewPage from "./pages/lab_management/storefront_preview/StorefrontPreviewPage";
 import HelpPage from "./pages/maker/signup/HelpPage";
 import SignupPage from "./pages/maker/signup/SignupPage";
 import MakerspacePage from "./pages/makerspace_page/MakerspacePage";
@@ -26,7 +24,6 @@ import NewAnnouncementPage from "./pages/lab_management/announcements/NewAnnounc
 import StaffBar from "./pages/makerspace_page/StaffBar";
 import UsersPage from "./pages/lab_management/users/UsersPage";
 import UserPage from "./pages/lab_management/users/UserPage";
-import { CartListPage } from "./pages/lab_management/storefront/internal/CartListPage";
 import TrainingModulesPage from "./pages/lab_management/training_modules/TrainingModulesPage";
 import NewModulePage from "./pages/lab_management/edit_module/NewModulePage";
 import EditActiveModulePage from "./pages/lab_management/edit_module/EditActiveModulePage";
@@ -37,7 +34,6 @@ import OrganizationsPage from "./pages/lab_management/organizations/Organization
 import ManageMakerspacePage from "./pages/makerspace_page/ManageMakerspacePage";
 import CurrencyPage from "./pages/lab_management/currency/CurrencyPage";
 import ManageRoomPage from "./pages/makerspace_page/MonitorRoomPage";
-import { CartPage } from "./pages/lab_management/storefront/internal/CartPage";
 import ManageEquipmentPage from "./pages/makerspace_page/equipment_pages/ManageEquipmentPage";
 import ReservationRequestPage from "./pages/makerspace_page/reservation_pages/ReservationRequestPage";
 import ManageReservationsPage from "./pages/makerspace_page/reservation_pages/ManageReservationsPage";
@@ -119,7 +115,6 @@ export const routes = [
     element: <AppRoot />,
     children: [
       { path: "/signup", element: <SignupPage /> },
-      { path: "/admin/storefront/preview", element: <StorefrontPreviewPage /> },
 
       /* Routes for the static displays around the makerspaces */
       {
@@ -141,7 +136,6 @@ export const routes = [
           { path: "/makerspace/:makerspaceID", element: <MakerspacePage /> },
           { path: "/terms", element: <TermsPage /> },
           { path: "/help", element: <HelpPage /> },
-          { path: "/storefront", element: <StorefrontPage /> },
 
           /* Routes that need to be protected by auth */
           {
@@ -162,8 +156,6 @@ export const routes = [
                     children: [
                       { path: "/makerspace/:makerspaceID/people", element: <UsersPage /> },
                       { path: "/makerspace/:makerspaceID/people/:userID", element: <UserPage /> },
-                      { path: "/makerspace/:makerspaceID/storefront/carts", element: <CartListPage /> },
-                      { path: "/makerspace/:makerspaceID/storefront/carts/:cartID", element: <CartPage /> },
 
                       /* Routes for staff + higher */
                       {
@@ -240,8 +232,6 @@ export const routes = [
             ],
           },
           /* END OF PROTECTED ROUTES */
-
-          { path: "/storefront", element: <StorefrontPage /> },
 
           { path: "/logoutprompt", element: <LogoutPromptPage /> },
 

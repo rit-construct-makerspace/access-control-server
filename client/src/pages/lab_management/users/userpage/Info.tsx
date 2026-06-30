@@ -1,8 +1,7 @@
-import { Alert, Avatar, Button, IconButton, Stack, Typography } from "@mui/material";
+import { Alert, Avatar, Button, Stack, Typography } from "@mui/material";
 import { useIsMobile } from "../../../../common/IsMobileProvider";
 import { stringAvatar } from "../../../../common/avatarGenerator";
 import { useNavigate, useParams } from "react-router-dom";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import HistoryIcon from "@mui/icons-material/History";
 import InfoBlob from "../InfoBlob";
 import { format, parseISO } from "date-fns";
