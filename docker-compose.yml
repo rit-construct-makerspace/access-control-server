@@ -1,11 +1,9 @@
-version: '3.4'
-
 services:
   server:
     container_name: makerspace_server
     image: server
     depends_on:
-      - db
+      - testdb
     build:
       context: ./
       dockerfile: ./Dockerfile
@@ -16,34 +14,36 @@ services:
       - '3000'
     ports:
       - 3000:3000
-    command: npm run start && npm run knex:migrate:latest
+    command: npm run start:staging && npm run knex:migrate:latest
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-  db:
-    image: postgres
-    command: postgres -c config_file=/etc/postgresql.conf
-    container_name: makerspace_db
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
-    volumes:
-      - ${POSTGRES_CONFIG_HOST_PATH}:/etc/postgresql.conf  # Custom postgresql config
-    ports:
-      - "5433:5432"
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+  # db:
+  #   image: postgres
+  #   command: postgres -c config_file=/etc/postgresql.conf
+  #   container_name: makerspace_db
+  #   build:
+  #     context: ./
+  #     dockerfile: ./Dockerfile
+  #   volumes:
+  #     - ${POSTGRES_CONFIG_HOST_PATH}:/etc/postgresql.conf  # Custom postgresql config
+  #   ports:
+  #     - "5433:5432"
+  #   environment:
+  #     - POSTGRES_USER=${POSTGRES_USER}
+  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  #     - POSTGRES_DB=${POSTGRES_DB}
   testdb:
     image: postgres
     command: postgres -c config_file=/etc/postgresql.conf
     container_name: test_db
     volumes:
       - ${POSTGRES_CONFIG_HOST_PATH}:/etc/postgresql.conf  # Custom postgresql config
+      - ./server/cert/server.crt:/var/lib/postgresql/server.crt:ro
+      - ./server/cert/server.key:/var/lib/postgresql/server.key:ro
     ports:
-      - "5434:5432"
+      - "5432:5432"
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}

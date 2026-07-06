@@ -1,25 +1,27 @@
-FROM node:14-alpine as base
+FROM node:22-alpine AS base
 WORKDIR /usr/src/app
 COPY package*.json ./
 COPY tsconfig*.json ./
+COPY server/ ./
+COPY client/ ./
 RUN npm i
 COPY . .
 RUN npm run build
 
-FROM node:14-alpine as dep
+FROM node:22-alpine AS dep
 WORKDIR /usr/src/app
-COPY --from=base /usr/src/app/package*.json ./
-COPY --from=base /usr/src/app/dist ./
-RUN npm install --only=production
+COPY --from=base /usr/src/app/package.json ./
+COPY --from=base /usr/src/app/server/dist ./
+RUN npm install
 
-FROM node:14-alpine as production
+FROM node:22-alpine AS production
 WORKDIR /usr/src/app
 COPY --from=dep /usr/src/app ./
-COPY --from=base /usr/src/app/dist ./dist
-ENV NODE_ENV=production
+COPY --from=base /usr/src/app/server/dist ./dist
+ENV NODE_ENV=production 
 ENV NODE_PATH=./dist
 EXPOSE 3000
-CMD npm start
+CMD npm run start:staging
 
 FROM postgres:16-alpine
 # On Windows root will own the files, and they will have permissions 755
