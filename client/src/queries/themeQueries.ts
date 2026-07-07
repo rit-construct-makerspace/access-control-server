@@ -47,3 +47,8 @@ export const MARK_DEFAULT_THEME = gql`
     markDefaultTheme(key: $key)
   }
 `;
+export const DELETE_THEME = gql`
+  mutation DeleteTheme($key: String!) {
+    deleteTheme(key: $key)
+  }
+`;

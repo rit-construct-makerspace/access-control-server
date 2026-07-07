@@ -24,14 +24,14 @@ import {
   getUserTrainerPerms,
   updateAtriumToken,
   updateUserName
-} from "./repositories/Users/UserRepository.js";
-import { getHoldsByUser } from "./repositories/Holds/HoldsRepository.js";
+} from "./database/repositories/Users/UserRepository.js";
+import { getHoldsByUser } from "./database/repositories/Holds/HoldsRepository.js";
 import { CurrentUser } from "./context.js";
-import { createUnassocaitedAuditLog } from "./repositories/AuditLogs/AuditLogRepository.js";
+import { createUnassocaitedAuditLog } from "./database/repositories/AuditLogs/AuditLogRepository.js";
 import path from "path";
-import { insertTempRole } from './repositories/tempRolesRepo.js';
+import { insertTempRole } from './database/repositories/tempRolesRepo.js';
 import { generateAtriumToken } from './integrations/atrium-integration/atrium.js';
-import * as SessionRepo from "./repositories/Users/SessionRepository.js";
+import * as SessionRepo from "./database/repositories/Users/SessionRepository.js";
 
 const __dirname = import.meta.dirname;
 

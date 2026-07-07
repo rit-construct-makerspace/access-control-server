@@ -1,4 +1,4 @@
-import { Alert, AppBar, Box, Button, Card, createTheme, Paper, Stack, TextField, ThemeOptions, ThemeProvider, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@mui/material";
+import { AppBar, Box, Button, Card, createTheme, Paper, Stack, TextField, ThemeOptions, ThemeProvider, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
 import { useState } from "react";
@@ -7,10 +7,11 @@ import styled from "styled-components";
 import { makeCDNLink } from "../../common/ImageFinder";
 import AddIcon from '@mui/icons-material/Add';
 import { useMutation } from "@apollo/client/react";
-import { CREATE_THEME } from "../../queries/themeQueries";
+import { CREATE_THEME, GET_THEMES } from "../../queries/themeQueries";
 import { toast } from "react-toastify";
 import { useMakeTheme } from "../../common/MakeThemeProvider";
 import AnnouncementIcon from '@mui/icons-material/Announcement';
+import ThemePreview from "./ThemePreview";
 
 const StyledImg = styled.img`
   padding: 12px;
@@ -22,7 +23,7 @@ const StyledImg = styled.img`
 export default function NewThemePage() {
   const navigate = useNavigate();
 
-  const [createMakeTheme] = useMutation(CREATE_THEME, { refetchQueries: ["GetThemes"], awaitRefetchQueries: true });
+  const [createMakeTheme] = useMutation(CREATE_THEME, { refetchQueries: [{ query: GET_THEMES, variables: {}} ], awaitRefetchQueries: true });
 
   const makeTheme = useMakeTheme();
 
@@ -76,9 +77,9 @@ export default function NewThemePage() {
     },
   });
 
-  async function handleCreateTheme() {
+  function handleCreateTheme() {
     try {
-      await createMakeTheme({
+      createMakeTheme({
         variables: {
           themeName: themeName,
           title: siteTitle,
@@ -236,122 +237,7 @@ export default function NewThemePage() {
                 onChange={(e) => setSuccess(e.target.value)}
               />
             </Stack>
-            <Stack direction={"row"} spacing={2}>
-              <Stack spacing={1} width={"100%"}>
-                <Typography variant="subtitle1">Primary Example</Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
-                >
-                  I'm a Button!
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                >
-                  I'm a Button!
-                </Button>
-              </Stack>
-              <Stack spacing={1} width={"100%"}>
-                <Typography variant="subtitle1">Secondary Example</Typography>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                >
-                  I'm a Button!
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                >
-                  I'm a Button!
-                </Button>
-              </Stack>
-              <Stack spacing={1} width={"100%"}>
-                <Typography variant="subtitle1">Error Example</Typography>
-                <Button
-                  variant="contained"
-                  color="error"
-                >
-                  I'm a Button!
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="error"
-                >
-                  I'm a Button!
-                </Button>
-                <Alert
-                  variant="filled"
-                  severity="error"
-                >
-                  Error!
-                </Alert>
-              </Stack>
-              <Stack spacing={1} width={"100%"}>
-                <Typography variant="subtitle1">Warning Example</Typography>
-                <Button
-                  variant="contained"
-                  color="warning"
-                >
-                  I'm a Button!
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="warning"
-                >
-                  I'm a Button!
-                </Button>
-                <Alert
-                  variant="filled"
-                  severity="warning"
-                >
-                  Warning!
-                </Alert>
-              </Stack>
-              <Stack spacing={1} width={"100%"}>
-                <Typography variant="subtitle1">Info Example</Typography>
-                <Button
-                  variant="contained"
-                  color="info"
-                >
-                  I'm a Button!
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="info"
-                >
-                  I'm a Button!
-                </Button>
-                <Alert
-                  variant="filled"
-                  severity="info"
-                >
-                  Info!
-                </Alert>
-              </Stack>
-              <Stack spacing={1} width={"100%"}>
-                <Typography variant="subtitle1">Success Example</Typography>
-                <Button
-                  variant="contained"
-                  color="success"
-                >
-                  I'm a Button!
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="success"
-                >
-                  I'm a Button!
-                </Button>
-                <Alert
-                  variant="filled"
-                  severity="success"
-                >
-                  Success!
-                </Alert>
-              </Stack>
-            </Stack>
+            <ThemePreview />
           </Stack>
         </Stack>
       </Paper>

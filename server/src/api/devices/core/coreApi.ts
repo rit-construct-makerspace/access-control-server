@@ -1,6 +1,6 @@
 import expressWs from 'express-ws';
-import { Device } from "../../../models/devices/device.js";
-import * as CoreRepo from "../../../repositories/Devices/CoreRepository.js"
+import { Device } from "../../../database/models/devices/device.js";
+import * as CoreRepo from "../../../database/repositories/Devices/CoreRepository.js"
 import * as AccessAPI from "./access/access.js";
 
 

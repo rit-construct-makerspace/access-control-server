@@ -1,9 +1,9 @@
 import expressWs from 'express-ws';
-import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js"
+import * as DeviceRepo from "../../database/repositories/Devices/DeviceRepository.js"
 import * as CardAPI from "./cards/cardApi.js";
 import * as CoreAPI from "./core/coreApi.js";
 import * as FileAPI from "./files/fileApi.js";
-import { Device } from "../../models/devices/device.js";
+import { Device } from "../../database/models/devices/device.js";
 
 export async function authenticateDevice(device: Device, submittedKey: string): Promise<boolean> {
   if (device.pairTime === undefined || device.SN === undefined || device.keyCycle === undefined) { return false; }
