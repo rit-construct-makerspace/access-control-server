@@ -15,7 +15,6 @@ export async function getThemeByID(id: number): Promise<ThemeRow | undefined> {
 }
 
 export async function updateTheme(id: number, themeName: string, title: string, muiThemeOptions: object, logo: string): Promise<ThemeRow> {
-  console.log("updating w/ logo: ", logo)
   const result = await knex("Themes").where({ id: id }).update({
     themeName: themeName,
     title: title,
@@ -29,5 +28,10 @@ export async function updateTheme(id: number, themeName: string, title: string, 
 export async function markDefaultTheme(id: number): Promise<boolean> {
   await knex("Themes").update({ default: false });
   await knex("Themes").where({ id: id }).update({ default: true });
+  return true;
+}
+
+export async function deleteTheme(id: number): Promise<boolean> {
+  await knex("Themes").where({ id: id }).delete();
   return true;
 }
