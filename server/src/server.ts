@@ -16,7 +16,7 @@ import path from "path";
 import * as schedule from "node-schedule";
 import { getUserByCardTagID, getUsersFullName } from "./database/repositories/Users/UserRepository.js";
 import { createUnassocaitedAuditLog } from "./database/repositories/AuditLogs/AuditLogRepository.js";
-import { getReaderCertCA } from "./database/repositories/Readers/ReaderRepository.js";
+import { getReaderCertCA, setReaderCertCA } from "./database/repositories/Readers/ReaderRepository.js";
 import morgan from "morgan"; //Log provider
 import { createRequire } from "module";
 import { setDataPointValue } from "./database/repositories/DataPoints/DataPointsRepository.js";
@@ -43,10 +43,10 @@ import fs from "node:fs";
 import { ViteDevServer } from "vite";
 import { SiteSettings } from "./database/models/site_settings/SiteSettings.js";
 import * as ThemeRepo from "./database/repositories/SiteSettings/ThemesRepository.js";
+import { createHash } from 'node:crypto';
 
 const require = createRequire(import.meta.url);
 
-const allowed_origins = [process.env.VITE_ORIGIN, "https://studio.apollographql.com", "https://make.rit.edu", "https://shibboleth.main.ad.rit.edu"];
 const SECURE_ORIGIN = (process.env.VITE_ORIGIN ?? "");
 const __dirname = import.meta.dirname;
 
@@ -249,12 +249,32 @@ async function startServer() {
   });
   app.use("/api/files/", express.static(path.join(__dirname, '../../client/shlug-files/')));
 
-  app.get("/api/files/certCA", async function (req, res) {
+  app.get("/api/rootCA", async function (req, res) {
+    const SNHeader = 'shlug-sn';
+    if (!req.headers[SNHeader]) {
+      return res.status(401).send();
+    }
+    const SN = req.headers[SNHeader];
+    if (typeof SN !== "string") {
+      return res.status(401).send();
+    }
+
+    const device = await getDeviceBySN(SN);
+    if (device == null) {
+      return res.status(404).send();
+    }
+
     const certca = (await getReaderCertCA())?.value;
     if (certca == null) {
       return res.status(404).send();
     }
-    return res.send(certca);
+    const textForSha = `${device.SN}:${await device.generateKey()}:${certca}`
+    const sha = createHash('sha256').update(textForSha).digest('hex')
+    const result = {
+      cert: certca,
+      sha: sha,
+    } 
+    return res.json(result);
   })
 
   app.get('/api/files/ota/:tagname', async function (req, res) {
@@ -542,6 +562,27 @@ async function startServer() {
     createUnassocaitedAuditLog(`Trainings: Sent ${numNotified} expiry notices, and purged ${numPurged} expired trainings.`, "server")
 
   }
+  async function updateRootCert() {
+    try {
+      const url = process.env.READER_CERT_URL;
+      if (url == undefined || url == "") {
+        console.error("Can not update root cert. No download URL provided");
+        return
+      }
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        console.error(`Could not download new root cert. HTTP error: ${response.status}`)
+        return;
+      }
+
+      const certString = await response.text();
+      // normalize \r\n to \n
+      setReaderCertCA(certString.replace(/\r/g,""));
+    } catch (error) {
+      console.error(`Failed to update root cert: ${error}`)
+    }
+  }
   /**
    Cron Format:
     *    *    *    *    *    *
@@ -573,6 +614,9 @@ async function startServer() {
 
     // Advance any time-based maintennace tickets from UPCOMING -> TODO
     await advanceTimeTickets();
+
+    // Get a new root certificate for readers
+    await updateRootCert();
 
     // Command all cores to restart for the periodic restart
     await scheduledRestartAllCores();
