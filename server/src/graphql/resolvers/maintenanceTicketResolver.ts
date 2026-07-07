@@ -165,18 +165,20 @@ const MaintenanceTicketResolver = {
       if (args.assignedID) {
         const assigned = await UserRepo.getUserByID(args.assignedID);
         await AuditLogRepo.createAuditLog(
-          `{user} assigned ticket #${args.id} to {user}`,
+          `{user} assigned ticket #${args.id} for {equipment} to {user}`,
           "admin",
           makerspaceID,
           { id: user.id, label: UserRepo.getUsersFullName(user) },
+          { id: equipRow?.id ?? 0, label: equipRow?.name ?? "unknown equipment" },
           { id: assigned.id, label: UserRepo.getUsersFullName(assigned) }
         );
       } else {
         await AuditLogRepo.createAuditLog(
-          `{user} unassigned ticket #${args.id}`,
+          `{user} unassigned ticket #${args.id} for {equipment}`,
           "admin",
           makerspaceID,
-          { id: user.id, label: UserRepo.getUsersFullName(user) }
+          { id: user.id, label: UserRepo.getUsersFullName(user) },
+          { id: equipRow?.id ?? 0, label: equipRow?.name ?? "unknown equipment" }
         );
       }
     }),
