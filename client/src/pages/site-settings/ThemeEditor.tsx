@@ -1,5 +1,5 @@
 import { AppBar, Box, Card, createTheme, PaletteMode, Paper, Stack, TextField, ThemeOptions, ThemeProvider, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ThemePreview from "./ThemePreview";
 import FileUploadButton from "../../common/FileUploadButton";
 import { makeCDNLink } from "../../common/ImageFinder";
@@ -15,6 +15,8 @@ const StyledImg = styled.img`
 `;
 
 interface ThemeEditorProps {
+  onChange: (theme: ThemeEditorProps) => void
+  themeKey: string
   themeName: string;
   siteTitle: string;
   logo: string;
@@ -41,6 +43,32 @@ export default function ThemeEditor(props: ThemeEditorProps) {
   const [info, setInfo] = useState(props.info);
   const [success, setSuccess] = useState(props.success);
   const [mode, setMode] = useState(props.mode);
+
+
+  useEffect(() => {
+    const new_props: ThemeEditorProps = {
+      onChange: props.onChange,
+      themeKey: props.themeKey,
+
+      themeName: themeName,
+      siteTitle: siteTitle,
+      logo: logo,
+      primary: primary,
+      secondary: secondary,
+      error: error,
+      warning: warning,
+      info: info,
+      success: success,
+      mode: mode,
+    }
+
+    if (props.onChange) {
+      props.onChange(new_props)
+    }
+
+  }, [props, themeName, siteTitle, logo, primary, secondary, error, warning, info, success, mode
+  ]);
+
 
   const muiThemeOptions: ThemeOptions = {
     palette: {

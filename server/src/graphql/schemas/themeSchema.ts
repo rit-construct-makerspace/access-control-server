@@ -20,5 +20,6 @@ export const ThemeTypeDefs = gql`
     createTheme(themeName: String!, title: String!, muiThemeOptions: String!, logo: String!): Theme
     updateTheme(key: String!, themeName: String!, title: String!, muiThemeOptions: String!, logo: String!): Theme
     markDefaultTheme(key: String!): Boolean!
+    deleteTheme(key: String!): Boolean!
   }
 `;

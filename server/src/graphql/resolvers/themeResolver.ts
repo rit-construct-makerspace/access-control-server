@@ -77,6 +77,15 @@ const ThemeResolver = {
       { isAdmin }: ApolloContext
     ) => isAdmin(async (_user) => (
       ThemeRepo.markDefaultTheme(Number(args.key))
+    )),
+    deleteTheme: async (
+      _parent: any,
+      args: {
+        key: string
+      },
+      { isAdmin }: ApolloContext
+    ) => isAdmin(async (_user) => (
+      ThemeRepo.deleteTheme(Number(args.key))
     ))
   }
 };
