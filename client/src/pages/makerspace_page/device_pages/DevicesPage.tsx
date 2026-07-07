@@ -38,7 +38,7 @@ export default function DevicesPage() {
   const cores: Core[] = makerspaceWithDevicesResult.data?.makerspaceByID.cores ?? [];
   const _dispensers: Dispenser[] = makerspaceWithDevicesResult.data?.makerspaceByID.dispensers ?? [];
 
-  const filteredCores: Core[] = cores.filter((core) => core.device.name.includes(searchText))
+  const filteredCores: Core[] = cores.filter((core) => core.device.name.toLowerCase().includes(searchText.toLowerCase()))
 
   return (
     <Stack padding={"10px"} spacing={1}>
