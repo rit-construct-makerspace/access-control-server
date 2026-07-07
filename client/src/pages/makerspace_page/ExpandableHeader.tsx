@@ -5,7 +5,7 @@ import { isManagerFor } from "../../common/PrivilegeUtils";
 import EditIcon from "@mui/icons-material/Edit";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { FullMakerspace } from "../../queries/makerspaceQueries";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import MakerspaceHours from "../../types/MakerspaceHours";
 import MakerspaceHoursSection from "./MakerspaceHours";
@@ -127,10 +127,12 @@ export default function ExpandableHeader({ makerspace, makerspaceTrainings }: Ex
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  const [expanded, setExpanded] = useState<boolean>(user.visitor);
+  const [searchParams, setSearchParams] = useSearchParams()
+  const startOpen = searchParams.get("o") == "1"
+  const [expanded, setExpanded] = useState<boolean>(user.visitor || startOpen);
 
   return (
-    <Accordion expanded={expanded} sx={{ border: "none" }} elevation={0} onChange={() => setExpanded(!expanded)}>
+    <Accordion expanded={expanded} sx={{ border: "none" }} elevation={0} onChange={() => {setExpanded(!expanded); setSearchParams({"o":(!expanded)  ? "1" : "0"})}}>
       <AccordionSummary>
         {TitleRow(
           navigate,
