@@ -174,10 +174,11 @@ const MaintenanceTicketResolver = {
         );
       } else {
         await AuditLogRepo.createAuditLog(
-          `{user} unassigned ticket #${args.id}`,
+          `{user} unassigned ticket #${args.id} for {equipment}`,
           "admin",
           makerspaceID,
-          { id: user.id, label: UserRepo.getUsersFullName(user) }
+          { id: user.id, label: UserRepo.getUsersFullName(user) },
+          { id: equipRow?.id ?? 0, label: equipRow?.name ?? "unknown equipment" }
         );
       }
     }),
