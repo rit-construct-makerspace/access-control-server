@@ -249,6 +249,32 @@ async function startServer() {
   });
   app.use("/api/files/", express.static(path.join(__dirname, '../../client/shlug-files/')));
 
+
+  let lastCertUpdateTime: Date | undefined = undefined
+  async function updateRootCert() {
+    try {
+      const url = process.env.READER_CERT_URL;
+      if (url == undefined || url == "") {
+        console.error("Can not update root cert. No download URL provided");
+        return
+      }
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        console.error(`Could not download new root cert. HTTP error: ${response.status}`)
+        return;
+      }
+
+      const certString = await response.text();
+      // normalize \r\n to \n
+      setReaderCertCA(certString.replace(/\r/g, ""));
+      console.log("Successfully updated root cert. New cert ends in ", certString.substring(certString.length - 50, certString.length - 27))
+      lastCertUpdateTime = new Date()
+    } catch (error) {
+      console.error(`Failed to update root cert: ${error}`)
+    }
+  }
+
   app.get("/api/rootCA", async function (req, res) {
     const SNHeader = 'shlug-sn';
     if (!req.headers[SNHeader]) {
@@ -264,6 +290,12 @@ async function startServer() {
       return res.status(404).send();
     }
 
+    // only update cert if its been an hour since the last time a shlug said its out of date
+    // prevent an easily ddos-able endpoint
+    if (lastCertUpdateTime == undefined || Math.abs(Date.now() - lastCertUpdateTime.getTime()) >= 1000 * 60 * 60) {
+      updateRootCert();
+    }
+
     const certca = (await getReaderCertCA())?.value;
     if (certca == null) {
       return res.status(404).send();
@@ -273,7 +305,7 @@ async function startServer() {
     const result = {
       cert: certca,
       sha: sha,
-    } 
+    }
     return res.json(result);
   })
 
@@ -561,27 +593,6 @@ async function startServer() {
 
     createUnassocaitedAuditLog(`Trainings: Sent ${numNotified} expiry notices, and purged ${numPurged} expired trainings.`, "server")
 
-  }
-  async function updateRootCert() {
-    try {
-      const url = process.env.READER_CERT_URL;
-      if (url == undefined || url == "") {
-        console.error("Can not update root cert. No download URL provided");
-        return
-      }
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        console.error(`Could not download new root cert. HTTP error: ${response.status}`)
-        return;
-      }
-
-      const certString = await response.text();
-      // normalize \r\n to \n
-      setReaderCertCA(certString.replace(/\r/g,""));
-    } catch (error) {
-      console.error(`Failed to update root cert: ${error}`)
-    }
   }
   /**
    Cron Format:
