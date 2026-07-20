@@ -12,6 +12,7 @@ export const EquipmentInstanceTypeDefs = gql`
         name: String!
         status: String
         accessController: AccessController
+        hobbsTime: Int!
     }
     type Reader {
         id: ID!

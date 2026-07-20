@@ -700,6 +700,7 @@ export interface CoreRow {
   flags: CoreFlags;
   sealedDeployment: ACSDeployment | undefined;
   reportedDeployment: ACSDeployment | undefined;
+  hobbsTime: number
 }
 
 export enum AccessControllerState {

@@ -1,5 +1,5 @@
 import { ACSController } from "./ACSController.js";
-import { CoreAuthToRequest, CoreConfigReport, CoreInfoOptions, CoreInfoRequest, CoreLogRequest, CoreStateChangeReport, CoreStatusReport, ServerCommand, ServerInfoResponse } from "./ACSFormats.js";
+import { CoreAuthToRequest, CoreConfigReport, CoreInfoOptions, CoreInfoRequest, CoreLogRequest, CoreRole, CoreStateChangeReport, CoreStatusReport, ServerCommand, ServerInfoResponse } from "./ACSFormats.js";
 import * as CoreRepo from "../../repositories/Devices/CoreRepository.js";
 import * as ACRepo from "../../repositories/Devices/AccessControllerRepository.js";
 import * as AuditLogRepo from "../../repositories/AuditLogs/AuditLogRepository.js";
@@ -10,6 +10,8 @@ import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 import { AccessControllerState, DeviceLogSeverity } from "../../knex/tables.js";
 import { AccessAttemptReason } from "../devices/accessController.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
+import { Core } from "../devices/core.js";
+import { getInstanceByAccessControllerID } from "../../repositories/Equipment/EquipmentInstancesRepository.js";
 
 export class ACSOrchestrator {
   private static coreControllers: Map<number, ACSController> = new Map();
@@ -27,7 +29,7 @@ export class ACSOrchestrator {
       const core = await CoreRepo.getCoreByDeviceID(deviceID);
       if (core === undefined) { return; }
 
-      await core.statusUpdate(statusReport.currentCardTag);
+      await core.statusUpdate(statusReport.currentCardTag, statusReport.hobbsTime);
 
       for (let i = 0; i < statusReport.channels.length; i++) {
         await core.updateControllerState(statusReport.channels[i].channelID, statusReport.channels[i].state);
@@ -142,6 +144,27 @@ export class ACSOrchestrator {
     }
   }
 
+
+  static async getHMIInfo(core: Core){
+    const acs = await core.getAccessControllers()
+    const welcomeFor = core.getWelcomeMakerspace()
+    if (acs.length == 0 && welcomeFor == undefined){
+      // this thing is unassociated, doesn't make sense to report as welcome reader or equipment
+      return undefined;
+    }
+    const role = welcomeFor != undefined ? CoreRole.WELCOME : CoreRole.EQUIPMENT  
+    const makerspace = await MakerspaceRepo.getMakerspaceByID(core.makerspaceID)
+    const channels =   await Promise.all(acs.map(async (ac)=>{
+      const entity = await getInstanceByAccessControllerID(ac.id)
+      return {channelID: ac.channelID, pairedEntity: entity?.name ?? "unknown"};
+    }));
+    return {
+      role: role,
+      makerspace: makerspace?.name ?? "unknown",
+      channels: channels
+    } 
+  }
+
   public static async handleCoreInfoRequest(deviceID: number, infoRequest: CoreInfoRequest) {
     try {
       const core = await CoreRepo.getCoreByDeviceID(deviceID);
@@ -152,13 +175,14 @@ export class ACSOrchestrator {
           ? (new Date).getTime() : undefined,
         state: infoRequest.fields.includes(CoreInfoOptions.STATE)
           ? (await core.getAccessControllers()).map((controller) => ({ id: controller.channelID, state: controller.state })) : undefined,
-        hmi: undefined,
+        hmi: infoRequest.fields.includes(CoreInfoOptions.HMI) ? await this.getHMIInfo(core) : undefined,
         flags: infoRequest.fields.includes(CoreInfoOptions.FLAGS)
           ? {
             lockWhenIdle: core.flags?.lockWhenIdle ?? false,
             restartWhenUnused: core.flags?.restartWhenUnused ?? false,
             welcoming: (await core.getWelcomeMakerspace()) !== undefined
-          } : undefined
+          } : undefined,
+          hobbsTime: infoRequest.fields.includes(CoreInfoOptions.HOBBS_TIME) ? core.hobbsTime : undefined
       }
 
       ACSOrchestrator.getDeviceController(core.deviceID)?.sendCoreInfoResponse(core, response);

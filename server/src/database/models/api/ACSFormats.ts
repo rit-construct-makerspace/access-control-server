@@ -7,6 +7,7 @@ export interface CoreStatusReport {
     state: AccessControllerState
   }[];
   currentCardTag: string;
+  hobbsTime: number
 }
 
 enum CoreStateChangeReason {
@@ -66,7 +67,8 @@ export enum CoreInfoOptions {
   TIME = "TIME",
   STATE = "STATE",
   HMI = "HMI",
-  FLAGS = "FLAGS"
+  FLAGS = "FLAGS",
+  HOBBS_TIME = "HOBBS_TIME"
 }
 
 export interface CoreInfoRequest {
@@ -150,7 +152,8 @@ export interface ServerInfoResponse {
       pairedEntity: string;
     }[];
   };
-  flags?: CoreFlags
+  flags?: CoreFlags;
+  hobbsTime?: number
 }
 
 export interface WelcomeRequest {
