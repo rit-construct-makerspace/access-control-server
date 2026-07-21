@@ -109,6 +109,22 @@ export const UPDATE_INSTANCE = gql`
           }
           name
           status
+          hobbsTime
+      }
+  }
+`;
+
+export const UPDATE_INSTANCE_HOBBS_TIME = gql`
+  mutation UpdateInstanceHobbsTime($id: ID!, $hobbsTime: Int!) {
+      updateInstanceHobbsTime(id: $id, hobbsTime: $hobbsTime) {
+          id
+          equipment {
+            id
+            name
+          }
+          name
+          status
+          hobbsTime
       }
   }
 `;
