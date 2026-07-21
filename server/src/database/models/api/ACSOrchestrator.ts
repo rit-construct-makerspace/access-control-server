@@ -11,7 +11,7 @@ import { AccessControllerState, DeviceLogSeverity } from "../../knex/tables.js";
 import { AccessAttemptReason } from "../devices/accessController.js";
 import { Makerspace } from "../makerspaces/makerspace.js";
 import { Core } from "../devices/core.js";
-import { getInstanceByAccessControllerID } from "../../repositories/Equipment/EquipmentInstancesRepository.js";
+import { getInstanceByAccessControllerDeviceAndChannel, getInstanceByAccessControllerID, updateInstanceHobbsTime } from "../../repositories/Equipment/EquipmentInstancesRepository.js";
 
 export class ACSOrchestrator {
   private static coreControllers: Map<number, ACSController> = new Map();
@@ -26,16 +26,50 @@ export class ACSOrchestrator {
 
   public static async handleCoreStatusReport(deviceID: number, statusReport: CoreStatusReport) {
     try {
+      console.log("handle: ", statusReport)
       const core = await CoreRepo.getCoreByDeviceID(deviceID);
-      if (core === undefined) { return; }
+      if (core === undefined) {
+        console.warn("status report from non-core", deviceID)
+        return;
+      }
+      console.log(core)
 
-      await core.statusUpdate(statusReport.currentCardTag, statusReport.hobbsTime);
+      await core.statusUpdate(statusReport.currentCardTag);
+      const timesToSend = [];
+      let shouldUpdateTimes = false
 
+      console.log("channels", statusReport.channels)
       for (let i = 0; i < statusReport.channels.length; i++) {
-        await core.updateControllerState(statusReport.channels[i].channelID, statusReport.channels[i].state);
+        const channel = statusReport.channels[i];
+        await core.updateControllerState(channel.channelID, channel.state);
+        const inst = await getInstanceByAccessControllerDeviceAndChannel(deviceID, channel.channelID)
+        timesToSend.push({ channelID: channel.channelID, hobbsTime: inst? Number(inst.hobbsTime) : 0 })
+        if (inst == undefined) {
+          continue;
+        }
+        console.log("inst", inst)
+        
+
+        if (inst.hobbsTime > channel.hobbsTime) {
+          console.warn("hobbs tme fiasco", inst, channel)
+          // warning: the device is wrong about how long
+          DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { msg: "hobbs-time-mismatch", reported: channel.hobbsTime, stored: inst.hobbsTime })
+          shouldUpdateTimes = true
+        } else {
+          const updated = await updateInstanceHobbsTime(inst.id, channel.hobbsTime)
+          console.log("update", updated)
+        }
+      }
+      if (shouldUpdateTimes) {
+        console.log("hobbs tme mismatch: ", timesToSend)
+        ACSOrchestrator.getDeviceController(deviceID)?.sendCoreCommand(core, {
+          hobbsTime: timesToSend
+        })
+
       }
 
     } catch (e) {
+      console.warn(e)
       await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "core-status-error", error: e });
     }
   }
@@ -105,7 +139,7 @@ export class ACSOrchestrator {
           "auth",
           core?.makerspaceID,
           { id: user?.id ?? -1, label: user ? `${user.firstName} ${user.lastName}` : "Unknown User" },
-          { id: deviceID, label: core ? core.name : "unkown device" }
+          { id: deviceID, label: core ? core.name : "unknown device" }
         );
 
         if (core !== undefined) {
@@ -145,48 +179,69 @@ export class ACSOrchestrator {
   }
 
 
-  static async getHMIInfo(core: Core){
+  static async getHMIInfo(core: Core) {
     const acs = await core.getAccessControllers()
-    const welcomeFor = core.getWelcomeMakerspace()
-    if (acs.length == 0 && welcomeFor == undefined){
+    const welcomeFor = await core.getWelcomeMakerspace()
+    if (acs.length == 0 && welcomeFor == undefined) {
       // this thing is unassociated, doesn't make sense to report as welcome reader or equipment
       return undefined;
     }
-    const role = welcomeFor != undefined ? CoreRole.WELCOME : CoreRole.EQUIPMENT  
-    const makerspace = await MakerspaceRepo.getMakerspaceByID(core.makerspaceID)
-    const channels =   await Promise.all(acs.map(async (ac)=>{
+    const role = welcomeFor != undefined ? CoreRole.WELCOME : CoreRole.EQUIPMENT
+    const makerspace = await MakerspaceRepo.getMakerspaceByID(welcomeFor?.id ?? core.makerspaceID)
+    const channels = await Promise.all(acs.map(async (ac) => {
       const entity = await getInstanceByAccessControllerID(ac.id)
-      return {channelID: ac.channelID, pairedEntity: entity?.name ?? "unknown"};
+      return { channelID: ac.channelID, pairedEntity: entity?.name ?? "unknown" };
     }));
     return {
       role: role,
+      deviceName: core.name,
       makerspace: makerspace?.name ?? "unknown",
       channels: channels
-    } 
+    }
   }
 
   public static async handleCoreInfoRequest(deviceID: number, infoRequest: CoreInfoRequest) {
     try {
+      const getHobbsTimes = async (core: Core) => {
+        const acs = await core.getAccessControllers()
+        if (acs.length == 0) {
+          console.warn("warn: hobbs time request from device with no controllers ")
+          return undefined
+        }
+        const times = await Promise.all(acs.map(async (ac) => {
+          const inst = await getInstanceByAccessControllerDeviceAndChannel(acs[0].deviceID, ac.channelID);
+          return { channelID: ac.channelID, hobbsTime: inst ? Number(inst.hobbsTime) : 0 };
+        }))
+        return times;
+      };
+
+
       const core = await CoreRepo.getCoreByDeviceID(deviceID);
       if (core === undefined) { return; }
-
+      console.log("request", infoRequest.fields, core)
       const response: ServerInfoResponse = {
         time: infoRequest.fields.includes(CoreInfoOptions.TIME)
           ? (new Date).getTime() : undefined,
+
         state: infoRequest.fields.includes(CoreInfoOptions.STATE)
           ? (await core.getAccessControllers()).map((controller) => ({ id: controller.channelID, state: controller.state })) : undefined,
+
         hmi: infoRequest.fields.includes(CoreInfoOptions.HMI) ? await this.getHMIInfo(core) : undefined,
+
         flags: infoRequest.fields.includes(CoreInfoOptions.FLAGS)
           ? {
             lockWhenIdle: core.flags?.lockWhenIdle ?? false,
             restartWhenUnused: core.flags?.restartWhenUnused ?? false,
             welcoming: (await core.getWelcomeMakerspace()) !== undefined
           } : undefined,
-          hobbsTime: infoRequest.fields.includes(CoreInfoOptions.HOBBS_TIME) ? core.hobbsTime : undefined
+
+        hobbsTime: infoRequest.fields.includes(CoreInfoOptions.HOBBS_TIME) ? await getHobbsTimes(core) : undefined
       }
+      console.log(response)
 
       ACSOrchestrator.getDeviceController(core.deviceID)?.sendCoreInfoResponse(core, response);
     } catch (e) {
+      console.error(e)
       await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "core-info-request-error", error: e });
     }
   }
@@ -214,7 +269,7 @@ export class ACSOrchestrator {
       if (user === undefined) {
         ACSOrchestrator.getDeviceController(deviceID)?.sendWelcomeResponse(device, { welcomed: false, cardTagID: cardTagID });
         await AuditLogRepo.createAuditLog(
-          `Unkown card {conceal} failed to sign in to {makerspace}`,
+          `Unknown card {conceal} failed to sign in to {makerspace}`,
           "welcome",
           rawSpace.id,
           { id: 0, label: cardTagID },
@@ -237,8 +292,8 @@ export class ACSOrchestrator {
         { id: rawSpace.id, label: rawSpace.name }
       );
 
-    } catch (_e) {
-
+    } catch (e) {
+      console.warn("ACS: Error handling welcome request: ", e)
     }
   }
 
@@ -252,8 +307,8 @@ export class ACSOrchestrator {
 
         ACSOrchestrator.coreControllers.get(coreID)?.sendCoreCommand(core, command);
       }
-    } catch (_e) {
-
+    } catch (e) {
+      console.warn("ACS: Error commanding all cores: ", e)
     }
   }
 
@@ -267,8 +322,8 @@ export class ACSOrchestrator {
 
         ACSOrchestrator.coreControllers.get(coreID)?.sendCoreCommand(core, command);
       }
-    } catch (_e) {
-
+    } catch (e) {
+      console.warn("ACS: Error commanding makerspace cores: ", e)
     }
   }
 }

@@ -16,7 +16,7 @@ export async function getInstancesByEquipment(equipmentID: number): Promise<Equi
 }
 
 /**
- * Fetch an EquipmentInstance by unqiue ID
+ * Fetch an EquipmentInstance by unique ID
  * @param id unique id of EquipmentInstance
  * @returns EquipmentInstance or undefined if not exist
  */
@@ -25,7 +25,7 @@ export async function getInstanceByID(id: number): Promise<EquipmentInstancesRow
 }
 
 /**
- * Fetch an EquipmentInstance by unqiue ID
+ * Update an EquipmentInstance by unique ID
  * @param id unique id of EquipmentInstance
  * @returns EquipmentInstance or undefined if not exist
  */
@@ -34,12 +34,37 @@ export async function updateInstance(id: number, name: string, status: string): 
 }
 
 /**
+ * Update hobbs time of an EquipmentInstance by unique ID
+ * @param id unique id of EquipmentInstance
+ * @returns EquipmentInstance or undefined if not exist
+ */
+export async function updateInstanceHobbsTime(id: number, hobbsTime: number): Promise<EquipmentInstancesRow | undefined> {
+    return (await knex("EquipmentInstances").update({  hobbsTime: hobbsTime }).where({ id }).returning("*"))[0];
+}
+
+
+
+/**
  * Fetch an EquipmentInstance by its associate reader ID
  * @param id unique id of reader
  * @returns EquipmentInstance or undefined if not exist
  */
 export async function getInstanceByAccessControllerID(accessControllerID: number): Promise<EquipmentInstancesRow | undefined> {
     return await knex("EquipmentInstances").where("accessControllerID", "=", accessControllerID).first();
+}
+
+/**
+ * Fetch an EquipmentInstance by its associated reader by its device and channel id
+ * @param device_id unique id of device
+ * @param channel_id unique id of channel
+ * @returns EquipmentInstance or undefined if not exist
+ */
+export async function getInstanceByAccessControllerDeviceAndChannel(deviceId: number, channelId: number): Promise<EquipmentInstancesRow | undefined> {
+    return await knex("EquipmentInstances as ei")
+        .leftJoin("AccessControllers as ac","accessControllerID", "=", "ac.id")
+        .where("ac.deviceID", "=", deviceId)
+        .andWhere("ac.channelID", "=", channelId)
+        .select("ei.id", "ei.equipmentID", "name", "status", "accessControllerID", "ei.hobbsTime").first();
 }
 
 export async function getReaderByInstanceId(instanceID: number): Promise<ReaderRow | undefined> {

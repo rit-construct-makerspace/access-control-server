@@ -4,10 +4,10 @@ import { ACSDeployment } from "../ACS/deployment.js";
 export interface CoreStatusReport {
   channels: {
     channelID: number,
-    state: AccessControllerState
+    state: AccessControllerState,
+    hobbsTime: number,
   }[];
   currentCardTag: string;
-  hobbsTime: number
 }
 
 enum CoreStateChangeReason {
@@ -127,6 +127,7 @@ export interface ServerCommand {
   action?: CoreActions;
   identifyChannel?: number;
   flags?: CoreFlags;
+  hobbsTime?: {channelID: number, hobbsTime: number}[]
 }
 
 export enum CoreRole {
@@ -146,6 +147,7 @@ export interface ServerInfoResponse {
   }[];
   hmi?: {
     role: CoreRole;
+    deviceName: string,
     makerspace: string;
     channels: {
       channelID: number;
@@ -153,7 +155,10 @@ export interface ServerInfoResponse {
     }[];
   };
   flags?: CoreFlags;
-  hobbsTime?: number
+  hobbsTime?: {
+    channelID: number;
+    hobbsTime: number;
+  }[]
 }
 
 export interface WelcomeRequest {

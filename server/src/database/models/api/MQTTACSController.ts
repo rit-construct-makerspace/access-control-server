@@ -5,6 +5,7 @@ import { ACSController } from "./ACSController.js";
 import { Core } from "../devices/core.js";
 import * as DeviceRepo from "../../repositories/Devices/DeviceRepository.js";
 import { Device } from "../devices/device.js";
+import { getCoreByDeviceID } from "../../repositories/Devices/CoreRepository.js";
 
 
 export default class MQTTACSController extends ACSController {
@@ -27,13 +28,13 @@ export default class MQTTACSController extends ACSController {
     });
 
     MQTTACSController.client.on("connect", (_packet) => {
-      MQTTACSController.client.subscribe("makerspace/+/device/+/status", { qos: 2 });
-      MQTTACSController.client.subscribe("makerspace/+/device/+/stateChange", { qos: 2 });
-      MQTTACSController.client.subscribe("makerspace/+/device/+/log", { qos: 2 });
-      MQTTACSController.client.subscribe("makerspace/+/device/+/authTo/request", { qos: 2 });
-      MQTTACSController.client.subscribe("makerspace/+/device/+/config/report", { qos: 2 });
-      MQTTACSController.client.subscribe("makerspace/+/device/+/info/request", { qos: 2 });
-      MQTTACSController.client.subscribe("makerspace/+/device/+/welcome/request", { qos: 2 });
+      MQTTACSController.client.subscribe("makerspace/device/+/status", { qos: 2 });
+      MQTTACSController.client.subscribe("makerspace/device/+/stateChange", { qos: 2 });
+      MQTTACSController.client.subscribe("makerspace/device/+/log", { qos: 2 });
+      MQTTACSController.client.subscribe("makerspace/device/+/authTo/request", { qos: 2 });
+      MQTTACSController.client.subscribe("makerspace/device/+/config/report", { qos: 2 });
+      MQTTACSController.client.subscribe("makerspace/device/+/info/request", { qos: 2 });
+      MQTTACSController.client.subscribe("makerspace/device/+/welcome/request", { qos: 2 });
     });
 
     MQTTACSController.client.on("error", (error) => console.log(`[MQTTACSController] Error: ${error}`))
@@ -60,8 +61,8 @@ export default class MQTTACSController extends ACSController {
   private static messageDirecter(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     const topicArray = topic.split("/");
 
-    if (topicArray.length < 5) { return; }
-    switch (topicArray[4]) {
+    if (topicArray.length < 4) { return; }
+    switch (topicArray[3]) {
       case "status":
         return MQTTACSController.statusHandler(topic, payload, packet);
       case "stateChange":
@@ -77,7 +78,7 @@ export default class MQTTACSController extends ACSController {
       case "welcome":
         return MQTTACSController.welcomeRequestHandler(topic, payload, packet);
       default:
-        console.log("UNKOWN TOPIC: ", topicArray[4]);
+        console.log("UNKNOWN TOPIC: ", topicArray[3]);
         return;
     }
   }
@@ -85,7 +86,7 @@ export default class MQTTACSController extends ACSController {
   private static async statusHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     try {
       const topicArray = topic.split("/");
-      const SN = topicArray[3];
+      const SN = topicArray[2];
       const device = await DeviceRepo.getDeviceBySN(SN);
       if (device == undefined) { return; }
       MQTTACSController.registerDevice(device.id);
@@ -102,7 +103,7 @@ export default class MQTTACSController extends ACSController {
   private static async stateChangeHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     try {
       const topicArray = topic.split("/");
-      const SN = topicArray[3];
+      const SN = topicArray[2];
       const device = await DeviceRepo.getDeviceBySN(SN);
       if (device == undefined) { return; }
       MQTTACSController.registerDevice(device.id);
@@ -119,7 +120,7 @@ export default class MQTTACSController extends ACSController {
   private static async logHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     try {
       const topicArray = topic.split("/");
-      const SN = topicArray[3];
+      const SN = topicArray[2];
       const device = await DeviceRepo.getDeviceBySN(SN);
       if (device == undefined) { return; }
       MQTTACSController.registerDevice(device.id);
@@ -136,7 +137,7 @@ export default class MQTTACSController extends ACSController {
   private static async authToRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     try {
       const topicArray = topic.split("/");
-      const SN = topicArray[3];
+      const SN = topicArray[2];
       const device = await DeviceRepo.getDeviceBySN(SN);
       if (device == undefined) { return; }
       MQTTACSController.registerDevice(device.id);
@@ -153,7 +154,7 @@ export default class MQTTACSController extends ACSController {
   private static async configReportHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     try {
       const topicArray = topic.split("/");
-      const SN = topicArray[3];
+      const SN = topicArray[2];
       const device = await DeviceRepo.getDeviceBySN(SN);
       if (device == undefined) { return; }
       MQTTACSController.registerDevice(device.id);
@@ -170,14 +171,14 @@ export default class MQTTACSController extends ACSController {
   private static async infoRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     try {
       const topicArray = topic.split("/");
-      const SN = topicArray[3];
+      const SN = topicArray[2];
       const device = await DeviceRepo.getDeviceBySN(SN);
       if (device == undefined) { return; }
       MQTTACSController.registerDevice(device.id);
 
       const infoRequest: CoreInfoRequest = JSON.parse(payload.toString());
       // TODO: INPUT VALIDATION
-
+      console.log("info request")
       ACSOrchestrator.handleCoreInfoRequest(device.id, infoRequest);
     } catch (e) {
       console.error(`[MQTTACSController] handleCoreInfoRequest error: ${e}`);
@@ -187,15 +188,19 @@ export default class MQTTACSController extends ACSController {
   private static async welcomeRequestHandler(topic: string, payload: Buffer<ArrayBufferLike>, packet: mqtt.IPublishPacket) {
     try {
       const topicArray = topic.split("/");
-      const makerspaceID = Number(topicArray[1]);
-      const SN = topicArray[3];
+      const SN = topicArray[2];
       const device = await DeviceRepo.getDeviceBySN(SN);
       if (device == undefined) { return; }
+      const core = await getCoreByDeviceID(device.id )
+      if (core == undefined) { return; }
+      const makerspace = await core?.getWelcomeMakerspace()
+      if (makerspace == undefined) { return; }
+      
       MQTTACSController.registerDevice(device.id);
 
       const welcomeRequest: WelcomeRequest = JSON.parse(payload.toString());
 
-      ACSOrchestrator.handleWelcomeRequest(makerspaceID, device.id, welcomeRequest.cardTagID);
+      ACSOrchestrator.handleWelcomeRequest(makerspace.id, device.id, welcomeRequest.cardTagID);
     } catch (e) {
       console.error(`[MQTTACSController] welcomeRequestHandler error: ${e}`);
     }
@@ -203,7 +208,7 @@ export default class MQTTACSController extends ACSController {
 
   sendCoreAuthToResponse(core: Core, response: ServerAuthToResponse): boolean {
     try {
-      MQTTACSController.client.publish(`makerspace/${core.makerspaceID}/device/${core.SN}/authTo/response`, JSON.stringify(response), { qos: 2 });
+      MQTTACSController.client.publish(`makerspace/device/${core.SN}/authTo/response`, JSON.stringify(response), { qos: 2 });
     } catch (_e) {
       return false;
     }
@@ -212,7 +217,7 @@ export default class MQTTACSController extends ACSController {
 
   sendCoreConfigUpdate(core: Core, update: ServerConfigUpdateRequest): boolean {
     try {
-      MQTTACSController.client.publish(`makerspace/${core.makerspaceID}/device/${core.SN}/config/update`, JSON.stringify(update), { qos: 2 });
+      MQTTACSController.client.publish(`makerspace/device/${core.SN}/config/update`, JSON.stringify(update), { qos: 2 });
     } catch (_e) {
       return false;
     }
@@ -220,8 +225,9 @@ export default class MQTTACSController extends ACSController {
   }
 
   sendCoreInfoResponse(core: Core, response: ServerInfoResponse): boolean {
+    console.log("sending info", response)
     try {
-      MQTTACSController.client.publish(`makerspace/${core.makerspaceID}/device/${core.SN}/info/response`, JSON.stringify(response), { qos: 2 });
+      MQTTACSController.client.publish(`makerspace/device/${core.SN}/info/response`, JSON.stringify(response), { qos: 2 });
     } catch (_e) {
       return false;
     }
@@ -230,7 +236,7 @@ export default class MQTTACSController extends ACSController {
 
   sendCoreCommand(core: Core, command: ServerCommand): boolean {
     try {
-      MQTTACSController.client.publish(`makerspace/${core.makerspaceID}/device/${core.SN}/command`, JSON.stringify(command), { qos: 2 });
+      MQTTACSController.client.publish(`makerspace/device/${core.SN}/command`, JSON.stringify(command), { qos: 2 });
     } catch (_e) {
       return false;
     }
@@ -239,7 +245,7 @@ export default class MQTTACSController extends ACSController {
 
   sendWelcomeResponse(device: Device, response: WelcomeResponse): boolean {
     try {
-      MQTTACSController.client.publish(`makerspace/${device.makerspaceID}/device/${device.SN}/welcome/response`, JSON.stringify(response), { qos: 2 });
+      MQTTACSController.client.publish(`makerspace/device/${device.SN}/welcome/response`, JSON.stringify(response), { qos: 2 });
     } catch (_e) {
       return false;
     }

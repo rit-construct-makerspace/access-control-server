@@ -37,7 +37,6 @@ export class Core extends Device implements CoreRow {
   flags: CoreFlags;
   sealedDeployment: ACSDeployment | undefined;
   reportedDeployment: ACSDeployment | undefined;
-  hobbsTime: number;
 
   constructor(coreRow: CoreRow, deviceRow: DeviceRow) {
     super(deviceRow);
@@ -51,7 +50,6 @@ export class Core extends Device implements CoreRow {
     this.flags = verifyCoreFlags(coreRow.flags);
     this.sealedDeployment = coreRow.sealedDeployment;
     this.reportedDeployment = coreRow.reportedDeployment;
-    this.hobbsTime = coreRow.deviceID;
   }
 
 
@@ -97,16 +95,11 @@ export class Core extends Device implements CoreRow {
       flags: this.flags,
       sealedDeployment: this.sealedDeployment,
       reportedDeployment: this.reportedDeployment,
-      hobbsTime: this.hobbsTime
     }
   }
 
-  async statusUpdate(curCardTag: string | undefined, hobbsTime: number | null): Promise<void> {
-    let reportedHobbsTime = (hobbsTime ?? 0)
-    if (reportedHobbsTime < this.hobbsTime){
-      reportedHobbsTime = this.hobbsTime
-    }
-    await CoreRepo.coreStatusUpdate(this.deviceID, curCardTag, reportedHobbsTime);
+  async statusUpdate(curCardTag: string | undefined): Promise<void> {
+    await CoreRepo.coreStatusUpdate(this.deviceID, curCardTag);
   }
 
   async updateControllerState(channelID: number, newState: AccessControllerState) {

@@ -81,7 +81,9 @@ export interface EquipmentInstancesRow {
   /** The state of the equipment, ACTIVE,RETIRED,NEEDS_REPAIRED, etc. */
   status: string;
   /** Optional FK of the card reader associated with this instance */
-  accessControllerID: number | null
+  accessControllerID: number | null;
+  /** Required number of seconds that this equipment has been run for */
+  hobbsTime: number;
 }
 
 export interface HoldRow {

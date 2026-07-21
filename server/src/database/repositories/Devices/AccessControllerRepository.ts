@@ -2,6 +2,7 @@ import { GraphQLError } from "graphql";
 import { knex } from "../../knex/index.js";
 import { AccessControllerRow, AccessControllerState } from "../../knex/tables.js";
 import { AccessController } from "../../models/devices/accessController.js";
+import { getInstanceByAccessControllerID } from "../Equipment/EquipmentInstancesRepository.js";
 
 export async function getAccessControllersByDeviceID(deviceID: number): Promise<AccessController[]> {
   const rawRows = await knex("AccessControllers").where("deviceID", "=", deviceID);
@@ -39,7 +40,7 @@ export async function updateAccessControllerStateByDeviceAndChannelID(deviceID: 
     await knex("AccessControllers").update({ state: newState }).where({ deviceID: deviceID, channelID: channelID });
   } catch (e) {
     console.log(`Update Controller state failed: ${e}`)
-  }
+  }  
 }
 
 export async function updateAccessControllerDurationByDeviceAndChannelID(deviceID: number, channelID: number, tempDuration: number): Promise<void> {

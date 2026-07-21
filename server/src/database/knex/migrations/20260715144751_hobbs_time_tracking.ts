@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
         if (!exists) return;
 
         return knex.schema.alterTable("EquipmentInstances", function (t) {
-            t.bigInteger("hobbsTime").defaultTo(0);
+            t.integer("hobbsTime").defaultTo(0);
         });
     });
 
