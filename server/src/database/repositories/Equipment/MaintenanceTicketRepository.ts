@@ -1,7 +1,8 @@
 import { GraphQLError } from "graphql";
 import { knex } from "../../knex/index.js";
-import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../knex/tables.js";
+import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketTimeUnit, MaintenanceTicketType } from "../../knex/tables.js";
 import { addHours, endOfDay } from "date-fns"
+import { getInstanceByID } from "./EquipmentInstancesRepository.js";
 
 export async function createMaintenanceTicket(
   type: MaintenanceTicketType,
@@ -31,6 +32,8 @@ export async function createIntervalMaintenanceTicket(
   instanceID: number,
   description: string,
   startDate: string,
+  hobbsTimeAtCreate: number,
+  timeUnit: MaintenanceTicketTimeUnit,
   intervalHours: number,
   imageUrl?: string
 ): Promise<MaintenanceTicketRow> {
@@ -42,7 +45,9 @@ export async function createIntervalMaintenanceTicket(
     description,
     dateCreated: startDate,
     intervalHours,
-    imageUrl
+    timeUnit: timeUnit,
+    imageUrl,
+    hobbsTimeAtCreate: hobbsTimeAtCreate
   }).returning("*");
 
   if (result.length > 0) {
@@ -63,18 +68,23 @@ export async function modifyMaintenanceTicketStatus(id: number, status: Maintena
     return 0; // don't update the status to the same thing
   }
 
-  if (status === MaintenanceTicketStatus.CLOSED) {
-
-    if (ticket.type === MaintenanceTicketType.AUTOMATIC) {
-
-      const newTargetDate = addHours(new Date(), ticket.intervalHours ?? 0);
-      await createIntervalMaintenanceTicket(
-        ticket.severity,
-        ticket.instanceID,
-        ticket.description,
-        newTargetDate.toISOString(), ticket.intervalHours ?? 0
-      )
+  if (status === MaintenanceTicketStatus.CLOSED && ticket.type === MaintenanceTicketType.AUTOMATIC) {
+    const inst = await getInstanceByID(ticket.instanceID)
+    if (!inst) {
+      throw new GraphQLError("Could not find instance for ticket to update hours")
     }
+
+    const newTargetDate = addHours(new Date(), ticket.intervalHours ?? 0);
+    const newTargetHobbs = inst.hobbsTime + (ticket.intervalHours ?? 0) * 60 * 60;
+    await createIntervalMaintenanceTicket(
+      ticket.severity,
+      ticket.instanceID,
+      ticket.description,
+      newTargetDate.toISOString(),
+      newTargetHobbs,
+      ticket.timeUnit,
+      ticket.intervalHours ?? 0
+    )
 
     return await knex("MaintenanceTickets").update({ status: status, dateClosed: knex.fn.now() }).where({ id: id });
   } else {
@@ -189,11 +199,24 @@ export async function assignMaintenanceTicket(id: number, assignedID: number | n
   return result[0];
 }
 
-export async function advanceIntervalTickets(): Promise<MaintenanceTicketRow[]> {
+export async function advanceCalendarIntervalTickets(): Promise<MaintenanceTicketRow[]> {
   return await knex("MaintenanceTickets").update({ status: MaintenanceTicketStatus.TODO })
-    .where("status", "=", MaintenanceTicketStatus.UPCOMING).andWhere("dateCreated", "<=", endOfDay(new Date()).toISOString()) // TODO: normalize this to timezone
+    .where("status", "=", MaintenanceTicketStatus.UPCOMING)
+    .andWhere("timeUnit", "=", MaintenanceTicketTimeUnit.CALENDAR)
+    .andWhere("dateCreated", "<=", endOfDay(new Date()).toISOString()) // TODO: normalize this to timezone
     .returning("*");
 }
+export async function advanceUsageIntervalTickets(): Promise<MaintenanceTicketRow[]> {
+  return await knex("MaintenanceTickets as m")
+    .leftJoin("EquipmentInstances as e", "e.id", "=", "m.instanceID")
+    .update({ status: MaintenanceTicketStatus.TODO, dateCreated: knex.fn.now() })
+    .where("status", "=", MaintenanceTicketStatus.UPCOMING)
+    .andWhere("timeUnit", "=", MaintenanceTicketTimeUnit.USAGE)
+    .andWhere("m.hobbsTimeAtCreate", "<=", "e.hobbsTime")
+    .returning("*");
+}
+
+
 
 export async function deleteMaintenanceTicket(id: number): Promise<number> {
   return await knex("MaintenanceTickets").delete().where("id", "=", id);

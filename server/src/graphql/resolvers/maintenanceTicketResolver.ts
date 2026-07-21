@@ -1,5 +1,5 @@
 import { ApolloContext } from "../../context.js"
-import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../database/knex/tables.js"
+import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketTimeUnit, MaintenanceTicketType } from "../../database/knex/tables.js"
 import * as MaintenanceTicketRepo from "../../database/repositories/Equipment/MaintenanceTicketRepository.js"
 import * as InstanceRepo from "../../database/repositories/Equipment/EquipmentInstancesRepository.js"
 import * as UserRepo from "../../database/repositories/Users/UserRepository.js"
@@ -112,7 +112,9 @@ const MaintenanceTicketResolver = {
         description: string,
         startDate: string,
         intervalHours: number,
-        imageUrl?: string
+        imageUrl?: string,
+        timeUnit: MaintenanceTicketTimeUnit,
+        hobbsTimeAtCreate: number,
       },
       { isManager }: ApolloContext // should perhaps be ifManagerFor
     ) => isManager(async (_user) => (
@@ -120,8 +122,10 @@ const MaintenanceTicketResolver = {
         args.severity,
         args.instanceID,
         args.description,
-        args.startDate,
-        args.intervalHours,
+        args.startDate, 
+        args.hobbsTimeAtCreate,
+        args.timeUnit,
+        args.intervalHours, 
         args.imageUrl
       )
     )),

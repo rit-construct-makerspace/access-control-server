@@ -2,6 +2,11 @@ import { gql } from "@apollo/client";
 import { CurrentUser } from "../common/CurrentUserProvider";
 import { EquipmentInstance } from "./equipmentInstanceQueries";
 
+export enum MaintenanceTicketTimeUnit {
+  USAGE = "USAGE",
+  CALENDAR = "CALENDAR"
+} 
+
 export enum MaintenanceTicketType {
   AUTOMATIC = "AUTOMATIC",
   REPORTED = "REPORTED"
@@ -32,7 +37,10 @@ export interface MaintenanceTicket {
   creator: CurrentUser | null,
   instance: EquipmentInstance,
   assigned: CurrentUser | null,
-  intervalHours: number | null
+  intervalHours: number | null,
+  timeUnit: MaintenanceTicketTimeUnit,
+  hobbsTimeAtCreate: number,
+  hobbsTimeAtClose: number | null
 }
 
 export const PAGINATED_MAINTENANCE_TICKETS = gql`
@@ -47,6 +55,9 @@ export const PAGINATED_MAINTENANCE_TICKETS = gql`
       dateCreated
       dateClosed
       intervalHours
+      timeUnit
+      hobbsTimeAtCreate
+      hobbsTimeAtClose
       creator {
         id
         ritUsername
@@ -80,6 +91,9 @@ export const GET_MAINTENANCE_TICKET = gql`
       imageUrl
       dateCreated
       dateClosed
+      timeUnit
+      hobbsTimeAtCreate
+      hobbsTimeAtClose
       creator {
         id
         ritUsername
@@ -133,6 +147,9 @@ export const GET_MAINTENANCE_TICKETS = gql`
       dateCreated
       dateClosed
       intervalHours
+      timeUnit
+      hobbsTimeAtCreate
+      hobbsTimeAtClose
       creator {
         id
         ritUsername
@@ -180,7 +197,9 @@ export const CREATE_INTERVAL_MAINTENANCE_TICKET = gql`
     $description: String!,
     $startDate: String!,
     $intervalHours: Int!,
-    $imageUrl: String
+    $imageUrl: String,
+    $timeUnit: String!,
+    $hobbsTimeAtCreate: Int!,
   ) {
     createIntervalMaintenanceTicket(
       severity: $severity,
@@ -188,7 +207,9 @@ export const CREATE_INTERVAL_MAINTENANCE_TICKET = gql`
       description: $description,
       startDate: $startDate,
       intervalHours: $intervalHours,
-      imageUrl: $imageUrl
+      imageUrl: $imageUrl,
+      timeUnit: $timeUnit,
+      hobbsTimeAtCreate: $hobbsTimeAtCreate,
     ) {
       id
     }

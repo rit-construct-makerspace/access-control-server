@@ -2,6 +2,11 @@ import { gql } from "graphql-tag";
 
 export const MaintenanceTicketTypeDefs = gql`
   
+  enum MaintenanceTicketTimeUnit {
+    USAGE
+    CALENDAR
+  }
+
   enum MaintenanceTicketType {
     AUTOMATIC
     REPORTED
@@ -36,6 +41,9 @@ export const MaintenanceTicketTypeDefs = gql`
     instance: EquipmentInstance!
     creator: User
     assigned: User
+    timeUnit: MaintenanceTicketTimeUnit
+    hobbsTimeAtCreate: Int!
+    hobbsTimeAtClose: Int
   }
 
   input Pagination {
@@ -75,7 +83,9 @@ export const MaintenanceTicketTypeDefs = gql`
       description: String!,
       startDate: String!,
       intervalHours: Int!,
-      imageUrl: String
+      imageUrl: String,
+      timeUnit: String!,
+      hobbsTimeAtCreate: Int!
     ): MaintenanceTicket
 
     modifyMaintenanceTicketStatus(id: Int!, status: MaintenanceTicketStatus!): Int

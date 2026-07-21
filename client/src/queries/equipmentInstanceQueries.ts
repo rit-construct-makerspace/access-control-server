@@ -22,6 +22,21 @@ export interface EquipmentInstance {
   accessController: AccessController | undefined;
   hobbsTime: number
 }
+export function formatHobbsTime(allSeconds: number){
+  const hours = Math.floor(allSeconds / 3600);
+  if (hours > 0){
+    return (allSeconds / 3600).toFixed(2) + " hrs"
+  }
+  const minutes = Math.floor((allSeconds % 3600) / 60);
+  const seconds = allSeconds % 60;  
+  if (minutes > 0){
+    return (minutes + seconds / 50).toFixed(2) + " min"
+  } else {
+    return Math.floor(allSeconds) + "sec"
+  }
+}
+
+
 
 export const GET_EQUIPMENT_INSTANCES = gql`
   query EquipmentInstances($equipmentID: ID!) {

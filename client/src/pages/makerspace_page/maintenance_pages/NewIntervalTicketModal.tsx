@@ -50,12 +50,18 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
   const makerspace_equipments = makerspace_equipments_2?.flat(1);
 
   const [startDate, setStartDate] = useState(new Date());
-  const [scale, setScale] = useState("days");
+  const [timeUnit, setTimeUnit] = useState("USAGE"); // USAGE | CALENDAR
+  const [scale, setScale] = useState("days"); // hours | days | weeks
   const [interval, setInterval] = useState("1");
 
   function handleChangeScale(_event: React.MouseEvent<HTMLElement>, value: string) {
     if (value !== null && value !== scale) {
       setScale(value);
+    }
+  }
+  function handleChangeTimeUnit(_event: React.MouseEvent<HTMLElement>, value: string) {
+    if (value !== null && value !== timeUnit) {
+      setTimeUnit(value);
     }
   }
 
@@ -67,6 +73,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
     setImageUrl(undefined);
     setStartDate(new Date());
     setScale("days");
+    setTimeUnit("calendar")
     setInterval("1");
 
     props.onClose();
@@ -78,6 +85,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
       return;
     }
     try {
+      const intervalHours = scale === "days" ? Number(interval) * 24 : (scale == "weeks" ? Number(interval) * 168 : interval)
       await createTicket({
         variables: {
           severity: severity,
@@ -85,7 +93,10 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
           description: description,
           startDate: startDate.toISOString(),
           imageUrl: imageUrl,
-          intervalHours: scale === "days" ? Number(interval) * 24 : Number(interval) * 168
+          intervalHours: intervalHours,
+          timeUnit: timeUnit,
+          hobbsTimeAtCreate: instance?.hobbsTime
+          
         }
       })
     } catch (e) {
@@ -127,6 +138,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
         {
           equipment
             ? <Autocomplete
+              fullWidth
               key={instances.length === 1 ? "auto-selected" : "manual-select"}
               renderInput={
                 (params) => (
@@ -159,21 +171,40 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
               disabled
             />
         }
-        <Autocomplete
-          renderInput={
-            (params) => (
-              <TextField
-                {...params}
-                label="Severity"
-                placeholder="Select Severity..."
-                required
-              />
-            )
-          }
-          options={[MaintenanceTicketSeverity.HIGH, MaintenanceTicketSeverity.MEDIUM, MaintenanceTicketSeverity.LOW]}
-          value={severity}
-          onChange={(event, newValue) => setSeverity(newValue ?? undefined)}
-        />
+        <Stack direction={"row"} spacing={1}>
+          <Autocomplete
+            renderInput={
+              (params) => (
+                <TextField
+                  {...params}
+                  label="Severity"
+                  placeholder="Select Severity..."
+                  required
+                />
+              )
+            }
+            options={[MaintenanceTicketSeverity.HIGH, MaintenanceTicketSeverity.MEDIUM, MaintenanceTicketSeverity.LOW]}
+            value={severity}
+            onChange={(event, newValue) => setSeverity(newValue ?? undefined)}
+            sx={{flexGrow: 1}}
+          />
+
+          <ToggleButtonGroup
+            exclusive
+            value={timeUnit}
+            onChange={handleChangeTimeUnit}
+          >
+            <ToggleButton value="USAGE">
+              Usage
+            </ToggleButton>
+            <ToggleButton value="CALENDAR">
+              Calendar
+            </ToggleButton>
+          </ToggleButtonGroup>
+
+
+        </Stack>
+
         <Stack direction={"row"} justifyContent={"space-between"}>
           <DatePicker
             value={startDate}
@@ -196,11 +227,15 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
                 width: "120px"
               }}
             />
+
             <ToggleButtonGroup
               exclusive
               value={scale}
               onChange={handleChangeScale}
             >
+              <ToggleButton value="hours">
+                Hours
+              </ToggleButton>
               <ToggleButton value="days">
                 Days
               </ToggleButton>

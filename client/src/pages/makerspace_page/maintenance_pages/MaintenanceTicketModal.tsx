@@ -17,6 +17,7 @@ import { useParams } from "react-router-dom";
 import { GET_VALID_STAFF } from "../../../queries/makerspaceQueries";
 import { CurrentUser, useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManager } from "../../../common/PrivilegeUtils";
+import { formatHobbsTime } from "../../../queries/equipmentInstanceQueries";
 
 interface TicketModalProps {
   open: boolean,
@@ -194,6 +195,7 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     }
   }
 
+
   return (
     <PrettyModal open={props.open} onClose={handleClose} width={"600px"}>
       <Stack spacing={2}>
@@ -316,6 +318,10 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
                 />
               </Stack>
           }
+        </Stack>
+        <Stack justifyContent={"space-between"} direction={"row"}>
+          <Typography variant="body1">Usage at Open: {formatHobbsTime(props.ticket.hobbsTimeAtCreate)}</Typography> 
+          <Typography variant="body1">Usage at Close: {props.ticket.hobbsTimeAtClose ? formatHobbsTime(props.ticket.hobbsTimeAtClose) : "N/A"}</Typography> 
         </Stack>
         {
           editing
