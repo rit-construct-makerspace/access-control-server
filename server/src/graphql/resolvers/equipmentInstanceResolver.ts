@@ -5,9 +5,10 @@ import * as ACRepo from "../../database/repositories/Devices/AccessControllerRep
 import { ApolloContext } from "../../context.js";
 import { EquipmentInstancesRow } from "../../database/knex/tables.js";
 import { createInstance, deleteInstance, getInstanceByID, getInstancesByEquipment, setInstanceName, setInstanceStatus } from "../../database/repositories/Equipment/EquipmentInstancesRepository.js";
-import { createUnassocaitedAuditLog } from "../../database/repositories/AuditLogs/AuditLogRepository.js";
+import { createAuditLog, createUnassocaitedAuditLog } from "../../database/repositories/AuditLogs/AuditLogRepository.js";
 import { GraphQLError } from "graphql";
 import { getUsersFullName } from "../../database/repositories/Users/UserRepository.js";
+import { ACSOrchestrator } from "../../database/models/api/ACSOrchestrator.js";
 
 const EquipmentInstanceResolver = {
   EquipmentInstance: {
@@ -129,7 +130,49 @@ const EquipmentInstanceResolver = {
         return newInstance;
       }),
 
+
     /**
+     * Update the hobbs time of an equipment instance
+     * @argument instanceID ID of the instance to modify
+     * @argument hobbsTime seconds of hobbs time to set
+     */
+    updateInstanceHobbsTime: async (
+      _parent: any,
+      args: {
+        id: number,
+        hobbsTime: number
+      },
+      { isStaff }: ApolloContext) =>
+      isStaff(async (user) => {
+
+        const instance = await InstanceRepo.getInstanceByID(args.id);
+        if (!instance) throw new GraphQLError("Instance does not exist");
+
+        const equipment = await EquipmentRepo.getEquipmentByID(instance.equipmentID);
+        if (!equipment) throw new GraphQLError("Instance does not have associated Machine");
+
+        const room = await RoomRepo.getRoomByID(equipment.roomID) 
+        if (!room) throw new GraphQLError("Instance does not have associated Room");
+
+        if (!instance.accessControllerID) throw new GraphQLError("Instance has no associated access controller")
+      
+        const accessController = await ACRepo.getAccessControllerByID(instance.accessControllerID)
+        if (!accessController) throw new GraphQLError("Instance has no associated access controller")
+      
+
+        const newInstance = await InstanceRepo.updateInstanceHobbsTime(args.id, args.hobbsTime);
+
+        ACSOrchestrator.handleSendCoreCommand(accessController.deviceID, {
+          hobbsTime: [{channelID: accessController.channelID, hobbsTime: args.hobbsTime}]
+        })
+
+        await createAuditLog(`{user} set hobbs time of instance '${instance?.name}' of equipment {equipment} to ${args.hobbsTime} seconds from ${instance.hobbsTime} seconds`, 'admin', room.makerspaceID ?? undefined, { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
+
+        return newInstance;
+      }),
+
+
+      /**
      * Update the status field of an Equipment Instance
      * @argument id ID of equipment instance to modify
      * @argument status New Instance status

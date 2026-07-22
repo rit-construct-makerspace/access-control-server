@@ -20,6 +20,7 @@ export interface EquipmentInstance {
   name: string;
   status: InstanceStatus;
   accessController: AccessController | undefined;
+  hobbsTime: number
 }
 
 export const GET_EQUIPMENT_INSTANCES = gql`
@@ -32,6 +33,7 @@ export const GET_EQUIPMENT_INSTANCES = gql`
       }
       name
       status
+      hobbsTime
       accessController {
         id
         channelID
@@ -63,6 +65,7 @@ export const GET_EQUIPMENT_INSTANCE_BY_ID = gql`
       }
       name
       status
+      hobbsTime
       reader {
         id
         name
@@ -106,6 +109,22 @@ export const UPDATE_INSTANCE = gql`
           }
           name
           status
+          hobbsTime
+      }
+  }
+`;
+
+export const UPDATE_INSTANCE_HOBBS_TIME = gql`
+  mutation UpdateInstanceHobbsTime($id: ID!, $hobbsTime: Int!) {
+      updateInstanceHobbsTime(id: $id, hobbsTime: $hobbsTime) {
+          id
+          equipment {
+            id
+            name
+          }
+          name
+          status
+          hobbsTime
       }
   }
 `;

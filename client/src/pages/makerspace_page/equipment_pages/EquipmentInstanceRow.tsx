@@ -1,5 +1,5 @@
 import { Autocomplete, Button, Card, Chip, IconButton, Link, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
-import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, InstanceStatus, UPDATE_INSTANCE, UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT } from "../../../queries/equipmentInstanceQueries";
+import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, InstanceStatus, UPDATE_INSTANCE, UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT, UPDATE_INSTANCE_HOBBS_TIME } from "../../../queries/equipmentInstanceQueries";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import { useMutation, useQuery } from "@apollo/client/react";
 import { useState } from "react";
@@ -29,6 +29,11 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
     awaitRefetchQueries: true
   });
 
+  const [updateInstanceHobbsTime] = useMutation(UPDATE_INSTANCE_HOBBS_TIME, {
+    refetchQueries: ["EquipmentInstances", "GetUnpairedAccessControllers"],
+    awaitRefetchQueries: true
+  });
+
   const [updatePairing] = useMutation(UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT, {
     refetchQueries: ["EquipmentInstances", "GetUnpairedAccessControllers"],
     awaitRefetchQueries: true
@@ -47,9 +52,12 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
   const [sendCommandedState] = useMutation(COMMAND_CONTROLLER_STATE);
   const [commandedState, setCommandedState] = useState<string>("IDLE");
 
+  const [hobbsTime, setHobbsTime] = useState(props.instance.hobbsTime);
+
 
   async function handleSave() {
     setAllowEdit(false);
+    await updateInstanceHobbsTime({ variables: { id: props.instance.id, hobbsTime: hobbsTime } })
     await updateInstance({ variables: { id: props.instance.id, name: name, status: status } })
     await updatePairing({ variables: { id: Number(props.instance.id), accessControllerID: pairedController?.id } })
   }
@@ -91,6 +99,20 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
     />;
   }
 
+  function formatSeconds(allSeconds: number){
+    const hours = Math.floor(allSeconds / 3600);
+    if (hours > 0){
+      return (allSeconds / 3600).toFixed(2) + " hrs"
+    }
+    const minutes = Math.floor((allSeconds % 3600) / 60);
+    const seconds = allSeconds % 60;  
+    if (minutes > 0){
+      return (minutes + seconds / 50).toFixed(2) + " min"
+    } else {
+      return Math.floor(allSeconds) + "sec"
+    }
+  }
+
   function activeUserDisplay() {
     if (!currentAccessController) {
       return <Typography>No User</Typography>;
@@ -106,6 +128,15 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
       User:&nbsp;
       <AuditLogEntity entityCode={`user:${currentAccessController.core?.activeUser.id}:${currentAccessController.core?.activeUser?.firstName} ${currentAccessController.core?.activeUser?.lastName}`} />
     </Stack>
+  }
+
+  function hobbsTimeSetField(){
+    return <TextField label="Hobbs (s)" 
+    required 
+    value={hobbsTime}
+    onChange={(e) => setHobbsTime(Math.abs(Number(e.target.value)))}
+    >
+    </TextField>
   }
 
   return (
@@ -127,6 +158,16 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
               : controllerPairingField()
           }
         </Stack>
+
+        <Stack alignItems={"center"} direction={"row"} width={"200px"}>
+          {
+            !allowEdit
+              ? formatSeconds(props.instance.hobbsTime)
+              : hobbsTimeSetField()
+          }
+        </Stack>
+
+
         <Stack direction={"row"} alignItems={"center"} width={"300px"}>
           {activeUserDisplay()}
         </Stack>
