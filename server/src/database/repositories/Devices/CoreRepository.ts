@@ -87,7 +87,7 @@ export async function getMakerspaceWelcomeCores(makerspaceID: number): Promise<C
 }
 
 export async function coreStatusUpdate(deviceID: number, cardTagID: string | undefined) {
-  await knex("Cores").update({ currentCardTag: cardTagID, lastStatusTime: knex.fn.now() }).where({ deviceID: deviceID });
+  await knex("Cores").update({ currentCardTag: cardTagID, lastStatusTime: knex.fn.now()}).where({ deviceID: deviceID });
 }
 
 export async function updateCoreDeployment(deviceID: number, deployment: ACSDeployment): Promise<void> {

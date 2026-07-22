@@ -94,7 +94,7 @@ export class Core extends Device implements CoreRow {
       sessionStartTime: this.sessionStartTime,
       flags: this.flags,
       sealedDeployment: this.sealedDeployment,
-      reportedDeployment: this.reportedDeployment
+      reportedDeployment: this.reportedDeployment,
     }
   }
 

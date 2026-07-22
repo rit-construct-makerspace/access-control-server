@@ -4,7 +4,8 @@ import { ACSDeployment } from "../ACS/deployment.js";
 export interface CoreStatusReport {
   channels: {
     channelID: number,
-    state: AccessControllerState
+    state: AccessControllerState,
+    hobbsTime: number,
   }[];
   currentCardTag: string;
 }
@@ -66,7 +67,8 @@ export enum CoreInfoOptions {
   TIME = "TIME",
   STATE = "STATE",
   HMI = "HMI",
-  FLAGS = "FLAGS"
+  FLAGS = "FLAGS",
+  HOBBS_TIME = "HOBBS_TIME"
 }
 
 export interface CoreInfoRequest {
@@ -125,6 +127,7 @@ export interface ServerCommand {
   action?: CoreActions;
   identifyChannel?: number;
   flags?: CoreFlags;
+  hobbsTime?: {channelID: number, hobbsTime: number}[]
 }
 
 export enum CoreRole {
@@ -144,13 +147,18 @@ export interface ServerInfoResponse {
   }[];
   hmi?: {
     role: CoreRole;
+    deviceName: string,
     makerspace: string;
     channels: {
       channelID: number;
       pairedEntity: string;
     }[];
   };
-  flags?: CoreFlags
+  flags?: CoreFlags;
+  hobbsTime?: {
+    channelID: number;
+    hobbsTime: number;
+  }[]
 }
 
 export interface WelcomeRequest {
