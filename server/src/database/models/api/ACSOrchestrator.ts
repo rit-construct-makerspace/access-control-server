@@ -26,19 +26,16 @@ export class ACSOrchestrator {
 
   public static async handleCoreStatusReport(deviceID: number, statusReport: CoreStatusReport) {
     try {
-      console.log("handle: ", statusReport)
       const core = await CoreRepo.getCoreByDeviceID(deviceID);
       if (core === undefined) {
         console.warn("status report from non-core", deviceID)
         return;
       }
-      console.log(core)
 
       await core.statusUpdate(statusReport.currentCardTag);
       const timesToSend = [];
       let shouldUpdateTimes = false
 
-      console.log("channels", statusReport.channels)
       for (let i = 0; i < statusReport.channels.length; i++) {
         const channel = statusReport.channels[i];
         await core.updateControllerState(channel.channelID, channel.state);
@@ -47,7 +44,6 @@ export class ACSOrchestrator {
         if (inst == undefined) {
           continue;
         }
-        console.log("inst", inst)
         
 
         if (inst.hobbsTime > channel.hobbsTime) {
@@ -56,12 +52,10 @@ export class ACSOrchestrator {
           DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { msg: "hobbs-time-mismatch", reported: channel.hobbsTime, stored: inst.hobbsTime })
           shouldUpdateTimes = true
         } else {
-          const updated = await updateInstanceHobbsTime(inst.id, channel.hobbsTime)
-          console.log("update", updated)
+          await updateInstanceHobbsTime(inst.id, channel.hobbsTime)
         }
       }
       if (shouldUpdateTimes) {
-        console.log("hobbs tme mismatch: ", timesToSend)
         ACSOrchestrator.getDeviceController(deviceID)?.sendCoreCommand(core, {
           hobbsTime: timesToSend
         })
@@ -69,7 +63,6 @@ export class ACSOrchestrator {
       }
 
     } catch (e) {
-      console.warn(e)
       await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "core-status-error", error: e });
     }
   }
@@ -218,7 +211,6 @@ export class ACSOrchestrator {
 
       const core = await CoreRepo.getCoreByDeviceID(deviceID);
       if (core === undefined) { return; }
-      console.log("request", infoRequest.fields, core)
       const response: ServerInfoResponse = {
         time: infoRequest.fields.includes(CoreInfoOptions.TIME)
           ? (new Date).getTime() : undefined,
@@ -237,11 +229,9 @@ export class ACSOrchestrator {
 
         hobbsTime: infoRequest.fields.includes(CoreInfoOptions.HOBBS_TIME) ? await getHobbsTimes(core) : undefined
       }
-      console.log(response)
 
       ACSOrchestrator.getDeviceController(core.deviceID)?.sendCoreInfoResponse(core, response);
     } catch (e) {
-      console.error(e)
       await DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { type: "core-info-request-error", error: e });
     }
   }
