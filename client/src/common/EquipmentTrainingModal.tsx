@@ -98,6 +98,21 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
           user.visitor
             ? <Typography variant="subtitle1" fontWeight={"bold"}>Sign In to View Training Progress</Typography>
             : <Stack alignItems={"center"} width={"100%"}>
+              <LinearProgress
+                variant="determinate"
+                value={percentComplete}
+                color={
+                  totalReqsComplete !== totalRequirements
+                    ? "primary"
+                    : byExpiry.length > 0 && byExpiry[0].status === "Expiring Soon"
+                      ? "warning"
+                      : "success"
+                }
+                sx={{
+                  width: "95%",
+                  height: "16px"
+                }}
+              />
               <Typography variant="subtitle1" fontWeight={"bold"}>
                 {
                   totalReqsComplete !== totalRequirements
