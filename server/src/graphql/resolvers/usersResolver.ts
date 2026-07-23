@@ -13,6 +13,7 @@ import { getActiveTrainingHoldsByUser } from "../../database/repositories/Traini
 import { getMakerspaceByID } from "../../database/repositories/Makerspaces/MakerspaceRespository.js";
 import { EntityNotFound } from "../../EntityNotFound.js";
 import { UserRow } from "../../database/knex/tables.js";
+import { User } from "../../database/models/users/User.js";
 
 const UsersResolvers = {
   User: {
@@ -146,6 +147,23 @@ const UsersResolvers = {
       { user }: ApolloContext) => {
       return user;
     },
+
+    /**
+     * Check if the target user has been welcomed today
+     * @param userID the user to check
+     * @param roomID the room to check
+     * @returns true if welcomed
+     */
+
+    isUserWelcomed: async (
+      _parent: any,
+      args: { userID: string, roomID: string },
+      { ifStaffOrSelf }: ApolloContext) =>
+      ifStaffOrSelf(Number(args.userID), async () => {
+        const rawUser = await UserRepo.getUserByID(Number(args.userID))
+        const fullUser = new User(rawUser)
+        return await fullUser.wasWelcomedToday(Number(args.roomID));
+      }),
 
     /**
      * Fetch the number of total users
