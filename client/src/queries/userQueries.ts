@@ -207,6 +207,11 @@ export const UPDATE_STUDENT_PROFILE = gql`
   }
 `;
 
+export const IS_USER_WELCOMED = gql`
+  query IsUserWelcomed($userID: ID!, $roomID: ID!) {
+    isUserWelcomed(userID: $userID, roomID: $roomID)
+  }
+`
 
 export const GET_CURRENT_USER = gql`
   query GetCurrentUser {

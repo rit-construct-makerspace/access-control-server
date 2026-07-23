@@ -92,6 +92,7 @@ export const UsersTypeDefs = gql`
     usersLimit(searchText: String): [User]
     user(id: ID!): User
     currentUser: User
+    isUserWelcomed(userID: ID!, roomID: ID!): Boolean
     numUsers: Count
     userByUsernameorUID(value: String): User
   }
