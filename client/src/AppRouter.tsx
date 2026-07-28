@@ -50,6 +50,7 @@ import AdminHistoryPage from "./pages/site-settings/AdminHistoryPage";
 import ThemeManagementPage from "./pages/site-settings/ThemeManagementPage";
 import NewThemePage from "./pages/site-settings/NewThemePage";
 import ManageThemePage from "./pages/site-settings/ManageThemePage";
+import EquipmentUserInfo from "./pages/makerspace_page/equipment_pages/EquipmentUserInfo";
 
 function AppRoot() {
   return (
@@ -136,7 +137,8 @@ export const routes = [
           { path: "/makerspace/:makerspaceID", element: <MakerspacePage /> },
           { path: "/terms", element: <TermsPage /> },
           { path: "/help", element: <HelpPage /> },
-
+          { path: "/makerspace/:makerspaceID/equipmentUserInfo/:equipmentID", element: <EquipmentUserInfo /> },
+          
           /* Routes that need to be protected by auth */
           {
             element: <AuthedRoute />,
