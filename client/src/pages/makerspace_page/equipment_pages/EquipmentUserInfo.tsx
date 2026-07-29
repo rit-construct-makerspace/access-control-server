@@ -1,7 +1,7 @@
 import PersonIcon from '@mui/icons-material/Person';
 import { useParams } from "react-router-dom";
 import { GET_EQUIPMENT_BY_ID } from "../../../queries/equipmentQueries";
-import { Alert, Button, CardActionArea, LinearProgress, Typography } from "@mui/material";
+import { Alert, Button, CardActionArea, LinearProgress, Link, Typography } from "@mui/material";
 import { useQuery } from "@apollo/client/react";
 import { Equipment } from "./ManageEquipmentPage";
 import { Stack } from "@mui/system";
@@ -11,13 +11,16 @@ import { FullMakerspace, GET_MAKERSPACE_BY_ID } from "../../../queries/makerspac
 import { GET_ROOM } from "../../../queries/roomQueries";
 import RequestWrapper from "../../../common/RequestWrapper";
 import Room from "../../../types/Room";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { IS_USER_WELCOMED } from "../../../queries/userQueries";
 import ModuleStatusRow from "../../../common/ModuleStatusRow";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from '@mui/icons-material/Check';
-import { Link } from "react-router-dom";
+import WarningIcon from '@mui/icons-material/Warning';
+import NewTicketModal from '../maintenance_pages/NewTicketModal';
+import { isStaffFor } from '../../../common/PrivilegeUtils';
+
 
 export default function EquipmentUserInfo() {
     const user = useCurrentUser();
@@ -25,6 +28,7 @@ export default function EquipmentUserInfo() {
 
 
     const { makerspaceID, equipmentID } = useParams<{ makerspaceID: string, equipmentID: string }>();
+    const isStaffForHere = isStaffFor(user, Number(makerspaceID));
     const getEquipmentByIDResult = useQuery(GET_EQUIPMENT_BY_ID, {
         variables: {
             id: equipmentID,
@@ -47,6 +51,12 @@ export default function EquipmentUserInfo() {
             roomID: getEquipmentByIDResult?.data?.equipment?.room?.id ?? -1,
         }
     });
+
+    const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
+
+
+    const [newTicketModal, setNewTicketModal] = useState(false);
+
 
     function unfinishedTrainingWarning(): ReactNode {
         return <Alert severity="warning" title="Unfinished Training">
@@ -209,12 +219,26 @@ export default function EquipmentUserInfo() {
                         : null
                 }
             </Stack>
-            <Button
-                color="info"
-                variant="contained"
-                onClick={() => window.open(equipment.sopUrl, "_blank")}
+            <Stack direction="row" spacing="10px">
+                <Button
+                    color="info"
+                    variant="contained"
+                    onClick={() => window.open(equipment.sopUrl, "_blank")}
+                >
+                    Equipment Information
+                </Button>
 
-            >Equipment Information</Button>
+                {isStaffForHere ? <Button
+                    color="primary"
+                    variant="contained"
+                    onClick={() => setNewTicketModal(true)}
+                    startIcon={<WarningIcon />}
+                >
+                    Report Issue
+                </Button> : undefined}
+            </Stack>
+
+
         </Stack>
     }
 
@@ -233,6 +257,8 @@ export default function EquipmentUserInfo() {
             >
                 LOGIN
             </Button>
+
+
         </Stack>
 
     }
@@ -244,5 +270,7 @@ export default function EquipmentUserInfo() {
                 ? renderVisitor(getEquipmentByIDResult?.data?.equipment as Equipment)
                 : renderPage(isWelcomedResult?.data?.isUserWelcomed ? isWelcomedResult?.data?.isUserWelcomed : false, getEquipmentByIDResult?.data?.equipment as Equipment, getRoomResult.data?.room as Room, getMakerspaceResult.data?.makerspaceByID as FullMakerspace)
         }
+        {getMakerspace?.data?.makerspaceByID ? <NewTicketModal open={newTicketModal} onClose={() => setNewTicketModal(false)} makerspace={getMakerspace?.data?.makerspaceByID} /> : undefined}
+
     </RequestWrapper>
 }

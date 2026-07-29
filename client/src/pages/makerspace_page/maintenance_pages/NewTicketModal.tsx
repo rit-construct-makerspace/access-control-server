@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import FileUploadButton from "../../../common/FileUploadButton";
 import styled from "styled-components";
 import { makeCDNLink } from "../../../common/ImageFinder";
+import { useIsMobile } from "../../../common/IsMobileProvider";
 
 const StyledImg = styled.img`
   padding: 5px
@@ -27,6 +28,7 @@ interface NewTicketModalProps {
 
 export default function NewTicketModal(props: NewTicketModalProps) {
   const user = useCurrentUser();
+  const isMobile = useIsMobile();
 
   const [equipment, setEquipment] = useState(props.equipment);
   const [instance, setInstance] = useState<EquipmentInstance>();
@@ -93,7 +95,7 @@ export default function NewTicketModal(props: NewTicketModalProps) {
   }
 
   return (
-    <PrettyModal open={props.open} onClose={handleClose} width={"620px"}>
+    <PrettyModal open={props.open} onClose={handleClose} width={isMobile ? "90%" : "620px"}>
       <Stack spacing={2} padding={"10px"}>
         <Stack direction={"row"} justifyContent={"space-between"}>
           <Typography variant="h6">Create a Maintenance Ticket</Typography>
@@ -186,7 +188,7 @@ export default function NewTicketModal(props: NewTicketModalProps) {
             ? <StyledImg src={makeCDNLink(imageUrl, "user-uploads/")} />
             : null
         }
-        <Stack direction={"row"} justifyContent={"space-between"}>
+        <Stack direction={isMobile ? "column" : "row"} spacing="2px" justifyContent={"space-between"}>
           <Button
             color="error"
             variant="contained"
