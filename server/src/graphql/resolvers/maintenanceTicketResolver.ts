@@ -1,5 +1,5 @@
 import { ApolloContext } from "../../context.js"
-import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType } from "../../database/knex/tables.js"
+import { MaintenanceTicketRow, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketTimeUnit, MaintenanceTicketType } from "../../database/knex/tables.js"
 import * as MaintenanceTicketRepo from "../../database/repositories/Equipment/MaintenanceTicketRepository.js"
 import * as InstanceRepo from "../../database/repositories/Equipment/EquipmentInstancesRepository.js"
 import * as UserRepo from "../../database/repositories/Users/UserRepository.js"
@@ -7,6 +7,7 @@ import * as AuditLogRepo from "../../database/repositories/AuditLogs/AuditLogRep
 import * as EquipmentRepo from "../../database/repositories/Equipment/EquipmentRepository.js";
 import { notifyNewMaintenanceTicket } from "../../integrations/slack/slack.js"
 import { Equipment } from "../../database/models/equipment/Equipment.js"
+import { GraphQLError } from "graphql"
 
 const MaintenanceTicketResolver = {
   MaintenanceTicket: {
@@ -112,19 +113,30 @@ const MaintenanceTicketResolver = {
         description: string,
         startDate: string,
         intervalHours: number,
-        imageUrl?: string
+        imageUrl?: string,
+        timeUnit: MaintenanceTicketTimeUnit,
       },
       { isManager }: ApolloContext // should perhaps be ifManagerFor
-    ) => isManager(async (_user) => (
+    ) => isManager(async (_user) => {
+      const inst = await InstanceRepo.getInstanceByID(args.instanceID);
+      if (inst == undefined){
+        throw new GraphQLError("Could not find instance for maintenance ticket");
+      }
+      let hobbsTimeAtCreate = inst.hobbsTime;
+      if (args.timeUnit == MaintenanceTicketTimeUnit.USAGE){
+        hobbsTimeAtCreate += args.intervalHours *  60 * 60;
+      }
       await MaintenanceTicketRepo.createIntervalMaintenanceTicket(
         args.severity,
         args.instanceID,
         args.description,
-        args.startDate,
-        args.intervalHours,
+        args.startDate, 
+        hobbsTimeAtCreate,
+        args.timeUnit,
+        args.intervalHours, 
         args.imageUrl
       )
-    )),
+  }),
 
     modifyMaintenanceTicketStatus: async (
       _parent: any,
