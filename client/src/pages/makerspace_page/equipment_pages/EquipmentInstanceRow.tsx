@@ -1,5 +1,5 @@
 import { Autocomplete, Button, Card, Chip, IconButton, Link, MenuItem, Select, Stack, TextField, Typography } from "@mui/material";
-import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, InstanceStatus, UPDATE_INSTANCE, UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT, UPDATE_INSTANCE_HOBBS_TIME } from "../../../queries/equipmentInstanceQueries";
+import { DELETE_EQUIPMENT_INSTANCE, EquipmentInstance, formatHobbsTime, InstanceStatus, UPDATE_INSTANCE, UPDATE_INSTANCE_CONTROLLER_ASSIGNMENT, UPDATE_INSTANCE_HOBBS_TIME } from "../../../queries/equipmentInstanceQueries";
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import { useMutation, useQuery } from "@apollo/client/react";
 import { useState } from "react";
@@ -99,20 +99,6 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
     />;
   }
 
-  function formatSeconds(allSeconds: number){
-    const hours = Math.floor(allSeconds / 3600);
-    if (hours > 0){
-      return (allSeconds / 3600).toFixed(2) + " hrs"
-    }
-    const minutes = Math.floor((allSeconds % 3600) / 60);
-    const seconds = allSeconds % 60;  
-    if (minutes > 0){
-      return (minutes + seconds / 50).toFixed(2) + " min"
-    } else {
-      return Math.floor(allSeconds) + "sec"
-    }
-  }
-
   function activeUserDisplay() {
     if (!currentAccessController) {
       return <Typography>No User</Typography>;
@@ -162,7 +148,7 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
         <Stack alignItems={"center"} direction={"row"} width={"200px"}>
           {
             !allowEdit
-              ? formatSeconds(props.instance.hobbsTime)
+              ? formatHobbsTime(props.instance.hobbsTime)
               : hobbsTimeSetField()
           }
         </Stack>

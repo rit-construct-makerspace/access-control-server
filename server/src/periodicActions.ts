@@ -5,7 +5,7 @@ import { notifyNewMaintenanceTicket } from "./integrations/slack/slack.js";
 import { CoreActions } from "./database/models/api/ACSFormats.js";
 import { ACSOrchestrator } from "./database/models/api/ACSOrchestrator.js";
 import { createUnassocaitedAuditLog } from "./database/repositories/AuditLogs/AuditLogRepository.js";
-import { advanceIntervalTickets } from "./database/repositories/Equipment/MaintenanceTicketRepository.js";
+import { advanceCalendarIntervalTickets, advanceUsageIntervalTickets  } from "./database/repositories/Equipment/MaintenanceTicketRepository.js";
 
 /**
  * If you use the CDN to store user-uploads, make sure you update this query so it knows that those images are in use
@@ -67,9 +67,12 @@ export async function deletePastSpecialHours(): Promise<void> {
 
 export async function advanceTimeTickets(): Promise<void> {
 	try {
-		const result = await advanceIntervalTickets();
+		const calendarResult = await advanceCalendarIntervalTickets();
+		const usageResult = await advanceUsageIntervalTickets();
+
+		const result = [...calendarResult, ...usageResult]
 		if (result.length > 0) {
-			createUnassocaitedAuditLog(`Advanced ${result.length} time-based maintenance tickets`, "server");
+			createUnassocaitedAuditLog(`Advanced ${calendarResult.length} calendar-time and ${usageResult.length} usage-time maintenance tickets`, "server");
 		}
 
 		result.forEach((ticket) => {

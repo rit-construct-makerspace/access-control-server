@@ -7,7 +7,7 @@ import { FullMakerspace } from "../../../queries/makerspaceQueries";
 import { useMemo, useState } from "react";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
 import { useMutation, useQuery } from "@apollo/client/react";
-import { CREATE_INTERVAL_MAINTENANCE_TICKET, MaintenanceTicketSeverity } from "../../../queries/maintenanceTicketQueries";
+import { CREATE_INTERVAL_MAINTENANCE_TICKET, GET_MAINTENANCE_TICKETS, MaintenanceTicketSeverity, PAGINATED_MAINTENANCE_TICKETS } from "../../../queries/maintenanceTicketQueries";
 import { toast } from "react-toastify";
 import FileUploadButton from "../../../common/FileUploadButton";
 import styled from "styled-components";
@@ -32,7 +32,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
   const [imageUrl, setImageUrl] = useState<string>();
 
   const equipmentInstancesResult = useQuery(GET_EQUIPMENT_INSTANCES, { variables: { equipmentID: equipment?.id ?? -1 } });
-  const [createTicket] = useMutation(CREATE_INTERVAL_MAINTENANCE_TICKET, { refetchQueries: ["PaginatedMaintenanceTickets", "MaintenanceTickets"] });
+  const [createTicket] = useMutation(CREATE_INTERVAL_MAINTENANCE_TICKET, { refetchQueries: [{query: PAGINATED_MAINTENANCE_TICKETS}, {query: GET_MAINTENANCE_TICKETS}] });
 
   const EMPTY_ARRAY: EquipmentInstance[] = [];
   const instances: EquipmentInstance[] = equipmentInstancesResult.data?.equipmentInstances ?? EMPTY_ARRAY;
@@ -50,12 +50,18 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
   const makerspace_equipments = makerspace_equipments_2?.flat(1);
 
   const [startDate, setStartDate] = useState(new Date());
-  const [scale, setScale] = useState("days");
+  const [timeUnit, setTimeUnit] = useState(""); // USAGE | CALENDAR
+  const [scale, setScale] = useState("days"); // hours | days | weeks
   const [interval, setInterval] = useState("1");
 
   function handleChangeScale(_event: React.MouseEvent<HTMLElement>, value: string) {
     if (value !== null && value !== scale) {
       setScale(value);
+    }
+  }
+  function handleChangeTimeUnit(_event: React.MouseEvent<HTMLElement>, value: string) {
+    if (value !== null && value !== timeUnit) {
+      setTimeUnit(value);
     }
   }
 
@@ -67,17 +73,20 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
     setImageUrl(undefined);
     setStartDate(new Date());
     setScale("days");
+    setTimeUnit("CALENDAR")
     setInterval("1");
 
     props.onClose();
   }
 
   async function handleCreateTicket() {
-    if (!(equipment && reportedInstance && severity && !Number.isNaN(Number(interval)))) {
-      toast.error("A required field is empty!");
+    if (!(equipment && reportedInstance && severity && !Number.isNaN(Number(interval)) && (timeUnit == "USAGE" || timeUnit == "CALENDAR") ) ) {
+      toast.error("A required field is empty or invalid!");
       return;
     }
     try {
+      const intervalHours = scale === "days" ? Math.floor(Number(interval) * 24) : (scale == "weeks") ? Math.floor(Number(interval) * 168) : Math.floor(Number(interval))
+
       await createTicket({
         variables: {
           severity: severity,
@@ -85,7 +94,8 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
           description: description,
           startDate: startDate.toISOString(),
           imageUrl: imageUrl,
-          intervalHours: scale === "days" ? Number(interval) * 24 : Number(interval) * 168
+          intervalHours: intervalHours,
+          timeUnit: timeUnit,
         }
       })
     } catch (e) {
@@ -127,6 +137,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
         {
           equipment
             ? <Autocomplete
+              fullWidth
               key={instances.length === 1 ? "auto-selected" : "manual-select"}
               renderInput={
                 (params) => (
@@ -159,21 +170,40 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
               disabled
             />
         }
-        <Autocomplete
-          renderInput={
-            (params) => (
-              <TextField
-                {...params}
-                label="Severity"
-                placeholder="Select Severity..."
-                required
-              />
-            )
-          }
-          options={[MaintenanceTicketSeverity.HIGH, MaintenanceTicketSeverity.MEDIUM, MaintenanceTicketSeverity.LOW]}
-          value={severity}
-          onChange={(event, newValue) => setSeverity(newValue ?? undefined)}
-        />
+        <Stack direction={"row"} spacing={1}>
+          <Autocomplete
+            renderInput={
+              (params) => (
+                <TextField
+                  {...params}
+                  label="Severity"
+                  placeholder="Select Severity..."
+                  required
+                />
+              )
+            }
+            options={[MaintenanceTicketSeverity.HIGH, MaintenanceTicketSeverity.MEDIUM, MaintenanceTicketSeverity.LOW]}
+            value={severity}
+            onChange={(event, newValue) => setSeverity(newValue ?? undefined)}
+            sx={{flexGrow: 1}}
+          />
+
+          <ToggleButtonGroup
+            exclusive
+            value={timeUnit}
+            onChange={handleChangeTimeUnit}
+          >
+            <ToggleButton value="USAGE">
+              Usage
+            </ToggleButton>
+            <ToggleButton value="CALENDAR">
+              Calendar
+            </ToggleButton>
+          </ToggleButtonGroup>
+
+
+        </Stack>
+
         <Stack direction={"row"} justifyContent={"space-between"}>
           <DatePicker
             value={startDate}
@@ -196,11 +226,15 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
                 width: "120px"
               }}
             />
+
             <ToggleButtonGroup
               exclusive
               value={scale}
               onChange={handleChangeScale}
             >
+              <ToggleButton value="hours">
+                Hours
+              </ToggleButton>
               <ToggleButton value="days">
                 Days
               </ToggleButton>
