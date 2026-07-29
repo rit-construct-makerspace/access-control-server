@@ -7,7 +7,7 @@ import { FullMakerspace } from "../../../queries/makerspaceQueries";
 import { useMemo, useState } from "react";
 import { EquipmentInstance, GET_EQUIPMENT_INSTANCES } from "../../../queries/equipmentInstanceQueries";
 import { useMutation, useQuery } from "@apollo/client/react";
-import { CREATE_INTERVAL_MAINTENANCE_TICKET, MaintenanceTicketSeverity } from "../../../queries/maintenanceTicketQueries";
+import { CREATE_INTERVAL_MAINTENANCE_TICKET, GET_MAINTENANCE_TICKETS, MaintenanceTicketSeverity, PAGINATED_MAINTENANCE_TICKETS } from "../../../queries/maintenanceTicketQueries";
 import { toast } from "react-toastify";
 import FileUploadButton from "../../../common/FileUploadButton";
 import styled from "styled-components";
@@ -32,7 +32,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
   const [imageUrl, setImageUrl] = useState<string>();
 
   const equipmentInstancesResult = useQuery(GET_EQUIPMENT_INSTANCES, { variables: { equipmentID: equipment?.id ?? -1 } });
-  const [createTicket] = useMutation(CREATE_INTERVAL_MAINTENANCE_TICKET, { refetchQueries: ["PaginatedMaintenanceTickets", "MaintenanceTickets"] });
+  const [createTicket] = useMutation(CREATE_INTERVAL_MAINTENANCE_TICKET, { refetchQueries: [{query: PAGINATED_MAINTENANCE_TICKETS}, {query: GET_MAINTENANCE_TICKETS}] });
 
   const EMPTY_ARRAY: EquipmentInstance[] = [];
   const instances: EquipmentInstance[] = equipmentInstancesResult.data?.equipmentInstances ?? EMPTY_ARRAY;
@@ -50,7 +50,7 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
   const makerspace_equipments = makerspace_equipments_2?.flat(1);
 
   const [startDate, setStartDate] = useState(new Date());
-  const [timeUnit, setTimeUnit] = useState("USAGE"); // USAGE | CALENDAR
+  const [timeUnit, setTimeUnit] = useState(""); // USAGE | CALENDAR
   const [scale, setScale] = useState("days"); // hours | days | weeks
   const [interval, setInterval] = useState("1");
 
@@ -73,19 +73,20 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
     setImageUrl(undefined);
     setStartDate(new Date());
     setScale("days");
-    setTimeUnit("calendar")
+    setTimeUnit("CALENDAR")
     setInterval("1");
 
     props.onClose();
   }
 
   async function handleCreateTicket() {
-    if (!(equipment && reportedInstance && severity && !Number.isNaN(Number(interval)))) {
-      toast.error("A required field is empty!");
+    if (!(equipment && reportedInstance && severity && !Number.isNaN(Number(interval)) && (timeUnit == "USAGE" || timeUnit == "CALENDAR") ) ) {
+      toast.error("A required field is empty or invalid!");
       return;
     }
     try {
-      const intervalHours = scale === "days" ? Number(interval) * 24 : (scale == "weeks" ? Number(interval) * 168 : interval)
+      const intervalHours = scale === "days" ? Math.floor(Number(interval) * 24) : (scale == "weeks") ? Math.floor(Number(interval) * 168) : Math.floor(Number(interval))
+
       await createTicket({
         variables: {
           severity: severity,
@@ -95,8 +96,6 @@ export default function NewIntervalTicketModal(props: NewTicketModalProps) {
           imageUrl: imageUrl,
           intervalHours: intervalHours,
           timeUnit: timeUnit,
-          hobbsTimeAtCreate: instance?.hobbsTime
-          
         }
       })
     } catch (e) {

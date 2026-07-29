@@ -69,6 +69,7 @@ export const PAGINATED_MAINTENANCE_TICKETS = gql`
           id
           name
         }
+        hobbsTime
       }
       assigned {
         id
@@ -105,6 +106,7 @@ export const GET_MAINTENANCE_TICKET = gql`
           id
           name
         }
+        hobbsTime
       }
     }
   }
@@ -167,6 +169,7 @@ export const GET_MAINTENANCE_TICKETS = gql`
           id
           name
         }
+        hobbsTime
       }
     }
   }
@@ -199,7 +202,6 @@ export const CREATE_INTERVAL_MAINTENANCE_TICKET = gql`
     $intervalHours: Int!,
     $imageUrl: String,
     $timeUnit: String!,
-    $hobbsTimeAtCreate: Int!,
   ) {
     createIntervalMaintenanceTicket(
       severity: $severity,
@@ -209,7 +211,6 @@ export const CREATE_INTERVAL_MAINTENANCE_TICKET = gql`
       intervalHours: $intervalHours,
       imageUrl: $imageUrl,
       timeUnit: $timeUnit,
-      hobbsTimeAtCreate: $hobbsTimeAtCreate,
     ) {
       id
     }

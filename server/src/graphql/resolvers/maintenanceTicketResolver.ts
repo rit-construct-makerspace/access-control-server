@@ -7,6 +7,7 @@ import * as AuditLogRepo from "../../database/repositories/AuditLogs/AuditLogRep
 import * as EquipmentRepo from "../../database/repositories/Equipment/EquipmentRepository.js";
 import { notifyNewMaintenanceTicket } from "../../integrations/slack/slack.js"
 import { Equipment } from "../../database/models/equipment/Equipment.js"
+import { GraphQLError } from "graphql"
 
 const MaintenanceTicketResolver = {
   MaintenanceTicket: {
@@ -114,21 +115,28 @@ const MaintenanceTicketResolver = {
         intervalHours: number,
         imageUrl?: string,
         timeUnit: MaintenanceTicketTimeUnit,
-        hobbsTimeAtCreate: number,
       },
       { isManager }: ApolloContext // should perhaps be ifManagerFor
-    ) => isManager(async (_user) => (
+    ) => isManager(async (_user) => {
+      const inst = await InstanceRepo.getInstanceByID(args.instanceID);
+      if (inst == undefined){
+        throw new GraphQLError("Could not find instance for maintenance ticket");
+      }
+      let hobbsTimeAtCreate = inst.hobbsTime;
+      if (args.timeUnit == MaintenanceTicketTimeUnit.USAGE){
+        hobbsTimeAtCreate += args.intervalHours *  60 * 60;
+      }
       await MaintenanceTicketRepo.createIntervalMaintenanceTicket(
         args.severity,
         args.instanceID,
         args.description,
         args.startDate, 
-        args.hobbsTimeAtCreate,
+        hobbsTimeAtCreate,
         args.timeUnit,
         args.intervalHours, 
         args.imageUrl
       )
-    )),
+  }),
 
     modifyMaintenanceTicketStatus: async (
       _parent: any,

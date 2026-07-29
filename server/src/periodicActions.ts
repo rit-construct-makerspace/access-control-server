@@ -72,7 +72,7 @@ export async function advanceTimeTickets(): Promise<void> {
 
 		const result = [...calendarResult, ...usageResult]
 		if (result.length > 0) {
-			createUnassocaitedAuditLog(`Advanced ${result.length} time-based maintenance tickets`, "server");
+			createUnassocaitedAuditLog(`Advanced ${calendarResult.length} calendar-time and ${usageResult.length} usage-time maintenance tickets`, "server");
 		}
 
 		result.forEach((ticket) => {

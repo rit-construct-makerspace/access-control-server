@@ -85,7 +85,6 @@ export const MaintenanceTicketTypeDefs = gql`
       intervalHours: Int!,
       imageUrl: String,
       timeUnit: String!,
-      hobbsTimeAtCreate: Int!
     ): MaintenanceTicket
 
     modifyMaintenanceTicketStatus(id: Int!, status: MaintenanceTicketStatus!): Int
