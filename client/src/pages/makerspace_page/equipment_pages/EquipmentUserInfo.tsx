@@ -53,8 +53,6 @@ export default function EquipmentUserInfo() {
     });
 
     const getMakerspace = useQuery(GET_MAKERSPACE_BY_ID, { variables: { id: makerspaceID } });
-
-
     const [newTicketModal, setNewTicketModal] = useState(false);
 
 
@@ -237,8 +235,6 @@ export default function EquipmentUserInfo() {
                     Report Issue
                 </Button> : undefined}
             </Stack>
-
-
         </Stack>
     }
 
@@ -257,10 +253,7 @@ export default function EquipmentUserInfo() {
             >
                 LOGIN
             </Button>
-
-
         </Stack>
-
     }
 
     return <RequestWrapper loading={getEquipmentByIDResult.loading || getMakerspaceResult.loading || getRoomResult.loading} error={getEquipmentByIDResult.error || getMakerspaceResult.error || getRoomResult.error} minHeight={322}>
