@@ -57,7 +57,10 @@ export default function EquipmentInstanceRow(props: EquipmentInstanceRowProps) {
 
   async function handleSave() {
     setAllowEdit(false);
-    await updateInstanceHobbsTime({ variables: { id: props.instance.id, hobbsTime: hobbsTime } })
+
+    if (hobbsTime != props.instance.hobbsTime){
+      await updateInstanceHobbsTime({ variables: { id: props.instance.id, hobbsTime: hobbsTime } })
+    }
     await updateInstance({ variables: { id: props.instance.id, name: name, status: status } })
     await updatePairing({ variables: { id: Number(props.instance.id), accessControllerID: pairedController?.id } })
   }

@@ -151,20 +151,21 @@ const EquipmentInstanceResolver = {
         const equipment = await EquipmentRepo.getEquipmentByID(instance.equipmentID);
         if (!equipment) throw new GraphQLError("Instance does not have associated Machine");
 
-        const room = await RoomRepo.getRoomByID(equipment.roomID) 
+        const room = await RoomRepo.getRoomByID(equipment.roomID)
         if (!room) throw new GraphQLError("Instance does not have associated Room");
-
-        if (!instance.accessControllerID) throw new GraphQLError("Instance has no associated access controller")
-      
-        const accessController = await ACRepo.getAccessControllerByID(instance.accessControllerID)
-        if (!accessController) throw new GraphQLError("Instance has no associated access controller")
-      
-
         const newInstance = await InstanceRepo.updateInstanceHobbsTime(args.id, args.hobbsTime);
 
-        ACSOrchestrator.handleSendCoreCommand(accessController.deviceID, {
-          hobbsTime: [{channelID: accessController.channelID, hobbsTime: args.hobbsTime}]
-        })
+        if (instance.accessControllerID) {
+          const accessController = await ACRepo.getAccessControllerByID(instance.accessControllerID)
+
+          if (accessController) {
+            ACSOrchestrator.handleSendCoreCommand(accessController.deviceID, {
+              hobbsTime: [{ channelID: accessController.channelID, hobbsTime: args.hobbsTime }]
+            })
+          } else {
+            throw new GraphQLError("Could not find AccessController to update");
+          }
+        }
 
         await createAuditLog(`{user} set hobbs time of instance '${instance?.name}' of equipment {equipment} to ${args.hobbsTime} seconds from ${instance.hobbsTime} seconds`, 'admin', room.makerspaceID ?? undefined, { id: user.id, label: getUsersFullName(user) }, { id: equipment.id, label: equipment.name });
 
@@ -172,13 +173,13 @@ const EquipmentInstanceResolver = {
       }),
 
 
-      /**
-     * Update the status field of an Equipment Instance
-     * @argument id ID of equipment instance to modify
-     * @argument status New Instance status
-     * @returns updated equipment instance
-     * @throws GraphQLError if not MENTOR or STAFF or is on hold or equipment instance does not exist
-     */
+    /**
+   * Update the status field of an Equipment Instance
+   * @argument id ID of equipment instance to modify
+   * @argument status New Instance status
+   * @returns updated equipment instance
+   * @throws GraphQLError if not MENTOR or STAFF or is on hold or equipment instance does not exist
+   */
     setInstanceStatus: async (
       _parent: any,
       args: { id: number, status: string },
