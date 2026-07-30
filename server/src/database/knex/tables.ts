@@ -626,6 +626,11 @@ export interface ReservationRow {
   end: string; // ^
 }
 
+export enum MaintenanceTicketTimeUnit {
+  USAGE = "USAGE",
+  CALENDAR = "CALENDAR"
+} 
+
 export enum MaintenanceTicketType {
   AUTOMATIC = "AUTOMATIC",
   REPORTED = "REPORTED"
@@ -640,7 +645,7 @@ export enum MaintenanceTicketSeverity {
 export enum MaintenanceTicketStatus {
   UPCOMING = "UPCOMING",
   TODO = "TODO",
-  IN_PROGESS = "IN_PROGRESS",
+  IN_PROGRESS = "IN_PROGRESS",
   CLOSED = "CLOSED"
 }
 
@@ -657,6 +662,9 @@ export interface MaintenanceTicketRow {
   dateClosed: string | null; // ^
   intervalHours: number | null;
   assignedID: number | null;
+  timeUnit: MaintenanceTicketTimeUnit;
+  hobbsTimeAtCreate: number;
+  hobbsTimeAtClose: number | null;
 }
 
 export interface TempCardRow {

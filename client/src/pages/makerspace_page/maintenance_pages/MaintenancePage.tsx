@@ -60,15 +60,16 @@ export default function MaintenancePage() {
   // const containsOperator = getGridStringOperators().filter((operator) => operator.value === "contains");
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 10, filterable: false, resizable: false, hideable: false },
+    { field: "id", headerName: "ID", width: 25, filterable: false, resizable: false, hideable: false },
     { field: "equipment", headerName: "Equipment", width: 350, sortable: false, filterable: false, resizable: false },
     { field: "instance", headerName: "Instance", width: 300, sortable: false, filterable: false, resizable: false },
     { field: "type", headerName: "Type", width: 140, sortable: false, filterable: false, resizable: false },
     { field: "status", headerName: "Status", width: 140, filterable: false, resizable: false },
-    { field: "severity", headerName: "Severity", width: 140, filterable: false, resizable: false },
-    { field: "creator", headerName: "Creator", width: 140, sortable: false, filterable: false, resizable: false },
-    { field: "assigned", headerName: "Assigned", width: 140, sortable: false, filterable: false, resizable: false },
-    { field: "dateCreated", headerName: "Created", width: 180, filterable: false, resizable: false },
+    { field: "severity", headerName: "Severity", width: 120, filterable: false, resizable: false },
+    { field: "creator", headerName: "Creator", width: 120, sortable: false, filterable: false, resizable: false },
+    { field: "assigned", headerName: "Assigned", width: 120, sortable: false, filterable: false, resizable: false },
+    { field: "timeUnit", headerName: "Time Unit", width: 140, sortable: false, filterable: false, resizable: false },
+    { field: "dateCreated", headerName: "Create Date", width: 180, filterable: false, resizable: false },
     {
       field: "manage", headerName: "Manage", width: 140, filterable: false, sortable: false, renderCell: (params: GridRenderCellParams<any, MaintenanceTicket>) => (
         <MaintenanceTicketButtonCell ticket={params.value} />
@@ -96,6 +97,7 @@ export default function MaintenancePage() {
       severity: ticket.severity,
       creator: ticket.type === MaintenanceTicketType.REPORTED ? ticket.creator?.ritUsername ?? "" : "SERVER",
       assigned: ticket.assigned?.ritUsername ?? "UNASSIGNED",
+      timeUnit: ticket.timeUnit,
       dateCreated: formatter.format(new Date(Number(ticket.dateCreated))),
       manage: ticket
     }

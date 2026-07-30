@@ -1,6 +1,6 @@
 import { Stack } from "@mui/system";
 import PrettyModal from "../../../common/PrettyModal";
-import { ASSIGN_MAINTENANCE_TICKET, DELETE_MAINTENACE_TICKET, MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketType, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
+import { ASSIGN_MAINTENANCE_TICKET, DELETE_MAINTENACE_TICKET, MaintenanceTicket, MaintenanceTicketSeverity, MaintenanceTicketStatus, MaintenanceTicketTimeUnit, MaintenanceTicketType, MODIFY_MAINTENANCE_TICKET_STATUS, UPDATE_MAINTENACE_TICKET } from "../../../queries/maintenanceTicketQueries";
 import { Autocomplete, Button, Chip, IconButton, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
@@ -17,6 +17,7 @@ import { useParams } from "react-router-dom";
 import { GET_VALID_STAFF } from "../../../queries/makerspaceQueries";
 import { CurrentUser, useCurrentUser } from "../../../common/CurrentUserProvider";
 import { isManager } from "../../../common/PrivilegeUtils";
+import { formatHobbsTime } from "../../../queries/equipmentInstanceQueries";
 
 interface TicketModalProps {
   open: boolean,
@@ -194,6 +195,19 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
     }
   }
 
+  function createTimeLabel(){
+    const after = `Create After: ${props.ticket.intervalHours} hours` 
+    const difference = props.ticket.instance.hobbsTime - props.ticket.hobbsTimeAtCreate
+    if (difference < 0){
+      return `${after} (${formatHobbsTime(Math.abs(difference))} to go)`
+    } else {
+      return `${after} (${formatHobbsTime(difference)} ago)`
+    }
+  }
+
+  const shouldShowHobbsAtOpen= props.ticket.timeUnit == MaintenanceTicketTimeUnit.USAGE || props.ticket.status != MaintenanceTicketStatus.UPCOMING;
+  const shouldShowHobbsAtClose= props.ticket.status == MaintenanceTicketStatus.CLOSED;
+
   return (
     <PrettyModal open={props.open} onClose={handleClose} width={"600px"}>
       <Stack spacing={2}>
@@ -214,7 +228,10 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
         </Stack>
         <Stack direction={"row"} justifyContent={"space-between"}>
           <Typography variant="subtitle1">{`Ticket #${props.ticket.id}`}</Typography>
-          <Typography variant="subtitle1">{`Created: ${formatter.format(Number(props.ticket.dateCreated))}`}</Typography>
+          { props.ticket.timeUnit=== MaintenanceTicketTimeUnit.CALENDAR ? 
+              <Typography variant="subtitle1">{`Create Date: ${formatter.format(Number(props.ticket.dateCreated))}`}</Typography>
+            : <Typography variant="subtitle1">{createTimeLabel()}</Typography>
+        }
         </Stack>
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
           <Typography variant="body1">{`Reported by: ${props.ticket.type === MaintenanceTicketType.REPORTED ? props.ticket.creator?.ritUsername ?? "" : "SERVER"}`}</Typography>
@@ -316,6 +333,10 @@ export default function MaintenanceTicketModal(props: TicketModalProps) {
                 />
               </Stack>
           }
+        </Stack>
+        <Stack justifyContent={"space-between"} direction={"row"}>
+          {shouldShowHobbsAtOpen ? <Typography variant="body1">Usage at Open: {formatHobbsTime(props.ticket.hobbsTimeAtCreate)}</Typography> : undefined}
+          {shouldShowHobbsAtClose ? <Typography variant="body1">Usage at Close: {props.ticket.hobbsTimeAtClose ? formatHobbsTime(props.ticket.hobbsTimeAtClose) : "N/A"}</Typography> : undefined}
         </Stack>
         {
           editing

@@ -623,7 +623,7 @@ async function startServer() {
     // Delete past special hours
     await deletePastSpecialHours();
 
-    // Advance any time-based maintennace tickets from UPCOMING -> TODO
+    // Advance any time-based maintenance tickets from UPCOMING -> TODO
     await advanceTimeTickets();
 
     // Get a new root certificate for readers
