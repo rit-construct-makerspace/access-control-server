@@ -236,7 +236,7 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
                 {
                   (totalRequirements === totalReqsComplete && byExpiry.length > 0)
                     ? <Typography variant="subtitle2">
-                      {`All Set Until: ${byExpiry[0].expirationDate}`}
+                      All Set Until: {byExpiry[0].expirationDate}
                     </Typography>
                     : null
                 }
