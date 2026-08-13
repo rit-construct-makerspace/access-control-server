@@ -43,14 +43,7 @@ export default function TopNav() {
     setAnchorEl(null);
   };
 
-  const [labTraining, setLabTraining] = useState(!(localStorage.getItem("showLabTraining2") === "false"));
-
   const [mobileDrawer, setMobileDrawer] = useState(false);
-
-  function handleDismissLabTraining() {
-    setLabTraining(false);
-    localStorage.setItem("showLabTraining2", "false");
-  }
 
   const makeAlerts =
     <Stack>
@@ -65,13 +58,6 @@ export default function TopNav() {
         currentUser.hasHolds
           ? <Alert variant="filled" severity="error" sx={{ borderRadius: 0 }}>
             A hold has been placed on your account. You won't be able to create reservations, use machines, or purchase materials. Please speak to a member of staff in the makerspace to rectify this.
-          </Alert>
-          : null
-      }
-      { // Lab training Alert
-        labTraining
-          ? <Alert variant="filled" severity="info" onClose={handleDismissLabTraining} sx={{ borderRadius: 0 }}>
-            All Makerspace users must complete the <a href="https://make.rit.edu/link/ehs" rel="noopener noreferrer" target="_blank">Shop Safety training course</a> before using any equipment.
           </Alert>
           : null
       }
