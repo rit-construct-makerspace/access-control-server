@@ -36,6 +36,7 @@ export const TrainingModuleTypeDefs = gql`
     equipment: [Equipment]
     isLocked: Boolean
     makerspaceID: ID
+    expires: Boolean
   }
 
   type AccessProgress {
@@ -62,8 +63,8 @@ export const TrainingModuleTypeDefs = gql`
   }
 
   extend type Mutation {
-    createModule(name: String!, quiz: JSON!, makerspaceID: ID): TrainingModule
-    updateModule(id: ID!, name: String!, quiz: JSON!, reservationPrompt: JSON, makerspaceID: ID): TrainingModule
+    createModule(name: String!, quiz: JSON!, makerspaceID: ID, expires: Boolean): TrainingModule
+    updateModule(id: ID!, name: String!, quiz: JSON!, reservationPrompt: JSON, makerspaceID: ID, expires: Boolean): TrainingModule
     archiveModule(id: ID!): TrainingModule
     publishModule(id: ID!): TrainingModule
     deleteModule(id: ID!): TrainingModule

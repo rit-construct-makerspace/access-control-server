@@ -35,7 +35,6 @@ const QuizItemDraft = memo(function QuizItemDraft({
   onDuplicate,
   extraActions,
 }: QuizItemDraftProps) {
-  console.log("quiz item draft render", index);
   
   return (
     <Draggable draggableId={itemId} index={index}>
