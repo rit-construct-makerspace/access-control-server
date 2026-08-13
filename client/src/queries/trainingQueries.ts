@@ -131,10 +131,12 @@ export const GET_ACCESS_PROGRESSES = gql`
       passedModules {
         id
         name
+        expires
       }
       availableModules {
         id
         name
+        expires
       }
       accessCheckDone
     }
@@ -147,6 +149,7 @@ export const GET_ALL_TRAINING_MODULES = gql`
 			id
 			name
 			archived
+      expires
 		}
 	}
 `;
