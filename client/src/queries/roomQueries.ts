@@ -75,6 +75,7 @@ export const GET_ROOM = gql`
         trainingModules {
           id
           name
+          expires
         }
         numAvailable
         numInUse
@@ -83,6 +84,7 @@ export const GET_ROOM = gql`
       trainingModules {
         id
         name
+        expires
       }
     }
   }
