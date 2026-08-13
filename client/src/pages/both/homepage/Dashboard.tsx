@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, IconButton, Stack } from "@mui/material";
+import { Box, Button, Divider, Grid, IconButton, Stack } from "@mui/material";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +14,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { isAdmin } from "../../../common/PrivilegeUtils";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useMakeTheme } from "../../../common/MakeThemeProvider";
+import { padding } from "@mui/system";
 
 export function Dashboard() {
   const currentUser = useCurrentUser();
@@ -26,9 +27,41 @@ export function Dashboard() {
   const getAnnouncementsResult = useQuery(GET_ANNOUNCEMENTS);
   const getEvents = useQuery(GET_EVENTS);
 
+
+
+  function NewUserHeader(loggedIn: boolean, finishedTraining: boolean){
+    if (finishedTraining && loggedIn){
+      return undefined
+    }
+    function buttonAction(){
+      if (!loggedIn){
+        window.location.replace(import.meta.env.VITE_LOGIN_URL + "?redir=" + import.meta.env.VITE_ORIGIN + window.location.pathname)
+      } else {
+        // navigate to quiz
+        navigate(`/maker/training/${import.meta.env.VITE_STARTING_MODULE_ID}`)
+      }
+    }
+    const buttonText = !loggedIn ? "New Maker? Click to create an account." : "Click here to learn how to access equipment"
+    return <Stack justifyContent={"center"} alignItems={"center"} spacing={"10px"} paddingY={"1em"} margin={"10px"}>
+      <Typography variant="h2" fontWeight={"bold"} display={"inline"}>
+          Welcome to the SHED Makerspace
+      </Typography>
+      <Button variant="contained" sx={{borderRadius: "2.5em", paddingX: "2em", textTransform: 'none'}} onClick={buttonAction}>
+        <Typography fontSize={"2.5em"}  fontWeight={"bold"} display={"inline"}>
+            {buttonText}
+        </Typography>
+        </Button>
+      <Typography variant="h3" fontWeight={"bold"} display={"inline"}>
+        Select a makerspace to learn more:
+      </Typography>  
+    </Stack>
+  }
+  
+  const finishedTraining = import.meta.env.VITE_STARTING_MODULE_ID == "" ? true : currentUser.passedModules.map(o => Number(o.moduleID)).includes(Number(import.meta.env.VITE_STARTING_MODULE_ID)) 
   return (
     <Box>
       <title>{makeTheme.title}</title>
+      {NewUserHeader(!currentUser.visitor, finishedTraining)}
       {/* Makerspaces */}
       <RequestWrapper2
         result={getMakerspacesResult}
