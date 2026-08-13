@@ -70,6 +70,6 @@ export const moduleStatusMapper =
         archived: module.archived,
         status: expired ? "Expired" : "Passed",
         submissionDate: submissionDate.toDateString(),
-        expirationDate: expirationDate.toDateString(),
+        expirationDate: module.expires ? expirationDate.toDateString() : undefined,
       };
     };
