@@ -21,6 +21,7 @@ export default function NewModulePage() {
   const makeTheme = useMakeTheme();
 
   const [title, setTitle] = useState("New Module");
+  const [expires, setExpires] = useState(true);
 
   const [createModule] = useMutation(CREATE_TRAINING_MODULE);
 
@@ -30,11 +31,11 @@ export default function NewModulePage() {
         name: title,
         quiz: [],
         makerspaceID: makerspaceID,
+        expires: expires
       },
       refetchQueries: [
         { query: GET_ARCHIVED_TRAINING_MODULES },
         { query: GET_TRAINING_MODULES },
-        { query: GET_MODULE },
       ],
       onCompleted: (data) => { const id = data.createModule.id; navigate(`/makerspace/${makerspaceID}/training/${id}`) },
       onError: () => { alert("Failed to create new module. Try again?"); navigate(`/makerspace/${makerspaceID}/trainings`); }

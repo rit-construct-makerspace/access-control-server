@@ -4,6 +4,7 @@ import { GET_PASSED_SUBMISSION, GET_REMAINING_SUBMISSIONS } from "../../../queri
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { Stack } from "@mui/system";
 import RequestWrapper from "../../../common/RequestWrapper";
+import { GET_MODULE } from "../../../queries/trainingQueries";
 
 export default function RetakeQuiz(props: { moduleID: number }) {
     const isMobile = useIsMobile();
@@ -17,6 +18,7 @@ export default function RetakeQuiz(props: { moduleID: number }) {
     const passedSubmission = useQuery(GET_PASSED_SUBMISSION, {variables: {moduleID: props.moduleID}});
     const expirationDate = new Date(+(passedSubmission?.data?.passingSubmission?.expirationDate)).toLocaleString('en-US');
     const remainingAttempts = Number(submissions.data?.remainingSubmissions.submissionLimit) - Number(submissions.data?.remainingSubmissions.failedSubmissions)
+    const moduleData = useQuery(GET_MODULE, {variables : {id: props.moduleID}});
 
   return (
     <RequestWrapper loading={ submissions.loading || submissions.data === undefined }
@@ -26,7 +28,7 @@ export default function RetakeQuiz(props: { moduleID: number }) {
       <CardContent>
         <Card>
           <CardContent>
-            {passedSubmission?.data?.passingSubmission ? <Typography>Your training expires on {expirationDate}</Typography> : <></>}
+            {passedSubmission?.data?.passingSubmission && moduleData?.data?.module.expires  ? <Typography>Your training expires on {expirationDate}</Typography> : <></>}
             {remainingAttempts <= 0 ?
               <Stack>
                 <Typography><b>This training has been locked due to too many attempts. </b></Typography>

@@ -9,6 +9,7 @@ export const GET_MODULE = gql`
       reservationPrompt
       archived
       isLocked
+      expires
     }
   }
 `;
@@ -23,6 +24,7 @@ export const GET_MODULE_WITH_ANSWERS = gql`
       archived
       isLocked
       makerspaceID
+      expires
     }
   }
 `;
@@ -36,6 +38,7 @@ export const GET_MODULE_ANSWER_COUNT = gql`
       reservationPrompt
       archived
       isLocked
+      expires
     }
   }
 `;
@@ -48,6 +51,7 @@ export const GET_ARCHIVED_MODULE = gql`
       quiz
       reservationPrompt
       archived
+      expires
     }
   }
 `;
@@ -60,6 +64,7 @@ export const GET_TRAINING_MODULES = gql`
       archived
       isLocked
       makerspaceID
+      expires
     }
   }
 `;
@@ -71,21 +76,22 @@ export const GET_ARCHIVED_TRAINING_MODULES = gql`
       name
       archived
       makerspaceID
+      expires
     }
   }
 `;
 
 export const CREATE_TRAINING_MODULE = gql`
-  mutation CreateTrainingModule($name: String!, $quiz: JSON!, $makerspaceID: ID) {
-    createModule(name: $name, quiz: $quiz, makerspaceID: $makerspaceID) {
+  mutation CreateTrainingModule($name: String!, $quiz: JSON!, $makerspaceID: ID, $expires: Boolean) {
+    createModule(name: $name, quiz: $quiz, makerspaceID: $makerspaceID, expires: $expires) {
       id
     }
   }
 `;
 
 export const UPDATE_MODULE = gql`
-  mutation UpdateModule($id: ID!, $name: String!, $quiz: JSON!, $reservationPrompt: JSON, $makerspaceID: ID) {
-    updateModule(id: $id, name: $name, quiz: $quiz, reservationPrompt: $reservationPrompt, makerspaceID: $makerspaceID) {
+  mutation UpdateModule($id: ID!, $name: String!, $quiz: JSON!, $reservationPrompt: JSON, $makerspaceID: ID, $expires: Boolean) {
+    updateModule(id: $id, name: $name, quiz: $quiz, reservationPrompt: $reservationPrompt, makerspaceID: $makerspaceID, expires: $expires) {
       id
     }
   }
@@ -125,10 +131,12 @@ export const GET_ACCESS_PROGRESSES = gql`
       passedModules {
         id
         name
+        expires
       }
       availableModules {
         id
         name
+        expires
       }
       accessCheckDone
     }
@@ -141,6 +149,7 @@ export const GET_ALL_TRAINING_MODULES = gql`
 			id
 			name
 			archived
+      expires
 		}
 	}
 `;

@@ -42,6 +42,7 @@ export interface Module {
   reservationPrompt: ReservationPrompt;
   isLocked?: boolean;
   makerspaceID: number | null;
+  expires: boolean
 }
 
 export interface Submission {

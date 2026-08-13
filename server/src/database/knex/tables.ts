@@ -222,6 +222,8 @@ export interface TrainingModuleRow {
   reservationPrompt: ReservationPrompt;
   /** FK:Makerspace this training applies to (optional) */
   makerspaceID: number | null;
+  /** Whether or not the training should expire */
+  expires: boolean
 }
 
 // not a table but the json structure for a column on the table above

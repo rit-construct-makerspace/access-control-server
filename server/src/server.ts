@@ -23,7 +23,7 @@ import { setDataPointValue } from "./database/repositories/DataPoints/DataPoints
 import { addItemAmount, getItemById, getItems, getItemsWhereStaff, getItemsWhereStorefront, setItemAmount } from "./database/repositories/Store/InventoryRepository.js";
 import { createLedger } from "./database/repositories/Store/InventoryLedgerRepository.js";
 import { getMakerspaceHoursNextWeek } from "./database/repositories/Makerspaces/MakerspaceHoursRepository.js";
-import { getPassedTrainingsDaysAgo, purgeExpiredPassedModules } from "./database/repositories/Training/PassedRepository.js";
+import { getPassedTrainingsDaysAgo as getExpiringPassedTrainingsDaysAgo, purgeExpiredPassedModules } from "./database/repositories/Training/PassedRepository.js";
 import * as Emailer from "./integrations/email/email.js"
 import { pingAtrium } from "./integrations/atrium-integration/atrium.js";
 import * as S3 from "./integrations/aws/s3.js"
@@ -576,7 +576,7 @@ async function startServer() {
       })
     };
 
-    let expiryNotices = await getPassedTrainingsDaysAgo(365);
+    let expiryNotices = await getExpiringPassedTrainingsDaysAgo(365);
     if (expiryNotices.length > EXPIRY_EMAIL_LIMIT_AT_ONCE) {
       // dont overload the emails (100 / hr, 400 / day) 
       expiryNotices = expiryNotices.slice(0, EXPIRY_EMAIL_LIMIT_AT_ONCE);

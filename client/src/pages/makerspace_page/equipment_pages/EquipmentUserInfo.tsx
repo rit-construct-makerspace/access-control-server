@@ -105,7 +105,7 @@ export default function EquipmentUserInfo() {
         const numEquipmentTrainingsComplete: number = equipmentStatuses.filter((module) => module.status === "Passed" || module.status === "Expiring Soon").length
 
         const byExpiry = [...makerspaceStatuses, ...roomStatuses, ...equipmentStatuses]
-            .filter((module) => module.status === "Expiring Soon" || module.status === "Passed")
+            .filter((module) => ((module.status === "Expiring Soon" || module.status === "Passed")&&module.expirationDate != undefined))
             .sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
 
         const totalRequirements = makerspaceStatuses.length + roomStatuses.length + equipmentStatuses.length + (equipment.requiresInPerson ? 1 : 0);
