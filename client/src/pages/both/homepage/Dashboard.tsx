@@ -14,7 +14,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import { isAdmin } from "../../../common/PrivilegeUtils";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import { useMakeTheme } from "../../../common/MakeThemeProvider";
-import { padding } from "@mui/system";
 
 export function Dashboard() {
   const currentUser = useCurrentUser();
@@ -43,7 +42,7 @@ export function Dashboard() {
     }
     const buttonText = !loggedIn ? "New Maker? Click to create an account." : "Click here to learn how to access equipment"
     return <Stack justifyContent={"center"} alignItems={"center"} spacing={"10px"} paddingY={"1em"} margin={"10px"}>
-      <Typography variant="h2" fontWeight={"bold"} display={"inline"}>
+      <Typography variant="h2" fontWeight={"bold"} display={"inline"} textAlign={"center"}>
           Welcome to the SHED Makerspace
       </Typography>
       <Button variant="contained" sx={{borderRadius: "2.5em", paddingX: "2em", textTransform: 'none'}} onClick={buttonAction}>
@@ -51,7 +50,7 @@ export function Dashboard() {
             {buttonText}
         </Typography>
         </Button>
-      <Typography variant="h3" fontWeight={"bold"} display={"inline"}>
+      <Typography variant="h3" fontWeight={"bold"} display={"inline"}  textAlign={"center"}>
         Select a makerspace to learn more:
       </Typography>  
     </Stack>

@@ -7,7 +7,7 @@ export interface ModuleStatus {
   archived: boolean;
   status: "Passed" | "Expired" | "Not taken" | "Expiring Soon" | "Locked";
   submissionDate: string;
-  expirationDate: string;
+  expirationDate: string | undefined;
 }
 
 export interface TrainingModule {
@@ -16,6 +16,7 @@ export interface TrainingModule {
   archived: boolean;
   isLocked?: boolean;
   makerspaceID: number | null;
+  expires: boolean
 }
 
 /**
@@ -50,8 +51,8 @@ export const moduleStatusMapper =
       const submissionDate = parseISO(passedModule.passedDate);
       const expirationDate = new Date(submissionDate);
       expirationDate.setFullYear(submissionDate.getFullYear() + 1);
-      const expiringSoon = differenceInMonths(expirationDate, new Date()) <= 1; // differenceInMonths(new Date(), submissionDate) > 11 && differenceInMonths(new Date(), submissionDate) < 12;
-      const expired = differenceInYears(submissionDate, new Date()) > 0;
+      const expiringSoon = module.expires && differenceInMonths(expirationDate, new Date()) <= 1; // differenceInMonths(new Date(), submissionDate) > 11 && differenceInMonths(new Date(), submissionDate) < 12;
+      const expired = module.expires && differenceInYears(submissionDate, new Date()) > 0;
 
       if (expiringSoon)
         return {

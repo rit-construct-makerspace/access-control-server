@@ -7,6 +7,8 @@ import {
   Select,
   Stack,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -25,7 +27,7 @@ import { FullMakerspace, GET_FULL_MAKERSPACES } from "../../../queries/makerspac
 import RequestWrapper2 from "../../../common/RequestWrapper2";
 import { isAdmin, isManagerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useIsMobile } from "../../../common/IsMobileProvider";
 import GET_TRAINING_MODULES, { ARCHIVE_MODULE, GET_ARCHIVED_TRAINING_MODULES, GET_MODULE, PUBLISH_MODULE } from "../../../queries/trainingQueries";
 import { useMakeTheme } from "../../../common/MakeThemeProvider";
@@ -52,6 +54,7 @@ export default function EditModulePage({
   const [module, setModule] = useImmer<Module>(moduleInitialValue);
   const queryResult = useQuery(GET_MODULE, { variables: { id: module.id } });
   const getMakerspacesResult = useQuery(GET_FULL_MAKERSPACES);
+
 
   const [publishModule] = useMutation(PUBLISH_MODULE, {
     variables: { id: module.id },
@@ -227,6 +230,21 @@ export default function EditModulePage({
         }}
         />
         <Stack direction="row" spacing={2}>
+        <ToggleButtonGroup
+              exclusive
+              value={module.expires ? "expire" : "dont_expire"}
+              onChange={(e, value) => setModule((draft) => {
+                draft.expires = value == "expire";
+              })}
+            >
+              <ToggleButton value="expire">
+                Expire
+              </ToggleButton>
+              <ToggleButton value="dont_expire">
+                Don't Expire
+              </ToggleButton>
+            </ToggleButtonGroup>
+
           {moduleArchived ? (
             <Button
               startIcon={<UnarchiveIcon />}

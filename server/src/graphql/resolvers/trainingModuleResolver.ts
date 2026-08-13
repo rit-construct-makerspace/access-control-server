@@ -331,7 +331,7 @@ const TrainingModuleResolvers = {
      */
     createModule: async (
       _parent: any,
-      args: { name: string; quiz: object; makerspaceID: number },
+      args: { name: string; quiz: object; makerspaceID: number, expires: boolean  },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user: any) => {
@@ -340,6 +340,7 @@ const TrainingModuleResolvers = {
           args.quiz,
           args.makerspaceID,
           true, // default to archived to avoid pollution
+          args.expires
         );
 
         await createUnassocaitedAuditLog(
@@ -363,7 +364,7 @@ const TrainingModuleResolvers = {
      */
     updateModule: async (
       _parent: any,
-      args: { id: string; name: string; quiz: object; reservationPrompt?: object; makerspaceID: number },
+      args: { id: string; name: string; quiz: object; reservationPrompt?: object; makerspaceID: number, expires: boolean },
       { isStaff }: ApolloContext
     ) =>
       isStaff(async (user: any) => {
@@ -373,6 +374,7 @@ const TrainingModuleResolvers = {
           args.quiz,
           args.reservationPrompt ?? { "promptText": "Make reservation", "enabled": false },
           args.makerspaceID,
+          args.expires
         );
 
         await createUnassocaitedAuditLog(

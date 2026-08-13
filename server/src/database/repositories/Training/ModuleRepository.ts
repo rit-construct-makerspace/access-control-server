@@ -104,7 +104,7 @@ export async function setModuleArchived(id: number, archived: boolean): Promise<
  * @param quiz {TrainingModuleItem} the attached quiz
  * @returns the added module
  */
-export async function addModule(name: string, quiz: object, makerspaceID: number | null, archived: boolean = true): Promise<TrainingModuleRow> {
+export async function addModule(name: string, quiz: object, makerspaceID: number | null, archived: boolean = true, expires: boolean ): Promise<TrainingModuleRow> {
 
 
   const addedModule: TrainingModuleRow[] = await knex("TrainingModule")
@@ -114,6 +114,7 @@ export async function addModule(name: string, quiz: object, makerspaceID: number
         quiz: JSON.stringify(quiz) as unknown as TrainingModuleItem[], //quiz has same format as TrainingModuleItem, (updateModule does  as unknown as TrainingModuleItem[] behind the scene somewhere but I cannot find how to do that)
         makerspaceID: makerspaceID,
         archived: archived,
+        expires: expires
       }, "*");
 
   if (addedModule.length < 1) throw new EntityNotFound(`Could not add module ${name}`);
@@ -134,11 +135,12 @@ export async function updateModule(
   quiz: object,
   reservationPrompt: object,
   makerspaceID: number,
+  expires: boolean
 ): Promise<TrainingModuleRow> {
   await knex("TrainingModule")
     .where({ id })
     // @ts-ignore
-    .update({ name, quiz: JSON.stringify(quiz), reservationPrompt: JSON.stringify(reservationPrompt), makerspaceID: makerspaceID });
+    .update({ name, quiz: JSON.stringify(quiz), reservationPrompt: JSON.stringify(reservationPrompt), makerspaceID: makerspaceID, expires: expires });
   return getModuleByID(id);
 }
 

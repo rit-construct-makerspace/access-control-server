@@ -49,8 +49,8 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
   const equipmentReqsComplete: number = equipmentStatuses.filter((module) => module.status === "Passed" || module.status === "Expiring Soon").length + ((props.requiresInPerson && hasApprovedAccessCheck) ? 1 : 0);
 
   const byExpiry = [...makerspaceStatuses, ...roomStatuses, ...equipmentStatuses]
-    .filter((module) => module.status === "Expiring Soon" || module.status === "Passed")
-    .sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
+    .filter((module) =>(module.status === "Expiring Soon" || module.status === "Passed") && module.expirationDate != undefined)
+    .sort((a, b) => new Date(a.expirationDate ?? 0).getTime() - new Date(b.expirationDate ?? 0).getTime());
 
   const totalRequirements = makerspaceStatuses.length + roomStatuses.length + equipmentStatuses.length + (props.requiresInPerson ? 1 : 0);
   const totalReqsComplete = makerspaceReqsComplete + roomReqsComplete + equipmentReqsComplete;
@@ -236,7 +236,7 @@ export default function EquipmentTrainingModal(props: EquipmentTrainingModalProp
                 {
                   (totalRequirements === totalReqsComplete && byExpiry.length > 0)
                     ? <Typography variant="subtitle2">
-                      All Set Until: {byExpiry[0].expirationDate}
+                      {`All Set Until: ${byExpiry[0].expirationDate}`}
                     </Typography>
                     : null
                 }

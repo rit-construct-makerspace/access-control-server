@@ -29,6 +29,7 @@ export default function EditActiveModulePage() {
         name: updatedModule.name,
         quiz: updatedModule.quiz,
         makerspaceID: updatedModule.makerspaceID,
+        expires: updatedModule.expires
       },
       refetchQueries: [
         { query: GET_MODULE_WITH_ANSWERS, variables: { id } },
