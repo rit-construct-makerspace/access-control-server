@@ -33,7 +33,6 @@ export function Dashboard() {
     if (finishedTraining && loggedIn){
       return undefined
     }
-    console.log("user", currentUser)
     function buttonAction(){
       if (!loggedIn){
         window.location.replace(import.meta.env.VITE_LOGIN_URL + "?redir=" + import.meta.env.VITE_ORIGIN + window.location.pathname)
