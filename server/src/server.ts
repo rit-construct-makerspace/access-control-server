@@ -594,10 +594,6 @@ async function startServer() {
     createUnassocaitedAuditLog(`Trainings: Sent ${numNotified} expiry notices, and purged ${numPurged} expired trainings.`, "server")
 
   }
-  let expiryNotices = await getExpiringPassedTrainingsDaysAgo(365);
-  console.log("expirey notes", expiryNotices);
-  const numPurged = await purgeExpiredPassedModules();
-
   /**
    Cron Format:
     *    *    *    *    *    *
