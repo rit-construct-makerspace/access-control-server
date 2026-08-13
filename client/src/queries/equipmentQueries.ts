@@ -11,6 +11,7 @@ export const GET_EQUIPMENTS = gql`
       trainingModules {
         id
         name
+        expires
       }
       numAvailable
       numInUse
@@ -55,6 +56,7 @@ export const GET_EQUIPMENT_BY_ID = gql`
         id
         name
         archived
+        expires
       }
       notes
       numAvailable
@@ -85,6 +87,7 @@ export const GET_ANY_EQUIPMENT_BY_ID = gql`
       trainingModules {
         id
         name
+        expires
       }
       notes
       numAvailable
@@ -111,6 +114,7 @@ export const GET_CORRESPONDING_MACHINE_BY_READER_ID = gql`
       trainingModules {
         id
         name
+        expires
       }
       notes
       numAvailable
@@ -154,6 +158,7 @@ export const GET_ARCHIVED_EQUIPMENT_BY_ID = gql`
       trainingModules {
         id
         name
+        expires
       }
       notes
       byReservationOnly
@@ -261,6 +266,7 @@ export const GET_EQUIPMENT_TRAININGS_BY_ID = gql`
       trainingModules {
         id
         name
+        expires
       }
       room {
         id
@@ -268,6 +274,7 @@ export const GET_EQUIPMENT_TRAININGS_BY_ID = gql`
         trainingModules {
           id
           name
+          expires
         }
         makerspace {
           id
@@ -275,6 +282,7 @@ export const GET_EQUIPMENT_TRAININGS_BY_ID = gql`
           trainingModules {
             id
             name
+            expires
           }
         }
       }

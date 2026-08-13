@@ -93,6 +93,7 @@ export const GET_FULL_MAKERSPACES = gql`
           trainingModules {
             id
             name
+            expires
           }
           numAvailable
           numInUse
@@ -207,6 +208,7 @@ export const GET_MAKERSPACE_BY_ID = gql`
           trainingModules {
             id
             name
+            expires
           }
           numAvailable
           numInUse
@@ -222,11 +224,13 @@ export const GET_MAKERSPACE_BY_ID = gql`
         trainingModules {
           id
           name
+          expires
         }
       }
       trainingModules {
         id
         name
+        expires
       }
     }
   }

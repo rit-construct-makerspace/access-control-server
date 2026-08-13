@@ -28,6 +28,7 @@ export const GET_ACCESS_CHECKS_BY_USERID: TypedDocumentNode<AccessCheck, { userI
                 archived
                 quiz
                 isLocked
+                expires
             }
         }
     }
