@@ -54,9 +54,9 @@
     "knex": "^3.1.0",
     "mailgun.js": "^12.0.3",
     "morgan": "^1.10.0",
-    "mqtt": "^5.15.1",
+    "mqtt": "^5.15.2",
     "node-schedule": "^2.1.1",
-    "npm": "^11.12.1",
+    "npm": "^12.0.2",
     "passport": "~0.6.0",
     "passport-local": "^1.0.0",
     "pg": "^8.7.1",
@@ -85,7 +85,7 @@
     "@types/express-xml-bodyparser": "^0.3.5",
     "@types/got": "^9.6.12",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.1.0",
+    "@types/node": "^24.13.3",
     "@types/node-schedule": "^2.1.7",
     "@types/passport": "^1.0.11",
     "@types/passport-local": "^1.0.35",
@@ -96,13 +96,17 @@
     "@types/uuid": "^8.3.4",
     "cross-env": "^7.0.3",
     "eslint": "^9.35.0",
-    "node": "^22.6.0",
+    "node": "^24.19.0",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
     "typescript-eslint": "^8.44.0"
   },
   "engines": {
-    "node": ">=20.x"
+    "node": ">=24.x"
   },
-  "allowScripts": {}
+  "allowScripts": {
+    "@apollo/protobufjs@1.2.8": true,
+    "esbuild@0.28.2": true,
+    "node@24.19.0": true
+  }
 }
