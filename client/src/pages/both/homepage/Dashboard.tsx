@@ -44,7 +44,7 @@ export function Dashboard() {
     const buttonText = !loggedIn ? "New Maker? Click to create an account." : "Click here to learn how to access equipment"
     return <Stack justifyContent={"center"} alignItems={"center"} spacing={"10px"} paddingY={"1em"} margin={"10px"}>
       <Typography variant="h2" fontWeight={"bold"} display={"inline"}>
-          Welcome to the <span>SHED Makerspace</span>
+          Welcome to the SHED Makerspace
       </Typography>
       <Button variant="contained" sx={{borderRadius: "2.5em", paddingX: "2em", textTransform: 'none'}} onClick={buttonAction}>
         <Typography fontSize={"2.5em"}  fontWeight={"bold"} display={"inline"}>
