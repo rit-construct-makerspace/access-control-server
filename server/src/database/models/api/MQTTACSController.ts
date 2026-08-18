@@ -178,7 +178,6 @@ export default class MQTTACSController extends ACSController {
 
       const infoRequest: CoreInfoRequest = JSON.parse(payload.toString());
       // TODO: INPUT VALIDATION
-      console.log("info request")
       ACSOrchestrator.handleCoreInfoRequest(device.id, infoRequest);
     } catch (e) {
       console.error(`[MQTTACSController] handleCoreInfoRequest error: ${e}`);
@@ -225,7 +224,6 @@ export default class MQTTACSController extends ACSController {
   }
 
   sendCoreInfoResponse(core: Core, response: ServerInfoResponse): boolean {
-    console.log("sending info", response)
     try {
       MQTTACSController.client.publish(`makerspace/device/${core.SN}/info/response`, JSON.stringify(response), { qos: 2 });
     } catch (_e) {
