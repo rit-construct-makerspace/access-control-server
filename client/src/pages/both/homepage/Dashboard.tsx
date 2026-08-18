@@ -40,12 +40,13 @@ export function Dashboard() {
         navigate(`/maker/training/${import.meta.env.VITE_STARTING_MODULE_ID}`)
       }
     }
+    const buttonColor = loggedIn ? "primary" :  "secondary"
     const buttonText = !loggedIn ? "New Maker? Click to create an account." : "Click here to learn how to access equipment"
     return <Stack justifyContent={"center"} alignItems={"center"} spacing={"10px"} paddingY={"1em"} margin={"10px"}>
       <Typography variant="h2" fontWeight={"bold"} display={"inline"} textAlign={"center"}>
           Welcome to the SHED Makerspace
       </Typography>
-      <Button variant="contained" sx={{borderRadius: "2.5em", paddingX: "2em", textTransform: 'none'}} onClick={buttonAction}>
+      <Button variant="contained" sx={{borderRadius: "2.5em", paddingX: "2em", textTransform: 'none'}} onClick={buttonAction} color={buttonColor}>
         <Typography fontSize={"2.5em"}  fontWeight={"bold"} display={"inline"}>
             {buttonText}
         </Typography>
