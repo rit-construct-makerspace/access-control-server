@@ -46,8 +46,8 @@ export class ACSOrchestrator {
         }
         
 
-        if (inst.hobbsTime > channel.hobbsTime) {
-          console.warn("hobbs tme fiasco", inst, channel)
+        if (inst.hobbsTime > channel.hobbsTime && channel.state != undefined) {
+          console.warn("hobbs time fiasco", inst, channel)
           // warning: the device is wrong about how long
           DeviceLogRepo.createDeviceLog(deviceID, DeviceLogSeverity.MEDIUM, { msg: "hobbs-time-mismatch", reported: channel.hobbsTime, stored: inst.hobbsTime })
           shouldUpdateTimes = true
