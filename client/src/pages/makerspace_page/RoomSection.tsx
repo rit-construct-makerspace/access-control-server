@@ -10,6 +10,7 @@ interface RoomSectionProps {
   equipmentSearch: string;
   isMobile: boolean;
   staffMode: boolean;
+  trainerForIds: number[];
   showHidden: boolean;
   makerspaceTrainings: {
     id: number;
@@ -41,7 +42,7 @@ export default function RoomSection(props: RoomSectionProps) {
               <EquipmentCard
                 equipment={equipment}
                 isMobile={props.isMobile}
-                staffMode={props.staffMode}
+                staffMode={props.staffMode || props.trainerForIds.includes(Number(equipment.id))}
                 makerspaceTrainings={props.makerspaceTrainings}
                 roomTrainings={{
                   id: props.room.id,
@@ -59,7 +60,7 @@ export default function RoomSection(props: RoomSectionProps) {
                 <EquipmentCard
                   equipment={equipment}
                   isMobile={props.isMobile}
-                  staffMode={props.staffMode}
+                  staffMode={props.staffMode || props.trainerForIds.includes(Number(equipment.id))}
                   makerspaceTrainings={props.makerspaceTrainings}
                   roomTrainings={{
                     id: props.room.id,

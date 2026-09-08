@@ -81,12 +81,6 @@ export enum CoreActions {
   IDENTIFY = "IDENTIFY"
 }
 
-export const SET_CORE_STATE = gql`
-  mutation SetCoreState($deviceID: Int!, $targetState: CoreStateInput) {
-    setCoreState(deviceID: $deviceID, targetState: $targetState)
-  }
-`;
-
 export const COMMAND_CONTROLLER_STATE = gql`
   mutation CommandControllerState($accessControllerID: Int!, $targetState: CoreStateInput!) {
     commandAccessControllerState(accessControllerID: $accessControllerID, targetState: $targetState)

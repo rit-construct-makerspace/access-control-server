@@ -159,34 +159,13 @@ const DeviceResolver = {
   },
 
   Mutation: {
-    // This should not be used, setting state should be done on the access controller level
-    setCoreState: async (
-      _parent: any,
-      args: {
-        deviceID: number,
-        targetState: AccessControllerState
-      },
-      { isStaff }: ApolloContext
-    ) => isStaff(async (user) => {
-      const core = await CoreRepo.getCoreByDeviceID(args.deviceID);
-      if (core === undefined) { return false; }
-      await AuditLogRepo.createAuditLog(
-        `{user} commanded {device} to ${args.targetState}`,
-        "admin",
-        core.makerspaceID,
-        { id: user.id, label: `${user.firstName} ${user.lastName}` },
-        { id: args.deviceID, label: core.name }
-      );
-      return await core.setState(user, args.targetState);
-    }),
-
     commandAccessControllerState: async (
       _parent: any,
       args: {
         accessControllerID: number,
         targetState: AccessControllerState
       },
-      { isStaffFor }: ApolloContext
+      { isTrainerFor }: ApolloContext
     ) => {
       const controller = await ACRepo.getAccessControllerByID(args.accessControllerID);
       if (controller === undefined) { throw new EntityNotFound(`Access Controller ${args.accessControllerID} not found`); }
@@ -197,7 +176,7 @@ const DeviceResolver = {
       const instance = await InstanceRepo.getInstanceByAccessControllerID(controller.id);
       const equipment = await EquipmentRepo.getEquipmentByID(instance?.equipmentID ?? -1);
 
-      return await isStaffFor(core.makerspaceID, async (user) => {
+      return await isTrainerFor(equipment.id, async (user) => {
         const result = await controller.canControl(user.id, args.targetState);
         if (result.canControl) {
           ACSOrchestrator.handleSendCoreCommand(core.deviceID, {

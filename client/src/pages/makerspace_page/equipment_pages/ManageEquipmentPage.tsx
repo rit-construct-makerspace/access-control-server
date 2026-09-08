@@ -11,7 +11,7 @@ import { useRef, useState } from "react";
 import AddIcon from '@mui/icons-material/Add';
 import { CREATE_EQUIPMENT_INSTANCE } from "../../../queries/equipmentInstanceQueries";
 import HistoryIcon from '@mui/icons-material/History';
-import { isManagerFor } from "../../../common/PrivilegeUtils";
+import { isManagerFor, isStaffFor, isTrainerFor } from "../../../common/PrivilegeUtils";
 import { useCurrentUser } from "../../../common/CurrentUserProvider";
 import HandymanIcon from '@mui/icons-material/Handyman';
 import MaintenanceTicketGrid from "../maintenance_pages/MaintenanceTicketGrid";
@@ -20,6 +20,7 @@ import NewTicketModal from "../maintenance_pages/NewTicketModal";
 import { useMakeTheme } from "../../../common/MakeThemeProvider";
 import QrCodeIcon from '@mui/icons-material/QrCode';
 import { QRCode } from "react-qr-code";
+import NoPrivilegePage from "../../NoPrivilegePage";
 
 export interface Equipment {
   id: number;
@@ -63,6 +64,8 @@ export default function ManageEquipmentPage() {
   const navigate = useNavigate();
   const user = useCurrentUser();
   const makeTheme = useMakeTheme();
+
+  const canBeHere = isStaffFor(user, Number(makerspaceID)) || ((equipmentID!= null && makerspaceID != null) ? isTrainerFor(user, Number(equipmentID), Number(makerspaceID)) : false)
 
   const qrRef = useRef(null);
 
@@ -132,7 +135,7 @@ export default function ManageEquipmentPage() {
     await createInstance({ variables: { equipmentID: equipmentID, name: newInstanceName } })
   }
 
-  return (
+  return !canBeHere ? <NoPrivilegePage /> : (
     <RequestWrapper2 result={getEquipmentByIDResult} render={(data) => {
 
       const equipment: Equipment = data.equipment;
