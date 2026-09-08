@@ -91,6 +91,7 @@ export default function MakerspacePage() {
               equipmentSearch={equipmentSearch}
               isMobile={isMobile}
               staffMode={staffMode}
+              trainerForIds={user.trainer}
               showHidden={showHidden}
               makerspaceTrainings={{
                 id: fullSpace.id,

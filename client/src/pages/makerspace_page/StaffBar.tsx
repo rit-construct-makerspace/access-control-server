@@ -16,25 +16,25 @@ import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useCurrentUser } from "../../common/CurrentUserProvider";
 import { useIsMobile } from "../../common/IsMobileProvider";
-import { isOnlyTrainer, isStaffFor, isManagerFor } from "../../common/PrivilegeUtils";
+import { isOnlyTrainer, isStaffFor, isManagerFor, isTrainerAnywhere } from "../../common/PrivilegeUtils";
 import NavLink from "../../top_nav/NavLink";
 
 export default function StaffBar() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
-
   const user = useCurrentUser();
   const isMobile = useIsMobile();
-  const isPriviledged = isStaffFor(user, Number(makerspaceID));
-  const isTrainer = isOnlyTrainer(user);
+  const isTrainer_ = isTrainerAnywhere(user);
+  const isStaffHere = isStaffFor(user, Number(makerspaceID)) ;
   const isManager = isManagerFor(user, Number(makerspaceID));
+  console.log("staff bar", isTrainer_, isManager)
 
   const [mobileMenu, setMobileMenu] = useState(false);
 
-  if (!isPriviledged && !isTrainer) {
+  if (!isStaffHere && !isTrainer_) {
     return null;
   }
 
-  const staffNavigation = isTrainer
+  const staffNavigation = isTrainer_ && ! isStaffHere
     ? (
       <Stack
         direction={isMobile ? "column" : "row"}
@@ -163,7 +163,7 @@ export default function StaffBar() {
             ? staffNavigation
             : <ButtonBase onClick={() => setMobileMenu(true)} sx={{ width: "100%", padding: "10px 0px" }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center" width="100%">
-                <Typography variant="body1" color="grey">{isTrainer ? "Trainer Actions" : "Staff Actions"}</Typography>
+                <Typography variant="body1" color="grey">{isTrainer_ ? "Trainer Actions" : "Staff Actions"}</Typography>
                 <MenuIcon />
               </Stack>
             </ButtonBase>

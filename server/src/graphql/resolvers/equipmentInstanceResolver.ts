@@ -40,16 +40,16 @@ const EquipmentInstanceResolver = {
     equipmentInstances: async (
       _parent: any,
       args: { equipmentID: number },
-      { isStaff }: ApolloContext) =>
-      isStaff(async () => {
+      { isTrainerFor }: ApolloContext) =>
+        isTrainerFor(args.equipmentID, async () => {
         return await getInstancesByEquipment(args.equipmentID)
       }),
 
     getInstanceByID: async (
       _parent: any,
       args: { id: number },
-      { isStaff }: ApolloContext) =>
-      isStaff(async () => {
+      { isTrainerFor }: ApolloContext) =>
+        isTrainerFor(args.equipmentID, async () => {
         return await getInstanceByID(args.id)
       }),
 

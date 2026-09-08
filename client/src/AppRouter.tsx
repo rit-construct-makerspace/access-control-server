@@ -1,6 +1,6 @@
 import { Outlet, useParams } from "react-router-dom";
 import { CurrentUserProvider, useCurrentUser } from "./common/CurrentUserProvider";
-import { isAdmin, isManagerFor, isOnlyTrainer, isStaffFor } from "./common/PrivilegeUtils";
+import { isAdmin, isManagerFor, isOnlyTrainer, isStaffFor, isTrainerAnywhere } from "./common/PrivilegeUtils";
 import NoPrivilegePage from "./pages/NoPrivilegePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import { Dashboard } from "./pages/both/homepage/Dashboard";
@@ -74,9 +74,11 @@ function AuthedRoute() {
 function TrainerRoute() {
   const { makerspaceID } = useParams<{ makerspaceID: string }>();
   const user = useCurrentUser();
-  if (isOnlyTrainer(user) || isStaffFor(user, Number(makerspaceID))) {
+  if (isTrainerAnywhere(user) || isStaffFor(user, Number(makerspaceID))) {
+    console.log("is trainer")
     return <Outlet />;
   } else {
+    console.log("isnt trainer", user)
     return <NoPrivilegePage />;
   }
 }
@@ -158,6 +160,7 @@ export const routes = [
                     children: [
                       { path: "/makerspace/:makerspaceID/people", element: <UsersPage /> },
                       { path: "/makerspace/:makerspaceID/people/:userID", element: <UserPage /> },
+                      { path: "/makerspace/:makerspaceID/equipment/:equipmentID", element: <ManageEquipmentPage /> },
 
                       /* Routes for staff + higher */
                       {
@@ -168,7 +171,6 @@ export const routes = [
                           { path: "/makerspace/:makerspaceID/training/:id", element: <EditActiveModulePage /> },
 
                           { path: "/makerspace/:makerspaceID/equipment/new", element: <NewEquipmentPage /> },
-                          { path: "/makerspace/:makerspaceID/equipment/:equipmentID", element: <ManageEquipmentPage /> },
 
                           { path: "/makerspace/:makerspaceID/inventory", element: <InventoryPage /> },
                           { path: "/makerspace/:makerspaceID/inventory/quick/item/:invID", element: <QuickEditInventoryPage fromTag={false} /> },
