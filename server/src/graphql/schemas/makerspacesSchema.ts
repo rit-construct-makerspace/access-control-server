@@ -26,6 +26,7 @@ export const MakerspacesTypeDefs = gql`
     hours: [MakerspaceHours]
     items: [InventoryItem]
     imageUrl: String
+    mapSvgUrl: String
     trainingModules: [TrainingModule]
     devices: [Device]
     genericDevices: [Device]

@@ -154,6 +154,7 @@ async function startServer() {
     // Production, serve built files
     app.use("/app/", express.static(path.join(__dirname, '../../client/build'), { index: false }));
   }
+  app.use("/sameorigin/", express.static(path.join(__dirname, '../../art'), { index: false }));
 
   app.use(async (req, res, next) => {
 

@@ -28,6 +28,9 @@ const EquipmentResolvers = {
     trainingModules: async (parent: EquipmentRow) => {
       return await EquipmentRepo.getModulesByEquipment(parent.id);
     },
+    instances: async (parent: EquipmentRow) => {
+      return await EquipmentInstanceRepo.getInstancesByEquipment(parent.id)
+    },
 
     //Set numAvailable to number of ACS Readers that are Idle and responding
     numAvailable: async (parent: EquipmentRow) => {

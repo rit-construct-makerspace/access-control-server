@@ -378,6 +378,8 @@ export interface MakerspaceRow {
   imageUrl: string;
   /** If true, this makerspace is out of use and can't be visited. It is effecively deleted  */
   archived: boolean;
+  /** Link to SVG with equipment instance objects to highlight */
+  mapSvgUrl: string | null;
 }
 
 export interface EquipmentSessionRow {

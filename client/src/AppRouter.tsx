@@ -51,6 +51,7 @@ import ThemeManagementPage from "./pages/site-settings/ThemeManagementPage";
 import NewThemePage from "./pages/site-settings/NewThemePage";
 import ManageThemePage from "./pages/site-settings/ManageThemePage";
 import EquipmentUserInfo from "./pages/makerspace_page/equipment_pages/EquipmentUserInfo";
+import MapDisplay from "./pages/signage/MapDisplay";
 
 function AppRoot() {
   return (
@@ -123,6 +124,7 @@ export const routes = [
         children: [
           { path: "/display/announcements", element: <AnnouncementsDisplay /> },
           { path: "/display/hours/:makerspaceID", element: <HoursDisplay /> },
+          { path: "/display/map/:makerspaceID", element: <MapDisplay /> },
           { path: "/display/events", element: <EventsDisplay /> },
         ],
       },

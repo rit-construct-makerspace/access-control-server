@@ -44,6 +44,28 @@ export interface MakerspaceWithItems {
   items: InventoryItem[];
 }
 
+export interface MakerspaceInstanceStates {
+  id: number;
+  name: number;
+  mapSvgUrl: string;
+  rooms: {
+    id: number;
+    name: string
+    equipment: {
+      id: number
+      name: string
+      instances: {
+        id: number
+        name: string
+        accessController: {
+          channelID: number;
+          state: string;
+        }
+      }[]
+    }[];
+  }[];
+}
+
 export const GET_MAKERSPACES_WITH_HOURS = gql`
  query GetMakerspacesWithHours {
   makerspaces {
@@ -196,6 +218,7 @@ export const GET_MAKERSPACE_BY_ID = gql`
         closed
       }
       imageUrl
+      mapSvgUrl
       rooms {
         id
         name
@@ -236,6 +259,36 @@ export const GET_MAKERSPACE_BY_ID = gql`
   }
 `;
 
+
+
+
+
+export const GET_MAKERSPACE_INSTANCE_STATES = gql`
+query GetInstanceStatesByMakerspace($id: ID!) {
+  makerspaceByID(id: $id) {
+    name
+    mapSvgUrl
+      rooms {
+        equipment {
+          id
+          name
+          instances {
+            id
+            name
+            status
+            accessController {
+              channelID
+              state
+            }
+          }
+        }
+      }
+  }
+}`;
+
+
+
+
 export const UPDATE_MAKERSPACE = gql`
   mutation UpdateMakerspace(
     $id: ID!
@@ -245,10 +298,11 @@ export const UPDATE_MAKERSPACE = gql`
     $description: String
     $docsLink: String
     $imageUrl: String
+    $mapSvgUrl: String
   ) {
     updateMakerspace(
       id: $id
-      newMakerspace: { name: $name, subtitle: $subtitle, location: $location, description: $description, docsLink: $docsLink, imageUrl: $imageUrl }
+      newMakerspace: { name: $name, subtitle: $subtitle, location: $location, description: $description, docsLink: $docsLink, imageUrl: $imageUrl, mapSvgUrl: $mapSvgUrl }
     ) {
       id
     }

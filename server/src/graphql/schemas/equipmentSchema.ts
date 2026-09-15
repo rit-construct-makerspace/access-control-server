@@ -42,6 +42,7 @@ export const EquipmentTypeDefs = gql`
     schedulable: Boolean
     subName: String!
     signOffUrl: String!
+    instances: [EquipmentInstance!]!
   }
 
   input EquipmentInput {
