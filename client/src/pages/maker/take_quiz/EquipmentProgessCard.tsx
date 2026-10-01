@@ -23,8 +23,6 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
     return (<></>);
   }
 
-  const modulesToHideInPersonFor: number[] = (import.meta.env.VITE_MODULE_IDS_WITHOUT_INPERSON ?? "").split(",").map(s => Number(s));
-  const shouldHideCompetency = modulesToHideInPersonFor.includes(Number(props.moduleID));
 
   return (
     <Card sx={{ width: (isMobile ? "90vw" : 0.85) }}>
@@ -47,7 +45,7 @@ export default function EquipmentProgressCard(props: { moduleID: number }) {
                     <MinimalTrainingModuleRow module={module} passed={false} />
                   ))}
                 </Stack>
-                { (!shouldHideCompetency) &&
+                { (accessProgress.accessCheckRequired) &&
                   <Card sx={{ mt: 5, border: (!accessProgress.accessCheckDone && accessProgress.availableModules.length === 0) ? "2px solid blue" : "inherit" }}>
                     <Stack direction={"row"} spacing={1} width={"75%"} p={2}>
                       {accessProgress.accessCheckDone
