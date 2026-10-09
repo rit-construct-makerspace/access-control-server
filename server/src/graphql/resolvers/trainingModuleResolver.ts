@@ -16,6 +16,7 @@ import { createTrainingHold, getTrainingHoldByUserForModule } from "../../databa
 import * as PassedModuleRepo from "../../database/repositories/Training/PassedRepository.js";
 import * as TrainingModuleReo from "../../database/repositories/Training/ModuleRepository.js";
 import { GraphQLError } from "graphql";
+import { getEquipmentByID } from "../../database/repositories/Equipment/EquipmentRepository.js";
 
 /**
  * IDs of quizzes that will grant access to 3DPrinterOS Workgroups
@@ -313,7 +314,8 @@ const TrainingModuleResolvers = {
             }
           }
           const accessCheckDone = await hasApprovedAccessCheck(user.id, relatedEquipments[i].id);
-          accessProgresses.push({ equipment: relatedEquipments[i], passedModules, availableModules, accessCheckDone: accessCheckDone ?? false });
+          const eq = await getEquipmentByID(relatedEquipments[i].id);
+          accessProgresses.push({ equipment: relatedEquipments[i], passedModules, availableModules, accessCheckDone: accessCheckDone ?? false, accessCheckRequired: eq?.requiresInPerson ?? false });
         }
 
         return accessProgresses;

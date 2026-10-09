@@ -19,5 +19,6 @@ export interface AccessProgress {
         id: number;
         name: string;
     }[];
+    accessCheckRequired: boolean;
     accessCheckDone: boolean;
 }

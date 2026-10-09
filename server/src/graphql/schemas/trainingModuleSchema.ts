@@ -17,6 +17,7 @@ export interface AccessProgress {
   passedModules: TrainingModuleRow[];
   availableModules: TrainingModuleRow[];
   accessCheckDone: boolean;
+  accessCheckRequired: boolean;
 }
 
 export interface AnswerInput {
