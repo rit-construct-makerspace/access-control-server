@@ -11,7 +11,6 @@ interface ImportMetaEnv {
     readonly VITE_DISABLE_STOREFRONT_CART: string;
     readonly VITE_ORIGIN: string;
     readonly VITE_EQUIPMENT_IDS_WITHOUT_INPERSON: string;
-    readonly VITE_MODULE_IDS_WITHOUT_INPERSON: string;
     readonly VITE_STARTING_MODULE_ID: string
     readonly VITE_HELP_PAGE_URL: string;
 }
